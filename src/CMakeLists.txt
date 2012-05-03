@@ -75,6 +75,23 @@ FIND_PACKAGE( OpenGL REQUIRED )
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------
+# NiftiLib, at least 2.0.0
+# See  http://niftilib.sourceforge.net
+FIND_PACKAGE( niftilib REQUIRED QUIET )
+IF( NIFTILIB_FOUND )
+   #MESSAGE( STATUS "Using system installed nifitlib." )
+   INCLUDE_DIRECTORIES( ${NIFTILIB_INCLUDE_DIR} )
+ENDIF()
+
+FIND_PACKAGE( ZLIB REQUIRED )
+# this now works on win if we specify the zlib directory
+IF( ZLIB_FOUND )
+    ADD_DEFINITIONS( -DHAVE_ZLIB )
+    INCLUDE_DIRECTORIES( ${OPENSCENEGRAPH_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIR} )
+ENDIF( ZLIB_FOUND )
+
+
 INCLUDE( Utils )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,4 +122,4 @@ ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${fnav_HEADERS_
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
     SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 ENDIF()
-TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${Boost_LIBRARIES}  )
+TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${Boost_LIBRARIES} ${NIFTILIB_LIBRARY} )
