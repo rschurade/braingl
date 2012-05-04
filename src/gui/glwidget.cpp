@@ -28,14 +28,6 @@ QSize GLWidget::sizeHint() const
     return QSize( 400, 400 );
 }
 
-static void qNormalizeAngle( int &angle )
-{
-    while ( angle < 0 )
-        angle += 360 * 16;
-    while ( angle > 360 * 16 )
-        angle -= 360 * 16;
-}
-
 void GLWidget::initializeGL()
 {
     qglClearColor( QColor::fromCmykF(0.39, 0.39, 0.0, 0.0) );

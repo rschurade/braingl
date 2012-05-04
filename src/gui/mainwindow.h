@@ -7,6 +7,7 @@ class QAction;
 class QListWidget;
 class QMenu;
 
+class DataStore;
 class GLWidget;
 
 class MainWindow: public QMainWindow
@@ -49,6 +50,8 @@ private:
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
+
+    DataStore* m_dataStore;
 };
 
 #endif
