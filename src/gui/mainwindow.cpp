@@ -1,5 +1,8 @@
 #include <QtGui/QtGui>
 
+#include "../data/datastore.h"
+#include "../data/loader.h"
+
 #include "glwidget.h"
 
 #include "mainwindow.h"
@@ -8,6 +11,8 @@ MainWindow::MainWindow()
 {
     mainGLWidget = new GLWidget;
     setCentralWidget( mainGLWidget );
+
+    m_dataStore = new DataStore();
 
     createActions();
     createMenus();
@@ -26,7 +31,12 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    //#include <nifti1_io.h>
+    QString fileName = QFileDialog::getOpenFileName( this );
+    if ( !fileName.isEmpty() )
+    {
+        Loader loader( fileName );
+        loader.load();
+    }
 }
 
 void MainWindow::save()
