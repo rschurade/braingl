@@ -10,7 +10,7 @@
 
 #include <QtCore/QString>
 
-#include <nifti1_io.h>
+#include "nifti/nifti1_io.h"
 
 #include "dataset.h"
 

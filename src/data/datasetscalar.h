@@ -8,7 +8,7 @@
 #ifndef DATASETSCALAR_H_
 #define DATASETSCALAR_H_
 
-#include "dataset.h";
+#include "dataset.h"
 
 class DatasetScalar : public Dataset
 {
