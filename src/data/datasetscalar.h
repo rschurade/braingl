@@ -8,6 +8,7 @@
 #ifndef DATASETSCALAR_H_
 #define DATASETSCALAR_H_
 
+#include <string>
 #include <vector>
 
 #include "nifti/nifti1_io.h"
@@ -17,7 +18,7 @@
 class DatasetScalar : public Dataset
 {
 public:
-    DatasetScalar( std::vector<float> data );
+    DatasetScalar( std::string filename, std::vector<float> data );
     virtual ~DatasetScalar();
 
     void parseNiftiHeader( nifti_image* header );

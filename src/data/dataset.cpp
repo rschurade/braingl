@@ -7,7 +7,8 @@
 
 #include "dataset.h"
 
-Dataset::Dataset()
+Dataset::Dataset( std::string filename ) :
+	m_filename( filename )
 {
     // TODO Auto-generated constructor stub
 
@@ -18,3 +19,7 @@ Dataset::~Dataset()
     // TODO Auto-generated destructor stub
 }
 
+std::string Dataset::getFilename()
+{
+	return m_filename;
+}

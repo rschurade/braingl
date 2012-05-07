@@ -7,8 +7,8 @@
 
 #include "datasetscalar.h"
 
-DatasetScalar::DatasetScalar( std::vector<float> data ) :
-    Dataset(),
+DatasetScalar::DatasetScalar( std::string filename, std::vector<float> data ) :
+    Dataset( filename ),
     m_data ( data )
 {
 }

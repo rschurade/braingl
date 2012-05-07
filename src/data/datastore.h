@@ -18,6 +18,8 @@ public:
     DataStore();
     virtual ~DataStore();
 
+    bool load( QString fileName );
+
     void addDataset( Dataset* dataset );
 
 private:

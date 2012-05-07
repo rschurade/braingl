@@ -1,7 +1,6 @@
 #include <QtGui/QtGui>
 
 #include "../data/datastore.h"
-#include "../data/loader.h"
 
 #include "glwidget.h"
 
@@ -34,8 +33,7 @@ void MainWindow::open()
     QString fileName = QFileDialog::getOpenFileName( this );
     if ( !fileName.isEmpty() )
     {
-        Loader loader( fileName );
-        loader.load();
+    	m_dataStore->load( fileName );
     }
 }
 
