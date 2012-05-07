@@ -14,8 +14,10 @@ SET( FN_TOOLS_DIR ${PROJECT_SOURCE_DIR}/../tools )
 # append search path for FindModules:
 LIST( APPEND CMAKE_MODULE_PATH ${FN_TOOLS_DIR}/cmake )
 
-set(CMAKE_AUTOMOC TRUE)
-#set ( CMAKE_VERBOSE_MAKEFILE ON )
+OPTION( FN_VERBOSE_MAKEFILE "More output on compilation" OFF )
+IF ( FN_VERBOSE_MAKEFILE MATCHES ON )
+    set ( CMAKE_VERBOSE_MAKEFILE ON )
+ENDIF()
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Some common setup
@@ -103,23 +105,28 @@ INCLUDE( Utils )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
+SET ( CMAKE_AUTOMOC TRUE )
+SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/data/nifti/nifti1_io.cpp PROPERTIES COMPILE_FLAGS -Wno-write-strings)
 
 # Collect the compile-files for this target
 COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
 
-# Qt4 Requires all classes with a QWidget stuff inside to be put into the MOC mechanism. We utilize the automoc mechanism here.
 SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
-QT4_AUTOMOC( ${TARGET_CPP_FILES} )
+
+IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
+    QT4_AUTOMOC( ${TARGET_CPP_FILES} )
+ENDIF()
+
 # This is needed since the mocs will be generated there
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 
 QT4_ADD_RESOURCES(QtIcon_RCC_SRCS ${QtIcon_RCCS})
 
-#QT4_WRAP_CPP(fnav_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
+IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
+    QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
+ENDIF()
 
-set_source_files_properties( ${CMAKE_CURRENT_SOURCE_DIR}/data/nifti/nifti1_io.cpp PROPERTIES COMPILE_FLAGS -Wno-write-strings)
-
-ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${fnav_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
