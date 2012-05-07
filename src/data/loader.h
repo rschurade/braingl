@@ -8,6 +8,8 @@
 #ifndef LOADER_H_
 #define LOADER_H_
 
+#include <vector>
+
 #include <QtCore/QString>
 
 #include "nifti/nifti1_io.h"
@@ -17,19 +19,26 @@
 class Loader
 {
 public:
-    Loader( QString filename );
+    Loader( QString fileName );
     virtual ~Loader();
 
-    Dataset* load();
+    bool load();
 
+    Dataset* getDataset();
+
+    bool succes();
 private:
     FN_DATASET_TYPE determineType();
 
     std::vector<float> loadNifti();
 
     nifti_image* m_header;
-    QString m_filename;
+    QString m_fileName;
     FN_DATASET_TYPE m_datasetType;
+
+    Dataset* m_dataset;
+
+    bool m_success;
 
 };
 

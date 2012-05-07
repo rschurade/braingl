@@ -8,6 +8,8 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
+#include <string>
+
 enum FN_DATASET_TYPE
 {
     FNDT_UNKNOWN,
@@ -19,8 +21,12 @@ enum FN_DATASET_TYPE
 class Dataset
 {
 public:
-    Dataset();
+    Dataset( std::string filename );
     virtual ~Dataset();
+
+    std::string getFilename();
+private:
+    std::string m_filename;
 };
 
 #endif /* DATASET_H_ */

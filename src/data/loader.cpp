@@ -15,9 +15,10 @@
 
 #include "loader.h"
 
-Loader::Loader( QString filename ) :
-    m_filename( filename ),
-    m_datasetType( FNDT_UNKNOWN )
+Loader::Loader( QString fileName ) :
+    m_fileName( fileName ),
+    m_datasetType( FNDT_UNKNOWN ),
+    m_success( false )
 {
     // TODO Auto-generated constructor stub
 
@@ -28,17 +29,29 @@ Loader::~Loader()
     // TODO Auto-generated destructor stub
 }
 
-Dataset* Loader::load()
+bool Loader::succes()
+{
+	return m_success;
+}
+
+Dataset* Loader::getDataset()
+{
+	return m_dataset;
+}
+
+bool Loader::load()
 {
     switch ( determineType() )
     {
         case FNDT_NIFTI_SCALAR:
-            loadNifti();
-            //DatasetScalar* dataset = new DatasetScalar( data );
-            //dataset->parseNiftiHeader( m_header );
-            //return dataset;
-
+        {
+        	std::vector<float> data = loadNifti();
+            DatasetScalar* dataset = new DatasetScalar( m_fileName.toStdString(), data );
+            dataset->parseNiftiHeader( m_header );
+            m_dataset = dataset;
+            return true;
             break;
+        }
         case FNDT_NIFTI_VECTOR:
             break;
         case FNDT_NIFTI_4D:
@@ -46,13 +59,14 @@ Dataset* Loader::load()
         default:
             break;
     }
+    return false;
 }
 
 FN_DATASET_TYPE Loader::determineType()
 {
-    if ( m_filename.endsWith(".nii.gz") || m_filename.endsWith(".nii") )
+    if ( m_fileName.endsWith(".nii.gz") || m_fileName.endsWith(".nii") )
     {
-        m_header = nifti_image_read( m_filename.toStdString().c_str(), 0 );
+        m_header = nifti_image_read( m_fileName.toStdString().c_str(), 0 );
 
         // if a proper nifti header is found
         if ( m_header )
@@ -76,12 +90,16 @@ FN_DATASET_TYPE Loader::determineType()
 
 std::vector<float> Loader::loadNifti()
 {
-    nifti_image* filedata = nifti_image_read( m_filename.toStdString().c_str(), 1 );
+    nifti_image* filedata = nifti_image_read( m_fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];
 
-    std::vector<float> data( blockSize, 0.0 );
+    std::vector<float> data;
+    if ( filedata )
+    {
+    	data.resize( blockSize, 0.0 );
+    }
 
     switch ( m_header->datatype )
     {
