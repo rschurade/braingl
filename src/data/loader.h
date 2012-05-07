@@ -25,7 +25,7 @@ public:
 private:
     FN_DATASET_TYPE determineType();
 
-    void loadNifti();
+    Dataset* loadNifti();
 
     nifti_image* m_header;
     QString m_filename;

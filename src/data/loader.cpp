@@ -11,6 +11,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include "datasetscalar.h"
+
 #include "loader.h"
 
 Loader::Loader( QString filename ) :
@@ -68,7 +70,7 @@ FN_DATASET_TYPE Loader::determineType()
     return FNDT_UNKNOWN;
 }
 
-void Loader::loadNifti()
+Dataset* Loader::loadNifti()
 {
     nifti_image* filedata = nifti_image_read( m_filename.toStdString().c_str(), 1 );
 
@@ -157,6 +159,7 @@ void Loader::loadNifti()
             }
             break;
         }
-
     }
+    DatasetScalar* dataset = new DatasetScalar( data );
+    return dataset;
 }

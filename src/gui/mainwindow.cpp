@@ -142,7 +142,7 @@ void MainWindow::createDockWindows()
                     << "fa.nii.gz"
                     << "fa_rgb.nii.gz" );
     dock->setWidget( datasetList );
-    addDockWidget( Qt::RightDockWidgetArea, dock );
+    addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
 
     dock = new QDockWidget( tr( "Other Datasets" ), this );
@@ -153,6 +153,6 @@ void MainWindow::createDockWindows()
                     << "fibers"
                     << "zeugs" );
     dock->setWidget( dataset2List );
-    addDockWidget( Qt::RightDockWidgetArea, dock );
+    addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
 }
