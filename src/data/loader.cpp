@@ -34,6 +34,10 @@ Dataset* Loader::load()
     {
         case FNDT_NIFTI_SCALAR:
             loadNifti();
+            //DatasetScalar* dataset = new DatasetScalar( data );
+            //dataset->parseNiftiHeader( m_header );
+            //return dataset;
+
             break;
         case FNDT_NIFTI_VECTOR:
             break;
@@ -70,7 +74,7 @@ FN_DATASET_TYPE Loader::determineType()
     return FNDT_UNKNOWN;
 }
 
-Dataset* Loader::loadNifti()
+std::vector<float> Loader::loadNifti()
 {
     nifti_image* filedata = nifti_image_read( m_filename.toStdString().c_str(), 1 );
 
@@ -160,6 +164,5 @@ Dataset* Loader::loadNifti()
             break;
         }
     }
-    DatasetScalar* dataset = new DatasetScalar( data );
-    return dataset;
+    return data;
 }
