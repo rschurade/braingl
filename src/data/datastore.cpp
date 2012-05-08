@@ -11,13 +11,10 @@
 
 DataStore::DataStore()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 DataStore::~DataStore()
 {
-    // TODO Auto-generated destructor stub
 }
 
 void DataStore::addDataset( Dataset* dataset )
@@ -100,4 +97,18 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
 QModelIndex DataStore::parent( const QModelIndex & index ) const
 {
 	return QModelIndex();
+}
+
+void DataStore::moveItemUp( int row )
+{
+	beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
+	m_datasetList.swap( row, row - 1 );
+	endMoveRows();
+}
+
+void DataStore::moveItemDown( int row )
+{
+	beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
+	m_datasetList.swap( row, row + 1 );
+	endMoveRows();
 }
