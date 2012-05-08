@@ -46,7 +46,7 @@ bool Loader::load()
         case FNDT_NIFTI_SCALAR:
         {
         	std::vector<float> data = loadNifti();
-            DatasetScalar* dataset = new DatasetScalar( m_fileName.toStdString(), data );
+            DatasetScalar* dataset = new DatasetScalar( m_fileName, data );
             dataset->parseNiftiHeader( m_header );
             m_dataset = dataset;
             return true;

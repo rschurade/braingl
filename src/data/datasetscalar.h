@@ -18,11 +18,289 @@
 class DatasetScalar : public Dataset
 {
 public:
-    DatasetScalar( std::string filename, std::vector<float> data );
+    DatasetScalar( QString filename, std::vector<float> data );
     virtual ~DatasetScalar();
 
     void parseNiftiHeader( nifti_image* header );
+
+
+	const char* getAuxFile() const
+	{
+		return aux_file;
+	}
+
+	int getByteorder() const
+	{
+		return byteorder;
+	}
+
+	float getCalMax() const
+	{
+		return cal_max;
+	}
+
+	float getCalMin() const
+	{
+		return cal_min;
+	}
+
+	int getDatatype() const
+	{
+		return datatype;
+	}
+
+	const char* getDescrip() const
+	{
+		return descrip;
+	}
+
+	const int* getDim() const
+	{
+		return dim;
+	}
+
+	float getDt() const
+	{
+		return dt;
+	}
+
+	float getDu() const
+	{
+		return du;
+	}
+
+	float getDv() const
+	{
+		return dv;
+	}
+
+	float getDw() const
+	{
+		return dw;
+	}
+
+	float getDx() const
+	{
+		return dx;
+	}
+
+	float getDy() const
+	{
+		return dy;
+	}
+
+	float getDz() const
+	{
+		return dz;
+	}
+
+	char* getFname() const
+	{
+		return fname;
+	}
+
+	int getFreqDim() const
+	{
+		return freq_dim;
+	}
+
+	char* getIname() const
+	{
+		return iname;
+	}
+
+	int getInameOffset() const
+	{
+		return iname_offset;
+	}
+
+	int getIntentCode() const
+	{
+		return intent_code;
+	}
+
+	const char* getIntentName() const
+	{
+		return intent_name;
+	}
+
+	float getIntentP1() const
+	{
+		return intent_p1;
+	}
+
+	float getIntentP2() const
+	{
+		return intent_p2;
+	}
+
+	float getIntentP3() const
+	{
+		return intent_p3;
+	}
+
+	std::vector< float > getData() const
+	{
+		return m_data;
+	}
+
+	int getNbyper() const
+	{
+		return nbyper;
+	}
+
+	int getNdim() const
+	{
+		return ndim;
+	}
+
+	int getNiftiType() const
+	{
+		return nifti_type;
+	}
+
+	int getNt() const
+	{
+		return nt;
+	}
+
+	int getNu() const
+	{
+		return nu;
+	}
+
+	int getNv() const
+	{
+		return nv;
+	}
+
+	size_t getNvox() const
+	{
+		return nvox;
+	}
+
+	int getNw() const
+	{
+		return nw;
+	}
+
+	int getNx() const
+	{
+		return nx;
+	}
+
+	int getNy() const
+	{
+		return ny;
+	}
+
+	int getNz() const
+	{
+		return nz;
+	}
+
+	int getPhaseDim() const
+	{
+		return phase_dim;
+	}
+
+	const float* getPixdim() const
+	{
+		return pixdim;
+	}
+
+	int getQformCode() const
+	{
+		return qform_code;
+	}
+
+	mat44 getQtoIjk() const
+	{
+		return qto_ijk;
+	}
+
+	mat44 getQtoXyz() const
+	{
+		return qto_xyz;
+	}
+
+	float getQuaternB() const
+	{
+		return quatern_b;
+	}
+
+	float getSclInter() const
+	{
+		return scl_inter;
+	}
+
+	float getSclSlope() const
+	{
+		return scl_slope;
+	}
+
+	int getSformCode() const
+	{
+		return sform_code;
+	}
+
+	int getSliceCode() const
+	{
+		return slice_code;
+	}
+
+	int getSliceDim() const
+	{
+		return slice_dim;
+	}
+
+	float getSliceDuration() const
+	{
+		return slice_duration;
+	}
+
+	int getSliceEnd() const
+	{
+		return slice_end;
+	}
+
+	int getSliceStart() const
+	{
+		return slice_start;
+	}
+
+	mat44 getStoIjk() const
+	{
+		return sto_ijk;
+	}
+
+	mat44 getStoXyz() const
+	{
+		return sto_xyz;
+	}
+
+	int getSwapsize() const
+	{
+		return swapsize;
+	}
+
+	int getTimeUnits() const
+	{
+		return time_units;
+	}
+
+	float getToffset() const
+	{
+		return toffset;
+	}
+
+	int getXyzUnits() const
+	{
+		return xyz_units;
+	}
 private:
+
+
     std::vector<float> m_data;
 
     int ndim;       /*!< last dimension greater than 1 (1..7) */
