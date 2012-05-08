@@ -4,7 +4,8 @@
 #include <QtGui/QMainWindow>
 
 class QAction;
-class QListWidget;
+class QListView;
+class QTableView;
 class QMenu;
 
 class DataStore;
@@ -33,8 +34,8 @@ private:
 
     GLWidget *mainGLWidget;
 
-    QListWidget *datasetList;
-    QListWidget *dataset2List;
+    QListView *datasetView;
+    QTableView *datasetView2;
 
     QMenu *fileMenu;
     QMenu *editMenu;

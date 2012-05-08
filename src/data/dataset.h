@@ -8,7 +8,7 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include <string>
+#include <QtCore/QString>
 
 enum FN_DATASET_TYPE
 {
@@ -21,12 +21,17 @@ enum FN_DATASET_TYPE
 class Dataset
 {
 public:
-    Dataset( std::string filename );
+    Dataset( QString fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    std::string getFilename();
+    QString getFilename();
+
+    QString getShortFilename();
+
+    FN_DATASET_TYPE getType();
 private:
-    std::string m_filename;
+    QString m_fileName;
+    FN_DATASET_TYPE m_type;
 };
 
 #endif /* DATASET_H_ */

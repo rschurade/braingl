@@ -8,11 +8,12 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include <vector>
+#include <QtCore/Qlist>
+#include <QtCore/QAbstractItemModel>
 
 class Dataset;
 
-class DataStore
+class DataStore : public QAbstractItemModel
 {
 public:
     DataStore();
@@ -22,8 +23,16 @@ public:
 
     void addDataset( Dataset* dataset );
 
+	int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+	QVariant data( const QModelIndex &index, int role ) const;
+	QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+
+	QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
+	QModelIndex parent ( const QModelIndex & index ) const;
+
 private:
-    std::vector< Dataset* >m_datasetList;
+    QList< Dataset* >m_datasetList;
 };
 
 #endif /* DATASTORE_H_ */

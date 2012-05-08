@@ -131,26 +131,21 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-    QDockWidget *dock = new QDockWidget( tr( "Datasets" ), this );
+    QDockWidget *dock = new QDockWidget( tr( "Dataset View 1" ), this );
     dock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    datasetList = new QListWidget( dock );
-    datasetList->addItems(
-            QStringList()
-                    << "t1.nii.gz"
-                    << "fa.nii.gz"
-                    << "fa_rgb.nii.gz" );
-    dock->setWidget( datasetList );
+    datasetView = new QListView( dock );
+    datasetView->setModel( m_dataStore );
+
+
+    dock->setWidget( datasetView );
     addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
 
-    dock = new QDockWidget( tr( "Other Datasets" ), this );
-    dataset2List = new QListWidget( dock );
-    dataset2List->addItems(
-            QStringList()
-                    << "brain surface"
-                    << "fibers"
-                    << "zeugs" );
-    dock->setWidget( dataset2List );
+    dock = new QDockWidget( tr( "Dataset View 2" ), this );
+    datasetView2 = new QTableView( dock );
+    datasetView2->setModel( m_dataStore );
+
+    dock->setWidget( datasetView2 );
     addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
 }

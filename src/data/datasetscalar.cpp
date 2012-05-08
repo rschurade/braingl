@@ -7,8 +7,8 @@
 
 #include "datasetscalar.h"
 
-DatasetScalar::DatasetScalar( std::string filename, std::vector<float> data ) :
-    Dataset( filename ),
+DatasetScalar::DatasetScalar( QString filename, std::vector<float> data ) :
+    Dataset( filename, FNDT_NIFTI_SCALAR ),
     m_data ( data )
 {
 }

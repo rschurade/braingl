@@ -4,22 +4,31 @@
  *  Created on: May 3, 2012
  *      Author: schurade
  */
+#include <QtCore/QStringlist>
 
 #include "dataset.h"
 
-Dataset::Dataset( std::string filename ) :
-	m_filename( filename )
+Dataset::Dataset( QString fileName, FN_DATASET_TYPE type ) :
+	m_fileName( fileName ),
+	m_type( type )
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 Dataset::~Dataset()
 {
-    // TODO Auto-generated destructor stub
 }
 
-std::string Dataset::getFilename()
+QString Dataset::getFilename()
 {
-	return m_filename;
+	return m_fileName;
+}
+
+FN_DATASET_TYPE Dataset::getType()
+{
+	return m_type;
+}
+
+QString Dataset::getShortFilename()
+{
+	return m_fileName.split("/").last();
 }
