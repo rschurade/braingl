@@ -15,6 +15,8 @@ class Dataset;
 
 class DataStore : public QAbstractItemModel
 {
+	Q_OBJECT
+
 public:
     DataStore();
     virtual ~DataStore();
@@ -31,8 +33,13 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
 	QModelIndex parent ( const QModelIndex & index ) const;
 
+public slots:
+	void moveItemUp( int row );
+	void moveItemDown( int row );
+
 private:
     QList< Dataset* >m_datasetList;
+
 };
 
 #endif /* DATASTORE_H_ */

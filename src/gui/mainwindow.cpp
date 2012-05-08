@@ -3,6 +3,7 @@
 #include "../data/datastore.h"
 
 #include "glwidget.h"
+#include "datasetViewWidget.h"
 
 #include "mainwindow.h"
 
@@ -131,20 +132,17 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-    QDockWidget *dock = new QDockWidget( tr( "Dataset View 1" ), this );
-    dock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    datasetView = new QListView( dock );
-    datasetView->setModel( m_dataStore );
+	DatasetViewWidget* dock1 = new DatasetViewWidget( this );
+	dock1->setModel( m_dataStore );
+	addDockWidget( Qt::LeftDockWidgetArea, dock1 );
+	viewMenu->addAction( dock1->toggleViewAction() );
 
+	connect( dock1, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
+	connect( dock1, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 
-    dock->setWidget( datasetView );
-    addDockWidget( Qt::LeftDockWidgetArea, dock );
-    viewMenu->addAction( dock->toggleViewAction() );
-
-    dock = new QDockWidget( tr( "Dataset View 2" ), this );
+	QDockWidget *dock = new QDockWidget( tr( "Dataset View 2" ), this );
     datasetView2 = new QTableView( dock );
     datasetView2->setModel( m_dataStore );
-
     dock->setWidget( datasetView2 );
     addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
