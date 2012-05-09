@@ -7,6 +7,12 @@
 int main( int argc, char *argv[] )
 {
     QApplication app( argc, argv );
+
+    QCoreApplication::setOrganizationDomain( "OrgDomain" );
+	QCoreApplication::setOrganizationName( "OrgName" );
+	QCoreApplication::setApplicationName( "Fibernavigator 2" );
+	QCoreApplication::setApplicationVersion( "1.0.0" );
+
     Q_INIT_RESOURCE( icons );
 
     QStringList args = app.arguments();

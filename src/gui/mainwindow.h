@@ -19,6 +19,8 @@ Q_OBJECT
 public:
     MainWindow( DataStore* dataStore );
 
+    void closeEvent( QCloseEvent *event );
+
 private slots:
     void open();
     void save();
