@@ -41,7 +41,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-	return 3;
+	return 6;
 }
 
 
@@ -57,20 +57,11 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 	{
 		return m_datasetList.at( index.row() )->getShortFilename();
 	}
-	else if ( role == Qt::DisplayRole && index.column() == 1 )
+	else if ( role == Qt::DisplayRole && index.column() > 0 )
 	{
-		if ( m_datasetList.at( index.row() )->getType() == FNDT_NIFTI_SCALAR )
-		{
-			return QString( "scalar" );
-		}
+	    return datasetInfo( index );
 	}
-	else if ( role == Qt::DisplayRole && index.column() == 2 )
-	{
-		if ( m_datasetList.at( index.row() )->getType() == FNDT_NIFTI_SCALAR )
-		{
-			return dynamic_cast<DatasetScalar*>( m_datasetList.at( index.row() ) )->getDatatype();
-		}
-	}
+
 	else
 	{
 		return QVariant();
@@ -84,9 +75,31 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
 		return QVariant();
 
 	if ( orientation == Qt::Horizontal )
-		return QString( "Column %1" ).arg( section );
+	{
+	    switch ( section )
+	    {
+	        case 0:
+	            return QString("name");
+	            break;
+	        case 1:
+                return QString("dim");
+                break;
+	        case 2:
+                return QString("data type");
+                break;
+	        case 3:
+                return QString("nx");
+                break;
+            case 4:
+                return QString("ny");
+                break;
+            case 5:
+                return QString("nz");
+                break;
+	    }
+	}
 	else
-		return QString( "Row %1" ).arg( section );
+		return m_datasetList.at( section )->getShortFilename();
 }
 
 QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) const
@@ -124,4 +137,75 @@ void DataStore::deleteItem( int row )
         reset();
         endResetModel();
     }
+}
+
+QVariant DataStore::datasetInfo( const QModelIndex &index ) const
+{
+    FN_DATASET_TYPE type = m_datasetList.at( index.row() )->getType();
+
+
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR )
+    {
+        DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
+
+        switch ( index.column() )
+        {
+            case 1:
+                return ds->getNt();
+                break;
+            case 2:
+                return getNiftiDataType( ds->getDatatype() );
+                break;
+            case 3:
+                return ds->getNx();
+                break;
+            case 4:
+                return ds->getNy();
+                break;
+            case 5:
+                return ds->getNz();
+                break;
+            default:
+                break;
+        }
+    }
+    return QVariant();
+}
+
+QString DataStore::getNiftiDataType( const int type ) const
+{
+    switch( type )
+    {
+        case 0:
+            return QString("unknown");
+            break;
+        case 1:
+            return QString("binary");
+            break;
+        case 2:
+            return QString("unsigned char");
+            break;
+        case 4:
+            return QString("signed short");
+            break;
+        case 8:
+            return QString("signed int");
+            break;
+        case 16:
+            return QString("float");
+            break;
+        case 32:
+            return QString("complex");
+            break;
+        case 64:
+            return QString("double");
+            break;
+        case 128:
+            return QString("RGB");
+            break;
+        default:
+            return QString("unknown");
+            break;
+    }
+    return QString("unknown");
 }
