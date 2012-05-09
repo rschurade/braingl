@@ -8,8 +8,12 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow( DataStore* dataStore ) :
+	QMainWindow(),
     m_dataStore( dataStore )
 {
+	QSettings settings;
+	restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
+
     mainGLWidget = new GLWidget;
     setCentralWidget( mainGLWidget );
 
@@ -22,6 +26,15 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     setWindowTitle( tr( "Fibernavigator 2" ) );
 
     setUnifiedTitleAndToolBarOnMac( true );
+
+	restoreState( settings.value( "mainWindowState" ).toByteArray() );
+}
+
+void MainWindow::closeEvent( QCloseEvent *event )
+{
+	QSettings settings;
+	settings.setValue( "mainWindowGeometry", saveGeometry() );
+	settings.setValue( "mainWindowState", saveState() );
 }
 
 void MainWindow::print()
@@ -119,9 +132,11 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
     fileToolBar->addAction( printAct );
+    fileToolBar->setObjectName( "fileToolbar");
 
     editToolBar = addToolBar( tr( "Edit" ) );
     editToolBar->addAction( undoAct );
+    editToolBar->setObjectName( "editToolbar");
 }
 
 void MainWindow::createStatusBar()
@@ -141,6 +156,7 @@ void MainWindow::createDockWindows()
 	connect( dock1, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
 	QDockWidget *dock = new QDockWidget( tr( "Dataset View 2" ), this );
+	dock->setObjectName( "Dataset View Dock 2" );
     datasetView2 = new QTableView( dock );
     datasetView2->setModel( m_dataStore );
     datasetView2->setSelectionModel( dock1->selectionModel() );
