@@ -112,3 +112,16 @@ void DataStore::moveItemDown( int row )
 	m_datasetList.swap( row, row + 1 );
 	endMoveRows();
 }
+
+void DataStore::deleteItem( int row )
+{
+    if ( row >= 0 && row < m_datasetList.size() )
+    {
+        beginRemoveRows( index( row, 0 ), row, row );
+        m_datasetList.removeAt( row );
+        endRemoveRows();
+        beginResetModel();
+        reset();
+        endResetModel();
+    }
+}

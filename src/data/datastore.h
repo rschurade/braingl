@@ -36,6 +36,7 @@ public:
 public slots:
 	void moveItemUp( int row );
 	void moveItemDown( int row );
+	void deleteItem( int row );
 
 private:
     QList< Dataset* >m_datasetList;

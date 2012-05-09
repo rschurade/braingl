@@ -34,12 +34,16 @@ DatasetViewWidget::DatasetViewWidget( QWidget* parent ) :
 	m_downButton->setText( QString( "down" ) );
 	m_upButton = new QPushButton();
 	m_upButton->setText( QString( "up" ) );
+	m_deleteButton = new QPushButton();
+	m_deleteButton->setText( QString( "delete" ) );
 
 	buttonLayout->addWidget( m_downButton );
 	buttonLayout->addWidget( m_upButton );
+	buttonLayout->addWidget( m_deleteButton );
 
 	connect( m_upButton, SIGNAL( pressed() ), this, SLOT( moveItemUp() ) );
 	connect( m_downButton, SIGNAL( pressed() ), this, SLOT( moveItemDown() ) );
+	connect( m_deleteButton, SIGNAL( pressed() ), this, SLOT( deleteItem() ) );
 
 	connect( m_listView, SIGNAL(itemSelectionChanged( const QItemSelection ) ), this, SLOT( itemSelectionChanged( const QItemSelection ) ) );
 
@@ -48,6 +52,10 @@ DatasetViewWidget::DatasetViewWidget( QWidget* parent ) :
 
 	panel->setLayout( m_layout );
 	setWidget( panel );
+
+	m_upButton->setEnabled( false );
+	m_downButton->setEnabled( false );
+	m_deleteButton->setEnabled( false );
 }
 
 DatasetViewWidget::~DatasetViewWidget()
@@ -97,9 +105,12 @@ void DatasetViewWidget::itemSelectionChanged( const QItemSelection &selected )
 {
 	m_upButton->setEnabled( false );
 	m_downButton->setEnabled( false );
+	m_deleteButton->setEnabled( false );
+
 	if ( selected.indexes().size() > 0 )
 	{
 	    m_selected = selected.indexes().first().row();
+	    m_deleteButton->setEnabled( true );
 	}
 	else
 	{
@@ -114,4 +125,36 @@ void DatasetViewWidget::itemSelectionChanged( const QItemSelection &selected )
 	{
 		m_downButton->setEnabled( true );
 	}
+}
+
+void DatasetViewWidget::deleteItem()
+{
+    emit deleteSelectedItem( m_selected );
+
+    QItemSelectionModel* selector = m_listView->selectionModel();
+    QAbstractItemModel* model = m_listView->model();
+
+    if ( model->rowCount() > 0 )
+    {
+        m_selected = qMin( m_selected, m_listView->model()->rowCount() - 1 );
+        m_listView->selectionModel()->clearSelection();
+        selector->select( model->index( m_selected, 0 ), QItemSelectionModel::Select );
+        m_deleteButton->setEnabled( true );
+        if ( m_selected > 0 )
+        {
+            m_upButton->setEnabled( true );
+        }
+        if ( m_selected < m_listView->model()->rowCount() - 1 )
+        {
+            m_downButton->setEnabled( true );
+        }
+    }
+    else
+    {
+        m_listView->selectionModel()->clearSelection();
+        m_selected = -1;
+        m_upButton->setEnabled( false );
+        m_downButton->setEnabled( false );
+        m_deleteButton->setEnabled( false );
+    }
 }

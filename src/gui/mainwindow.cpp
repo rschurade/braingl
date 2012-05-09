@@ -138,6 +138,7 @@ void MainWindow::createDockWindows()
 
 	connect( dock1, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
 	connect( dock1, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
+	connect( dock1, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
 	QDockWidget *dock = new QDockWidget( tr( "Dataset View 2" ), this );
     datasetView2 = new QTableView( dock );
