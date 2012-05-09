@@ -17,7 +17,7 @@ class MainWindow: public QMainWindow
 Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow( DataStore* dataStore );
 
 private slots:
     void open();
