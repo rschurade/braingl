@@ -34,17 +34,20 @@ private:
 
 	QPushButton* m_downButton;
 	QPushButton* m_upButton;
+	QPushButton* m_deleteButton;
 
 	int m_selected;
 
 private slots:
 	void moveItemUp();
 	void moveItemDown();
+	void deleteItem();
 	void itemSelectionChanged( const QItemSelection &selected );
 
 signals:
 	void moveSelectedItemUp( int row );
 	void moveSelectedItemDown( int row );
+	void deleteSelectedItem( int row );
 };
 
 #endif /* DATASETVIEWWIDGET_H_ */
