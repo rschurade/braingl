@@ -7,12 +7,11 @@
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow( DataStore* dataStore ) :
+    m_dataStore( dataStore )
 {
     mainGLWidget = new GLWidget;
     setCentralWidget( mainGLWidget );
-
-    m_dataStore = new DataStore();
 
     createActions();
     createMenus();
