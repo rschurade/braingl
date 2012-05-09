@@ -14,6 +14,7 @@ class QVBoxLayout;
 class QPushButton;
 class QAbstractItemModel;
 class DatasetListView;
+class QItemSelection;
 
 class DatasetViewWidget : public QDockWidget
 {

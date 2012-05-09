@@ -51,24 +51,6 @@ SET(QtIcon_RCCS icons.qrc)
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
-# Boost, see http://www.boost.org/
-#
-# To see, which boost libs we currently use, you may run the following command # in the src directory on a linux box to make some investigations:
-# grep -i include `find . -type f` | grep boost | awk '{print $2}' | sort | uniq
-
-# Setup boost options
-SET( Boost_USE_MULTITHREAD ON )
-
-# find the boost packages
-FIND_PACKAGE( Boost 1.46.0 REQUIRED program_options thread filesystem date_time system signals regex )
-
-# include the boost headers
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-
-# avoid filesystem 2 stuff
-ADD_DEFINITIONS( "-DBOOST_FILESYSTEM_VERSION=3" )
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------
 # OpenGL, at least 1.2
 # See http://www.opengl.org
 #
@@ -77,22 +59,6 @@ FIND_PACKAGE( OpenGL REQUIRED )
 # include the OpenGL header paths
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------
-# NiftiLib, at least 2.0.0
-# See  http://niftilib.sourceforge.net
-# FIND_PACKAGE( niftilib REQUIRED QUIET )
-# IF( NIFTILIB_FOUND )
-#   #MESSAGE( STATUS "Using system installed nifitlib." )
-#   INCLUDE_DIRECTORIES( ${NIFTILIB_INCLUDE_DIR} )
-# ENDIF()
-
-# FIND_PACKAGE( ZLIB )
-# this now works on win if we specify the zlib directory
-# IF( ZLIB_FOUND )
-#    ADD_DEFINITIONS( -DHAVE_ZLIB )
-#    INCLUDE_DIRECTORIES( ${ZLIB_INCLUDE_DIR} )
-# ENDIF( ZLIB_FOUND )
 
 ADD_DEFINITIONS( -DHAVE_ZLIB )
 
@@ -132,7 +98,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${Boost_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )

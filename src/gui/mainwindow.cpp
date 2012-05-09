@@ -3,7 +3,7 @@
 #include "../data/datastore.h"
 
 #include "glwidget.h"
-#include "datasetViewWidget.h"
+#include "datasetviewwidget.h"
 
 #include "mainwindow.h"
 

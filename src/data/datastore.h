@@ -8,7 +8,7 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include <QtCore/Qlist>
+#include <QtCore/QList>
 #include <QtCore/QAbstractItemModel>
 
 class Dataset;
