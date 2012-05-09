@@ -15,6 +15,7 @@ class QPushButton;
 class QAbstractItemModel;
 class DatasetListView;
 class QItemSelection;
+class QItemSelectionModel;
 
 class DatasetViewWidget : public QDockWidget
 {
@@ -24,7 +25,8 @@ public:
 	DatasetViewWidget( QWidget* parent = 0 );
 	virtual ~DatasetViewWidget();
 
-	void setModel (QAbstractItemModel  *model );
+	void setModel ( QAbstractItemModel  *model );
+	QItemSelectionModel* selectionModel();
 
 private:
 	DatasetListView* m_listView;
