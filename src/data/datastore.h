@@ -39,6 +39,9 @@ public slots:
 	void deleteItem( int row );
 
 private:
+	QVariant datasetInfo( const QModelIndex &index ) const;
+	QString getNiftiDataType( const int type ) const;
+
     QList< Dataset* >m_datasetList;
 
 };

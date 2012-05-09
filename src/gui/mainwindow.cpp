@@ -144,6 +144,7 @@ void MainWindow::createDockWindows()
     datasetView2 = new QTableView( dock );
     datasetView2->setModel( m_dataStore );
     datasetView2->setSelectionModel( dock1->selectionModel() );
+    datasetView2->hideColumn( 0 );
     dock->setWidget( datasetView2 );
     addDockWidget( Qt::LeftDockWidgetArea, dock );
     viewMenu->addAction( dock->toggleViewAction() );
