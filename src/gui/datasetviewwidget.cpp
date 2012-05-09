@@ -4,6 +4,9 @@
  *  Created on: 08.05.2012
  *      Author: Ralph
  */
+#include <string>
+#include <iostream>
+
 #include <QtGui/QtGui>
 
 #include "datasetlistview.h"
@@ -56,29 +59,59 @@ void DatasetViewWidget::setModel (QAbstractItemModel  *model )
 	m_listView->setModel( model );
 }
 
+QItemSelectionModel* DatasetViewWidget::selectionModel()
+{
+    return m_listView->selectionModel();
+}
+
 void DatasetViewWidget::moveItemDown()
 {
-	emit moveSelectedItemDown( m_selected);
+	emit moveSelectedItemDown( m_selected );
+	QItemSelectionModel* selector = m_listView->selectionModel();
+	QAbstractItemModel* model = m_listView->model();
+
+	int toSelect = m_selected + 1;
+	if ( m_selected > -1 && m_selected < m_listView->model()->rowCount() )
+	{
+	    selector->select( model->index( m_selected, 0 ), QItemSelectionModel::Deselect );
+	    selector->select( model->index( toSelect, 0 ), QItemSelectionModel::Select );
+    }
 }
 
 void DatasetViewWidget::moveItemUp()
 {
-	emit moveSelectedItemUp( m_selected);
+	emit moveSelectedItemUp( m_selected );
+    QItemSelectionModel* selector = m_listView->selectionModel();
+    QAbstractItemModel* model = m_listView->model();
+
+    int toSelect = m_selected - 1;
+    if ( m_selected > 0 )
+    {
+        selector->select( model->index( m_selected, 0 ), QItemSelectionModel::Deselect );
+        selector->select( model->index( toSelect, 0 ), QItemSelectionModel::Select );
+    }
 }
 
 
 void DatasetViewWidget::itemSelectionChanged( const QItemSelection &selected )
 {
-	m_upButton->setEnabled( true );
-	m_downButton->setEnabled( true );
-	m_selected = selected.indexes().first().row();
-
-	if ( m_selected == 0 )
+	m_upButton->setEnabled( false );
+	m_downButton->setEnabled( false );
+	if ( selected.indexes().size() > 0 )
 	{
-		m_upButton->setEnabled( false );
+	    m_selected = selected.indexes().first().row();
 	}
-	if ( m_selected == m_listView->model()->rowCount() - 1 )
+	else
 	{
-		m_downButton->setEnabled( false );
+	    m_selected = -1;
+	}
+
+	if ( m_selected > 0 )
+	{
+		m_upButton->setEnabled( true );
+	}
+	if ( m_selected < m_listView->model()->rowCount() - 1 )
+	{
+		m_downButton->setEnabled( true );
 	}
 }
