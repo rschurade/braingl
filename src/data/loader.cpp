@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "datasetscalar.h"
+#include "dataset3d.h"
 
 #include "loader.h"
 
@@ -20,13 +21,10 @@ Loader::Loader( QString fileName ) :
     m_datasetType( FNDT_UNKNOWN ),
     m_success( false )
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 Loader::~Loader()
 {
-    // TODO Auto-generated destructor stub
 }
 
 bool Loader::succes()
@@ -53,7 +51,14 @@ bool Loader::load()
             break;
         }
         case FNDT_NIFTI_VECTOR:
+        {
+            std::vector<float> data = loadNifti();
+            Dataset3D* dataset = new Dataset3D( m_fileName, data );
+            dataset->parseNiftiHeader( m_header );
+            m_dataset = dataset;
+            return true;
             break;
+        }
         case FNDT_NIFTI_4D:
             break;
         default:
@@ -98,7 +103,7 @@ std::vector<float> Loader::loadNifti()
     std::vector<float> data;
     if ( filedata )
     {
-    	data.resize( blockSize, 0.0 );
+    	data.resize( blockSize * m_header->dim[4], 0.0 );
     }
 
     switch ( m_header->datatype )
