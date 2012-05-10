@@ -27,7 +27,7 @@ public:
 	void initShader();
 	void initGeometry();
 	void setShaderVars();
-	void draw();
+	void draw( QMatrix4x4 rotation );
 
 private:
 

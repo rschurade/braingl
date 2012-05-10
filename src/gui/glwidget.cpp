@@ -42,8 +42,25 @@ void GLWidget::resizeGL( int width, int height )
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
+    if ( event->buttons() & Qt::LeftButton )
+    {
+        m_sceneRenderer->leftMouseDown( event->x(), event->y() );
+    }
+    updateGL();
 }
 
 void GLWidget::mouseMoveEvent( QMouseEvent *event )
 {
+    if ( event->buttons() & Qt::LeftButton )
+    {
+        m_sceneRenderer->leftMouseDrag( event->x(), event->y() );
+    }
+    updateGL();
+}
+
+void GLWidget::mouseReleaseEvent( QMouseEvent *event )
+{
+    m_sceneRenderer->leftMouseUp();
+
+    updateGL();
 }

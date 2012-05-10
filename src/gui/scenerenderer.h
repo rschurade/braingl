@@ -10,6 +10,9 @@
 
 #include "../glew/include/glew.h"
 
+#include <QtGui/QMatrix4x4>
+
+class ArcBall;
 class DataStore;
 class SliceRenderer;
 
@@ -24,9 +27,16 @@ public:
 	void initGL();
 	void draw();
 
+	void leftMouseDown( int x, int y );
+	void leftMouseDrag( int x, int y );
+	void leftMouseUp();
+
 private:
+	ArcBall* m_arcBall;
 	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
+
+	QMatrix4x4 m_lastRot;
 };
 
 #endif /* SCENERENDERER_H_ */
