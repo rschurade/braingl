@@ -4,7 +4,6 @@
 
 #include "glwidget.h"
 #include "datasetviewwidget.h"
-
 #include "mainwindow.h"
 
 MainWindow::MainWindow( DataStore* dataStore ) :
@@ -14,7 +13,7 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 	QSettings settings;
 	restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
 
-    mainGLWidget = new GLWidget;
+    mainGLWidget = new GLWidget( m_dataStore );
     setCentralWidget( mainGLWidget );
 
     createActions();
