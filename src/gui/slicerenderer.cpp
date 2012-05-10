@@ -147,7 +147,7 @@ void SliceRenderer::setShaderVars()
 
 }
 
-void SliceRenderer::draw()
+void SliceRenderer::draw( QMatrix4x4 rotation )
 {
     m_x = 80.;
     m_y = 100.;
@@ -175,7 +175,7 @@ void SliceRenderer::draw()
 
     QMatrix4x4 matrix;
     matrix.translate( 0.0, 0.0, -5.0 );
-    //matrix.rotate(rotation);
+    matrix = matrix * rotation;
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
     const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;

@@ -7,6 +7,8 @@
 #include <QtCore/QDebug>
 
 #include "../data/datastore.h"
+
+#include "arcball.h"
 #include "slicerenderer.h"
 
 #include "scenerenderer.h"
@@ -19,6 +21,8 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
 	m_dataStore( dataStore )
 {
 	m_sliceRenderer = new SliceRenderer( dataStore );
+	m_arcBall = new ArcBall( 400, 400 );
+	m_lastRot.setToIdentity();
 }
 
 SceneRenderer::~SceneRenderer()
@@ -48,7 +52,7 @@ void SceneRenderer::initGL()
 	glEnable (GL_LIGHTING);
 	glEnable (GL_LIGHT0);
 	glEnable (GL_MULTISAMPLE);
-	static GLfloat lightPosition[ 4 ] =	{ 0.5, 5.0, 7.0, 1.0 };
+	static GLfloat lightPosition[ 4 ] =	{ 0.5, 5.0, -3000.0, 1.0 };
 	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
 	m_sliceRenderer->init();
@@ -56,6 +60,8 @@ void SceneRenderer::initGL()
 
 void SceneRenderer::resizeGL( int width, int height )
 {
+    m_arcBall->set_win_size( width, height );
+
     int side = qMin( width, height );
     glViewport( ( width - side ) / 2, ( height - side ) / 2, side, side );
 
@@ -72,5 +78,20 @@ void SceneRenderer::draw()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glLoadIdentity();
 
-    m_sliceRenderer->draw();
+    m_sliceRenderer->draw( m_arcBall->get() );
+}
+
+void SceneRenderer::leftMouseDown( int x, int y )
+{
+    m_arcBall->click( x, y );
+}
+
+void SceneRenderer::leftMouseDrag( int x, int y )
+{
+    m_arcBall->drag( x, y );
+}
+
+void SceneRenderer::leftMouseUp()
+{
+    m_arcBall->release();
 }
