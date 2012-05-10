@@ -8,5 +8,7 @@
 	<file>icons/print.png</file>
 	<file>icons/save.png</file>
 	<file>icons/undo.png</file>
+	<file>shaders/vshader.glsl</file>
+	<file>shaders/fshader.glsl</file>
  </qresource>
  </RCC>

@@ -42,13 +42,14 @@ SET( QT_LIBS ${QT_QTCORE_LIBRARY}
              ${QT_QTOPENGL_LIBRARY} )
 
 # Resources
-SET(QtIcon_RCCS icons.qrc)
+SET(QtIcon_RCCS resources.qrc)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 #
 # REQUIRED third party libs
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
+FIND_PACKAGE( GLEW REQUIRED )
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 # OpenGL, at least 1.2
@@ -102,6 +103,6 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} glu32 opengl32 )
 ENDIF()
 

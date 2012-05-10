@@ -1,16 +1,19 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include "scenerenderer.h"
+
 #include <QtOpenGL/QGLWidget>
 
-class QtLogo;
+class DataStore;
+class SceneRenderer;
 
 class GLWidget: public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget( QWidget *parent = 0 );
+    GLWidget( DataStore* dataStore, QWidget *parent = 0 );
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -28,6 +31,8 @@ protected:
     void mouseMoveEvent( QMouseEvent *event );
 
 private:
+    DataStore* m_dataStore;
+    SceneRenderer* m_sceneRenderer;
 };
 
 #endif

@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
 	QCoreApplication::setApplicationName( "Fibernavigator 2" );
 	QCoreApplication::setApplicationVersion( "1.0.0" );
 
-    Q_INIT_RESOURCE( icons );
+    Q_INIT_RESOURCE( resources );
 
     QStringList args = app.arguments();
 
