@@ -64,19 +64,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
     int side = qMin( width, height );
     glViewport( ( width - side ) / 2, ( height - side ) / 2, side, side );
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    //glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-    glOrtho( 0, 200, 0, 200, -3000, 3000 );
 }
 
 
 void SceneRenderer::draw()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glLoadIdentity();
 
     m_sliceRenderer->draw( m_arcBall->get() );
 }
