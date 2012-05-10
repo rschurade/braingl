@@ -10,11 +10,8 @@
 
 #include "../glew/include/glew.h"
 
-#include <QtGui/QMatrix4x4>
-
 #include "objectrenderer.h"
 
-class DataStore;
 class QGLShaderProgram;
 
 class SliceRenderer : public ObjectRenderer
@@ -49,7 +46,6 @@ private:
 
 	QGLShaderProgram *m_program;
 
-	QMatrix4x4 projection;
 };
 
 #endif /* SLICERENDERER_H_ */

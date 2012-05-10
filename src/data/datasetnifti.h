@@ -8,6 +8,8 @@
 #ifndef DATASETNIFTI_H_
 #define DATASETNIFTI_H_
 
+#include "../glew/include/glew.h"
+
 #include <vector>
 
 #include "nifti/nifti1_io.h"
@@ -22,6 +24,7 @@ public:
 
     void parseNiftiHeader( nifti_image* header );
 
+    GLuint getTextureGLuint();
 
     const char* getAuxFile() const
     {
@@ -297,8 +300,13 @@ public:
     {
         return xyz_units;
     }
-private:
+
+protected:
+    virtual void createTexture() = 0;
+
     std::vector<float> m_data;
+
+    GLuint m_textureGLuint;
 
     int ndim;       /*!< last dimension greater than 1 (1..7) */
     int nx;         /*!< dimensions of grid array             */

@@ -9,12 +9,22 @@
 
 DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, std::vector<float> data ) :
     Dataset( filename, type ),
-    m_data( data )
+    m_data( data ),
+    m_textureGLuint( 0 )
 {
 }
 
 DatasetNifti::~DatasetNifti()
 {
+}
+
+GLuint DatasetNifti::getTextureGLuint()
+{
+    if ( m_textureGLuint == 0 )
+    {
+        createTexture();
+    }
+    return m_textureGLuint;
 }
 
 void DatasetNifti::parseNiftiHeader( nifti_image* header )

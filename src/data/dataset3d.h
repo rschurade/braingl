@@ -19,6 +19,9 @@ class Dataset3D : public DatasetNifti
 public:
     Dataset3D( QString filename, std::vector<float> data );
     virtual ~Dataset3D();
+
+private:
+    void createTexture();
 };
 
 #endif /* DATASET3D_H_ */

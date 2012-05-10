@@ -19,6 +19,9 @@ class DatasetScalar : public DatasetNifti
 public:
     DatasetScalar( QString filename, std::vector<float> data );
     virtual ~DatasetScalar();
+
+private:
+    void createTexture();
 };
 
 #endif /* DATASETSCALAR_H_ */

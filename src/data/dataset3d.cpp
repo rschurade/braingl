@@ -16,3 +16,7 @@ Dataset3D::~Dataset3D()
 {
 }
 
+void Dataset3D::createTexture()
+{
+
+}
