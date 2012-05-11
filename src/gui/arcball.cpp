@@ -96,10 +96,6 @@ void ArcBall::click( int x, int y )
     v_from = map_sphere( x, y );
 }
 
-void ArcBall::release()
-{
-}
-
 // returns the rotation matrix to be used directly
 QQuaternion ArcBall::getRotQuat()
 {

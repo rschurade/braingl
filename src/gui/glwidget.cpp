@@ -60,7 +60,5 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
-    m_sceneRenderer->leftMouseUp();
-
     updateGL();
 }
