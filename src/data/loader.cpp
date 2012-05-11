@@ -4,12 +4,7 @@
  *  Created on: May 3, 2012
  *      Author: schurade
  */
-
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <stdint.h>
+#include <QtCore/QDebug>
 
 #include "datasetscalar.h"
 #include "dataset3d.h"
@@ -43,7 +38,7 @@ bool Loader::load()
     {
         case FNDT_NIFTI_SCALAR:
         {
-        	std::vector<float> data = loadNifti();
+        	void* data = loadNifti();
             DatasetScalar* dataset = new DatasetScalar( m_fileName, data );
             dataset->parseNiftiHeader( m_header );
             m_dataset = dataset;
@@ -52,7 +47,7 @@ bool Loader::load()
         }
         case FNDT_NIFTI_VECTOR:
         {
-            std::vector<float> data = loadNifti();
+            void* data = loadNifti();
             Dataset3D* dataset = new Dataset3D( m_fileName, data );
             dataset->parseNiftiHeader( m_header );
             m_dataset = dataset;
@@ -93,99 +88,113 @@ FN_DATASET_TYPE Loader::determineType()
     return FNDT_UNKNOWN;
 }
 
-std::vector<float> Loader::loadNifti()
+void* Loader::loadNifti()
 {
     nifti_image* filedata = nifti_image_read( m_fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];
 
-    std::vector<float> data;
-    if ( filedata )
-    {
-    	data.resize( blockSize * m_header->dim[4], 0.0 );
-    }
-
     switch ( m_header->datatype )
     {
         case NIFTI_TYPE_UINT8:
         {
-            uint8_t *inputData;
+            uint8_t* data = new uint8_t[ blockSize * dim ];
+
+            uint8_t* inputData;
             inputData = reinterpret_cast<uint8_t*>( filedata->data );
+
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
         case NIFTI_TYPE_INT16:
         {
-            int16_t *inputData;
+            uint16_t* data = new uint16_t[ blockSize * dim ];
+
+            int16_t* inputData;
             inputData = reinterpret_cast<int16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
         case NIFTI_TYPE_INT32:
         {
-            int32_t *inputData;
+            uint32_t* data = new uint32_t[ blockSize * dim ];
+
+            int32_t* inputData;
             inputData = reinterpret_cast<int32_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
         case NIFTI_TYPE_FLOAT32:
         {
-            float *inputData;
+            float* data = new float[ blockSize * dim ];
+
+            float* inputData;
             inputData = reinterpret_cast<float*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
         case NIFTI_TYPE_INT8:
         {
-            int8_t *inputData;
+            int8_t* data = new int8_t[ blockSize * dim ];
+
+            int8_t* inputData;
             inputData = reinterpret_cast<int8_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
         case NIFTI_TYPE_UINT16:
         {
-            uint16_t *inputData;
+            uint16_t* data = new uint16_t[ blockSize * dim ];
+
+            uint16_t* inputData;
             inputData = reinterpret_cast<uint16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
                 for ( size_t j = 0; j < dim; ++j )
                 {
-                    data[i * dim + j] = static_cast<float>( inputData[j * blockSize + i] );
+                    data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            return data;
             break;
         }
     }
-    return data;
+
+    return 0;
 }

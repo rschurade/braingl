@@ -10,8 +10,6 @@
 
 #include "../glew/include/glew.h"
 
-#include <vector>
-
 #include "nifti/nifti1_io.h"
 
 #include "dataset.h"
@@ -19,7 +17,7 @@
 class DatasetNifti : public Dataset
 {
 public:
-    DatasetNifti(  QString filename, FN_DATASET_TYPE type, std::vector<float> data  );
+    DatasetNifti(  QString filename, FN_DATASET_TYPE type, void* data  );
     virtual ~DatasetNifti();
 
     void parseNiftiHeader( nifti_image* header );
@@ -141,7 +139,7 @@ public:
         return intent_p3;
     }
 
-    std::vector< float > getData() const
+    void* getData() const
     {
         return m_data;
     }
@@ -304,7 +302,7 @@ public:
 protected:
     virtual void createTexture() = 0;
 
-    std::vector<float> m_data;
+    void* m_data;
 
     GLuint m_textureGLuint;
 

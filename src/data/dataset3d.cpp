@@ -7,7 +7,7 @@
 
 #include "dataset3d.h"
 
-Dataset3D::Dataset3D( QString filename, std::vector< float > data ) :
+Dataset3D::Dataset3D( QString filename, void* data ) :
         DatasetNifti( filename, FNDT_NIFTI_VECTOR, data )
 {
 }
@@ -18,6 +18,7 @@ Dataset3D::~Dataset3D()
 
 void Dataset3D::createTexture()
 {
+    /*
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
     glGenTextures( 1, &m_textureGLuint );
@@ -31,4 +32,5 @@ void Dataset3D::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
     glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, &m_data[ 0 ] );
+    */
 }
