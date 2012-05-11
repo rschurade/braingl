@@ -24,7 +24,8 @@ public:
 
     void click( int x, int y );
 
-    QMatrix4x4 get();
+    QQuaternion getRotQuat();
+    QMatrix4x4 getRotMat();
 
     void release();
 

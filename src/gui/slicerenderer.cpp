@@ -21,9 +21,18 @@ struct VertexData
 };
 
 SliceRenderer::SliceRenderer( DataStore* dataStore ) :
-        ObjectRenderer( dataStore ),
-        m_program( new QGLShaderProgram ),
-        vboIds( new GLuint[ 2 ] )
+    ObjectRenderer( dataStore ),
+    m_program( new QGLShaderProgram ),
+    vboIds( new GLuint[ 4 ] ),
+    m_x( 80. ),
+    m_y( 100.),
+    m_z( 80.),
+    m_xb( 160),
+    m_yb( 200),
+    m_zb( 160),
+    m_xc( 1.0),
+    m_yc( 1.0),
+    m_zc( 1.0)
 {
 }
 
@@ -74,26 +83,50 @@ void SliceRenderer::initShader()
 
 void SliceRenderer::initGeometry()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 4, vboIds );
 
-    VertexData vertices[] =
+    VertexData verticesAxial[] =
     {
-    // Vertex data for face 0
-            { QVector3D( 0.0,   0.0     , 80.0 ), QVector3D( 0.0, 0.0, 0.5 ) }, // v0
-            { QVector3D( 160.0, 0.0     , 80.0 ), QVector3D( 1.0, 0.0, 0.5 ) }, // v1
-            { QVector3D( 160.0, 200.0   , 80.0 ), QVector3D( 1.0, 1.0, 0.5 ) }, // v2
-            { QVector3D( 0.0,   200.0   , 80.0 ), QVector3D( 0.0, 1.0, 0.5 ) }
+            { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) },
+            { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) },
+            { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) },
+            { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) }
+    };
+
+    VertexData verticesCoronal[] =
+    {
+            { QVector3D( 0.0,  m_y, 0.0  ), QVector3D( 0.0, m_y/m_yb, 0.0 ) },
+            { QVector3D( m_xb, m_y, 0.0  ), QVector3D( 1.0, m_y/m_yb, 0.0 ) },
+            { QVector3D( m_xb, m_y, m_zb ), QVector3D( 1.0, m_y/m_yb, 1.0 ) },
+            { QVector3D( 0.0,  m_y, m_zb ), QVector3D( 0.0, m_y/m_yb, 1.0 ) }
+    };
+
+    VertexData verticesSagittal[] =
+    {
+            { QVector3D( m_x, 0.0,  0.0  ), QVector3D( m_x/m_xb, 0.0, 0.0 ) },
+            { QVector3D( m_x, m_yb, 0.0  ), QVector3D( m_x/m_xb, 1.0, 0.0 ) },
+            { QVector3D( m_x, m_yb, m_zb ), QVector3D( m_x/m_xb, 1.0, 1.0 ) },
+            { QVector3D( m_x, 0.0,  m_zb ), QVector3D( m_x/m_xb, 0.0, 1.0 ) }
     };
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
 
-    // Transfer vertex data to VBO 0
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
-
-    // Transfer index data to VBO 1
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    // Transfer index data to VBO 0
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+
+    // Transfer vertex data to VBO 1
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesAxial, GL_STATIC_DRAW );
+
+    // Transfer vertex data to VBO 2
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCoronal, GL_STATIC_DRAW );
+
+    // Transfer vertex data to VBO 3
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesSagittal, GL_STATIC_DRAW );
+
 }
 
 void SliceRenderer::setupTextures()
@@ -139,59 +172,62 @@ void SliceRenderer::setShaderVars()
     glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
 }
 
-void SliceRenderer::draw( QMatrix4x4 rotation )
+void SliceRenderer::draw( QMatrix4x4 rotation, float ratio )
+//void SliceRenderer::draw( QQuaternion rotation )
 {
     setupTextures();
 
-//    m_x = 80.;
-//    m_y = 100.;
-//    m_z = 80.;
-//    m_xb = 160;
-//    m_yb = 200;
-//    m_zb = 160;
-//    m_xc = 1.0;
-//    m_yc = 1.0;
-//    m_zc = 1.0;
-
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
-
-    // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-
-    setShaderVars();
 
     QMatrix4x4 mvMatrix;
     mvMatrix.setToIdentity();
     mvMatrix.translate( -80.0, -100.0, -80.0 );
-
-    mvMatrix = mvMatrix * rotation;
+    //mvMatrix.rotate( rotation );
+    mvMatrix =  rotation.inverted() * mvMatrix;
     //mvMatrix.translate( 80.0, 100.0, 80.0 );
-
 
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
     // Set perspective projection
-    pMatrix.ortho( -100, 100, -100, 100, -3000, 3000 );
+    pMatrix.ortho( -100*ratio, 100*ratio, -100, 100, -3000, 3000 );
 
     // Set modelview-projection matrix
     m_program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
 
-    // Draw cube geometry using indices from VBO 1
+    drawAxial();
+    drawCoronal();
+    drawSagittal();
+}
+
+void SliceRenderer::drawAxial()
+{
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    setShaderVars();
+
+    // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
-
 }
 
-void SliceRenderer::renderAxial()
+void SliceRenderer::drawCoronal()
 {
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    setShaderVars();
+    // Draw cube geometry using indices from VBO 0
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
-void SliceRenderer::renderCoronal()
+void SliceRenderer::drawSagittal()
 {
-}
-
-void SliceRenderer::renderSagittal()
-{
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    setShaderVars();
+    // Draw cube geometry using indices from VBO 0
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }

@@ -19,6 +19,8 @@ public:
     virtual ~DatasetScalar();
 
 private:
+    void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
+
     void createTexture();
 
     float m_min;

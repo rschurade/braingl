@@ -4,6 +4,8 @@
  *  Created on: 10.05.2012
  *      Author: Ralph
  */
+#include <QtCore/QtDebug>
+
 #include <math.h>
 
 #include "arcball.h"
@@ -28,8 +30,13 @@ ArcBall::~ArcBall()
 // surface of the sphere.
 QVector3D ArcBall::map_sphere( int x, int y )
 {
+#if 1
+    float tmpx = 1.0 - ( x * m_adjust_width );
+    float tmpy = ( y * m_adjust_height ) - 1.0;
+#else
     float tmpx = ( x * m_adjust_width ) - 1.0;
     float tmpy = 1.0 - ( y * m_adjust_height );
+#endif
 
     float length = ( tmpx * tmpx ) + ( tmpy * tmpy );
 
@@ -98,8 +105,15 @@ void ArcBall::release()
 {
 }
 
+// returns the rotation matrix to be used directly
+QQuaternion ArcBall::getRotQuat()
+{
+    return q_current_rotation;
+}
+
+
 /// returns the rotation matrix to be used directly
-QMatrix4x4 ArcBall::get()
+QMatrix4x4 ArcBall::getRotMat()
 {
     return m_currentRot;
 }
