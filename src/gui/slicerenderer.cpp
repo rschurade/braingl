@@ -10,6 +10,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
+#include "../data/datastore.h"
+
 #include "slicerenderer.h"
 
 struct VertexData
@@ -77,10 +79,10 @@ void SliceRenderer::initGeometry()
     VertexData vertices[] =
     {
     // Vertex data for face 0
-            { QVector3D( 0.0,   0.0     , 80.0 ), QVector2D( 0.0, 0.0 ) }, // v0
-            { QVector3D( 160.0, 0.0     , 80.0 ), QVector2D( 0.33, 0.0 ) }, // v1
-            { QVector3D( 160.0, 200.0   , 80.0 ), QVector2D( 0.0, 0.5 ) }, // v2
-            { QVector3D( 0.0,   200.0   , 80.0 ), QVector2D( 0.33, 0.5 ) }
+            { QVector3D( 0.0,   0.0     , 80.0 ), QVector3D( 0.0, 0.0, 0.5 ) }, // v0
+            { QVector3D( 160.0, 0.0     , 80.0 ), QVector3D( 1.0, 0.0, 0.5 ) }, // v1
+            { QVector3D( 160.0, 200.0   , 80.0 ), QVector3D( 1.0, 1.0, 0.5 ) }, // v2
+            { QVector3D( 0.0,   200.0   , 80.0 ), QVector3D( 0.0, 1.0, 0.5 ) }
     };
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
@@ -94,29 +96,32 @@ void SliceRenderer::initGeometry()
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 }
 
-void SliceRenderer::setShaderVars()
+void SliceRenderer::setupTextures()
 {
+    GLuint tex = m_dataStore->getFirstTexture();
 
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+    int allocatedTextureCount = 0;
+
+    glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
+    glBindTexture( GL_TEXTURE_3D, tex );
+
+    bool interpolation = false;
+    if ( interpolation )
+    {
+        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    }
+    else
+    {
+        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    }
 }
 
-void SliceRenderer::draw( QMatrix4x4 rotation )
+void SliceRenderer::setShaderVars()
 {
-    m_x = 80.;
-    m_y = 100.;
-    m_z = 80.;
-    m_xb = 160;
-    m_yb = 200;
-    m_zb = 160;
-    m_xc = 1.0;
-    m_yc = 1.0;
-    m_zc = 1.0;
-
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
-
-    // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-
     // Offset for position
     int offset = 0;
 
@@ -124,6 +129,37 @@ void SliceRenderer::draw( QMatrix4x4 rotation )
     int vertexLocation = m_program->attributeLocation( "a_position" );
     m_program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+
+    // Offset for texture coordinate
+    offset += sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+    int texcoordLocation = m_program->attributeLocation("a_texcoord");
+    m_program->enableAttributeArray(texcoordLocation);
+    glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
+}
+
+void SliceRenderer::draw( QMatrix4x4 rotation )
+{
+    setupTextures();
+
+//    m_x = 80.;
+//    m_y = 100.;
+//    m_z = 80.;
+//    m_xb = 160;
+//    m_yb = 200;
+//    m_zb = 160;
+//    m_xc = 1.0;
+//    m_yc = 1.0;
+//    m_zc = 1.0;
+
+    glColor4f( 0.0, 0.0, 0.0, 1.0 );
+
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+
+    setShaderVars();
 
     QMatrix4x4 mvMatrix;
     mvMatrix.setToIdentity();
