@@ -173,7 +173,6 @@ void SliceRenderer::setShaderVars()
 }
 
 void SliceRenderer::draw( QMatrix4x4 rotation, float ratio )
-//void SliceRenderer::draw( QQuaternion rotation )
 {
     setupTextures();
 
@@ -181,10 +180,9 @@ void SliceRenderer::draw( QMatrix4x4 rotation, float ratio )
 
     QMatrix4x4 mvMatrix;
     mvMatrix.setToIdentity();
+
+    mvMatrix = mvMatrix * rotation;
     mvMatrix.translate( -80.0, -100.0, -80.0 );
-    //mvMatrix.rotate( rotation );
-    mvMatrix =  rotation.inverted() * mvMatrix;
-    //mvMatrix.translate( 80.0, 100.0, 80.0 );
 
     // Reset projection
     QMatrix4x4 pMatrix;

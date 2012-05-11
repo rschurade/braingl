@@ -67,8 +67,6 @@ void SceneRenderer::resizeGL( int width, int height )
     //qDebug() << "window width: " << width << " height: " << height;
     m_arcBall->set_win_size( width, height );
 
-//    int side = qMin( width, height );
-//    glViewport( ( width - side ) / 2, ( height - side ) / 2, side, side );
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
 }
@@ -78,11 +76,13 @@ void SceneRenderer::draw()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     m_sliceRenderer->draw( m_thisRot, m_ratio );
+    //m_sliceRenderer->draw( m_arcBall->getRotMat(), m_ratio );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
 {
     m_lastRot = m_thisRot;
+
     //qDebug() << "arcball click: " << x << " , " << y;
     m_arcBall->click( x, y );
 }
@@ -91,8 +91,7 @@ void SceneRenderer::leftMouseDrag( int x, int y )
 {
     //qDebug() << "arcball drag: " << x << " , " << y;
     m_arcBall->drag( x, y );
-    m_thisRot = m_lastRot * m_arcBall->getRotMat();
-
+    m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
 }
 
 void SceneRenderer::leftMouseUp()

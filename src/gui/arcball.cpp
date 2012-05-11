@@ -30,13 +30,8 @@ ArcBall::~ArcBall()
 // surface of the sphere.
 QVector3D ArcBall::map_sphere( int x, int y )
 {
-#if 1
-    float tmpx = 1.0 - ( x * m_adjust_width );
-    float tmpy = ( y * m_adjust_height ) - 1.0;
-#else
     float tmpx = ( x * m_adjust_width ) - 1.0;
     float tmpy = 1.0 - ( y * m_adjust_height );
-#endif
 
     float length = ( tmpx * tmpx ) + ( tmpy * tmpy );
 

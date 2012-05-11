@@ -23,7 +23,6 @@ public:
 	void init();
 
 	void draw( QMatrix4x4 rotation, float ratio );
-	//void draw( QQuaternion rotation );
 
 protected:
     void initShader();
