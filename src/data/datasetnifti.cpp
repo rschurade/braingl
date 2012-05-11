@@ -7,7 +7,7 @@
 
 #include "datasetnifti.h"
 
-DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, std::vector<float> data ) :
+DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, void* data ) :
     Dataset( filename, type ),
     m_data( data ),
     m_textureGLuint( 0 )

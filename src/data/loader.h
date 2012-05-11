@@ -30,7 +30,7 @@ public:
 private:
     FN_DATASET_TYPE determineType();
 
-    std::vector<float> loadNifti();
+    void* loadNifti();
 
     nifti_image* m_header;
     QString m_fileName;
