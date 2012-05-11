@@ -23,6 +23,8 @@ public:
 	void init();
 	void initShader();
 	void initGeometry();
+
+	void setupTextures();
 	void setShaderVars();
 	void draw( QMatrix4x4 rotation );
 

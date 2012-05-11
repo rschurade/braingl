@@ -99,7 +99,10 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
 	    }
 	}
 	else
+	{
 		return m_datasetList.at( section )->getShortFilename();
+	}
+	return QVariant();
 }
 
 QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) const
@@ -208,4 +211,18 @@ QString DataStore::getNiftiDataType( const int type ) const
             break;
     }
     return QString("unknown");
+}
+
+GLuint DataStore::getFirstTexture()
+{
+    if ( m_datasetList.size() > 0 )
+    {
+        Dataset* ds = m_datasetList.first();
+        if ( ds->getType() == FNDT_NIFTI_SCALAR )
+        {
+            return dynamic_cast<DatasetScalar*>( ds )->getTextureGLuint();
+        }
+
+    }
+    return 0;
 }
