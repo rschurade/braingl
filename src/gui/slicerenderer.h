@@ -21,18 +21,21 @@ public:
 	virtual ~SliceRenderer();
 
 	void init();
-	void initShader();
-	void initGeometry();
 
-	void setupTextures();
-	void setShaderVars();
-	void draw( QMatrix4x4 rotation );
+	void draw( QMatrix4x4 rotation, float ratio );
+	//void draw( QQuaternion rotation );
+
+protected:
+    void initShader();
+    void setupTextures();
+    void setShaderVars();
+
+    void initGeometry();
 
 private:
-
-	void renderAxial();
-	void renderCoronal();
-	void renderSagittal();
+	void drawAxial();
+	void drawCoronal();
+	void drawSagittal();
 
 	float m_x;
 	float m_y;

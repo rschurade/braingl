@@ -36,7 +36,10 @@ private:
 	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
 
+	float m_ratio;
+
 	QMatrix4x4 m_lastRot;
+	QMatrix4x4 m_thisRot;
 };
 
 #endif /* SCENERENDERER_H_ */

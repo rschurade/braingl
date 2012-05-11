@@ -12,10 +12,31 @@
 DatasetScalar::DatasetScalar( QString filename, void* data ) :
     DatasetNifti( filename, FNDT_NIFTI_SCALAR, data )
 {
+    examineDataset();
 }
 
 DatasetScalar::~DatasetScalar()
 {
+}
+
+void DatasetScalar::examineDataset()
+{
+    if ( getDatatype() == DT_UNSIGNED_CHAR )
+    {
+        unsigned char* charData = reinterpret_cast< unsigned char* >( m_data );
+
+        unsigned char min = 255;
+        unsigned char max = 0;
+
+        int size = nx * ny * nz;
+        for ( size_t i = 0; i < size; ++i )
+        {
+            min = qMin( min, charData[ i ] );
+            max = qMax( max, charData[ i ] );
+        }
+        m_min = static_cast< float >( min );
+        m_max = static_cast< float >( max );
+    }
 }
 
 void DatasetScalar::createTexture()
@@ -34,20 +55,7 @@ void DatasetScalar::createTexture()
 
     if ( getDatatype() == DT_UNSIGNED_CHAR )
     {
-        unsigned char* charData = reinterpret_cast<unsigned char*>(m_data);
-
-        unsigned char min = 255;
-        unsigned char max = 0;
-
-        int size = nx * ny * nz;
-        for ( size_t i = 0; i < size; ++i )
-        {
-            min = qMin( min, charData[i] );
-            max = qMax( max, charData[i] );
-        }
+        unsigned char* charData = reinterpret_cast< unsigned char* >( m_data );
         glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, m_data );
-
-        m_min = static_cast<float>( min );
-        m_max = static_cast<float>( max );
     }
 }
