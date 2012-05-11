@@ -29,7 +29,7 @@ public:
 
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );
-	void leftMouseUp();
+
 
 private:
 	ArcBall* m_arcBall;
@@ -40,6 +40,8 @@ private:
 
 	QMatrix4x4 m_lastRot;
 	QMatrix4x4 m_thisRot;
+
+	QMatrix4x4 m_mvpMatrix;
 };
 
 #endif /* SCENERENDERER_H_ */

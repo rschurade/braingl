@@ -27,8 +27,6 @@ public:
     QQuaternion getRotQuat();
     QMatrix4x4 getRotMat();
 
-    void release();
-
 private:
     QVector3D map_sphere( int x, int y );
 

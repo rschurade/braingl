@@ -23,6 +23,9 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
 {
     m_sliceRenderer = new SliceRenderer( dataStore );
     m_arcBall = new ArcBall( 400, 400 );
+
+    m_thisRot.setToIdentity();
+    m_thisRot.translate( -80.0, -100.0, -80.0 );
     m_lastRot.setToIdentity();
 }
 
@@ -64,37 +67,44 @@ void SceneRenderer::initGL()
 
 void SceneRenderer::resizeGL( int width, int height )
 {
-    //qDebug() << "window width: " << width << " height: " << height;
     m_arcBall->set_win_size( width, height );
 
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
+
+    m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
+
+    // Reset projection
+    QMatrix4x4 pMatrix;
+    pMatrix.setToIdentity();
+    pMatrix.ortho( -100 * m_ratio, 100 * m_ratio, -100, 100, -3000, 3000 );
+    m_thisRot.translate( -80.0, -100.0, -80.0 );
+    m_mvpMatrix = pMatrix * m_thisRot;
 }
 
 void SceneRenderer::draw()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_sliceRenderer->draw( m_thisRot, m_ratio );
-    //m_sliceRenderer->draw( m_arcBall->getRotMat(), m_ratio );
+    m_sliceRenderer->draw( m_mvpMatrix );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
 {
     m_lastRot = m_thisRot;
-
-    //qDebug() << "arcball click: " << x << " , " << y;
+    m_lastRot.translate( 80.0, 100.0, 80.0 );
     m_arcBall->click( x, y );
 }
 
 void SceneRenderer::leftMouseDrag( int x, int y )
 {
-    //qDebug() << "arcball drag: " << x << " , " << y;
     m_arcBall->drag( x, y );
     m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
-}
 
-void SceneRenderer::leftMouseUp()
-{
-    m_arcBall->release();
+    // Reset projection
+    QMatrix4x4 pMatrix;
+    pMatrix.setToIdentity();
+    pMatrix.ortho( -100 * m_ratio, 100 * m_ratio, -100, 100, -3000, 3000 );
+    m_thisRot.translate( -80.0, -100.0, -80.0 );
+    m_mvpMatrix = pMatrix * m_thisRot;
 }

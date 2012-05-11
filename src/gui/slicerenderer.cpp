@@ -172,27 +172,15 @@ void SliceRenderer::setShaderVars()
     glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
 }
 
-void SliceRenderer::draw( QMatrix4x4 rotation, float ratio )
+void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 {
     setupTextures();
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
-    QMatrix4x4 mvMatrix;
-    mvMatrix.setToIdentity();
-
-    mvMatrix = mvMatrix * rotation;
-    mvMatrix.translate( -80.0, -100.0, -80.0 );
-
-    // Reset projection
-    QMatrix4x4 pMatrix;
-    pMatrix.setToIdentity();
-
-    // Set perspective projection
-    pMatrix.ortho( -100*ratio, 100*ratio, -100, 100, -3000, 3000 );
 
     // Set modelview-projection matrix
-    m_program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+    m_program->setUniformValue( "mvp_matrix", mvp_matrix );
 
     drawAxial();
     drawCoronal();

@@ -22,7 +22,7 @@ public:
 
 	void init();
 
-	void draw( QMatrix4x4 rotation, float ratio );
+	void draw( QMatrix4x4 mvp_matrix );
 
 protected:
     void initShader();
