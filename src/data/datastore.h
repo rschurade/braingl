@@ -41,8 +41,6 @@ public:
 	QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
 	QModelIndex parent ( const QModelIndex & index ) const;
 
-
-
 public slots:
 	void moveItemUp( int row );
 	void moveItemDown( int row );
@@ -54,6 +52,8 @@ private:
 
     QList< Dataset* >m_datasetList;
 
+signals:
+    void datasetListChanged();
 };
 
 #endif /* DATASTORE_H_ */
