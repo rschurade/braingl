@@ -9,6 +9,7 @@ GLWidget::GLWidget( DataStore* dataStore, QWidget *parent ) :
 	m_dataStore( dataStore )
 {
 	m_sceneRenderer = new SceneRenderer( m_dataStore );
+	connect( m_dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
 }
 
 GLWidget::~GLWidget()
@@ -59,6 +60,11 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 }
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
+{
+    updateGL();
+}
+
+void GLWidget::update()
 {
     updateGL();
 }

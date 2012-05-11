@@ -20,6 +20,8 @@ DataStore::~DataStore()
 void DataStore::addDataset( Dataset* dataset )
 {
     m_datasetList.push_back( dataset );
+
+    emit ( datasetListChanged() );
 }
 
 bool DataStore::load( QString fileName )
@@ -31,6 +33,8 @@ bool DataStore::load( QString fileName )
 		m_datasetList.push_back( loader.getDataset() );
 		endInsertRows();
 	}
+	emit ( datasetListChanged() );
+
 	return loader.succes();
 }
 
@@ -120,6 +124,7 @@ void DataStore::moveItemUp( int row )
 	beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
 	m_datasetList.swap( row, row - 1 );
 	endMoveRows();
+	emit ( datasetListChanged() );
 }
 
 void DataStore::moveItemDown( int row )
@@ -127,6 +132,7 @@ void DataStore::moveItemDown( int row )
 	beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
 	m_datasetList.swap( row, row + 1 );
 	endMoveRows();
+	emit ( datasetListChanged() );
 }
 
 void DataStore::deleteItem( int row )
@@ -139,6 +145,8 @@ void DataStore::deleteItem( int row )
         beginResetModel();
         reset();
         endResetModel();
+
+        emit ( datasetListChanged() );
     }
 }
 

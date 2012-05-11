@@ -20,8 +20,9 @@ public:
     QSize sizeHint() const;
 
 public slots:
+    void update();
 
-    signals:
+signals:
 
 protected:
     void initializeGL();

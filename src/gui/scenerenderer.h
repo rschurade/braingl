@@ -30,7 +30,6 @@ public:
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );
 
-
 private:
 	ArcBall* m_arcBall;
 	DataStore* m_dataStore;
