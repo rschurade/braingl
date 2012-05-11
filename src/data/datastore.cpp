@@ -140,11 +140,14 @@ void DataStore::deleteItem( int row )
     if ( row >= 0 && row < m_datasetList.size() )
     {
         beginRemoveRows( index( row, 0 ), row, row );
+        Dataset* toDelete = m_datasetList.at( row );
         m_datasetList.removeAt( row );
         endRemoveRows();
         beginResetModel();
         reset();
         endResetModel();
+
+        delete toDelete;
 
         emit ( datasetListChanged() );
     }

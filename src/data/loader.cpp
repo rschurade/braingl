@@ -41,6 +41,7 @@ bool Loader::load()
         	void* data = loadNifti();
             DatasetScalar* dataset = new DatasetScalar( m_fileName, data );
             dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
             m_dataset = dataset;
             return true;
             break;
@@ -111,6 +112,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
@@ -127,6 +130,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
@@ -143,6 +148,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
@@ -159,6 +166,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
@@ -175,6 +184,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
@@ -191,6 +202,8 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
+            delete[] inputData;
+            delete filedata;
             return data;
             break;
         }
