@@ -10,7 +10,8 @@
 
 Dataset::Dataset( QString fileName, FN_DATASET_TYPE type ) :
 	m_fileName( fileName ),
-	m_type( type )
+	m_type( type ),
+	m_size( -1 )
 {
 }
 
@@ -31,4 +32,9 @@ FN_DATASET_TYPE Dataset::getType()
 QString Dataset::getShortFilename()
 {
 	return m_fileName.split("/").last();
+}
+
+int Dataset::getSize()
+{
+    return m_size;
 }

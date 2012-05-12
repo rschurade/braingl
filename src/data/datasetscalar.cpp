@@ -36,6 +36,8 @@ void DatasetScalar::examineDataset()
         }
         m_min = static_cast< float >( min );
         m_max = static_cast< float >( max );
+
+        m_size = size * sizeof( unsigned char );
     }
     if ( getDatatype() == DT_SIGNED_SHORT )
     {
@@ -53,6 +55,8 @@ void DatasetScalar::examineDataset()
         m_min = static_cast< float >( min );
         m_max = static_cast< float >( max );
         qDebug() << "min: " << min << " max: " << max;
+
+        m_size = size * sizeof( short );
     }
 }
 

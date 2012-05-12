@@ -45,7 +45,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-	return 6;
+	return 7;
 }
 
 
@@ -99,6 +99,9 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                 break;
             case 5:
                 return QString("nz");
+                break;
+            case 6:
+                return QString("size");
                 break;
 	    }
 	}
@@ -178,6 +181,9 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
                 break;
             case 5:
                 return ds->getNz();
+                break;
+            case 6:
+                return ds->getSize();
                 break;
             default:
                 break;
