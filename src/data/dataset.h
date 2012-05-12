@@ -29,9 +29,14 @@ public:
     QString getShortFilename();
 
     FN_DATASET_TYPE getType();
-private:
+
+    int getSize();
+protected:
     QString m_fileName;
+
     FN_DATASET_TYPE m_type;
+
+    int m_size; // actual size in bytes that the data requires in memory
 };
 
 #endif /* DATASET_H_ */
