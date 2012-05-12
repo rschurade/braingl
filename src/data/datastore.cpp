@@ -4,6 +4,8 @@
  *  Created on: May 4, 2012
  *      Author: schurade
  */
+#include <QtCore/QLocale>
+
 #include "datasetscalar.h"
 #include "loader.h"
 
@@ -183,7 +185,8 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
                 return ds->getNz();
                 break;
             case 6:
-                return ds->getSize();
+                QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+                return QString("%L1").arg( ds->getSize() );
                 break;
             default:
                 break;
