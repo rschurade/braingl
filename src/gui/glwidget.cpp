@@ -10,6 +10,7 @@ GLWidget::GLWidget( DataStore* dataStore, QWidget *parent ) :
 {
 	m_sceneRenderer = new SceneRenderer( m_dataStore );
 	connect( m_dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
+	connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant ) ), this, SLOT( update() ) );
 }
 
 GLWidget::~GLWidget()

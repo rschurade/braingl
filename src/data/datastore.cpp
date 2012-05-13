@@ -5,6 +5,7 @@
  *      Author: schurade
  */
 #include <QtCore/QLocale>
+#include <QtCore/QDebug>
 
 #include "datasetscalar.h"
 #include "loader.h"
@@ -13,6 +14,18 @@
 
 DataStore::DataStore()
 {
+    m_globals["axial"] = 80;
+    m_globals["coronal"] = 100;
+    m_globals["sagittal"] = 80;
+    m_globals[ "max_axial" ] = 160;
+    m_globals[ "max_coronal" ] = 200;
+    m_globals[ "max_sagittal" ] = 160;
+    m_globals[ "min_axial" ] = 0;
+    m_globals[ "min_coronal" ] = 0;
+    m_globals[ "min_sagittal" ] = 0;
+    m_globals[ "slice_dx" ] = 1.0;
+    m_globals[ "slice_dy" ] = 1.0;
+    m_globals[ "slice_dz" ] = 1.0;
 }
 
 DataStore::~DataStore()
@@ -21,7 +34,24 @@ DataStore::~DataStore()
 
 void DataStore::addDataset( Dataset* dataset )
 {
+    beginInsertRows(QModelIndex(), m_datasetList.size(), m_datasetList.size());
     m_datasetList.push_back( dataset );
+    endInsertRows();
+
+    // TODO dont just use the first dataset
+    // check if there is maybe first texture added
+    if ( m_datasetList.size() == 1 )
+    {
+        Dataset* ds = m_datasetList.first();
+        if ( ds->getType() == FNDT_NIFTI_SCALAR )
+        {
+            DatasetScalar* dss = dynamic_cast<DatasetScalar*>( ds );
+            m_globals[ "axial" ] = dss->getNz() / 2;
+            m_globals[ "coronal" ] = dss->getNy() / 2;
+            m_globals[ "sagittal" ] =  dss->getNx() / 2;
+        }
+    }
+    updateGlobals();
 
     emit ( datasetListChanged() );
 }
@@ -31,12 +61,8 @@ bool DataStore::load( QDir fileName )
 	Loader loader( fileName );
 	if ( loader.load() )
 	{
-		beginInsertRows(QModelIndex(), m_datasetList.size(), m_datasetList.size());
-		m_datasetList.push_back( loader.getDataset() );
-		endInsertRows();
+		addDataset( loader.getDataset() );
 	}
-	emit ( datasetListChanged() );
-
 	return loader.succes();
 }
 
@@ -47,7 +73,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-	return 7;
+	return 10;
 }
 
 
@@ -117,16 +143,25 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                 return QString("data type");
                 break;
 	        case 3:
+                return QString("size in byte");
+                break;
+	        case 4:
                 return QString("nx");
                 break;
-            case 4:
+            case 5:
                 return QString("ny");
                 break;
-            case 5:
+            case 6:
                 return QString("nz");
                 break;
-            case 6:
-                return QString("size in byte");
+            case 7:
+                return QString( "dx" );
+                break;
+            case 8:
+                return QString( "dy" );
+                break;
+            case 9:
+                return QString( "dz" );
                 break;
 	    }
 	}
@@ -152,6 +187,7 @@ void DataStore::moveItemUp( int row )
 	beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
 	m_datasetList.swap( row, row - 1 );
 	endMoveRows();
+	updateGlobals();
 	emit ( datasetListChanged() );
 }
 
@@ -160,6 +196,7 @@ void DataStore::moveItemDown( int row )
 	beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
 	m_datasetList.swap( row, row + 1 );
 	endMoveRows();
+	updateGlobals();
 	emit ( datasetListChanged() );
 }
 
@@ -176,7 +213,7 @@ void DataStore::deleteItem( int row )
         endResetModel();
 
         delete toDelete;
-
+        updateGlobals();
         emit ( datasetListChanged() );
     }
 }
@@ -199,17 +236,26 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
                 return getNiftiDataType( ds->getDatatype() );
                 break;
             case 3:
-                return ds->getNx();
-                break;
-            case 4:
-                return ds->getNy();
-                break;
-            case 5:
-                return ds->getNz();
-                break;
-            case 6:
                 QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
                 return QString("%L1").arg( ds->getSize() );
+                break;
+            case 4:
+                return ds->getNx();
+                break;
+            case 5:
+                return ds->getNy();
+                break;
+            case 6:
+                return ds->getNz();
+                break;
+            case 7:
+                return ds->getDx();
+                break;
+            case 8:
+                return ds->getDy();
+                break;
+            case 9:
+                return ds->getDz();
                 break;
             default:
                 break;
@@ -268,4 +314,51 @@ GLuint DataStore::getFirstTexture()
 
     }
     return 0;
+}
+
+void DataStore::setGlobal( QString key, QVariant data )
+{
+    //qDebug() << "set global: " << key << "," << data;
+    m_globals[key] = data;
+    emit( globalSettingChanged( key, data ) );
+}
+
+QVariant DataStore::getGlobalSetting( QString name )
+{
+    if ( m_globals.contains( name ) )
+    {
+        return m_globals[name];
+    }
+    return QVariant();
+}
+
+void DataStore::updateGlobals()
+{
+    updateSliceGlobals();
+}
+
+void DataStore::updateSliceGlobals()
+{
+    if ( m_datasetList.size() > 0 )
+    {
+        Dataset* ds = m_datasetList.first();
+        if ( ds->getType() == FNDT_NIFTI_SCALAR )
+        {
+            DatasetScalar* dss = dynamic_cast<DatasetScalar*>( ds );
+            m_globals[ "max_axial" ] = dss->getNz();
+            m_globals[ "max_coronal" ] = dss->getNy();
+            m_globals[ "max_sagittal" ] =  dss->getNx();
+            m_globals[ "slice_dx"] = dss->getDx();
+            m_globals[ "slice_dy"] = dss->getDy();
+            m_globals[ "slice_dz"] = dss->getDz();
+
+            emit( globalSettingChanged( "max_axial", dss->getNz() ) );
+            emit( globalSettingChanged( "max_coronal", dss->getNy() ) );
+            emit( globalSettingChanged( "max_sagittal", dss->getNx() ) );
+
+            emit( globalSettingChanged( "axial", m_globals[ "axial"] ) );
+            emit( globalSettingChanged( "coronal", m_globals[ "coronal"] ) );
+            emit( globalSettingChanged( "sagittal", m_globals[ "sagittal"] ) );
+        }
+    }
 }

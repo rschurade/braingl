@@ -24,15 +24,12 @@ SliceRenderer::SliceRenderer( DataStore* dataStore ) :
     ObjectRenderer( dataStore ),
     m_program( new QGLShaderProgram ),
     vboIds( new GLuint[ 4 ] ),
-    m_x( 80. ),
-    m_y( 100.),
-    m_z( 80.),
-    m_xb( 160),
-    m_yb( 200),
-    m_zb( 160),
-    m_xc( 1.0),
-    m_yc( 1.0),
-    m_zc( 1.0)
+    m_x( 0. ),
+    m_y( 0.),
+    m_z( 0.),
+    m_xb( 0 ),
+    m_yb( 0 ),
+    m_zb( 0 )
 {
 }
 
@@ -84,6 +81,25 @@ void SliceRenderer::initShader()
 void SliceRenderer::initGeometry()
 {
     glGenBuffers( 4, vboIds );
+
+    m_x = m_dataStore->getGlobalSetting( "sagittal" ).toFloat();
+    m_y = m_dataStore->getGlobalSetting( "coronal" ).toFloat();
+    m_z = m_dataStore->getGlobalSetting( "axial" ).toFloat();
+    m_xb = m_dataStore->getGlobalSetting( "max_sagittal" ).toFloat();
+    m_yb = m_dataStore->getGlobalSetting( "max_coronal" ).toFloat();
+    m_zb = m_dataStore->getGlobalSetting( "max_axial" ).toFloat();
+
+    float dx = m_dataStore->getGlobalSetting( "slice_dx" ).toFloat();
+    float dy = m_dataStore->getGlobalSetting( "slice_dy" ).toFloat();
+    float dz = m_dataStore->getGlobalSetting( "slice_dz" ).toFloat();
+
+    m_x *= dx;
+    m_y *= dy;
+    m_z *= dz;
+    m_xb *= dx;
+    m_yb *= dy;
+    m_zb *= dz;
+
 
     VertexData verticesAxial[] =
     {
@@ -182,9 +198,16 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
     // Set modelview-projection matrix
     m_program->setUniformValue( "mvp_matrix", mvp_matrix );
 
+    initGeometry();
+
     drawAxial();
     drawCoronal();
     drawSagittal();
+
+    glDeleteBuffers( 1, &vboIds[0] );
+    glDeleteBuffers( 1, &vboIds[1] );
+    glDeleteBuffers( 1, &vboIds[2] );
+    glDeleteBuffers( 1, &vboIds[3] );
 }
 
 void SliceRenderer::drawAxial()

@@ -30,6 +30,8 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     setUnifiedTitleAndToolBarOnMac( true );
 
 	restoreState( settings.value( "mainWindowState" ).toByteArray() );
+
+	m_dataStore->updateGlobals();
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -173,12 +175,18 @@ void MainWindow::createDockWindows()
     NavGLWidget* nav1 = new NavGLWidget( QString("axial"), this );
     addDockWidget( Qt::RightDockWidgetArea, nav1 );
     viewMenu->addAction( nav1->toggleViewAction() );
+    connect( nav1, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
+    connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), nav1, SLOT( settingChanged( QString, QVariant ) ) );
 
     NavGLWidget* nav2 = new NavGLWidget( QString( "sagittal" ), this );
     addDockWidget( Qt::RightDockWidgetArea, nav2 );
     viewMenu->addAction( nav2->toggleViewAction() );
+    connect( nav2, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
+    connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), nav2, SLOT( settingChanged( QString, QVariant ) ) );
 
     NavGLWidget* nav3 = new NavGLWidget( QString( "coronal" ), this );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
+    connect( nav3, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
+    connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), nav3, SLOT( settingChanged( QString, QVariant ) ) );
 }

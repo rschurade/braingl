@@ -10,7 +10,8 @@
 #include "navglwidget.h"
 
 NavGLWidget::NavGLWidget( QString name, QWidget* parent ) :
-    QDockWidget( name, parent )
+    QDockWidget( name, parent ),
+    m_name( name )
 {
     setObjectName( QString("nav gl") + name );
 
@@ -30,8 +31,12 @@ NavGLWidget::NavGLWidget( QString name, QWidget* parent ) :
     m_slider->setMinimum( 0 );
     m_slider->setMaximum( 200 );
 
+    m_lineEdit = new QLineEdit();
+    m_lineEdit->setMaxLength( 3 );
+    m_lineEdit->setMaximumWidth( 30 );
     connect( m_slider, SIGNAL( valueChanged( int) ), this, SLOT( sliderChanged( int ) ) );
 
+    sliderLayout->addWidget( m_lineEdit );
     sliderLayout->addWidget( m_slider );
 
     m_layout->addWidget( m_glWidget );
@@ -61,5 +66,19 @@ QSize NavGLWidget::sizeHint() const
 
 void NavGLWidget::sliderChanged( int value )
 {
+    m_lineEdit->setText( QString::number( value, 10 ) );
+    emit( sliderChange( m_name, value ) );
     //qDebug() << value;
+}
+
+void NavGLWidget::settingChanged( QString name, QVariant data )
+{
+    if ( name == tr("max_") + m_name )
+    {
+        m_slider->setMaximum( data.toInt() );
+    }
+    if ( name == m_name )
+    {
+        m_slider->setValue( data.toInt() );
+    }
 }
