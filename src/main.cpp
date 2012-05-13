@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
 #include <QtCore/QDebug>
+#include <QtCore/QDir>
 
 #include "data/datastore.h"
 #include "gui/mainwindow.h"
@@ -20,7 +21,7 @@ int main( int argc, char *argv[] )
     DataStore* dataStore = new DataStore();
     for ( int i = 1; i < args.size(); ++i )
     {
-        dataStore->load( args.at( i ) );
+        dataStore->load( QDir( args.at( i ) ) );
         //qDebug() << i << " : " << args.at( i );
     }
 

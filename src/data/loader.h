@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include <QtCore/QString>
+#include <QtCore/QDir>
 
 #include "nifti/nifti1_io.h"
 
@@ -19,7 +19,7 @@
 class Loader
 {
 public:
-    Loader( QString fileName );
+    Loader( QDir fileName );
     virtual ~Loader();
 
     bool load();
@@ -33,7 +33,7 @@ private:
     void* loadNifti();
 
     nifti_image* m_header;
-    QString m_fileName;
+    QDir m_fileName;
     FN_DATASET_TYPE m_datasetType;
 
     Dataset* m_dataset;
