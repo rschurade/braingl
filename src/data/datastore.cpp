@@ -61,7 +61,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
 	if ( role == Qt::DisplayRole && index.column() == 0 )
 	{
-		return m_datasetList.at( index.row() )->getShortFilename();
+		return m_datasetList.at( index.row() )->getName();
 	}
 	else if ( role == Qt::DisplayRole && index.column() > 0 )
 	{
@@ -73,6 +73,29 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 		return QVariant();
 	}
 	return QVariant();
+}
+
+bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
+{
+    if ( !index.isValid() )
+    {
+        return false;
+    }
+
+    if ( role == Qt::EditRole )
+    {
+        if ( index.row() >= 0 && index.row() < m_datasetList.size() )
+        {
+            if ( index.column() == 0 )
+            {
+                m_datasetList.at( index.row() )->setName( value.toString() );
+            }
+        }
+        emit( dataChanged( index, index ) );
+        emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
+        return true;
+    }
+    return false;
 }
 
 QVariant DataStore::headerData( int section, Qt::Orientation orientation, int role ) const
@@ -109,7 +132,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
 	}
 	else
 	{
-		return m_datasetList.at( section )->getShortFilename();
+		return m_datasetList.at( section )->getName();
 	}
 	return QVariant();
 }

@@ -14,7 +14,6 @@ QDockWidget( name, parent )
     setObjectName( name );
 
     m_infoView = new DatasetInfoView( this );
-    m_infoView->hideColumn( 0 );
     setWidget( m_infoView );
 }
 
@@ -25,7 +24,7 @@ DatasetInfoWidget::~DatasetInfoWidget()
 void DatasetInfoWidget::setModel( QAbstractItemModel* model )
 {
     m_infoView->setModel( model );
-
+    m_infoView->hideColumn( 0 );
 }
 
 void DatasetInfoWidget::setSelectionModel( QItemSelectionModel* selectionModel )

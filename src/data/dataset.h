@@ -26,13 +26,16 @@ public:
 
     QString getFilename();
 
-    QString getShortFilename();
+    QString getName();
+    void setName( QString name );
 
     FN_DATASET_TYPE getType();
 
     int getSize();
 protected:
     QString m_fileName;
+
+    QString m_name;
 
     FN_DATASET_TYPE m_type;
 

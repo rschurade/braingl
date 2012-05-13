@@ -36,11 +36,16 @@ public:
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 
+
+private slots:
+    void nameEdited();
+
 private:
     QWidget* m_widget;
 
     QVBoxLayout* m_layout;
     QLineEdit* m_nameEdit;
+    QModelIndex m_currentIndex;
 
 
 };
