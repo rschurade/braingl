@@ -68,15 +68,44 @@ void NavRenderer::resizeGL( int width, int height )
 
     if ( m_name == "axial" )
     {
-        pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
+
+        float textureRatio = m_xb/ m_yb;
+        float mult = m_ratio / textureRatio;
+
+        if ( mult >= 1.0 )
+        {
+            pMatrix.ortho( 0, m_xb * mult, 0, m_yb, -3000, 3000 );
+        }
+        else
+        {
+            pMatrix.ortho( 0, m_xb, 0, m_yb * ( 1.0 / mult ) , -3000, 3000 );
+        }
     }
     else if ( m_name == "coronal" )
     {
-        pMatrix.ortho( 0, m_xb, 0, m_zb, -3000, 3000 );
+        float textureRatio = m_xb/ m_zb;
+        float mult = m_ratio / textureRatio;
+        if ( mult >= 1.0 )
+        {
+            pMatrix.ortho( 0, m_xb * mult, 0, m_zb, -3000, 3000 );
+        }
+        else
+        {
+            pMatrix.ortho( 0, m_xb, 0, m_zb * ( 1.0 / mult ), -3000, 3000 );
+        }
     }
     else
     {
-        pMatrix.ortho( 0, m_yb, 0, m_zb, -3000, 3000 );
+        float textureRatio = m_yb/ m_zb;
+        float mult = m_ratio / textureRatio;
+        if ( mult >= 1.0 )
+        {
+            pMatrix.ortho( 0, m_yb * mult, 0, m_zb, -3000, 3000 );
+        }
+        else
+        {
+            pMatrix.ortho( 0, m_yb, 0, m_zb * ( 1.0 / mult ), -3000, 3000 );
+        }
     }
     m_mvpMatrix = pMatrix;
 }
