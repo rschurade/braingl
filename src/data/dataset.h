@@ -8,6 +8,7 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
+#include <QtCore/QDir>
 #include <QtCore/QString>
 
 enum FN_DATASET_TYPE
@@ -21,10 +22,10 @@ enum FN_DATASET_TYPE
 class Dataset
 {
 public:
-    Dataset( QString fileName, FN_DATASET_TYPE type );
+    Dataset( QDir fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    QString getFilename();
+    QDir getFilename();
 
     QString getName();
     void setName( QString name );
@@ -33,7 +34,7 @@ public:
 
     int getSize();
 protected:
-    QString m_fileName;
+    QDir m_fileName;
 
     QString m_name;
 

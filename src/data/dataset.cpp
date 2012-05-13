@@ -8,19 +8,19 @@
 
 #include "dataset.h"
 
-Dataset::Dataset( QString fileName, FN_DATASET_TYPE type ) :
+Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type ) :
 	m_fileName( fileName ),
 	m_type( type ),
 	m_size( -1 )
 {
-    m_name = m_fileName.split("/").last();
+    m_name = m_fileName.path().split("/").last();
 }
 
 Dataset::~Dataset()
 {
 }
 
-QString Dataset::getFilename()
+QDir Dataset::getFilename()
 {
 	return m_fileName;
 }

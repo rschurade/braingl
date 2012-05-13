@@ -26,7 +26,7 @@ void DataStore::addDataset( Dataset* dataset )
     emit ( datasetListChanged() );
 }
 
-bool DataStore::load( QString fileName )
+bool DataStore::load( QDir fileName )
 {
 	Loader loader( fileName );
 	if ( loader.load() )

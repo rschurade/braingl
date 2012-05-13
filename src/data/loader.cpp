@@ -11,7 +11,7 @@
 
 #include "loader.h"
 
-Loader::Loader( QString fileName ) :
+Loader::Loader( QDir fileName ) :
     m_fileName( fileName ),
     m_datasetType( FNDT_UNKNOWN ),
     m_success( false )
@@ -39,7 +39,7 @@ bool Loader::load()
         case FNDT_NIFTI_SCALAR:
         {
         	void* data = loadNifti();
-            DatasetScalar* dataset = new DatasetScalar( m_fileName, data );
+            DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
             m_dataset = dataset;
@@ -49,7 +49,7 @@ bool Loader::load()
         case FNDT_NIFTI_VECTOR:
         {
             void* data = loadNifti();
-            Dataset3D* dataset = new Dataset3D( m_fileName, data );
+            Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             m_dataset = dataset;
             return true;
@@ -65,9 +65,9 @@ bool Loader::load()
 
 FN_DATASET_TYPE Loader::determineType()
 {
-    if ( m_fileName.endsWith(".nii.gz") || m_fileName.endsWith(".nii") )
+    if ( m_fileName.path().endsWith(".nii.gz") || m_fileName.path().endsWith(".nii") )
     {
-        m_header = nifti_image_read( m_fileName.toStdString().c_str(), 0 );
+        m_header = nifti_image_read( m_fileName.path().toStdString().c_str(), 0 );
 
         // if a proper nifti header is found
         if ( m_header )
@@ -91,7 +91,7 @@ FN_DATASET_TYPE Loader::determineType()
 
 void* Loader::loadNifti()
 {
-    nifti_image* filedata = nifti_image_read( m_fileName.toStdString().c_str(), 1 );
+    nifti_image* filedata = nifti_image_read( m_fileName.path().toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];

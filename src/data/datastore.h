@@ -10,6 +10,7 @@
 
 #include "../glew/include/glew.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QList>
 #include <QtCore/QAbstractItemModel>
 
@@ -23,7 +24,7 @@ public:
     DataStore();
     virtual ~DataStore();
 
-    bool load( QString fileName );
+    bool load( QDir fileName );
 
     void addDataset( Dataset* dataset );
 
