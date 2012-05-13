@@ -12,7 +12,10 @@
 
 class QGLWidget;
 class QSlider;
+class QLineEdit;
 class QVBoxLayout;
+class LineEdit;
+
 
 class NavGLWidget : public QDockWidget
 {
@@ -29,9 +32,16 @@ private:
     QGLWidget* m_glWidget;
     QVBoxLayout* m_layout;
     QSlider* m_slider;
+    QLineEdit* m_lineEdit;
+
+    QString m_name;
 
 private slots:
     void sliderChanged( int value );
+    void settingChanged( QString name, QVariant data );
+
+signals:
+    void sliderChange( QString name, QVariant value );
 
 };
 

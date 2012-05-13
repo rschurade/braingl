@@ -42,9 +42,6 @@ private:
 	float m_xb;
 	float m_yb;
 	float m_zb;
-	float m_xc;
-	float m_yc;
-	float m_zc;
 
 	GLuint *vboIds;
 

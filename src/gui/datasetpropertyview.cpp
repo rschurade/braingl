@@ -89,8 +89,11 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     {
         sel = selected.indexes().first().row();
     }
-    m_currentIndex = model()->index( sel, 0 );
-    m_nameEdit->setText( model()->data( m_currentIndex, Qt::DisplayRole ).toString() );
+    if ( sel != -1 )
+    {
+        m_currentIndex = model()->index( sel, 0 );
+        m_nameEdit->setText( model()->data( m_currentIndex, Qt::DisplayRole ).toString() );
+    }
 }
 
 void DatasetPropertyView::nameEdited()

@@ -11,6 +11,7 @@
 #include "../glew/include/glew.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QAbstractItemModel>
 
@@ -31,6 +32,9 @@ public:
     // only temporary, will be removed again
     GLuint getFirstTexture();
 
+    QVariant getGlobalSetting( QString name );
+
+    void updateGlobals();
 
     /**
      * reimplemented from QAbstractItemModel
@@ -41,21 +45,28 @@ public:
 	QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 	QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
 	QModelIndex parent ( const QModelIndex & index ) const;
-
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::EditRole );
+
 public slots:
 	void moveItemUp( int row );
 	void moveItemDown( int row );
 	void deleteItem( int row );
 
+	void setGlobal( QString key, QVariant data );
+
 private:
 	QVariant datasetInfo( const QModelIndex &index ) const;
 	QString getNiftiDataType( const int type ) const;
 
+	void updateSliceGlobals();
+
     QList< Dataset* >m_datasetList;
+
+    QHash< QString, QVariant >m_globals;
 
 signals:
     void datasetListChanged();
+    void globalSettingChanged( QString name, QVariant data );
 };
 
 #endif /* DATASTORE_H_ */
