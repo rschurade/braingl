@@ -3,7 +3,10 @@
 #include "../data/datastore.h"
 
 #include "glwidget.h"
-#include "datasetviewwidget.h"
+#include "datasetlistwidget.h"
+#include "datasetinfowidget.h"
+#include "datasetpropertywidget.h"
+#include "navglwidget.h"
 #include "mainwindow.h"
 
 MainWindow::MainWindow( DataStore* dataStore ) :
@@ -145,22 +148,35 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-	DatasetViewWidget* dock1 = new DatasetViewWidget( this );
-	dock1->setModel( m_dataStore );
-	addDockWidget( Qt::LeftDockWidgetArea, dock1 );
-	viewMenu->addAction( dock1->toggleViewAction() );
+	DatasetListWidget* dsList = new DatasetListWidget( this );
+	dsList->setModel( m_dataStore );
+	addDockWidget( Qt::LeftDockWidgetArea, dsList );
+	viewMenu->addAction( dsList->toggleViewAction() );
 
-	connect( dock1, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
-	connect( dock1, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
-	connect( dock1, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
+	connect( dsList, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
+	connect( dsList, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
+	connect( dsList, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	QDockWidget *dock = new QDockWidget( tr( "Dataset View 2" ), this );
-	dock->setObjectName( "Dataset View Dock 2" );
-    datasetView2 = new QTableView( dock );
-    datasetView2->setModel( m_dataStore );
-    datasetView2->setSelectionModel( dock1->selectionModel() );
-    datasetView2->hideColumn( 0 );
-    dock->setWidget( datasetView2 );
-    addDockWidget( Qt::LeftDockWidgetArea, dock );
-    viewMenu->addAction( dock->toggleViewAction() );
+	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("properties"), this );
+    addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
+    viewMenu->addAction( dsProperties->toggleViewAction() );
+
+
+	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
+	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
+	dsInfo->setModel( m_dataStore );
+    dsInfo->setSelectionModel( dsList->selectionModel() );
+    viewMenu->addAction( dsInfo->toggleViewAction() );
+
+    NavGLWidget* nav1 = new NavGLWidget( QString("axial"), this );
+    addDockWidget( Qt::RightDockWidgetArea, nav1 );
+    viewMenu->addAction( nav1->toggleViewAction() );
+
+    NavGLWidget* nav2 = new NavGLWidget( QString( "sagittal" ), this );
+    addDockWidget( Qt::RightDockWidgetArea, nav2 );
+    viewMenu->addAction( nav2->toggleViewAction() );
+
+    NavGLWidget* nav3 = new NavGLWidget( QString( "coronal" ), this );
+    addDockWidget( Qt::RightDockWidgetArea, nav3 );
+    viewMenu->addAction( nav3->toggleViewAction() );
 }

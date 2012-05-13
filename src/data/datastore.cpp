@@ -103,7 +103,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                 return QString("nz");
                 break;
             case 6:
-                return QString("size");
+                return QString("size in byte");
                 break;
 	    }
 	}

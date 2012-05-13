@@ -11,9 +11,9 @@
 
 #include "datasetlistview.h"
 
-#include "datasetviewwidget.h"
+#include "datasetlistwidget.h"
 
-DatasetViewWidget::DatasetViewWidget( QWidget* parent ) :
+DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QDockWidget( "Datasets", parent ),
 	m_selected( -1 )
 {
@@ -58,21 +58,21 @@ DatasetViewWidget::DatasetViewWidget( QWidget* parent ) :
 	m_deleteButton->setEnabled( false );
 }
 
-DatasetViewWidget::~DatasetViewWidget()
+DatasetListWidget::~DatasetListWidget()
 {
 }
 
-void DatasetViewWidget::setModel (QAbstractItemModel  *model )
+void DatasetListWidget::setModel (QAbstractItemModel  *model )
 {
 	m_listView->setModel( model );
 }
 
-QItemSelectionModel* DatasetViewWidget::selectionModel()
+QItemSelectionModel* DatasetListWidget::selectionModel()
 {
     return m_listView->selectionModel();
 }
 
-void DatasetViewWidget::moveItemDown()
+void DatasetListWidget::moveItemDown()
 {
 	emit moveSelectedItemDown( m_selected );
 	QItemSelectionModel* selector = m_listView->selectionModel();
@@ -86,7 +86,7 @@ void DatasetViewWidget::moveItemDown()
     }
 }
 
-void DatasetViewWidget::moveItemUp()
+void DatasetListWidget::moveItemUp()
 {
 	emit moveSelectedItemUp( m_selected );
     QItemSelectionModel* selector = m_listView->selectionModel();
@@ -101,7 +101,7 @@ void DatasetViewWidget::moveItemUp()
 }
 
 
-void DatasetViewWidget::itemSelectionChanged( const QItemSelection &selected )
+void DatasetListWidget::itemSelectionChanged( const QItemSelection &selected )
 {
 	m_upButton->setEnabled( false );
 	m_downButton->setEnabled( false );
@@ -127,7 +127,7 @@ void DatasetViewWidget::itemSelectionChanged( const QItemSelection &selected )
 	}
 }
 
-void DatasetViewWidget::deleteItem()
+void DatasetListWidget::deleteItem()
 {
     emit deleteSelectedItem( m_selected );
 

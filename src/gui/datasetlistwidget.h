@@ -17,13 +17,13 @@ class DatasetListView;
 class QItemSelection;
 class QItemSelectionModel;
 
-class DatasetViewWidget : public QDockWidget
+class DatasetListWidget : public QDockWidget
 {
 	Q_OBJECT
 
 public:
-	DatasetViewWidget( QWidget* parent = 0 );
-	virtual ~DatasetViewWidget();
+	DatasetListWidget( QWidget* parent = 0 );
+	virtual ~DatasetListWidget();
 
 	void setModel ( QAbstractItemModel  *model );
 	QItemSelectionModel* selectionModel();
