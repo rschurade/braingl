@@ -1,10 +1,12 @@
 /*
- * slicerenderer.cpp
+ * NavRenderer.cpp
  *
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-#include "../glew/include/glew.h"
+#include "navrenderer.h"
+
+#include <QtCore/QDebug>
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
@@ -12,34 +14,82 @@
 
 #include "../data/datastore.h"
 
-#include "slicerenderer.h"
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE  0x809D
+#endif
 
-SliceRenderer::SliceRenderer( DataStore* dataStore ) :
-    ObjectRenderer( dataStore ),
+NavRenderer::NavRenderer( DataStore* dataStore, QString name ) :
+    m_dataStore( dataStore ),
+    m_name( name ),
+    m_ratio( 1.0 ),
     m_program( new QGLShaderProgram ),
-    vboIds( new GLuint[ 4 ] ),
+    vboIds( new GLuint[ 2 ] ),
     m_x( 0. ),
-    m_y( 0.),
-    m_z( 0.),
+    m_y( 0. ),
+    m_z( 0. ),
     m_xb( 0 ),
     m_yb( 0 ),
     m_zb( 0 )
 {
 }
 
-SliceRenderer::~SliceRenderer()
+NavRenderer::~NavRenderer()
 {
-    glDeleteBuffers( 2, vboIds );
-    delete[] vboIds;
 }
 
-void SliceRenderer::init()
+void NavRenderer::initGL()
 {
+    glClearColor( 1.0, 0.0, 1.0, 0.0 );
+
+    glEnable( GL_DEPTH_TEST );
+
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable( GL_BLEND );
+
+    glShadeModel( GL_SMOOTH );
+    glEnable( GL_LIGHTING );
+    glEnable( GL_LIGHT0 );
+    glEnable( GL_MULTISAMPLE );
+    static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
+    glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
+
     initShader();
-    initGeometry();
 }
 
-void SliceRenderer::initShader()
+void NavRenderer::resizeGL( int width, int height )
+{
+
+    m_ratio = static_cast<float>( width )/ static_cast<float>(height);
+    glViewport( 0, 0, width, height );
+
+    // Reset projection
+    QMatrix4x4 pMatrix;
+    pMatrix.setToIdentity();
+
+    if ( m_name == "axial" )
+    {
+        pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
+    }
+    else if ( m_name == "coronal" )
+    {
+        pMatrix.ortho( 0, m_xb, 0, m_zb, -3000, 3000 );
+    }
+    else
+    {
+        pMatrix.ortho( 0, m_yb, 0, m_zb, -3000, 3000 );
+    }
+    m_mvpMatrix = pMatrix;
+}
+
+void NavRenderer::leftMouseDown( int x, int y )
+{
+}
+
+void NavRenderer::leftMouseDrag( int x, int y )
+{
+}
+
+void NavRenderer::initShader()
 {
     // Overriding system locale until shaders are compiled
     setlocale( LC_NUMERIC, "C" );
@@ -72,7 +122,7 @@ void SliceRenderer::initShader()
     setlocale( LC_ALL, "" );
 }
 
-void SliceRenderer::initGeometry()
+void NavRenderer::initGeometry()
 {
     glGenBuffers( 4, vboIds );
 
@@ -105,18 +155,18 @@ void SliceRenderer::initGeometry()
 
     VertexData verticesCoronal[] =
     {
-            { QVector3D( 0.0,  m_y, 0.0  ), QVector3D( 0.0, m_y/m_yb, 0.0 ) },
-            { QVector3D( m_xb, m_y, 0.0  ), QVector3D( 1.0, m_y/m_yb, 0.0 ) },
-            { QVector3D( m_xb, m_y, m_zb ), QVector3D( 1.0, m_y/m_yb, 1.0 ) },
-            { QVector3D( 0.0,  m_y, m_zb ), QVector3D( 0.0, m_y/m_yb, 1.0 ) }
+            { QVector3D( 0.0,  0.0,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) },
+            { QVector3D( m_xb, 0.0,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) },
+            { QVector3D( m_xb, m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) },
+            { QVector3D( 0.0,  m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) }
     };
 
     VertexData verticesSagittal[] =
     {
-            { QVector3D( m_x, 0.0,  0.0  ), QVector3D( m_x/m_xb, 0.0, 0.0 ) },
-            { QVector3D( m_x, m_yb, 0.0  ), QVector3D( m_x/m_xb, 1.0, 0.0 ) },
-            { QVector3D( m_x, m_yb, m_zb ), QVector3D( m_x/m_xb, 1.0, 1.0 ) },
-            { QVector3D( m_x, 0.0,  m_zb ), QVector3D( m_x/m_xb, 0.0, 1.0 ) }
+            { QVector3D( 0.0,  0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) },
+            { QVector3D( m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) },
+            { QVector3D( m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) },
+            { QVector3D( 0.0,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) }
     };
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
@@ -139,7 +189,7 @@ void SliceRenderer::initGeometry()
 
 }
 
-void SliceRenderer::setupTextures()
+void NavRenderer::setupTextures()
 {
     GLuint tex = m_dataStore->getFirstTexture();
 
@@ -163,7 +213,7 @@ void SliceRenderer::setupTextures()
     }
 }
 
-void SliceRenderer::setShaderVars()
+void NavRenderer::setShaderVars()
 {
     // Offset for position
     int offset = 0;
@@ -182,21 +232,32 @@ void SliceRenderer::setShaderVars()
     glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
 }
 
-void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
+void NavRenderer::draw()
 {
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
     setupTextures();
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
 
     // Set modelview-projection matrix
-    m_program->setUniformValue( "mvp_matrix", mvp_matrix );
+    m_program->setUniformValue( "mvp_matrix", m_mvpMatrix );
 
     initGeometry();
 
-    drawAxial();
-    drawCoronal();
-    drawSagittal();
+    if ( m_name == "axial" )
+    {
+        drawAxial();
+    }
+    else if ( m_name == "coronal" )
+    {
+        drawCoronal();
+    }
+    else
+    {
+        drawSagittal();
+    }
 
     glDeleteBuffers( 1, &vboIds[0] );
     glDeleteBuffers( 1, &vboIds[1] );
@@ -204,7 +265,7 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
     glDeleteBuffers( 1, &vboIds[3] );
 }
 
-void SliceRenderer::drawAxial()
+void NavRenderer::drawAxial()
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -215,7 +276,7 @@ void SliceRenderer::drawAxial()
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
-void SliceRenderer::drawCoronal()
+void NavRenderer::drawCoronal()
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -225,7 +286,7 @@ void SliceRenderer::drawCoronal()
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
-void SliceRenderer::drawSagittal()
+void NavRenderer::drawSagittal()
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -234,3 +295,5 @@ void SliceRenderer::drawSagittal()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
+
+

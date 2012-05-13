@@ -5,17 +5,18 @@
  *      Author: Ralph
  */
 #include <QtGui/QtGui>
-#include <QtOpenGL/QGLWidget>
+
+#include "navglwidget.h"
 
 #include "docknavglwidget.h"
 
-DockNavGLWidget::DockNavGLWidget( QString name, QWidget* parent, const QGLWidget *shareWidget ) :
+DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* parent, const QGLWidget *shareWidget ) :
     QDockWidget( name, parent ),
     m_name( name )
 {
-    setObjectName( QString("nav gl") + name );
+    setObjectName( QString("nav gl ") + name );
 
-    m_glWidget = new QGLWidget( this, shareWidget );
+    m_glWidget = new NavGLWidget( dataStore, name, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     this->setAllowedAreas( Qt::AllDockWidgetAreas );
@@ -81,4 +82,5 @@ void DockNavGLWidget::settingChanged( QString name, QVariant data )
     {
         m_slider->setValue( data.toInt() );
     }
+    m_glWidget->update();
 }
