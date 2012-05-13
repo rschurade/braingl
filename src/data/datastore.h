@@ -14,8 +14,15 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QAbstractItemModel>
+#include <QtGui/QVector3D>
 
 class Dataset;
+
+struct VertexData
+{
+    QVector3D position;
+    QVector3D texCoord;
+};
 
 class DataStore : public QAbstractItemModel
 {

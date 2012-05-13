@@ -172,19 +172,19 @@ void MainWindow::createDockWindows()
     dsInfo->setSelectionModel( dsList->selectionModel() );
     viewMenu->addAction( dsInfo->toggleViewAction() );
 
-    DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), this, mainGLWidget );
+    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav1 );
     viewMenu->addAction( nav1->toggleViewAction() );
     connect( nav1, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
     connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), nav1, SLOT( settingChanged( QString, QVariant ) ) );
 
-    DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), this, mainGLWidget );
+    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav2 );
     viewMenu->addAction( nav2->toggleViewAction() );
     connect( nav2, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
     connect( m_dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), nav2, SLOT( settingChanged( QString, QVariant ) ) );
 
-    DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), this, mainGLWidget );
+    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
     connect( nav3, SIGNAL( sliderChange( QString, QVariant ) ), m_dataStore, SLOT( setGlobal( QString, QVariant ) ) );
