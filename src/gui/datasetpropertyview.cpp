@@ -8,7 +8,8 @@
 
 #include "datasetpropertyview.h"
 
-DatasetPropertyView::DatasetPropertyView( QWidget* parent )
+DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
+    m_currentIndex( QModelIndex() )
 {
     m_widget = new QWidget( this );
 
@@ -23,6 +24,8 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent )
     m_layout->addLayout( layout );
 
     m_widget->setLayout( m_layout );
+
+    connect( m_nameEdit, SIGNAL( editingFinished() ), this, SLOT( nameEdited() ) );
 }
 
 DatasetPropertyView::~DatasetPropertyView()
@@ -86,6 +89,11 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     {
         sel = selected.indexes().first().row();
     }
-    QModelIndex index = model()->index( sel, 0 );
-    m_nameEdit->setText( model()->data( index, Qt::DisplayRole ).toString() );
+    m_currentIndex = model()->index( sel, 0 );
+    m_nameEdit->setText( model()->data( m_currentIndex, Qt::DisplayRole ).toString() );
+}
+
+void DatasetPropertyView::nameEdited()
+{
+    model()->setData( m_currentIndex, m_nameEdit->text() );
 }
