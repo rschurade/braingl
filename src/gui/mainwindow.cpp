@@ -159,6 +159,8 @@ void MainWindow::createDockWindows()
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
+    dsProperties->setModel( m_dataStore );
+    dsProperties->setSelectionModel( dsList->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
 
 
