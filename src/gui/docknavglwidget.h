@@ -17,13 +17,13 @@ class QVBoxLayout;
 class LineEdit;
 
 
-class NavGLWidget : public QDockWidget
+class DockNavGLWidget : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    NavGLWidget( QString name, QWidget* parent = 0 );
-    virtual ~NavGLWidget();
+    DockNavGLWidget( QString name, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
+    virtual ~DockNavGLWidget();
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
