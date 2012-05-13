@@ -7,15 +7,15 @@
 #include <QtGui/QtGui>
 #include <QtOpenGL/QGLWidget>
 
-#include "navglwidget.h"
+#include "docknavglwidget.h"
 
-NavGLWidget::NavGLWidget( QString name, QWidget* parent ) :
+DockNavGLWidget::DockNavGLWidget( QString name, QWidget* parent, const QGLWidget *shareWidget ) :
     QDockWidget( name, parent ),
     m_name( name )
 {
     setObjectName( QString("nav gl") + name );
 
-    m_glWidget = new QGLWidget( this );
+    m_glWidget = new QGLWidget( this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     this->setAllowedAreas( Qt::AllDockWidgetAreas );
@@ -49,29 +49,29 @@ NavGLWidget::NavGLWidget( QString name, QWidget* parent ) :
 
 }
 
-NavGLWidget::~NavGLWidget()
+DockNavGLWidget::~DockNavGLWidget()
 {
 }
 
-QSize NavGLWidget::minimumSizeHint() const
+QSize DockNavGLWidget::minimumSizeHint() const
 {
     return QSize( 50, 50 );
 }
 
-QSize NavGLWidget::sizeHint() const
+QSize DockNavGLWidget::sizeHint() const
 {
     return QSize( 400, 400 );
 }
 
 
-void NavGLWidget::sliderChanged( int value )
+void DockNavGLWidget::sliderChanged( int value )
 {
     m_lineEdit->setText( QString::number( value, 10 ) );
     emit( sliderChange( m_name, value ) );
     //qDebug() << value;
 }
 
-void NavGLWidget::settingChanged( QString name, QVariant data )
+void DockNavGLWidget::settingChanged( QString name, QVariant data )
 {
     if ( name == tr("max_") + m_name )
     {
