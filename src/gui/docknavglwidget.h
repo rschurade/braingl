@@ -40,6 +40,7 @@ private:
     QString m_name;
 
 private slots:
+    void update();
     void sliderChanged( int value );
     void settingChanged( QString name, QVariant data );
 
