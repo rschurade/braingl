@@ -21,7 +21,12 @@ DatasetScalar::~DatasetScalar()
 
 void DatasetScalar::examineDataset()
 {
-    if ( getDatatype() == DT_UNSIGNED_CHAR )
+    int nx = getProperty( "nx" ).toInt();
+    int ny = getProperty( "ny" ).toInt();
+    int nz = getProperty( "nz" ).toInt();
+    int type = getProperty( "datatype" ).toInt();
+
+    if ( type == DT_UNSIGNED_CHAR )
     {
         unsigned char* data = reinterpret_cast< unsigned char* >( m_data );
 
@@ -39,7 +44,7 @@ void DatasetScalar::examineDataset()
 
         m_properties["size"] = size * sizeof( unsigned char );
     }
-    if ( getDatatype() == DT_SIGNED_SHORT )
+    if ( type == DT_SIGNED_SHORT )
     {
         short* data = reinterpret_cast< short* >( m_data );
 
@@ -57,7 +62,7 @@ void DatasetScalar::examineDataset()
 
         m_properties["size"] = size * sizeof( short );
     }
-    if ( getDatatype() == DT_FLOAT )
+    if ( type == DT_FLOAT )
     {
         float* data = reinterpret_cast< float* >( m_data );
 
@@ -89,12 +94,17 @@ void DatasetScalar::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-    if ( getDatatype() == DT_UNSIGNED_CHAR )
+    int nx = getProperty( "nx" ).toInt();
+    int ny = getProperty( "ny" ).toInt();
+    int nz = getProperty( "nz" ).toInt();
+    int type = getProperty( "datatype" ).toInt();
+
+    if ( type == DT_UNSIGNED_CHAR )
     {
         glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, m_data );
     }
 
-    if ( getDatatype() == DT_SIGNED_SHORT )
+    if ( type == DT_SIGNED_SHORT )
     {
         short* data = reinterpret_cast< short* >( m_data );
 
@@ -109,7 +119,7 @@ void DatasetScalar::createTexture()
         delete[] tmpData;
     }
 
-    if ( getDatatype() == DT_FLOAT )
+    if ( type == DT_FLOAT )
     {
         glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, m_data );
     }

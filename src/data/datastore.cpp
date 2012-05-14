@@ -45,10 +45,9 @@ void DataStore::addDataset( Dataset* dataset )
         Dataset* ds = m_datasetList.first();
         if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            DatasetScalar* dss = dynamic_cast< DatasetScalar* >( ds );
-            m_globals[ "axial" ] = dss->getNz() / 2;
-            m_globals[ "coronal" ] = dss->getNy() / 2;
-            m_globals[ "sagittal" ] = dss->getNx() / 2;
+            m_globals[ "axial" ] = ds->getProperty( "nz" ).toInt() / 2;
+            m_globals[ "coronal" ] = ds->getProperty( "ny" ).toInt() / 2;
+            m_globals[ "sagittal" ] = ds->getProperty( "nx" ).toInt() / 2;
         }
     }
     updateGlobals();
@@ -228,32 +227,32 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
         switch ( index.column() )
         {
             case 1:
-                return ds->getNt();
+                return ds->getProperty( "nt" ).toInt();
                 break;
             case 2:
-                return getNiftiDataType( ds->getDatatype() );
+                return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
                 break;
             case 3:
                 QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
                 return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
                 break;
             case 4:
-                return ds->getNx();
+                return ds->getProperty( "nx" ).toInt();
                 break;
             case 5:
-                return ds->getNy();
+                return ds->getProperty( "ny" ).toInt();
                 break;
             case 6:
-                return ds->getNz();
+                return ds->getProperty( "nz" ).toInt();
                 break;
             case 7:
-                return ds->getDx();
+                return ds->getProperty( "dx" ).toFloat();
                 break;
             case 8:
-                return ds->getDy();
+                return ds->getProperty( "dy" ).toFloat();
                 break;
             case 9:
-                return ds->getDz();
+                return ds->getProperty( "dz" ).toFloat();
                 break;
             default:
                 break;
@@ -342,17 +341,16 @@ void DataStore::updateSliceGlobals()
         Dataset* ds = m_datasetList.first();
         if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            DatasetScalar* dss = dynamic_cast< DatasetScalar* >( ds );
-            m_globals[ "max_axial" ] = dss->getNz();
-            m_globals[ "max_coronal" ] = dss->getNy();
-            m_globals[ "max_sagittal" ] = dss->getNx();
-            m_globals[ "slice_dx" ] = dss->getDx();
-            m_globals[ "slice_dy" ] = dss->getDy();
-            m_globals[ "slice_dz" ] = dss->getDz();
+            m_globals[ "max_axial" ] = ds->getProperty( "nz" ).toInt();
+            m_globals[ "max_coronal" ] = ds->getProperty( "ny" ).toInt();
+            m_globals[ "max_sagittal" ] = ds->getProperty( "nx" ).toInt();
+            m_globals[ "slice_dx" ] = ds->getProperty( "dx" ).toFloat();
+            m_globals[ "slice_dy" ] = ds->getProperty( "dy" ).toFloat();
+            m_globals[ "slice_dz" ] = ds->getProperty( "dz" ).toFloat();
 
-            emit( globalSettingChanged( "max_axial", dss->getNz() ) );
-            emit( globalSettingChanged( "max_coronal", dss->getNy() ) );
-            emit( globalSettingChanged( "max_sagittal", dss->getNx() ) );
+            emit( globalSettingChanged( "max_axial", ds->getProperty( "nz").toInt() ) );
+            emit( globalSettingChanged( "max_coronal", ds->getProperty( "ny").toInt() ) );
+            emit( globalSettingChanged( "max_sagittal", ds->getProperty( "nx").toInt() ) );
 
             emit( globalSettingChanged( "axial", m_globals[ "axial" ] ) );
             emit( globalSettingChanged( "coronal", m_globals[ "coronal" ] ) );
