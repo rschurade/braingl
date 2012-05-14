@@ -29,7 +29,7 @@ SliceRenderer::SliceRenderer( DataStore* dataStore ) :
 
 SliceRenderer::~SliceRenderer()
 {
-    glDeleteBuffers( 2, vboIds );
+    glDeleteBuffers( 4, vboIds );
     delete[] vboIds;
 }
 
@@ -141,25 +141,30 @@ void SliceRenderer::initGeometry()
 
 void SliceRenderer::setupTextures()
 {
-    GLuint tex = m_dataStore->getFirstTexture();
-
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+    QList<GLuint> texList = m_dataStore->getTextures();
 
     int allocatedTextureCount = 0;
-
-    glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
-    glBindTexture( GL_TEXTURE_3D, tex );
-
-    bool interpolation = false;
-    if ( interpolation )
+    for ( int i = 0; i < texList.size(); ++i )
     {
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    }
-    else
-    {
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        GLuint tex = texList.at( i );
+
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+        glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
+        glBindTexture( GL_TEXTURE_3D, tex );
+
+        bool interpolation = false;
+        if ( interpolation )
+        {
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        }
+        else
+        {
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        }
+        ++allocatedTextureCount;
     }
 }
 
@@ -180,6 +185,14 @@ void SliceRenderer::setShaderVars()
     int texcoordLocation = m_program->attributeLocation("a_texcoord");
     m_program->enableAttributeArray(texcoordLocation);
     glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
+
+    int samplerUniform0 = m_program->attributeLocation( "texture0" );
+    int samplerUniform1 = m_program->attributeLocation( "texture1" );
+    int samplerUniform2 = m_program->attributeLocation( "texture2" );
+
+    m_program->setUniformValue( samplerUniform0, 0 );
+    m_program->setUniformValue( samplerUniform1, 1 );
+    m_program->setUniformValue( samplerUniform2, 2 );
 }
 
 void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
