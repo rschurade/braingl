@@ -3,7 +3,7 @@
 #include "../data/datastore.h"
 #include "navrenderer.h"
 
-#include "NavGLWidget.h"
+#include "navglwidget.h"
 
 NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )

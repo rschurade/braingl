@@ -11,6 +11,8 @@
 #include <QtGui/QDockWidget>
 
 class DatasetPropertyView;
+class QAbstractItemModel;
+class QItemSelectionModel;
 
 class DatasetPropertyWidget : public QDockWidget
 {

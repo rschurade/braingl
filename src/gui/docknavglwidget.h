@@ -8,6 +8,7 @@
 #ifndef NAVGLWIDGET_H_
 #define NAVGLWIDGET_H_
 
+#include <QtCore/QVariant>
 #include <QtGui/QDockWidget>
 #include <QtOpenGL/QGLWidget>
 
