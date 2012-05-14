@@ -299,18 +299,22 @@ QString DataStore::getNiftiDataType( const int type ) const
     return QString( "unknown" );
 }
 
-GLuint DataStore::getFirstTexture()
+QList<GLuint> DataStore::getTextures()
 {
+    QList<GLuint> returnList;
     if ( m_datasetList.size() > 0 )
     {
-        Dataset* ds = m_datasetList.first();
-        if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
+        Dataset* ds;
+        for( int i = 0; i < m_datasetList.size(); ++i )
         {
-            return dynamic_cast< DatasetScalar* >( ds )->getTextureGLuint();
+            ds = m_datasetList.at( i );
+            if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
+            {
+                returnList.push_back( dynamic_cast< DatasetScalar* >( ds )->getTextureGLuint() );
+            }
         }
-
     }
-    return 0;
+    return returnList;
 }
 
 void DataStore::setGlobal( QString key, QVariant data )

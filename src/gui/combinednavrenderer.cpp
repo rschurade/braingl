@@ -186,54 +186,91 @@ void CombinedNavRenderer::initGeometry()
 
     if ( m_ratio > 1.5 )
     {
-        vertices[ 0 ] =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
-        vertices[ 1 ] =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        vertices[ 2 ] =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        vertices[ 3 ] =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        VertexData vd0 = { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
 
-        vertices[ 4 ] =  { QVector3D( m_xb,  0.0,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        vertices[ 5 ] =  { QVector3D( m_xb + m_xb, 0.0,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        vertices[ 6 ] =  { QVector3D( m_xb + m_xb, m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        vertices[ 7 ] =  { QVector3D( m_xb,  m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
 
-        vertices[ 8 ] =  { QVector3D( m_xb + m_xb,  0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        vertices[ 9 ] =  { QVector3D( m_xb + m_xb + m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        vertices[ 10 ] = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 11 ] = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd4 =  { QVector3D( m_xb,  0.0,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        VertexData vd5 =  { QVector3D( m_xb + m_xb, 0.0,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        VertexData vd6 =  { QVector3D( m_xb + m_xb, m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        VertexData vd7 =  { QVector3D( m_xb,  m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+
+        VertexData vd8 =  { QVector3D( m_xb + m_xb,  0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_xb + m_xb + m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[ 0 ] = vd0;
+        vertices[ 1 ] = vd1;
+        vertices[ 2 ] = vd2;
+        vertices[ 3 ] = vd3;
+        vertices[ 4 ] = vd4;
+        vertices[ 5 ] = vd5;
+        vertices[ 6 ] = vd6;
+        vertices[ 7 ] = vd7;
+        vertices[ 8 ] = vd8;
+        vertices[ 9 ] = vd9;
+        vertices[ 10 ] = vd10;
+        vertices[ 11 ] = vd11;
     }
     else if ( m_ratio < 0.66 )
     {
-        vertices[ 0 ] =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
-        vertices[ 1 ] =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        vertices[ 2 ] =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        vertices[ 3 ] =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        VertexData vd0 =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
 
-        vertices[ 4 ] =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        vertices[ 5 ] =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        vertices[ 6 ] =  { QVector3D( m_xb, m_yb + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        vertices[ 7 ] =  { QVector3D( 0.0,  m_yb + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        VertexData vd4 =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        VertexData vd5 =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        VertexData vd6 =  { QVector3D( m_xb, m_yb + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        VertexData vd7 =  { QVector3D( 0.0,  m_yb + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        vertices[ 8 ] =  { QVector3D( 0.0,  m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        vertices[ 9 ] =  { QVector3D( m_yb, m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        vertices[ 10 ] = { QVector3D( m_yb, m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 11 ] = { QVector3D( 0.0,  m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd8 =  { QVector3D( 0.0,  m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_yb, m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_yb, m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( 0.0,  m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[ 0 ] = vd0;
+        vertices[ 1 ] = vd1;
+        vertices[ 2 ] = vd2;
+        vertices[ 3 ] = vd3;
+        vertices[ 4 ] = vd4;
+        vertices[ 5 ] = vd5;
+        vertices[ 6 ] = vd6;
+        vertices[ 7 ] = vd7;
+        vertices[ 8 ] = vd8;
+        vertices[ 9 ] = vd9;
+        vertices[ 10 ] = vd10;
+        vertices[ 11 ] = vd11;
     }
     else
     {
-        vertices[ 0 ] =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
-        vertices[ 1 ] =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        vertices[ 2 ] =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        vertices[ 3 ] =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        VertexData vd0 =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
 
-        vertices[ 4 ] =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        vertices[ 5 ] =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        vertices[ 6 ] =  { QVector3D( m_xb, m_zb + m_yb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        vertices[ 7 ] =  { QVector3D( 0.0,  m_zb + m_yb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        VertexData vd4 =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        VertexData vd5 =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        VertexData vd6 =  { QVector3D( m_xb, m_zb + m_yb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        VertexData vd7 =  { QVector3D( 0.0,  m_zb + m_yb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        vertices[ 8 ] =  { QVector3D( m_xb,  m_yb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        vertices[ 9 ] =  { QVector3D( m_yb + m_xb, m_yb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        vertices[ 10 ] = { QVector3D( m_yb + m_xb, m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 11 ] = { QVector3D( m_xb,  m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd8 =  { QVector3D( m_xb,  m_yb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_yb + m_xb, m_yb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_yb + m_xb, m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( m_xb,  m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[ 0 ] = vd0;
+        vertices[ 1 ] = vd1;
+        vertices[ 2 ] = vd2;
+        vertices[ 3 ] = vd3;
+        vertices[ 4 ] = vd4;
+        vertices[ 5 ] = vd5;
+        vertices[ 6 ] = vd6;
+        vertices[ 7 ] = vd7;
+        vertices[ 8 ] = vd8;
+        vertices[ 9 ] = vd9;
+        vertices[ 10 ] = vd10;
+        vertices[ 11 ] = vd11;
     }
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3,
@@ -251,25 +288,31 @@ void CombinedNavRenderer::initGeometry()
 
 void CombinedNavRenderer::setupTextures()
 {
-    GLuint tex = m_dataStore->getFirstTexture();
-
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+    QList<GLuint> texList = m_dataStore->getTextures();
 
     int allocatedTextureCount = 0;
 
-    glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
-    glBindTexture( GL_TEXTURE_3D, tex );
+    for ( int i = 0; i < texList.size(); ++i )
+    {
+        GLuint tex = texList.at( i );
 
-    bool interpolation = false;
-    if ( interpolation )
-    {
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    }
-    else
-    {
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-        glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+        glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
+        glBindTexture( GL_TEXTURE_3D, tex );
+
+        bool interpolation = false;
+        if ( interpolation )
+        {
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        }
+        else
+        {
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        }
+        ++allocatedTextureCount;
     }
 }
 

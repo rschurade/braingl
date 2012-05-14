@@ -36,8 +36,7 @@ public:
 
     void addDataset( Dataset* dataset );
 
-    // only temporary, will be removed again
-    GLuint getFirstTexture();
+    QList<GLuint> getTextures();
 
     QVariant getGlobalSetting( QString name );
 
