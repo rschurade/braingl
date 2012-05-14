@@ -21,7 +21,6 @@ DatasetScalar::~DatasetScalar()
 
 void DatasetScalar::examineDataset()
 {
-    qDebug() << "data type: " << getDatatype();
     if ( getDatatype() == DT_UNSIGNED_CHAR )
     {
         unsigned char* data = reinterpret_cast< unsigned char* >( m_data );
@@ -72,7 +71,6 @@ void DatasetScalar::examineDataset()
             m_min = qMin( m_min, data[ i ] );
             m_max = qMax( m_max, data[ i ] );
         }
-        qDebug() << "min: " << m_min << " max: " << m_max;
 
         m_size = size * sizeof( float );
     }
