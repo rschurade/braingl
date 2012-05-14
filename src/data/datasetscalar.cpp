@@ -54,7 +54,6 @@ void DatasetScalar::examineDataset()
         }
         m_min = static_cast< float >( min );
         m_max = static_cast< float >( max );
-        qDebug() << "min: " << min << " max: " << max;
 
         m_size = size * sizeof( short );
     }
@@ -108,5 +107,10 @@ void DatasetScalar::createTexture()
 
         glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_SHORT, tmpData );
         delete[] tmpData;
+    }
+
+    if ( getDatatype() == DT_FLOAT )
+    {
+        glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, m_data );
     }
 }
