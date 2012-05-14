@@ -8,39 +8,28 @@
 
 #include "dataset.h"
 
-Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type ) :
-	m_fileName( fileName ),
-	m_type( type ),
-	m_size( -1 )
+Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type )
 {
-    m_name = m_fileName.path().split("/").last();
+    m_properties["fileName"] = fileName.path();
+    m_properties["type"] = type;
+    m_properties["name"] = fileName.path().split("/").last();
+    m_properties["size"] = -1;
 }
 
 Dataset::~Dataset()
 {
 }
 
-QDir Dataset::getFilename()
+QVariant Dataset::getProperty( QString name )
 {
-	return m_fileName;
+    if ( m_properties.contains( name ) )
+    {
+        return m_properties[name];
+    }
+    return QVariant();
 }
 
-FN_DATASET_TYPE Dataset::getType()
+void Dataset::setProperty( QString name, QVariant value )
 {
-	return m_type;
-}
-
-QString Dataset::getName()
-{
-	return m_name;
-}
-
-void Dataset::setName( QString name )
-{
-    m_name = name;
-}
-
-int Dataset::getSize()
-{
-    return m_size;
+    m_properties[name] = value;
 }

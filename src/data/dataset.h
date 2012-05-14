@@ -10,6 +10,8 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QString>
+#include <QtCore/QHash>
+#include <QtCore/QVariant>
 
 enum FN_DATASET_TYPE
 {
@@ -25,22 +27,11 @@ public:
     Dataset( QDir fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    QDir getFilename();
+    QVariant getProperty( QString name );
+    void setProperty( QString name, QVariant value );
 
-    QString getName();
-    void setName( QString name );
-
-    FN_DATASET_TYPE getType();
-
-    int getSize();
 protected:
-    QDir m_fileName;
-
-    QString m_name;
-
-    FN_DATASET_TYPE m_type;
-
-    int m_size; // actual size in bytes that the data requires in memory
+    QHash< QString, QVariant >m_properties;
 };
 
 #endif /* DATASET_H_ */

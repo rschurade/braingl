@@ -37,7 +37,7 @@ void DatasetScalar::examineDataset()
         m_min = static_cast< float >( min );
         m_max = static_cast< float >( max );
 
-        m_size = size * sizeof( unsigned char );
+        m_properties["size"] = size * sizeof( unsigned char );
     }
     if ( getDatatype() == DT_SIGNED_SHORT )
     {
@@ -55,7 +55,7 @@ void DatasetScalar::examineDataset()
         m_min = static_cast< float >( min );
         m_max = static_cast< float >( max );
 
-        m_size = size * sizeof( short );
+        m_properties["size"] = size * sizeof( short );
     }
     if ( getDatatype() == DT_FLOAT )
     {
@@ -71,7 +71,7 @@ void DatasetScalar::examineDataset()
             m_max = qMax( m_max, data[ i ] );
         }
 
-        m_size = size * sizeof( float );
+        m_properties["size"] = size * sizeof( float );
     }
 }
 
