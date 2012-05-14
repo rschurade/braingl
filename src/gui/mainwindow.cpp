@@ -7,6 +7,8 @@
 #include "datasetinfowidget.h"
 #include "datasetpropertywidget.h"
 #include "docknavglwidget.h"
+#include "combinednavglwidget.h"
+#include "dockcombinednavglwidget.h"
 #include "mainwindow.h"
 
 MainWindow::MainWindow( DataStore* dataStore ) :
@@ -16,8 +18,16 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 	QSettings settings;
 	restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
 
+	m_centralTabWidget = new QTabWidget( this );
+	setCentralWidget( m_centralTabWidget );
+
     mainGLWidget = new GLWidget( m_dataStore );
-    setCentralWidget( mainGLWidget );
+    m_centralTabWidget->addTab( mainGLWidget, "main gl" );
+
+    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    m_centralTabWidget->addTab( combNav, "slices" );
+    connect( dataStore, SIGNAL( datasetListChanged() ), combNav, SLOT( update() ) );
+    connect( dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), combNav, SLOT( update() ) );
 
     createActions();
     createMenus();
@@ -183,4 +193,8 @@ void MainWindow::createDockWindows()
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
+
+    DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    addDockWidget( Qt::RightDockWidgetArea, nav4 );
+    viewMenu->addAction( nav4->toggleViewAction() );
 }

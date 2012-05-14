@@ -6,6 +6,7 @@
 class QAction;
 class QListView;
 class DatasetListWidget;
+class QTabWidget;
 class QTableView;
 class QMenu;
 
@@ -38,8 +39,9 @@ private:
     GLWidget *mainGLWidget;
 
     DatasetListWidget *datasetView;
-    //QListView *datasetView;
     QTableView *datasetView2;
+
+    QTabWidget* m_centralTabWidget;
 
     QMenu *fileMenu;
     QMenu *editMenu;
