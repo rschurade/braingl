@@ -17,7 +17,7 @@ NavGLWidget::~NavGLWidget()
 
 QSize NavGLWidget::minimumSizeHint() const
 {
-    return QSize( 50, 50 );
+    return QSize( 200, 200 );
 }
 
 QSize NavGLWidget::sizeHint() const
@@ -37,7 +37,7 @@ void NavGLWidget::paintGL()
 
 void NavGLWidget::resizeGL( int width, int height )
 {
-	m_navRenderer->resizeGL( width, height );
+    m_navRenderer->resizeGL( width, height );
 }
 
 void NavGLWidget::mousePressEvent( QMouseEvent *event )
