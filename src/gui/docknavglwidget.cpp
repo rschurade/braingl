@@ -44,11 +44,13 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
 
     m_layout->addWidget( m_glWidget );
     m_layout->addLayout( sliderLayout );
+    m_layout->addStretch( 0 );
 
     panel->setLayout( m_layout );
     setWidget( panel );
 
-    m_glWidget->setMinimumSize( 50,50 );
+    m_glWidget->setMinimumSize( 200, 200 );
+    m_glWidget->setMaximumSize( 800, 800 );
 
     connect( dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
     connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
@@ -62,7 +64,7 @@ DockNavGLWidget::~DockNavGLWidget()
 
 QSize DockNavGLWidget::minimumSizeHint() const
 {
-    return QSize( 50, 50 );
+    return QSize( 200, 200 );
 }
 
 QSize DockNavGLWidget::sizeHint() const
