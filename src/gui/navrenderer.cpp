@@ -58,9 +58,16 @@ void NavRenderer::initGL()
 
 void NavRenderer::resizeGL( int width, int height )
 {
+    m_width = width;
+    m_height = height;
 
-    m_ratio = static_cast<float>( width )/ static_cast<float>(height);
-    glViewport( 0, 0, width, height );
+    adjustRatios();
+}
+
+void NavRenderer::adjustRatios()
+{
+    m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
+    glViewport( 0, 0, m_width, m_height );
 
     // Reset projection
     QMatrix4x4 pMatrix;
@@ -69,7 +76,7 @@ void NavRenderer::resizeGL( int width, int height )
     if ( m_name == "axial" )
     {
 
-        float textureRatio = m_xb/ m_yb;
+        float textureRatio = m_xb / m_yb;
         float mult = m_ratio / textureRatio;
 
         if ( mult >= 1.0 )
@@ -78,12 +85,12 @@ void NavRenderer::resizeGL( int width, int height )
         }
         else
         {
-            pMatrix.ortho( 0, m_xb, 0, m_yb * ( 1.0 / mult ) , -3000, 3000 );
+            pMatrix.ortho( 0, m_xb, 0, m_yb * ( 1.0 / mult ), -3000, 3000 );
         }
     }
     else if ( m_name == "coronal" )
     {
-        float textureRatio = m_xb/ m_zb;
+        float textureRatio = m_xb / m_zb;
         float mult = m_ratio / textureRatio;
         if ( mult >= 1.0 )
         {
@@ -96,7 +103,7 @@ void NavRenderer::resizeGL( int width, int height )
     }
     else
     {
-        float textureRatio = m_yb/ m_zb;
+        float textureRatio = m_yb / m_zb;
         float mult = m_ratio / textureRatio;
         if ( mult >= 1.0 )
         {
@@ -267,7 +274,7 @@ void NavRenderer::draw()
 
     setupTextures();
 
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
+    adjustRatios();
 
 
     // Set modelview-projection matrix
