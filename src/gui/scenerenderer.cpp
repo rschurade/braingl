@@ -44,7 +44,7 @@ void SceneRenderer::initGL()
     }
     else
     {
-        qDebug() << glewGetErrorString( errorCode );
+        //qDebug() << glewGetErrorString( errorCode );
     }
 
     glClearColor( 1.0, 1.0, 0.0, 0.0 );
