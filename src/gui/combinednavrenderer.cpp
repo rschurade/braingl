@@ -73,7 +73,7 @@ void CombinedNavRenderer::adjustRatios()
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
-    if ( m_ratio > 2 )
+    if ( m_ratio > 1.5 )
     {
         float textureRatio =  ( m_xb + m_xb + m_yb ) / m_yb;
         float mult = textureRatio / m_ratio;
@@ -86,7 +86,7 @@ void CombinedNavRenderer::adjustRatios()
             pMatrix.ortho( 0, m_xb + m_xb + m_yb, 0, m_yb * mult , -3000, 3000 );
         }
     }
-    else if ( m_ratio < 0.5 )
+    else if ( m_ratio < 0.66 )
     {
         float textureRatio = m_yb / ( m_yb + m_zb + m_zb );
         float mult = textureRatio / m_ratio;
@@ -184,7 +184,7 @@ void CombinedNavRenderer::initGeometry()
 
     VertexData vertices[12];
 
-    if ( m_ratio > 2.0 )
+    if ( m_ratio > 1.5 )
     {
         vertices[ 0 ] =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
         vertices[ 1 ] =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
@@ -201,7 +201,7 @@ void CombinedNavRenderer::initGeometry()
         vertices[ 10 ] = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
         vertices[ 11 ] = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
     }
-    else if ( m_ratio < 0.5 )
+    else if ( m_ratio < 0.66 )
     {
         vertices[ 0 ] =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
         vertices[ 1 ] =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
