@@ -29,6 +29,8 @@ public:
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );
 
+	void adjustRatios();
+
 private:
 	void drawAxial();
 	void drawCoronal();
@@ -57,6 +59,9 @@ private:
     float m_xb;
     float m_yb;
     float m_zb;
+
+    int m_width;
+    int m_height;
 };
 
 #endif /* SCENERENDERER_H_ */

@@ -6,6 +6,8 @@
  */
 #include <QtGui/QtGui>
 
+#include "../data/datastore.h"
+
 #include "navglwidget.h"
 
 #include "docknavglwidget.h"
@@ -48,6 +50,10 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
 
     m_glWidget->setMinimumSize( 50,50 );
 
+    connect( dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
+    connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
+    connect( dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), this, SLOT( settingChanged( QString, QVariant ) ) );
+
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -82,5 +88,10 @@ void DockNavGLWidget::settingChanged( QString name, QVariant data )
     {
         m_slider->setValue( data.toInt() );
     }
+    m_glWidget->update();
+}
+
+void DockNavGLWidget::update()
+{
     m_glWidget->update();
 }
