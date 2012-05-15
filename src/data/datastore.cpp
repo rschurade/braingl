@@ -240,20 +240,26 @@ QModelIndex DataStore::parent( const QModelIndex & index ) const
 
 void DataStore::moveItemUp( int row )
 {
-    beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
-    m_datasetList.swap( row, row - 1 );
-    endMoveRows();
-    updateGlobals();
-    emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+    if ( row > 0 && row < m_datasetList.size() )
+    {
+        beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
+        m_datasetList.swap( row, row - 1 );
+        endMoveRows();
+        updateGlobals();
+        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+    }
 }
 
 void DataStore::moveItemDown( int row )
 {
-    beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
-    m_datasetList.swap( row, row + 1 );
-    endMoveRows();
-    updateGlobals();
-    emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+    if ( row >= 0 && row < m_datasetList.size() - 1 )
+    {
+        beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
+        m_datasetList.swap( row, row + 1 );
+        endMoveRows();
+        updateGlobals();
+        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+    }
 }
 
 void DataStore::deleteItem( int row )
