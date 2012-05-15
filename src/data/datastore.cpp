@@ -80,7 +80,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     if ( !index.isValid() )
         return QVariant();
 
-    if ( index.row() >= m_datasetList.size() )
+    if ( index.row() > m_datasetList.size() - 1 )
         return QVariant();
 
     if ( role == Qt::DisplayRole )
@@ -94,7 +94,6 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
             return datasetInfo( index );
         }
     }
-
 
     if ( role == Qt::UserRole )
     {
@@ -230,7 +229,14 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
 
 QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) const
 {
-    return createIndex( row, column, m_datasetList.at( row ) );
+    if ( row < m_datasetList.size() )
+    {
+        return createIndex( row, column, m_datasetList.at( row ) );
+    }
+    else
+    {
+        return QModelIndex();
+    }
 }
 
 QModelIndex DataStore::parent( const QModelIndex & index ) const

@@ -19,10 +19,10 @@ int main( int argc, char *argv[] )
     QStringList args = app.arguments();
 
     DataStore* dataStore = new DataStore();
+
     for ( int i = 1; i < args.size(); ++i )
     {
         dataStore->load( QDir( args.at( i ) ) );
-        //qDebug() << i << " : " << args.at( i );
     }
 
     MainWindow mainWin( dataStore );
