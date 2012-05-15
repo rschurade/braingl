@@ -203,10 +203,10 @@ void NavRenderer::initGeometry()
 
     VertexData verticesSagittal[] =
     {
-            { QVector3D( 0.0,  0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) },
-            { QVector3D( m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) },
-            { QVector3D( m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) },
-            { QVector3D( 0.0,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) }
+            { QVector3D( 0.0,  0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) },
+            { QVector3D( m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) },
+            { QVector3D( m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) },
+            { QVector3D( 0.0,  m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) }
     };
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
