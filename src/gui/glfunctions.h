@@ -21,12 +21,13 @@ struct VertexData
 class GLFunctions
 {
 public:
-    GLFunctions();
-    virtual ~GLFunctions();
-
     static void setupTextures( QAbstractItemModel* model );
     static QGLShaderProgram* initSliceShader();
     static void setSliceShaderVars( QGLShaderProgram* program );
+
+private:
+    GLFunctions();
+    virtual ~GLFunctions();
 };
 
 #endif /* GLFUNCTIONS_H_ */
