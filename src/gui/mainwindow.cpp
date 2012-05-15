@@ -38,8 +38,6 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     setUnifiedTitleAndToolBarOnMac( true );
 
 	restoreState( settings.value( "mainWindowState" ).toByteArray() );
-
-	m_dataStore->updateGlobals();
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
