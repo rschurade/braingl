@@ -52,7 +52,7 @@ void DataStore::addDataset( Dataset* dataset )
     }
     updateGlobals();
 
-    emit ( datasetListChanged() );
+    emit ( dataChanged( index( m_datasetList.size()- 1, 0 ), index( m_datasetList.size()- 1, 0 ) ) );
 }
 
 bool DataStore::load( QDir fileName )
@@ -83,19 +83,63 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     if ( index.row() >= m_datasetList.size() )
         return QVariant();
 
-    if ( role == Qt::DisplayRole && index.column() == 0 )
+    if ( role == Qt::DisplayRole )
     {
-        return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-    }
-    else if ( role == Qt::DisplayRole && index.column() > 0 )
-    {
-        return datasetInfo( index );
+        if ( index.column() == 0 )
+        {
+            return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+        }
+        else if ( index.column() > 0 )
+        {
+            return datasetInfo( index );
+        }
     }
 
-    else
+
+    if ( role == Qt::UserRole )
     {
-        return QVariant();
+        if ( index.column() == 1 )
+        {
+            DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+            return ds->getTextureGLuint();
+        }
+        else if ( index.column() > 99 )
+        {
+            switch ( index.column() )
+            {
+                case 100:
+                    return m_globals[ "sagittal" ];
+                    break;
+                case 101:
+                    return m_globals[ "coronal" ];
+                    break;
+                case 102:
+                    return m_globals[ "axial" ];
+                    break;
+                case 103:
+                    return m_globals[ "max_sagittal" ];
+                    break;
+                case 104:
+                    return m_globals[ "max_coronal" ];
+                    break;
+                case 105:
+                    return m_globals[ "max_axial" ];
+                    break;
+                case 106:
+                    return m_globals[ "slice_dx" ];
+                    break;
+                case 107:
+                    return m_globals[ "slice_dy" ];
+                    break;
+                case 108:
+                    return m_globals[ "slice_dz" ];
+                    break;
+
+            }
+        }
     }
+
+
     return QVariant();
 }
 
@@ -124,48 +168,62 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
 
 QVariant DataStore::headerData( int section, Qt::Orientation orientation, int role ) const
 {
-    if ( role != Qt::DisplayRole )
-        return QVariant();
-
-    if ( orientation == Qt::Horizontal )
+    if ( role == Qt::DisplayRole )
     {
-        switch ( section )
+        if ( orientation == Qt::Horizontal )
         {
-            case 0:
-                return QString( "name" );
-                break;
-            case 1:
-                return QString( "dim" );
-                break;
-            case 2:
-                return QString( "data type" );
-                break;
-            case 3:
-                return QString( "size in byte" );
-                break;
-            case 4:
-                return QString( "nx" );
-                break;
-            case 5:
-                return QString( "ny" );
-                break;
-            case 6:
-                return QString( "nz" );
-                break;
-            case 7:
-                return QString( "dx" );
-                break;
-            case 8:
-                return QString( "dy" );
-                break;
-            case 9:
-                return QString( "dz" );
-                break;
+            switch ( section )
+            {
+                case 0:
+                    return QString( "name" );
+                    break;
+                case 1:
+                    return QString( "dim" );
+                    break;
+                case 2:
+                    return QString( "data type" );
+                    break;
+                case 3:
+                    return QString( "size in byte" );
+                    break;
+                case 4:
+                    return QString( "nx" );
+                    break;
+                case 5:
+                    return QString( "ny" );
+                    break;
+                case 6:
+                    return QString( "nz" );
+                    break;
+                case 7:
+                    return QString( "dx" );
+                    break;
+                case 8:
+                    return QString( "dy" );
+                    break;
+                case 9:
+                    return QString( "dz" );
+                    break;
+            }
+        }
+        else
+        {
+            return m_datasetList.at( section )->getProperty( "name" ).toString();
         }
     }
-    else
+    if ( role == Qt::UserRole )
     {
-        return m_datasetList.at( section )->getProperty( "name" ).toString();
+        if ( orientation == Qt::Horizontal )
+        {
+            switch ( section )
+            {
+                case 1:
+                    return QString( "GLuint" );
+                    break;
+                default:
+                    break;
+            }
+        }
     }
     return QVariant();
 }
@@ -186,7 +244,7 @@ void DataStore::moveItemUp( int row )
     m_datasetList.swap( row, row - 1 );
     endMoveRows();
     updateGlobals();
-    emit ( datasetListChanged() );
+    emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
 }
 
 void DataStore::moveItemDown( int row )
@@ -195,7 +253,7 @@ void DataStore::moveItemDown( int row )
     m_datasetList.swap( row, row + 1 );
     endMoveRows();
     updateGlobals();
-    emit ( datasetListChanged() );
+    emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
 }
 
 void DataStore::deleteItem( int row )
@@ -212,7 +270,7 @@ void DataStore::deleteItem( int row )
 
         delete toDelete;
         updateGlobals();
-        emit ( datasetListChanged() );
+        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
     }
 }
 
@@ -253,6 +311,9 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
                 break;
             case 9:
                 return ds->getProperty( "dz" ).toFloat();
+                break;
+            case 10:
+                //return ds->getProperty( "dz" ).toFloat();
                 break;
             default:
                 break;
@@ -299,40 +360,6 @@ QString DataStore::getNiftiDataType( const int type ) const
     return QString( "unknown" );
 }
 
-QList<GLuint> DataStore::getTextures()
-{
-    QList<GLuint> returnList;
-    if ( m_datasetList.size() > 0 )
-    {
-        Dataset* ds;
-        for( int i = 0; i < m_datasetList.size(); ++i )
-        {
-            ds = m_datasetList.at( i );
-            if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
-            {
-                returnList.push_back( dynamic_cast< DatasetScalar* >( ds )->getTextureGLuint() );
-            }
-        }
-    }
-    return returnList;
-}
-
-void DataStore::setGlobal( QString key, QVariant data )
-{
-    //qDebug() << "set global: " << key << "," << data;
-    m_globals[ key ] = data;
-    emit( globalSettingChanged( key, data ) );
-}
-
-QVariant DataStore::getGlobalSetting( QString name )
-{
-    if ( m_globals.contains( name ) )
-    {
-        return m_globals[ name ];
-    }
-    return QVariant();
-}
-
 void DataStore::updateGlobals()
 {
     updateSliceGlobals();
@@ -352,13 +379,14 @@ void DataStore::updateSliceGlobals()
             m_globals[ "slice_dy" ] = ds->getProperty( "dy" ).toFloat();
             m_globals[ "slice_dz" ] = ds->getProperty( "dz" ).toFloat();
 
-            emit( globalSettingChanged( "max_axial", ds->getProperty( "nz").toInt() ) );
-            emit( globalSettingChanged( "max_coronal", ds->getProperty( "ny").toInt() ) );
-            emit( globalSettingChanged( "max_sagittal", ds->getProperty( "nx").toInt() ) );
-
-            emit( globalSettingChanged( "axial", m_globals[ "axial" ] ) );
-            emit( globalSettingChanged( "coronal", m_globals[ "coronal" ] ) );
-            emit( globalSettingChanged( "sagittal", m_globals[ "sagittal" ] ) );
+            emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
         }
     }
+}
+
+void DataStore::setGlobal( QString key, QVariant data )
+{
+    //qDebug() << "set global: " << key << "," << data;
+    m_globals[ key ] = data;
+    emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
 }

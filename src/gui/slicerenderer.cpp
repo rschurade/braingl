@@ -10,12 +10,10 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../data/datastore.h"
-
 #include "slicerenderer.h"
 
-SliceRenderer::SliceRenderer( DataStore* dataStore ) :
-    ObjectRenderer( dataStore ),
+SliceRenderer::SliceRenderer() :
+    ObjectRenderer(),
     m_program( new QGLShaderProgram ),
     vboIds( new GLuint[ 4 ] ),
     m_x( 0. ),
@@ -76,16 +74,16 @@ void SliceRenderer::initGeometry()
 {
     glGenBuffers( 4, vboIds );
 
-    m_x = m_dataStore->getGlobalSetting( "sagittal" ).toFloat();
-    m_y = m_dataStore->getGlobalSetting( "coronal" ).toFloat();
-    m_z = m_dataStore->getGlobalSetting( "axial" ).toFloat();
-    m_xb = m_dataStore->getGlobalSetting( "max_sagittal" ).toFloat();
-    m_yb = m_dataStore->getGlobalSetting( "max_coronal" ).toFloat();
-    m_zb = m_dataStore->getGlobalSetting( "max_axial" ).toFloat();
+    m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
+    m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
+    m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();
+    m_xb = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toFloat();
+    m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
+    m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
 
-    float dx = m_dataStore->getGlobalSetting( "slice_dx" ).toFloat();
-    float dy = m_dataStore->getGlobalSetting( "slice_dy" ).toFloat();
-    float dz = m_dataStore->getGlobalSetting( "slice_dz" ).toFloat();
+    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
+    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
+    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
 
     m_x *= dx;
     m_y *= dy;
@@ -141,30 +139,34 @@ void SliceRenderer::initGeometry()
 
 void SliceRenderer::setupTextures()
 {
-    QList<GLuint> texList = m_dataStore->getTextures();
-
+    int countDatasets = model()->rowCount();
     int allocatedTextureCount = 0;
-    for ( int i = 0; i < texList.size(); ++i )
+
+    for ( int i = 0; i < countDatasets; ++i )
     {
-        GLuint tex = texList.at( i );
-
-        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-
-        glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
-        glBindTexture( GL_TEXTURE_3D, tex );
-
-        bool interpolation = false;
-        if ( interpolation )
+        QModelIndex index = model()->index( i, 1 );
+        if ( model()->data( index, Qt::DisplayRole ).toInt() == 1 || model()->data( index, Qt::DisplayRole ).toInt() == 3 )
         {
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            GLuint tex = static_cast<GLuint>( model()->data( index, Qt::UserRole ).toInt() );
+
+            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+            glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
+            glBindTexture( GL_TEXTURE_3D, tex );
+
+            bool interpolation = false;
+            if ( interpolation )
+            {
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            }
+            else
+            {
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+            }
+            ++allocatedTextureCount;
         }
-        else
-        {
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-        }
-        ++allocatedTextureCount;
     }
 }
 

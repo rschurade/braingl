@@ -32,20 +32,15 @@ public:
     QSize sizeHint() const;
 
 private:
+    QString m_name;
+
     CombinedNavGLWidget* m_glWidget;
     QVBoxLayout* m_layout;
-    QSlider* m_slider;
-    QLineEdit* m_lineEdit;
-
-    QString m_name;
 
 private slots:
     void update();
-    void sliderChanged( int value );
-    void settingChanged( QString name, QVariant data );
 
 signals:
-    void sliderChange( QString name, QVariant value );
 
 };
 

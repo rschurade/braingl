@@ -8,7 +8,9 @@
 NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_navRenderer = new NavRenderer( dataStore, name );
+    m_navRenderer = new NavRenderer( name );
+    m_navRenderer->setModel( dataStore );
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 NavGLWidget::~NavGLWidget()

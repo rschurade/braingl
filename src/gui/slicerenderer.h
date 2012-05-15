@@ -17,7 +17,7 @@ class QGLShaderProgram;
 class SliceRenderer : public ObjectRenderer
 {
 public:
-	SliceRenderer( DataStore* dataStore );
+	SliceRenderer();
 	virtual ~SliceRenderer();
 
 	void init();

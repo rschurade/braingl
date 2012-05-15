@@ -27,34 +27,14 @@ DockCombinedNavGLWidget::DockCombinedNavGLWidget( DataStore* dataStore, QString 
     QWidget* panel = new QWidget( this );
 
     m_layout = new QVBoxLayout();
-
-    QHBoxLayout* sliderLayout = new QHBoxLayout();
-    m_slider = new QSlider();
-    m_slider->setOrientation( Qt::Horizontal );
-    m_slider->setMinimum( 0 );
-    m_slider->setMaximum( 200 );
-
-    m_lineEdit = new QLineEdit();
-    m_lineEdit->setMaxLength( 3 );
-    m_lineEdit->setMaximumWidth( 30 );
-    connect( m_slider, SIGNAL( valueChanged( int) ), this, SLOT( sliderChanged( int ) ) );
-
-    sliderLayout->addWidget( m_lineEdit );
-    sliderLayout->addWidget( m_slider );
-
     m_layout->addWidget( m_glWidget );
-
-   // m_layout->addLayout( sliderLayout );
 
     panel->setLayout( m_layout );
     setWidget( panel );
 
     m_glWidget->setMinimumSize( 50,50 );
 
-    connect( dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
-    connect( dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), this, SLOT( settingChanged( QString, QVariant ) ) );
-
-    //connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 DockCombinedNavGLWidget::~DockCombinedNavGLWidget()
@@ -69,27 +49,6 @@ QSize DockCombinedNavGLWidget::minimumSizeHint() const
 QSize DockCombinedNavGLWidget::sizeHint() const
 {
     return QSize( 400, 400 );
-}
-
-
-void DockCombinedNavGLWidget::sliderChanged( int value )
-{
-    m_lineEdit->setText( QString::number( value, 10 ) );
-    emit( sliderChange( m_name, value ) );
-    //qDebug() << value;
-}
-
-void DockCombinedNavGLWidget::settingChanged( QString name, QVariant data )
-{
-    if ( name == tr("max_") + m_name )
-    {
-        m_slider->setMaximum( data.toInt() );
-    }
-    if ( name == m_name )
-    {
-        m_slider->setValue( data.toInt() );
-    }
-    m_glWidget->update();
 }
 
 void DockCombinedNavGLWidget::update()

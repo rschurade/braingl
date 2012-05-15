@@ -18,12 +18,6 @@
 
 class Dataset;
 
-struct VertexData
-{
-    QVector3D position;
-    QVector3D texCoord;
-};
-
 class DataStore : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -36,15 +30,9 @@ public:
 
     void addDataset( Dataset* dataset );
 
-    QList<GLuint> getTextures();
-
-    QVariant getGlobalSetting( QString name );
-
     void updateGlobals();
 
-    /**
-     * reimplemented from QAbstractItemModel
-     */
+    // reimplemented from QAbstractItemModel
 	int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 	QVariant data( const QModelIndex &index, int role ) const;
@@ -71,8 +59,6 @@ private:
     QHash< QString, QVariant >m_globals;
 
 signals:
-    void datasetListChanged();
-    void globalSettingChanged( QString name, QVariant data );
 };
 
 #endif /* DATASTORE_H_ */

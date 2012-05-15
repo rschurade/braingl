@@ -14,6 +14,7 @@
 
 DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* parent, const QGLWidget *shareWidget ) :
     QDockWidget( name, parent ),
+    m_dataStore( dataStore ),
     m_name( name )
 {
     setObjectName( QString("nav gl ") + name );
@@ -52,10 +53,9 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
     m_glWidget->setMinimumSize( 200, 200 );
     m_glWidget->setMaximumSize( 800, 800 );
 
-    connect( dataStore, SIGNAL( datasetListChanged() ), this, SLOT( update() ) );
-    connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
-    connect( dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), this, SLOT( settingChanged( QString, QVariant ) ) );
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 
+    connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -80,20 +80,27 @@ void DockNavGLWidget::sliderChanged( int value )
     //qDebug() << value;
 }
 
-void DockNavGLWidget::settingChanged( QString name, QVariant data )
+void DockNavGLWidget::settingChanged()
 {
-    if ( name == tr("max_") + m_name )
+    if  ( m_name == "sagittal")
     {
-        m_slider->setMaximum( data.toInt() );
+        m_slider->setValue( m_dataStore->data( m_dataStore->index( 0, 100 ), Qt::UserRole ).toInt() );
+        m_slider->setMaximum( m_dataStore->data( m_dataStore->index( 0, 103 ), Qt::UserRole ).toInt() );
     }
-    if ( name == m_name )
+    else if ( m_name == "coronal" )
     {
-        m_slider->setValue( data.toInt() );
+        m_slider->setValue( m_dataStore->data( m_dataStore->index( 0, 101 ), Qt::UserRole ).toInt() );
+        m_slider->setMaximum( m_dataStore->data( m_dataStore->index( 0, 104 ), Qt::UserRole ).toInt() );
     }
-    m_glWidget->update();
+    else if ( m_name == "axial" )
+    {
+        m_slider->setValue( m_dataStore->data( m_dataStore->index( 0, 102 ), Qt::UserRole ).toInt() );
+        m_slider->setMaximum( m_dataStore->data( m_dataStore->index( 0, 105 ), Qt::UserRole ).toInt() );
+    }
 }
 
 void DockNavGLWidget::update()
 {
+    settingChanged();
     m_glWidget->update();
 }

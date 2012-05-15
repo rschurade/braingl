@@ -26,8 +26,6 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 
     CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     m_centralTabWidget->addTab( combNav, "slices" );
-    connect( dataStore, SIGNAL( datasetListChanged() ), combNav, SLOT( update() ) );
-    connect( dataStore, SIGNAL( globalSettingChanged( QString, QVariant) ), combNav, SLOT( update() ) );
 
     createActions();
     createMenus();
