@@ -171,7 +171,6 @@ void MainWindow::createDockWindows()
     dsProperties->setSelectionModel( dsList->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
 
-
 	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
 	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
 	dsInfo->setModel( m_dataStore );
