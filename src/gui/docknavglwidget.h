@@ -43,6 +43,7 @@ private:
 private slots:
     void update();
     void sliderChanged( int value );
+    void editChanged( QString text );
     void settingChanged();
 
 signals:

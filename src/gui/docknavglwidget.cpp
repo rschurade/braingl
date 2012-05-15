@@ -38,7 +38,8 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
     m_lineEdit = new QLineEdit();
     m_lineEdit->setMaxLength( 3 );
     m_lineEdit->setMaximumWidth( 30 );
-    connect( m_slider, SIGNAL( valueChanged( int) ), this, SLOT( sliderChanged( int ) ) );
+    connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
+    connect( m_lineEdit, SIGNAL( textEdited( QString ) ), this, SLOT( editChanged( QString ) ) );
 
     sliderLayout->addWidget( m_lineEdit );
     sliderLayout->addWidget( m_slider );
@@ -80,6 +81,12 @@ void DockNavGLWidget::sliderChanged( int value )
     emit( sliderChange( m_name, value ) );
     //qDebug() << value;
 }
+
+void DockNavGLWidget::editChanged( QString text )
+{
+    m_slider->setValue( text.toInt() );
+}
+
 
 void DockNavGLWidget::settingChanged()
 {
