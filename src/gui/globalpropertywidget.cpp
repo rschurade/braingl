@@ -25,4 +25,5 @@ GlobalPropertyWidget::~GlobalPropertyWidget()
 void GlobalPropertyWidget::setModel( QAbstractItemModel* model )
 {
     m_propertyView->setModel( model );
+    m_propertyView->init();
 }

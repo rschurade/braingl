@@ -34,6 +34,8 @@ public:
 
     QWidget* getWidget();
 
+    void init();
+
 public slots:
     void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 

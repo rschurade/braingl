@@ -63,6 +63,16 @@ GlobalPropertyView::~GlobalPropertyView()
     // TODO Auto-generated destructor stub
 }
 
+void GlobalPropertyView::init()
+{
+    QModelIndex mi;
+    mi = model()->index( 0, 99 );
+    if ( mi.isValid() )
+    {
+        model()->setData( mi, true, Qt::UserRole );
+    }
+}
+
 QWidget* GlobalPropertyView::getWidget()
 {
     return m_widget;
