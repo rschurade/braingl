@@ -53,8 +53,9 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
     m_glWidget->setMinimumSize( 200, 200 );
     m_glWidget->setMaximumSize( 800, 800 );
 
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    settingChanged();
 
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
 }
 

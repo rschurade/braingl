@@ -30,8 +30,6 @@ public:
 
     void addDataset( Dataset* dataset );
 
-    void updateGlobals();
-
     // reimplemented from QAbstractItemModel
 	int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -52,6 +50,7 @@ private:
 	QVariant datasetInfo( const QModelIndex &index ) const;
 	QString getNiftiDataType( const int type ) const;
 
+    void updateGlobals();
 	void updateSliceGlobals();
 
     QList< Dataset* >m_datasetList;

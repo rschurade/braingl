@@ -36,6 +36,8 @@ private:
     void createStatusBar();
     void createDockWindows();
 
+    DataStore* m_dataStore;
+
     GLWidget *mainGLWidget;
 
     DatasetListWidget *datasetView;
@@ -57,8 +59,6 @@ private:
     QAction *aboutAct;
     QAction *aboutQtAct;
     QAction *quitAct;
-
-    DataStore* m_dataStore;
 };
 
 #endif
