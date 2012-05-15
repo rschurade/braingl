@@ -6,6 +6,7 @@
 #include "datasetlistwidget.h"
 #include "datasetinfowidget.h"
 #include "datasetpropertywidget.h"
+#include "globalpropertywidget.h"
 #include "docknavglwidget.h"
 #include "combinednavglwidget.h"
 #include "dockcombinednavglwidget.h"
@@ -165,11 +166,16 @@ void MainWindow::createDockWindows()
 	connect( dsList, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( dsList, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("properties"), this );
+	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("dataset properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
     dsProperties->setModel( m_dataStore );
     dsProperties->setSelectionModel( dsList->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
+
+    GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( QString("global properties"), this );
+    addDockWidget( Qt::LeftDockWidgetArea, globalProperties );
+    globalProperties->setModel( m_dataStore );
+    viewMenu->addAction( globalProperties->toggleViewAction() );
 
 	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
 	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );

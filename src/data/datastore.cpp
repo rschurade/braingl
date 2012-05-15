@@ -162,6 +162,49 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
         return true;
     }
+
+    if ( role == Qt::UserRole )
+    {
+        if ( index.row() == 0 && index.column() > 99 )
+        {
+            switch ( index.column() )
+            {
+                case 100:
+                    m_globals[ "sagittal" ] = value.toInt();
+                    break;
+                case 101:
+                    m_globals[ "coronal" ] = value.toInt();
+                    break;
+                case 102:
+                    m_globals[ "axial" ] = value.toInt();
+                    break;
+                case 103:
+                    m_globals[ "max_sagittal" ] = value.toInt();
+                    break;
+                case 104:
+                    m_globals[ "max_coronal" ] = value.toInt();
+                    break;
+                case 105:
+                    m_globals[ "max_axial" ] = value.toInt();
+                    break;
+                case 106:
+                    m_globals[ "slice_dx" ] = value.toInt();
+                    break;
+                case 107:
+                    m_globals[ "slice_dy" ] = value.toInt();
+                    break;
+                case 108:
+                    m_globals[ "slice_dz" ] = value.toInt();
+                    break;
+
+            }
+        }
+        emit( dataChanged( index, index ) );
+
+        return true;
+    }
+
+
     return false;
 }
 

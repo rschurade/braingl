@@ -22,6 +22,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     layout->addWidget( m_nameEdit );
 
     m_layout->addLayout( layout );
+    m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
 
