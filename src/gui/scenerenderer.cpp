@@ -21,7 +21,9 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
         m_dataStore( dataStore ),
         m_ratio( 1.0 )
 {
-    m_sliceRenderer = new SliceRenderer( dataStore );
+    m_sliceRenderer = new SliceRenderer();
+    m_sliceRenderer->setModel( m_dataStore );
+
     m_arcBall = new ArcBall( 400, 400 );
 
     m_thisRot.setToIdentity();

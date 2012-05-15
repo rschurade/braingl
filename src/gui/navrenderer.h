@@ -12,17 +12,20 @@
 
 #include <QtGui/QMatrix4x4>
 
+#include "objectrenderer.h"
+
 class DataStore;
 class QGLShaderProgram;
 
-class NavRenderer
+class NavRenderer : public ObjectRenderer
 {
 public:
-	NavRenderer( DataStore* dataStore, QString name );
+	NavRenderer( QString name );
 	virtual ~NavRenderer();
 
 	void resizeGL( int width, int height );
 
+	void init();
 	void initGL();
 	void draw();
 
@@ -42,7 +45,6 @@ private:
 
     void initGeometry();
 
-	DataStore* m_dataStore;
 	QString m_name;
 
 	float m_ratio;

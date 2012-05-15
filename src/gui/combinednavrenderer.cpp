@@ -18,8 +18,8 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-CombinedNavRenderer::CombinedNavRenderer( DataStore* dataStore, QString name ) :
-    m_dataStore( dataStore ),
+CombinedNavRenderer::CombinedNavRenderer( QString name ) :
+    ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
     m_program( new QGLShaderProgram ),
@@ -35,6 +35,11 @@ CombinedNavRenderer::CombinedNavRenderer( DataStore* dataStore, QString name ) :
 
 CombinedNavRenderer::~CombinedNavRenderer()
 {
+}
+
+void CombinedNavRenderer::init()
+{
+
 }
 
 void CombinedNavRenderer::initGL()
@@ -164,16 +169,16 @@ void CombinedNavRenderer::initGeometry()
 {
     glGenBuffers( 2, vboIds );
 
-    m_x = m_dataStore->getGlobalSetting( "sagittal" ).toFloat();
-    m_y = m_dataStore->getGlobalSetting( "coronal" ).toFloat();
-    m_z = m_dataStore->getGlobalSetting( "axial" ).toFloat();
-    m_xb = m_dataStore->getGlobalSetting( "max_sagittal" ).toFloat();
-    m_yb = m_dataStore->getGlobalSetting( "max_coronal" ).toFloat();
-    m_zb = m_dataStore->getGlobalSetting( "max_axial" ).toFloat();
+    m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
+    m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
+    m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();
+    m_xb = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toFloat();
+    m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
+    m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
 
-    float dx = m_dataStore->getGlobalSetting( "slice_dx" ).toFloat();
-    float dy = m_dataStore->getGlobalSetting( "slice_dy" ).toFloat();
-    float dz = m_dataStore->getGlobalSetting( "slice_dz" ).toFloat();
+    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
+    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
+    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
 
     m_x *= dx;
     m_y *= dy;
@@ -288,31 +293,34 @@ void CombinedNavRenderer::initGeometry()
 
 void CombinedNavRenderer::setupTextures()
 {
-    QList<GLuint> texList = m_dataStore->getTextures();
-
+    int countDatasets = model()->rowCount();
     int allocatedTextureCount = 0;
 
-    for ( int i = 0; i < texList.size(); ++i )
+    for ( int i = 0; i < countDatasets; ++i )
     {
-        GLuint tex = texList.at( i );
-
-        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-
-        glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
-        glBindTexture( GL_TEXTURE_3D, tex );
-
-        bool interpolation = false;
-        if ( interpolation )
+        QModelIndex index = model()->index( i, 1 );
+        if ( model()->data( index, Qt::DisplayRole ).toInt() == 1 || model()->data( index, Qt::DisplayRole ).toInt() == 3 )
         {
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            GLuint tex = static_cast<GLuint>( model()->data( index, Qt::UserRole ).toInt() );
+
+            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
+            glActiveTexture( GL_TEXTURE0 + allocatedTextureCount );
+            glBindTexture( GL_TEXTURE_3D, tex );
+
+            bool interpolation = false;
+            if ( interpolation )
+            {
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            }
+            else
+            {
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+                glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+            }
+            ++allocatedTextureCount;
         }
-        else
-        {
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-            glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-        }
-        ++allocatedTextureCount;
     }
 }
 

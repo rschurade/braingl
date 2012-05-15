@@ -8,7 +8,9 @@
 CombinedNavGLWidget::CombinedNavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_renderer = new CombinedNavRenderer( dataStore, name );
+    m_renderer = new CombinedNavRenderer( name );
+    m_renderer->setModel( dataStore );
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 CombinedNavGLWidget::~CombinedNavGLWidget()

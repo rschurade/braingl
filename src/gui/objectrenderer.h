@@ -8,12 +8,19 @@
 #ifndef OBJECTRENDERER_H_
 #define OBJECTRENDERER_H_
 
-class DataStore;
+#include <QtGui/QVector3D>
+#include <QtGui/QAbstractItemView>
 
-class ObjectRenderer
+struct VertexData
+{
+    QVector3D position;
+    QVector3D texCoord;
+};
+
+class ObjectRenderer : public QAbstractItemView
 {
 public:
-	ObjectRenderer( DataStore* dataStore );
+	ObjectRenderer();
 	virtual ~ObjectRenderer();
 
 	virtual void init() = 0;
@@ -22,8 +29,18 @@ public:
 	virtual void setShaderVars() = 0;
 	//virtual void draw() = 0;
 
+	QRect visualRect( const QModelIndex &index ) const;
+    void scrollTo( const QModelIndex &index, ScrollHint hint = EnsureVisible );
+    QModelIndex indexAt( const QPoint &point ) const;
+    QModelIndex moveCursor( CursorAction cursorAction, Qt::KeyboardModifiers modifiers );
+    int horizontalOffset() const;
+    int verticalOffset() const;
+    bool isIndexHidden( const QModelIndex &index ) const;
+    void setSelection( const QRect &rect, QItemSelectionModel::SelectionFlags flags );
+    QRegion visualRegionForSelection( const QItemSelection &selection ) const;
+
 protected:
-	DataStore* m_dataStore;
+
 };
 
 #endif /* OBJECTRENDERER_H_ */
