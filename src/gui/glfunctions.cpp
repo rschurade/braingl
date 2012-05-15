@@ -15,13 +15,10 @@
 
 GLFunctions::GLFunctions()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 GLFunctions::~GLFunctions()
 {
-    // TODO Auto-generated destructor stub
 }
 
 void GLFunctions::setupTextures( QAbstractItemModel* model )
