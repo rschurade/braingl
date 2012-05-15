@@ -202,10 +202,10 @@ void CombinedNavRenderer::initGeometry()
         VertexData vd6 =  { QVector3D( m_xb + m_xb, m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
         VertexData vd7 =  { QVector3D( m_xb,  m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        VertexData vd8 =  { QVector3D( m_xb + m_xb,  0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_xb + m_xb + m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd8 =  { QVector3D( m_xb + m_xb,  0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_xb + m_xb + m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
         vertices[ 0 ] = vd0;
         vertices[ 1 ] = vd1;
         vertices[ 2 ] = vd2;
@@ -231,10 +231,10 @@ void CombinedNavRenderer::initGeometry()
         VertexData vd6 =  { QVector3D( m_xb, m_yb + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
         VertexData vd7 =  { QVector3D( 0.0,  m_yb + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        VertexData vd8 =  { QVector3D( 0.0,  m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_yb, m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_yb, m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( 0.0,  m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd8 =  { QVector3D( 0.0,  m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_yb, m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_yb, m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( 0.0,  m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
         vertices[ 0 ] = vd0;
         vertices[ 1 ] = vd1;
         vertices[ 2 ] = vd2;
@@ -260,10 +260,10 @@ void CombinedNavRenderer::initGeometry()
         VertexData vd6 =  { QVector3D( m_xb, m_zb + m_yb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
         VertexData vd7 =  { QVector3D( 0.0,  m_zb + m_yb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        VertexData vd8 =  { QVector3D( m_xb,  m_yb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_yb + m_xb, m_yb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_yb + m_xb, m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( m_xb,  m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd8 =  { QVector3D( m_xb,  m_yb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        VertexData vd9 =  { QVector3D( m_yb + m_xb, m_yb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        VertexData vd10 = { QVector3D( m_yb + m_xb, m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        VertexData vd11 = { QVector3D( m_xb,  m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
         vertices[ 0 ] = vd0;
         vertices[ 1 ] = vd1;
         vertices[ 2 ] = vd2;
