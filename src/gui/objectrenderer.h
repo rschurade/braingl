@@ -11,12 +11,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QAbstractItemView>
 
-struct VertexData
-{
-    QVector3D position;
-    QVector3D texCoord;
-};
-
 class ObjectRenderer : public QAbstractItemView
 {
 public:
