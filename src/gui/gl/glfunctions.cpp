@@ -13,6 +13,8 @@
 
 #include "glfunctions.h"
 
+#define NUM_TEXTURES 1
+
 GLFunctions::GLFunctions()
 {
 }
@@ -50,6 +52,10 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
                 glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
             }
             ++allocatedTextureCount;
+            if ( allocatedTextureCount >= NUM_TEXTURES )
+            {
+                break;
+            }
         }
     }
 }
@@ -91,7 +97,7 @@ QGLShaderProgram* GLFunctions::initSliceShader()
     return program;
 }
 
-void GLFunctions::setSliceShaderVars( QGLShaderProgram* program )
+void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
 {
     // Offset for position
     int offset = 0;
@@ -112,4 +118,23 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program )
     program->setUniformValue( "texture0", 0 );
     program->setUniformValue( "texture1", 1 );
     program->setUniformValue( "texture2", 2 );
+
+    int countDatasets = model->rowCount();
+    int allocatedTextureCount = 0;
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = model->index( i, 1 );
+        if ( model->data( index, Qt::DisplayRole ).toInt() == 1 || model->data( index, Qt::DisplayRole ).toInt() == 3 )
+        {
+            index = model->index( i, 50 );
+            program->setUniformValue( "u_lowerThreshold", model->data( index, Qt::EditRole ).toFloat() / 255 );
+            index = model->index( i, 51 );
+            program->setUniformValue( "u_upperThreshold", model->data( index, Qt::EditRole ).toFloat() / 255 );
+            ++allocatedTextureCount;
+            if ( allocatedTextureCount >= NUM_TEXTURES )
+            {
+                break;
+            }
+        }
+    }
 }
