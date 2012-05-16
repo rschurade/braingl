@@ -47,7 +47,11 @@ public slots:
 	void setGlobal( QString key, QVariant data );
 
 private:
-	QVariant datasetInfo( const QModelIndex &index ) const;
+	QVariant getDatasetInfo( const QModelIndex &index ) const;
+	QVariant getGlobal( const QModelIndex &index ) const;
+	QVariant getDatasetEditables( const QModelIndex &index ) const;
+
+
 	QString getNiftiDataType( const int type ) const;
 
     void updateGlobals();

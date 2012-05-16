@@ -82,7 +82,7 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     setProperty( "nu", header->nu );
     setProperty( "nv", header->nv );
     setProperty( "nw", header->nw );
-//setProperty("dim", header->dim );
+    //setProperty("dim", header->dim );
     setProperty( "nvox", header->nvox );
     setProperty( "nbyper", header->nbyper );
     setProperty( "datatype", header->datatype );
@@ -93,7 +93,7 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     setProperty( "du", header->du );
     setProperty( "dv", header->dv );
     setProperty( "dw", header->dw );
-//setProperty("pixdim", header->pixdim );
+    //setProperty("pixdim", header->pixdim );
     setProperty( "scl_slope", header->scl_slope );
     setProperty( "scl_inter", header->scl_inter );
     setProperty( "cal_min", header->cal_min );
@@ -114,10 +114,10 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     setProperty( "qoffset_y", header->qoffset_y );
     setProperty( "qoffset_z", header->qoffset_z );
     setProperty( "qfac", header->qfac );
-//setProperty(" qto_xyz", header->qto_xyz );
-//setProperty("qto_ijk", header->qto_ijk );
-//setProperty(" sto_xyz", header->sto_xyz );
-//setProperty("sto_ijk", header->sto_ijk );
+    //setProperty(" qto_xyz", header->qto_xyz );
+    //setProperty("qto_ijk", header->qto_ijk );
+    //setProperty(" sto_xyz", header->sto_xyz );
+    //setProperty("sto_ijk", header->sto_ijk );
     setProperty( "toffset", header->toffset );
     setProperty( "xyz_units", header->xyz_units );
     setProperty( "time_units", header->time_units );
@@ -126,9 +126,9 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     setProperty( "intent_p1", header->intent_p1 );
     setProperty( "intent_p2", header->intent_p2 );
     setProperty( "intent_p3", header->intent_p3 );
-//setProperty("intent_name", header->intent_name );
-//setProperty("descrip", header->descrip );
-//setProperty("aux_file", header->aux_file );
+    //setProperty("intent_name", header->intent_name );
+    //setProperty("descrip", header->descrip );
+    //setProperty("aux_file", header->aux_file );
     setProperty( "swapsize", header->swapsize );
     setProperty( "byteorder", header->byteorder );
 }

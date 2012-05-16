@@ -14,12 +14,12 @@
 
 DataStore::DataStore()
 {
-    m_globals[ "axial" ] = 80;
-    m_globals[ "coronal" ] = 100;
-    m_globals[ "sagittal" ] = 80;
-    m_globals[ "max_axial" ] = 160;
-    m_globals[ "max_coronal" ] = 200;
-    m_globals[ "max_sagittal" ] = 160;
+    m_globals[ "axial" ] = 0;
+    m_globals[ "coronal" ] = 0;
+    m_globals[ "sagittal" ] = 0;
+    m_globals[ "max_axial" ] = 1;
+    m_globals[ "max_coronal" ] = 1;
+    m_globals[ "max_sagittal" ] = 1;
     m_globals[ "min_axial" ] = 0;
     m_globals[ "min_coronal" ] = 0;
     m_globals[ "min_sagittal" ] = 0;
@@ -72,7 +72,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-    return 10;
+    return 12;
 }
 
 QVariant DataStore::data( const QModelIndex &index, int role ) const
@@ -80,64 +80,23 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     if ( !index.isValid() )
         return QVariant();
 
-    if ( index.row() > m_datasetList.size() - 1 )
+    if ( index.row() < 0 || index.row() > m_datasetList.size() - 1 )
         return QVariant();
 
-    if ( role == Qt::DisplayRole )
+    switch( role )
     {
-        if ( index.column() == 0 )
-        {
-            return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-        }
-        else if ( index.column() > 0 )
-        {
-            return datasetInfo( index );
-        }
+        case Qt::DisplayRole:
+            return getDatasetInfo( index );
+            break;
+        case Qt::UserRole:
+            return getGlobal( index );
+            break;
+        case Qt::EditRole:
+            return getDatasetEditables( index );
+            break;
+        default:
+            break;
     }
-
-    if ( role == Qt::UserRole )
-    {
-        if ( index.column() == 1 )
-        {
-            DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
-            return ds->getTextureGLuint();
-        }
-        else if ( index.column() > 99 )
-        {
-            switch ( index.column() )
-            {
-                case 100:
-                    return m_globals[ "sagittal" ];
-                    break;
-                case 101:
-                    return m_globals[ "coronal" ];
-                    break;
-                case 102:
-                    return m_globals[ "axial" ];
-                    break;
-                case 103:
-                    return m_globals[ "max_sagittal" ];
-                    break;
-                case 104:
-                    return m_globals[ "max_coronal" ];
-                    break;
-                case 105:
-                    return m_globals[ "max_axial" ];
-                    break;
-                case 106:
-                    return m_globals[ "slice_dx" ];
-                    break;
-                case 107:
-                    return m_globals[ "slice_dy" ];
-                    break;
-                case 108:
-                    return m_globals[ "slice_dz" ];
-                    break;
-
-            }
-        }
-    }
-
 
     return QVariant();
 }
@@ -156,6 +115,14 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             if ( index.column() == 0 )
             {
                 m_datasetList.at( index.row() )->setProperty( "name", value.toString() );
+            }
+            if ( index.column() == 50 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "lowerThreshold", value.toFloat() );
+            }
+            if ( index.column() == 51 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "upperThreshold", value.toFloat() );
             }
         }
         emit( dataChanged( index, index ) );
@@ -246,6 +213,12 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                 case 9:
                     return QString( "dz" );
                     break;
+                case 10:
+                    return QString( "min" );
+                    break;
+                case 11:
+                    return QString( "max" );
+                    break;
             }
         }
         else
@@ -329,7 +302,7 @@ void DataStore::deleteItem( int row )
     }
 }
 
-QVariant DataStore::datasetInfo( const QModelIndex &index ) const
+QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
@@ -339,6 +312,9 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
 
         switch ( index.column() )
         {
+            case 0:
+                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+                break;
             case 1:
                 return ds->getProperty( "nt" ).toInt();
                 break;
@@ -368,11 +344,81 @@ QVariant DataStore::datasetInfo( const QModelIndex &index ) const
                 return ds->getProperty( "dz" ).toFloat();
                 break;
             case 10:
-                //return ds->getProperty( "dz" ).toFloat();
+                return ds->getProperty( "min" ).toFloat();
+                break;
+            case 11:
+                return ds->getProperty( "max" ).toFloat();
                 break;
             default:
                 break;
         }
+    }
+    return QVariant();
+}
+
+QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
+{
+
+    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR )
+    {
+        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+
+        switch ( index.column() )
+        {
+            case 0:
+                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+                break;
+            case 50:
+                return ds->getProperty( "lowerThreshold" ).toFloat();
+                break;
+            case 51:
+                return ds->getProperty( "upperThreshold" ).toFloat();
+                break;
+
+
+        }
+    }
+    return QVariant();
+}
+
+QVariant DataStore::getGlobal( const QModelIndex &index ) const
+{
+    switch ( index.column() )
+    {
+        case 1:
+        {
+            DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+            return ds->getTextureGLuint();
+        }
+        case 100:
+            return m_globals[ "sagittal" ];
+            break;
+        case 101:
+            return m_globals[ "coronal" ];
+            break;
+        case 102:
+            return m_globals[ "axial" ];
+            break;
+        case 103:
+            return m_globals[ "max_sagittal" ];
+            break;
+        case 104:
+            return m_globals[ "max_coronal" ];
+            break;
+        case 105:
+            return m_globals[ "max_axial" ];
+            break;
+        case 106:
+            return m_globals[ "slice_dx" ];
+            break;
+        case 107:
+            return m_globals[ "slice_dy" ];
+            break;
+        case 108:
+            return m_globals[ "slice_dz" ];
+            break;
     }
     return QVariant();
 }
