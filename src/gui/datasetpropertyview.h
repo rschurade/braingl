@@ -12,6 +12,7 @@
 
 class QLineEdit;
 class QVBoxLayout;
+class SliderWithEdit;
 
 class DatasetPropertyView : public QAbstractItemView
 {
@@ -39,13 +40,22 @@ public slots:
 
 private slots:
     void nameEdited();
+    void lowerThresholdChanged( float value );
+    void upperThresholdChanged( float value );
 
 private:
+    QModelIndex getSelectedIndex( int column );
+
     QWidget* m_widget;
 
     QVBoxLayout* m_layout;
     QLineEdit* m_nameEdit;
-    QModelIndex m_currentIndex;
+
+    SliderWithEdit* m_lowerThresholdSlider;
+    SliderWithEdit* m_upperThresholdSlider;
+    SliderWithEdit* m_alphaSlider;
+
+    QItemSelection m_selected;
 
 
 };

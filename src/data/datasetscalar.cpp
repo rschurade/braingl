@@ -39,8 +39,8 @@ void DatasetScalar::examineDataset()
             min = qMin( min, data[ i ] );
             max = qMax( max, data[ i ] );
         }
-        m_min = static_cast< float >( min );
-        m_max = static_cast< float >( max );
+        m_properties["min"] = static_cast< float >( min );
+        m_properties["max"] = static_cast< float >( max );
 
         m_properties["size"] = size * sizeof( unsigned char );
     }
@@ -57,8 +57,8 @@ void DatasetScalar::examineDataset()
             min = qMin( min, data[ i ] );
             max = qMax( max, data[ i ] );
         }
-        m_min = static_cast< float >( min );
-        m_max = static_cast< float >( max );
+        m_properties["min"] = static_cast< float >( min );
+        m_properties["max"] = static_cast< float >( max );
 
         m_properties["size"] = size * sizeof( short );
     }
@@ -66,18 +66,22 @@ void DatasetScalar::examineDataset()
     {
         float* data = reinterpret_cast< float* >( m_data );
 
-        m_min = std::numeric_limits<float>::max();
-        m_max = 0;
+        float min = std::numeric_limits<float>::max();
+        float max = 0;
 
         int size = nx * ny * nz;
         for ( size_t i = 0; i < size; ++i )
         {
-            m_min = qMin( m_min, data[ i ] );
-            m_max = qMax( m_max, data[ i ] );
+            min = qMin( min, data[ i ] );
+            max = qMax( max, data[ i ] );
         }
+        m_properties["min"] = min;
+        m_properties["max"] = max;
 
         m_properties["size"] = size * sizeof( float );
     }
+    m_properties["lowerThreshold"] = m_properties["min"].toFloat();
+    m_properties["upperThreshold"] = m_properties["max"].toFloat();
 }
 
 void DatasetScalar::createTexture()
@@ -108,7 +112,7 @@ void DatasetScalar::createTexture()
     {
         short* data = reinterpret_cast< short* >( m_data );
 
-        int mult = 65535 / m_max;
+        int mult = 65535 / m_properties["max"].toFloat();
         short* tmpData = new short[nx*ny*nz];
         for ( int i = 0; i < nx*ny*nz; ++i )
         {
