@@ -272,7 +272,7 @@ void CombinedNavRenderer::setupTextures()
 
 void CombinedNavRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program );
+    GLFunctions::setSliceShaderVars( m_program, model() );
 }
 
 void CombinedNavRenderer::draw()

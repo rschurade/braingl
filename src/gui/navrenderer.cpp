@@ -209,7 +209,7 @@ void NavRenderer::setupTextures()
 
 void NavRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program );
+    GLFunctions::setSliceShaderVars( m_program, model() );
 }
 
 void NavRenderer::draw()

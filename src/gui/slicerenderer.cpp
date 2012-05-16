@@ -117,7 +117,7 @@ void SliceRenderer::setupTextures()
 
 void SliceRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program );
+    GLFunctions::setSliceShaderVars( m_program, model() );
 }
 
 void SliceRenderer::draw( QMatrix4x4 mvp_matrix )

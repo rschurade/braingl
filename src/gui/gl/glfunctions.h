@@ -23,7 +23,7 @@ class GLFunctions
 public:
     static void setupTextures( QAbstractItemModel* model );
     static QGLShaderProgram* initSliceShader();
-    static void setSliceShaderVars( QGLShaderProgram* program );
+    static void setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model );
 
 private:
     GLFunctions();

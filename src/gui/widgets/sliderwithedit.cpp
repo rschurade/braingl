@@ -7,6 +7,7 @@
 #include <QTGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
+#include <QtCore/QDebug>
 
 #include "sliderwithedit.h"
 
@@ -41,8 +42,8 @@ void SliderWithEdit::sliderChanged( int value )
 
 void SliderWithEdit::sliderMoved( int value )
 {
-    m_edit->setText( QString::number( static_cast<double>( value ) / 100., 'f', 2 ) );
-    emit( valueChanged( static_cast<float>( m_slider->value() ) / 100.  ) );
+    m_edit->setText( QString::number( static_cast<float>( value ) / 100., 'f', 2 ) );
+    emit( valueChanged( static_cast<float>( value ) / 100.  ) );
 }
 
 void SliderWithEdit::editChanged( QString text )
