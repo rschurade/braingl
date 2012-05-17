@@ -10,6 +10,7 @@
 
 #include <QtGui/QAbstractItemView>
 
+class QComboBox;
 class QLineEdit;
 class QVBoxLayout;
 class SliderWithEdit;
@@ -42,9 +43,12 @@ private slots:
     void nameEdited();
     void lowerThresholdChanged( float value );
     void upperThresholdChanged( float value );
+    void colormapChanged( int index );
 
 private:
     QModelIndex getSelectedIndex( int column );
+
+    QItemSelection m_selected;
 
     QWidget* m_widget;
 
@@ -55,7 +59,7 @@ private:
     SliderWithEdit* m_upperThresholdSlider;
     SliderWithEdit* m_alphaSlider;
 
-    QItemSelection m_selected;
+    QComboBox* m_colormapSelect;
 
 
 };

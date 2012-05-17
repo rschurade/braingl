@@ -13,6 +13,7 @@
 DatasetScalar::DatasetScalar( QString filename, void* data ) :
     DatasetNifti( filename, FNDT_NIFTI_SCALAR, data )
 {
+    m_properties["colormap"] = 0;
 }
 
 DatasetScalar::~DatasetScalar()

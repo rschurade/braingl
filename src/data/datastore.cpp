@@ -124,6 +124,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             {
                 m_datasetList.at( index.row() )->setProperty( "upperThreshold", value.toFloat() );
             }
+            if ( index.column() == 52 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "colormap", value.toInt() );
+            }
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -375,6 +379,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
                 break;
             case 51:
                 return ds->getProperty( "upperThreshold" ).toFloat();
+                break;
+            case 52:
+                return ds->getProperty( "colormap" ).toInt();
                 break;
 
 
