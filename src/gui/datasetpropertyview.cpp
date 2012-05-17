@@ -29,9 +29,20 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_upperThresholdSlider = new SliderWithEdit( tr( "upper threshold" ) );
     connect( m_upperThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( upperThresholdChanged( float ) ) );
 
+    QHBoxLayout* layout2 = new QHBoxLayout();
+    m_colormapSelect = new QComboBox();
+    m_colormapSelect->insertItem( 0, tr( "grey" ) );
+    m_colormapSelect->insertItem( 1, tr( "rainbow" ) );
+    m_colormapSelect->insertItem( 2, tr( "red/yellow" ) );
+    layout2->addWidget( new QLabel( tr("colormap" ) ) );
+    layout2->addWidget( m_colormapSelect );
+    connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
+
+
     m_layout->addLayout( layout1 );
     m_layout->addLayout( m_lowerThresholdSlider );
     m_layout->addLayout( m_upperThresholdSlider );
+    m_layout->addLayout( layout2 );
     m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
@@ -123,6 +134,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     m_lowerThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
     index = getSelectedIndex( 51 );
     m_upperThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    index = getSelectedIndex( 52 );
+    m_colormapSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 }
 
 void DatasetPropertyView::nameEdited()
@@ -146,4 +160,9 @@ void DatasetPropertyView::upperThresholdChanged( float value )
         m_lowerThresholdSlider->setValue( value );
     }
     model()->setData( getSelectedIndex( 51 ), value );
+}
+
+void DatasetPropertyView::colormapChanged( int index )
+{
+    model()->setData( getSelectedIndex( 52 ), index );
 }
