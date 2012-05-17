@@ -38,11 +38,17 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     layout2->addWidget( m_colormapSelect );
     connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
 
+    QHBoxLayout* layout3 = new QHBoxLayout();
+    m_textureInterpolation = new QCheckBox();
+    layout3->addWidget( new QLabel( tr("interpolation" ) ) );
+    layout3->addWidget( m_textureInterpolation );
+    connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
 
     m_layout->addLayout( layout1 );
     m_layout->addLayout( m_lowerThresholdSlider );
     m_layout->addLayout( m_upperThresholdSlider );
     m_layout->addLayout( layout2 );
+    m_layout->addLayout( layout3 );
     m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
@@ -137,6 +143,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( 52 );
     m_colormapSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
+
+    index = getSelectedIndex( 53 );
+    m_textureInterpolation->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
 
 void DatasetPropertyView::nameEdited()
@@ -165,4 +174,16 @@ void DatasetPropertyView::upperThresholdChanged( float value )
 void DatasetPropertyView::colormapChanged( int index )
 {
     model()->setData( getSelectedIndex( 52 ), index );
+}
+
+void DatasetPropertyView::interpolationStateChanged( int state )
+{
+    if ( state == Qt::Checked )
+    {
+        model()->setData( getSelectedIndex( 53 ), true );
+    }
+    else
+    {
+        model()->setData( getSelectedIndex( 53 ), false );
+    }
 }
