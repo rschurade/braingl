@@ -10,6 +10,7 @@
 
 #include <QtGui/QAbstractItemView>
 
+class QCheckBox;
 class QComboBox;
 class QLineEdit;
 class QVBoxLayout;
@@ -44,6 +45,7 @@ private slots:
     void lowerThresholdChanged( float value );
     void upperThresholdChanged( float value );
     void colormapChanged( int index );
+    void interpolationStateChanged( int state );
 
 private:
     QModelIndex getSelectedIndex( int column );
@@ -61,6 +63,7 @@ private:
 
     QComboBox* m_colormapSelect;
 
+    QCheckBox* m_textureInterpolation;
 
 };
 

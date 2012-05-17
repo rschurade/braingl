@@ -128,6 +128,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             {
                 m_datasetList.at( index.row() )->setProperty( "colormap", value.toInt() );
             }
+            if ( index.column() == 53 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "interpolation", value.toBool() );
+            }
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -383,7 +387,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 52:
                 return ds->getProperty( "colormap" ).toInt();
                 break;
-
+            case 53:
+                return ds->getProperty( "interpolation" ).toBool();
+                break;
 
         }
     }
