@@ -44,12 +44,19 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     layout3->addWidget( m_textureInterpolation );
     connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
 
+    QHBoxLayout* layout4 = new QHBoxLayout();
+    m_textureActive = new QCheckBox();
+    layout4->addWidget( new QLabel( tr("active" ) ) );
+    layout4->addWidget( m_textureActive );
+    connect( m_textureActive, SIGNAL( stateChanged( int ) ), this, SLOT( activeStateChanged( int ) ) );
+
     m_alphaSlider = new SliderWithEdit( tr( "alpha" ) );
     connect( m_alphaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( alphaChanged( float ) ) );
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
 
     m_layout->addLayout( layout1 );
+    m_layout->addLayout( layout4 );
     m_layout->addLayout( m_lowerThresholdSlider );
     m_layout->addLayout( m_upperThresholdSlider );
     m_layout->addLayout( layout2 );
@@ -155,6 +162,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( 54 );
     m_alphaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    index = getSelectedIndex( 55 );
+    m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
 
 void DatasetPropertyView::nameEdited()
@@ -194,6 +204,18 @@ void DatasetPropertyView::interpolationStateChanged( int state )
     else
     {
         model()->setData( getSelectedIndex( 53 ), false );
+    }
+}
+
+void DatasetPropertyView::activeStateChanged( int state )
+{
+    if ( state == Qt::Checked )
+    {
+        model()->setData( getSelectedIndex( 55 ), true );
+    }
+    else
+    {
+        model()->setData( getSelectedIndex( 55 ), false );
     }
 }
 
