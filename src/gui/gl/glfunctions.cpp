@@ -13,7 +13,7 @@
 
 #include "glfunctions.h"
 
-#define NUM_TEXTURES 3
+#define NUM_TEXTURES 5
 
 GLFunctions::GLFunctions()
 {
@@ -164,6 +164,8 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
     program->setUniformValue( "texture0", 0 );
     program->setUniformValue( "texture1", 1 );
     program->setUniformValue( "texture2", 2 );
+    program->setUniformValue( "texture3", 3 );
+    program->setUniformValue( "texture4", 4 );
 
     program->setUniformValue( "u_texActive0", false );
     program->setUniformValue( "u_texActive1", false );
@@ -187,6 +189,8 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold4", model->data( index, Qt::EditRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), 51 );
             program->setUniformValue( "u_upperThreshold4", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ), 54 );
+            program->setUniformValue( "u_alpha4", model->data( index, Qt::EditRole ).toFloat() );
             program->setUniformValue( "u_texActive4", true );
         }
             /* no break */
@@ -199,6 +203,8 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold3", model->data( index, Qt::EditRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), 51 );
             program->setUniformValue( "u_upperThreshold3", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ), 54 );
+            program->setUniformValue( "u_alpha3", model->data( index, Qt::EditRole ).toFloat() );
             program->setUniformValue( "u_texActive3", true );
         }
             /* no break */
@@ -211,6 +217,8 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold2", model->data( index, Qt::EditRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), 51 );
             program->setUniformValue( "u_upperThreshold2", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ), 54 );
+            program->setUniformValue( "u_alpha2", model->data( index, Qt::EditRole ).toFloat() );
             program->setUniformValue( "u_texActive2", true );
         }
             /* no break */
@@ -223,6 +231,8 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold1", model->data( index, Qt::EditRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), 51 );
             program->setUniformValue( "u_upperThreshold1", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ), 54 );
+            program->setUniformValue( "u_alpha1", model->data( index, Qt::EditRole ).toFloat() );
             program->setUniformValue( "u_texActive1", true );
         }
             /* no break */
@@ -235,7 +245,10 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold0", model->data( index, Qt::EditRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), 51 );
             program->setUniformValue( "u_upperThreshold0", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ), 54 );
+            program->setUniformValue( "u_alpha0", model->data( index, Qt::EditRole ).toFloat() );
             program->setUniformValue( "u_texActive0", true );
+
         }
             break;
         default:
