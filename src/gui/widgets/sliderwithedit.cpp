@@ -4,7 +4,7 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
-#include <QTGui/QSlider>
+#include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtCore/QDebug>

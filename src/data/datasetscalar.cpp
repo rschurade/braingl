@@ -45,7 +45,7 @@ void DatasetScalar::examineDataset()
         m_properties["min"] = static_cast< float >( min );
         m_properties["max"] = static_cast< float >( max );
 
-        m_properties["size"] = size * sizeof( unsigned char );
+        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
     }
     if ( type == DT_SIGNED_SHORT )
     {
@@ -63,7 +63,7 @@ void DatasetScalar::examineDataset()
         m_properties["min"] = static_cast< float >( min );
         m_properties["max"] = static_cast< float >( max );
 
-        m_properties["size"] = size * sizeof( short );
+        m_properties["size"] = static_cast<int>( size * sizeof( short ) );
     }
     if ( type == DT_FLOAT )
     {
@@ -81,7 +81,7 @@ void DatasetScalar::examineDataset()
         m_properties["min"] = min;
         m_properties["max"] = max;
 
-        m_properties["size"] = size * sizeof( float );
+        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
     }
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();

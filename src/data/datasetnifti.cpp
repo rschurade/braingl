@@ -83,7 +83,7 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     setProperty( "nv", header->nv );
     setProperty( "nw", header->nw );
     //setProperty("dim", header->dim );
-    setProperty( "nvox", header->nvox );
+    setProperty( "nvox", static_cast<int>( header->nvox ) );
     setProperty( "nbyper", header->nbyper );
     setProperty( "datatype", header->datatype );
     setProperty( "dx", header->dx );
