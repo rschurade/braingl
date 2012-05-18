@@ -44,7 +44,7 @@ void NavRenderer::init()
 
 void NavRenderer::initGL()
 {
-    glClearColor( 1.0, 0.0, 1.0, 0.0 );
+    glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
 
