@@ -8,6 +8,8 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
+#include <QtCore/QList>
+
 class QAbstractItemModel;
 class QGLShaderProgram;
 
@@ -22,12 +24,18 @@ class GLFunctions
 {
 public:
     static void setupTextures( QAbstractItemModel* model );
+    static void setTexInterpolation( QAbstractItemModel* model, int row );
+
+
     static QGLShaderProgram* initSliceShader();
     static void setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model );
 
+    static QList<int> getTextureIndexes( QAbstractItemModel* model );
 private:
     GLFunctions();
     virtual ~GLFunctions();
+
+
 };
 
 #endif /* GLFUNCTIONS_H_ */

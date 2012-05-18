@@ -44,11 +44,17 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     layout3->addWidget( m_textureInterpolation );
     connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
 
+    m_alphaSlider = new SliderWithEdit( tr( "alpha" ) );
+    connect( m_alphaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( alphaChanged( float ) ) );
+    m_alphaSlider->setMin( 0.0 );
+    m_alphaSlider->setMax( 1.0 );
+
     m_layout->addLayout( layout1 );
     m_layout->addLayout( m_lowerThresholdSlider );
     m_layout->addLayout( m_upperThresholdSlider );
     m_layout->addLayout( layout2 );
     m_layout->addLayout( layout3 );
+    m_layout->addLayout( m_alphaSlider );
     m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
@@ -146,6 +152,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( 53 );
     m_textureInterpolation->setChecked( model()->data( index, Qt::EditRole ).toBool() );
+
+    index = getSelectedIndex( 54 );
+    m_alphaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 }
 
 void DatasetPropertyView::nameEdited()
@@ -186,4 +195,9 @@ void DatasetPropertyView::interpolationStateChanged( int state )
     {
         model()->setData( getSelectedIndex( 53 ), false );
     }
+}
+
+void DatasetPropertyView::alphaChanged( float value )
+{
+    model()->setData( getSelectedIndex( 54 ), value );
 }
