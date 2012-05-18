@@ -46,6 +46,7 @@ private slots:
     void upperThresholdChanged( float value );
     void colormapChanged( int index );
     void interpolationStateChanged( int state );
+    void activeStateChanged( int state );
 
     void alphaChanged( float value );
 
@@ -66,6 +67,7 @@ private:
     QComboBox* m_colormapSelect;
 
     QCheckBox* m_textureInterpolation;
+    QCheckBox* m_textureActive;
 
 };
 

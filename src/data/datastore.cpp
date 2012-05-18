@@ -136,6 +136,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             {
                 m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
             }
+            if ( index.column() == 55 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
+            }
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -397,6 +401,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 54:
                return ds->getProperty( "alpha" ).toFloat();
                break;
+            case 55:
+                return ds->getProperty( "active" ).toBool();
+                break;
 
         }
     }
