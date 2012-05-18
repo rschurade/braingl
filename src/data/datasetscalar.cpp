@@ -15,6 +15,7 @@ DatasetScalar::DatasetScalar( QString filename, void* data ) :
 {
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
+    m_properties["alpha"] = 1.0;
 }
 
 DatasetScalar::~DatasetScalar()

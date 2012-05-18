@@ -47,6 +47,8 @@ private slots:
     void colormapChanged( int index );
     void interpolationStateChanged( int state );
 
+    void alphaChanged( float value );
+
 private:
     QModelIndex getSelectedIndex( int column );
 

@@ -132,6 +132,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             {
                 m_datasetList.at( index.row() )->setProperty( "interpolation", value.toBool() );
             }
+            if ( index.column() == 54 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
+            }
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -390,6 +394,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 53:
                 return ds->getProperty( "interpolation" ).toBool();
                 break;
+            case 54:
+               return ds->getProperty( "alpha" ).toFloat();
+               break;
 
         }
     }
