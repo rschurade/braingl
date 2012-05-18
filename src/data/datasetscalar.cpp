@@ -13,6 +13,7 @@
 DatasetScalar::DatasetScalar( QString filename, void* data ) :
     DatasetNifti( filename, FNDT_NIFTI_SCALAR, data )
 {
+    m_properties["active"] = true;
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
