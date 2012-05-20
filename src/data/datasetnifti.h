@@ -24,6 +24,8 @@ public:
 
     GLuint getTextureGLuint();
 
+    virtual void examineDataset() = 0;
+
 protected:
     virtual void createTexture() = 0;
 

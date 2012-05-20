@@ -33,7 +33,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_colormapSelect = new QComboBox();
     m_colormapSelect->insertItem( 0, tr( "grey" ) );
     m_colormapSelect->insertItem( 1, tr( "rainbow" ) );
-    m_colormapSelect->insertItem( 2, tr( "red/yellow" ) );
+    m_colormapSelect->insertItem( 2, tr( "unused" ) );
     layout2->addWidget( new QLabel( tr("colormap" ) ) );
     layout2->addWidget( m_colormapSelect );
     connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );

@@ -37,11 +37,11 @@ uniform int u_colormap4;
 varying vec3 v_texcoord;
 
 
-vec3 colormap( float value, int colormapSelection )
+vec3 colormap( vec3 input, int colormapSelection )
 {
 	if ( colormapSelection == 1 )
 	{
-		value *= 5.0;
+		float value = input.r * 5.0;
         vec3 color;
         if( value < 0.0 )
         	color = vec3( 0.0, 0.0, 0.0 );
@@ -61,7 +61,7 @@ vec3 colormap( float value, int colormapSelection )
 	}
 	else
 	{
-		return vec3( value, value, value );
+		return input;
 	}
 }
 
@@ -76,7 +76,7 @@ void main()
 		vec4 color0 = texture3D( texture0, v_texcoord );
 		if( color0.r > u_lowerThreshold0 && color0.r <= u_upperThreshold0 )
 		{
-			color = vec4( colormap( color0.r, u_colormap0 ), 1.0 );
+			color = vec4( colormap( color0.rgb, u_colormap0 ), 1.0 );
 		}
 	}
 
@@ -85,7 +85,7 @@ void main()
 		vec4 color1 = texture3D( texture1, v_texcoord );
 		if( color1.r > u_lowerThreshold1 && color1.r <= u_upperThreshold1 )
 		{
-			color.rgb =  mix( color.rgb, colormap( color1.r, u_colormap1 ), u_alpha1 );
+			color.rgb =  mix( color.rgb, colormap( color1.rgb, u_colormap1 ), u_alpha1 );
 		}
 	}
 	
@@ -94,7 +94,7 @@ void main()
 		vec4 color2 = texture3D( texture2, v_texcoord );
 		if( color2.r > u_lowerThreshold2 && color2.r <= u_upperThreshold2 )
 		{
-			color.rgb =  mix( color.rgb, colormap( color2.r, u_colormap2 ), u_alpha2 );
+			color.rgb =  mix( color.rgb, colormap( color2.rgb, u_colormap2 ), u_alpha2 );
 		}
 	}
 	
@@ -103,7 +103,7 @@ void main()
 		vec4 color3 = texture3D( texture3, v_texcoord );
 		if( color3.r > u_lowerThreshold3 && color3.r <= u_upperThreshold3 )
 		{
-			color.rgb =  mix( color.rgb, colormap( color3.r, u_colormap3 ), u_alpha3 );
+			color.rgb =  mix( color.rgb, colormap( color3.rgb, u_colormap3 ), u_alpha3 );
 		}
 	}
 	
@@ -112,7 +112,7 @@ void main()
 		vec4 color4 = texture3D( texture4, v_texcoord );
 		if( color4.r > u_lowerThreshold4 && color4.r <= u_upperThreshold4 )
 		{
-			color.rgb =  mix( color.rgb, colormap( color4.r, u_colormap4 ), u_alpha4 );
+			color.rgb =  mix( color.rgb, colormap( color4.rgb, u_colormap4 ), u_alpha4 );
 		}
 	}
 
