@@ -18,6 +18,8 @@ public:
     Dataset3D( QString filename, void* data );
     virtual ~Dataset3D();
 
+    void examineDataset();
+
 private:
     void createTexture();
 };

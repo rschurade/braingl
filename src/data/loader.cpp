@@ -51,6 +51,7 @@ bool Loader::load()
             void* data = loadNifti();
             Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
             m_dataset = dataset;
             return true;
             break;

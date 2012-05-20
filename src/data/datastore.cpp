@@ -386,6 +386,11 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 0:
                 return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
                 break;
+            case 1:
+            {
+                DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+                return ds->getTextureGLuint();
+            }
             case 50:
                 return ds->getProperty( "lowerThreshold" ).toFloat();
                 break;
@@ -414,11 +419,6 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
 {
     switch ( index.column() )
     {
-        case 1:
-        {
-            DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
-            return ds->getTextureGLuint();
-        }
         case 100:
             return m_globals[ "sagittal" ];
             break;

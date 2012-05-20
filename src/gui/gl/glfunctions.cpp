@@ -34,7 +34,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 4;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::UserRole ).toInt() );
+            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -45,7 +45,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 3;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::UserRole ).toInt() );
+            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -56,7 +56,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 2;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::UserRole ).toInt() );
+            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -67,7 +67,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 1;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::UserRole ).toInt() );
+            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -78,7 +78,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 0;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::UserRole ).toInt() );
+            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE0 );
             glBindTexture( GL_TEXTURE_3D, tex );
