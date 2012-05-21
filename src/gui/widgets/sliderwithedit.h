@@ -30,7 +30,7 @@ public:
 public slots:
     void sliderChanged( int value );
     void sliderMoved( int value );
-    void editChanged( QString text );
+    void editEdited();
 
 signals:
     void valueChanged( float value );

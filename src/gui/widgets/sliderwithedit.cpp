@@ -19,11 +19,11 @@ SliderWithEdit::SliderWithEdit( QString name, QWidget* parent ) :
 
     m_edit = new QLineEdit();
     m_edit->setMaxLength( 6 );
-    m_edit->setMaximumWidth( 50 );
+    m_edit->setMaximumWidth( 55 );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
-    connect( m_edit, SIGNAL( textEdited( QString ) ), this, SLOT( editChanged( QString ) ) );
+    connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
     addWidget( new QLabel( name ) );
     addWidget( m_slider );
@@ -38,23 +38,28 @@ SliderWithEdit::~SliderWithEdit()
 void SliderWithEdit::sliderChanged( int value )
 {
     m_edit->setText( QString::number( static_cast<double>( value ) / 100., 'f', 2 ) );
+    m_slider->repaint();
 }
 
 void SliderWithEdit::sliderMoved( int value )
 {
     m_edit->setText( QString::number( static_cast<float>( value ) / 100., 'f', 2 ) );
+    m_slider->repaint();
     emit( valueChanged( static_cast<float>( value ) / 100.  ) );
 }
 
-void SliderWithEdit::editChanged( QString text )
+void SliderWithEdit::editEdited()
 {
+    QString text = m_edit->text();
     m_slider->setValue( static_cast<int>( text.toFloat() * 100 ) );
-    emit( valueChanged( static_cast<float>( m_slider->value() ) / 100. ) );
+    emit( valueChanged( text.toFloat() ) );
+    m_slider->repaint();
 }
 
 void SliderWithEdit::setValue( float value )
 {
     m_slider->setValue( value * 100 );
+    m_slider->repaint();
 }
 
 float SliderWithEdit::getValue()
@@ -65,10 +70,12 @@ float SliderWithEdit::getValue()
 void SliderWithEdit::setMin( float min )
 {
     m_slider->setMinimum( min * 100 );
+    m_slider->repaint();
 }
 
 
 void SliderWithEdit::setMax( float max )
 {
     m_slider->setMaximum( max * 100 );
+    m_slider->repaint();
 }

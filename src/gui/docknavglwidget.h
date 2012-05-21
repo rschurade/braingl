@@ -14,10 +14,9 @@
 
 class DataStore;
 class NavGLWidget;
-class QSlider;
-class QLineEdit;
+class SliderWithEditInt;
 class QVBoxLayout;
-class LineEdit;
+
 
 
 class DockNavGLWidget : public QDockWidget
@@ -37,13 +36,11 @@ private:
 
     NavGLWidget* m_glWidget;
     QVBoxLayout* m_layout;
-    QSlider* m_slider;
-    QLineEdit* m_lineEdit;
+    SliderWithEditInt* m_slider;
 
 private slots:
     void update();
     void sliderChanged( int value );
-    void editChanged( QString text );
     void settingChanged();
 
 signals:
