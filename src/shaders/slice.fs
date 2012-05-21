@@ -37,11 +37,11 @@ uniform int u_colormap4;
 varying vec3 v_texcoord;
 
 
-vec3 colormap( vec3 input, int colormapSelection )
+vec3 colormap( vec3 v, int colormapSelection )
 {
 	if ( colormapSelection == 1 )
 	{
-		float value = input.r * 5.0;
+		float value = v.r * 5.0;
         vec3 color;
         if( value < 0.0 )
         	color = vec3( 0.0, 0.0, 0.0 );
@@ -61,7 +61,7 @@ vec3 colormap( vec3 input, int colormapSelection )
 	}
 	else
 	{
-		return input;
+		return v;
 	}
 }
 
