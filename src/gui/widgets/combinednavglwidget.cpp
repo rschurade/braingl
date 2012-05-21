@@ -1,7 +1,7 @@
 #include <QtGui/QtGui>
 
-#include "../data/datastore.h"
-#include "combinednavrenderer.h"
+#include "../../data/datastore.h"
+#include "../gl/combinednavrenderer.h"
 
 #include "combinednavglwidget.h"
 

@@ -6,11 +6,11 @@
  */
 #include <QtGui/QtGui>
 
-#include "../data/datastore.h"
-#include "widgets/sliderwitheditint.h"
+#include "../../data/datastore.h"
+#include "../widgets/sliderwitheditint.h"
 
 
-#include "navglwidget.h"
+#include "../widgets/navglwidget.h"
 
 #include "docknavglwidget.h"
 

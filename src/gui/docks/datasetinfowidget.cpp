@@ -5,7 +5,7 @@
  *      Author: Ralph
  */
 
-#include "datasetinfoview.h"
+#include "../views/datasetinfoview.h"
 #include "datasetinfowidget.h"
 
 DatasetInfoWidget::DatasetInfoWidget( QString name, QWidget* parent ) :

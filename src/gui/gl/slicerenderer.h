@@ -8,7 +8,7 @@
 #ifndef SLICERENDERER_H_
 #define SLICERENDERER_H_
 
-#include "../glew/include/glew.h"
+#include "../../glew/include/glew.h"
 
 #include "objectrenderer.h"
 

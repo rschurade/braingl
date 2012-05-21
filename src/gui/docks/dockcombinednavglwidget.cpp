@@ -6,9 +6,9 @@
  */
 #include <QtGui/QtGui>
 
-#include "../data/datastore.h"
+#include "../../data/datastore.h"
 
-#include "combinednavglwidget.h"
+#include "../widgets/combinednavglwidget.h"
 
 #include "dockcombinednavglwidget.h"
 

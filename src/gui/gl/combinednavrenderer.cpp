@@ -12,9 +12,9 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../data/datastore.h"
+#include "../../data/datastore.h"
 
-#include "gl/glfunctions.h"
+#include "../gl/glfunctions.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

@@ -4,13 +4,13 @@
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-#include "../glew/include/glew.h"
+#include "../../glew/include/glew.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "gl/glfunctions.h"
+#include "glfunctions.h"
 
 #include "slicerenderer.h"
 

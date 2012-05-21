@@ -1,6 +1,6 @@
 #include <QtGui/QtGui>
 
-#include "../data/datastore.h"
+#include "../../data/datastore.h"
 
 #include "glwidget.h"
 
