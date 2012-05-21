@@ -38,7 +38,6 @@ private:
     QVBoxLayout* m_layout;
 
 private slots:
-    void update();
 
 signals:
 

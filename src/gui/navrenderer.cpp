@@ -214,6 +214,7 @@ void NavRenderer::setShaderVars()
 
 void NavRenderer::draw()
 {
+    //qDebug() << "nav draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     setupTextures();
