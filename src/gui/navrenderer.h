@@ -39,6 +39,8 @@ private:
 	void drawCoronal();
 	void drawSagittal();
 
+	void drawCrosshair();
+
 	void initShader();
     void setupTextures();
     void setShaderVars();
@@ -54,6 +56,7 @@ private:
     GLuint *vboIds;
 
     QGLShaderProgram *m_program;
+    QGLShaderProgram *m_crosshairProgram;
 
     float m_x;
     float m_y;
