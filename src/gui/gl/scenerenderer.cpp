@@ -6,7 +6,7 @@
  */
 #include <QtCore/QDebug>
 
-#include "../data/datastore.h"
+#include "../../data/datastore.h"
 
 #include "arcball.h"
 #include "slicerenderer.h"

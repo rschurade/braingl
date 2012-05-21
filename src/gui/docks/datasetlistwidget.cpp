@@ -9,7 +9,7 @@
 
 #include <QtGui/QtGui>
 
-#include "datasetlistview.h"
+#include "../views/datasetlistview.h"
 
 #include "datasetlistwidget.h"
 

@@ -1,7 +1,7 @@
 #include <QtGui/QtGui>
 #include <QtCore/QDebug>
-#include "../data/datastore.h"
-#include "navrenderer.h"
+#include "../../data/datastore.h"
+#include "../gl/navrenderer.h"
 
 #include "navglwidget.h"
 

@@ -2,14 +2,16 @@
 
 #include "../data/datastore.h"
 
-#include "glwidget.h"
-#include "datasetlistwidget.h"
-#include "datasetinfowidget.h"
-#include "datasetpropertywidget.h"
-#include "globalpropertywidget.h"
-#include "docknavglwidget.h"
-#include "combinednavglwidget.h"
-#include "dockcombinednavglwidget.h"
+#include "docks/datasetlistwidget.h"
+#include "docks/datasetinfowidget.h"
+#include "docks/datasetpropertywidget.h"
+#include "docks/globalpropertywidget.h"
+#include "docks/docknavglwidget.h"
+#include "docks/dockcombinednavglwidget.h"
+
+#include "widgets/glwidget.h"
+#include "widgets/combinednavglwidget.h"
+
 #include "mainwindow.h"
 
 MainWindow::MainWindow( DataStore* dataStore ) :

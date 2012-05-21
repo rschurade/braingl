@@ -4,7 +4,7 @@
  *  Created on: 13.05.2012
  *      Author: Ralph
  */
-#include "globalpropertyview.h"
+#include "../views/globalpropertyview.h"
 
 #include "globalpropertywidget.h"
 

@@ -6,7 +6,7 @@
  */
 #include <QtGui/QtGui>
 
-#include "widgets/sliderwithedit.h"
+#include "../widgets/sliderwithedit.h"
 
 #include "datasetpropertyview.h"
 

@@ -5,10 +5,10 @@
  *      Author: Ralph
  */
 
-#ifndef NAVRENDERER_H_
-#define NAVRENDERER_H_
+#ifndef COMBINEDNAVRENDERER_H_
+#define COMBINEDNAVRENDERER_H_
 
-#include "../glew/include/glew.h"
+#include "../../glew/include/glew.h"
 
 #include <QtGui/QMatrix4x4>
 
@@ -17,15 +17,16 @@
 class DataStore;
 class QGLShaderProgram;
 
-class NavRenderer : public ObjectRenderer
+class CombinedNavRenderer : public ObjectRenderer
 {
 public:
-	NavRenderer( QString name );
-	virtual ~NavRenderer();
+	CombinedNavRenderer( QString name );
+	virtual ~CombinedNavRenderer();
 
 	void resizeGL( int width, int height );
 
 	void init();
+
 	void initGL();
 	void draw();
 
@@ -35,12 +36,6 @@ public:
 	void adjustRatios();
 
 private:
-	void drawAxial();
-	void drawCoronal();
-	void drawSagittal();
-
-	void drawCrosshair();
-
 	void initShader();
     void setupTextures();
     void setShaderVars();
@@ -56,7 +51,6 @@ private:
     GLuint *vboIds;
 
     QGLShaderProgram *m_program;
-    QGLShaderProgram *m_crosshairProgram;
 
     float m_x;
     float m_y;

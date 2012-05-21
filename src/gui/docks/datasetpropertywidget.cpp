@@ -4,7 +4,7 @@
  *  Created on: 13.05.2012
  *      Author: Ralph
  */
-#include "datasetpropertyview.h"
+#include "../views/datasetpropertyview.h"
 
 #include "datasetpropertywidget.h"
 
