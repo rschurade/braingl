@@ -51,7 +51,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* p
 
     settingChanged();
 
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
     connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
 }
 
@@ -118,10 +118,4 @@ void DockNavGLWidget::settingChanged()
             m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() );
         }
     }
-}
-
-void DockNavGLWidget::update()
-{
-    settingChanged();
-    m_glWidget->update();
 }

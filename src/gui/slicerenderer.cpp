@@ -122,6 +122,7 @@ void SliceRenderer::setShaderVars()
 
 void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 {
+    //qDebug() << "main gl draw";
     setupTextures();
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );

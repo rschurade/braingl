@@ -277,12 +277,12 @@ void CombinedNavRenderer::setShaderVars()
 
 void CombinedNavRenderer::draw()
 {
+    //qDebug() << "combined draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     setupTextures();
 
     adjustRatios();
-
 
     // Set modelview-projection matrix
     m_program->setUniformValue( "mvp_matrix", m_mvpMatrix );

@@ -77,6 +77,7 @@ int DataStore::columnCount( const QModelIndex &parent ) const
 
 QVariant DataStore::data( const QModelIndex &index, int role ) const
 {
+    //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
     if ( !index.isValid() )
         return QVariant();
 
@@ -103,6 +104,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
 {
+    //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
     if ( !index.isValid() )
     {
         return false;

@@ -33,8 +33,6 @@ DockCombinedNavGLWidget::DockCombinedNavGLWidget( DataStore* dataStore, QString 
     setWidget( panel );
 
     m_glWidget->setMinimumSize( 50,50 );
-
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 DockCombinedNavGLWidget::~DockCombinedNavGLWidget()
@@ -49,9 +47,4 @@ QSize DockCombinedNavGLWidget::minimumSizeHint() const
 QSize DockCombinedNavGLWidget::sizeHint() const
 {
     return QSize( 400, 400 );
-}
-
-void DockCombinedNavGLWidget::update()
-{
-    m_glWidget->update();
 }

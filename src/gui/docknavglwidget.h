@@ -39,7 +39,6 @@ private:
     SliderWithEditInt* m_slider;
 
 private slots:
-    void update();
     void sliderChanged( int value );
     void settingChanged();
 
