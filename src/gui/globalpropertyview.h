@@ -13,6 +13,7 @@
 class QLineEdit;
 class QVBoxLayout;
 class QSlider;
+class SliderWithEditInt;
 
 class GlobalPropertyView : public QAbstractItemView
 {
@@ -43,10 +44,6 @@ public slots:
     void coronalSliderChanged( int value );
     void axialSliderChanged( int value );
 
-    void sagittalEditChanged( QString text );
-    void coronalEditChanged( QString text );
-    void axialEditChanged( QString text );
-
 private slots:
 
 
@@ -55,14 +52,9 @@ private:
 
     QVBoxLayout* m_layout;
 
-    QSlider* m_sagittalSlider;
-    QSlider* m_coronalSlider;
-    QSlider* m_axialSlider;
-
-    QLineEdit* m_sagittalEdit;
-    QLineEdit* m_coronalEdit;
-    QLineEdit* m_axialEdit;
-
+    SliderWithEditInt* m_sagittalSlider;
+    SliderWithEditInt* m_coronalSlider;
+    SliderWithEditInt* m_axialSlider;
 };
 
 #endif /* GLOBALPROPERTYVIEW_H_ */
