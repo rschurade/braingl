@@ -1,5 +1,5 @@
 #include <QtGui/QtGui>
-
+#include <QtCore/QDebug>
 #include "../data/datastore.h"
 #include "navrenderer.h"
 

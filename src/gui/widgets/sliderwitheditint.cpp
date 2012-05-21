@@ -22,7 +22,6 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
     m_edit->setMaximumWidth( 35 );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
-    connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
     addWidget( new QLabel( name ) );
@@ -33,12 +32,6 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
 SliderWithEditInt::~SliderWithEditInt()
 {
 
-}
-
-void SliderWithEditInt::sliderChanged( int value )
-{
-    m_edit->setText( QString::number( value ) );
-    m_slider->repaint();
 }
 
 void SliderWithEditInt::sliderMoved( int value )
@@ -59,6 +52,7 @@ void SliderWithEditInt::editEdited()
 void SliderWithEditInt::setValue( int value )
 {
     m_slider->setValue( value );
+    m_edit->setText( QString::number( value ) );
     m_slider->repaint();
 }
 
