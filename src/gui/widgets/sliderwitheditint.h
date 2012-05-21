@@ -28,7 +28,6 @@ public:
    void setMax( int max );
 
 public slots:
-    void sliderChanged( int value );
     void sliderMoved( int value );
     void editEdited();
 

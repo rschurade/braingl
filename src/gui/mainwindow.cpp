@@ -25,8 +25,8 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     mainGLWidget = new GLWidget( m_dataStore );
     m_centralTabWidget->addTab( mainGLWidget, "main gl" );
 
-    //CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
-    //m_centralTabWidget->addTab( combNav, "slices" );
+    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    m_centralTabWidget->addTab( combNav, "slices" );
 
     createActions();
     createMenus();
