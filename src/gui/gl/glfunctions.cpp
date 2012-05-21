@@ -106,7 +106,7 @@ void GLFunctions::setTexInterpolation( QAbstractItemModel* model, int row )
     }
 }
 
-QGLShaderProgram* GLFunctions::initSliceShader()
+QGLShaderProgram* GLFunctions::initShader( QString name )
 {
     QGLShaderProgram* program = new QGLShaderProgram;
 
@@ -114,13 +114,13 @@ QGLShaderProgram* GLFunctions::initSliceShader()
     setlocale( LC_NUMERIC, "C" );
 
     // Compiling vertex shader
-    if ( !program->addShaderFromSourceFile( QGLShader::Vertex, ":/shaders/vshader.glsl" ) )
+    if ( !program->addShaderFromSourceFile( QGLShader::Vertex, ":/shaders/" + name + ".vs" ) )
     {
         exit( false );
     }
 
     // Compiling fragment shader
-    if ( !program->addShaderFromSourceFile( QGLShader::Fragment, ":/shaders/fshader.glsl" ) )
+    if ( !program->addShaderFromSourceFile( QGLShader::Fragment, ":/shaders/" + name + ".fs" ) )
     {
         exit( false );
     }
@@ -145,6 +145,7 @@ QGLShaderProgram* GLFunctions::initSliceShader()
 
 void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
 {
+    program->bind();
     // Offset for position
     int offset = 0;
 

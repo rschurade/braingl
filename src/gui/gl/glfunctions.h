@@ -27,7 +27,7 @@ public:
     static void setTexInterpolation( QAbstractItemModel* model, int row );
 
 
-    static QGLShaderProgram* initSliceShader();
+    static QGLShaderProgram* initShader( QString name );
     static void setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model );
 
     static QList<int> getTextureIndexes( QAbstractItemModel* model );

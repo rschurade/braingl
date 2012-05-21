@@ -8,7 +8,9 @@
 	<file>icons/print.png</file>
 	<file>icons/save.png</file>
 	<file>icons/undo.png</file>
-	<file>shaders/vshader.glsl</file>
-	<file>shaders/fshader.glsl</file>
+	<file>shaders/slice.vs</file>
+	<file>shaders/slice.fs</file>
+	<file>shaders/crosshair.vs</file>
+    <file>shaders/crosshair.fs</file>
  </qresource>
  </RCC>

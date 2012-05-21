@@ -40,7 +40,7 @@ void SliceRenderer::init()
 
 void SliceRenderer::initShader()
 {
-    m_program = GLFunctions::initSliceShader();
+    m_program = GLFunctions::initShader( "slice" );
 }
 
 void SliceRenderer::initGeometry()

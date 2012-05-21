@@ -136,7 +136,7 @@ void CombinedNavRenderer::leftMouseDrag( int x, int y )
 
 void CombinedNavRenderer::initShader()
 {
-    m_program = GLFunctions::initSliceShader();
+    m_program = GLFunctions::initShader( "slice" );
 }
 
 void CombinedNavRenderer::initGeometry()
