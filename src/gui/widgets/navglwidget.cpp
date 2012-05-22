@@ -35,6 +35,7 @@ NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, int orient, QWidge
 
 NavGLWidget::~NavGLWidget()
 {
+    destroy ( m_navRenderer );
 }
 
 QSize NavGLWidget::minimumSizeHint() const
