@@ -26,7 +26,6 @@ NavRendererSagittal::~NavRendererSagittal()
 void NavRendererSagittal::adjustRatios()
 {
     m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
-    glViewport( 0, 0, m_width, m_height );
 
     // Reset projection
     QMatrix4x4 pMatrix;
@@ -38,10 +37,16 @@ void NavRendererSagittal::adjustRatios()
     if ( mult >= 1.0 )
     {
         pMatrix.ortho( 0, m_yb * mult, 0, m_zb, -3000, 3000 );
+
+        int xoff = ( m_width - ( m_width / mult ) ) / 2;
+        glViewport( xoff, 0, m_width - ( 2* xoff) , m_height );
     }
     else
     {
-        pMatrix.ortho( 0, m_yb, 0, m_zb * ( 1.0 / mult ), -3000, 3000 );
+        pMatrix.ortho( 0, m_yb, 0, m_zb, -3000, 3000 );
+
+        int yoff = ( m_height - ( m_height * mult ) ) / 2;
+        glViewport( 0, yoff, m_width, m_height - ( 2 * yoff ) );
     }
 
     m_mvpMatrix = pMatrix;
