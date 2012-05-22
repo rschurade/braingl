@@ -28,6 +28,7 @@ private slots:
     void print();
     void undo();
     void about();
+    void closeTab( int index );
 
 private:
     void createActions();
