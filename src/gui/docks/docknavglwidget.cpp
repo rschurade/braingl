@@ -46,8 +46,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     panel->setLayout( m_layout );
     setWidget( panel );
 
-    m_glWidget->setMinimumSize( 200, 200 );
-    m_glWidget->setMaximumSize( 800, 800 );
+    m_glWidget->setMinimumSize( 50, 50 );
 
     settingChanged();
 
@@ -61,7 +60,7 @@ DockNavGLWidget::~DockNavGLWidget()
 
 QSize DockNavGLWidget::minimumSizeHint() const
 {
-    return QSize( 200, 200 );
+    return QSize( 50, 50 );
 }
 
 QSize DockNavGLWidget::sizeHint() const
