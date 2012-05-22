@@ -28,6 +28,15 @@ void Dataset3D::examineDataset()
     int nz = getProperty( "nz" ).toInt();
     int size = nx * ny * nz * 3;
 
+    if ( type == DT_UNSIGNED_CHAR )
+    {
+        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
+
+        m_properties["min"] = 0;
+        m_properties["max"] = 255;
+    }
+
+
     if ( type == DT_FLOAT )
     {
         m_properties["size"] = static_cast<int>( size * sizeof( float ) );
