@@ -24,7 +24,7 @@ class DockNavGLWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    DockNavGLWidget( DataStore* dataStore, QString name, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
+    DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
     virtual ~DockNavGLWidget();
 
     QSize minimumSizeHint() const;

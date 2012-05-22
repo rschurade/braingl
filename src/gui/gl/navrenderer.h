@@ -14,7 +14,6 @@
 
 #include "objectrenderer.h"
 
-class DataStore;
 class QGLShaderProgram;
 
 class NavRenderer : public ObjectRenderer
@@ -27,25 +26,19 @@ public:
 
 	void init();
 	void initGL();
-	void draw();
+	virtual void draw()=0;
 
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );
 
-	void adjustRatios();
+	virtual void adjustRatios()=0;
 
-private:
-	void drawAxial();
-	void drawCoronal();
-	void drawSagittal();
-
-	void drawCrosshair();
-
+protected:
 	void initShader();
     void setupTextures();
     void setShaderVars();
 
-    void initGeometry();
+    virtual void initGeometry()=0;
 
 	QString m_name;
 
