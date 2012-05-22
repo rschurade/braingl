@@ -14,7 +14,7 @@
 
 class DataStore;
 class NavGLWidget;
-class SliderWithEditInt;
+class SliderWithEditInt2;
 class QVBoxLayout;
 
 
@@ -36,7 +36,7 @@ private:
 
     NavGLWidget* m_glWidget;
     QVBoxLayout* m_layout;
-    SliderWithEditInt* m_slider;
+    SliderWithEditInt2* m_slider;
 
 private slots:
     void sliderChanged( int value );

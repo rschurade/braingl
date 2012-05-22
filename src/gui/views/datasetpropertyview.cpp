@@ -19,8 +19,8 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 
     QHBoxLayout* layout1 = new QHBoxLayout();
     m_nameEdit = new QLineEdit();
-    layout1->addWidget( new QLabel( tr("name" ) ) );
-    layout1->addWidget( m_nameEdit );
+    layout1->addWidget( new QLabel( tr("name" ) ), 25 );
+    layout1->addWidget( m_nameEdit, 75 );
     connect( m_nameEdit, SIGNAL( editingFinished() ), this, SLOT( nameEdited() ) );
 
     m_lowerThresholdSlider = new SliderWithEdit( tr( "lower threshold" ) );
@@ -34,20 +34,20 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_colormapSelect->insertItem( 0, tr( "grey" ) );
     m_colormapSelect->insertItem( 1, tr( "rainbow" ) );
     m_colormapSelect->insertItem( 2, tr( "unused" ) );
-    layout2->addWidget( new QLabel( tr("colormap" ) ) );
-    layout2->addWidget( m_colormapSelect );
+    layout2->addWidget( new QLabel( tr("colormap" ) ), 25 );
+    layout2->addWidget( m_colormapSelect, 75 );
     connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
 
     QHBoxLayout* layout3 = new QHBoxLayout();
     m_textureInterpolation = new QCheckBox();
-    layout3->addWidget( new QLabel( tr("interpolation" ) ) );
-    layout3->addWidget( m_textureInterpolation );
+    layout3->addWidget( new QLabel( tr("interpolation" ) ), 25 );
+    layout3->addWidget( m_textureInterpolation, 75 );
     connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
 
     QHBoxLayout* layout4 = new QHBoxLayout();
     m_textureActive = new QCheckBox();
-    layout4->addWidget( new QLabel( tr("active" ) ) );
-    layout4->addWidget( m_textureActive );
+    layout4->addWidget( new QLabel( tr("active" ) ), 25 );
+    layout4->addWidget( m_textureActive, 75 );
     connect( m_textureActive, SIGNAL( stateChanged( int ) ), this, SLOT( activeStateChanged( int ) ) );
 
     m_alphaSlider = new SliderWithEdit( tr( "alpha" ) );
@@ -57,11 +57,11 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 
     m_layout->addLayout( layout1 );
     m_layout->addLayout( layout4 );
-    m_layout->addLayout( m_lowerThresholdSlider );
-    m_layout->addLayout( m_upperThresholdSlider );
+    m_layout->addWidget( m_lowerThresholdSlider );
+    m_layout->addWidget( m_upperThresholdSlider );
     m_layout->addLayout( layout2 );
     m_layout->addLayout( layout3 );
-    m_layout->addLayout( m_alphaSlider );
+    m_layout->addWidget( m_alphaSlider );
     m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
@@ -138,6 +138,8 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 {
     m_selected = selected;
 
+    updateWidgetVisibility();
+
     QModelIndex index = getSelectedIndex( 0 );
     m_nameEdit->setText( model()->data( index, Qt::DisplayRole ).toString() );
 
@@ -165,6 +167,21 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( 55 );
     m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
+}
+
+void DatasetPropertyView::updateWidgetVisibility()
+{
+    QModelIndex index = getSelectedIndex( 1 );
+    int dim = model()->data( index, Qt::DisplayRole ).toInt();
+
+    m_lowerThresholdSlider->setHidden( true );
+    m_upperThresholdSlider->setHidden( true );
+
+    if ( dim == 1 )
+    {
+        m_lowerThresholdSlider->setHidden( false );
+        m_upperThresholdSlider->setHidden( false );
+    }
 }
 
 void DatasetPropertyView::nameEdited()

@@ -10,9 +10,9 @@
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
 
-#include "sliderwitheditint.h"
+#include "sliderwitheditint2.h"
 
-SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
+SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     QWidget( parent )
 {
     m_slider = new QSlider();
@@ -27,28 +27,25 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
 
     QHBoxLayout* layout = new QHBoxLayout();
 
-    m_label = new QLabel( name );
-
-    layout->addWidget( m_label, 20 );
-    layout->addWidget( m_slider, 60 );
-    layout->addWidget( m_edit, 20 );
+    layout->addWidget( m_slider );
+    layout->addWidget( m_edit );
 
     setLayout( layout );
 }
 
-SliderWithEditInt::~SliderWithEditInt()
+SliderWithEditInt2::~SliderWithEditInt2()
 {
 
 }
 
-void SliderWithEditInt::sliderMoved( int value )
+void SliderWithEditInt2::sliderMoved( int value )
 {
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
     emit( valueChanged( value ) );
 }
 
-void SliderWithEditInt::editEdited()
+void SliderWithEditInt2::editEdited()
 {
     QString text = m_edit->text();
     m_slider->setValue( text.toInt() );
@@ -56,26 +53,26 @@ void SliderWithEditInt::editEdited()
     m_slider->repaint();
 }
 
-void SliderWithEditInt::setValue( int value )
+void SliderWithEditInt2::setValue( int value )
 {
     m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
 }
 
-int SliderWithEditInt::getValue()
+int SliderWithEditInt2::getValue()
 {
     return m_slider->value();
 }
 
-void SliderWithEditInt::setMin( int min )
+void SliderWithEditInt2::setMin( int min )
 {
     m_slider->setMinimum( min );
     m_slider->repaint();
 }
 
 
-void SliderWithEditInt::setMax( int max )
+void SliderWithEditInt2::setMax( int max )
 {
     m_slider->setMaximum( max );
     m_slider->repaint();

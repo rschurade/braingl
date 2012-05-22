@@ -7,7 +7,7 @@
 #include <QtGui/QtGui>
 
 #include "../../data/datastore.h"
-#include "../widgets/sliderwitheditint.h"
+#include "../widgets/sliderwitheditint2.h"
 
 
 #include "../widgets/navglwidget.h"
@@ -32,7 +32,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     m_layout = new QVBoxLayout();
 
     QHBoxLayout* sliderLayout = new QHBoxLayout();
-    m_slider = new SliderWithEditInt("");
+    m_slider = new SliderWithEditInt2();
 
     m_slider->setMin( 0 );
     m_slider->setMax( 200 );
@@ -40,7 +40,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
 
     m_layout->addWidget( m_glWidget );
-    m_layout->addLayout( m_slider );
+    m_layout->addWidget( m_slider );
     m_layout->addStretch( 0 );
 
     panel->setLayout( m_layout );

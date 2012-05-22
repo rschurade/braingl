@@ -8,12 +8,13 @@
 #ifndef SLIDERWITHEDIT_H_
 #define SLIDERWITHEDIT_H_
 
-#include <QtGui/QHBoxLayout>
+#include <QtGui/QWidget>
 
 class QSlider;
 class QLineEdit;
+class QLabel;
 
-class SliderWithEdit : public QHBoxLayout
+class SliderWithEdit : public QWidget
 {
     Q_OBJECT
 
@@ -38,6 +39,7 @@ signals:
 private:
    QSlider*  m_slider;
    QLineEdit* m_edit;
+   QLabel* m_label;
 };
 
 #endif /* SLIDERWITHEDIT_H_ */

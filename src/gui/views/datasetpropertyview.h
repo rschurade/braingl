@@ -52,6 +52,7 @@ private slots:
 
 private:
     QModelIndex getSelectedIndex( int column );
+    void updateWidgetVisibility();
 
     QItemSelection m_selected;
 
