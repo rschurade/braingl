@@ -29,6 +29,10 @@ private slots:
     void undo();
     void about();
     void closeTab( int index );
+    void slotAddTabCombined();
+    void slotAddTabSagittal();
+    void slotAddTabCoronal();
+    void slotAddTabAxial();
 
 private:
     void createActions();
@@ -39,27 +43,33 @@ private:
 
     DataStore* m_dataStore;
 
-    GLWidget *mainGLWidget;
+    GLWidget* mainGLWidget;
 
-    DatasetListWidget *datasetView;
-    QTableView *datasetView2;
+    DatasetListWidget* datasetView;
+    QTableView* datasetView2;
 
     QTabWidget* m_centralTabWidget;
 
-    QMenu *fileMenu;
-    QMenu *editMenu;
-    QMenu *viewMenu;
-    QMenu *helpMenu;
-    QToolBar *fileToolBar;
-    QToolBar *editToolBar;
-    QAction *newLetterAct;
-    QAction *openAct;
-    QAction *saveAct;
-    QAction *printAct;
-    QAction *undoAct;
-    QAction *aboutAct;
-    QAction *aboutQtAct;
-    QAction *quitAct;
+    QMenu* fileMenu;
+    QMenu* editMenu;
+    QMenu* viewMenu;
+    QMenu* tabMenu;
+    QMenu* helpMenu;
+    QToolBar* fileToolBar;
+    QToolBar* editToolBar;
+    QAction* newLetterAct;
+    QAction* openAct;
+    QAction* saveAct;
+    QAction* printAct;
+    QAction* undoAct;
+    QAction* aboutAct;
+    QAction* aboutQtAct;
+    QAction* quitAct;
+
+    QAction* addTabCombined;
+    QAction* addTabSagittal;
+    QAction* addTabCoronal;
+    QAction* addTabAxial;
 };
 
 #endif

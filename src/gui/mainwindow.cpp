@@ -9,6 +9,7 @@
 #include "docks/docknavglwidget.h"
 #include "docks/dockcombinednavglwidget.h"
 
+#include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
 
@@ -28,9 +29,6 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 
     mainGLWidget = new GLWidget( m_dataStore );
     m_centralTabWidget->addTab( mainGLWidget, "main gl" );
-
-    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
-    m_centralTabWidget->addTab( combNav, "slices" );
 
     createActions();
     createMenus();
@@ -118,6 +116,22 @@ void MainWindow::createActions()
     aboutQtAct = new QAction( tr( "About &Qt" ), this );
     aboutQtAct->setStatusTip( tr( "Show the Qt library's About box" ) );
     connect( aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()) );
+
+    addTabCombined = new QAction( tr( "Add Combined Slice Tab" ), this );
+    addTabCombined->setStatusTip( tr( "Add a new tab to the central tab widget with all 3 slices." ) );
+    connect( addTabCombined, SIGNAL(triggered()), this, SLOT( slotAddTabCombined() ) );
+
+    addTabSagittal = new QAction( tr( "Add Sagittal Slice Tab" ), this );
+    addTabSagittal->setStatusTip( tr( "Add a new tab to the central tab widget showing the sagittal slice." ) );
+    connect( addTabSagittal, SIGNAL(triggered()), this, SLOT( slotAddTabSagittal() ) );
+
+    addTabCoronal = new QAction( tr( "Add Coronal Slice Tab" ), this );
+    addTabCoronal->setStatusTip( tr( "Add a new tab to the central tab widget showing the coronal slice." ) );
+    connect( addTabCoronal, SIGNAL(triggered()), this, SLOT( slotAddTabCoronal() ) );
+
+    addTabAxial = new QAction( tr( "Add Axial Slice Tab" ), this );
+    addTabAxial->setStatusTip( tr( "Add a new tab to the central tab widget showing the axial slice." ) );
+    connect( addTabAxial, SIGNAL(triggered()), this, SLOT( slotAddTabAxial() ) );
 }
 
 void MainWindow::createMenus()
@@ -133,6 +147,12 @@ void MainWindow::createMenus()
     editMenu->addAction( undoAct );
 
     viewMenu = menuBar()->addMenu( tr( "&View" ) );
+
+    tabMenu = menuBar()->addMenu( tr( "&Tabs" ) );
+    tabMenu->addAction( addTabCombined );
+    tabMenu->addAction( addTabSagittal );
+    tabMenu->addAction( addTabCoronal );
+    tabMenu->addAction( addTabAxial );
 
     menuBar()->addSeparator();
 
@@ -210,4 +230,28 @@ void MainWindow::closeTab( int index )
     {
         m_centralTabWidget->removeTab( index );
     }
+}
+
+void MainWindow::slotAddTabCombined()
+{
+    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    m_centralTabWidget->addTab( combNav, "slices" );
+}
+
+void MainWindow::slotAddTabSagittal()
+{
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("sagittal"), 0, this, mainGLWidget );
+    m_centralTabWidget->addTab( glWidget, "sagittal" );
+}
+
+void MainWindow::slotAddTabCoronal()
+{
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("coronal"), 1, this, mainGLWidget );
+    m_centralTabWidget->addTab( glWidget, "coronal" );
+}
+
+void MainWindow::slotAddTabAxial()
+{
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("axial"), 2, this, mainGLWidget );
+    m_centralTabWidget->addTab( glWidget, "axial" );
 }
