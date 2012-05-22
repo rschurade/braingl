@@ -236,22 +236,26 @@ void MainWindow::slotAddTabCombined()
 {
     CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     m_centralTabWidget->addTab( combNav, "slices" );
+    m_centralTabWidget->setCurrentWidget( combNav );
 }
 
 void MainWindow::slotAddTabSagittal()
 {
     NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("sagittal"), 0, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "sagittal" );
+    m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotAddTabCoronal()
 {
     NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("coronal"), 1, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "coronal" );
+    m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotAddTabAxial()
 {
     NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("axial"), 2, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "axial" );
+    m_centralTabWidget->setCurrentWidget( glWidget );
 }
