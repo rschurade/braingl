@@ -28,7 +28,9 @@ NavRenderer::NavRenderer( QString name ) :
     m_z( 0. ),
     m_xb( 0 ),
     m_yb( 0 ),
-    m_zb( 0 )
+    m_zb( 0 ),
+    m_xoff( 0 ),
+    m_yoff( 0 )
 {
 }
 
@@ -69,12 +71,9 @@ void NavRenderer::resizeGL( int width, int height )
     adjustRatios();
 }
 
-void NavRenderer::leftMouseDown( int x, int y )
-{
-}
-
 void NavRenderer::leftMouseDrag( int x, int y )
 {
+    leftMouseDown( x, y );
 }
 
 void NavRenderer::initShader()

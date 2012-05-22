@@ -45,7 +45,7 @@ QSize NavGLWidget::minimumSizeHint() const
 
 QSize NavGLWidget::sizeHint() const
 {
-    return QSize( 400, 400 );
+    return QSize( 2000, 2000 );
 }
 
 void NavGLWidget::initializeGL()
@@ -67,7 +67,7 @@ void NavGLWidget::mousePressEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        //m_sceneRenderer->leftMouseDown( event->x(), event->y() );
+        m_navRenderer->leftMouseDown( event->x(), event->y() );
     }
     updateGL();
 }
@@ -76,7 +76,7 @@ void NavGLWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        //m_sceneRenderer->leftMouseDrag( event->x(), event->y() );
+        m_navRenderer->leftMouseDrag( event->x(), event->y() );
     }
     updateGL();
 }
