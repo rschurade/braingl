@@ -40,7 +40,7 @@ NavGLWidget::~NavGLWidget()
 
 QSize NavGLWidget::minimumSizeHint() const
 {
-    return QSize( 200, 200 );
+    return QSize( 50, 50 );
 }
 
 QSize NavGLWidget::sizeHint() const
