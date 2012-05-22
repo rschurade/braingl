@@ -65,15 +65,11 @@ void NavRendererAxial::leftMouseDown( int x, int y )
     int yout = m_yb * ymult / m_yd;
 
     QModelIndex mi;
-    mi = model()->index( 0, 100 );
+    QPoint p( xout, yout );
+    mi = model()->index( 0, 111 );
     if ( mi.isValid() )
     {
-        model()->setData( mi, xout, Qt::UserRole );
-    }
-    mi = model()->index( 0, 101 );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, yout, Qt::UserRole );
+        model()->setData( mi, p, Qt::UserRole );
     }
 }
 

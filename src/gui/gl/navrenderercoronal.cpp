@@ -65,15 +65,11 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
     int yout = m_zb * ymult / m_zd;
 
     QModelIndex mi;
-    mi = model()->index( 0, 100 );
+    QPoint p( xout, yout );
+    mi = model()->index( 0, 110 );
     if ( mi.isValid() )
     {
-        model()->setData( mi, xout, Qt::UserRole );
-    }
-    mi = model()->index( 0, 102 );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, yout, Qt::UserRole );
+        model()->setData( mi, p, Qt::UserRole );
     }
 }
 

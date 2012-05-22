@@ -181,6 +181,18 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 case 108:
                     m_globals[ "slice_dz" ] = value.toInt();
                     break;
+                case 109:
+                    m_globals[ "coronal" ] = value.toPoint().x();
+                    m_globals[ "axial" ] = value.toPoint().y();
+                    break;
+                case 110:
+                    m_globals[ "sagittal" ] = value.toPoint().x();
+                    m_globals[ "axial" ] = value.toPoint().y();
+                    break;
+                case 111:
+                    m_globals[ "sagittal" ] = value.toPoint().x();
+                    m_globals[ "coronal" ] = value.toPoint().y();
+                    break;
 
             }
         }
