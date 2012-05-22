@@ -25,7 +25,6 @@ public:
 	void draw();
 
 	void leftMouseDown( int x, int y );
-	void leftMouseDrag( int x, int y );
 
 	void adjustRatios();
 

@@ -31,6 +31,9 @@ void NavRendererAxial::adjustRatios()
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
+    m_xoff = 0;
+    m_yoff = 0;
+
     float textureRatio = m_xb / m_yb;
     float mult = m_ratio / textureRatio;
 
@@ -38,25 +41,40 @@ void NavRendererAxial::adjustRatios()
     {
         pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
 
-        int xoff = ( m_width - ( m_width / mult ) ) / 2;
-        glViewport( xoff, 0, m_width - ( 2* xoff) , m_height );
+        m_xoff = ( m_width - ( m_width / mult ) ) / 2;
+        glViewport( m_xoff, 0, m_width - ( 2* m_xoff) , m_height );
     }
     else
     {
         pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
 
-        int yoff = ( m_height - ( m_height * mult ) ) / 2;
-        glViewport( 0, yoff, m_width, m_height - ( 2 * yoff ) );
+        int m_yoff = ( m_height - ( m_height * mult ) ) / 2;
+        glViewport( 0, m_yoff, m_width, m_height - ( 2 * m_yoff ) );
     }
     m_mvpMatrix = pMatrix;
 }
 
 void NavRendererAxial::leftMouseDown( int x, int y )
 {
-}
+    y = m_height - y;
+    float adjustx = x - m_xoff;
+    float adjusty = y - m_yoff;
+    float xmult = adjustx / ( m_width - ( 2 * m_xoff ) );
+    float ymult = adjusty / ( m_height - ( 2 * m_yoff ) );
+    int xout = m_xb * xmult / m_xd;
+    int yout = m_yb * ymult / m_yd;
 
-void NavRendererAxial::leftMouseDrag( int x, int y )
-{
+    QModelIndex mi;
+    mi = model()->index( 0, 100 );
+    if ( mi.isValid() )
+    {
+        model()->setData( mi, xout, Qt::UserRole );
+    }
+    mi = model()->index( 0, 101 );
+    if ( mi.isValid() )
+    {
+        model()->setData( mi, yout, Qt::UserRole );
+    }
 }
 
 void NavRendererAxial::initGeometry()
@@ -70,16 +88,16 @@ void NavRendererAxial::initGeometry()
     m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
     m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
 
-    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
+    m_xd = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
+    m_yd = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
+    m_zd = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
 
-    m_x *= dx;
-    m_y *= dy;
-    m_z *= dz;
-    m_xb *= dx;
-    m_yb *= dy;
-    m_zb *= dz;
+    m_x *= m_xd;
+    m_y *= m_yd;
+    m_z *= m_zd;
+    m_xb *= m_xd;
+    m_yb *= m_yd;
+    m_zb *= m_zd;
 
 
     VertexData vertices[] =

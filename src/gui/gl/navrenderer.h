@@ -28,8 +28,8 @@ public:
 	void initGL();
 	virtual void draw()=0;
 
-	void leftMouseDown( int x, int y );
-	void leftMouseDrag( int x, int y );
+	virtual void leftMouseDown( int x, int y )=0;
+	virtual void leftMouseDrag( int x, int y );
 
 	virtual void adjustRatios()=0;
 
@@ -57,9 +57,15 @@ protected:
     float m_xb;
     float m_yb;
     float m_zb;
+    float m_xd;
+    float m_yd;
+    float m_zd;
 
     int m_width;
     int m_height;
+
+    int m_xoff;
+    int m_yoff;
 };
 
 #endif /* SCENERENDERER_H_ */
