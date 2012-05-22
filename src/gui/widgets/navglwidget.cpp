@@ -1,14 +1,34 @@
 #include <QtGui/QtGui>
 #include <QtCore/QDebug>
 #include "../../data/datastore.h"
-#include "../gl/navrenderer.h"
+#include "../gl/navrendereraxial.h"
+#include "../gl/navrenderercoronal.h"
+#include "../gl/navrenderersagittal.h"
 
 #include "navglwidget.h"
 
-NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_navRenderer = new NavRenderer( name );
+    switch( orient )
+    {
+        case 0:
+        {
+            m_navRenderer = new NavRendererSagittal( name );
+            break;
+        }
+        case 1:
+        {
+            m_navRenderer = new NavRendererCoronal( name );
+            break;
+        }
+        case 2:
+        {
+            m_navRenderer = new NavRendererAxial( name );
+            break;
+        }
+    }
+
     m_navRenderer->setModel( dataStore );
     connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }

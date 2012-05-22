@@ -14,14 +14,14 @@
 
 #include "docknavglwidget.h"
 
-DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, QWidget* parent, const QGLWidget *shareWidget ) :
+DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QDockWidget( name, parent ),
     m_dataStore( dataStore ),
     m_name( name )
 {
     setObjectName( QString("nav gl ") + name );
 
-    m_glWidget = new NavGLWidget( dataStore, name, this, shareWidget );
+    m_glWidget = new NavGLWidget( dataStore, name, orient, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     this->setAllowedAreas( Qt::AllDockWidgetAreas );

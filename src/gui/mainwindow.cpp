@@ -185,15 +185,15 @@ void MainWindow::createDockWindows()
     dsInfo->setSelectionModel( dsList->selectionModel() );
     viewMenu->addAction( dsInfo->toggleViewAction() );
 
-    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), this, mainGLWidget );
+    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav1 );
     viewMenu->addAction( nav1->toggleViewAction() );
 
-    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), this, mainGLWidget );
+    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), 0, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav2 );
     viewMenu->addAction( nav2->toggleViewAction() );
 
-    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), this, mainGLWidget );
+    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), 1, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
 
