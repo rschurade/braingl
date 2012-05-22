@@ -110,10 +110,10 @@ void NavRendererAxial::initGeometry()
 
     VertexData verticesCrosshair[] =
     {
-        { QVector3D( m_x,  0.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_x, m_yb, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( 0.0, m_y, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_xb, m_y, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) }
+        { QVector3D( m_x + m_xd / 2.,  0.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_x + m_xd / 2., m_yb, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( 0.0, m_y + m_yd / 2.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_xb, m_y + m_yd / 2.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) }
     };
 
 

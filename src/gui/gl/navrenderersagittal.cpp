@@ -111,10 +111,10 @@ void NavRendererSagittal::initGeometry()
 
     VertexData verticesCrosshair[] =
     {
-        { QVector3D( 0.0,  m_z, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_yb, m_z, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_y,  0.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_y, m_zb, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) }
+        { QVector3D( 0.0,  m_z + m_zd / 2., 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_yb, m_z + m_zd / 2., 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_y + m_yd / 2.,  0.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_y + m_yd / 2., m_zb, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) }
     };
 
 
