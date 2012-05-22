@@ -8,11 +8,12 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtCore/QDebug>
+#include <QtGui/QHBoxLayout>
 
 #include "sliderwithedit.h"
 
 SliderWithEdit::SliderWithEdit( QString name, QWidget* parent ) :
-    QHBoxLayout( parent )
+    QWidget( parent )
 {
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
@@ -25,14 +26,22 @@ SliderWithEdit::SliderWithEdit( QString name, QWidget* parent ) :
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
-    addWidget( new QLabel( name ) );
-    addWidget( m_slider );
-    addWidget( m_edit );
+    QHBoxLayout* layout = new QHBoxLayout();
+
+    m_label = new QLabel( name );
+
+    layout->addWidget( m_label, 25 );
+    layout->addWidget( m_slider, 60 );
+    layout->addWidget( m_edit, 15 );
+
+    setLayout( layout );
 }
 
 SliderWithEdit::~SliderWithEdit()
 {
-
+    delete m_slider;
+    delete m_label;
+    delete m_edit;
 }
 
 void SliderWithEdit::sliderChanged( int value )

@@ -5,22 +5,21 @@
  *      Author: Ralph
  */
 
-#ifndef SLIDERWITHEDITINT_H_
-#define SLIDERWITHEDITINT_H_
+#ifndef SLIDERWITHEDITINT2_H_
+#define SLIDERWITHEDITINT2_H_
 
 #include <QtGui/QWidget>
 
 class QSlider;
 class QLineEdit;
-class QLabel;
 
-class SliderWithEditInt : public QWidget
+class SliderWithEditInt2 : public QWidget
 {
     Q_OBJECT
 
 public:
-    SliderWithEditInt( QString name, QWidget* parent = 0 );
-    virtual ~SliderWithEditInt();
+    SliderWithEditInt2( QWidget* parent = 0 );
+    virtual ~SliderWithEditInt2();
 
     void setValue( int value );
     int getValue();
@@ -38,7 +37,6 @@ signals:
 private:
    QSlider*  m_slider;
    QLineEdit* m_edit;
-   QLabel* m_label;
 };
 
 #endif /* SLIDERWITHEDITINT_H_ */

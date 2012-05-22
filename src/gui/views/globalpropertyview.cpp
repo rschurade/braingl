@@ -20,9 +20,9 @@ GlobalPropertyView::GlobalPropertyView( QWidget* parent )
     m_coronalSlider = new SliderWithEditInt( "coronal" );
     m_axialSlider = new SliderWithEditInt( "axial" );
 
-    m_layout->addLayout( m_sagittalSlider );
-    m_layout->addLayout( m_coronalSlider );
-    m_layout->addLayout( m_axialSlider );
+    m_layout->addWidget( m_sagittalSlider );
+    m_layout->addWidget( m_coronalSlider );
+    m_layout->addWidget( m_axialSlider );
 
     m_layout->addStretch( 0 );
     m_widget->setLayout( m_layout );
