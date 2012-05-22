@@ -34,6 +34,8 @@ NavRenderer::NavRenderer( QString name ) :
 
 NavRenderer::~NavRenderer()
 {
+    destroy( m_program );
+    destroy( m_crosshairProgram );
 }
 
 void NavRenderer::init()
