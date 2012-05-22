@@ -23,6 +23,8 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 
 	m_centralTabWidget = new QTabWidget( this );
 	setCentralWidget( m_centralTabWidget );
+	m_centralTabWidget->setTabsClosable( true );
+	connect( m_centralTabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab( int ) ) );
 
     mainGLWidget = new GLWidget( m_dataStore );
     m_centralTabWidget->addTab( mainGLWidget, "main gl" );
@@ -200,4 +202,12 @@ void MainWindow::createDockWindows()
     DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav4 );
     viewMenu->addAction( nav4->toggleViewAction() );
+}
+
+void MainWindow::closeTab( int index )
+{
+    if ( index > 0 )
+    {
+        m_centralTabWidget->removeTab( index );
+    }
 }
