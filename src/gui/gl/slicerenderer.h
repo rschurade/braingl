@@ -43,10 +43,13 @@ private:
 	float m_yb;
 	float m_zb;
 
+	int m_xOld;
+    int m_yOld;
+    int m_zOld;
+
 	GLuint *vboIds;
 
 	QGLShaderProgram *m_program;
-
 };
 
 #endif /* SLICERENDERER_H_ */
