@@ -113,8 +113,7 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
+            nifti_image_free( filedata );
             return data;
             break;
         }
@@ -131,8 +130,7 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
+            nifti_image_free( filedata );
             return data;
             break;
         }
@@ -149,8 +147,7 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
+            nifti_image_free( filedata );
             return data;
             break;
         }
@@ -167,8 +164,7 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
+            nifti_image_free( filedata );
             return data;
             break;
         }
@@ -185,8 +181,6 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
             return data;
             break;
         }
@@ -203,8 +197,7 @@ void* Loader::loadNifti()
                     data[i * dim + j] = inputData[j * blockSize + i];
                 }
             }
-            delete[] inputData;
-            delete filedata;
+            nifti_image_free( filedata );
             return data;
             break;
         }
