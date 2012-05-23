@@ -60,6 +60,9 @@ protected:
     float m_xd;
     float m_yd;
     float m_zd;
+    int m_xOld;
+    int m_yOld;
+    int m_zOld;
 
     int m_width;
     int m_height;

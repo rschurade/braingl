@@ -29,6 +29,12 @@ NavRenderer::NavRenderer( QString name ) :
     m_xb( 0 ),
     m_yb( 0 ),
     m_zb( 0 ),
+    m_xd( 0 ),
+    m_yd( 0 ),
+    m_zd( 0 ),
+    m_xOld( -1 ),
+    m_yOld( -1 ),
+    m_zOld( -1 ),
     m_xoff( 0 ),
     m_yoff( 0 )
 {
@@ -61,6 +67,19 @@ void NavRenderer::initGL()
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
     initShader();
+
+    glGenBuffers( 4, vboIds );
+
+    GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
+    GLushort crosshairIndices[] = { 0, 1, 2, 3 };
+
+    // Transfer index data to VBO 0
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+
+    // Transfer index data to VBO 3
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), crosshairIndices, GL_STATIC_DRAW );
 }
 
 void NavRenderer::resizeGL( int width, int height )
