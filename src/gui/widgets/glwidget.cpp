@@ -84,5 +84,6 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::update()
 {
+    m_sceneRenderer->calcMVPMatrix();
     updateGL();
 }

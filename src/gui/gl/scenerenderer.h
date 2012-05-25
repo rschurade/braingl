@@ -33,9 +33,9 @@ public:
 	void middleMouseDrag( int x, int y );
 	void mouseWheel( int step );
 
-private:
 	void calcMVPMatrix();
 
+private:
 	ArcBall* m_arcBall;
 	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
