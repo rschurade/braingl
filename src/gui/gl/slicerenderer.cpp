@@ -25,7 +25,10 @@ SliceRenderer::SliceRenderer() :
     m_zb( 0. ),
     m_xOld( -1 ),
     m_yOld( -1 ),
-    m_zOld( -1 )
+    m_zOld( -1 ),
+    m_xbOld( -1 ),
+    m_ybOld( -1 ),
+    m_zbOld( -1 )
 {
 }
 
@@ -64,6 +67,9 @@ void SliceRenderer::initGeometry()
     m_xb = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toFloat();
     m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
     m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
+    int xbi = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toInt();
+    int ybi = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toInt();
+    int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
 
     float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
     float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
@@ -76,7 +82,7 @@ void SliceRenderer::initGeometry()
     m_yb *= dy;
     m_zb *= dz;
 
-    if ( zi != m_zOld )
+    if ( zi != m_zOld && zbi != m_zbOld )
     {
         VertexData verticesAxial[] =
         {
@@ -90,7 +96,7 @@ void SliceRenderer::initGeometry()
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesAxial, GL_STATIC_DRAW );
     }
 
-    if ( yi != m_yOld )
+    if ( yi != m_yOld && ybi != m_ybOld )
     {
         VertexData verticesCoronal[] =
         {
@@ -105,7 +111,7 @@ void SliceRenderer::initGeometry()
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCoronal, GL_STATIC_DRAW );
     }
 
-    if ( xi != m_xOld )
+    if ( xi != m_xOld  && xbi != m_xbOld )
     {
         VertexData verticesSagittal[] =
         {
@@ -122,6 +128,9 @@ void SliceRenderer::initGeometry()
     m_xOld = xi;
     m_yOld = yi;
     m_zOld = zi;
+    m_xbOld = xbi;
+    m_ybOld = ybi;
+    m_zbOld = zbi;
 }
 
 void SliceRenderer::setupTextures()
