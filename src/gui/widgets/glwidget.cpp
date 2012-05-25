@@ -48,6 +48,10 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
     {
         m_sceneRenderer->leftMouseDown( event->x(), event->y() );
     }
+    if ( event->buttons() & Qt::MiddleButton )
+    {
+        m_sceneRenderer->middleMouseDown( event->x(), event->y() );
+    }
     updateGL();
 }
 
@@ -57,12 +61,25 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
     {
         m_sceneRenderer->leftMouseDrag( event->x(), event->y() );
     }
+    if ( event->buttons() & Qt::MiddleButton )
+    {
+        m_sceneRenderer->middleMouseDrag( event->x(), event->y() );
+    }
     updateGL();
 }
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
     updateGL();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+     int numDegrees = event->delta() / 8;
+     int numSteps = numDegrees / 15;
+     m_sceneRenderer->mouseWheel( numSteps );
+     updateGL();
+
 }
 
 void GLWidget::update()

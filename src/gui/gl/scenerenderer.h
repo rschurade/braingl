@@ -29,18 +29,40 @@ public:
 
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );
+	void middleMouseDown( int x, int y );
+	void middleMouseDrag( int x, int y );
+	void mouseWheel( int step );
 
 private:
+	void calcMVPMatrix();
+
 	ArcBall* m_arcBall;
 	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
 
+	int m_boundingbox;
+
+	float m_datasetSizeX;
+	float m_datasetSizeY;
+	float m_datasetSizeZ;
+
+	int m_width;
+	int m_height;
 	float m_ratio;
 
 	QMatrix4x4 m_lastRot;
 	QMatrix4x4 m_thisRot;
 
 	QMatrix4x4 m_mvpMatrix;
+
+	int m_zoom;
+	int m_middleDownX;
+	int m_middleDownY;
+	int m_moveX;
+	int m_moveY;
+	int m_moveXOld;
+    int m_moveYOld;
+
 };
 
 #endif /* SCENERENDERER_H_ */
