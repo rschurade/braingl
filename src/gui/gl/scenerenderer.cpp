@@ -74,12 +74,23 @@ void SceneRenderer::resizeGL( int width, int height )
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
 
+    if ( m_ratio >= 1.0 )
+    {
+        int xoff = width - ( width / m_ratio );
+        glViewport( xoff / 2, 0, width - xoff, height );
+    }
+    else
+    {
+        int yoff = height - ( height * m_ratio );
+        glViewport( 0, yoff / 2, width, height - yoff );
+    }
+
     m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
 
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
-    pMatrix.ortho( -100 * m_ratio, 100 * m_ratio, -100, 100, -3000, 3000 );
+    pMatrix.ortho( -100, 100, -100, 100, -3000, 3000 );
     m_thisRot.translate( -80.0, -100.0, -80.0 );
     m_mvpMatrix = pMatrix * m_thisRot;
 }
@@ -106,7 +117,7 @@ void SceneRenderer::leftMouseDrag( int x, int y )
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
-    pMatrix.ortho( -100 * m_ratio, 100 * m_ratio, -100, 100, -3000, 3000 );
+    pMatrix.ortho( -100, 100, -100, 100, -3000, 3000 );
     m_thisRot.translate( -80.0, -100.0, -80.0 );
     m_mvpMatrix = pMatrix * m_thisRot;
 }
