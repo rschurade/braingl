@@ -1,0 +1,16 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+	<file>icons/copy.png</file>
+	<file>icons/cut.png</file>
+	<file>icons/new.png</file>
+	<file>icons/open.png</file>
+	<file>icons/paste.png</file>
+	<file>icons/print.png</file>
+	<file>icons/save.png</file>
+	<file>icons/undo.png</file>
+	<file>shaders/slice.vs</file>
+	<file>shaders/slice.fs</file>
+	<file>shaders/crosshair.vs</file>
+    <file>shaders/crosshair.fs</file>
+ </qresource>
+ </RCC>
