@@ -46,6 +46,9 @@ private:
 	int m_xOld;
     int m_yOld;
     int m_zOld;
+    int m_xbOld;
+    int m_ybOld;
+    int m_zbOld;
 
 	GLuint *vboIds;
 
