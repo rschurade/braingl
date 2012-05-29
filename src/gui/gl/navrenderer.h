@@ -30,6 +30,9 @@ public:
 
 	virtual void leftMouseDown( int x, int y )=0;
 	virtual void leftMouseDrag( int x, int y );
+	void middleMouseDown( int x, int y );
+    void middleMouseDrag( int x, int y );
+	virtual void mouseWheel( int step );
 
 	virtual void adjustRatios()=0;
 
@@ -69,6 +72,14 @@ protected:
 
     int m_xoff;
     int m_yoff;
+
+    int m_zoom;
+    int m_middleDownX;
+    int m_middleDownY;
+    int m_moveX;
+    int m_moveY;
+    int m_moveXOld;
+    int m_moveYOld;
 };
 
 #endif /* SCENERENDERER_H_ */

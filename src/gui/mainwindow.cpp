@@ -34,6 +34,7 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     createMenus();
     createToolBars();
     createStatusBar();
+
     createDockWindows();
 
     setWindowTitle( tr( "Fibernavigator 2" ) );
