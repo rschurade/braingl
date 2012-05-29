@@ -27,44 +27,56 @@ NavRendererAxial::~NavRendererAxial()
 
 void NavRendererAxial::adjustRatios()
 {
+    glViewport( 0, 0, m_width, m_height );
+
     m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
 
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
-    m_xoff = 0;
-    m_yoff = 0;
+    int boundingbox = qMax ( m_xb * m_xd, qMax( m_yb * m_yd, m_zb * m_zd ) );
 
-    float textureRatio = m_xb / m_yb;
-    float mult = m_ratio / textureRatio;
+    pMatrix.ortho( 0, boundingbox, 0, boundingbox, -3000, 3000 );
 
-    if ( mult >= 1.0 )
+    pMatrix.translate( static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / boundingbox ),
+                       static_cast<float>( m_moveY ) / ( static_cast<float>( m_height ) / boundingbox ), 0 );
+
+    pMatrix.translate( boundingbox / 2, boundingbox / 2, 0 );
+
+    pMatrix.scale( m_zoom );
+
+    if ( m_ratio >= 1.0 )
     {
-        pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
-
-        m_xoff = ( m_width - ( m_width / mult ) ) / 2;
-        glViewport( m_xoff, 0, m_width - ( 2* m_xoff) , m_height );
+        pMatrix.scale( 1.0 / m_ratio, 1.0, 1.0 );
     }
     else
     {
-        pMatrix.ortho( 0, m_xb, 0, m_yb, -3000, 3000 );
-
-        int m_yoff = ( m_height - ( m_height * mult ) ) / 2;
-        glViewport( 0, m_yoff, m_width, m_height - ( 2 * m_yoff ) );
+        pMatrix.scale( 1.0, m_ratio, 1.0 );
     }
+
+    pMatrix.translate( m_xb * m_xd / -2, m_yb * m_yd / -2, 0 );
     m_mvpMatrix = pMatrix;
 }
 
 void NavRendererAxial::leftMouseDown( int x, int y )
 {
-    y = m_height - y;
-    float adjustx = x - m_xoff;
-    float adjusty = y - m_yoff;
-    float xmult = adjustx / ( m_width - ( 2 * m_xoff ) );
-    float ymult = adjusty / ( m_height - ( 2 * m_yoff ) );
-    int xout = m_xb * xmult / m_xd;
-    int yout = m_yb * ymult / m_yd;
+    float xf = static_cast<float>( x );
+    float yf = static_cast<float>( m_height - y );
+
+    QVector4D test;
+    test.setX( ( 2 * xf ) / m_width - 1 );
+    test.setY( ( 2 * yf ) / m_height - 1 );
+    test.setZ( 1 );
+    test.setW( 1 );
+
+    QVector4D out = m_mvpMatrix.inverted() * test;
+
+    int xout = out.x() / m_xd;
+    int yout = out.y() / m_yd;
+
+    xout = qMax( 0, qMin( xout, static_cast<int>( m_xb ) ) );
+    yout = qMax( 0, qMin( yout, static_cast<int>( m_yb ) ) );
 
     QModelIndex mi;
     QPoint p( xout, yout );
@@ -95,28 +107,27 @@ void NavRendererAxial::initGeometry()
         m_yd = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
         m_zd = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
 
-        m_x *= m_xd;
-        m_y *= m_yd;
-        m_z *= m_zd;
-        m_xb *= m_xd;
-        m_yb *= m_yd;
-        m_zb *= m_zd;
-
+        float x = m_x * m_xd;
+        float y = m_y * m_yd;
+        float z = m_z * m_zd;
+        float xb = m_xb * m_xd;
+        float yb = m_yb * m_yd;
+        float zb = m_zb * m_zd;
 
         VertexData vertices[] =
         {
-            { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) },
-            { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) },
-            { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) },
-            { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) }
+            { QVector3D( 0.0, 0.0, z ), QVector3D( 0.0, 0.0, m_z/m_zb ) },
+            { QVector3D( xb,  0.0, z ), QVector3D( 1.0, 0.0, m_z/m_zb ) },
+            { QVector3D( xb,  yb,  z ), QVector3D( 1.0, 1.0, m_z/m_zb ) },
+            { QVector3D( 0.0, yb,  z ), QVector3D( 0.0, 1.0, m_z/m_zb ) }
         };
 
         VertexData verticesCrosshair[] =
         {
-            { QVector3D( m_x + m_xd / 2.,  0.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( m_x + m_xd / 2., m_yb, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( 0.0, m_y + m_yd / 2.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( m_xb, m_y + m_yd / 2.0, 1000. ), QVector3D( 0.0, 0.0, 0.0 ) }
+            { QVector3D( x + m_xd / 2.,  0.0, z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( x + m_xd / 2., yb, z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( 0.0, y + m_yd / 2.0, z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( xb, y + m_yd / 2.0, z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) }
         };
 
         // Transfer vertex data to VBO 1

@@ -69,6 +69,10 @@ void NavGLWidget::mousePressEvent( QMouseEvent *event )
     {
         m_navRenderer->leftMouseDown( event->x(), event->y() );
     }
+    if ( event->buttons() & Qt::MiddleButton )
+    {
+        m_navRenderer->middleMouseDown( event->x(), event->y() );
+    }
     updateGL();
 }
 
@@ -78,8 +82,22 @@ void NavGLWidget::mouseMoveEvent( QMouseEvent *event )
     {
         m_navRenderer->leftMouseDrag( event->x(), event->y() );
     }
+    if ( event->buttons() & Qt::MiddleButton )
+    {
+        m_navRenderer->middleMouseDrag( event->x(), event->y() );
+    }
     updateGL();
 }
+
+void NavGLWidget::wheelEvent(QWheelEvent *event)
+{
+     int numDegrees = event->delta() / 8;
+     int numSteps = numDegrees / 15;
+     m_navRenderer->mouseWheel( numSteps );
+     updateGL();
+
+}
+
 
 void NavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
