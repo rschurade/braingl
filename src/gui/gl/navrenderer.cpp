@@ -36,7 +36,14 @@ NavRenderer::NavRenderer( QString name ) :
     m_yOld( -1 ),
     m_zOld( -1 ),
     m_xoff( 0 ),
-    m_yoff( 0 )
+    m_yoff( 0 ),
+    m_zoom( 1 ),
+    m_middleDownX( -1 ),
+    m_middleDownY( -1 ),
+    m_moveX( 0 ),
+    m_moveY( 0 ),
+    m_moveXOld( 0 ),
+    m_moveYOld( 0 )
 {
 }
 
@@ -110,4 +117,24 @@ void NavRenderer::setupTextures()
 void NavRenderer::setShaderVars()
 {
     GLFunctions::setSliceShaderVars( m_program, model() );
+}
+
+void NavRenderer::mouseWheel( int step )
+{
+    m_zoom += step;
+    m_zoom = qMax( 1, m_zoom );
+}
+
+void NavRenderer::middleMouseDown( int x, int y )
+{
+    m_moveXOld = m_moveX;
+    m_moveYOld = m_moveY;
+    m_middleDownX = x;
+    m_middleDownY = y;
+}
+
+void NavRenderer::middleMouseDrag( int x, int y )
+{
+    m_moveX = m_moveXOld - ( m_middleDownX - x );
+    m_moveY = m_moveYOld + m_middleDownY - y;
 }
