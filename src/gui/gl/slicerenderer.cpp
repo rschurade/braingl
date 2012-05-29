@@ -82,7 +82,7 @@ void SliceRenderer::initGeometry()
     m_yb *= dy;
     m_zb *= dz;
 
-    if ( zi != m_zOld && zbi != m_zbOld )
+    if ( zi != m_zOld || zbi != m_zbOld )
     {
         VertexData verticesAxial[] =
         {
@@ -96,7 +96,7 @@ void SliceRenderer::initGeometry()
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesAxial, GL_STATIC_DRAW );
     }
 
-    if ( yi != m_yOld && ybi != m_ybOld )
+    if ( yi != m_yOld || ybi != m_ybOld )
     {
         VertexData verticesCoronal[] =
         {
@@ -111,7 +111,7 @@ void SliceRenderer::initGeometry()
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCoronal, GL_STATIC_DRAW );
     }
 
-    if ( xi != m_xOld  && xbi != m_xbOld )
+    if ( xi != m_xOld  || xbi != m_xbOld )
     {
         VertexData verticesSagittal[] =
         {
