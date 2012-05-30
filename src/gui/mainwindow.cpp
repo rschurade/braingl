@@ -42,6 +42,14 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     setUnifiedTitleAndToolBarOnMac( true );
 
 	restoreState( settings.value( "mainWindowState" ).toByteArray() );
+
+	if ( settings.contains( "lastPath" ) )
+	{
+	    QString lastPath = settings.value( "lastPath" ).toString();
+	    QModelIndex mi = m_dataStore->index( 0, 112 );
+	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
+	}
+
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -49,6 +57,8 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	QSettings settings;
 	settings.setValue( "mainWindowGeometry", saveGeometry() );
 	settings.setValue( "mainWindowState", saveState() );
+	QModelIndex mi = m_dataStore->index( 0, 112 );
+	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
 }
 
 void MainWindow::print()
@@ -57,10 +67,20 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QString fileName = QFileDialog::getOpenFileName( this );
+    QModelIndex mi = m_dataStore->index( 0, 112 );
+    QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
+
+
+    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
     {
     	m_dataStore->load( fileName );
+    	QFileInfo fi( fileName );
+    	QDir dir = fi.absoluteDir();
+    	QString lastPath = dir.absolutePath();
+
+
+        m_dataStore->setData( mi, lastPath, Qt::UserRole );
     }
 }
 

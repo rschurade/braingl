@@ -26,6 +26,7 @@ DataStore::DataStore()
     m_globals[ "slice_dx" ] = 1.0;
     m_globals[ "slice_dy" ] = 1.0;
     m_globals[ "slice_dz" ] = 1.0;
+    m_globals[ "lastPath" ] = "";
 }
 
 DataStore::~DataStore()
@@ -192,6 +193,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 case 111:
                     m_globals[ "sagittal" ] = value.toPoint().x();
                     m_globals[ "coronal" ] = value.toPoint().y();
+                    break;
+                case 112:
+                    m_globals[ "lastPath"] = value.toString();
                     break;
 
             }
@@ -459,6 +463,9 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
             break;
         case 108:
             return m_globals[ "slice_dz" ];
+            break;
+        case 112:
+            return m_globals[ "lastPath" ];
             break;
     }
     return QVariant();
