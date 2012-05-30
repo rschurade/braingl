@@ -61,7 +61,7 @@ void NavRendererSagittal::adjustRatios()
 
 void NavRendererSagittal::leftMouseDown( int x, int y )
 {
-    float xf = static_cast<float>( x );
+    float xf = static_cast<float>( m_width - x );
     float yf = static_cast<float>( m_height - y );
 
     QVector4D test;
@@ -126,8 +126,8 @@ void NavRendererSagittal::initGeometry()
         {
             { QVector3D( 0.0,  z + m_zd / 2., x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
             { QVector3D( yb, z + m_zd / 2., x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( y + m_yd / 2.,  0.0, x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( y + m_yd / 2., zb, x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) }
+            { QVector3D( yb - ( y + m_yd / 2. ),  0.0, x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( yb - ( y + m_yd / 2. ), zb, x + 1. ), QVector3D( 0.0, 0.0, 0.0 ) }
         };
 
         // Transfer vertex data to VBO 3
