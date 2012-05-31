@@ -38,7 +38,7 @@ bool Loader::load()
     {
         case FNDT_NIFTI_SCALAR:
         {
-        	void* data = loadNifti();
+        	void* data = loadNifti( m_fileName.path() );
             DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -48,7 +48,7 @@ bool Loader::load()
         }
         case FNDT_NIFTI_VECTOR:
         {
-            void* data = loadNifti();
+            void* data = loadNifti( m_fileName.path() );
             Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -56,6 +56,57 @@ bool Loader::load()
             return true;
             break;
         }
+        case FNDT_NIFTI2_SCALAR:
+        {
+            QString fn = m_fileName.path();
+            if ( m_fileName.path().endsWith(".hdr") )
+            {
+                QDir dir;
+                fn.replace( fn.size() - 3, 3, "img" );
+                if ( !dir.exists( fn ) )
+                {
+                    fn.replace( fn.size() - 3, 3, "ima" );
+                    if ( !dir.exists( fn ) )
+                    {
+                        qDebug() << "no image file found";
+                    }
+                }
+            }
+
+            void* data = loadNifti( fn );
+            DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
+            dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
+            m_dataset = dataset;
+            return true;
+            break;
+        }
+        case FNDT_NIFTI2_VECTOR:
+        {
+            QString fn = m_fileName.path();
+            if ( m_fileName.path().endsWith(".hdr") )
+            {
+                QDir dir;
+                fn.replace( fn.size() - 3, 3, "img" );
+                if ( !dir.exists( fn ) )
+                {
+                    fn.replace( fn.size() - 3, 3, "ima" );
+                    if ( !dir.exists( fn ) )
+                    {
+                        qDebug() << "no image file found";
+                    }
+                }
+            }
+
+            void* data = loadNifti( m_fileName.path() );
+            Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
+            dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
+            m_dataset = dataset;
+            return true;
+            break;
+        }
+
         case FNDT_NIFTI_4D:
             break;
         default:
@@ -87,12 +138,40 @@ FN_DATASET_TYPE Loader::determineType()
             }
         }
     }
+    else if ( m_fileName.path().endsWith(".hdr") || m_fileName.path().endsWith(".ima") || m_fileName.path().endsWith(".img") )
+    {
+        if ( m_fileName.path().endsWith(".hdr") )
+        {
+            m_header = nifti_image_read( m_fileName.path().toStdString().c_str(), 0 );
+        }
+        else
+        {
+            QString fn = m_fileName.path();
+            fn.replace( fn.size() - 3, 3, "hdr" );
+            m_header = nifti_image_read( fn.toStdString().c_str(), 0 );
+        }
+        if ( m_header )
+        {
+            if ( m_header->dim[4] == 1 )
+            {
+                return FNDT_NIFTI2_SCALAR;
+            }
+            else if ( m_header->dim[4] == 3 )
+            {
+                return FNDT_NIFTI2_VECTOR;
+            }
+            else if ( m_header->dim[4] > 3 )
+            {
+                return FNDT_NIFTI2_4D;
+            }
+        }
+    }
     return FNDT_UNKNOWN;
 }
 
-void* Loader::loadNifti()
+void* Loader::loadNifti( QString fileName )
 {
-    nifti_image* filedata = nifti_image_read( m_fileName.path().toStdString().c_str(), 1 );
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];
