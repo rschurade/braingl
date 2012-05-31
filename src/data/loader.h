@@ -30,7 +30,7 @@ public:
 private:
     FN_DATASET_TYPE determineType();
 
-    void* loadNifti();
+    void* loadNifti( QString fileName );
 
     nifti_image* m_header;
     QDir m_fileName;
