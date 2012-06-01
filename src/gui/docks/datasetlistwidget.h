@@ -28,6 +28,8 @@ public:
 	void setModel ( QAbstractItemModel  *model );
 	QItemSelectionModel* selectionModel();
 
+	int getSelected();
+
 private:
 	DatasetListView* m_listView;
 	QVBoxLayout* m_layout;

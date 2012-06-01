@@ -158,3 +158,9 @@ void DatasetListWidget::deleteItem()
         m_deleteButton->setEnabled( false );
     }
 }
+
+
+int DatasetListWidget::getSelected()
+{
+    return m_selected;
+}

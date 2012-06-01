@@ -26,10 +26,15 @@ public:
 
     virtual void examineDataset() = 0;
 
+    nifti_image* getHeader();
+    void* getData();
+
 protected:
     virtual void createTexture() = 0;
 
     void* m_data;
+
+    nifti_image* m_header;
 
     GLuint m_textureGLuint;
 };

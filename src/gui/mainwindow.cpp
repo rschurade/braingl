@@ -19,9 +19,6 @@ MainWindow::MainWindow( DataStore* dataStore ) :
 	QMainWindow(),
     m_dataStore( dataStore )
 {
-	QSettings settings;
-	restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
-
 	m_centralTabWidget = new QTabWidget( this );
 	setCentralWidget( m_centralTabWidget );
 	m_centralTabWidget->setTabsClosable( true );
@@ -34,12 +31,14 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     createMenus();
     createToolBars();
     createStatusBar();
-
     createDockWindows();
 
     setWindowTitle( tr( "Fibernavigator 2" ) );
 
     setUnifiedTitleAndToolBarOnMac( true );
+
+    QSettings settings;
+    restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
 
 	restoreState( settings.value( "mainWindowState" ).toByteArray() );
 
@@ -75,10 +74,10 @@ void MainWindow::open()
     if ( !fileName.isEmpty() )
     {
     	m_dataStore->load( fileName );
+
     	QFileInfo fi( fileName );
     	QDir dir = fi.absoluteDir();
     	QString lastPath = dir.absolutePath();
-
 
         m_dataStore->setData( mi, lastPath, Qt::UserRole );
     }
@@ -86,6 +85,40 @@ void MainWindow::open()
 
 void MainWindow::save()
 {
+    QModelIndex mi = m_dataStore->index( 0, 112 );
+    QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
+    QString fileName = QFileDialog::getOpenFileName( this, "Save File", fn );
+
+    if ( !fileName.isEmpty() )
+    {
+        QDir dir;
+        if ( dir.exists( fileName ) )
+        {
+            QMessageBox msgBox;
+            msgBox.setText("File already exists.");
+            msgBox.setInformativeText("Do you want to overwrite it?");
+            msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Save);
+            int ret = msgBox.exec();
+            switch ( ret )
+            {
+                case QMessageBox::Save :
+                    m_dataStore->save( m_datasetView->getSelected(), fileName );
+                    break;
+                case QMessageBox::Cancel :
+                    break;
+            }
+        }
+        else
+        {
+            m_dataStore->save( m_datasetView->getSelected(), fileName );
+        }
+
+        QFileInfo fi( fileName );
+        dir = fi.absoluteDir();
+        QString lastPath = dir.absolutePath();
+        m_dataStore->setData( mi, lastPath, Qt::UserRole );
+    }
 }
 
 void MainWindow::undo()
@@ -202,19 +235,19 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-	DatasetListWidget* dsList = new DatasetListWidget( this );
-	dsList->setModel( m_dataStore );
-	addDockWidget( Qt::LeftDockWidgetArea, dsList );
-	viewMenu->addAction( dsList->toggleViewAction() );
+	m_datasetView = new DatasetListWidget( this );
+	m_datasetView->setModel( m_dataStore );
+	addDockWidget( Qt::LeftDockWidgetArea, m_datasetView );
+	viewMenu->addAction( m_datasetView->toggleViewAction() );
 
-	connect( dsList, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
-	connect( dsList, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
-	connect( dsList, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
+	connect( m_datasetView, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
+	connect( m_datasetView, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
+	connect( m_datasetView, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("dataset properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
     dsProperties->setModel( m_dataStore );
-    dsProperties->setSelectionModel( dsList->selectionModel() );
+    dsProperties->setSelectionModel( m_datasetView->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
 
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( QString("global properties"), this );
@@ -225,7 +258,7 @@ void MainWindow::createDockWindows()
 	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
 	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
 	dsInfo->setModel( m_dataStore );
-    dsInfo->setSelectionModel( dsList->selectionModel() );
+    dsInfo->setSelectionModel( m_datasetView->selectionModel() );
     viewMenu->addAction( dsInfo->toggleViewAction() );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
