@@ -48,6 +48,7 @@ SceneRenderer::~SceneRenderer()
 
 void SceneRenderer::initGL()
 {
+    qDebug() << "gl init main widget";
     GLenum errorCode = glewInit();
     if ( GLEW_OK != errorCode )
     {
@@ -57,7 +58,7 @@ void SceneRenderer::initGL()
     }
     else
     {
-        //qDebug() << glewGetErrorString( errorCode );
+        qDebug() << "OpenGL initialized.";
     }
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );

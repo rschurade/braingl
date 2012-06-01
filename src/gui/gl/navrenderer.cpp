@@ -59,6 +59,20 @@ void NavRenderer::init()
 
 void NavRenderer::initGL()
 {
+    qDebug() << "gl init " << m_name << " widget";
+
+    GLenum errorCode = glewInit();
+    if ( GLEW_OK != errorCode )
+    {
+        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
+        qDebug() << glewGetErrorString( errorCode );
+        exit( false );
+    }
+    else
+    {
+        //qDebug() << "OpenGL initialized.";
+    }
+
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
