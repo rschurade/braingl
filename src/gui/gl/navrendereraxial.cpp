@@ -153,9 +153,9 @@ void NavRendererAxial::draw()
 
     adjustRatios();
 
-    m_program->bind();
+    GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
-    m_program->setUniformValue( "mvp_matrix", m_mvpMatrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
 
     initGeometry();
 
@@ -167,15 +167,15 @@ void NavRendererAxial::draw()
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
 
-    m_crosshairProgram->bind();
-    m_crosshairProgram->setUniformValue( "mvp_matrix", m_mvpMatrix );
+    GLFunctions::getShader( "crosshair" )->bind();
+    GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
     int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = m_crosshairProgram->attributeLocation( "a_position" );
-    m_crosshairProgram->enableAttributeArray( vertexLocation );
+    int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
+    GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), (const void *) offset );
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_LINES, 4, GL_UNSIGNED_SHORT, 0 );

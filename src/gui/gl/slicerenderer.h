@@ -25,7 +25,6 @@ public:
 	void draw( QMatrix4x4 mvp_matrix );
 
 protected:
-    void initShader();
     void setupTextures();
     void setShaderVars();
 
@@ -51,8 +50,6 @@ private:
     int m_zbOld;
 
 	GLuint *vboIds;
-
-	QGLShaderProgram *m_program;
 };
 
 #endif /* SLICERENDERER_H_ */

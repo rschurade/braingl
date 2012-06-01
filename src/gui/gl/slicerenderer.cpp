@@ -40,7 +40,7 @@ SliceRenderer::~SliceRenderer()
 
 void SliceRenderer::init()
 {
-    initShader();
+    GLFunctions::loadShaders();
     glGenBuffers( 4, vboIds );
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
@@ -49,11 +49,6 @@ void SliceRenderer::init()
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 
     initGeometry();
-}
-
-void SliceRenderer::initShader()
-{
-    m_program = GLFunctions::initShader( "slice" );
 }
 
 void SliceRenderer::initGeometry()
@@ -140,7 +135,7 @@ void SliceRenderer::setupTextures()
 
 void SliceRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program, model() );
+    GLFunctions::setShaderVars( "slice", model() );
 }
 
 void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
@@ -150,9 +145,9 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
-
+    GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
-    m_program->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", mvp_matrix );
 
     initGeometry();
 

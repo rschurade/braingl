@@ -7,6 +7,7 @@
 #include "../../glew/include/glew.h"
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QHash>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
@@ -14,6 +15,9 @@
 #include "glfunctions.h"
 
 #define NUM_TEXTURES 5
+
+bool GLFunctions::shadersLoaded = false;
+QHash<QString, QGLShaderProgram*> GLFunctions::m_shaders;
 
 GLFunctions::GLFunctions()
 {
@@ -106,6 +110,20 @@ void GLFunctions::setTexInterpolation( QAbstractItemModel* model, int row )
     }
 }
 
+QGLShaderProgram* GLFunctions::getShader( QString name )
+{
+    return m_shaders[name];
+}
+
+void GLFunctions::loadShaders()
+{
+    if ( !GLFunctions::shadersLoaded )
+    {
+        GLFunctions::m_shaders["slice"] = initShader( "slice" );
+        GLFunctions::m_shaders["crosshair"] = initShader( "crosshair" );
+    }
+}
+
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
     QGLShaderProgram* program = new QGLShaderProgram;
@@ -141,6 +159,14 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     setlocale( LC_ALL, "" );
 
     return program;
+}
+
+void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
+{
+    if ( name == "slice" )
+    {
+        setSliceShaderVars( m_shaders[name], model );
+    }
 }
 
 void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )

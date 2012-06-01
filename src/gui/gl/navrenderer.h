@@ -37,7 +37,6 @@ public:
 	virtual void adjustRatios()=0;
 
 protected:
-	void initShader();
     void setupTextures();
     void setShaderVars();
 
@@ -50,9 +49,6 @@ protected:
 	QMatrix4x4 m_mvpMatrix;
 
     GLuint *vboIds;
-
-    QGLShaderProgram *m_program;
-    QGLShaderProgram *m_crosshairProgram;
 
     float m_x;
     float m_y;

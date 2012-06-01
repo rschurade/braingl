@@ -49,8 +49,6 @@ NavRenderer::NavRenderer( QString name ) :
 
 NavRenderer::~NavRenderer()
 {
-    destroy( m_program );
-    destroy( m_crosshairProgram );
 }
 
 void NavRenderer::init()
@@ -87,7 +85,7 @@ void NavRenderer::initGL()
     static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
-    initShader();
+    GLFunctions::loadShaders();
 
     glGenBuffers( 4, vboIds );
 
@@ -116,13 +114,6 @@ void NavRenderer::leftMouseDrag( int x, int y )
     leftMouseDown( x, y );
 }
 
-void NavRenderer::initShader()
-{
-    m_program = GLFunctions::initShader( "slice" );
-    m_crosshairProgram = GLFunctions::initShader( "crosshair" );
-}
-
-
 void NavRenderer::setupTextures()
 {
     GLFunctions::setupTextures( model() );
@@ -130,7 +121,7 @@ void NavRenderer::setupTextures()
 
 void NavRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program, model() );
+    GLFunctions::setShaderVars( "slice", model() );
 }
 
 void NavRenderer::mouseWheel( int step )
