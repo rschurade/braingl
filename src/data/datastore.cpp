@@ -9,6 +9,7 @@
 
 #include "datasetscalar.h"
 #include "loader.h"
+#include "writer.h"
 
 #include "datastore.h"
 
@@ -64,6 +65,16 @@ bool DataStore::load( QDir fileName )
         addDataset( loader.getDataset() );
     }
     return loader.succes();
+}
+
+bool DataStore::save( int index, QString fileName )
+{
+    if ( index >= 0 && index < m_datasetList.size() )
+    {
+        Writer writer( m_datasetList[index], fileName );
+        return writer.save();
+    }
+    return false;
 }
 
 int DataStore::rowCount( const QModelIndex &parent ) const

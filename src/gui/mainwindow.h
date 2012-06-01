@@ -45,8 +45,7 @@ private:
 
     GLWidget* mainGLWidget;
 
-    DatasetListWidget* datasetView;
-    QTableView* datasetView2;
+    DatasetListWidget* m_datasetView;
 
     QTabWidget* m_centralTabWidget;
 

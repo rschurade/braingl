@@ -74,6 +74,8 @@ GLuint DatasetNifti::getTextureGLuint()
 
 void DatasetNifti::parseNiftiHeader( nifti_image* header )
 {
+    m_header = header;
+
     setProperty( "ndim", header->ndim );
     setProperty( "nx", header->nx );
     setProperty( "ny", header->ny );
@@ -131,4 +133,14 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     //setProperty("aux_file", header->aux_file );
     setProperty( "swapsize", header->swapsize );
     setProperty( "byteorder", header->byteorder );
+}
+
+nifti_image* DatasetNifti::getHeader()
+{
+    return m_header;
+}
+
+void* DatasetNifti::getData()
+{
+    return m_data;
 }

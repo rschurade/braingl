@@ -27,6 +27,7 @@ public:
     virtual ~DataStore();
 
     bool load( QDir fileName );
+    bool save( int index, QString fileName );
 
     void addDataset( Dataset* dataset );
 

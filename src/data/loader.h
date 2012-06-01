@@ -8,8 +8,6 @@
 #ifndef LOADER_H_
 #define LOADER_H_
 
-#include <vector>
-
 #include <QtCore/QDir>
 
 #include "nifti/nifti1_io.h"
