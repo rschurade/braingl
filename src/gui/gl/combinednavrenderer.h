@@ -36,7 +36,6 @@ public:
 	void adjustRatios();
 
 private:
-	void initShader();
     void setupTextures();
     void setShaderVars();
 
@@ -49,8 +48,6 @@ private:
 	QMatrix4x4 m_mvpMatrix;
 
     GLuint *vboIds;
-
-    QGLShaderProgram *m_program;
 
     float m_x;
     float m_y;

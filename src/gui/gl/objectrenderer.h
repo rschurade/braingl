@@ -18,7 +18,6 @@ public:
 	virtual ~ObjectRenderer();
 
 	virtual void init() = 0;
-	virtual void initShader() = 0;
 	virtual void initGeometry() = 0;
 	virtual void setShaderVars() = 0;
 	//virtual void draw() = 0;

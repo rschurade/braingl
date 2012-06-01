@@ -24,7 +24,6 @@ CombinedNavRenderer::CombinedNavRenderer( QString name ) :
     ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
-    m_program( new QGLShaderProgram ),
     vboIds( new GLuint[ 2 ] ),
     m_x( 0. ),
     m_y( 0. ),
@@ -73,7 +72,7 @@ void CombinedNavRenderer::initGL()
     static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
-    initShader();
+    GLFunctions::loadShaders();
 }
 
 void CombinedNavRenderer::resizeGL( int width, int height )
@@ -145,11 +144,6 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
 
 void CombinedNavRenderer::leftMouseDrag( int x, int y )
 {
-}
-
-void CombinedNavRenderer::initShader()
-{
-    m_program = GLFunctions::initShader( "slice" );
 }
 
 void CombinedNavRenderer::initGeometry()
@@ -285,7 +279,7 @@ void CombinedNavRenderer::setupTextures()
 
 void CombinedNavRenderer::setShaderVars()
 {
-    GLFunctions::setSliceShaderVars( m_program, model() );
+    GLFunctions::setShaderVars( "slice", model() );
 }
 
 void CombinedNavRenderer::draw()
@@ -297,8 +291,9 @@ void CombinedNavRenderer::draw()
 
     adjustRatios();
 
+    GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
-    m_program->setUniformValue( "mvp_matrix", m_mvpMatrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
 
     initGeometry();
 
