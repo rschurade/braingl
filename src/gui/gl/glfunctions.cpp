@@ -302,17 +302,15 @@ QList<int> GLFunctions::getTextureIndexes( QAbstractItemModel* model )
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = model->index( i, 1 );
-        if ( model->data( index, Qt::DisplayRole ).toInt() == 1 || model->data( index, Qt::DisplayRole ).toInt() == 3 )
+
+        index = model->index( i, 55 );
+        if ( model->data( index, Qt::EditRole ).toBool() )
         {
-            index = model->index( i, 55 );
-            if ( model->data( index, Qt::EditRole ).toBool() )
+            tl.push_back( i );
+            ++allocatedTextureCount;
+            if ( allocatedTextureCount >= NUM_TEXTURES )
             {
-                tl.push_back( i );
-                ++allocatedTextureCount;
-                if ( allocatedTextureCount >= NUM_TEXTURES )
-                {
-                    break;
-                }
+                break;
             }
         }
     }

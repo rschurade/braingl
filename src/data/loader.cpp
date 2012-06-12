@@ -5,9 +5,11 @@
  *      Author: schurade
  */
 #include <QtCore/QDebug>
+#include <QtGui/QVector3D>
 
 #include "datasetscalar.h"
 #include "dataset3d.h"
+#include "datasetdwi.h"
 
 #include "loader.h"
 
@@ -107,8 +109,12 @@ bool Loader::load()
             break;
         }
 
-        case FNDT_NIFTI_4D:
+        case FNDT_NIFTI_DWI:
+        {
+            loadDWI( m_fileName.path() );
+            return true;
             break;
+        }
         default:
             break;
     }
@@ -134,7 +140,28 @@ FN_DATASET_TYPE Loader::determineType()
             }
             else if ( m_header->dim[4] > 3 )
             {
-                return FNDT_NIFTI_4D;
+                QString fn = m_fileName.path();
+                bool hasBVal = false;
+                bool hasBVec = false;
+
+                fn.replace( ".nii.gz", ".bval" );
+                fn.replace( ".nii", ".bval" );
+                QDir dir( fn );
+                if ( dir.exists( dir.absolutePath() ) )
+                {
+                    hasBVal = true;
+                }
+                fn.replace( ".bval", ".bvec" );
+                QDir dir2( fn );
+                if ( dir2.exists( dir2.absolutePath() ) )
+                {
+                    hasBVec = true;
+                }
+
+                if ( hasBVal && hasBVec )
+                {
+                    return FNDT_NIFTI_DWI;
+                }
             }
         }
     }
@@ -162,7 +189,7 @@ FN_DATASET_TYPE Loader::determineType()
             }
             else if ( m_header->dim[4] > 3 )
             {
-                return FNDT_NIFTI2_4D;
+                return FNDT_NIFTI2_DWI;
             }
         }
     }
@@ -198,8 +225,7 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_INT16:
         {
-            uint16_t* data = new uint16_t[ blockSize * dim ];
-
+            int16_t* data = new int16_t[ blockSize * dim ];
             int16_t* inputData;
             inputData = reinterpret_cast<int16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
@@ -215,8 +241,7 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_INT32:
         {
-            uint32_t* data = new uint32_t[ blockSize * dim ];
-
+            int32_t* data = new int32_t[ blockSize * dim ];
             int32_t* inputData;
             inputData = reinterpret_cast<int32_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
@@ -233,7 +258,6 @@ void* Loader::loadNifti( QString fileName )
         case NIFTI_TYPE_FLOAT32:
         {
             float* data = new float[ blockSize * dim ];
-
             float* inputData;
             inputData = reinterpret_cast<float*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
@@ -250,7 +274,6 @@ void* Loader::loadNifti( QString fileName )
         case NIFTI_TYPE_INT8:
         {
             int8_t* data = new int8_t[ blockSize * dim ];
-
             int8_t* inputData;
             inputData = reinterpret_cast<int8_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
@@ -266,7 +289,6 @@ void* Loader::loadNifti( QString fileName )
         case NIFTI_TYPE_UINT16:
         {
             uint16_t* data = new uint16_t[ blockSize * dim ];
-
             uint16_t* inputData;
             inputData = reinterpret_cast<uint16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
@@ -283,4 +305,134 @@ void* Loader::loadNifti( QString fileName )
     }
 
     return 0;
+}
+
+void Loader::loadDWI( QString fileName )
+{
+    QStringList slBvals;
+    QStringList slBvecs;
+
+    int numB0 = 0;
+    QVector<int> bvals;
+    QVector<int>bvals2;
+    QVector<QVector3D> bvecs;
+
+    QString fn = m_fileName.path();
+    fn.replace( ".nii.gz", ".bval" );
+    fn.replace( ".nii", ".bval" );
+    QDir dir( fn );
+    if ( dir.exists( dir.absolutePath() ) )
+    {
+        QFile file( fn );
+        if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+        {
+            return;
+        }
+
+        QTextStream in( &file );
+        if ( !in.atEnd() )
+        {
+            slBvals = in.readLine().split( " " );
+            for ( int i = 0; i < slBvals.size(); ++i )
+            {
+                bvals.push_back( slBvals[i].toInt() );
+            }
+
+        }
+    }
+
+    fn.replace( ".bval", ".bvec" );
+    QDir dir2( fn );
+    if ( dir2.exists( dir2.absolutePath() ) )
+    {
+        QFile file( fn );
+        if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+        {
+            return;
+        }
+
+        QTextStream in( &file );
+        while ( !in.atEnd() )
+        {
+            slBvecs.push_back( in.readLine() );
+        }
+        QString sX = slBvecs[0];
+        QString sY = slBvecs[1];
+        QString sZ = slBvecs[2];
+        QStringList slX = sX.split( " " );
+        QStringList slY = sY.split( " " );
+        QStringList slZ = sZ.split( " " );
+
+        for ( int i = 0; i < slX.size(); ++i )
+        {
+            if ( bvals[i] != 0 )
+            {
+                bvecs.push_back( QVector3D( slX[i].toFloat(), slY[i].toFloat(), slZ[i].toFloat() ) );
+                bvals2.push_back( bvals[i] );
+            }
+            else
+            {
+                ++numB0;
+            }
+        }
+    }
+
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    size_t dim = m_header->dim[4];
+
+    int numData = dim - numB0;
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_INT16:
+        {
+            int16_t* data = new int16_t[ blockSize * numData ];
+            int16_t* b0data = new int16_t[ blockSize * numB0 ];
+            int16_t* inputData;
+
+            int b0Index = 0;
+            int dataIndex = 0;
+
+            inputData = reinterpret_cast<int16_t*>( filedata->data );
+
+            for ( int i = 0; i < dim; ++i )
+            {
+                if ( bvals[i] == 0 )
+                {
+                    qDebug() << "extract b0 at image " << i;
+                    for ( int j = 0; j < blockSize; ++j )
+                    {
+                        b0data[ b0Index ] = inputData[ i * blockSize + j ];
+                        ++b0Index;
+                    }
+
+                }
+                else
+                {
+                    qDebug() << "extract data at image " << i;
+                    for ( int j = 0; j < blockSize; ++j )
+                    {
+                        data[ dataIndex + j * numData ] = inputData[ i * blockSize + j ];
+                    }
+                    ++dataIndex;
+                }
+            }
+
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), data, b0data, bvals2, bvecs );
+            dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
+            m_dataset = dataset;
+
+            nifti_image_free( filedata );
+            break;
+        }
+    }
+
+    qDebug() << "end loading data";
+
+    qDebug() << bvals2;
+    qDebug() << bvecs;
+
+
 }
