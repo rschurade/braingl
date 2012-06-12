@@ -29,6 +29,7 @@ private:
     FN_DATASET_TYPE determineType();
 
     void* loadNifti( QString fileName );
+    void loadDWI( QString fileName );
 
     nifti_image* m_header;
     QDir m_fileName;

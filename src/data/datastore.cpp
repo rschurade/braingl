@@ -351,7 +351,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 
@@ -406,7 +406,7 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 
