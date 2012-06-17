@@ -12,6 +12,7 @@ class QMenu;
 
 class DataStore;
 class GLWidget;
+class ToolBar;
 
 class MainWindow: public QMainWindow
 {
@@ -56,6 +57,7 @@ private:
     QMenu* helpMenu;
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
+    ToolBar* m_toolsToolBar;
     QAction* newLetterAct;
     QAction* openAct;
     QAction* saveAct;

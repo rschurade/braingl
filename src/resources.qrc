@@ -8,6 +8,11 @@
 	<file>icons/print.png</file>
 	<file>icons/save.png</file>
 	<file>icons/undo.png</file>
+	<file>icons/tmp1.png</file>
+	<file>icons/tmp3.png</file>
+	<file>icons/tmpx.png</file>
+	<file>icons/tmpm.png</file>
+	<file>icons/tmpf.png</file>
 	<file>shaders/slice.vs</file>
 	<file>shaders/slice.fs</file>
 	<file>shaders/crosshair.vs</file>

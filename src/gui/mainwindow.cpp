@@ -12,6 +12,7 @@
 #include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
+#include "widgets/toolBar.h"
 
 #include "mainwindow.h"
 
@@ -32,6 +33,9 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     createToolBars();
     createStatusBar();
     createDockWindows();
+
+    // this needs to be done after the view is created
+    m_toolsToolBar->setSelectionModel( m_datasetView->selectionModel() );
 
     setWindowTitle( tr( "Fibernavigator 2" ) );
 
@@ -223,9 +227,13 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( printAct );
     fileToolBar->setObjectName( "fileToolbar");
 
-    editToolBar = addToolBar( tr( "Edit" ) );
-    editToolBar->addAction( undoAct );
-    editToolBar->setObjectName( "editToolbar");
+//    editToolBar = addToolBar( tr( "Edit" ) );
+//    editToolBar->addAction( undoAct );
+//    editToolBar->setObjectName( "editToolbar");
+
+    m_toolsToolBar = new ToolBar( tr( "Tools" ) );
+    m_toolsToolBar->setModel( m_dataStore );
+    addToolBar( m_toolsToolBar );
 }
 
 void MainWindow::createStatusBar()
