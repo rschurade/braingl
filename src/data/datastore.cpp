@@ -10,6 +10,7 @@
 #include "datasetscalar.h"
 #include "loader.h"
 #include "writer.h"
+#include "vptr.h"
 
 #include "datastore.h"
 
@@ -84,7 +85,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-    return 12;
+    return 13;
 }
 
 QVariant DataStore::data( const QModelIndex &index, int role ) const
@@ -111,6 +112,147 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
             break;
     }
 
+    return QVariant();
+}
+
+QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
+{
+    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
+    {
+        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+
+        switch ( index.column() )
+        {
+            case 0:
+                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+                break;
+            case 1:
+                return ds->getProperty( "nt" ).toInt();
+                break;
+            case 2:
+                return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
+                break;
+            case 3:
+                QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
+                return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
+                break;
+            case 4:
+                return ds->getProperty( "nx" ).toInt();
+                break;
+            case 5:
+                return ds->getProperty( "ny" ).toInt();
+                break;
+            case 6:
+                return ds->getProperty( "nz" ).toInt();
+                break;
+            case 7:
+                return ds->getProperty( "dx" ).toFloat();
+                break;
+            case 8:
+                return ds->getProperty( "dy" ).toFloat();
+                break;
+            case 9:
+                return ds->getProperty( "dz" ).toFloat();
+                break;
+            case 10:
+                return ds->getProperty( "min" ).toFloat();
+                break;
+            case 11:
+                return ds->getProperty( "max" ).toFloat();
+                break;
+            case 12:
+                return ds->getProperty( "type" ).toInt();
+                break;
+            default:
+                break;
+        }
+    }
+    return QVariant();
+}
+
+QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
+{
+
+    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
+    {
+        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+
+        switch ( index.column() )
+        {
+            case 0:
+                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+                break;
+            case 1:
+            {
+                return ds->getTextureGLuint();
+            }
+            case 2:
+            {
+                return VPtr<DatasetNifti>::asQVariant( ds );
+            }
+            case 50:
+                return ds->getProperty( "lowerThreshold" ).toFloat();
+                break;
+            case 51:
+                return ds->getProperty( "upperThreshold" ).toFloat();
+                break;
+            case 52:
+                return ds->getProperty( "colormap" ).toInt();
+                break;
+            case 53:
+                return ds->getProperty( "interpolation" ).toBool();
+                break;
+            case 54:
+               return ds->getProperty( "alpha" ).toFloat();
+               break;
+            case 55:
+                return ds->getProperty( "active" ).toBool();
+                break;
+
+        }
+    }
+    return QVariant();
+}
+
+QVariant DataStore::getGlobal( const QModelIndex &index ) const
+{
+    switch ( index.column() )
+    {
+        case 100:
+            return m_globals[ "sagittal" ];
+            break;
+        case 101:
+            return m_globals[ "coronal" ];
+            break;
+        case 102:
+            return m_globals[ "axial" ];
+            break;
+        case 103:
+            return m_globals[ "max_sagittal" ];
+            break;
+        case 104:
+            return m_globals[ "max_coronal" ];
+            break;
+        case 105:
+            return m_globals[ "max_axial" ];
+            break;
+        case 106:
+            return m_globals[ "slice_dx" ];
+            break;
+        case 107:
+            return m_globals[ "slice_dy" ];
+            break;
+        case 108:
+            return m_globals[ "slice_dz" ];
+            break;
+        case 112:
+            return m_globals[ "lastPath" ];
+            break;
+    }
     return QVariant();
 }
 
@@ -264,6 +406,9 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                 case 11:
                     return QString( "max" );
                     break;
+                case 12:
+                    return QString( "internal type" );
+                    break;
             }
         }
         else
@@ -345,141 +490,6 @@ void DataStore::deleteItem( int row )
         updateGlobals();
         emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
     }
-}
-
-QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
-{
-    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
-
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
-    {
-        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
-
-        switch ( index.column() )
-        {
-            case 0:
-                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-                break;
-            case 1:
-                return ds->getProperty( "nt" ).toInt();
-                break;
-            case 2:
-                return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
-                break;
-            case 3:
-                QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
-                return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
-                break;
-            case 4:
-                return ds->getProperty( "nx" ).toInt();
-                break;
-            case 5:
-                return ds->getProperty( "ny" ).toInt();
-                break;
-            case 6:
-                return ds->getProperty( "nz" ).toInt();
-                break;
-            case 7:
-                return ds->getProperty( "dx" ).toFloat();
-                break;
-            case 8:
-                return ds->getProperty( "dy" ).toFloat();
-                break;
-            case 9:
-                return ds->getProperty( "dz" ).toFloat();
-                break;
-            case 10:
-                return ds->getProperty( "min" ).toFloat();
-                break;
-            case 11:
-                return ds->getProperty( "max" ).toFloat();
-                break;
-            default:
-                break;
-        }
-    }
-    return QVariant();
-}
-
-QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
-{
-
-    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
-
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
-    {
-        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
-
-        switch ( index.column() )
-        {
-            case 0:
-                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-                break;
-            case 1:
-            {
-                DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
-                return ds->getTextureGLuint();
-            }
-            case 50:
-                return ds->getProperty( "lowerThreshold" ).toFloat();
-                break;
-            case 51:
-                return ds->getProperty( "upperThreshold" ).toFloat();
-                break;
-            case 52:
-                return ds->getProperty( "colormap" ).toInt();
-                break;
-            case 53:
-                return ds->getProperty( "interpolation" ).toBool();
-                break;
-            case 54:
-               return ds->getProperty( "alpha" ).toFloat();
-               break;
-            case 55:
-                return ds->getProperty( "active" ).toBool();
-                break;
-
-        }
-    }
-    return QVariant();
-}
-
-QVariant DataStore::getGlobal( const QModelIndex &index ) const
-{
-    switch ( index.column() )
-    {
-        case 100:
-            return m_globals[ "sagittal" ];
-            break;
-        case 101:
-            return m_globals[ "coronal" ];
-            break;
-        case 102:
-            return m_globals[ "axial" ];
-            break;
-        case 103:
-            return m_globals[ "max_sagittal" ];
-            break;
-        case 104:
-            return m_globals[ "max_coronal" ];
-            break;
-        case 105:
-            return m_globals[ "max_axial" ];
-            break;
-        case 106:
-            return m_globals[ "slice_dx" ];
-            break;
-        case 107:
-            return m_globals[ "slice_dy" ];
-            break;
-        case 108:
-            return m_globals[ "slice_dz" ];
-            break;
-        case 112:
-            return m_globals[ "lastPath" ];
-            break;
-    }
-    return QVariant();
 }
 
 QString DataStore::getNiftiDataType( const int type ) const

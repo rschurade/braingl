@@ -23,6 +23,12 @@ public:
 
     void examineDataset();
 
+    void* getB0Data();
+
+    QVector<int> getBvals();
+
+    QVector<QVector3D> getBvecs();
+
 private:
     void createTexture();
 

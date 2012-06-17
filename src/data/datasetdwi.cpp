@@ -23,6 +23,21 @@ DatasetDWI::~DatasetDWI()
 {
 }
 
+void* DatasetDWI::getB0Data()
+{
+    return m_b0Data;
+}
+
+QVector<int> DatasetDWI::getBvals()
+{
+    return m_bvals;
+}
+
+QVector<QVector3D> DatasetDWI::getBvecs()
+{
+    return m_bvecs;
+}
+
 void DatasetDWI::examineDataset()
 {
     int type = getProperty( "datatype" ).toInt();
