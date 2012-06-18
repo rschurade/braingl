@@ -12,7 +12,7 @@
 #include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
-#include "widgets/toolBar.h"
+#include "widgets/toolbar.h"
 
 #include "mainwindow.h"
 
@@ -35,7 +35,7 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     createDockWindows();
 
     // this needs to be done after the view is created
-    m_toolsToolBar->setSelectionModel( m_datasetView->selectionModel() );
+    m_toolsToolBar->setSelectionModel( m_datasetWidget->selectionModel() );
 
     setWindowTitle( tr( "Fibernavigator 2" ) );
 
@@ -107,7 +107,7 @@ void MainWindow::save()
             switch ( ret )
             {
                 case QMessageBox::Save :
-                    m_dataStore->save( m_datasetView->getSelected(), fileName );
+                    m_dataStore->save( m_datasetWidget->getSelected(), fileName );
                     break;
                 case QMessageBox::Cancel :
                     break;
@@ -115,7 +115,7 @@ void MainWindow::save()
         }
         else
         {
-            m_dataStore->save( m_datasetView->getSelected(), fileName );
+            m_dataStore->save( m_datasetWidget->getSelected(), fileName );
         }
 
         QFileInfo fi( fileName );
@@ -243,19 +243,19 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-	m_datasetView = new DatasetListWidget( this );
-	m_datasetView->setModel( m_dataStore );
-	addDockWidget( Qt::LeftDockWidgetArea, m_datasetView );
-	viewMenu->addAction( m_datasetView->toggleViewAction() );
+	m_datasetWidget = new DatasetListWidget( this );
+	m_datasetWidget->setModel( m_dataStore );
+	addDockWidget( Qt::LeftDockWidgetArea, m_datasetWidget );
+	viewMenu->addAction( m_datasetWidget->toggleViewAction() );
 
-	connect( m_datasetView, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
-	connect( m_datasetView, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
-	connect( m_datasetView, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
+	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
+	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
+	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("dataset properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
     dsProperties->setModel( m_dataStore );
-    dsProperties->setSelectionModel( m_datasetView->selectionModel() );
+    dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
 
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( QString("global properties"), this );
@@ -266,7 +266,7 @@ void MainWindow::createDockWindows()
 	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
 	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
 	dsInfo->setModel( m_dataStore );
-    dsInfo->setSelectionModel( m_datasetView->selectionModel() );
+    dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dsInfo->toggleViewAction() );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
