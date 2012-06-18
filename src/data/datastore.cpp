@@ -12,6 +12,8 @@
 #include "writer.h"
 #include "vptr.h"
 
+#include "dwialgos.h"
+
 #include "datastore.h"
 
 DataStore::DataStore()
@@ -304,54 +306,66 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
 
     if ( role == Qt::UserRole )
     {
-        if ( index.row() == 0 && index.column() > 99 )
+        switch ( index.column() )
         {
-            switch ( index.column() )
+            // First index of scalar algos
+            case 0:
+                break;
+            // First index of vector 3D algos
+            case 20:
+                break;
+            // First index of DWI algos
+            case 40:
             {
-                case 100:
-                    m_globals[ "sagittal" ] = value.toInt();
-                    break;
-                case 101:
-                    m_globals[ "coronal" ] = value.toInt();
-                    break;
-                case 102:
-                    m_globals[ "axial" ] = value.toInt();
-                    break;
-                case 103:
-                    m_globals[ "max_sagittal" ] = value.toInt();
-                    break;
-                case 104:
-                    m_globals[ "max_coronal" ] = value.toInt();
-                    break;
-                case 105:
-                    m_globals[ "max_axial" ] = value.toInt();
-                    break;
-                case 106:
-                    m_globals[ "slice_dx" ] = value.toInt();
-                    break;
-                case 107:
-                    m_globals[ "slice_dy" ] = value.toInt();
-                    break;
-                case 108:
-                    m_globals[ "slice_dz" ] = value.toInt();
-                    break;
-                case 109:
-                    m_globals[ "coronal" ] = value.toPoint().x();
-                    m_globals[ "axial" ] = value.toPoint().y();
-                    break;
-                case 110:
-                    m_globals[ "sagittal" ] = value.toPoint().x();
-                    m_globals[ "axial" ] = value.toPoint().y();
-                    break;
-                case 111:
-                    m_globals[ "sagittal" ] = value.toPoint().x();
-                    m_globals[ "coronal" ] = value.toPoint().y();
-                    break;
-                case 112:
-                    m_globals[ "lastPath"] = value.toString();
-                    break;
-
+                Dataset* ds = m_datasetList[index.row];
+                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                {
+                    DWIAlgos::qBall( dynamic_cast<DatasetDWI*>( ds ) );
+                }
+                break;
             }
+            case 100:
+                m_globals[ "sagittal" ] = value.toInt();
+                break;
+            case 101:
+                m_globals[ "coronal" ] = value.toInt();
+                break;
+            case 102:
+                m_globals[ "axial" ] = value.toInt();
+                break;
+            case 103:
+                m_globals[ "max_sagittal" ] = value.toInt();
+                break;
+            case 104:
+                m_globals[ "max_coronal" ] = value.toInt();
+                break;
+            case 105:
+                m_globals[ "max_axial" ] = value.toInt();
+                break;
+            case 106:
+                m_globals[ "slice_dx" ] = value.toInt();
+                break;
+            case 107:
+                m_globals[ "slice_dy" ] = value.toInt();
+                break;
+            case 108:
+                m_globals[ "slice_dz" ] = value.toInt();
+                break;
+            case 109:
+                m_globals[ "coronal" ] = value.toPoint().x();
+                m_globals[ "axial" ] = value.toPoint().y();
+                break;
+            case 110:
+                m_globals[ "sagittal" ] = value.toPoint().x();
+                m_globals[ "axial" ] = value.toPoint().y();
+                break;
+            case 111:
+                m_globals[ "sagittal" ] = value.toPoint().x();
+                m_globals[ "coronal" ] = value.toPoint().y();
+                break;
+            case 112:
+                m_globals[ "lastPath"] = value.toString();
+                break;
         }
         emit( dataChanged( index, index ) );
 

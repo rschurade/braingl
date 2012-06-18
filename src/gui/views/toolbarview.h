@@ -28,10 +28,13 @@ public:
     void setSelection( const QRect &rect, QItemSelectionModel::SelectionFlags flags );
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
+    int getSelected();
+
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 
 private:
+    int m_selected;
 
 signals:
     void sigSelectionChanged( int type );
