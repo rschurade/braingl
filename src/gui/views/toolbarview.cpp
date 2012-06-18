@@ -8,7 +8,8 @@
 
 #include "toolbarview.h"
 
-ToolBarView::ToolBarView( QWidget* parent )
+ToolBarView::ToolBarView( QWidget* parent ) :
+    m_selected( -1 )
 {
 }
 
@@ -63,11 +64,15 @@ void ToolBarView::selectionChanged( const QItemSelection &selected, const QItemS
 {
     if ( selected.indexes().size() > 0 )
     {
-        int sel = -1;
-        sel = selected.indexes().first().row();
-        QModelIndex index = model()->index( sel, 12 );
+        m_selected = selected.indexes().first().row();
+        QModelIndex index = model()->index( m_selected, 12 );
         int type = model()->data( index, Qt::DisplayRole ).toInt();
 
         emit( sigSelectionChanged( type ) );
     }
+}
+
+int ToolBarView::getSelected()
+{
+    return m_selected;
 }
