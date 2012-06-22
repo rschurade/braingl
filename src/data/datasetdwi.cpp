@@ -7,8 +7,9 @@
 
 #include "datasetdwi.h"
 
-DatasetDWI::DatasetDWI( QString filename, void* data, void* b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
-        DatasetNifti( filename, FNDT_NIFTI_DWI, data ),
+DatasetDWI::DatasetDWI( QString filename, QVector<NEWMAT::ColumnVector>* data, void* b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
+        DatasetNifti( filename, FNDT_NIFTI_DWI ),
+        m_dataVector( data ),
         m_b0Data( b0Data ),
         m_bvals( bvals ),
         m_bvecs( bvecs )
@@ -21,6 +22,11 @@ DatasetDWI::DatasetDWI( QString filename, void* data, void* b0Data, QVector<int>
 
 DatasetDWI::~DatasetDWI()
 {
+}
+
+QVector<NEWMAT::ColumnVector>* DatasetDWI::getDataVector()
+{
+    return m_dataVector;
 }
 
 void* DatasetDWI::getB0Data()
