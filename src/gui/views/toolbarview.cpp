@@ -76,3 +76,9 @@ int ToolBarView::getSelected()
 {
     return m_selected;
 }
+
+void ToolBarView::activateAlgo( FN_ALGO algo )
+{
+    QModelIndex index = model()->index( m_selected, algo );
+    model()->setData( index, 0, Qt::UserRole );
+}

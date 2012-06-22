@@ -16,7 +16,7 @@ DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, void* data )
 
 DatasetNifti::~DatasetNifti()
 {
-    switch ( getProperty( "datatype").toInt() )
+    switch ( getProperty( "datatype" ).toInt() )
     {
         case NIFTI_TYPE_UINT8:
         {

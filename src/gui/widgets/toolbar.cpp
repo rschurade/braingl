@@ -7,6 +7,8 @@
 #include "../views/toolbarview.h"
 #include "../../data/dataset.h"
 
+#include "../../data/enums.h"
+
 #include "toolbar.h"
 
 ToolBar::ToolBar( const QString &title, QWidget* parent ) :
@@ -77,6 +79,7 @@ void ToolBar::slotVector1()
 void ToolBar::slotMulti1()
 {
     qDebug() << "multi button pressed";
+    m_toolBarView->activateAlgo( FNALGO_QBALL );
 }
 
 void ToolBar::slotMesh1()
