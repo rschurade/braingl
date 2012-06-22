@@ -18,6 +18,8 @@
 
 #include "dwialgos.h"
 
+using namespace NEWMAT;
+
 DWIAlgos::DWIAlgos()
 {
 }
@@ -26,7 +28,7 @@ DWIAlgos::~DWIAlgos()
 {
 }
 
-DatasetNifti* DWIAlgos::qBall( DatasetDWI* ds )
+DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
 {
     qDebug() << "start calculating qBall";
     QVector<QVector3D>bvecs =  ds->getBvecs();
@@ -42,47 +44,28 @@ DatasetNifti* DWIAlgos::qBall( DatasetDWI* ds )
     double lambda = 0.006;
     int maxOrder = 4;
     Matrix qBallBase = calcQBallBase( gradients, lambda, maxOrder );
+
+    qDebug() << "elements in data" << ds->getDataVector()->at( 0 ).Nrows();
+    qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
+
+    QVector<NEWMAT::ColumnVector>* data = ds->getDataVector();
+
+    QVector<NEWMAT::ColumnVector>* qballVector = new QVector<NEWMAT::ColumnVector>();
+
+    for ( int i = 0; i < data->size(); ++i )
+    {
+        qballVector->push_back( qBallBase * data->at( i ) );
+    }
+
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qballVector, ds->getB0Data(), ds->getBvals(), bvecs );
+    out->parseNiftiHeader( ds->getHeader() );
+    out->examineDataset();
+    out->setProperty( "fileName", "QBall" );
+    out->setProperty( "name", "QBall" );
+
     qDebug() << "finished calculating qBall";
 
-    switch ( ds->getProperty( "datatype" ).toInt() )
-    {
-        case NIFTI_TYPE_UINT8:
-        {
-            uint8_t* data;
-            data = reinterpret_cast< uint8_t* >( ds->getData() );
-            break;
-        }
-        case NIFTI_TYPE_INT16:
-        {
-            int16_t* data;
-            data = reinterpret_cast< int16_t* >( ds->getData() );
-            break;
-        }
-        case NIFTI_TYPE_INT32:
-        {
-            int32_t* data;
-            data = reinterpret_cast< int32_t* >( ds->getData() );
-            break;
-        }
-        case NIFTI_TYPE_FLOAT32:
-        {
-            float* data;
-            data = reinterpret_cast< float* >( ds->getData() );
-            break;
-        }
-        case NIFTI_TYPE_INT8:
-        {
-            int8_t* data;
-            data = reinterpret_cast< int8_t* >( ds->getData() );
-            break;
-        }
-        case NIFTI_TYPE_UINT16:
-        {
-            uint16_t* data;
-            data = reinterpret_cast< uint16_t* >( ds->getData() );
-            break;
-        }
-    }
+    return out;
 }
 
 Matrix DWIAlgos::calcQBallBase( Matrix gradients, double lambda, int maxOrder )

@@ -382,6 +382,9 @@ void Loader::loadDWI( QString fileName )
     size_t dim = m_header->dim[4];
 
     int numData = dim - numB0;
+
+    QVector<NEWMAT::ColumnVector>* dataVector = new QVector<NEWMAT::ColumnVector>();
+
     qDebug() << "start loading data";
     switch ( m_header->datatype )
     {
@@ -392,7 +395,6 @@ void Loader::loadDWI( QString fileName )
             int16_t* inputData;
 
             int b0Index = 0;
-            int dataIndex = 0;
 
             inputData = reinterpret_cast<int16_t*>( filedata->data );
 
@@ -408,18 +410,26 @@ void Loader::loadDWI( QString fileName )
                     }
 
                 }
-                else
-                {
-                    qDebug() << "extract data at image " << i;
-                    for ( int j = 0; j < blockSize; ++j )
-                    {
-                        data[ dataIndex + j * numData ] = inputData[ i * blockSize + j ];
-                    }
-                    ++dataIndex;
-                }
             }
 
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), data, b0data, bvals2, bvecs );
+            qDebug() << "extract data ";
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                NEWMAT::ColumnVector v( numData );
+                int dataIndex = 1;
+                for ( int j = 0; j < dim; ++j )
+                {
+                    if ( bvals[j] != 0 )
+                    {
+                        v( dataIndex ) = inputData[ j * blockSize + i ];
+                        ++dataIndex;
+                    }
+                }
+                dataVector->push_back( v );
+            }
+            qDebug() << "extract data done";
+
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
             m_dataset = dataset;
