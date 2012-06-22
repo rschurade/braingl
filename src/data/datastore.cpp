@@ -8,6 +8,7 @@
 #include <QtCore/QDebug>
 
 #include "datasetscalar.h"
+#include "datasetdwi.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
@@ -304,26 +305,27 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         return true;
     }
 
-    if ( role == Qt::UserRole )
+    if ( role == Qt::UserRole && index.column() < 100 )
     {
-        switch ( index.column() )
+        int algo = index.column();
+        switch( algo )
         {
-            // First index of scalar algos
-            case 0:
-                break;
-            // First index of vector 3D algos
-            case 20:
-                break;
-            // First index of DWI algos
-            case 40:
+            case FNALGO_QBALL:
             {
-                Dataset* ds = m_datasetList[index.row];
+                Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
                 {
                     DWIAlgos::qBall( dynamic_cast<DatasetDWI*>( ds ) );
                 }
                 break;
             }
+        }
+    }
+
+    if ( role == Qt::UserRole )
+    {
+        switch ( index.column() )
+        {
             case 100:
                 m_globals[ "sagittal" ] = value.toInt();
                 break;

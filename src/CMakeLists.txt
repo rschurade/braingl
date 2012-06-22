@@ -60,33 +60,14 @@ FIND_PACKAGE( OpenGL REQUIRED )
 # include the OpenGL header paths
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 
-
 # -----------------------------------------------------------------------------------------------------------------------------------------------
-# Boost, see http://www.boost.org/
+# NewMat
+# See http://www.robertnz.net/nm_intro.htm
 #
-# To see, which boost libs we currently use, you may run the following command # in the src directory on a linux box to make some investigations:
-# grep -i include `find . -type f` | grep boost | awk '{print $2}' | sort | uniq
+FIND_PACKAGE( Newmat )
 
-# Setup boost options
-SET( Boost_USE_MULTITHREAD ON )
+INCLUDE_DIRECTORIES( Newmat_INCLUDE_DIRS )
 
-# find the boost packages
-FIND_PACKAGE( Boost 1.46.0 REQUIRED system )
-
-# include the boost headers
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------
-# GSL
-#
-FIND_PACKAGE( GSL REQUIRED )
-
-#INCLUDE_DIRECTORIES( ${GSL_INCLUDE_DIRS} ${GSLCBLAS_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${GSL_INCLUDE_DIR} )
-message(  STATUS "hallo" )
-message(  STATUS "${GSL_INCLUDE_DIR}" )
-
-#SET( LIBS ${LIBS} ${GSL_LIBRARIES} ${GSLCBLAS_LIBRARIES} )
 
 
 ADD_DEFINITIONS( -DHAVE_ZLIB )
@@ -127,10 +108,10 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 
-	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${GSLCBLAS_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${Newmat_LIBRARIES} )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${GSLCBLAS_LIBRARIES} glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${Newmat_LIBRARIES} glu32 opengl32 )
 ENDIF()
 

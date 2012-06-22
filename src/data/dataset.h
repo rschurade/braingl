@@ -13,16 +13,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QVariant>
 
-enum FN_DATASET_TYPE
-{
-    FNDT_UNKNOWN,
-    FNDT_NIFTI_SCALAR,
-    FNDT_NIFTI_VECTOR,
-    FNDT_NIFTI_DWI,
-    FNDT_NIFTI2_SCALAR,
-    FNDT_NIFTI2_VECTOR,
-    FNDT_NIFTI2_DWI
-};
+#include "enums.h"
 
 class Dataset
 {
