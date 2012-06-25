@@ -4,7 +4,7 @@
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-#include "../../glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>

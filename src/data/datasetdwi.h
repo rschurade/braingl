@@ -13,8 +13,6 @@
 
 #include <newmat/newmat.h>
 
-#include "nifti/nifti1_io.h"
-
 #include "datasetnifti.h"
 
 class DatasetDWI : public DatasetNifti

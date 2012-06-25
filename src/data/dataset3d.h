@@ -8,8 +8,6 @@
 #ifndef DATASET3D_H_
 #define DATASET3D_H_
 
-#include "nifti/nifti1_io.h"
-
 #include "datasetnifti.h"
 
 class Dataset3D : public DatasetNifti

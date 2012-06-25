@@ -8,7 +8,7 @@
 #ifndef NAVRENDERER_H_
 #define NAVRENDERER_H_
 
-#include "../../glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
 #include <QtGui/QMatrix4x4>
 
