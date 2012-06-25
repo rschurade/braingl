@@ -82,7 +82,7 @@ INCLUDE( Utils )
 # Add sources as target
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 SET ( CMAKE_AUTOMOC TRUE )
-SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/data/nifti/nifti1_io.cpp PROPERTIES COMPILE_FLAGS -Wno-write-strings)
+SET_SOURCE_FILES_PROPERTIES( ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTIES COMPILE_FLAGS -Wno-write-strings)
 
 # Collect the compile-files for this target
 COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )

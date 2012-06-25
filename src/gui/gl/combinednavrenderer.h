@@ -8,7 +8,7 @@
 #ifndef COMBINEDNAVRENDERER_H_
 #define COMBINEDNAVRENDERER_H_
 
-#include "../../glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
 #include <QtGui/QMatrix4x4>
 

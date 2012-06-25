@@ -8,7 +8,7 @@
 #ifndef NAVRENDERERAXIAL_H_
 #define NAVRENDERERAXIAL_H_
 
-#include "../../glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
 
 #include <QtGui/QMatrix4x4>

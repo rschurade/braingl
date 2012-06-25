@@ -8,8 +8,6 @@
 #ifndef DATASETSCALAR_H_
 #define DATASETSCALAR_H_
 
-#include "nifti/nifti1_io.h"
-
 #include "datasetnifti.h"
 
 class DatasetScalar : public DatasetNifti

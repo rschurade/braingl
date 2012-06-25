@@ -8,7 +8,7 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include "../glew/include/glew.h"
+#include "../thirdparty/glew/include/glew.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QHash>

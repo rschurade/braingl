@@ -4,7 +4,7 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
-#include "../../glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QHash>
