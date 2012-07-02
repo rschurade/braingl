@@ -12,6 +12,7 @@
 
 class DatasetDWI;
 class DatasetNifti;
+class TriangleMesh;
 
 class DWIAlgos
 {
@@ -27,7 +28,7 @@ private:
 
     static double sh_base_function( int order, int degree, double theta, double phi );
 
-    //template<typename T> void multQBall( T* data, DatasetDWI* ds, boost::shared_ptr<Matrix> qBallBase );
+    static TriangleMesh* writeSHGlyph( DatasetDWI* my_image, unsigned int steps, double color );
 };
 
 #endif /* DWIALGOS_H_ */
