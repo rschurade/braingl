@@ -14,6 +14,9 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include "mesh/trianglemesh.h"
+#include "mesh/tesselation.h"
+
 #include "datasetdwi.h"
 
 #include "dwialgos.h"
@@ -170,17 +173,79 @@ double DWIAlgos::sh_base_function( int order, int degree, double theta, double p
     }
 }
 
-//template<typename T> void DWIAlgos::multQBall( T* data, DatasetDWI* ds, boost::shared_ptr<Matrix> qBallBase )
-//{
-//    int nx = ds->getProperty( "nx" ).toInt();
-//    int ny = ds->getProperty( "ny" ).toInt();
-//    int nz = ds->getProperty( "nz" ).toInt();
-//
-//    int size = nx * ny * nz;
-//
-//    for ( int i = 0; i < size; ++i )
-//    {
-//       Vector v();
-//
-//    }
-//}
+TriangleMesh* DWIAlgos::writeSHGlyph( DatasetDWI* ds, unsigned int steps, double color )
+{
+    TriangleMesh* out = new TriangleMesh();
+
+    //get tesselation:
+    const Matrix* sphere_v( tess::vertices( steps ) );
+
+    QVector<ColumnVector>* data = ds->getDataVector();
+    const int order( ( -3 + ( int ) ( sqrt( 8 * ( data->at(0).Nrows() ) + 1 ) ) ) / 2 );
+
+    // calculate sh_base: (could be optimized via lookup table)
+    Matrix base( sh_base( *sphere_v, order ) );
+
+    QVector3D dist;
+    dist.setX( ds->getProperty( "dx" ).toFloat() );
+    dist.setY( ds->getProperty( "dy" ).toFloat() );
+    dist.setZ( ds->getProperty( "dz" ).toFloat() );
+
+    // calculate size parameters:
+    unsigned long num( 0 );
+
+    // compute glyph at every voxel:
+    for ( int x = 0; x < ds->getProperty( "nx" ).toInt(); ++x )
+    {
+        for ( int y = 0; y < ds->getProperty( "ny" ).toInt(); ++y )
+        {
+            for ( int z = 0; z < ds->getProperty( "nz" ).toInt(); ++z )
+            {
+                if ( ds->getDataVector()->at( 0 )( 0 ) != 0.0 )
+                {
+                    // calculate all the radii in the voxel and scale them:
+                    ColumnVector radius = base * ds->getDataVector()->at( 0 );
+                    radius = radius / 4.0;
+
+                    for ( int i = 0; i < radius.Nrows(); ++i )
+                    {
+                        // remove negative lobes:
+                        if ( radius( i ) < 0 )
+                        {
+                            radius( i ) = 0.0;
+                        }
+                        QVector3D v;
+                        v.setX( (double)( radius( i ) * ( ( *sphere_v )( i, 1 ) + .5 + x ) * dist.x() ) );
+                        v.setY( (double)( radius( i ) * ( ( *sphere_v )( i, 2 ) + .5 + y ) * dist.y() ) );
+                        v.setZ( (double)( radius( i ) * ( ( *sphere_v )( i, 3 ) + .5 + z ) * dist.z() ) );
+                        out->addVertex( v );
+                    }
+                }
+            }
+        }
+    }
+
+    const int* faces( tess::faces( steps ) );
+
+    for ( int i = 0; i < tess::n_faces( steps); ++i )
+    {
+        Triangle tri = { faces[3*i], faces[3*i+1], faces[3*i+2] };
+        out->addTriangle( tri );
+    }
+
+    // set coloring by setting magnitudes:
+//    fprintf( out_f, "Magnitudes\n" );
+//    if ( color < 0.0 )
+//        for ( unsigned long i( 0 ); i < num; i++ )
+//            for ( unsigned long j( 0 ); j < ( *sphere_v ).size1(); j++ )
+//            {
+//                fprintf( out_f, "%.8f\n", mri_color( ( *sphere_v )( j, 0 ), ( *sphere_v )( j, 1 ), ( *sphere_v )( j, 2 ) ) );
+//            }
+//    else
+//        for ( unsigned long i( 0 ); i < num; i++ )
+//            for ( unsigned long j( 0 ); j < ( *sphere_v ).size1(); j++ )
+//            {
+//                fprintf( out_f, "%.8f\n", color );
+//            }
+
+}
