@@ -8,7 +8,7 @@
 #ifndef DWIALGOS_H_
 #define DWIALGOS_H_
 
-#include <newmat/newmat.h>
+#include "../thirdparty/newmat10/newmat.h"
 
 class DatasetDWI;
 class DatasetNifti;
@@ -22,8 +22,8 @@ private:
     DWIAlgos();
     virtual ~DWIAlgos();
 
-    static NEWMAT::Matrix calcQBallBase( NEWMAT::Matrix gradients, double lambda, int maxOrder );
-    static NEWMAT::Matrix sh_base( NEWMAT::Matrix g, int max_order );
+    static Matrix calcQBallBase( Matrix gradients, double lambda, int maxOrder );
+    static Matrix sh_base( Matrix g, int max_order );
 
     static double sh_base_function( int order, int degree, double theta, double phi );
 

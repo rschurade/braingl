@@ -383,7 +383,7 @@ void Loader::loadDWI( QString fileName )
 
     int numData = dim - numB0;
 
-    QVector<NEWMAT::ColumnVector>* dataVector = new QVector<NEWMAT::ColumnVector>();
+    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -415,7 +415,7 @@ void Loader::loadDWI( QString fileName )
             qDebug() << "extract data ";
             for ( int i = 0; i < blockSize; ++i )
             {
-                NEWMAT::ColumnVector v( numData );
+                ColumnVector v( numData );
                 int dataIndex = 1;
                 for ( int j = 0; j < dim; ++j )
                 {

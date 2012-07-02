@@ -18,7 +18,6 @@
 
 #include "dwialgos.h"
 
-using namespace NEWMAT;
 
 DWIAlgos::DWIAlgos()
 {
@@ -48,9 +47,9 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     qDebug() << "elements in data" << ds->getDataVector()->at( 0 ).Nrows();
     qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
 
-    QVector<NEWMAT::ColumnVector>* data = ds->getDataVector();
+    QVector<ColumnVector>* data = ds->getDataVector();
 
-    QVector<NEWMAT::ColumnVector>* qballVector = new QVector<NEWMAT::ColumnVector>();
+    QVector<ColumnVector>* qballVector = new QVector<ColumnVector>();
 
     for ( int i = 0; i < data->size(); ++i )
     {
