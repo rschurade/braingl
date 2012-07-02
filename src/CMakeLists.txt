@@ -60,19 +60,17 @@ FIND_PACKAGE( OpenGL REQUIRED )
 # include the OpenGL header paths
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 
-# -----------------------------------------------------------------------------------------------------------------------------------------------
-# NewMat
-# See http://www.robertnz.net/nm_intro.htm
-#
-FIND_PACKAGE( Newmat )
-
-INCLUDE_DIRECTORIES( Newmat_INCLUDE_DIRS )
-
-
-
 ADD_DEFINITIONS( -DHAVE_ZLIB )
 
 INCLUDE( Utils )
+
+# find the boost packages
+FIND_PACKAGE( Boost 1.46.0 REQUIRED system )
+
+# include the boost headers
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+
+
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # GUI compilation options
@@ -108,10 +106,10 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 
-	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${Newmat_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${Newmat_LIBRARIES} glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} glu32 opengl32 )
 ENDIF()
 

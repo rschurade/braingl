@@ -11,19 +11,19 @@
 #include <QtGui/QVector3D>
 #include <QtCore/QVector>
 
-#include <newmat/newmat.h>
+#include "../thirdparty/newmat10/newmat.h"
 
 #include "datasetnifti.h"
 
 class DatasetDWI : public DatasetNifti
 {
 public:
-    DatasetDWI( QString filename, QVector<NEWMAT::ColumnVector>* data, void* b0Data, QVector<int>bvals, QVector<QVector3D>bvecs );
+    DatasetDWI( QString filename, QVector<ColumnVector>* data, void* b0Data, QVector<int>bvals, QVector<QVector3D>bvecs );
     virtual ~DatasetDWI();
 
     void examineDataset();
 
-    QVector<NEWMAT::ColumnVector>* getDataVector();
+    QVector<ColumnVector>* getDataVector();
 
     void* getB0Data();
 
@@ -34,7 +34,7 @@ public:
 private:
     void createTexture();
 
-    QVector<NEWMAT::ColumnVector>* m_dataVector;
+    QVector<ColumnVector>* m_dataVector;
     void* m_b0Data;
     QVector<int>m_bvals;
     QVector<QVector3D>m_bvecs;
