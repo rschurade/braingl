@@ -7,6 +7,7 @@
 #include <QtGui/QtGui>
 
 #include "../widgets/sliderwithedit.h"
+#include "../../data/enums.h"
 
 #include "datasetpropertyview.h"
 
@@ -55,6 +56,21 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
 
+    m_layout5 = new QHBoxLayout();
+    m_lodSelect = new QComboBox();
+    m_lodSelect->insertItem( 0, tr( "0" ) );
+    m_lodSelect->insertItem( 1, tr( "1" ) );
+    m_lodSelect->insertItem( 2, tr( "2" ) );
+    m_lodSelect->insertItem( 3, tr( "3" ) );
+    m_lodSelect->insertItem( 4, tr( "4" ) );
+    m_lodSelect->insertItem( 5, tr( "5" ) );
+    m_layout5->addWidget( new QLabel( tr("level of detail" ) ), 25 );
+    m_layout5->addWidget( m_lodSelect, 75 );
+    connect( m_lodSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( lodChanged( int ) ) );
+
+    m_scalingSlider = new SliderWithEdit( tr( "qball scaling" ) );
+    connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
+
     m_layout->addLayout( layout1 );
     m_layout->addLayout( layout4 );
     m_layout->addWidget( m_lowerThresholdSlider );
@@ -62,6 +78,8 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addLayout( layout2 );
     m_layout->addLayout( layout3 );
     m_layout->addWidget( m_alphaSlider );
+    m_layout->addLayout( m_layout5 );
+    m_layout->addWidget( m_scalingSlider );
     m_layout->addStretch( 0 );
 
     m_widget->setLayout( m_layout );
@@ -167,6 +185,14 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( 55 );
     m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
+
+    index = getSelectedIndex( 56 );
+    m_lodSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
+
+    m_scalingSlider->setMin( 0.1 );
+    m_scalingSlider->setMax( 10 );
+    index = getSelectedIndex( 57 );
+    m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 }
 
 void DatasetPropertyView::updateWidgetVisibility()
@@ -177,10 +203,19 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_lowerThresholdSlider->setHidden( true );
     m_upperThresholdSlider->setHidden( true );
 
+    m_scalingSlider->setHidden( true );
+
+
     if ( dim == 1 )
     {
         m_lowerThresholdSlider->setHidden( false );
         m_upperThresholdSlider->setHidden( false );
+    }
+
+    int created = model()->data( getSelectedIndex( 13 ), Qt::DisplayRole ).toInt();
+    if ( created == FNALGO_QBALL )
+    {
+        m_scalingSlider->setHidden( false );
     }
 }
 
@@ -239,4 +274,14 @@ void DatasetPropertyView::activeStateChanged( int state )
 void DatasetPropertyView::alphaChanged( float value )
 {
     model()->setData( getSelectedIndex( 54 ), value );
+}
+
+void DatasetPropertyView::lodChanged( int index )
+{
+    model()->setData( getSelectedIndex( 56 ), index );
+}
+
+void DatasetPropertyView::scalingChanged( float value )
+{
+    model()->setData( getSelectedIndex( 57 ), value );
 }

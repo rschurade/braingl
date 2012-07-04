@@ -10,6 +10,7 @@
 
 #include "arcball.h"
 #include "slicerenderer.h"
+#include "shrenderer.h"
 
 #include "scenerenderer.h"
 
@@ -34,6 +35,9 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( m_dataStore );
+
+    m_shRenderer = new SHRenderer();
+    m_shRenderer->setModel( m_dataStore );
 
     m_arcBall = new ArcBall( 400, 400 );
 
@@ -78,6 +82,7 @@ void SceneRenderer::initGL()
 
     calcMVPMatrix();
     m_sliceRenderer->init();
+    m_shRenderer->init();
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -135,6 +140,7 @@ void SceneRenderer::draw()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_sliceRenderer->draw( m_mvpMatrix );
+    m_shRenderer->draw( m_mvpMatrix );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )

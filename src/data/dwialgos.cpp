@@ -64,6 +64,9 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->examineDataset();
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
+    out->setProperty( "createdBy", FNALGO_QBALL );
+    out->setProperty( "lod", 2 );
+    out->setProperty( "scaling", 1.0 );
 
     qDebug() << "finished calculating qBall";
 

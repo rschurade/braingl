@@ -37,9 +37,21 @@ public:
     void removeTriangle( int index );
     void removeVertex( int index );
 
+    QVector<QVector3D>& getVertices();
+    QVector<QVector3D>& getVertNormals();
+    QVector<QColor>&    getVertColors();
+    QVector<Triangle>&  getTriangles();
+
+
+
 private:
+    bool m_dirty; // flag indicating that the number of vertices or triangles has changed
+
     QVector3D calcTriNormal( Triangle triangle );
     QVector3D calcVertNormal( int vertex );
+    void recalcNormals();
+
+    void clearDirty();
 
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_vertNormals;

@@ -15,6 +15,7 @@ enum FN_DATASET_TYPE
 
 enum FN_ALGO
 {
+    FNALGO_NONE,
     FNALGO_QBALL
 };
 

@@ -8,6 +8,7 @@
 #include "trianglemesh.h"
 
 TriangleMesh::TriangleMesh(  int vertSize, int triSize ) :
+    m_dirty( true ),
     m_reservedForVerts( 50 ),
     m_reservedForTris( 50 )
 {
@@ -58,6 +59,7 @@ void TriangleMesh::addVertex( int index, QVector3D position, QColor color )
         m_vertices[ index ] = position;
         m_vertColors[ index ] = color;
     }
+    m_dirty = true;
 }
 
 void TriangleMesh::addVertex( QVector3D position, QColor color )
@@ -72,6 +74,7 @@ void TriangleMesh::addVertex( QVector3D position, QColor color )
         m_vertNormals.reserve( m_reservedForVerts );
         m_vertColors.reserve( m_reservedForVerts );
     }
+    m_dirty = true;
 }
 
 void TriangleMesh::addTriangle( int index, Triangle triangle, QColor color )
@@ -82,6 +85,7 @@ void TriangleMesh::addTriangle( int index, Triangle triangle, QColor color )
         m_triColors[index] = color;
         m_triNormals[index] = calcTriNormal( triangle );
     }
+    m_dirty = true;
 }
 
 void TriangleMesh::addTriangle( Triangle triangle, QColor color )
@@ -96,6 +100,7 @@ void TriangleMesh::addTriangle( Triangle triangle, QColor color )
         m_triNormals.reserve( m_reservedForTris );
         m_triColors.reserve( m_reservedForTris );
     }
+    m_dirty = true;
 }
 
 QVector3D TriangleMesh::calcTriNormal( Triangle triangle )
@@ -127,6 +132,14 @@ QVector3D TriangleMesh::calcVertNormal( int vertex )
         }
     }
     return tempNormal / ( ( count > 0 ) ? count : 1 );
+}
+
+void TriangleMesh::recalcNormals()
+{
+    for ( int i = 0; i < m_vertices.size(); ++i )
+    {
+        m_vertNormals[i] = calcVertNormal(i);
+    }
 }
 
 void TriangleMesh::removeTriangle( int index )
@@ -169,4 +182,33 @@ void TriangleMesh::removeVertex( int index )
             }
         }
     }
+}
+
+void TriangleMesh::clearDirty()
+{
+    recalcNormals();
+
+    m_dirty = false;
+}
+
+
+QVector< QVector3D >& TriangleMesh::getVertices()
+{
+    return m_vertices;
+}
+QVector< QVector3D >& TriangleMesh::getVertNormals()
+{
+    if ( m_dirty )
+    {
+        clearDirty();
+    }
+    return m_vertNormals;
+}
+QVector< QColor >& TriangleMesh::getVertColors()
+{
+    return m_vertColors;
+}
+QVector< Triangle >& TriangleMesh::getTriangles()
+{
+    return m_triangles;
 }

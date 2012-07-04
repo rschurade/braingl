@@ -120,6 +120,7 @@ void GLFunctions::loadShaders()
     if ( !GLFunctions::shadersLoaded )
     {
         GLFunctions::m_shaders["slice"] = initShader( "slice" );
+        GLFunctions::m_shaders["qball"] = initShader( "qball" );
         GLFunctions::m_shaders["crosshair"] = initShader( "crosshair" );
     }
 }
@@ -166,6 +167,10 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
     if ( name == "slice" )
     {
         setSliceShaderVars( m_shaders[name], model );
+    }
+    if ( name == "qball" )
+    {
+        setQBallShaderVars( m_shaders[name], model );
     }
 }
 
@@ -291,6 +296,25 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
         default:
             break;
     }
+}
+
+void GLFunctions::setQBallShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
+{
+    program->bind();
+
+    int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+
+    // Offset for texture coordinate
+    offset += sizeof(float)*3;
+
+    // Tell OpenGL programmable pipeline how to locate vertex normal data
+    int normalLocation = program->attributeLocation("a_normal");
+    program->enableAttributeArray(normalLocation);
+    glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *)offset );
 }
 
 QList<int> GLFunctions::getTextureIndexes( QAbstractItemModel* model )

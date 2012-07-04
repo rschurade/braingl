@@ -19,12 +19,13 @@ class DWIAlgos
 public:
     static DatasetDWI* qBall( DatasetDWI* ds );
 
+    static Matrix sh_base( Matrix g, int max_order );
 private:
     DWIAlgos();
     virtual ~DWIAlgos();
 
     static Matrix calcQBallBase( Matrix gradients, double lambda, int maxOrder );
-    static Matrix sh_base( Matrix g, int max_order );
+
 
     static double sh_base_function( int order, int degree, double theta, double phi );
 
