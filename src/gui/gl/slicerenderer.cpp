@@ -165,6 +165,9 @@ void SliceRenderer::drawAxial()
 
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SliceRenderer::drawCoronal()
@@ -175,6 +178,9 @@ void SliceRenderer::drawCoronal()
     setShaderVars();
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SliceRenderer::drawSagittal()
@@ -185,4 +191,7 @@ void SliceRenderer::drawSagittal()
     setShaderVars();
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

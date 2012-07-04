@@ -13,6 +13,7 @@
 class QCheckBox;
 class QComboBox;
 class QLineEdit;
+class QHBoxLayout;
 class QVBoxLayout;
 class SliderWithEdit;
 
@@ -50,6 +51,9 @@ private slots:
 
     void alphaChanged( float value );
 
+    void lodChanged( int index );
+    void scalingChanged( float value );
+
 private:
     QModelIndex getSelectedIndex( int column );
     void updateWidgetVisibility();
@@ -69,6 +73,10 @@ private:
 
     QCheckBox* m_textureInterpolation;
     QCheckBox* m_textureActive;
+
+    QHBoxLayout* m_layout5;
+    QComboBox* m_lodSelect;
+    SliderWithEdit* m_scalingSlider;
 
 };
 

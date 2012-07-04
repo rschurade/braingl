@@ -53,6 +53,7 @@ NavRenderer::~NavRenderer()
 
 void NavRenderer::init()
 {
+    glGenBuffers( 4, vboIds );
 }
 
 void NavRenderer::initGL()

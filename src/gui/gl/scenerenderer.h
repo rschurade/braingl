@@ -15,6 +15,7 @@
 class ArcBall;
 class DataStore;
 class SliceRenderer;
+class SHRenderer;
 
 class SceneRenderer
 {
@@ -39,6 +40,7 @@ private:
 	ArcBall* m_arcBall;
 	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
+	SHRenderer* m_shRenderer;
 
 	int m_boundingbox;
 

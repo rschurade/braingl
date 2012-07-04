@@ -30,6 +30,7 @@ public:
     static void loadShaders();
 
     static void setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model );
+    static void setQBallShaderVars( QGLShaderProgram* program, QAbstractItemModel* model );
     static void setShaderVars( QString name, QAbstractItemModel* model );
 
     static QList<int> getTextureIndexes( QAbstractItemModel* model );

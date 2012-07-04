@@ -88,7 +88,7 @@ int DataStore::rowCount( const QModelIndex &parent ) const
 
 int DataStore::columnCount( const QModelIndex &parent ) const
 {
-    return 13;
+    return 14;
 }
 
 QVariant DataStore::data( const QModelIndex &index, int role ) const
@@ -168,6 +168,9 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
             case 12:
                 return ds->getProperty( "type" ).toInt();
                 break;
+            case 13:
+                return ds->getProperty( "createdBy" ).toInt();
+                break;
             default:
                 break;
         }
@@ -215,7 +218,12 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 55:
                 return ds->getProperty( "active" ).toBool();
                 break;
-
+            case 56:
+                return ds->getProperty( "lod" ).toInt();
+                break;
+            case 57:
+                return ds->getProperty( "scaling" ).toFloat();
+                break;
         }
     }
     return QVariant();
@@ -298,6 +306,14 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             if ( index.column() == 55 )
             {
                 m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
+            }
+            if ( index.column() == 56 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "lod", value.toInt() );
+            }
+            if ( index.column() == 57 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
             }
         }
         emit( dataChanged( index, index ) );
@@ -424,6 +440,9 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
                     break;
                 case 12:
                     return QString( "internal type" );
+                    break;
+                case 13:
+                    return QString( "created by" );
                     break;
             }
         }

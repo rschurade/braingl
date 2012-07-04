@@ -217,47 +217,15 @@ const Matrix* set_vertices( const double input[], const unsigned long size )
     // allocate output object.
     Matrix* result( new Matrix( size, 3 ) );
 
-    for ( unsigned long i( 0 ); i < size; i++ )
+    for ( int i = 0; i < size; ++i )
     {
-        (*result)( i, 1 ) = input[ 3 * i + 0 ];
-        (*result)( i, 2 ) = input[ 3 * i + 1 ];
-        (*result)( i, 3 ) = input[ 3 * i + 2 ];
+        (*result)( i + 1, 1 ) = input[ 3 * i + 0 ];
+        (*result)( i + 1, 2 ) = input[ 3 * i + 1 ];
+        (*result)( i + 1, 3 ) = input[ 3 * i + 2 ];
     }
 
     // return result.
     return result;
 }
-//******************************************************************************
 
-///*****************************************************************************
-///* @file Tesselation.cpp
-///* @fn const Matrix set_faces(
-///*
-///*     const T input[],
-///*     const unsigned long size )
-///*
-///* @brief Copies the faces from a std::array to a Matrix object.
-///*
-///*
-///* @param Array: tesselation data.
-///* @param Scalar: size.
-///*
-///* @return Matrix: including tesselation data.
-///*****************************************************************************
-const Matrix* set_faces( const unsigned long input[], const unsigned long size )
-{
-    // allocate output object.
-    Matrix* result( new Matrix( size, 3 ) );
-
-    for ( unsigned long i( 0 ); i < size; i++ )
-    {
-        (*result)( i + 1, 1 ) = input[3 * i + 0];
-        (*result)( i + 1, 2 ) = input[3 * i + 1];
-        (*result)( i + 1, 3 ) = input[3 * i + 2];
-    }
-
-    // return result.
-    return result;
-}
-//******************************************************************************
 } // End of namespace tess.
