@@ -227,6 +227,8 @@ void SHRenderer::initGeometry()
                 indexes[currTri] = balls[currBall]->getTriangles()[i].v2 + currBall * numVerts;
                 ++currTri;
             }
+
+            delete balls[currBall];
         }
 
 
