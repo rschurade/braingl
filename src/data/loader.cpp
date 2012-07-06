@@ -441,8 +441,8 @@ void Loader::loadDWI( QString fileName )
 
     qDebug() << "end loading data";
 
-    qDebug() << bvals2;
-    qDebug() << bvecs;
+    //qDebug() << bvals2;
+    //qDebug() << bvecs;
 
 
 }

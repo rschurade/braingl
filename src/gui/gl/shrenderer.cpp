@@ -6,6 +6,8 @@
  */
 #include "../../thirdparty/glew/include/glew.h"
 
+#include <limits>
+
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 #include <QtGui/QVector3D>
@@ -169,15 +171,33 @@ void SHRenderer::initGeometry()
 
         QVector<TriangleMesh*>balls;
 
-        for( int yy = 0; yy < ybi; ++yy )
+        qDebug() << "data vector size" << data->at( 0 ).Nrows();
+        qDebug() << "base vector size" << m_bases[lod].Nrows();
+        Matrix m = m_bases[lod] * data->at( 0 );
+        qDebug() << "radius vector size" << m.Nrows() << " " << m.Ncols();
+
+
+        for( int yy = 20; yy < ybi - 20; ++yy )
         {
-            for ( int xx = 0; xx < xbi; ++xx )
+            for ( int xx = 20; xx < xbi-20; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
                 {
                     ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
                     ColumnVector r = m_bases[lod] * dv;
-                    r = r / 200 * scaling;
+
+                    float max = 0;
+                    float min = std::numeric_limits<float>::max();
+                    for ( int i = 0; i < r.Nrows(); ++i )
+                    {
+                        max = qMax( max, (float)r(i+1) );
+                        min = qMin( min, (float)r(i+1) );
+                    }
+                    max = max - min;
+                    for ( int i = 0; i < r.Nrows(); ++i )
+                    {
+                        r(i+1) = ( r(i+1) - min ) / max;
+                    }
 
                     TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
 
