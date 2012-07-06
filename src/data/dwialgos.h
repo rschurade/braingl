@@ -28,8 +28,6 @@ private:
 
 
     static double sh_base_function( int order, int degree, double theta, double phi );
-
-    static TriangleMesh* writeSHGlyph( DatasetDWI* my_image, unsigned int steps, double color );
 };
 
 #endif /* DWIALGOS_H_ */

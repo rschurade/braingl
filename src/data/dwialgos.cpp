@@ -97,7 +97,7 @@ Matrix DWIAlgos::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
         double frt_val = 2.0 * M_PI * boost::math::legendre_p<double>( order, 0 );
         double lbt_val = lambda * order * order * ( order + 1 ) * ( order + 1 );
 
-        for ( int degree( -order ); degree <= order; degree++ )
+        for ( int degree( -order ); degree <= order; ++degree )
         {
             int i = order * ( order + 1 ) / 2 + degree;
             LBT( i+1 ) = lbt_val;
@@ -109,7 +109,7 @@ Matrix DWIAlgos::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     Matrix B = SH.t() * SH;
 
     // update with Laplace-Beltrami operator:
-    for( int i = 0; i < sh_size; i++ )
+    for( int i = 0; i < sh_size; ++i )
     {
         B(i+1,i+1) += LBT(i+1);
     }
@@ -117,9 +117,9 @@ Matrix DWIAlgos::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     Matrix out = B.i() * SH.t();
 
     // the Funk-Radon transformation:
-    for ( unsigned long i = 0; i < B.Nrows(); i++ )
+    for ( unsigned long i = 0; i < B.Nrows(); ++i )
     {
-        for ( unsigned long j = 0; j < B.Ncols(); j++ )
+        for ( unsigned long j = 0; j < B.Ncols(); ++j )
         {
             out( i+1, j+1 ) *= FRT( i+1 );
         }
@@ -139,7 +139,7 @@ Matrix DWIAlgos::sh_base( Matrix g, int maxOrder )
     Matrix out( g.Nrows(), sh_dirs );
 
     // for each direction
-    for ( unsigned long i=0; i < g.Nrows(); i++ )
+    for ( unsigned long i=0; i < g.Nrows(); ++i )
     {
         // transform current direction to polar coordinates
         double theta( acos( g( i+1, 3 ) ) );
@@ -148,7 +148,7 @@ Matrix DWIAlgos::sh_base( Matrix g, int maxOrder )
         // calculate spherical harmonic base
         for ( int order = 0, j=0; order <= maxOrder; order += 2 )
         {
-            for ( int degree( -order ); degree <= order; degree++, j++ )
+            for ( int degree( -order ); degree <= order; ++degree, ++j )
             {
                 out( i+1, j+1 ) = sh_base_function( order, degree, theta, phi );
             }
@@ -174,81 +174,4 @@ double DWIAlgos::sh_base_function( int order, int degree, double theta, double p
     {
         return spherical_harmonic_r( order, 0, theta, phi );
     }
-}
-
-TriangleMesh* DWIAlgos::writeSHGlyph( DatasetDWI* ds, unsigned int steps, double color )
-{
-    TriangleMesh* out = new TriangleMesh();
-
-    //get tesselation:
-    const Matrix* sphere_v( tess::vertices( steps ) );
-
-    QVector<ColumnVector>* data = ds->getDataVector();
-    const int order( ( -3 + ( int ) ( sqrt( 8 * ( data->at(0).Nrows() ) + 1 ) ) ) / 2 );
-
-    // calculate sh_base: (could be optimized via lookup table)
-    Matrix base( sh_base( *sphere_v, order ) );
-
-    QVector3D dist;
-    dist.setX( ds->getProperty( "dx" ).toFloat() );
-    dist.setY( ds->getProperty( "dy" ).toFloat() );
-    dist.setZ( ds->getProperty( "dz" ).toFloat() );
-
-    // calculate size parameters:
-    unsigned long num( 0 );
-
-    // compute glyph at every voxel:
-    for ( int x = 0; x < ds->getProperty( "nx" ).toInt(); ++x )
-    {
-        for ( int y = 0; y < ds->getProperty( "ny" ).toInt(); ++y )
-        {
-            for ( int z = 0; z < ds->getProperty( "nz" ).toInt(); ++z )
-            {
-                if ( ds->getDataVector()->at( 0 )( 0 ) != 0.0 )
-                {
-                    // calculate all the radii in the voxel and scale them:
-                    ColumnVector radius = base * ds->getDataVector()->at( 0 );
-                    radius = radius / 4.0;
-
-                    for ( int i = 0; i < radius.Nrows(); ++i )
-                    {
-                        // remove negative lobes:
-                        if ( radius( i ) < 0 )
-                        {
-                            radius( i ) = 0.0;
-                        }
-                        QVector3D v;
-                        v.setX( (double)( radius( i ) * ( ( *sphere_v )( i, 1 ) + .5 + x ) * dist.x() ) );
-                        v.setY( (double)( radius( i ) * ( ( *sphere_v )( i, 2 ) + .5 + y ) * dist.y() ) );
-                        v.setZ( (double)( radius( i ) * ( ( *sphere_v )( i, 3 ) + .5 + z ) * dist.z() ) );
-                        out->addVertex( v );
-                    }
-                }
-            }
-        }
-    }
-
-    const int* faces( tess::faces( steps ) );
-
-    for ( int i = 0; i < tess::n_faces( steps); ++i )
-    {
-        Triangle tri = { faces[3*i], faces[3*i+1], faces[3*i+2] };
-        out->addTriangle( tri );
-    }
-
-    // set coloring by setting magnitudes:
-//    fprintf( out_f, "Magnitudes\n" );
-//    if ( color < 0.0 )
-//        for ( unsigned long i( 0 ); i < num; i++ )
-//            for ( unsigned long j( 0 ); j < ( *sphere_v ).size1(); j++ )
-//            {
-//                fprintf( out_f, "%.8f\n", mri_color( ( *sphere_v )( j, 0 ), ( *sphere_v )( j, 1 ), ( *sphere_v )( j, 2 ) ) );
-//            }
-//    else
-//        for ( unsigned long i( 0 ); i < num; i++ )
-//            for ( unsigned long j( 0 ); j < ( *sphere_v ).size1(); j++ )
-//            {
-//                fprintf( out_f, "%.8f\n", color );
-//            }
-
 }
