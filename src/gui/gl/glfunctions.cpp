@@ -327,8 +327,10 @@ QList<int> GLFunctions::getTextureIndexes( QAbstractItemModel* model )
     {
         QModelIndex index = model->index( i, 1 );
 
-        index = model->index( i, 55 );
-        if ( model->data( index, Qt::EditRole ).toBool() )
+        bool active = model->data( model->index( i, 55 ), Qt::EditRole ).toBool();
+        int dim = model->data( model->index( i, 1 ), Qt::DisplayRole ).toInt();
+        bool isTex = ( dim == 1 || dim == 3 );
+        if ( active && isTex )
         {
             tl.push_back( i );
             ++allocatedTextureCount;
