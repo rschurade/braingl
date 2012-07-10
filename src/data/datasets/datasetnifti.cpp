@@ -7,60 +7,14 @@
 
 #include "datasetnifti.h"
 
-DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, void* data ) :
+DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type ) :
     Dataset( filename, type ),
-    m_data( data ),
     m_textureGLuint( 0 )
 {
 }
 
 DatasetNifti::~DatasetNifti()
 {
-    switch ( getProperty( "datatype" ).toInt() )
-    {
-        case NIFTI_TYPE_UINT8:
-        {
-            uint8_t* data;
-            data = reinterpret_cast< uint8_t* >( m_data );
-            delete[] data;
-            break;
-        }
-        case NIFTI_TYPE_INT16:
-        {
-            int16_t* data;
-            data = reinterpret_cast< int16_t* >( m_data );
-            delete[] data;
-            break;
-        }
-        case NIFTI_TYPE_INT32:
-        {
-            int32_t* data;
-            data = reinterpret_cast< int32_t* >( m_data );
-            delete[] data;
-            break;
-        }
-        case NIFTI_TYPE_FLOAT32:
-        {
-            float* data;
-            data = reinterpret_cast< float* >( m_data );
-            delete[] data;
-            break;
-        }
-        case NIFTI_TYPE_INT8:
-        {
-            int8_t* data;
-            data = reinterpret_cast< int8_t* >( m_data );
-            delete[] data;
-            break;
-        }
-        case NIFTI_TYPE_UINT16:
-        {
-            uint16_t* data;
-            data = reinterpret_cast< uint16_t* >( m_data );
-            delete[] data;
-            break;
-        }
-    }
 }
 
 GLuint DatasetNifti::getTextureGLuint()
@@ -138,9 +92,4 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
 nifti_image* DatasetNifti::getHeader()
 {
     return m_header;
-}
-
-void* DatasetNifti::getData()
-{
-    return m_data;
 }

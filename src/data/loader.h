@@ -28,7 +28,10 @@ public:
 private:
     FN_DATASET_TYPE determineType();
 
-    void* loadNifti( QString fileName );
+    QVector<float> loadNiftiScalar( QString fileName );
+    QVector<QVector3D> loadNiftiVector3D( QString fileName );
+
+
     void loadDWI( QString fileName );
 
     nifti_image* m_header;

@@ -7,8 +7,9 @@
 
 #include "dataset3d.h"
 
-Dataset3D::Dataset3D( QString filename, void* data ) :
-        DatasetNifti( filename, FNDT_NIFTI_VECTOR, data )
+Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data ) :
+        DatasetNifti( filename, FNDT_NIFTI_VECTOR ),
+        m_data( data )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -41,8 +42,8 @@ void Dataset3D::examineDataset()
     {
         m_properties["size"] = static_cast<int>( size * sizeof( float ) );
 
-        m_properties["min"] = -1.0;
-        m_properties["max"] = 1.0;
+        m_properties["min"] = 1.0;
+        m_properties["max"] = -1.0;
     }
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
@@ -70,18 +71,27 @@ void Dataset3D::createTexture()
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_UNSIGNED_BYTE, m_data );
-    }
-
-    if ( type == DT_FLOAT )
-    {
-        float* data = reinterpret_cast< float* >( m_data );
+        float* data = new float[nx*ny*nz*3];
 
         int size = nx * ny * nz * 3;
         for ( size_t i = 0; i < size; ++i )
         {
-            data[i] = qMax( data[i], data[i] * -1.0f );
+            data[i] = qMax( data[i], data[i] * -1.0f ) / 255;
         }
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, m_data );
+        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
+    }
+
+    if ( type == DT_FLOAT )
+    {
+        int blockSize = nx*ny*nz;
+        float* data = new float[blockSize*3];
+
+        for ( size_t i = 0; i < blockSize; ++i )
+        {
+            data[i*3] = fabs( m_data[i].x() );
+            data[i*3+1] = fabs( m_data[i].y() );
+            data[i*3+2] = fabs( m_data[i].z() );
+        }
+        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
     }
 }
