@@ -48,10 +48,10 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     int maxOrder = 4;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, maxOrder );
 
-    qDebug() << "elements in data" << ds->getDataVector()->at( 0 ).Nrows();
+    qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();
     qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
 
-    QVector<ColumnVector>* data = ds->getDataVector();
+    QVector<ColumnVector>* data = ds->getData();
 
     QVector<ColumnVector>* qballVector = new QVector<ColumnVector>();
 
@@ -113,7 +113,7 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
     double si = 0.0;
     vector<double>log_s0_si_pixel( N );
 
-    QVector<ColumnVector>* data = ds->getDataVector();
+    QVector<ColumnVector>* data = ds->getData();
     QVector<ColumnVector>* tensors = new QVector<ColumnVector>();
     QVector<float> b0Images = ds->getB0Data();
 

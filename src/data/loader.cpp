@@ -521,6 +521,4 @@ void Loader::loadDWI( QString fileName )
 
     //qDebug() << bvals2;
     //qDebug() << bvecs;
-
-
 }
