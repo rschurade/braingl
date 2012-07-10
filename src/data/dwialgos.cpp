@@ -62,12 +62,14 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
 
     DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qballVector, ds->getB0Data(), ds->getBvals(), bvecs );
     out->parseNiftiHeader( ds->getHeader() );
-    out->examineDataset();
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
     out->setProperty( "scaling", 1.0 );
+    out->setProperty( "nt", qballVector->at(0).Nrows() );
+    out->setProperty( "datatype", DT_FLOAT);
+    out->examineDataset();
 
     qDebug() << "finished calculating qBall";
 
@@ -154,6 +156,16 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
             tensors->push_back( t );
         } // end if s0 > 0
     }
+
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), tensors, ds->getB0Data(), ds->getBvals(), bvecs );
+    out->parseNiftiHeader( ds->getHeader() );
+    out->setProperty( "fileName", "Tensor" );
+    out->setProperty( "name", "Tensor" );
+    out->setProperty( "createdBy", FNALGO_TENSORFIT );
+    out->setProperty( "nt", 6 );
+    out->setProperty( "datatype", DT_FLOAT);
+    out->examineDataset();
+    return out;
 }
 
 
