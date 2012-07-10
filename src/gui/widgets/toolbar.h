@@ -30,6 +30,7 @@ private:
     QAction* m_vectorAction1;
     QAction* m_multiAction1;
     QAction* m_multiAction2;
+    QAction* m_multiAction3;
     QAction* m_meshAction1;
     QAction* m_fiberAction1;
 
@@ -40,6 +41,8 @@ private slots:
     void slotVector1();
     void slotMulti1();
     void slotMulti2();
+    void slotMulti3();
+
     void slotMesh1();
     void slotFiber1();
 

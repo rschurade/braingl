@@ -19,6 +19,7 @@
 #include "mesh/tesselation.h"
 
 #include "datasets/datasetdwi.h"
+#include "datasets/datasetscalar.h"
 #include "qball.h"
 #include "dwialgos.h"
 
@@ -119,6 +120,9 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
     QVector<ColumnVector>* tensors = new QVector<ColumnVector>();
     QVector<float> b0Images = ds->getB0Data();
 
+    ColumnVector blank( 6 );
+    blank = 0.0;
+
     for ( int i = 0; i < data->size(); ++i )
     {
         s0 = b0Images[i];
@@ -155,6 +159,10 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
             }
             tensors->push_back( t );
         } // end if s0 > 0
+        else
+        {
+            tensors->push_back( blank );
+        }
     }
 
     DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), tensors, ds->getB0Data(), ds->getBvals(), bvecs );
@@ -168,4 +176,61 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
     return out;
 }
 
+DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
+{
+    qDebug() << "huhu";
+    DatasetDWI* tensorDS = tensorFit( ds );
+    QVector<ColumnVector>* tensors = tensorDS->getData();
+qDebug() << "huhu1";
+    int blockSize = tensorDS->getData()->size();
+    qDebug() << "blockSize: " << blockSize;
+
+    QVector<float> trace( blockSize );
+    float value = 0;
+    for ( size_t i = 0; i < blockSize; ++i )
+    {
+        value = tensors->at( i )( 1 );
+        value += tensors->at( i )( 4 );
+        value += tensors->at( i )( 6 );
+        trace[i] = value/3.0;
+    }
+    qDebug() << "huhu2";
+    QVector<float>fa( blockSize );
+
+    double xx,xy,xz,yy,yz,zz,tr,AA,DD;
+    qDebug() << "huhu3";
+    for ( size_t i = 0; i < blockSize; ++i )
+    {
+        xx = tensors->at( i )(1);
+        xy = tensors->at( i )(2);
+        xz = tensors->at( i )(3);
+        yy = tensors->at( i )(4);
+        yz = tensors->at( i )(5);
+        zz = tensors->at( i )(6);
+        tr = trace[i];
+
+        AA = pow2( xx - tr ) + pow2( yy - tr ) + pow2( zz - tr ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
+        DD = pow2( xx ) + pow2( yy ) + pow2( zz ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
+
+        if ( DD > 0 )
+        {
+            fa[ i ] = (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) );
+        }
+        else
+        {
+            fa[ i ] = 0.0;
+        }
+    }
+    qDebug() << "huhu4";
+    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa );
+    out->parseNiftiHeader( ds->getHeader() );
+    out->setProperty( "fileName", "FA" );
+    out->setProperty( "name", "FA" );
+    out->setProperty( "createdBy", FNALGO_FA );
+    out->setProperty( "nt", 1 );
+    out->setProperty( "datatype", DT_FLOAT);
+    out->examineDataset();
+
+    return out;
+}
 

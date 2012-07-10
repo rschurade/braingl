@@ -61,6 +61,10 @@ void ToolBar::createActions()
     m_multiAction2->setStatusTip( tr( "tensor fit" ) );
     connect( m_multiAction2, SIGNAL( triggered() ), this, SLOT( slotMulti2() ) );
 
+    m_multiAction3 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Calc FA" ), this );
+    m_multiAction3->setStatusTip( tr( "calc FA" ) );
+    connect( m_multiAction3, SIGNAL( triggered() ), this, SLOT( slotMulti3() ) );
+
     m_meshAction1 = new QAction( QIcon( ":/icons/tmpm.png" ), tr( "Mesh 1" ), this );
     m_meshAction1->setStatusTip( tr( "Mesh Action 1" ) );
     connect( m_meshAction1, SIGNAL( triggered() ), this, SLOT( slotMesh1() ) );
@@ -88,6 +92,11 @@ void ToolBar::slotMulti1()
 void ToolBar::slotMulti2()
 {
     m_toolBarView->activateAlgo( FNALGO_TENSORFIT );
+}
+
+void ToolBar::slotMulti3()
+{
+    m_toolBarView->activateAlgo( FNALGO_FA );
 }
 
 void ToolBar::slotMesh1()
@@ -122,6 +131,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_multiAction1 );
             this->addAction( m_multiAction2 );
+            this->addAction( m_multiAction3 );
             break;
         }
         default:

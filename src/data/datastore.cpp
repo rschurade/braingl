@@ -344,6 +344,15 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 }
                 break;
             }
+            case FNALGO_FA:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                {
+                    addDataset( DWIAlgos::calcFA( dynamic_cast<DatasetDWI*>( ds ) ) );
+                }
+                break;
+            }
         }
     }
 
