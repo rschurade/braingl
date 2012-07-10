@@ -16,7 +16,8 @@ enum FN_DATASET_TYPE
 enum FN_ALGO
 {
     FNALGO_NONE,
-    FNALGO_QBALL
+    FNALGO_QBALL,
+    FNALGO_TENSORFIT
 };
 
 #endif /* ENUMS_H_ */

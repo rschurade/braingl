@@ -7,7 +7,7 @@
 
 #include <QtCore/QDebug>
 
-#include "datasetnifti.h"
+#include "datasets/datasetnifti.h"
 
 #include "writer.h"
 

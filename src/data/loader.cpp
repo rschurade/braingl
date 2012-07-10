@@ -7,9 +7,9 @@
 #include <QtCore/QDebug>
 #include <QtGui/QVector3D>
 
-#include "datasetscalar.h"
-#include "dataset3d.h"
-#include "datasetdwi.h"
+#include "datasets/datasetscalar.h"
+#include "datasets/dataset3d.h"
+#include "datasets/datasetdwi.h"
 
 #include "loader.h"
 
@@ -391,7 +391,7 @@ void Loader::loadDWI( QString fileName )
         case NIFTI_TYPE_INT16:
         {
             int16_t* data = new int16_t[ blockSize * numData ];
-            int16_t* b0data = new int16_t[ blockSize * numB0 ];
+            QVector<float> b0data( blockSize );
             int16_t* inputData;
 
             int b0Index = 0;
@@ -405,10 +405,9 @@ void Loader::loadDWI( QString fileName )
                     qDebug() << "extract b0 at image " << i;
                     for ( int j = 0; j < blockSize; ++j )
                     {
-                        b0data[ b0Index ] = inputData[ i * blockSize + j ];
-                        ++b0Index;
+                        b0data[ j ] += inputData[ i * blockSize + j ] / numB0;
                     }
-
+                    ++b0Index;
                 }
             }
 

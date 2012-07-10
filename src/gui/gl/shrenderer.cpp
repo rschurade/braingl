@@ -7,16 +7,17 @@
 #include "../../thirdparty/glew/include/glew.h"
 
 #include <limits>
+#include <omp.h>
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../data/datasetdwi.h"
+#include "../../data/datasets/datasetdwi.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
-#include "../../data/dwialgos.h"
+#include "../../data/qball.h"
 
 #include "../../data/mesh/tesselation.h"
 #include "../../data/mesh/trianglemesh.h"
@@ -66,7 +67,7 @@ SHRenderer::SHRenderer() :
         m_spheres.push_back( mesh );
 
         const Matrix* v1 = tess::vertices( lod );
-        Matrix base = ( DWIAlgos::sh_base( (*v1), 4 ) );
+        Matrix base = ( QBall::sh_base( (*v1), 4 ) );
         m_bases.push_back( base );
     }
 }
@@ -176,12 +177,15 @@ void SHRenderer::initGeometry()
         Matrix m = m_bases[lod] * data->at( 0 );
         qDebug() << "radius vector size" << m.Nrows() << " " << m.Ncols();
 
-
-        for( int yy = 20; yy < ybi - 20; ++yy )
+        //omp_set_num_threads( 4 );
+        qDebug() << "start creating meshes";
+        //#pragma omp parallel for
+        for( int yy = 0; yy < ybi; ++yy )
         {
-            for ( int xx = 20; xx < xbi-20; ++xx )
+            for ( int xx = 0; xx < xbi; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
+                //if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
+                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
                 {
                     ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
                     ColumnVector r = m_bases[lod] * dv;
@@ -214,10 +218,14 @@ void SHRenderer::initGeometry()
                     {
                         newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
                     }
-                    balls.push_back( newBall );
+                    #pragma omp critical
+                    {
+                        balls.push_back( newBall );
+                    }
                 }
             }
         }
+        qDebug() << "end creating meshes";
 
         std::vector<float>verts;
         verts.reserve( balls.size() * mesh->getVertSize() * 6 );

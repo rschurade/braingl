@@ -8,8 +8,6 @@
 #ifndef DWIALGOS_H_
 #define DWIALGOS_H_
 
-#include "../thirdparty/newmat10/newmat.h"
-
 class DatasetDWI;
 class DatasetNifti;
 class TriangleMesh;
@@ -18,16 +16,14 @@ class DWIAlgos
 {
 public:
     static DatasetDWI* qBall( DatasetDWI* ds );
+    static DatasetDWI* tensorFit( DatasetDWI* ds );
 
-    static Matrix sh_base( Matrix g, int max_order );
+
 private:
     DWIAlgos();
     virtual ~DWIAlgos();
 
-    static Matrix calcQBallBase( Matrix gradients, double lambda, int maxOrder );
 
-
-    static double sh_base_function( int order, int degree, double theta, double phi );
 };
 
 #endif /* DWIALGOS_H_ */

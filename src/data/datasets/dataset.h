@@ -13,7 +13,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QVariant>
 
-#include "enums.h"
+#include "../enums.h"
 
 class Dataset
 {
