@@ -12,7 +12,7 @@
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
-#include "dataset.h"
+#include "datasets/dataset.h"
 
 class Writer
 {

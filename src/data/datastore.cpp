@@ -7,8 +7,8 @@
 #include <QtCore/QLocale>
 #include <QtCore/QDebug>
 
-#include "datasetscalar.h"
-#include "datasetdwi.h"
+#include "datasets/datasetscalar.h"
+#include "datasets/datasetdwi.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
@@ -332,6 +332,15 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::qBall( dynamic_cast<DatasetDWI*>( ds ) ) );
+                }
+                break;
+            }
+            case FNALGO_TENSORFIT:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                {
+                    addDataset( DWIAlgos::tensorFit( dynamic_cast<DatasetDWI*>( ds ) ) );
                 }
                 break;
             }

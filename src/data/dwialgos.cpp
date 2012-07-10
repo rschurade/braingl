@@ -12,13 +12,14 @@
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
+#include "../thirdparty/newmat10/newmat.h"
+#include "../thirdparty/newmat10/newmatap.h"
 
 #include "mesh/trianglemesh.h"
 #include "mesh/tesselation.h"
 
-#include "datasetdwi.h"
-
+#include "datasets/datasetdwi.h"
+#include "qball.h"
 #include "dwialgos.h"
 
 
@@ -45,7 +46,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
 
     double lambda = 0.006;
     int maxOrder = 4;
-    Matrix qBallBase = calcQBallBase( gradients, lambda, maxOrder );
+    Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, maxOrder );
 
     qDebug() << "elements in data" << ds->getDataVector()->at( 0 ).Nrows();
     qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
@@ -73,105 +74,86 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     return out;
 }
 
-Matrix DWIAlgos::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
+DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
 {
-    qDebug() << "start calculating qBall base";
-    double sh_size( ( maxOrder + 1 ) * ( maxOrder + 2 ) / 2 );
+    QVector<QVector3D>bvecs =  ds->getBvecs();
+    QVector<int>bvals = ds->getBvals();
 
-    // check validity of input:
-    if ( gradients.Nrows() == 0 )
-        throw std::invalid_argument( "No gradient directions specified." );
+    int N = bvecs.size();
 
-    if ( gradients.Ncols() != 3 )
-        throw std::invalid_argument( "Gradients have to be 3D." );
+    Matrix B(N,6);
+    Matrix U(N,6);
+    Matrix V(6,6);
+    Matrix BI(6,N);
+    DiagonalMatrix D(6);
 
-    // calculate spherical harmonics base:
-    Matrix SH = sh_base( gradients, maxOrder );
+    double mult_c;
 
-    // calculate the Laplace-Beltrami and the Funk-Radon transformation:
-    ColumnVector LBT( sh_size );
-    ColumnVector FRT( sh_size );
-
-    for ( int order = 0; order <= maxOrder; order += 2 )
+    for ( int i=0; i < N; ++i )
     {
-        double frt_val = 2.0 * M_PI * boost::math::legendre_p<double>( order, 0 );
-        double lbt_val = lambda * order * order * ( order + 1 ) * ( order + 1 );
+        mult_c = (float)bvals[i] / (float)( bvecs[i].x()*bvecs[i].x() + bvecs[i].y()*bvecs[i].y() + bvecs[i].z()*bvecs[i].z() );
 
-        for ( int degree( -order ); degree <= order; ++degree )
-        {
-            int i = order * ( order + 1 ) / 2 + degree;
-            LBT( i+1 ) = lbt_val;
-            FRT( i+1 ) = frt_val;
-        }
+        B(i+1,1) =   mult_c * bvecs[i].x() * bvecs[i].x();
+        B(i+1,2) = 2*mult_c * bvecs[i].x() * bvecs[i].y();
+        B(i+1,3) = 2*mult_c * bvecs[i].x() * bvecs[i].z();
+        B(i+1,4) =   mult_c * bvecs[i].y() * bvecs[i].y();
+        B(i+1,5) = 2*mult_c * bvecs[i].y() * bvecs[i].z();
+        B(i+1,6) =   mult_c * bvecs[i].z() * bvecs[i].z();
     }
 
-    // prepare the calculation of the pseudoinverse:
-    Matrix B = SH.t() * SH;
+    SVD(B, D, U, V);
 
-    // update with Laplace-Beltrami operator:
-    for( int i = 0; i < sh_size; ++i )
+    for( int j=1; j<=6;++j )
     {
-        B(i+1,i+1) += LBT(i+1);
+        D(j)=1./D(j);
     }
+    BI=V*D*U.t();
 
-    Matrix out = B.i() * SH.t();
+    double s0 = 0.0;
+    double si = 0.0;
+    vector<double>log_s0_si_pixel( N );
 
-    // the Funk-Radon transformation:
-    for ( unsigned long i = 0; i < B.Nrows(); ++i )
+    QVector<ColumnVector>* data = ds->getDataVector();
+    QVector<ColumnVector>* tensors = new QVector<ColumnVector>();
+    QVector<float> b0Images = ds->getB0Data();
+
+    for ( int i = 0; i < data->size(); ++i )
     {
-        for ( unsigned long j = 0; j < B.Ncols(); ++j )
+        s0 = b0Images[i];
+
+        if ( s0 > 0 )
         {
-            out( i+1, j+1 ) *= FRT( i+1 );
-        }
-    }
-
-    qDebug() << "finished calculating qBall base";
-
-    return out;
-}
-
-
-Matrix DWIAlgos::sh_base( Matrix g, int maxOrder )
-{
-    qDebug() << "start calculating sh base";
-  // allcoate result matrix
-    unsigned long sh_dirs( ( maxOrder + 2 ) * ( maxOrder + 1 ) / 2 );
-    Matrix out( g.Nrows(), sh_dirs );
-
-    // for each direction
-    for ( unsigned long i=0; i < g.Nrows(); ++i )
-    {
-        // transform current direction to polar coordinates
-        double theta( acos( g( i+1, 3 ) ) );
-        double phi( atan2( g( i+1, 2 ), g( i+1, 1 ) ) );
-
-        // calculate spherical harmonic base
-        for ( int order = 0, j=0; order <= maxOrder; order += 2 )
-        {
-            for ( int degree( -order ); degree <= order; ++degree, ++j )
+            // compute log(s0)-log(si)
+            s0 = log(s0);
+            for ( int j=0; j < N; ++j )
             {
-                out( i+1, j+1 ) = sh_base_function( order, degree, theta, phi );
+                si = data->at(i)(j+1); //dti[j*blockSize+i];
+                if (si > 0)
+                {
+                    si = log(si);
+                }
+                else
+                {
+                    si = 0.0;
+                }
+                log_s0_si_pixel[j] = s0 - si;
             }
-        }
+
+            double value;
+            // compute tensor
+            ColumnVector t( 6 );
+            for( int l=0; l<6; l++ )
+            {
+                value=0;
+                for( size_t m = 1; m <= N; ++m )
+                {
+                    value += BI(l+1,m) * log_s0_si_pixel[m-1];
+                }
+                t( l+1 ) = (float) (value); // save the tensor components in a adjacent memory
+            }
+            tensors->push_back( t );
+        } // end if s0 > 0
     }
-    qDebug() << "finished calculating sh base";
-    return out;
 }
 
-double DWIAlgos::sh_base_function( int order, int degree, double theta, double phi )
-{
-    using namespace boost::math;
 
-    if ( degree > 0 )
-    {
-        return spherical_harmonic_r( order, abs( degree ), theta, phi );
-    }
-    else if ( degree < 0 )
-    {
-        return spherical_harmonic_i( order, abs( degree ), theta, phi );
-    }
-    else
-    {
-        return spherical_harmonic_r( order, 0, theta, phi );
-    }
-}

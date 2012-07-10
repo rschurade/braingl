@@ -7,7 +7,7 @@
 
 #include "datasetdwi.h"
 
-DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, void* b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
+DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
         DatasetNifti( filename, FNDT_NIFTI_DWI ),
         m_dataVector( data ),
         m_b0Data( b0Data ),
@@ -29,7 +29,7 @@ QVector<ColumnVector>* DatasetDWI::getDataVector()
     return m_dataVector;
 }
 
-void* DatasetDWI::getB0Data()
+QVector<float> DatasetDWI::getB0Data()
 {
     return m_b0Data;
 }
@@ -66,18 +66,16 @@ void DatasetDWI::examineDataset()
     {
         m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
 
-        short min = -32767;
-        short max = 32768;
-        short* data = reinterpret_cast< short* >( m_b0Data );
+        float max = -32767;
+        float min = 32768;
 
-        int size = nx * ny * nz;
-        for ( size_t i = 0; i < size; ++i )
+        for ( size_t i = 0; i < m_b0Data.size(); ++i )
         {
-            min = qMin( min, data[ i ] );
-            max = qMax( max, data[ i ] );
+            min = qMin( min, m_b0Data[ i ] );
+            max = qMax( max, m_b0Data[ i ] );
         }
-        m_properties["min"] = static_cast< float >( min );
-        m_properties["max"] = static_cast< float >( max );
+        m_properties["min"] = min;
+        m_properties["max"] = max;
 
     }
 
@@ -113,23 +111,16 @@ void DatasetDWI::createTexture()
     int nz = getProperty( "nz" ).toInt();
     int type = getProperty( "datatype" ).toInt();
 
-    if ( type == DT_UNSIGNED_CHAR )
+    int mult = 65535 / m_properties["max"].toFloat();
+
+    float* tmpData = new float[nx*ny*nz];
+    float max = m_properties["max"].toFloat();
+    for ( int i = 0; i < nx*ny*nz; ++i )
     {
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_UNSIGNED_BYTE, m_data );
+        tmpData[i] = m_b0Data[i] / max;
     }
 
-    if ( type == DT_SIGNED_SHORT )
-    {
-        short* data = reinterpret_cast< short* >( m_b0Data );
+    glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
+    delete[] tmpData;
 
-        int mult = 65535 / m_properties["max"].toFloat();
-        short* tmpData = new short[nx*ny*nz];
-        for ( int i = 0; i < nx*ny*nz; ++i )
-        {
-            tmpData[i] = data[i] * mult;
-        }
-
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_SHORT, tmpData );
-        delete[] tmpData;
-    }
 }

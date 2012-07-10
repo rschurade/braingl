@@ -5,7 +5,7 @@
  *      Author: Ralph
  */
 #include "../views/toolbarview.h"
-#include "../../data/dataset.h"
+#include "../../data/datasets/dataset.h"
 
 #include "../../data/enums.h"
 
@@ -53,9 +53,13 @@ void ToolBar::createActions()
     m_vectorAction1->setStatusTip( tr( "Vector Action 1" ) );
     connect( m_vectorAction1, SIGNAL( triggered() ), this, SLOT( slotVector1() ) );
 
-    m_multiAction1 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Multi 1" ), this );
-    m_multiAction1->setStatusTip( tr( "Multi Action 1" ) );
+    m_multiAction1 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "QBall" ), this );
+    m_multiAction1->setStatusTip( tr( "QBall" ) );
     connect( m_multiAction1, SIGNAL( triggered() ), this, SLOT( slotMulti1() ) );
+
+    m_multiAction2 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Tensor fit" ), this );
+    m_multiAction2->setStatusTip( tr( "tensor fit" ) );
+    connect( m_multiAction2, SIGNAL( triggered() ), this, SLOT( slotMulti2() ) );
 
     m_meshAction1 = new QAction( QIcon( ":/icons/tmpm.png" ), tr( "Mesh 1" ), this );
     m_meshAction1->setStatusTip( tr( "Mesh Action 1" ) );
@@ -78,8 +82,12 @@ void ToolBar::slotVector1()
 
 void ToolBar::slotMulti1()
 {
-    qDebug() << "multi button pressed";
     m_toolBarView->activateAlgo( FNALGO_QBALL );
+}
+
+void ToolBar::slotMulti2()
+{
+    m_toolBarView->activateAlgo( FNALGO_TENSORFIT );
 }
 
 void ToolBar::slotMesh1()
@@ -113,6 +121,7 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_NIFTI2_DWI:
         {
             this->addAction( m_multiAction1 );
+            this->addAction( m_multiAction2 );
             break;
         }
         default:

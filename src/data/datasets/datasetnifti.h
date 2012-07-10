@@ -8,9 +8,9 @@
 #ifndef DATASETNIFTI_H_
 #define DATASETNIFTI_H_
 
-#include "../thirdparty/glew/include/glew.h"
+#include "../../thirdparty/glew/include/glew.h"
 
-#include "../thirdparty/nifti/nifti1_io.h"
+#include "../../thirdparty/nifti/nifti1_io.h"
 
 #include "dataset.h"
 
