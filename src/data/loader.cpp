@@ -40,7 +40,7 @@ bool Loader::load()
     {
         case FNDT_NIFTI_SCALAR:
         {
-        	void* data = loadNifti( m_fileName.path() );
+        	QVector<float> data = loadNiftiScalar( m_fileName.path() );
             DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -50,7 +50,7 @@ bool Loader::load()
         }
         case FNDT_NIFTI_VECTOR:
         {
-            void* data = loadNifti( m_fileName.path() );
+            QVector<QVector3D> data = loadNiftiVector3D( m_fileName.path() );
             Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -75,7 +75,7 @@ bool Loader::load()
                 }
             }
 
-            void* data = loadNifti( fn );
+            QVector<float> data = loadNiftiScalar( fn );
             DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -100,7 +100,7 @@ bool Loader::load()
                 }
             }
 
-            void* data = loadNifti( m_fileName.path() );
+            QVector<QVector3D> data = loadNiftiVector3D( m_fileName.path() );
             Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
             dataset->parseNiftiHeader( m_header );
             dataset->examineDataset();
@@ -196,28 +196,25 @@ FN_DATASET_TYPE Loader::determineType()
     return FNDT_UNKNOWN;
 }
 
-void* Loader::loadNifti( QString fileName )
+QVector<float> Loader::loadNiftiScalar( QString fileName )
 {
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];
 
+    QVector<float> data( blockSize );
+
     switch ( m_header->datatype )
     {
         case NIFTI_TYPE_UINT8:
         {
-            uint8_t* data = new uint8_t[ blockSize * dim ];
-
             uint8_t* inputData;
             inputData = reinterpret_cast<uint8_t*>( filedata->data );
 
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
             return data;
@@ -225,15 +222,11 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_INT16:
         {
-            int16_t* data = new int16_t[ blockSize * dim ];
             int16_t* inputData;
             inputData = reinterpret_cast<int16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
             return data;
@@ -241,15 +234,11 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_INT32:
         {
-            int32_t* data = new int32_t[ blockSize * dim ];
             int32_t* inputData;
             inputData = reinterpret_cast<int32_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
             return data;
@@ -257,15 +246,11 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_FLOAT32:
         {
-            float* data = new float[ blockSize * dim ];
             float* inputData;
             inputData = reinterpret_cast<float*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
             return data;
@@ -273,30 +258,22 @@ void* Loader::loadNifti( QString fileName )
         }
         case NIFTI_TYPE_INT8:
         {
-            int8_t* data = new int8_t[ blockSize * dim ];
             int8_t* inputData;
             inputData = reinterpret_cast<int8_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             return data;
             break;
         }
         case NIFTI_TYPE_UINT16:
         {
-            uint16_t* data = new uint16_t[ blockSize * dim ];
             uint16_t* inputData;
             inputData = reinterpret_cast<uint16_t*>( filedata->data );
             for ( size_t i = 0; i < blockSize; ++i )
             {
-                for ( size_t j = 0; j < dim; ++j )
-                {
-                    data[i * dim + j] = inputData[j * blockSize + i];
-                }
+                data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
             return data;
@@ -304,8 +281,110 @@ void* Loader::loadNifti( QString fileName )
         }
     }
 
-    return 0;
+    return QVector<float>(0);
 }
+
+QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+
+    size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    size_t dim = m_header->dim[4];
+
+    QVector<QVector3D> data( blockSize );
+
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_UINT8:
+        {
+            uint8_t* inputData;
+            inputData = reinterpret_cast<uint8_t*>( filedata->data );
+
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            nifti_image_free( filedata );
+            return data;
+            break;
+        }
+        case NIFTI_TYPE_INT16:
+        {
+            int16_t* inputData;
+            inputData = reinterpret_cast<int16_t*>( filedata->data );
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            nifti_image_free( filedata );
+            return data;
+            break;
+        }
+        case NIFTI_TYPE_INT32:
+        {
+            int32_t* inputData;
+            inputData = reinterpret_cast<int32_t*>( filedata->data );
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            nifti_image_free( filedata );
+            return data;
+            break;
+        }
+        case NIFTI_TYPE_FLOAT32:
+        {
+            float* inputData;
+            inputData = reinterpret_cast<float*>( filedata->data );
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            nifti_image_free( filedata );
+            return data;
+            break;
+        }
+        case NIFTI_TYPE_INT8:
+        {
+            int8_t* inputData;
+            inputData = reinterpret_cast<int8_t*>( filedata->data );
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            return data;
+            break;
+        }
+        case NIFTI_TYPE_UINT16:
+        {
+            uint16_t* inputData;
+            inputData = reinterpret_cast<uint16_t*>( filedata->data );
+            for ( size_t i = 0; i < blockSize; ++i )
+            {
+                data[i].setX( inputData[i] );
+                data[i].setY( inputData[blockSize + i] );
+                data[i].setZ( inputData[2*blockSize + i] );
+            }
+            nifti_image_free( filedata );
+            return data;
+            break;
+        }
+    }
+
+    return QVector<QVector3D>( 0 );
+}
+
+
 
 void Loader::loadDWI( QString fileName )
 {

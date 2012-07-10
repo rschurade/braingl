@@ -30,6 +30,7 @@ bool Writer::save()
         case FNDT_NIFTI2_SCALAR:
         case FNDT_NIFTI2_VECTOR:
         {
+            /*
             qDebug() << "writing nifti file";
             DatasetNifti* dsNifti = dynamic_cast<DatasetNifti*>( m_dataset );
             nifti_image* out =  nifti_copy_nim_info( dsNifti->getHeader() );
@@ -41,6 +42,7 @@ bool Writer::save()
 
             nifti_image_write( out );
             break;
+            */
         }
     }
     return true;

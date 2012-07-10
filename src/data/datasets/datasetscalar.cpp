@@ -10,8 +10,9 @@
 
 #include "datasetscalar.h"
 
-DatasetScalar::DatasetScalar( QString filename, void* data ) :
-    DatasetNifti( filename, FNDT_NIFTI_SCALAR, data )
+DatasetScalar::DatasetScalar( QString filename, QVector<float> data ) :
+    DatasetNifti( filename, FNDT_NIFTI_SCALAR ),
+    m_data( data )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -30,60 +31,21 @@ void DatasetScalar::examineDataset()
     int nz = getProperty( "nz" ).toInt();
     int type = getProperty( "datatype" ).toInt();
 
-    if ( type == DT_UNSIGNED_CHAR )
+    float min = std::numeric_limits<float>::max();
+    float max = 0;
+
+    int size = nx * ny * nz;
+    for ( size_t i = 0; i < size; ++i )
     {
-        unsigned char* data = reinterpret_cast< unsigned char* >( m_data );
-
-        unsigned char min = 255;
-        unsigned char max = 0;
-
-        int size = nx * ny * nz;
-        for ( size_t i = 0; i < size; ++i )
-        {
-            min = qMin( min, data[ i ] );
-            max = qMax( max, data[ i ] );
-        }
-        m_properties["min"] = static_cast< float >( min );
-        m_properties["max"] = static_cast< float >( max );
-
-        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
+        min = qMin( min, m_data[ i ] );
+        max = qMax( max, m_data[ i ] );
     }
-    if ( type == DT_SIGNED_SHORT )
-    {
-        short* data = reinterpret_cast< short* >( m_data );
 
-        short min = 65535;
-        short max = 0;
+    m_properties["min"] = min;
+    m_properties["max"] = max;
 
-        int size = nx * ny * nz;
-        for ( size_t i = 0; i < size; ++i )
-        {
-            min = qMin( min, data[ i ] );
-            max = qMax( max, data[ i ] );
-        }
-        m_properties["min"] = static_cast< float >( min );
-        m_properties["max"] = static_cast< float >( max );
+    m_properties["size"] = static_cast<int>( size * sizeof( float ) );
 
-        m_properties["size"] = static_cast<int>( size * sizeof( short ) );
-    }
-    if ( type == DT_FLOAT )
-    {
-        float* data = reinterpret_cast< float* >( m_data );
-
-        float min = std::numeric_limits<float>::max();
-        float max = 0;
-
-        int size = nx * ny * nz;
-        for ( size_t i = 0; i < size; ++i )
-        {
-            min = qMin( min, data[ i ] );
-            max = qMax( max, data[ i ] );
-        }
-        m_properties["min"] = min;
-        m_properties["max"] = max;
-
-        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
-    }
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
 }
@@ -107,28 +69,15 @@ void DatasetScalar::createTexture()
     int nz = getProperty( "nz" ).toInt();
     int type = getProperty( "datatype" ).toInt();
 
-    if ( type == DT_UNSIGNED_CHAR )
+    float max = m_properties["max"].toFloat();
+
+    float* tmpData = new float[nx*ny*nz];
+    for ( int i = 0; i < nx*ny*nz; ++i )
     {
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, m_data );
+        tmpData[i] = m_data[i] / max ;
     }
 
-    if ( type == DT_SIGNED_SHORT )
-    {
-        short* data = reinterpret_cast< short* >( m_data );
+    glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
+    delete[] tmpData;
 
-        int mult = 65535 / m_properties["max"].toFloat();
-        short* tmpData = new short[nx*ny*nz];
-        for ( int i = 0; i < nx*ny*nz; ++i )
-        {
-            tmpData[i] = data[i] * mult;
-        }
-
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_SHORT, tmpData );
-        delete[] tmpData;
-    }
-
-    if ( type == DT_FLOAT )
-    {
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, m_data );
-    }
 }
