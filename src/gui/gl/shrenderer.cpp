@@ -165,7 +165,7 @@ void SHRenderer::initGeometry()
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
-        QVector<ColumnVector>* data = m_dataset->getDataVector();
+        QVector<ColumnVector>* data = m_dataset->getData();
 
 
         QVector< QVector3D > normals = mesh->getVertNormals();

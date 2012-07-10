@@ -23,7 +23,7 @@ public:
 
     void examineDataset();
 
-    QVector<ColumnVector>* getDataVector();
+    QVector<ColumnVector>* getData();
 
     QVector<float> getB0Data();
 
@@ -34,7 +34,7 @@ public:
 private:
     void createTexture();
 
-    QVector<ColumnVector>* m_dataVector;
+    QVector<ColumnVector>* m_data;
     QVector<float> m_b0Data;
     QVector<int>m_bvals;
     QVector<QVector3D>m_bvecs;

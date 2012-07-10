@@ -9,7 +9,7 @@
 
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
         DatasetNifti( filename, FNDT_NIFTI_DWI ),
-        m_dataVector( data ),
+        m_data( data ),
         m_b0Data( b0Data ),
         m_bvals( bvals ),
         m_bvecs( bvecs )
@@ -24,9 +24,9 @@ DatasetDWI::~DatasetDWI()
 {
 }
 
-QVector<ColumnVector>* DatasetDWI::getDataVector()
+QVector<ColumnVector>* DatasetDWI::getData()
 {
-    return m_dataVector;
+    return m_data;
 }
 
 QVector<float> DatasetDWI::getB0Data()
