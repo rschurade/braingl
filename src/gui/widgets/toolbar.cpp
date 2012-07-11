@@ -53,17 +53,21 @@ void ToolBar::createActions()
     m_vectorAction1->setStatusTip( tr( "Vector Action 1" ) );
     connect( m_vectorAction1, SIGNAL( triggered() ), this, SLOT( slotVector1() ) );
 
-    m_multiAction1 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "QBall" ), this );
+    m_multiAction1 = new QAction( QIcon( ":/icons/qball.png" ), tr( "QBall" ), this );
     m_multiAction1->setStatusTip( tr( "QBall" ) );
     connect( m_multiAction1, SIGNAL( triggered() ), this, SLOT( slotMulti1() ) );
 
-    m_multiAction2 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Tensor fit" ), this );
+    m_multiAction2 = new QAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this );
     m_multiAction2->setStatusTip( tr( "tensor fit" ) );
     connect( m_multiAction2, SIGNAL( triggered() ), this, SLOT( slotMulti2() ) );
 
-    m_multiAction3 = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Calc FA" ), this );
+    m_multiAction3 = new QAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this );
     m_multiAction3->setStatusTip( tr( "calc FA" ) );
     connect( m_multiAction3, SIGNAL( triggered() ), this, SLOT( slotMulti3() ) );
+
+    m_multiAction4 = new QAction( QIcon( ":/icons/eigenvector.png" ), tr( "Calc Eigen Vector" ), this );
+    m_multiAction4->setStatusTip( tr( "calc Eigen Vector" ) );
+    connect( m_multiAction4, SIGNAL( triggered() ), this, SLOT( slotMulti4() ) );
 
     m_meshAction1 = new QAction( QIcon( ":/icons/tmpm.png" ), tr( "Mesh 1" ), this );
     m_meshAction1->setStatusTip( tr( "Mesh Action 1" ) );
@@ -99,6 +103,13 @@ void ToolBar::slotMulti3()
     m_toolBarView->activateAlgo( FNALGO_FA );
 }
 
+void ToolBar::slotMulti4()
+{
+    m_toolBarView->activateAlgo( FNALGO_EV );
+}
+
+
+
 void ToolBar::slotMesh1()
 {
     qDebug() << "mesh button pressed";
@@ -132,6 +143,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_multiAction1 );
             this->addAction( m_multiAction2 );
             this->addAction( m_multiAction3 );
+            this->addAction( m_multiAction4 );
             break;
         }
         default:

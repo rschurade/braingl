@@ -13,6 +13,10 @@
 	<file>icons/tmpx.png</file>
 	<file>icons/tmpm.png</file>
 	<file>icons/tmpf.png</file>
+	<file>icons/calcfa.png</file>
+	<file>icons/fittensor.png</file>
+	<file>icons/qball.png</file>
+	<file>icons/eigenvector.png</file>
 	<file>shaders/slice.vs</file>
 	<file>shaders/slice.fs</file>
 	<file>shaders/qball.vs</file>

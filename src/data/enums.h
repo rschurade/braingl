@@ -18,7 +18,8 @@ enum FN_ALGO
     FNALGO_NONE,
     FNALGO_QBALL,
     FNALGO_TENSORFIT,
-    FNALGO_FA
+    FNALGO_FA,
+    FNALGO_EV
 };
 
 #endif /* ENUMS_H_ */

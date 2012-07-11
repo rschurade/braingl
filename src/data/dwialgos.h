@@ -10,6 +10,7 @@
 
 class DatasetDWI;
 class DatasetNifti;
+class Dataset3D;
 class TriangleMesh;
 
 class DWIAlgos
@@ -18,6 +19,7 @@ public:
     static DatasetDWI* qBall( DatasetDWI* ds );
     static DatasetDWI* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
+    static Dataset3D* calcEV( DatasetDWI* ds );
 
 
 private:
