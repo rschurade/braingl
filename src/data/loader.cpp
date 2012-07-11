@@ -446,7 +446,7 @@ void Loader::loadDWI( QString fileName )
         {
             if ( bvals[i] != 0 )
             {
-                bvecs.push_back( QVector3D( slX[i].toFloat(), slY[i].toFloat(), slZ[i].toFloat() ) );
+                bvecs.push_back( QVector3D( slX[i].toDouble(), slY[i].toDouble(), slZ[i].toDouble() ) );
                 bvals2.push_back( bvals[i] );
             }
             else
