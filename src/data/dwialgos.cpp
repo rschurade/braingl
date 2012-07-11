@@ -233,7 +233,7 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
     return out;
 }
 
-Dataset3D* DWIAlgos::calcEV( DatasetDWI* ds )
+QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
 {
     double xx,xy,xz,yy,yz,zz;
     double i1, i2, i3, v, s, phi, l1, l2, l3;
@@ -342,7 +342,9 @@ Dataset3D* DWIAlgos::calcEV( DatasetDWI* ds )
         evec3[i].setZ( ev3_z );
     }
 
-    Dataset3D* out = new Dataset3D( "evec.nii.gz", evec1 );
+    QList<Dataset*>l;
+
+    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1 );
     out->parseNiftiHeader( ds->getHeader() );
     out->setProperty( "name", "evec 1" );
     out->setProperty( "createdBy", FNALGO_EV );
@@ -350,5 +352,16 @@ Dataset3D* DWIAlgos::calcEV( DatasetDWI* ds )
     out->setProperty( "datatype", DT_FLOAT);
     out->examineDataset();
 
-    return out;
+    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1 );
+    out2->parseNiftiHeader( ds->getHeader() );
+    out2->setProperty( "name", "eval 1" );
+    out2->setProperty( "createdBy", FNALGO_EV );
+    out2->setProperty( "nt", 1 );
+    out2->setProperty( "datatype", DT_FLOAT);
+    out2->examineDataset();
+
+    l.push_back( out );
+    l.push_back( out2 );
+
+    return l;
 }

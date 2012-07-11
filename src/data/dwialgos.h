@@ -8,6 +8,8 @@
 #ifndef DWIALGOS_H_
 #define DWIALGOS_H_
 
+#include <QtCore/QList>
+
 class DatasetDWI;
 class DatasetNifti;
 class Dataset3D;
@@ -19,7 +21,7 @@ public:
     static DatasetDWI* qBall( DatasetDWI* ds );
     static DatasetDWI* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
-    static Dataset3D* calcEV( DatasetDWI* ds );
+    static QList<Dataset*> calcEV( DatasetDWI* ds );
 
 
 private:
