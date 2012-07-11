@@ -33,9 +33,12 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     // calculate spherical harmonics base:
     Matrix SH = sh_base( gradients, maxOrder );
 
+
     // calculate the Laplace-Beltrami and the Funk-Radon transformation:
     ColumnVector LBT( sh_size );
     ColumnVector FRT( sh_size );
+    LBT = 0;
+    FRT = 0;
 
     for ( int order = 0; order <= maxOrder; order += 2 )
     {
@@ -64,7 +67,7 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     // the Funk-Radon transformation:
     for ( unsigned long i = 0; i < B.Nrows(); ++i )
     {
-        for ( unsigned long j = 0; j < B.Ncols(); ++j )
+        for ( unsigned long j = 0; j < out.Ncols(); ++j )
         {
             out( i+1, j+1 ) *= FRT( i+1 );
         }
@@ -82,9 +85,10 @@ Matrix QBall::sh_base( Matrix g, int maxOrder )
   // allcoate result matrix
     unsigned long sh_dirs( ( maxOrder + 2 ) * ( maxOrder + 1 ) / 2 );
     Matrix out( g.Nrows(), sh_dirs );
+    out = 0.0;
 
     // for each direction
-    for ( unsigned long i=0; i < g.Nrows(); ++i )
+    for ( int i = 0; i < g.Nrows(); ++i )
     {
         // transform current direction to polar coordinates
         double theta( acos( g( i+1, 3 ) ) );
@@ -106,7 +110,22 @@ Matrix QBall::sh_base( Matrix g, int maxOrder )
 double QBall::sh_base_function( int order, int degree, double theta, double phi )
 {
     using namespace boost::math;
+#if 0
+    double P = legendre_p<double>( order, abs(degree), cos(theta) );
 
+    if ( degree > 0 )
+    {
+        return P * cos( degree * phi );
+    }
+    else if ( degree < 0 )
+    {
+        return P * sin( -degree * phi );
+    }
+    else
+    {
+        return P;
+    }
+#else
     if ( degree > 0 )
     {
         return spherical_harmonic_r( order, abs( degree ), theta, phi );
@@ -119,4 +138,5 @@ double QBall::sh_base_function( int order, int degree, double theta, double phi 
     {
         return spherical_harmonic_r( order, 0, theta, phi );
     }
+#endif
 }

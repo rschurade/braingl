@@ -181,14 +181,18 @@ void SHRenderer::initGeometry()
         qDebug() << "start creating meshes";
         //#pragma omp parallel for
         for( int yy = 0; yy < ybi; ++yy )
+        //for( int yy = 58; yy < 59; ++yy )
         {
             for ( int xx = 0; xx < xbi; ++xx )
+            //for ( int xx = 46; xx < 47; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
-                //if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+                //if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
+                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
                 {
                     ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
                     ColumnVector r = m_bases[lod] * dv;
+
+
 
                     float max = 0;
                     float min = std::numeric_limits<float>::max();
