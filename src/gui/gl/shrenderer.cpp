@@ -184,8 +184,8 @@ void SHRenderer::initGeometry()
         {
             for ( int xx = 0; xx < xbi; ++xx )
             {
-                //if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) && xx % 2 == 0 && yy % 2 == 0 )
+                //if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
                 {
                     ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
                     ColumnVector r = m_bases[lod] * dv;
