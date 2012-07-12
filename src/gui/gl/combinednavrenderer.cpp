@@ -40,7 +40,7 @@ CombinedNavRenderer::~CombinedNavRenderer()
 
 void CombinedNavRenderer::init()
 {
-
+    glGenBuffers( 2, vboIds );
 }
 
 void CombinedNavRenderer::initGL()
