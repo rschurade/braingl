@@ -8,6 +8,7 @@
 #include "docks/globalpropertywidget.h"
 #include "docks/docknavglwidget.h"
 #include "docks/dockcombinednavglwidget.h"
+#include "docks/docksingleshwidget.h"
 
 #include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
@@ -284,6 +285,10 @@ void MainWindow::createDockWindows()
     DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav4 );
     viewMenu->addAction( nav4->toggleViewAction() );
+
+    DockSingleSHWidget* sshw = new DockSingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
+    addDockWidget( Qt::RightDockWidgetArea, sshw );
+    viewMenu->addAction( sshw->toggleViewAction() );
 }
 
 void MainWindow::closeTab( int index )
