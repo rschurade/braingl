@@ -40,7 +40,6 @@ CombinedNavRenderer::~CombinedNavRenderer()
 
 void CombinedNavRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
 }
 
 void CombinedNavRenderer::initGL()
@@ -57,6 +56,8 @@ void CombinedNavRenderer::initGL()
     {
         //qDebug() << "OpenGL initialized.";
     }
+
+    glGenBuffers( 2, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
 

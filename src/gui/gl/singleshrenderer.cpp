@@ -24,6 +24,7 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include "glfunctions.h"
+#include "arcball.h"
 
 #include "singleshrenderer.h"
 
@@ -65,6 +66,11 @@ SingleSHRenderer::SingleSHRenderer( QString name ) :
         Matrix base = ( QBall::sh_base( (*v1), 6 ) );
         m_bases.push_back( base );
     }
+
+    m_arcBall = new ArcBall( 50, 50 );
+    m_thisRot.setToIdentity();
+    m_thisRot.translate( -1.0, -1.0, -1.0 );
+    m_lastRot.setToIdentity();
 }
 
 SingleSHRenderer::~SingleSHRenderer()
@@ -113,6 +119,8 @@ void SingleSHRenderer::resizeGL( int width, int height )
     m_width = width;
     m_height = height;
 
+    m_arcBall->set_win_size( width, height );
+
     adjustRatios();
 }
 
@@ -126,18 +134,32 @@ void SingleSHRenderer::adjustRatios()
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
-    pMatrix.ortho( 0, 2, 0, 2, -3000, 3000 );
+    pMatrix.ortho( -1, 1, -1, 1, -3000, 3000 );
 
-    m_mvpMatrix = pMatrix;
+    m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
+    m_thisRot.translate( -1.0, -1.0, -1.0 );
+    m_mvpMatrix = pMatrix * m_thisRot;
 }
 
 void SingleSHRenderer::leftMouseDown( int x, int y )
 {
+    m_lastRot = m_thisRot;
+    m_lastRot.translate( 1.0, 1.0, 1.0 );
+    m_arcBall->click( x, y );
 }
 
 void SingleSHRenderer::leftMouseDrag( int x, int y )
 {
+    m_arcBall->drag( x, y );
+    adjustRatios();
+    calcMVPMatrix();
 }
+
+void SingleSHRenderer::calcMVPMatrix()
+{
+
+}
+
 
 void SingleSHRenderer::initGeometry()
 {
