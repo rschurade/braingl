@@ -68,6 +68,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
+    out->setProperty( "renderSlice", 1 );
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qballVector->at(0).Nrows() );
     out->setProperty( "datatype", DT_FLOAT);

@@ -62,8 +62,14 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_lodSelect->insertItem( 3, tr( "3" ) );
     m_lodSelect->insertItem( 4, tr( "4" ) );
     m_lodSelect->insertItem( 5, tr( "5" ) );
-
     connect( m_lodSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( lodChanged( int ) ) );
+
+    m_sliceSelect = new SelectWithLabel( tr("render on slice" ) );
+    m_sliceSelect->insertItem( 0, tr( "none" ) );
+    m_sliceSelect->insertItem( 1, tr( "axial" ) );
+    m_sliceSelect->insertItem( 2, tr( "coronal" ) );
+    m_sliceSelect->insertItem( 3, tr( "sagittal" ) );
+    connect( m_sliceSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( renderSliceChanged( int ) ) );
 
     m_scalingSlider = new SliderWithEdit( tr( "qball scaling" ) );
     connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
@@ -76,6 +82,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addLayout( layout3 );
     m_layout->addWidget( m_alphaSlider );
     m_layout->addWidget( m_lodSelect );
+    m_layout->addWidget( m_sliceSelect );
     m_layout->addWidget( m_scalingSlider );
     m_layout->addStretch( 0 );
 
@@ -190,6 +197,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     m_scalingSlider->setMax( 10 );
     index = getSelectedIndex( 57 );
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    index = getSelectedIndex( 58 );
+    m_sliceSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 }
 
 void DatasetPropertyView::updateWidgetVisibility()
@@ -202,6 +212,7 @@ void DatasetPropertyView::updateWidgetVisibility()
 
     m_scalingSlider->setHidden( true );
     m_lodSelect->setHidden( true );
+    m_sliceSelect->setHidden( true );
 
 
     if ( dim == 1 )
@@ -215,6 +226,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     {
         m_scalingSlider->setHidden( false );
         m_lodSelect->setHidden( false );
+        m_sliceSelect->setHidden( false );
     }
 }
 
@@ -283,4 +295,9 @@ void DatasetPropertyView::lodChanged( int index )
 void DatasetPropertyView::scalingChanged( float value )
 {
     model()->setData( getSelectedIndex( 57 ), value );
+}
+
+void DatasetPropertyView::renderSliceChanged( int index )
+{
+    model()->setData( getSelectedIndex( 58 ), index );
 }

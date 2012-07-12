@@ -53,6 +53,7 @@ private slots:
     void alphaChanged( float value );
 
     void lodChanged( int index );
+    void renderSliceChanged( int index );
     void scalingChanged( float value );
 
 private:
@@ -76,7 +77,9 @@ private:
     QCheckBox* m_textureActive;
 
     SelectWithLabel* m_lodSelect;
+    SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;
+
 
 };
 
