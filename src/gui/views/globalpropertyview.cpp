@@ -106,7 +106,7 @@ void GlobalPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIn
     mi = model()->index( 0, 103 );
     if ( mi.isValid() )
     {
-        m_sagittalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() );
+        m_sagittalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
     }
 
     mi = model()->index( 0, 101 );
@@ -117,7 +117,7 @@ void GlobalPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIn
     mi = model()->index( 0, 104 );
     if ( mi.isValid() )
     {
-        m_coronalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() );
+        m_coronalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
     }
 
     mi = model()->index( 0, 102 );
@@ -128,7 +128,7 @@ void GlobalPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIn
     mi = model()->index( 0, 105 );
     if ( mi.isValid() )
     {
-        m_axialSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() );
+        m_axialSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
     }
 }
 
