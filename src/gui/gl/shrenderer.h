@@ -48,6 +48,7 @@ private:
 
     int m_lodOld;
     float m_scalingOld;
+    int m_renderSliceOld;
 
     int m_tris1;
 

@@ -225,6 +225,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case 57:
                 return ds->getProperty( "scaling" ).toFloat();
                 break;
+            case 58:
+                return ds->getProperty( "renderSlice" ).toInt();
+                break;
         }
     }
     return QVariant();
@@ -315,6 +318,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             if ( index.column() == 57 )
             {
                 m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
+            }
+            if ( index.column() == 58 )
+            {
+                m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
             }
         }
         emit( dataChanged( index, index ) );
