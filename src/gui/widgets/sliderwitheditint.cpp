@@ -7,6 +7,8 @@
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QFontMetrics>
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
 
@@ -29,8 +31,19 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
 
     m_label = new QLabel( name );
 
+    m_button1 = new QPushButton( tr(" - ") );
+    QFontMetrics _metrics( m_button1->fontMetrics() );
+    m_button1->setMaximumWidth( _metrics.boundingRect("  -  ").width() );
+    m_button2 = new QPushButton( tr(" + ") );
+    m_button2->setMaximumWidth( _metrics.boundingRect("  +  ").width() );
+
+    connect( m_button1, SIGNAL( clicked() ), this, SLOT( minusPressed() ) );
+    connect( m_button2, SIGNAL( clicked() ), this, SLOT( plusPressed() ) );
+
     layout->addWidget( m_label, 20 );
+    layout->addWidget( m_button1 );
     layout->addWidget( m_slider, 60 );
+    layout->addWidget( m_button2 );
     layout->addWidget( m_edit, 20 );
 
     setLayout( layout );
@@ -79,4 +92,33 @@ void SliderWithEditInt::setMax( int max )
 {
     m_slider->setMaximum( max );
     m_slider->repaint();
+}
+
+void SliderWithEditInt::minusPressed()
+{
+    int current = m_slider->value();
+    if ( current == m_slider->minimum() )
+    {
+        return;
+    }
+    int value = current - 1;
+    m_slider->setValue( value );
+    m_edit->setText( QString::number( value ) );
+    m_slider->repaint();
+    emit( valueChanged( value ) );
+}
+
+void SliderWithEditInt::plusPressed()
+{
+    int current = m_slider->value();
+    if ( current == m_slider->maximum() )
+    {
+        return;
+    }
+    int value = current + 1;
+    m_slider->setValue( value );
+    m_edit->setText( QString::number( value ) );
+    m_slider->repaint();
+    emit( valueChanged( value ) );
+
 }
