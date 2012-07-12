@@ -13,6 +13,7 @@
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
+#include "enums.h"
 
 #include "dwialgos.h"
 
@@ -133,47 +134,47 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 
         switch ( index.column() )
         {
-            case 0:
+            case FNDSP_NAME:
                 return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
                 break;
-            case 1:
+            case FNDSP_DIM:
                 return ds->getProperty( "nt" ).toInt();
                 break;
-            case 2:
+            case FNDSP_DATATYPE:
                 return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
                 break;
-            case 3:
+            case FNDSP_SIZE:
                 QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
                 return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
                 break;
-            case 4:
+            case FNDSP_NX:
                 return ds->getProperty( "nx" ).toInt();
                 break;
-            case 5:
+            case FNDSP_NY:
                 return ds->getProperty( "ny" ).toInt();
                 break;
-            case 6:
+            case FNDSP_NZ:
                 return ds->getProperty( "nz" ).toInt();
                 break;
-            case 7:
+            case FNDSP_DX:
                 return ds->getProperty( "dx" ).toFloat();
                 break;
-            case 8:
+            case FNDSP_DY:
                 return ds->getProperty( "dy" ).toFloat();
                 break;
-            case 9:
+            case FNDSP_DZ:
                 return ds->getProperty( "dz" ).toFloat();
                 break;
-            case 10:
+            case FNDSP_MIN:
                 return ds->getProperty( "min" ).toFloat();
                 break;
-            case 11:
+            case FNDSP_MAX:
                 return ds->getProperty( "max" ).toFloat();
                 break;
-            case 12:
+            case FNDSP_TYPE:
                 return ds->getProperty( "type" ).toInt();
                 break;
-            case 13:
+            case FNDSP_CREATED_BY:
                 return ds->getProperty( "createdBy" ).toInt();
                 break;
             default:
@@ -205,31 +206,31 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             {
                 return VPtr<DatasetNifti>::asQVariant( ds );
             }
-            case 50:
+            case FNDSE_LOWER_THRESHOLD:
                 return ds->getProperty( "lowerThreshold" ).toFloat();
                 break;
-            case 51:
+            case FNDSE_UPPER_THRESHOLD:
                 return ds->getProperty( "upperThreshold" ).toFloat();
                 break;
-            case 52:
+            case FNDSE_COLORMAP:
                 return ds->getProperty( "colormap" ).toInt();
                 break;
-            case 53:
+            case FNDSE_INTERPOLATION:
                 return ds->getProperty( "interpolation" ).toBool();
                 break;
-            case 54:
+            case FNDSE_ALPHA:
                return ds->getProperty( "alpha" ).toFloat();
                break;
-            case 55:
+            case FNDSE_ACTIVE:
                 return ds->getProperty( "active" ).toBool();
                 break;
-            case 56:
+            case FNDSE_LOD:
                 return ds->getProperty( "lod" ).toInt();
                 break;
-            case 57:
+            case FNDSE_SCALING:
                 return ds->getProperty( "scaling" ).toFloat();
                 break;
-            case 58:
+            case FNDSE_RENDER_SLICE:
                 return ds->getProperty( "renderSlice" ).toInt();
                 break;
         }
@@ -241,43 +242,43 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
 {
     switch ( index.column() )
     {
-        case 100:
+        case FNGLOBAL_SAGITTAL:
             return m_globals[ "sagittal" ];
             break;
-        case 101:
+        case FNGLOBAL_CORONAL:
             return m_globals[ "coronal" ];
             break;
-        case 102:
+        case FNGLOBAL_AXIAL:
             return m_globals[ "axial" ];
             break;
-        case 103:
+        case FNGLOBAL_MAX_SAGITTAL:
             return m_globals[ "max_sagittal" ];
             break;
-        case 104:
+        case FNGLOBAL_MAX_CORONAL:
             return m_globals[ "max_coronal" ];
             break;
-        case 105:
+        case FNGLOBAL_MAX_AXIAL:
             return m_globals[ "max_axial" ];
             break;
-        case 106:
+        case FNGLOBAL_SLICE_DX:
             return m_globals[ "slice_dx" ];
             break;
-        case 107:
+        case FNGLOBAL_SLICE_DY:
             return m_globals[ "slice_dy" ];
             break;
-        case 108:
+        case FNGLOBAL_SLICE_DZ:
             return m_globals[ "slice_dz" ];
             break;
-        case 112:
+        case FNGLOBAL_LAST_PATH:
             return m_globals[ "lastPath" ];
             break;
-        case 113:
+        case FNGLOBAL_SHOW_SAGITTAL:
             return m_globals[ "showSagittal" ];
             break;
-        case 114:
+        case FNGLOBAL_SHOW_CORONAL:
             return m_globals[ "showCoronal" ];
             break;
-        case 115:
+        case FNGLOBAL_SHOW_AXIAL:
             return m_globals[ "showAxial" ];
             break;
     }
@@ -296,45 +297,39 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     {
         if ( index.row() >= 0 && index.row() < m_datasetList.size() )
         {
-            if ( index.column() == 0 )
+            switch ( index.column() )
             {
+            case 0:
                 m_datasetList.at( index.row() )->setProperty( "name", value.toString() );
-            }
-            if ( index.column() == 50 )
-            {
+                break;
+
+            case FNDSE_LOWER_THRESHOLD:
                 m_datasetList.at( index.row() )->setProperty( "lowerThreshold", value.toFloat() );
-            }
-            if ( index.column() == 51 )
-            {
+                break;
+            case FNDSE_UPPER_THRESHOLD:
                 m_datasetList.at( index.row() )->setProperty( "upperThreshold", value.toFloat() );
-            }
-            if ( index.column() == 52 )
-            {
+                break;
+            case FNDSE_COLORMAP:
                 m_datasetList.at( index.row() )->setProperty( "colormap", value.toInt() );
-            }
-            if ( index.column() == 53 )
-            {
+                break;
+            case FNDSE_INTERPOLATION:
                 m_datasetList.at( index.row() )->setProperty( "interpolation", value.toBool() );
-            }
-            if ( index.column() == 54 )
-            {
+                break;
+            case FNDSE_ALPHA:
                 m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
-            }
-            if ( index.column() == 55 )
-            {
+                break;
+            case FNDSE_ACTIVE:
                 m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
-            }
-            if ( index.column() == 56 )
-            {
+                break;
+            case FNDSE_LOD:
                 m_datasetList.at( index.row() )->setProperty( "lod", value.toInt() );
-            }
-            if ( index.column() == 57 )
-            {
+                break;
+            case FNDSE_SCALING:
                 m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
-            }
-            if ( index.column() == 58 )
-            {
+                break;
+            case FNDSE_RENDER_SLICE:
                 m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
+                break;
             }
         }
         emit( dataChanged( index, index ) );
@@ -391,55 +386,55 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     {
         switch ( index.column() )
         {
-            case 100:
+            case FNGLOBAL_SAGITTAL:
                 m_globals[ "sagittal" ] = value.toInt();
                 break;
-            case 101:
+            case FNGLOBAL_CORONAL:
                 m_globals[ "coronal" ] = value.toInt();
                 break;
-            case 102:
+            case FNGLOBAL_AXIAL:
                 m_globals[ "axial" ] = value.toInt();
                 break;
-            case 103:
+            case FNGLOBAL_MAX_SAGITTAL:
                 m_globals[ "max_sagittal" ] = value.toInt();
                 break;
-            case 104:
+            case FNGLOBAL_MAX_CORONAL:
                 m_globals[ "max_coronal" ] = value.toInt();
                 break;
-            case 105:
+            case FNGLOBAL_MAX_AXIAL:
                 m_globals[ "max_axial" ] = value.toInt();
                 break;
-            case 106:
+            case FNGLOBAL_SLICE_DX:
                 m_globals[ "slice_dx" ] = value.toInt();
                 break;
-            case 107:
+            case FNGLOBAL_SLICE_DY:
                 m_globals[ "slice_dy" ] = value.toInt();
                 break;
-            case 108:
+            case FNGLOBAL_SLICE_DZ:
                 m_globals[ "slice_dz" ] = value.toInt();
                 break;
-            case 109:
+            case FNGLOBAL_CORONAL_AXIAL:
                 m_globals[ "coronal" ] = value.toPoint().x();
                 m_globals[ "axial" ] = value.toPoint().y();
                 break;
-            case 110:
+            case FNGLOBAL_SAGITTAL_AXIAL:
                 m_globals[ "sagittal" ] = value.toPoint().x();
                 m_globals[ "axial" ] = value.toPoint().y();
                 break;
-            case 111:
+            case FNGLOBAL_SAGITTAL_CORONAL:
                 m_globals[ "sagittal" ] = value.toPoint().x();
                 m_globals[ "coronal" ] = value.toPoint().y();
                 break;
-            case 112:
+            case FNGLOBAL_LAST_PATH:
                 m_globals[ "lastPath"] = value.toString();
                 break;
-            case 113:
+            case FNGLOBAL_SHOW_SAGITTAL:
                 m_globals[ "showSagittal" ] = value.toBool();
                 break;
-            case 114:
+            case FNGLOBAL_SHOW_CORONAL:
                 m_globals[ "showCoronal" ] = value.toBool();
                 break;
-            case 115:
+            case FNGLOBAL_SHOW_AXIAL:
                 m_globals[ "showAxial" ] = value.toBool();
                 break;
         }
