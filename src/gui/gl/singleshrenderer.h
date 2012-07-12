@@ -15,6 +15,7 @@
 
 #include "objectrenderer.h"
 
+class ArcBall;
 class DatasetDWI;
 class TriangleMesh;
 
@@ -42,6 +43,8 @@ private:
 
     void initGeometry();
 
+    void calcMVPMatrix();
+
     QString m_name;
 
     int m_width;
@@ -49,6 +52,8 @@ private:
     float m_ratio;
 
     QMatrix4x4 m_mvpMatrix;
+    QMatrix4x4 m_lastRot;
+    QMatrix4x4 m_thisRot;
 
     float m_x;
     float m_y;
@@ -68,6 +73,8 @@ private:
     float m_scalingOld;
 
     int m_tris1;
+
+    ArcBall* m_arcBall;
 
     GLuint *vboIds;
 

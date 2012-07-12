@@ -54,7 +54,7 @@ void SingleSHWidget::mousePressEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        //m_sceneRenderer->leftMouseDown( event->x(), event->y() );
+        m_renderer->leftMouseDown( event->x(), event->y() );
     }
     updateGL();
 }
@@ -63,7 +63,7 @@ void SingleSHWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        //m_sceneRenderer->leftMouseDrag( event->x(), event->y() );
+        m_renderer->leftMouseDrag( event->x(), event->y() );
     }
     updateGL();
 }
