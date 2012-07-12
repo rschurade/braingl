@@ -110,7 +110,7 @@ Matrix QBall::sh_base( Matrix g, int maxOrder )
 double QBall::sh_base_function( int order, int degree, double theta, double phi )
 {
     using namespace boost::math;
-#if 0
+#if 1
     double P = legendre_p<double>( order, abs(degree), cos(theta) );
 
     if ( degree > 0 )

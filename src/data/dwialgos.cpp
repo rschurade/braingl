@@ -47,7 +47,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     }
 
     double lambda = 0.006;
-    int maxOrder = 4;
+    int maxOrder = 6;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, maxOrder );
 
     qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();

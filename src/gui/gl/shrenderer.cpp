@@ -67,7 +67,7 @@ SHRenderer::SHRenderer() :
         m_spheres.push_back( mesh );
 
         const Matrix* v1 = tess::vertices( lod );
-        Matrix base = ( QBall::sh_base( (*v1), 4 ) );
+        Matrix base = ( QBall::sh_base( (*v1), 6 ) );
         m_bases.push_back( base );
     }
 }
