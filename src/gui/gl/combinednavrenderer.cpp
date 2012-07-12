@@ -148,8 +148,6 @@ void CombinedNavRenderer::leftMouseDrag( int x, int y )
 
 void CombinedNavRenderer::initGeometry()
 {
-    glGenBuffers( 2, vboIds );
-
     m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
     m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
     m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();

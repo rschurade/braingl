@@ -91,7 +91,7 @@ void SingleSHRenderer::initGL()
         //qDebug() << "OpenGL initialized.";
     }
 
-    glClearColor( 1.0, 0.0, 0.0, 1.0 );
+    glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
 
@@ -141,8 +141,6 @@ void SingleSHRenderer::leftMouseDrag( int x, int y )
 
 void SingleSHRenderer::initGeometry()
 {
-    glGenBuffers( 2, vboIds );
-
     m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
     m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
     m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();
@@ -322,7 +320,7 @@ void SingleSHRenderer::draw()
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
         setShaderVars();
-        //glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
