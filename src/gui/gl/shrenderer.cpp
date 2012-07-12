@@ -232,7 +232,6 @@ void SHRenderer::initGeometry()
                 }
             }
         }
-        qDebug() << "end creating meshes";
     }
     else if ( renderOnSlice == 2 && ( metaChanged || yChanged ) )
     {
@@ -285,7 +284,6 @@ void SHRenderer::initGeometry()
                 }
             }
         }
-        qDebug() << "end creating meshes";
     }
     else if ( renderOnSlice == 3 && ( metaChanged || xChanged ) )
     {
@@ -338,7 +336,6 @@ void SHRenderer::initGeometry()
                 }
             }
         }
-        qDebug() << "end creating meshes";
     }
     else
     {
@@ -379,14 +376,12 @@ void SHRenderer::initGeometry()
     }
 
 
-    qDebug() << "bind buffer 0";
     m_tris1 = mesh->getTriSize() * balls.size() * 3;
-    qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
+    //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
 
-    qDebug() << "bind buffer 1";
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 

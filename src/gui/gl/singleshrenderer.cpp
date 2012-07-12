@@ -79,7 +79,6 @@ SingleSHRenderer::~SingleSHRenderer()
 
 void SingleSHRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
 }
 
 void SingleSHRenderer::initGL()
@@ -97,12 +96,11 @@ void SingleSHRenderer::initGL()
         //qDebug() << "OpenGL initialized.";
     }
 
+    glGenBuffers( 2, vboIds );
+
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
-
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glEnable( GL_BLEND );
 
     glShadeModel( GL_SMOOTH );
     glEnable( GL_LIGHTING );
@@ -202,14 +200,8 @@ void SingleSHRenderer::initGeometry()
 
         TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
 
-        qDebug() << "data vector size" << data->at( 0 ).Nrows();
-        qDebug() << "base vector size" << m_bases[lod].Nrows();
         Matrix m = m_bases[lod] * data->at( 0 );
-        qDebug() << "radius vector size" << m.Nrows() << " " << m.Ncols();
 
-        //omp_set_num_threads( 4 );
-        qDebug() << "start creating meshes";
-        //#pragma omp parallel for
         if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
         {
             ColumnVector dv = data->at( xi + yi * xbi + zi * xbi * ybi );
@@ -243,8 +235,6 @@ void SingleSHRenderer::initGeometry()
             }
         }
 
-        qDebug() << "end creating meshes";
-
         std::vector<float>verts;
         verts.reserve( mesh->getVertSize() * 6 );
         std::vector<int>indexes;
@@ -272,20 +262,14 @@ void SingleSHRenderer::initGeometry()
 
         delete newBall;
 
-
-
-        qDebug() << "bind buffer 0";
         m_tris1 = triangles.size() * 3;
-        qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
+        //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
 
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
 
-        qDebug() << "bind buffer 1";
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-
-        qDebug() << "end init geometry";
     }
 
     m_xOld = xi;

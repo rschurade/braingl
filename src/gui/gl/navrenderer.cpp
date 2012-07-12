@@ -53,7 +53,6 @@ NavRenderer::~NavRenderer()
 
 void NavRenderer::init()
 {
-    glGenBuffers( 4, vboIds );
 }
 
 void NavRenderer::initGL()
@@ -72,6 +71,8 @@ void NavRenderer::initGL()
         //qDebug() << "OpenGL initialized.";
     }
 
+    glGenBuffers( 4, vboIds );
+
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
@@ -87,8 +88,6 @@ void NavRenderer::initGL()
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
     GLFunctions::loadShaders();
-
-    glGenBuffers( 4, vboIds );
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
     GLushort crosshairIndices[] = { 0, 1, 2, 3 };

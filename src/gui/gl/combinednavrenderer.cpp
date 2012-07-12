@@ -303,9 +303,4 @@ void CombinedNavRenderer::draw()
 
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, 0 );
-
-
-
-    glDeleteBuffers( 1, &vboIds[0] );
-    glDeleteBuffers( 1, &vboIds[1] );
 }

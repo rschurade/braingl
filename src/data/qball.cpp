@@ -20,7 +20,7 @@ QBall::~QBall()
 
 Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
 {
-    qDebug() << "start calculating qBall base";
+    //qDebug() << "start calculating qBall base";
     double sh_size( ( maxOrder + 1 ) * ( maxOrder + 2 ) / 2 );
 
     // check validity of input:
@@ -73,7 +73,7 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
         }
     }
 
-    qDebug() << "finished calculating qBall base";
+    //qDebug() << "finished calculating qBall base";
 
     return out;
 }
@@ -81,7 +81,7 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
 
 Matrix QBall::sh_base( Matrix g, int maxOrder )
 {
-    qDebug() << "start calculating sh base";
+    //qDebug() << "start calculating sh base";
   // allcoate result matrix
     unsigned long sh_dirs( ( maxOrder + 2 ) * ( maxOrder + 1 ) / 2 );
     Matrix out( g.Nrows(), sh_dirs );
@@ -103,7 +103,7 @@ Matrix QBall::sh_base( Matrix g, int maxOrder )
             }
         }
     }
-    qDebug() << "finished calculating sh base";
+    //qDebug() << "finished calculating sh base";
     return out;
 }
 
