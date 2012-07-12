@@ -16,6 +16,7 @@ class QLineEdit;
 class QHBoxLayout;
 class QVBoxLayout;
 class SliderWithEdit;
+class SelectWithLabel;
 
 class DatasetPropertyView : public QAbstractItemView
 {
@@ -69,13 +70,12 @@ private:
     SliderWithEdit* m_upperThresholdSlider;
     SliderWithEdit* m_alphaSlider;
 
-    QComboBox* m_colormapSelect;
+    SelectWithLabel* m_colormapSelect;
 
     QCheckBox* m_textureInterpolation;
     QCheckBox* m_textureActive;
 
-    QHBoxLayout* m_layout5;
-    QComboBox* m_lodSelect;
+    SelectWithLabel* m_lodSelect;
     SliderWithEdit* m_scalingSlider;
 
 };
