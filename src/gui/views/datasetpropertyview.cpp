@@ -7,9 +7,11 @@
 #include <QtGui/QtGui>
 
 #include "../widgets/sliderwithedit.h"
+#include "../widgets/SelectWithLabel.h"
 #include "../../data/enums.h"
 
 #include "datasetpropertyview.h"
+
 
 DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_selected( QItemSelection() )
@@ -30,13 +32,10 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_upperThresholdSlider = new SliderWithEdit( tr( "upper threshold" ) );
     connect( m_upperThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( upperThresholdChanged( float ) ) );
 
-    QHBoxLayout* layout2 = new QHBoxLayout();
-    m_colormapSelect = new QComboBox();
+    m_colormapSelect = new SelectWithLabel( tr("colormap" ) );
     m_colormapSelect->insertItem( 0, tr( "grey" ) );
     m_colormapSelect->insertItem( 1, tr( "rainbow" ) );
     m_colormapSelect->insertItem( 2, tr( "unused" ) );
-    layout2->addWidget( new QLabel( tr("colormap" ) ), 25 );
-    layout2->addWidget( m_colormapSelect, 75 );
     connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
 
     QHBoxLayout* layout3 = new QHBoxLayout();
@@ -56,17 +55,15 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
 
-    m_layout5 = new QHBoxLayout();
-    m_lodSelect = new QComboBox();
+    m_lodSelect = new SelectWithLabel( tr("level of detail" ) );
     m_lodSelect->insertItem( 0, tr( "0" ) );
     m_lodSelect->insertItem( 1, tr( "1" ) );
     m_lodSelect->insertItem( 2, tr( "2" ) );
     m_lodSelect->insertItem( 3, tr( "3" ) );
     m_lodSelect->insertItem( 4, tr( "4" ) );
     m_lodSelect->insertItem( 5, tr( "5" ) );
-    m_layout5->addWidget( new QLabel( tr("level of detail" ) ), 25 );
-    m_layout5->addWidget( m_lodSelect, 75 );
-    connect( m_lodSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( lodChanged( int ) ) );
+
+    connect( m_lodSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( lodChanged( int ) ) );
 
     m_scalingSlider = new SliderWithEdit( tr( "qball scaling" ) );
     connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
@@ -75,10 +72,10 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addLayout( layout4 );
     m_layout->addWidget( m_lowerThresholdSlider );
     m_layout->addWidget( m_upperThresholdSlider );
-    m_layout->addLayout( layout2 );
+    m_layout->addWidget( m_colormapSelect );
     m_layout->addLayout( layout3 );
     m_layout->addWidget( m_alphaSlider );
-    m_layout->addLayout( m_layout5 );
+    m_layout->addWidget( m_lodSelect );
     m_layout->addWidget( m_scalingSlider );
     m_layout->addStretch( 0 );
 
@@ -204,6 +201,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_upperThresholdSlider->setHidden( true );
 
     m_scalingSlider->setHidden( true );
+    m_lodSelect->setHidden( true );
 
 
     if ( dim == 1 )
@@ -216,6 +214,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     if ( created == FNALGO_QBALL )
     {
         m_scalingSlider->setHidden( false );
+        m_lodSelect->setHidden( false );
     }
 }
 
