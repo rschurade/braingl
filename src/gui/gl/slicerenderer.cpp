@@ -151,9 +151,18 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 
     initGeometry();
 
-    drawAxial();
-    drawCoronal();
-    drawSagittal();
+    if ( model()->data( model()->index( 0, 115 ), Qt::UserRole ).toBool() )
+    {
+        drawAxial();
+    }
+    if ( model()->data( model()->index( 0, 114 ), Qt::UserRole ).toBool() )
+    {
+        drawCoronal();
+    }
+    if ( model()->data( model()->index( 0, 113 ), Qt::UserRole ).toBool() )
+    {
+        drawSagittal();
+    }
 }
 
 void SliceRenderer::drawAxial()

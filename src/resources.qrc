@@ -8,6 +8,9 @@
 	<file>icons/print.png</file>
 	<file>icons/save.png</file>
 	<file>icons/undo.png</file>
+	<file>icons/axial.png</file>
+	<file>icons/coronal.png</file>
+	<file>icons/sagittal.png</file>
 	<file>icons/tmp1.png</file>
 	<file>icons/tmp3.png</file>
 	<file>icons/tmpx.png</file>
