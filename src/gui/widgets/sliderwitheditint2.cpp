@@ -8,6 +8,8 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtCore/QDebug>
+#include <QtGui/QPushButton>
+#include <QtGui/QFontMetrics>
 #include <QtGui/QHBoxLayout>
 
 #include "sliderwitheditint2.h"
@@ -25,9 +27,20 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
+    m_button1 = new QPushButton( tr(" - ") );
+    QFontMetrics _metrics( m_button1->fontMetrics() );
+    m_button1->setMaximumWidth( _metrics.boundingRect("  -  ").width() );
+    m_button2 = new QPushButton( tr(" + ") );
+    m_button2->setMaximumWidth( _metrics.boundingRect("  +  ").width() );
+
+    connect( m_button1, SIGNAL( clicked() ), this, SLOT( minusPressed() ) );
+    connect( m_button2, SIGNAL( clicked() ), this, SLOT( plusPressed() ) );
+
     QHBoxLayout* layout = new QHBoxLayout();
 
+    layout->addWidget( m_button1 );
     layout->addWidget( m_slider );
+    layout->addWidget( m_button2 );
     layout->addWidget( m_edit );
 
     setLayout( layout );
@@ -76,4 +89,33 @@ void SliderWithEditInt2::setMax( int max )
 {
     m_slider->setMaximum( max );
     m_slider->repaint();
+}
+
+void SliderWithEditInt2::minusPressed()
+{
+    int current = m_slider->value();
+    if ( current == m_slider->minimum() )
+    {
+        return;
+    }
+    int value = current - 1;
+    m_slider->setValue( value );
+    m_edit->setText( QString::number( value ) );
+    m_slider->repaint();
+    emit( valueChanged( value ) );
+}
+
+void SliderWithEditInt2::plusPressed()
+{
+    int current = m_slider->value();
+    if ( current == m_slider->maximum() )
+    {
+        return;
+    }
+    int value = current + 1;
+    m_slider->setValue( value );
+    m_edit->setText( QString::number( value ) );
+    m_slider->repaint();
+    emit( valueChanged( value ) );
+
 }

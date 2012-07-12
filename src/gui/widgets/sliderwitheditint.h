@@ -13,6 +13,7 @@
 class QSlider;
 class QLineEdit;
 class QLabel;
+class QPushButton;
 
 class SliderWithEditInt : public QWidget
 {
@@ -31,6 +32,8 @@ public:
 public slots:
     void sliderMoved( int value );
     void editEdited();
+    void minusPressed();
+    void plusPressed();
 
 signals:
     void valueChanged( int value );
@@ -39,6 +42,9 @@ private:
    QSlider*  m_slider;
    QLineEdit* m_edit;
    QLabel* m_label;
+   QPushButton* m_button1;
+   QPushButton* m_button2;
+
 };
 
 #endif /* SLIDERWITHEDITINT_H_ */
