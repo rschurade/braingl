@@ -6,6 +6,8 @@
  */
 #include <QtCore/QDebug>
 
+#include "../../data/enums.h"
+
 #include "toolbarview.h"
 
 ToolBarView::ToolBarView( QWidget* parent ) :
@@ -65,7 +67,7 @@ void ToolBarView::selectionChanged( const QItemSelection &selected, const QItemS
     if ( selected.indexes().size() > 0 )
     {
         m_selected = selected.indexes().first().row();
-        QModelIndex index = model()->index( m_selected, 12 );
+        QModelIndex index = model()->index( m_selected, FNDSP_TYPE );
         int type = model()->data( index, Qt::DisplayRole ).toInt();
 
         emit( sigSelectionChanged( type ) );

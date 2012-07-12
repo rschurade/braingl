@@ -7,7 +7,7 @@
 #include <QtGui/QtGui>
 
 #include "../widgets/sliderwitheditint.h"
-
+#include "../../data/enums.h"
 #include "globalpropertyview.h"
 
 GlobalPropertyView::GlobalPropertyView( QWidget* parent )
@@ -98,34 +98,34 @@ QRegion GlobalPropertyView::visualRegionForSelection( const QItemSelection &sele
 void GlobalPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
     QModelIndex mi;
-    mi = model()->index( 0, 100 );
+    mi = model()->index( 0, FNGLOBAL_SAGITTAL );
     if ( mi.isValid() )
     {
         m_sagittalSlider->setValue( model()->data( mi, Qt::UserRole ).toInt() );
     }
-    mi = model()->index( 0, 103 );
+    mi = model()->index( 0, FNGLOBAL_MAX_SAGITTAL );
     if ( mi.isValid() )
     {
         m_sagittalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
     }
 
-    mi = model()->index( 0, 101 );
+    mi = model()->index( 0, FNGLOBAL_CORONAL );
     if ( mi.isValid() )
     {
         m_coronalSlider->setValue( model()->data( mi, Qt::UserRole ).toInt() );
     }
-    mi = model()->index( 0, 104 );
+    mi = model()->index( 0, FNGLOBAL_MAX_CORONAL );
     if ( mi.isValid() )
     {
         m_coronalSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
     }
 
-    mi = model()->index( 0, 102 );
+    mi = model()->index( 0, FNGLOBAL_AXIAL );
     if ( mi.isValid() )
     {
         m_axialSlider->setValue( model()->data( mi, Qt::UserRole ).toInt() );
     }
-    mi = model()->index( 0, 105 );
+    mi = model()->index( 0, FNGLOBAL_MAX_AXIAL );
     if ( mi.isValid() )
     {
         m_axialSlider->setMax( model()->data( mi, Qt::UserRole ).toInt() - 1 );
@@ -136,7 +136,7 @@ void GlobalPropertyView::sagittalSliderChanged( int value )
 {
     QModelIndex mi;
 
-    mi = model()->index( 0, 100 );
+    mi = model()->index( 0, FNGLOBAL_SAGITTAL );
     if ( mi.isValid() )
     {
         model()->setData( mi, value, Qt::UserRole );
@@ -147,7 +147,7 @@ void GlobalPropertyView::coronalSliderChanged( int value )
 {
     QModelIndex mi;
 
-    mi = model()->index( 0, 101 );
+    mi = model()->index( 0, FNGLOBAL_CORONAL );
     if ( mi.isValid() )
     {
         model()->setData( mi, value, Qt::UserRole );
@@ -158,7 +158,7 @@ void GlobalPropertyView::axialSliderChanged( int value )
 {
     QModelIndex mi;
 
-    mi = model()->index( 0, 102 );
+    mi = model()->index( 0, FNGLOBAL_AXIAL );
     if ( mi.isValid() )
     {
         model()->setData( mi, value, Qt::UserRole );

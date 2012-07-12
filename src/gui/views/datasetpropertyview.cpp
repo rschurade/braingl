@@ -162,49 +162,49 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     updateWidgetVisibility();
 
-    QModelIndex index = getSelectedIndex( 0 );
+    QModelIndex index = getSelectedIndex( FNDSP_NAME );
     m_nameEdit->setText( model()->data( index, Qt::DisplayRole ).toString() );
 
-    index = getSelectedIndex( 10 );
+    index = getSelectedIndex( FNDSP_MIN );
     m_lowerThresholdSlider->setMin( model()->data( index, Qt::DisplayRole ).toFloat() );
     m_upperThresholdSlider->setMin( model()->data( index, Qt::DisplayRole ).toFloat() );
 
-    index = getSelectedIndex( 11 );
+    index = getSelectedIndex( FNDSP_MAX );
     m_lowerThresholdSlider->setMax( model()->data( index, Qt::DisplayRole ).toFloat() );
     m_upperThresholdSlider->setMax( model()->data( index, Qt::DisplayRole ).toFloat() );
 
-    index = getSelectedIndex( 50 );
+    index = getSelectedIndex( FNDSE_LOWER_THRESHOLD );
     m_lowerThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
-    index = getSelectedIndex( 51 );
+    index = getSelectedIndex( FNDSE_UPPER_THRESHOLD );
     m_upperThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    index = getSelectedIndex( 52 );
+    index = getSelectedIndex( FNDSE_COLORMAP );
     m_colormapSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 
-    index = getSelectedIndex( 53 );
+    index = getSelectedIndex( FNDSE_INTERPOLATION );
     m_textureInterpolation->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 
-    index = getSelectedIndex( 54 );
+    index = getSelectedIndex( FNDSE_ALPHA );
     m_alphaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    index = getSelectedIndex( 55 );
+    index = getSelectedIndex( FNDSE_ACTIVE );
     m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 
-    index = getSelectedIndex( 56 );
+    index = getSelectedIndex( FNDSE_LOD );
     m_lodSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 
     m_scalingSlider->setMin( 0.1 );
     m_scalingSlider->setMax( 10 );
-    index = getSelectedIndex( 57 );
+    index = getSelectedIndex( FNDSE_SCALING );
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    index = getSelectedIndex( 58 );
+    index = getSelectedIndex( FNDSE_RENDER_SLICE );
     m_sliceSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 }
 
 void DatasetPropertyView::updateWidgetVisibility()
 {
-    QModelIndex index = getSelectedIndex( 1 );
+    QModelIndex index = getSelectedIndex( FNDSP_DIM );
     int dim = model()->data( index, Qt::DisplayRole ).toInt();
 
     m_lowerThresholdSlider->setHidden( true );
@@ -221,7 +221,7 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_upperThresholdSlider->setHidden( false );
     }
 
-    int created = model()->data( getSelectedIndex( 13 ), Qt::DisplayRole ).toInt();
+    int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
     if ( created == FNALGO_QBALL )
     {
         m_scalingSlider->setHidden( false );
@@ -241,7 +241,7 @@ void DatasetPropertyView::lowerThresholdChanged( float value )
     {
         m_upperThresholdSlider->setValue( value );
     }
-    model()->setData( getSelectedIndex( 50 ), value );
+    model()->setData( getSelectedIndex( FNDSE_LOWER_THRESHOLD ), value );
 }
 
 void DatasetPropertyView::upperThresholdChanged( float value )
@@ -250,54 +250,40 @@ void DatasetPropertyView::upperThresholdChanged( float value )
     {
         m_lowerThresholdSlider->setValue( value );
     }
-    model()->setData( getSelectedIndex( 51 ), value );
+    model()->setData( getSelectedIndex( FNDSE_UPPER_THRESHOLD ), value );
 }
 
 void DatasetPropertyView::colormapChanged( int index )
 {
-    model()->setData( getSelectedIndex( 52 ), index );
+    model()->setData( getSelectedIndex( FNDSE_COLORMAP ), index );
 }
 
 void DatasetPropertyView::interpolationStateChanged( int state )
 {
-    if ( state == Qt::Checked )
-    {
-        model()->setData( getSelectedIndex( 53 ), true );
-    }
-    else
-    {
-        model()->setData( getSelectedIndex( 53 ), false );
-    }
+    model()->setData( getSelectedIndex( FNDSE_INTERPOLATION ), ( state == Qt::Checked ) );
 }
 
 void DatasetPropertyView::activeStateChanged( int state )
 {
-    if ( state == Qt::Checked )
-    {
-        model()->setData( getSelectedIndex( 55 ), true );
-    }
-    else
-    {
-        model()->setData( getSelectedIndex( 55 ), false );
-    }
+    model()->setData( getSelectedIndex( FNDSE_ACTIVE ), ( state == Qt::Checked ) );
 }
 
 void DatasetPropertyView::alphaChanged( float value )
 {
-    model()->setData( getSelectedIndex( 54 ), value );
+    model()->setData( getSelectedIndex( FNDSE_ALPHA ), value );
 }
 
 void DatasetPropertyView::lodChanged( int index )
 {
-    model()->setData( getSelectedIndex( 56 ), index );
+    model()->setData( getSelectedIndex( FNDSE_LOD ), index );
 }
 
 void DatasetPropertyView::scalingChanged( float value )
 {
-    model()->setData( getSelectedIndex( 57 ), value );
+    model()->setData( getSelectedIndex( FNDSE_SCALING ), value );
 }
 
 void DatasetPropertyView::renderSliceChanged( int index )
 {
-    model()->setData( getSelectedIndex( 58 ), index );
+    model()->setData( getSelectedIndex( FNDSE_RENDER_SLICE ), index );
 }
