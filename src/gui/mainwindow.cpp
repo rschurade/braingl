@@ -191,6 +191,25 @@ void MainWindow::createActions()
     addTabAxial = new QAction( tr( "Add Axial Slice Tab" ), this );
     addTabAxial->setStatusTip( tr( "Add a new tab to the central tab widget showing the axial slice." ) );
     connect( addTabAxial, SIGNAL(triggered()), this, SLOT( slotAddTabAxial() ) );
+
+    showAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Show Axial Slice" ), this );
+    showAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
+    showAxialAct->setCheckable( true );
+    showAxialAct->setChecked( true );
+    connect( showAxialAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleAxialSlice() ) );
+
+    showCoronalAct = new QAction( QIcon( ":/icons/coronal.png" ), tr( "Show Coronal Slice" ), this );
+    showCoronalAct->setStatusTip( tr( "Toggle rendering of the coronal slice." ) );
+    showCoronalAct->setCheckable( true );
+    showCoronalAct->setChecked( true );
+    connect( showCoronalAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleCoronalSlice() ) );
+
+    showSagittalAct = new QAction( QIcon( ":/icons/sagittal.png" ), tr( "Show Sagittal Slice" ), this );
+    showSagittalAct->setStatusTip( tr( "Toggle rendering of the sagittal slice." ) );
+    showSagittalAct->setCheckable( true );
+    showSagittalAct->setChecked( true );
+    connect( showSagittalAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleSagittalSlice() ) );
+
 }
 
 void MainWindow::createMenus()
@@ -228,9 +247,11 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( printAct );
     fileToolBar->setObjectName( "fileToolbar");
 
-//    editToolBar = addToolBar( tr( "Edit" ) );
-//    editToolBar->addAction( undoAct );
-//    editToolBar->setObjectName( "editToolbar");
+    editToolBar = addToolBar( tr( "Edit" ) );
+    editToolBar->addAction( showAxialAct );
+    editToolBar->addAction( showCoronalAct );
+    editToolBar->addAction( showSagittalAct );
+    editToolBar->setObjectName( "editToolbar");
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ) );
     m_toolsToolBar->setModel( m_dataStore );
@@ -325,4 +346,22 @@ void MainWindow::slotAddTabAxial()
     NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("axial"), 2, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "axial" );
     m_centralTabWidget->setCurrentWidget( glWidget );
+}
+
+void MainWindow::slotToggleAxialSlice()
+{
+    QModelIndex mi = m_dataStore->index( 0, 115 );
+    m_dataStore->setData( mi, showAxialAct->isChecked(), Qt::UserRole );
+}
+
+void MainWindow::slotToggleCoronalSlice()
+{
+    QModelIndex mi = m_dataStore->index( 0, 114 );
+    m_dataStore->setData( mi, showCoronalAct->isChecked(), Qt::UserRole );
+}
+
+void MainWindow::slotToggleSagittalSlice()
+{
+    QModelIndex mi = m_dataStore->index( 0, 113 );
+    m_dataStore->setData( mi, showSagittalAct->isChecked(), Qt::UserRole );
 }
