@@ -481,7 +481,7 @@ void Loader::loadDWI( QString fileName )
             {
                 if ( bvals[i] == 0 )
                 {
-                    qDebug() << "extract b0 at image " << i;
+                    //qDebug() << "extract b0 at image " << i;
                     for ( int j = 0; j < blockSize; ++j )
                     {
                         b0data[ j ] += inputData[ i * blockSize + j ] / numB0;

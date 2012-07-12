@@ -50,8 +50,8 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     int maxOrder = 6;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, maxOrder );
 
-    qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();
-    qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
+    //qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();
+    //qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
 
     QVector<ColumnVector>* data = ds->getData();
 
