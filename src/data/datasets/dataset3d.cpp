@@ -19,6 +19,7 @@ Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data ) :
 
 Dataset3D::~Dataset3D()
 {
+    m_data.clear();
 }
 
 void Dataset3D::examineDataset()
