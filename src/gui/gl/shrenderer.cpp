@@ -44,6 +44,12 @@ SHRenderer::SHRenderer() :
     m_lodOld( -1 ),
     m_scalingOld( -1 ),
     m_renderSliceOld( 0 ),
+    m_lowerXOld( -1 ),
+    m_lowerYOld( -1 ),
+    m_lowerZOld( -1 ),
+    m_upperXOld( -1 ),
+    m_upperYOld( -1 ),
+    m_upperZOld( -1 ),
     m_tris1( 0 )
 {
     for ( int lod = 0; lod < 6; ++lod )
@@ -154,6 +160,13 @@ void SHRenderer::initGeometry()
     float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
     float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
 
+    int lowerX = m_dataset->getProperty( "renderLowerX" ).toInt();
+    int lowerY = m_dataset->getProperty( "renderLowerY" ).toInt();
+    int lowerZ = m_dataset->getProperty( "renderLowerZ" ).toInt();
+    int upperX = m_dataset->getProperty( "renderUpperX" ).toInt();
+    int upperY = m_dataset->getProperty( "renderUpperY" ).toInt();
+    int upperZ = m_dataset->getProperty( "renderUpperZ" ).toInt();
+
     int lod = m_dataset->getProperty( "lod" ).toInt();
     float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
@@ -174,13 +187,17 @@ void SHRenderer::initGeometry()
     bool orientChanged = ( m_renderSliceOld != renderOnSlice );
     bool lodChanged = ( m_lodOld != lod );
 
+    bool xSpanChanged = ( lowerX != m_lowerXOld || upperX != m_upperXOld );
+    bool ySpanChanged = ( lowerY != m_lowerYOld || upperY != m_upperYOld );
+    bool zSpanChanged = ( lowerZ != m_lowerZOld || upperZ != m_upperZOld );
+
     bool metaChanged = ( datasetSizeChanged || orientChanged || lodChanged );
 
     bool xChanged = ( xi != m_xOld );
     bool yChanged = ( yi != m_yOld );
     bool zChanged = ( zi != m_zOld );
 
-    if ( renderOnSlice == 1 && ( metaChanged || zChanged ) )
+    if ( renderOnSlice == 1 && ( metaChanged || zChanged || xSpanChanged || ySpanChanged ) )
     {
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
@@ -189,9 +206,9 @@ void SHRenderer::initGeometry()
 
         Matrix m = m_bases[lod] * data->at( 0 );
 
-        for( int yy = 0; yy < ybi; ++yy )
+        for( int yy = lowerY; yy < upperY; ++yy )
         {
-            for ( int xx = 0; xx < xbi; ++xx )
+            for ( int xx = lowerX; xx < upperX; ++xx )
             {
                 if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
                 {
@@ -232,7 +249,7 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( renderOnSlice == 2 && ( metaChanged || yChanged ) )
+    else if ( renderOnSlice == 2 && ( metaChanged || yChanged || xSpanChanged || zSpanChanged ) )
     {
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
@@ -241,9 +258,9 @@ void SHRenderer::initGeometry()
 
         Matrix m = m_bases[lod] * data->at( 0 );
 
-        for( int zz = 0; zz < zbi; ++zz )
+        for( int zz = lowerZ; zz < upperZ; ++zz )
         {
-            for ( int xx = 0; xx < xbi; ++xx )
+            for ( int xx = lowerX; xx < upperX; ++xx )
             {
                 if ( ( fabs( data->at( xx + yi * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
                 {
@@ -284,7 +301,7 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( renderOnSlice == 3 && ( metaChanged || xChanged ) )
+    else if ( renderOnSlice == 3 && ( metaChanged || xChanged || ySpanChanged || zSpanChanged ) )
     {
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
@@ -293,9 +310,9 @@ void SHRenderer::initGeometry()
 
         Matrix m = m_bases[lod] * data->at( 0 );
 
-        for( int yy = 0; yy < ybi; ++yy )
+        for( int yy = lowerY; yy < upperY; ++yy )
         {
-            for ( int zz = 0; zz < zbi; ++zz )
+            for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
                 if ( ( fabs( data->at( xi + yy * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
                 {
@@ -393,4 +410,11 @@ void SHRenderer::initGeometry()
     m_lodOld = lod;
     m_scalingOld = scaling;
     m_renderSliceOld = renderOnSlice;
+
+    m_lowerXOld = lowerX;
+    m_lowerYOld = lowerY;
+    m_lowerZOld = lowerZ;
+    m_upperXOld = upperX;
+    m_upperYOld = upperY;
+    m_upperZOld = upperZ;
 }

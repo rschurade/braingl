@@ -15,6 +15,13 @@ Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type )
     m_properties["name"] = fileName.path().split("/").last();
     m_properties["size"] = -1;
     m_properties["createdBy"] = FNALGO_NONE;
+
+    m_properties["renderLowerX"] = 0;
+    m_properties["renderLowerY"] = 0;
+    m_properties["renderLowerZ"] = 0;
+    m_properties["renderUpperX"] = 0;
+    m_properties["renderUpperY"] = 0;
+    m_properties["renderUpperZ"] = 0;
 }
 
 Dataset::~Dataset()

@@ -56,6 +56,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
 
     QVector<ColumnVector>* qballVector = new QVector<ColumnVector>();
+    QVector<QPair<float, float> >* minmaxVector = new QVector<QPair<float, float> >;
 
     for ( int i = 0; i < data->size(); ++i )
     {
@@ -72,6 +73,9 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qballVector->at(0).Nrows() );
     out->setProperty( "datatype", DT_FLOAT);
+    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 1 );
+    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 1 );
+    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 1 );
     out->examineDataset();
 
     qDebug() << "finished calculating qBall";
