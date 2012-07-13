@@ -35,6 +35,8 @@ MARK_AS_ADVANCED( FORCE QT_QMAKE_EXECUTABLE )
 
 # Includes:
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtGui )
+INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtCore )
 
 # Libraries for linking:
 SET( QT_LIBS ${QT_QTCORE_LIBRARY}
@@ -70,7 +72,10 @@ FIND_PACKAGE( Boost 1.46.0 REQUIRED )
 # include the boost headers
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
-
+FIND_PACKAGE( QXT REQUIRED )
+INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH} )
+INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtGui )
+INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtCore )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # GUI compilation options
@@ -110,6 +115,6 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${QXT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 ENDIF()
 

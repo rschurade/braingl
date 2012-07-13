@@ -17,6 +17,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class SliderWithEdit;
 class SelectWithLabel;
+class QxtSpanSlider;
 
 class DatasetPropertyView : public QAbstractItemView
 {
@@ -56,6 +57,13 @@ private slots:
     void renderSliceChanged( int index );
     void scalingChanged( float value );
 
+    void lower1Changed( int value );
+    void upper1Changed( int value );
+    void lower2Changed( int value );
+    void upper2Changed( int value );
+
+
+
 private:
     QModelIndex getSelectedIndex( int column );
     void updateWidgetVisibility();
@@ -80,7 +88,8 @@ private:
     SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;
 
-
+    QxtSpanSlider* m_spanSlider1;
+    QxtSpanSlider* m_spanSlider2;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

@@ -50,6 +50,16 @@ private:
     float m_scalingOld;
     int m_renderSliceOld;
 
+    int m_lowerXOld;
+    int m_lowerYOld;
+    int m_lowerZOld;
+    int m_upperXOld;
+    int m_upperYOld;
+    int m_upperZOld;
+
+
+
+
     int m_tris1;
 
     GLuint *vboIds;

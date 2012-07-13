@@ -233,6 +233,24 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_RENDER_SLICE:
                 return ds->getProperty( "renderSlice" ).toInt();
                 break;
+            case FNDSE_RENDER_LOWER_X:
+                return ds->getProperty( "renderLowerX" ).toInt();
+                break;
+            case FNDSE_RENDER_UPPER_X:
+                return ds->getProperty( "renderUpperX" ).toInt();
+                break;
+            case FNDSE_RENDER_LOWER_Y:
+                return ds->getProperty( "renderLowerY" ).toInt();
+                break;
+            case FNDSE_RENDER_UPPER_Y:
+                return ds->getProperty( "renderUpperY" ).toInt();
+                break;
+            case FNDSE_RENDER_LOWER_Z:
+                return ds->getProperty( "renderLowerZ" ).toInt();
+                break;
+            case FNDSE_RENDER_UPPER_Z:
+                return ds->getProperty( "renderUpperZ" ).toInt();
+                break;
         }
     }
     return QVariant();
@@ -329,6 +347,24 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_RENDER_SLICE:
                 m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
+                break;
+            case FNDSE_RENDER_LOWER_X:
+                m_datasetList.at( index.row() )->setProperty( "renderLowerX", value.toInt() );
+                break;
+            case FNDSE_RENDER_UPPER_X:
+                m_datasetList.at( index.row() )->setProperty( "renderUpperX", value.toInt() );
+                break;
+            case FNDSE_RENDER_LOWER_Y:
+                m_datasetList.at( index.row() )->setProperty( "renderLowerY", value.toInt() );
+                break;
+            case FNDSE_RENDER_UPPER_Y:
+                m_datasetList.at( index.row() )->setProperty( "renderUpperY", value.toInt() );
+                break;
+            case FNDSE_RENDER_LOWER_Z:
+                m_datasetList.at( index.row() )->setProperty( "renderLowerZ", value.toInt() );
+                break;
+            case FNDSE_RENDER_UPPER_Z:
+                m_datasetList.at( index.row() )->setProperty( "renderUpperZ", value.toInt() );
                 break;
             }
         }
