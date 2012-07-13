@@ -397,8 +397,6 @@ void DatasetPropertyView::renderSliceChanged( int index )
 
 void DatasetPropertyView::lower1Changed( int value )
 {
-    qDebug() << "lower1: " << value;
-
     switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
     {
         case 1:
@@ -415,7 +413,6 @@ void DatasetPropertyView::lower1Changed( int value )
 
 void DatasetPropertyView::upper1Changed( int value )
 {
-    qDebug() << "upper1: " << value;
     switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
     {
         case 1:
@@ -432,8 +429,6 @@ void DatasetPropertyView::upper1Changed( int value )
 
 void DatasetPropertyView::lower2Changed( int value )
 {
-    qDebug() << "lower2: " << value;
-
     switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
     {
         case 1:
@@ -450,7 +445,6 @@ void DatasetPropertyView::lower2Changed( int value )
 
 void DatasetPropertyView::upper2Changed( int value )
 {
-    qDebug() << "upper2: " << value;
     switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
     {
         case 1:
