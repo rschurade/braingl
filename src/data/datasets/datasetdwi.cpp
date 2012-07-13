@@ -4,6 +4,7 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
+#include <QtCore/QDebug>
 
 #include "datasetdwi.h"
 
@@ -22,6 +23,10 @@ DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<f
 
 DatasetDWI::~DatasetDWI()
 {
+    m_data->clear();
+    m_b0Data.clear();
+    m_bvals.clear();
+    m_bvecs.clear();
 }
 
 QVector<ColumnVector>* DatasetDWI::getData()

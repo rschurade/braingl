@@ -22,6 +22,9 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data ) :
 
 DatasetScalar::~DatasetScalar()
 {
+    m_data.clear();
+    m_properties.clear();
+    glDeleteTextures( 1, &m_textureGLuint );
 }
 
 void DatasetScalar::examineDataset()
