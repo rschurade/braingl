@@ -65,7 +65,7 @@ ADD_DEFINITIONS( -DHAVE_ZLIB )
 INCLUDE( Utils )
 
 # find the boost packages
-FIND_PACKAGE( Boost 1.46.0 REQUIRED system )
+FIND_PACKAGE( Boost 1.46.0 REQUIRED )
 
 # include the boost headers
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
@@ -110,6 +110,6 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 ENDIF()
 

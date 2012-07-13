@@ -7,7 +7,6 @@
 #include "../../thirdparty/glew/include/glew.h"
 
 #include <limits>
-#include <omp.h>
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
