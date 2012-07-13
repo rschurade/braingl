@@ -7,7 +7,7 @@
 #include <QtGui/QtGui>
 
 #include "../widgets/sliderwithedit.h"
-#include "../widgets/SelectWithLabel.h"
+#include "../widgets/selectwithlabel.h"
 #include "../../data/enums.h"
 
 #include "datasetpropertyview.h"
