@@ -8,6 +8,7 @@
 
 #include "../widgets/sliderwithedit.h"
 #include "../widgets/selectwithlabel.h"
+#include "../widgets/checkboxwithlabel.h"
 #include "../../data/enums.h"
 
 #include <QxTGui/QxtSpanSlider>
@@ -40,16 +41,10 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_colormapSelect->insertItem( 2, tr( "unused" ) );
     connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
 
-    QHBoxLayout* layout3 = new QHBoxLayout();
-    m_textureInterpolation = new QCheckBox();
-    layout3->addWidget( new QLabel( tr("interpolation" ) ), 25 );
-    layout3->addWidget( m_textureInterpolation, 75 );
+    m_textureInterpolation = new CheckboxWithLabel( tr("interpolation"));
     connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
 
-    QHBoxLayout* layout4 = new QHBoxLayout();
-    m_textureActive = new QCheckBox();
-    layout4->addWidget( new QLabel( tr("active" ) ), 25 );
-    layout4->addWidget( m_textureActive, 75 );
+    m_textureActive = new CheckboxWithLabel( tr("active") );
     connect( m_textureActive, SIGNAL( stateChanged( int ) ), this, SLOT( activeStateChanged( int ) ) );
 
     m_alphaSlider = new SliderWithEdit( tr( "alpha" ) );
@@ -94,14 +89,12 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     connect( m_spanSlider2, SIGNAL( lowerPositionChanged( int ) ), this, SLOT( lower2Changed( int ) ) );
     connect( m_spanSlider2, SIGNAL( upperPositionChanged( int ) ), this, SLOT( upper2Changed( int ) ) );
 
-
-
     m_layout->addLayout( layout1 );
-    m_layout->addLayout( layout4 );
+    m_layout->addWidget( m_textureActive );
     m_layout->addWidget( m_lowerThresholdSlider );
     m_layout->addWidget( m_upperThresholdSlider );
     m_layout->addWidget( m_colormapSelect );
-    m_layout->addLayout( layout3 );
+    m_layout->addWidget( m_textureInterpolation );
     m_layout->addWidget( m_alphaSlider );
     m_layout->addWidget( m_lodSelect );
     m_layout->addWidget( m_sliceSelect );
@@ -109,6 +102,17 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_spanSlider1 );
     m_layout->addWidget( m_spanSlider2 );
     m_layout->addStretch( 0 );
+
+    m_lowerThresholdSlider->setHidden( true );
+    m_upperThresholdSlider->setHidden( true );
+    m_colormapSelect->setHidden( true );
+    m_textureInterpolation->setHidden( true );
+    m_alphaSlider->setHidden( true );
+    m_lodSelect->setHidden( true );
+    m_sliceSelect->setHidden( true );
+    m_scalingSlider->setHidden( true );
+    m_spanSlider1->setHidden( true );
+    m_spanSlider2->setHidden( true );
 
     m_widget->setLayout( m_layout );
 
@@ -271,11 +275,12 @@ void DatasetPropertyView::updateWidgetVisibility()
 
     m_lowerThresholdSlider->setHidden( true );
     m_upperThresholdSlider->setHidden( true );
-
-    m_scalingSlider->setHidden( true );
+    m_colormapSelect->setHidden( true );
+    m_textureInterpolation->setHidden( true );
+    m_alphaSlider->setHidden( true );
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
-
+    m_scalingSlider->setHidden( true );
     m_spanSlider1->setHidden( true );
     m_spanSlider2->setHidden( true );
 
@@ -283,6 +288,9 @@ void DatasetPropertyView::updateWidgetVisibility()
     {
         m_lowerThresholdSlider->setHidden( false );
         m_upperThresholdSlider->setHidden( false );
+        m_colormapSelect->setHidden( false );
+        m_textureInterpolation->setHidden( false );
+        m_alphaSlider->setHidden( false );
     }
 
     int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
@@ -292,6 +300,21 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
 
+        m_spanSlider1->setHidden( false );
+        m_spanSlider2->setHidden( false );
+    }
+
+    if ( dim == 999999 ) // simply for copy&paste
+    {
+        m_textureActive->setHidden( false );
+        m_lowerThresholdSlider->setHidden( false );
+        m_upperThresholdSlider->setHidden( false );
+        m_colormapSelect->setHidden( false );
+        m_textureInterpolation->setHidden( false );
+        m_alphaSlider->setHidden( false );
+        m_lodSelect->setHidden( false );
+        m_sliceSelect->setHidden( false );
+        m_scalingSlider->setHidden( false );
         m_spanSlider1->setHidden( false );
         m_spanSlider2->setHidden( false );
     }
