@@ -17,6 +17,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class SliderWithEdit;
 class SelectWithLabel;
+class CheckboxWithLabel;
 class QxtSpanSlider;
 
 class DatasetPropertyView : public QAbstractItemView
@@ -81,8 +82,8 @@ private:
 
     SelectWithLabel* m_colormapSelect;
 
-    QCheckBox* m_textureInterpolation;
-    QCheckBox* m_textureActive;
+    CheckboxWithLabel* m_textureInterpolation;
+    CheckboxWithLabel* m_textureActive;
 
     SelectWithLabel* m_lodSelect;
     SelectWithLabel* m_sliceSelect;
