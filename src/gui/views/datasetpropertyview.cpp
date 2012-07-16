@@ -11,7 +11,7 @@
 #include "../widgets/checkboxwithlabel.h"
 #include "../../data/enums.h"
 
-#include <QxTGui/QxtSpanSlider>
+#include <QxtGui/QxtSpanSlider>
 
 #include "datasetpropertyview.h"
 
