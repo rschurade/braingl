@@ -251,6 +251,10 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_RENDER_UPPER_Z:
                 return ds->getProperty( "renderUpperZ" ).toInt();
                 break;
+            case FNDSE_MINMAX_SCALING:
+                return ds->getProperty( "minmaxScaling" ).toBool();
+                break;
+
         }
     }
     return QVariant();
@@ -365,6 +369,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_RENDER_UPPER_Z:
                 m_datasetList.at( index.row() )->setProperty( "renderUpperZ", value.toInt() );
+                break;
+            case FNDSE_MINMAX_SCALING:
+                m_datasetList.at( index.row() )->setProperty( "minmaxScaling", value.toBool() );
                 break;
             }
         }

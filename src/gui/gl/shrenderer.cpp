@@ -44,6 +44,7 @@ SHRenderer::SHRenderer() :
     m_lodOld( -1 ),
     m_scalingOld( -1 ),
     m_renderSliceOld( 0 ),
+    m_minmaxScalingOld( false ),
     m_lowerXOld( -1 ),
     m_lowerYOld( -1 ),
     m_lowerZOld( -1 ),
@@ -172,6 +173,9 @@ void SHRenderer::initGeometry()
 
     int renderOnSlice = m_dataset->getProperty( "renderSlice" ).toInt();
 
+    bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
+    bool minmaxScalingChanged = ( m_minmaxScalingOld != minmaxScaling );
+
     float x = m_x * dx + dx / 2.;
     float y = m_y * dy + dy / 2.;
     float z = m_z * dz + dz / 2.;
@@ -191,7 +195,7 @@ void SHRenderer::initGeometry()
     bool ySpanChanged = ( lowerY != m_lowerYOld || upperY != m_upperYOld );
     bool zSpanChanged = ( lowerZ != m_lowerZOld || upperZ != m_upperZOld );
 
-    bool metaChanged = ( datasetSizeChanged || orientChanged || lodChanged );
+    bool metaChanged = ( datasetSizeChanged || orientChanged || lodChanged || minmaxScalingChanged );
 
     bool xChanged = ( xi != m_xOld );
     bool yChanged = ( yi != m_yOld );
@@ -222,10 +226,21 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    max = max - min;
-                    for ( int i = 0; i < r.Nrows(); ++i )
+
+                    if ( minmaxScaling )
                     {
-                        r(i+1) = ( r(i+1) - min ) / max;
+                        max = max - min;
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = ( r(i+1) - min ) / max;
+                        }
+                    }
+                    else
+                    {
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max;
+                        }
                     }
 
                     TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
@@ -274,12 +289,21 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    max = max - min;
-                    for ( int i = 0; i < r.Nrows(); ++i )
+                    if ( minmaxScaling )
                     {
-                        r(i+1) = ( r(i+1) - min ) / max;
+                        max = max - min;
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = ( r(i+1) - min ) / max;
+                        }
                     }
-
+                    else
+                    {
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max;
+                        }
+                    }
                     TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
 
                     for ( int i = 0; i < vertices.size(); ++i )
@@ -326,12 +350,21 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    max = max - min;
-                    for ( int i = 0; i < r.Nrows(); ++i )
+                    if ( minmaxScaling )
                     {
-                        r(i+1) = ( r(i+1) - min ) / max;
+                        max = max - min;
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = ( r(i+1) - min ) / max;
+                        }
                     }
-
+                    else
+                    {
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max;
+                        }
+                    }
                     TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
 
                     for ( int i = 0; i < vertices.size(); ++i )
@@ -410,6 +443,7 @@ void SHRenderer::initGeometry()
     m_lodOld = lod;
     m_scalingOld = scaling;
     m_renderSliceOld = renderOnSlice;
+    m_minmaxScalingOld = minmaxScaling;
 
     m_lowerXOld = lowerX;
     m_lowerYOld = lowerY;

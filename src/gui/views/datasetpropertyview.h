@@ -63,6 +63,7 @@ private slots:
     void lower2Changed( int value );
     void upper2Changed( int value );
 
+    void qballScalingChanged( int state );
 
 
 private:
@@ -91,6 +92,8 @@ private:
 
     QxtSpanSlider* m_spanSlider1;
     QxtSpanSlider* m_spanSlider2;
+
+    CheckboxWithLabel* m_qBallScaling;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */
