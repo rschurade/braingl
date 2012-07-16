@@ -49,6 +49,7 @@ private:
     int m_lodOld;
     float m_scalingOld;
     int m_renderSliceOld;
+    bool m_minmaxScalingOld;
 
     int m_lowerXOld;
     int m_lowerYOld;

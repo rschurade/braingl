@@ -89,6 +89,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     connect( m_spanSlider2, SIGNAL( lowerPositionChanged( int ) ), this, SLOT( lower2Changed( int ) ) );
     connect( m_spanSlider2, SIGNAL( upperPositionChanged( int ) ), this, SLOT( upper2Changed( int ) ) );
 
+    m_qBallScaling = new CheckboxWithLabel( tr("min-max scqaling"));
+    connect( m_qBallScaling, SIGNAL( stateChanged( int ) ), this, SLOT( qballScalingChanged( int ) ) );
+
     m_layout->addLayout( layout1 );
     m_layout->addWidget( m_textureActive );
     m_layout->addWidget( m_lowerThresholdSlider );
@@ -101,6 +104,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_scalingSlider );
     m_layout->addWidget( m_spanSlider1 );
     m_layout->addWidget( m_spanSlider2 );
+    m_layout->addWidget( m_qBallScaling );
     m_layout->addStretch( 0 );
 
     m_lowerThresholdSlider->setHidden( true );
@@ -113,6 +117,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_scalingSlider->setHidden( true );
     m_spanSlider1->setHidden( true );
     m_spanSlider2->setHidden( true );
+    m_qBallScaling->setHidden( true );
 
     m_widget->setLayout( m_layout );
 
@@ -266,6 +271,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
             m_spanSlider2->setUpperPosition( upperZ );
             break;
     }
+
+    index = getSelectedIndex( FNDSE_MINMAX_SCALING );
+    m_qBallScaling->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
 
 void DatasetPropertyView::updateWidgetVisibility()
@@ -283,6 +291,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_scalingSlider->setHidden( true );
     m_spanSlider1->setHidden( true );
     m_spanSlider2->setHidden( true );
+    m_qBallScaling->setHidden( true );
 
     if ( dim == 1 )
     {
@@ -302,6 +311,8 @@ void DatasetPropertyView::updateWidgetVisibility()
 
         m_spanSlider1->setHidden( false );
         m_spanSlider2->setHidden( false );
+
+        m_qBallScaling->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -317,6 +328,7 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_scalingSlider->setHidden( false );
         m_spanSlider1->setHidden( false );
         m_spanSlider2->setHidden( false );
+        m_qBallScaling->setHidden( false );
     }
 }
 
@@ -482,3 +494,7 @@ void DatasetPropertyView::upper2Changed( int value )
     }
 }
 
+void DatasetPropertyView::qballScalingChanged( int state )
+{
+    model()->setData( getSelectedIndex( FNDSE_MINMAX_SCALING ), ( state == Qt::Checked ) );
+}
