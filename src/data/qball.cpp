@@ -8,6 +8,8 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include "../algos/fmath.h"
+
 #include "qball.h"
 
 QBall::QBall()
@@ -78,6 +80,98 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     return out;
 }
 
+/*
+ * CMRImage calc_sharp_q_ball(
+
+     const CMRImage& data,
+     const CMRImage& b_zero,
+     const matrixT gradients,
+     const baseT order,
+     const rangeS r )
+{
+ *
+ */
+
+QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
+{
+    QVector<QVector3D>bvecs =  ds->getBvecs();
+
+    Matrix gradients( bvecs.size(), 3 );
+    for ( int i = 0; i < bvecs.size(); ++i )
+    {
+        gradients( i+1, 1 ) = bvecs.at( i ).x();
+        gradients( i+1, 2 ) = bvecs.at( i ).y();
+        gradients( i+1, 3 ) = bvecs.at( i ).z();
+    }
+
+    QVector<ColumnVector>* data = ds->getData();
+    QVector<float> b0Data = ds->getB0Data();
+
+    // inverse direction matrix for calculation:
+    //const matrixT A( pseudoinverse (sh_base( gradients, order ) ) );
+    Matrix B = sh_base( gradients, order );
+    Matrix A = ( B.t() * B ).i() * B.t();
+
+    QVector<ColumnVector>* qBallVector = new QVector<ColumnVector>();
+
+    // for all voxels:
+    for ( int i = 0; i < data->size(); ++i )
+    {
+        ColumnVector voxel( data->at( i )/ b0Data[i] );
+
+        // regularize data data:
+        regularize_sqball( 0.15, 0.15, voxel );
+        voxel = FMath::vlog( FMath::vlog( voxel ) * (-1) );
+        ColumnVector coeff = A * voxel;
+
+        for( int k(2); k <= order; k+=2 )
+        {
+            //double frt_val = 2.0 * M_PI * boost::math::legendre_p<double>( k, 0 );
+            //double lbt_val = k * ( 1 - k );
+            double leg = FMath::legendre_p( k );
+
+            for( int degree( - k ); degree <= k; degree++ )
+            {
+                int l = k * (k+1) / 2 + degree;
+                //coeff(l) *= frt_val * lbt_val;
+                coeff(l) *= leg;
+            }
+        }
+        if( b0Data[i] > 0.0 )
+        {
+            coeff( 1 ) = 1.0 / sqrt( 4. * M_PI );
+        }
+
+        // actual calculation:
+        qBallVector->push_back( coeff );
+    }
+
+    // done:
+    return qBallVector;
+}
+
+void QBall::regularize_sqball( const double par_1, const double par_2, ColumnVector& data )
+{
+    for ( int i = 1; i <= data.Nrows(); ++i )
+    {
+        if ( data( i ) < 0 )
+        {
+            data( i ) = 0.5 * par_1;
+        } else if ( data( i ) < par_1 )
+        {
+            data( i ) = 0.5 * par_1 + 0.5 * pow2( data( i ) ) / par_1;
+        } else if ( data( i ) < 1.0 - par_2 )
+        {
+            // do nothing with data
+        } else if ( data( i ) < 1.0 )
+        {
+            data( i ) = 1.0 - 0.5 * par_2 - 0.5 * pow2( 1.0 - data( i ) ) / par_2;
+        } else
+        {
+            data( i ) = 1.0 - 0.5 * par_2;
+        }
+    }
+}
 
 Matrix QBall::sh_base( Matrix g, int maxOrder )
 {

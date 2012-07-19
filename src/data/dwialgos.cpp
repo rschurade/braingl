@@ -47,8 +47,8 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     }
 
     double lambda = 0.006;
-    int maxOrder = 6;
-    Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, maxOrder );
+    int order = 6;
+    Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, order );
 
     //qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();
     //qDebug() << "elements in qball base" << qBallBase.Nrows() << " " << qBallBase.Ncols();
@@ -81,6 +81,33 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     qDebug() << "finished calculating qBall";
 
     return out;
+}
+
+DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
+{
+    int order = 6;
+
+    QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
+
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qBallVector, ds->getB0Data(), ds->getBvals(), ds->getBvecs() );
+    out->parseNiftiHeader( ds->getHeader() );
+    out->setProperty( "fileName", "QBall" );
+    out->setProperty( "name", "QBall" );
+    out->setProperty( "createdBy", FNALGO_QBALL );
+    out->setProperty( "lod", 2 );
+    out->setProperty( "renderSlice", 1 );
+    out->setProperty( "scaling", 1.0 );
+    out->setProperty( "nt", qBallVector->at(0).Nrows() );
+    out->setProperty( "datatype", DT_FLOAT);
+    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 1 );
+    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 1 );
+    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 1 );
+    out->examineDataset();
+
+    qDebug() << "finished calculating qBall";
+
+    return out;
+
 }
 
 DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )

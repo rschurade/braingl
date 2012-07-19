@@ -232,14 +232,16 @@ void SHRenderer::initGeometry()
                         max = max - min;
                         for ( int i = 0; i < r.Nrows(); ++i )
                         {
-                            r(i+1) = ( r(i+1) - min ) / max;
+                            r(i+1) = ( r(i+1) - min ) / max * 0.8;
                         }
                     }
                     else
                     {
                         for ( int i = 0; i < r.Nrows(); ++i )
                         {
-                            r(i+1) = r(i+1) / max;
+                            //r(i+1) *= -1.0;
+                            if ( r( i + 1) < 0.0 ) r( i+1 ) = 0.0;
+                            r(i+1) = r(i+1) / max * 0.8;
                         }
                     }
 

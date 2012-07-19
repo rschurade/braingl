@@ -5,13 +5,12 @@
  *      Author: Ralph
  */
 #include <QtGui/QtGui>
+#include <QxtGui/QxtSpanSlider>
 
 #include "../widgets/sliderwithedit.h"
 #include "../widgets/selectwithlabel.h"
 #include "../widgets/checkboxwithlabel.h"
 #include "../../data/enums.h"
-
-#include <QxtGui/QxtSpanSlider>
 
 #include "datasetpropertyview.h"
 
