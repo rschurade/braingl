@@ -19,6 +19,7 @@ class DWIAlgos
 {
 public:
     static DatasetDWI* qBall( DatasetDWI* ds );
+    static DatasetDWI* qBallSharp( DatasetDWI* ds );
     static DatasetDWI* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );
