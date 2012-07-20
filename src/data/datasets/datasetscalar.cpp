@@ -84,3 +84,8 @@ void DatasetScalar::createTexture()
     delete[] tmpData;
 
 }
+
+QVector<float> DatasetScalar::getData()
+{
+    return m_data;
+}

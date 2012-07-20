@@ -17,6 +17,9 @@ public:
     virtual ~DatasetScalar();
 
     void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
+
+    QVector<float> getData();
+
 private:
     QVector<float>m_data;
 
