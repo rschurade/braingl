@@ -99,9 +99,12 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qBallVector->at(0).Nrows() );
     out->setProperty( "datatype", DT_FLOAT);
-    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 1 );
-    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 1 );
-    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 1 );
+    out->setProperty( "renderLowerX", 30 );
+    out->setProperty( "renderLowerY", 60 );
+    out->setProperty( "renderLowerZ", 30 );
+    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 30 );
+    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 20);
+    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 30 );
     out->examineDataset();
 
     qDebug() << "finished calculating qBall";

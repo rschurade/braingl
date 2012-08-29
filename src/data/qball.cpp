@@ -126,23 +126,22 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
 
         for( int k(2); k <= order; k+=2 )
         {
-            //double frt_val = 2.0 * M_PI * boost::math::legendre_p<double>( k, 0 );
-            //double lbt_val = k * ( 1 - k );
-            double leg = FMath::legendre_p( k );
+            double frt_val = 2.0 * M_PI * boost::math::legendre_p<double>( k, 0 );
+            double lbt_val = -k * ( k + 1 );
 
-            for( int degree( - k ); degree <= k; degree++ )
+            for( int degree = -k; degree <= k; degree++ )
             {
-                int l = k * (k+1) / 2 + degree;
-                //coeff(l) *= frt_val * lbt_val;
-                coeff(l) *= leg;
+                int l = k * (k+1) / 2 + degree + 1;
+                coeff(l) *= frt_val * lbt_val;
             }
         }
+
+
         if( b0Data[i] > 0.0 )
         {
             coeff( 1 ) = 1.0 / sqrt( 4. * M_PI );
         }
 
-        // actual calculation:
         qBallVector->push_back( coeff );
     }
 
@@ -204,7 +203,7 @@ Matrix QBall::sh_base( Matrix g, int maxOrder )
 double QBall::sh_base_function( int order, int degree, double theta, double phi )
 {
     using namespace boost::math;
-#if 1
+#if 0
     double P = legendre_p<double>( order, abs(degree), cos(theta) );
 
     if ( degree > 0 )
