@@ -214,10 +214,22 @@ void SingleSHRenderer::initGeometry()
                 max = qMax( max, (float)r(i+1) );
                 min = qMin( min, (float)r(i+1) );
             }
-            max = max - min;
-            for ( int i = 0; i < r.Nrows(); ++i )
+
+            bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
+            if ( minmaxScaling )
             {
-                r(i+1) = ( r(i+1) - min ) / max;
+                max = max - min;
+                for ( int i = 0; i < r.Nrows(); ++i )
+                {
+                    r(i+1) = ( r(i+1) - min ) / max;
+                }
+            }
+            else
+            {
+                for ( int i = 0; i < r.Nrows(); ++i )
+                {
+                    r(i+1) = r(i+1) / max;
+                }
             }
 
             for ( int i = 0; i < vertices.size(); ++i )

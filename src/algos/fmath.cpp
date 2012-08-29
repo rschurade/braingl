@@ -36,13 +36,13 @@ double FMath::legendre_p( int k )
     for ( int i = 1; i <= k + 1; i += 2 ) z *= i;
     for ( int i = 2; i <= k - 2; i += 2 ) n *= i;
 
-    if ( k % 2 == 0)
+    if (( k / 2 ) % 2 == 0)
     {
-        return 1.0 / ( 8 * M_PI ) * ( z / n );
+        return -1.0 / ( 8 * M_PI ) * ( z / n );
     }
     else
     {
-        return -1.0 / ( 8 * M_PI ) * ( z / n );
+        return 1.0 / ( 8 * M_PI ) * ( z / n );
     }
 
 }
