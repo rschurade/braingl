@@ -13,17 +13,18 @@
 class DatasetScalar : public DatasetNifti
 {
 public:
-    DatasetScalar( QString filename, QVector<float> data );
+    DatasetScalar( QString filename, QVector<float> data, nifti_image* header );
     virtual ~DatasetScalar();
-
-    void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
 
     QVector<float> getData();
 
 private:
     QVector<float>m_data;
 
+    void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
     void createTexture();
+
+    void flipX();
 };
 
 #endif /* DATASETSCALAR_H_ */

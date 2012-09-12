@@ -7,14 +7,16 @@
 
 #include "dataset3d.h"
 
-Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data ) :
-        DatasetNifti( filename, FNDT_NIFTI_VECTOR ),
+Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ),
         m_data( data )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
+
+    examineDataset();
 }
 
 Dataset3D::~Dataset3D()
@@ -48,6 +50,12 @@ void Dataset3D::examineDataset()
     }
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
+
+    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+    {
+        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        flipX();
+    }
 }
 
 void Dataset3D::createTexture()
@@ -95,4 +103,26 @@ void Dataset3D::createTexture()
         }
         glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
     }
+}
+
+void Dataset3D::flipX()
+{
+    int xDim = m_properties["nx"].toInt();
+    int yDim = m_properties["ny"].toInt();
+    int zDim = m_properties["nz"].toInt();
+
+    QVector<QVector3D> newData;
+
+    for( int z = 0; z < zDim; ++z )
+    {
+        for( int y = 0; y < yDim; ++y )
+        {
+            for( int x = xDim -1; x >= 0; --x )
+            {
+                newData.push_back( m_data[ x + y * xDim + z * xDim * yDim ] );
+            }
+        }
+    }
+    m_data.clear();
+    m_data = newData;
 }
