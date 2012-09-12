@@ -8,6 +8,7 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
+#include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QString>
 #include <QtCore/QHash>

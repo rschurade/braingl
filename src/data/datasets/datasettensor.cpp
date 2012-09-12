@@ -7,8 +7,8 @@
 
 #include "datasettensor.h"
 
-DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data ) :
-        DatasetNifti( filename, FNDT_NIFTI_TENSOR ),
+DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
         m_data( data )
 {
     m_properties["active"] = true;
@@ -16,6 +16,8 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data ) :
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
     m_properties["createdBy"] = FNALGO_TENSORFIT;
+
+    examineDataset();
 }
 
 DatasetTensor::~DatasetTensor()
@@ -49,6 +51,11 @@ void DatasetTensor::examineDataset()
     m_properties["renderUpperY"] = ny - 1;
     m_properties["renderUpperZ"] = nz - 1;
 
+    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+    {
+        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        flipX();
+    }
 }
 
 void DatasetTensor::createTexture()

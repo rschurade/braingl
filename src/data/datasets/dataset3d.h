@@ -16,13 +16,14 @@
 class Dataset3D : public DatasetNifti
 {
 public:
-    Dataset3D( QString filename, QVector<QVector3D> data );
+    Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
 
-    void examineDataset();
-
 private:
+    void examineDataset();
     void createTexture();
+
+    void flipX();
 
     QVector<QVector3D> m_data;
 };

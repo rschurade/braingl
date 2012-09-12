@@ -18,17 +18,16 @@
 class DatasetTensor : public DatasetNifti
 {
 public:
-    DatasetTensor( QString filename, QVector<Matrix>* data );
+    DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header );
     virtual ~DatasetTensor();
-
-    void examineDataset();
 
     QVector<Matrix>* getData();
 
-    void flipX();
-
 private:
     void createTexture();
+    void examineDataset();
+
+    void flipX();
 
     QVector<Matrix>* m_data;
 };

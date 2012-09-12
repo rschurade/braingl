@@ -8,8 +8,8 @@
 
 #include "datasetdwi.h"
 
-DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<int>bvals, QVector<QVector3D>bvecs ) :
-        DatasetNifti( filename, FNDT_NIFTI_DWI ),
+DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<int>bvals, QVector<QVector3D>bvecs, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_DWI, header ),
         m_data( data ),
         m_b0Data( b0Data ),
         m_bvals( bvals ),
@@ -20,6 +20,8 @@ DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<f
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
     m_properties["order"] = 4;
+
+    examineDataset();
 }
 
 DatasetDWI::~DatasetDWI()
@@ -95,6 +97,12 @@ void DatasetDWI::examineDataset()
     }
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
+
+    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+    {
+        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        flipX();
+    }
 }
 
 void DatasetDWI::createTexture()
@@ -129,4 +137,26 @@ void DatasetDWI::createTexture()
     glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
     delete[] tmpData;
 
+}
+
+void DatasetDWI::flipX()
+{
+    int xDim = m_properties["nx"].toInt();
+    int yDim = m_properties["ny"].toInt();
+    int zDim = m_properties["nz"].toInt();
+
+    QVector<ColumnVector>* newData = new QVector<ColumnVector>();
+
+    for( int z = 0; z < zDim; ++z )
+    {
+        for( int y = 0; y < yDim; ++y )
+        {
+            for( int x = xDim -1; x >= 0; --x )
+            {
+                newData->push_back( m_data->at( x + y * xDim + z * xDim * yDim ) );
+            }
+        }
+    }
+    m_data->clear();
+    m_data = newData;
 }

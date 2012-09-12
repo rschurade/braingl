@@ -63,8 +63,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
         qballVector->push_back( qBallBase * data->at( i ) );
     }
 
-    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qballVector, ds->getB0Data(), ds->getBvals(), bvecs );
-    out->parseNiftiHeader( ds->getHeader() );
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qballVector, ds->getB0Data(), ds->getBvals(), bvecs, ds->getHeader() );
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
@@ -77,7 +76,6 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 1 );
     out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 1 );
     out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 1 );
-    out->examineDataset();
 
     qDebug() << "finished calculating qBall";
 
@@ -90,8 +88,7 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
 
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
 
-    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qBallVector, ds->getB0Data(), ds->getBvals(), ds->getBvecs() );
-    out->parseNiftiHeader( ds->getHeader() );
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qBallVector, ds->getB0Data(), ds->getBvals(), ds->getBvecs(), ds->getHeader() );
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
@@ -107,7 +104,6 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
     out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 30 );
     out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 20);
     out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 30 );
-    out->examineDataset();
 
     qDebug() << "finished calculating qBall";
 
@@ -203,14 +199,12 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
         }
     }
 
-    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), tensors, ds->getB0Data(), ds->getBvals(), bvecs );
-    out->parseNiftiHeader( ds->getHeader() );
+    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), tensors, ds->getB0Data(), ds->getBvals(), bvecs, ds->getHeader() );
     out->setProperty( "fileName", "Tensor" );
     out->setProperty( "name", "Tensor" );
     out->setProperty( "createdBy", FNALGO_TENSORFIT );
     out->setProperty( "nt", 6 );
     out->setProperty( "datatype", DT_FLOAT);
-    out->examineDataset();
     return out;
 }
 
@@ -258,15 +252,12 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
         }
     }
 
-    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa );
-    out->parseNiftiHeader( ds->getHeader() );
+    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
     out->setProperty( "fileName", "FA" );
     out->setProperty( "name", "FA" );
     out->setProperty( "createdBy", FNALGO_FA );
     out->setProperty( "nt", 1 );
     out->setProperty( "datatype", DT_FLOAT);
-    out->examineDataset();
-
     return out;
 }
 
@@ -381,21 +372,18 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
 
     QList<Dataset*>l;
 
-    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1 );
-    out->parseNiftiHeader( ds->getHeader() );
+    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, ds->getHeader() );
     out->setProperty( "name", "evec 1" );
     out->setProperty( "createdBy", FNALGO_EV );
     out->setProperty( "nt", 3 );
     out->setProperty( "datatype", DT_FLOAT);
-    out->examineDataset();
 
-    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1 );
-    out2->parseNiftiHeader( ds->getHeader() );
+
+    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, ds->getHeader() );
     out2->setProperty( "name", "eval 1" );
     out2->setProperty( "createdBy", FNALGO_EV );
     out2->setProperty( "nt", 1 );
     out2->setProperty( "datatype", DT_FLOAT);
-    out2->examineDataset();
 
     l.push_back( out );
     l.push_back( out2 );

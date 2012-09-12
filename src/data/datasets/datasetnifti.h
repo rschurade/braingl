@@ -19,14 +19,10 @@
 class DatasetNifti : public Dataset
 {
 public:
-    DatasetNifti( QString filename, FN_DATASET_TYPE type );
+    DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header );
     virtual ~DatasetNifti();
 
-    void parseNiftiHeader( nifti_image* header );
-
     GLuint getTextureGLuint();
-
-    virtual void examineDataset() = 0;
 
     nifti_image* getHeader();
 
@@ -35,6 +31,9 @@ public:
 
 protected:
     virtual void createTexture() = 0;
+    virtual void examineDataset() = 0;
+    virtual void flipX() = 0;
+    void parseNiftiHeader();
 
     nifti_image* m_header;
 

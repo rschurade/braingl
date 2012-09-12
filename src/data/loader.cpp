@@ -192,9 +192,7 @@ bool Loader::loadNiftiScalar( QString fileName )
         }
     }
 
-    DatasetScalar* dataset = new DatasetScalar( fileName, data );
-    dataset->parseNiftiHeader( m_header );
-    dataset->examineDataset();
+    DatasetScalar* dataset = new DatasetScalar( fileName, data, m_header );
     m_dataset = dataset;
     return true;
 }
@@ -291,9 +289,7 @@ bool Loader::loadNiftiVector3D( QString fileName )
         }
     }
 
-    Dataset3D* dataset = new Dataset3D( fileName, data );
-    dataset->parseNiftiHeader( m_header );
-    dataset->examineDataset();
+    Dataset3D* dataset = new Dataset3D( fileName, data, m_header );
     m_dataset = dataset;
     return true;
 }
@@ -303,14 +299,6 @@ bool Loader::loadNiftiTensor( QString fileName )
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     size_t dim = m_header->dim[4];
-
-    bool xFlip = ( m_header->qto_xyz.m[0][0] < 0 );
-    bool yFlip = ( m_header->qto_xyz.m[1][1] < 0 );
-    bool zFlip = ( m_header->qto_xyz.m[2][2] < 0 );
-
-    if ( xFlip ) qDebug() << "xFlip";
-    if ( yFlip ) qDebug() << "yFlip";
-    if ( zFlip ) qDebug() << "zFlip";
 
     QVector<Matrix>* dataVector = new QVector<Matrix>();
 
@@ -344,10 +332,7 @@ bool Loader::loadNiftiTensor( QString fileName )
                 dataVector->push_back( m );
             }
 
-            DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
-            if( xFlip ) dataset->flipX();
+            DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
             m_dataset = dataset;
 
             nifti_image_free( filedata );
@@ -481,9 +466,7 @@ bool Loader::loadNiftiDWI( QString fileName )
             }
             qDebug() << "extract data done";
 
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, m_header );
             m_dataset = dataset;
 
             nifti_image_free( filedata );

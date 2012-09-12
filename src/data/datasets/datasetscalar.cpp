@@ -10,14 +10,16 @@
 
 #include "datasetscalar.h"
 
-DatasetScalar::DatasetScalar( QString filename, QVector<float> data ) :
-    DatasetNifti( filename, FNDT_NIFTI_SCALAR ),
+DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
+    DatasetNifti( filename, FNDT_NIFTI_SCALAR, header ),
     m_data( data )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
+
+    examineDataset();
 }
 
 DatasetScalar::~DatasetScalar()
@@ -51,6 +53,12 @@ void DatasetScalar::examineDataset()
 
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
+
+    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+    {
+        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        flipX();
+    }
 }
 
 void DatasetScalar::createTexture()
@@ -88,4 +96,26 @@ void DatasetScalar::createTexture()
 QVector<float> DatasetScalar::getData()
 {
     return m_data;
+}
+
+void DatasetScalar::flipX()
+{
+    int xDim = m_properties["nx"].toInt();
+    int yDim = m_properties["ny"].toInt();
+    int zDim = m_properties["nz"].toInt();
+
+    QVector<float> newData;
+
+    for( int z = 0; z < zDim; ++z )
+    {
+        for( int y = 0; y < yDim; ++y )
+        {
+            for( int x = xDim -1; x >= 0; --x )
+            {
+                newData.push_back( m_data[ x + y * xDim + z * xDim * yDim ] );
+            }
+        }
+    }
+    m_data.clear();
+    m_data = newData;
 }
