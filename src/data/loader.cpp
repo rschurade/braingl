@@ -7,6 +7,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
+#include <QtGui/QtGui>
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
@@ -359,11 +360,13 @@ bool Loader::loadNiftiDWI( QString fileName )
     fn.replace( ".nii.gz", ".bval" );
     fn.replace( ".nii", ".bval" );
     QDir dir( fn );
+
     if ( dir.exists( dir.absolutePath() ) )
     {
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
+            qDebug() << "couldn't open " << fn;
             return false;
         }
 
@@ -378,6 +381,11 @@ bool Loader::loadNiftiDWI( QString fileName )
 
         }
     }
+    else
+    {
+        qDebug() << "couldn't open " << fn;
+        return false;
+    }
 
     fn.replace( ".bval", ".bvec" );
     QDir dir2( fn );
@@ -386,6 +394,7 @@ bool Loader::loadNiftiDWI( QString fileName )
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
+            qDebug() << "couldn't open " << fn;
             return false;
         }
 
@@ -413,6 +422,11 @@ bool Loader::loadNiftiDWI( QString fileName )
                 ++numB0;
             }
         }
+    }
+    else
+    {
+        qDebug() << "couldn't open " << fn;
+        return false;
     }
 
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
@@ -475,7 +489,6 @@ bool Loader::loadNiftiDWI( QString fileName )
             break;
         }
     }
-
     return false;
 }
 
