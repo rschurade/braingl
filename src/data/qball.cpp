@@ -96,6 +96,8 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
 {
     QVector<QVector3D>bvecs =  ds->getBvecs();
 
+    qDebug() << "order: " << order;
+
     Matrix gradients( bvecs.size(), 3 );
     for ( int i = 0; i < bvecs.size(); ++i )
     {

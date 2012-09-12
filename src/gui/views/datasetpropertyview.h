@@ -54,6 +54,7 @@ private slots:
 
     void alphaChanged( float value );
 
+    void orderChanged( int index );
     void lodChanged( int index );
     void renderSliceChanged( int index );
     void scalingChanged( float value );
@@ -86,6 +87,7 @@ private:
     CheckboxWithLabel* m_textureInterpolation;
     CheckboxWithLabel* m_textureActive;
 
+    SelectWithLabel* m_orderSelect;
     SelectWithLabel* m_lodSelect;
     SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;

@@ -47,7 +47,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     }
 
     double lambda = 0.006;
-    int order = 6;
+    int order = 4;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, order );
 
     //qDebug() << "elements in data" << ds->getData()->at( 0 ).Nrows();
@@ -69,6 +69,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
+    out->setProperty( "order", 0 );
     out->setProperty( "renderSlice", 1 );
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qballVector->at(0).Nrows() );
@@ -85,7 +86,7 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
 
 DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
 {
-    int order = 6;
+    int order = ds->getProperty("order").toInt();
 
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
 
@@ -95,6 +96,7 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
+    out->setProperty( "order", order );
     out->setProperty( "renderSlice", 1 );
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qBallVector->at(0).Nrows() );

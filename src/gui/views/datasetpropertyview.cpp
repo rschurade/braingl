@@ -51,6 +51,12 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
 
+    m_orderSelect = new SelectWithLabel( tr("order" ) );
+    m_orderSelect->insertItem( 0, tr( "4" ) );
+    m_orderSelect->insertItem( 1, tr( "6" ) );
+    m_orderSelect->insertItem( 2, tr( "8" ) );
+    connect( m_orderSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( orderChanged( int ) ) );
+
     m_lodSelect = new SelectWithLabel( tr("level of detail" ) );
     m_lodSelect->insertItem( 0, tr( "0" ) );
     m_lodSelect->insertItem( 1, tr( "1" ) );
@@ -98,6 +104,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_colormapSelect );
     m_layout->addWidget( m_textureInterpolation );
     m_layout->addWidget( m_alphaSlider );
+    m_layout->addWidget( m_orderSelect );
     m_layout->addWidget( m_lodSelect );
     m_layout->addWidget( m_sliceSelect );
     m_layout->addWidget( m_scalingSlider );
@@ -222,6 +229,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_ACTIVE );
     m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 
+    index = getSelectedIndex( FNDSE_ORDER );
+    m_orderSelect->setCurrentIndex( ( model()->data( index, Qt::EditRole ).toInt() / 2 ) -2 );
+
     index = getSelectedIndex( FNDSE_LOD );
     m_lodSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 
@@ -302,9 +312,10 @@ void DatasetPropertyView::updateWidgetVisibility()
     }
 
     int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
-    if ( created == FNALGO_QBALL )
+    if ( created == FNALGO_QBALL || created == FNALGO_TENSORFIT )
     {
         m_scalingSlider->setHidden( false );
+        m_orderSelect->setHidden( false );
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
 
@@ -373,6 +384,12 @@ void DatasetPropertyView::alphaChanged( float value )
 {
     model()->setData( getSelectedIndex( FNDSE_ALPHA ), value );
 }
+
+void DatasetPropertyView::orderChanged( int index )
+{
+    model()->setData( getSelectedIndex( FNDSE_ORDER ), ( index + 2 ) * 2 );
+}
+
 
 void DatasetPropertyView::lodChanged( int index )
 {

@@ -5,11 +5,14 @@
  *      Author: schurade
  */
 #include <QtCore/QDebug>
+#include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
+#include "datasets/datasettensor.h"
+#include "mesh/trianglemesh.h"
 
 #include "loader.h"
 
@@ -36,167 +39,81 @@ Dataset* Loader::getDataset()
 
 bool Loader::load()
 {
-    switch ( determineType() )
+    QString fn = m_fileName.path();
+
+    if ( fn.endsWith( ".nii.gz" ) || fn.endsWith( ".nii" ) || fn.endsWith(".hdr") || fn.endsWith(".ima") || fn.endsWith(".img") )
     {
-        case FNDT_NIFTI_SCALAR:
-        {
-        	QVector<float> data = loadNiftiScalar( m_fileName.path() );
-            DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
-            m_dataset = dataset;
-            return true;
-            break;
-        }
-        case FNDT_NIFTI_VECTOR:
-        {
-            QVector<QVector3D> data = loadNiftiVector3D( m_fileName.path() );
-            Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
-            m_dataset = dataset;
-            return true;
-            break;
-        }
-        case FNDT_NIFTI2_SCALAR:
-        {
-            QString fn = m_fileName.path();
-            if ( m_fileName.path().endsWith(".hdr") )
-            {
-                QDir dir;
-                fn.replace( fn.size() - 3, 3, "img" );
-                if ( !dir.exists( fn ) )
-                {
-                    fn.replace( fn.size() - 3, 3, "ima" );
-                    if ( !dir.exists( fn ) )
-                    {
-                        qDebug() << "no image file found";
-                    }
-                }
-            }
 
-            QVector<float> data = loadNiftiScalar( fn );
-            DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), data );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
-            m_dataset = dataset;
-            return true;
-            break;
-        }
-        case FNDT_NIFTI2_VECTOR:
-        {
-            QString fn = m_fileName.path();
-            if ( m_fileName.path().endsWith(".hdr") )
-            {
-                QDir dir;
-                fn.replace( fn.size() - 3, 3, "img" );
-                if ( !dir.exists( fn ) )
-                {
-                    fn.replace( fn.size() - 3, 3, "ima" );
-                    if ( !dir.exists( fn ) )
-                    {
-                        qDebug() << "no image file found";
-                    }
-                }
-            }
-
-            QVector<QVector3D> data = loadNiftiVector3D( m_fileName.path() );
-            Dataset3D* dataset = new Dataset3D( m_fileName.path(), data );
-            dataset->parseNiftiHeader( m_header );
-            dataset->examineDataset();
-            m_dataset = dataset;
-            return true;
-            break;
-        }
-
-        case FNDT_NIFTI_DWI:
-        {
-            loadDWI( m_fileName.path() );
-            return true;
-            break;
-        }
-        default:
-            break;
+        return loadNifti();
     }
+
+    if ( m_fileName.path().endsWith(".mesh") )
+    {
+        return loadMesh();
+    }
+
     return false;
 }
 
-FN_DATASET_TYPE Loader::determineType()
+bool Loader::loadNifti()
 {
-    if ( m_fileName.path().endsWith(".nii.gz") || m_fileName.path().endsWith(".nii") )
+    QString hdrPath = m_fileName.path();
+    QString fn = m_fileName.path();
+    if ( fn.endsWith(".ima") || fn.endsWith(".img") )
     {
-        m_header = nifti_image_read( m_fileName.path().toStdString().c_str(), 0 );
-
-        // if a proper nifti header is found
-        if ( m_header )
-        {
-            if ( m_header->dim[4] == 1 )
-            {
-                return FNDT_NIFTI_SCALAR;
-            }
-            else if ( m_header->dim[4] == 3 )
-            {
-                return FNDT_NIFTI_VECTOR;
-            }
-            else if ( m_header->dim[4] > 3 )
-            {
-                QString fn = m_fileName.path();
-                bool hasBVal = false;
-                bool hasBVec = false;
-
-                fn.replace( ".nii.gz", ".bval" );
-                fn.replace( ".nii", ".bval" );
-                QDir dir( fn );
-                if ( dir.exists( dir.absolutePath() ) )
-                {
-                    hasBVal = true;
-                }
-                fn.replace( ".bval", ".bvec" );
-                QDir dir2( fn );
-                if ( dir2.exists( dir2.absolutePath() ) )
-                {
-                    hasBVec = true;
-                }
-
-                if ( hasBVal && hasBVec )
-                {
-                    return FNDT_NIFTI_DWI;
-                }
-            }
-        }
+        hdrPath.replace( hdrPath.size() - 3, 3, "hdr" );
     }
-    else if ( m_fileName.path().endsWith(".hdr") || m_fileName.path().endsWith(".ima") || m_fileName.path().endsWith(".img") )
+
+    if ( !loadNiftiHeader( hdrPath ) )
     {
-        if ( m_fileName.path().endsWith(".hdr") )
-        {
-            m_header = nifti_image_read( m_fileName.path().toStdString().c_str(), 0 );
-        }
-        else
-        {
-            QString fn = m_fileName.path();
-            fn.replace( fn.size() - 3, 3, "hdr" );
-            m_header = nifti_image_read( fn.toStdString().c_str(), 0 );
-        }
-        if ( m_header )
-        {
-            if ( m_header->dim[4] == 1 )
-            {
-                return FNDT_NIFTI2_SCALAR;
-            }
-            else if ( m_header->dim[4] == 3 )
-            {
-                return FNDT_NIFTI2_VECTOR;
-            }
-            else if ( m_header->dim[4] > 3 )
-            {
-                return FNDT_NIFTI2_DWI;
-            }
-        }
+        return false;
     }
-    return FNDT_UNKNOWN;
+
+    if ( m_header->dim[4] == 1 )
+    {
+        m_datasetType = FNDT_NIFTI_SCALAR;
+        return loadNiftiScalar( fn );
+    }
+    else if ( m_header->dim[4] == 3 )
+    {
+        m_datasetType = FNDT_NIFTI_VECTOR;
+        return loadNiftiVector3D( fn );
+    }
+    else if ( m_header->dim[4] == 6 )
+    {
+        m_datasetType = FNDT_NIFTI_TENSOR;
+        return loadNiftiTensor( fn );
+    }
+    else if ( m_header->dim[4] > 3 )
+    {
+        m_datasetType = FNDT_NIFTI_DWI;
+        return loadNiftiDWI( fn );
+    }
+
+    return false;
 }
 
-QVector<float> Loader::loadNiftiScalar( QString fileName )
+bool Loader::loadNiftiHeader( QString hdrPath )
+{
+    try
+    {
+        m_header = nifti_image_read( hdrPath.toStdString().c_str(), 0 );
+    }
+    catch (...)
+    {
+        // failed to read header
+    }
+    if ( m_header )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool Loader::loadNiftiScalar( QString fileName )
 {
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
@@ -217,7 +134,6 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
                 data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT16:
@@ -229,7 +145,6 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
                 data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT32:
@@ -241,7 +156,6 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
                 data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_FLOAT32:
@@ -253,7 +167,6 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
                 data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT8:
@@ -264,7 +177,6 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
             {
                 data[i] = static_cast<float>( inputData[i] );
             }
-            return data;
             break;
         }
         case NIFTI_TYPE_UINT16:
@@ -276,15 +188,18 @@ QVector<float> Loader::loadNiftiScalar( QString fileName )
                 data[i] = static_cast<float>( inputData[i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
     }
 
-    return QVector<float>(0);
+    DatasetScalar* dataset = new DatasetScalar( fileName, data );
+    dataset->parseNiftiHeader( m_header );
+    dataset->examineDataset();
+    m_dataset = dataset;
+    return true;
 }
 
-QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
+bool Loader::loadNiftiVector3D( QString fileName )
 {
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
@@ -307,7 +222,6 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setZ( inputData[2*blockSize + i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT16:
@@ -321,7 +235,6 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setZ( inputData[2*blockSize + i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT32:
@@ -335,7 +248,6 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setZ( inputData[2*blockSize + i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_FLOAT32:
@@ -349,7 +261,6 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setZ( inputData[2*blockSize + i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
         case NIFTI_TYPE_INT8:
@@ -362,7 +273,7 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setY( inputData[blockSize + i] );
                 data[i].setZ( inputData[2*blockSize + i] );
             }
-            return data;
+            nifti_image_free( filedata );
             break;
         }
         case NIFTI_TYPE_UINT16:
@@ -376,17 +287,80 @@ QVector<QVector3D> Loader::loadNiftiVector3D( QString fileName )
                 data[i].setZ( inputData[2*blockSize + i] );
             }
             nifti_image_free( filedata );
-            return data;
             break;
         }
     }
 
-    return QVector<QVector3D>( 0 );
+    Dataset3D* dataset = new Dataset3D( fileName, data );
+    dataset->parseNiftiHeader( m_header );
+    dataset->examineDataset();
+    m_dataset = dataset;
+    return true;
+}
+
+bool Loader::loadNiftiTensor( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    size_t dim = m_header->dim[4];
+
+    bool xFlip = ( m_header->qto_xyz.m[0][0] < 0 );
+    bool yFlip = ( m_header->qto_xyz.m[1][1] < 0 );
+    bool zFlip = ( m_header->qto_xyz.m[2][2] < 0 );
+
+    if ( xFlip ) qDebug() << "xFlip";
+    if ( yFlip ) qDebug() << "yFlip";
+    if ( zFlip ) qDebug() << "zFlip";
+
+    QVector<Matrix>* dataVector = new QVector<Matrix>();
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_FLOAT32:
+        {
+            float* inputData;
+
+            inputData = reinterpret_cast<float*>( filedata->data );
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                ColumnVector v( dim );
+                for ( int j = 0; j < dim; ++j )
+                {
+                    v( j+1 ) = inputData[ j * blockSize + i ] * 500;
+                }
+                Matrix m( 3, 3 );
+                m( 1, 1 ) = v( 1 );
+                m( 1, 2 ) = v( 2 );
+                m( 1, 3 ) = v( 3 );
+                m( 2, 1 ) = v( 2 );
+                m( 2, 2 ) = v( 4 );
+                m( 2, 3 ) = v( 5 );
+                m( 3, 1 ) = v( 3 );
+                m( 3, 2 ) = v( 5 );
+                m( 3, 3 ) = v( 6 );
+
+                dataVector->push_back( m );
+            }
+
+            DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector );
+            dataset->parseNiftiHeader( m_header );
+            dataset->examineDataset();
+            if( xFlip ) dataset->flipX();
+            m_dataset = dataset;
+
+            nifti_image_free( filedata );
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
 }
 
 
-
-void Loader::loadDWI( QString fileName )
+bool Loader::loadNiftiDWI( QString fileName )
 {
     QStringList slBvals;
     QStringList slBvecs;
@@ -405,7 +379,7 @@ void Loader::loadDWI( QString fileName )
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
-            return;
+            return false;
         }
 
         QTextStream in( &file );
@@ -427,7 +401,7 @@ void Loader::loadDWI( QString fileName )
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
-            return;
+            return false;
         }
 
         QTextStream in( &file );
@@ -513,12 +487,86 @@ void Loader::loadDWI( QString fileName )
             m_dataset = dataset;
 
             nifti_image_free( filedata );
+            qDebug() << "end loading data";
+            return true;
             break;
         }
     }
 
-    qDebug() << "end loading data";
+    return false;
+}
 
-    //qDebug() << bvals2;
-    //qDebug() << bvecs;
+bool Loader::loadMesh()
+{
+    return loadMeshBinary();
+}
+
+bool Loader::loadMeshBinary()
+{
+    qDebug() << "load mesh";
+    QFile file( m_fileName.path() );
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    char* s = new char[29];
+    int len = 29;
+    int c = in.readRawData( s, len );
+    char* s1 = new char[10];
+    for ( int i = 0; i < 9; ++i )
+    {
+        s1[i] = s[i];
+    }
+    s1[9] = 0;
+    QString s2 = QString::fromLocal8Bit( s1 );
+    if ( s2 == "binarABCD" )
+    {
+        in.setByteOrder( QDataStream::BigEndian );
+        //qDebug() << "big endian";
+    }
+    else if ( s2 == "binarDCBA" )
+    {
+        in.setByteOrder( QDataStream::LittleEndian );
+        //qDebug() << "little endian";
+    }
+    else
+    {
+        qDebug() << "unknown entry in file";
+        return false;
+    }
+    m_datasetType = FNDT_MESH_BINARY;
+
+    in.setFloatingPointPrecision( QDataStream::SinglePrecision );
+    float fVal;
+    qint32 iVal;
+    TriangleMesh* tmesh = new TriangleMesh();
+    in >> iVal;
+    qDebug() << iVal;
+    float x,y,z;
+    for ( qint32 i = 0; i < iVal; ++i )
+    {
+        in >> x;
+        in >> y;
+        in >> z;
+        tmesh->addVertex( x, y, z );
+    }
+    in >> iVal;
+    qDebug() << iVal;
+    for ( qint32 i = 0; i < iVal; ++i )
+    {
+        in >> x;
+        in >> y;
+        in >> z;
+    }
+    in >> iVal;
+    in >> iVal;
+    qDebug() << iVal;
+    qint32 v1, v2, v3;
+    for ( qint32 i = 0; i < iVal; ++i )
+    {
+        in >> v1;
+        in >> v2;
+        in >> v3;
+        tmesh->addTriangle( v1, v2, v3 );
+    }
+
+    return false;
 }

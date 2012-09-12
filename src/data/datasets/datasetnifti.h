@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/nifti/nifti1_io.h"
 
+#include "../../thirdparty/newmat10/newmat.h"
+
 #include "dataset.h"
 
 class DatasetNifti : public Dataset
@@ -28,6 +30,8 @@ public:
 
     nifti_image* getHeader();
 
+    Matrix getQForm();
+    Matrix getSForm();
 
 protected:
     virtual void createTexture() = 0;
@@ -35,6 +39,9 @@ protected:
     nifti_image* m_header;
 
     GLuint m_textureGLuint;
+
+    Matrix m_qform;
+    Matrix m_sform;
 };
 
 #endif /* DATASETNIFTI_H_ */

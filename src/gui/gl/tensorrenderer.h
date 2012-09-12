@@ -5,21 +5,21 @@
  *      Author: Ralph
  */
 
-#ifndef SHRENDERER_H_
-#define SHRENDERER_H_
+#ifndef TENSORRENDERER_H_
+#define TENSORRENDERER_H_
 
 #include "objectrenderer.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class DatasetDWI;
+class DatasetTensor;
 class TriangleMesh;
 
-class SHRenderer : public ObjectRenderer
+class TensorRenderer : public ObjectRenderer
 {
 public:
-    SHRenderer();
-    virtual ~SHRenderer();
+    TensorRenderer();
+    virtual ~TensorRenderer();
 
     void init();
 
@@ -62,7 +62,7 @@ private:
 
     GLuint *vboIds;
 
-    DatasetDWI* m_dataset;
+    DatasetTensor* m_dataset;
 
     QVector<TriangleMesh*> m_spheres;
 };

@@ -61,10 +61,6 @@ SingleSHRenderer::SingleSHRenderer( QString name ) :
             mesh->addTriangle( i, tri );
         }
         m_spheres.push_back( mesh );
-
-        const Matrix* v1 = tess::vertices( lod );
-        Matrix base = ( QBall::sh_base( (*v1), 6 ) );
-        m_bases.push_back( base );
     }
 
     m_arcBall = new ArcBall( 50, 50 );
@@ -182,8 +178,13 @@ void SingleSHRenderer::initGeometry()
     float y = m_y * dy + dy / 2.;
     float z = m_z * dz + dz / 2.;
 
-
     TriangleMesh* mesh = m_spheres[lod];
+
+    int order = m_dataset->getProperty( "order" ).toInt();
+
+    const Matrix* v1 = tess::vertices( lod );
+    Matrix base = ( QBall::sh_base( (*v1), order ) );
+
 
     bool needsRedraw = ( xi != m_xOld  || xbi != m_xbOld || yi != m_yOld || ybi != m_ybOld || zi != m_zOld || zbi != m_zbOld || m_lodOld != lod || m_scalingOld != scaling );
 
@@ -200,12 +201,12 @@ void SingleSHRenderer::initGeometry()
 
         TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
 
-        Matrix m = m_bases[lod] * data->at( 0 );
+        Matrix m = base * data->at( 0 );
 
         if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
         {
             ColumnVector dv = data->at( xi + yi * xbi + zi * xbi * ybi );
-            ColumnVector r = m_bases[lod] * dv;
+            ColumnVector r = base * dv;
 
             float max = 0;
             float min = std::numeric_limits<float>::max();

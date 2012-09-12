@@ -31,10 +31,12 @@ public:
     void addVertex( int index, QVector3D position, QColor color = QColor( 255, 255, 255 ) );
     void addVertex( int index, float x, float y, float z, QColor color = QColor( 255, 255, 255 ) );
     void addVertex( QVector3D position, QColor color = QColor( 255, 255, 255 ) );
+    void addVertex( float x, float y, float z );
 
     void addTriangle( int index, Triangle triangle, QColor color = QColor( 255, 255, 255 ) );
     void addTriangle( int index, int id0, int id1, int id2, QColor color = QColor( 255, 255, 255 ) );
     void addTriangle( Triangle triangle, QColor color = QColor( 255, 255, 255 ) );
+    void addTriangle( int id0, int id1, int id2 );
 
     void removeTriangle( int index );
     void removeVertex( int index );

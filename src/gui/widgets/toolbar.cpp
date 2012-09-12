@@ -126,19 +126,16 @@ void ToolBar::slotSelectionChanged( int type )
     switch ( type )
     {
         case FNDT_NIFTI_SCALAR:
-        case FNDT_NIFTI2_SCALAR:
         {
             this->addAction( m_scalarAction1 );
             break;
         }
         case FNDT_NIFTI_VECTOR:
-        case FNDT_NIFTI2_VECTOR:
         {
             this->addAction( m_vectorAction1 );
             break;
         }
         case FNDT_NIFTI_DWI:
-        case FNDT_NIFTI2_DWI:
         {
             this->addAction( m_multiAction1 );
             this->addAction( m_multiAction2 );
