@@ -82,6 +82,11 @@ void TriangleMesh::addVertex( QVector3D position, QColor color )
     m_dirty = true;
 }
 
+void TriangleMesh::addVertex( float x, float y, float z )
+{
+    addVertex( QVector3D( x, y,z ) );
+}
+
 void TriangleMesh::addTriangle( int index, Triangle triangle, QColor color )
 {
     if ( index >= 0 && index < m_triangles.size() )
@@ -111,6 +116,11 @@ void TriangleMesh::addTriangle( Triangle triangle, QColor color )
         m_triColors.reserve( m_reservedForTris );
     }
     m_dirty = true;
+}
+
+void TriangleMesh::addTriangle( int id0, int id1, int id2 )
+{
+    addTriangle( Triangle( { id0, id1, id2 } ) );
 }
 
 QVector3D TriangleMesh::calcTriNormal( Triangle triangle )

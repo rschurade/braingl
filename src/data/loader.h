@@ -28,11 +28,17 @@ public:
 private:
     FN_DATASET_TYPE determineType();
 
-    QVector<float> loadNiftiScalar( QString fileName );
-    QVector<QVector3D> loadNiftiVector3D( QString fileName );
+    bool loadNifti();
+    bool loadNiftiHeader( QString hdrPath );
+
+    bool loadNiftiScalar( QString fileName );
+    bool loadNiftiVector3D( QString fileName );
+    bool loadNiftiTensor( QString fileName );
+    bool loadNiftiDWI( QString fileName );
 
 
-    void loadDWI( QString fileName );
+    bool loadMesh();
+    bool loadMeshBinary();
 
     nifti_image* m_header;
     QDir m_fileName;

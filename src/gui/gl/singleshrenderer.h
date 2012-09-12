@@ -81,7 +81,6 @@ private:
     DatasetDWI* m_dataset;
 
     QVector<TriangleMesh*> m_spheres;
-    QVector<Matrix> m_bases;
 };
 
 #endif /* SINGLESHRENDERER_H_ */

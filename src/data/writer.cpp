@@ -27,8 +27,6 @@ bool Writer::save()
     {
         case FNDT_NIFTI_SCALAR:
         case FNDT_NIFTI_VECTOR:
-        case FNDT_NIFTI2_SCALAR:
-        case FNDT_NIFTI2_VECTOR:
         {
             /*
             qDebug() << "writing nifti file";

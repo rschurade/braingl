@@ -128,7 +128,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 
@@ -189,7 +189,7 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_DWI )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 
@@ -223,6 +223,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
                break;
             case FNDSE_ACTIVE:
                 return ds->getProperty( "active" ).toBool();
+                break;
+            case FNDSE_ORDER:
+                return ds->getProperty( "order" ).toInt();
                 break;
             case FNDSE_LOD:
                 return ds->getProperty( "lod" ).toInt();
@@ -342,6 +345,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_ACTIVE:
                 m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
+                break;
+            case FNDSE_ORDER:
+                m_datasetList.at( index.row() )->setProperty( "order", value.toInt() );
                 break;
             case FNDSE_LOD:
                 m_datasetList.at( index.row() )->setProperty( "lod", value.toInt() );

@@ -19,6 +19,7 @@ DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<f
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
+    m_properties["order"] = 4;
 }
 
 DatasetDWI::~DatasetDWI()

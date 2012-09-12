@@ -13,10 +13,9 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../data/datasets/datasetdwi.h"
+#include "../../data/datasets/datasettensor.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
-#include "../../data/qball.h"
 
 #include "../../data/mesh/tesselation.h"
 #include "../../data/mesh/trianglemesh.h"
@@ -24,9 +23,9 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include "glfunctions.h"
-#include "shrenderer.h"
+#include "tensorrenderer.h"
 
-SHRenderer::SHRenderer() :
+TensorRenderer::TensorRenderer() :
     ObjectRenderer(),
     vboIds( new GLuint[ 6 ] ),
     m_x( 0. ),
@@ -75,16 +74,16 @@ SHRenderer::SHRenderer() :
     }
 }
 
-SHRenderer::~SHRenderer()
+TensorRenderer::~TensorRenderer()
 {
 }
 
-void SHRenderer::init()
+void TensorRenderer::init()
 {
     glGenBuffers( 6, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 mvp_matrix )
+void TensorRenderer::draw( QMatrix4x4 mvp_matrix )
 {
     QList<int>rl;
 
@@ -96,7 +95,7 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
         if ( model()->data( index, Qt::EditRole ).toBool() )
         {
             index = model()->index( i, FNDSP_CREATED_BY );
-            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNALGO_QBALL )
+            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNALGO_TENSORFIT )
             {
                 rl.push_back( i );
                 //qDebug() << "found QBall to render";
@@ -108,7 +107,7 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
     {
         //qDebug() << "sh draw";
 
-        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
+        m_dataset = VPtr<DatasetTensor>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
 
         int renderOnSlice = m_dataset->getProperty( "renderSlice" ).toInt();
         if ( renderOnSlice == 0 )
@@ -132,16 +131,16 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
     }
 }
 
-void SHRenderer::setupTextures()
+void TensorRenderer::setupTextures()
 {
 }
 
-void SHRenderer::setShaderVars()
+void TensorRenderer::setShaderVars()
 {
     GLFunctions::setShaderVars( "qball", model() );
 }
 
-void SHRenderer::initGeometry()
+void TensorRenderer::initGeometry()
 {
     m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
     m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
@@ -149,13 +148,13 @@ void SHRenderer::initGeometry()
     int xi = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toInt();
     int yi = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toInt();
     int zi = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toInt();
-    int xbi = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toInt();
-    int ybi = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toInt();
-    int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
+    int xbi = m_dataset->getProperty( "nx" ).toInt();
+    int ybi = m_dataset->getProperty( "ny" ).toInt();
+    int zbi = m_dataset->getProperty( "nz" ).toInt();
 
-    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
+    float dx = m_dataset->getProperty( "dx" ).toFloat();
+    float dy = m_dataset->getProperty( "dy" ).toFloat();
+    float dz = m_dataset->getProperty( "dz" ).toFloat();
 
     int lowerX = m_dataset->getProperty( "renderLowerX" ).toInt();
     int lowerY = m_dataset->getProperty( "renderLowerY" ).toInt();
@@ -182,9 +181,6 @@ void SHRenderer::initGeometry()
     QVector<TriangleMesh*>balls;
     QVector< QVector3D > normals = mesh->getVertNormals();
 
-    const Matrix* v1 = tess::vertices( lod );
-    Matrix base = ( QBall::sh_base( (*v1), order ) );
-
     std::vector<float>verts;
     std::vector<int>indexes;
 
@@ -202,190 +198,123 @@ void SHRenderer::initGeometry()
     bool yChanged = ( yi != m_yOld );
     bool zChanged = ( zi != m_zOld );
 
+    QVector< QVector3D > vertices = mesh->getVertices();
+    QVector< Triangle > triangles = mesh->getTriangles();
+
+    QVector<Matrix>* data = m_dataset->getData();
+    RowVector v1( 3 );
+    ColumnVector v2( 3 );
+
+    ColumnVector newVert( 3 );
+
     if ( renderOnSlice == 1 && ( metaChanged || zChanged || xSpanChanged || ySpanChanged ) )
     {
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-
-        QVector<ColumnVector>* data = m_dataset->getData();
-
-        Matrix m = base * data->at( 0 );
-
         for( int yy = lowerY; yy < upperY; ++yy )
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+                Matrix D = data->at( xx + yy * xbi + zi * xbi * ybi );
+                TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+
+                for ( int i = 0; i < vertices.size(); ++i )
                 {
-                    ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
-                    ColumnVector r = base * dv;
+                    v1( 1 ) = vertices[i].x();
+                    v1( 2 ) = vertices[i].y();
+                    v1( 3 ) = vertices[i].z();
 
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
+                    v2( 1 ) = vertices[i].x();
+                    v2( 2 ) = vertices[i].y();
+                    v2( 3 ) = vertices[i].z();
 
-                    if ( minmaxScaling )
-                    {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max * 0.8;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            //r(i+1) *= -1.0;
-                            //if ( r( i + 1) < 0.0 ) r( i+1 ) = 0.0;
-                            r(i+1) = r(i+1) / max * 0.8;
-                        }
-                    }
+                    float r = DotProduct( v1 * D, v2 );
 
-                    TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+                    newVert( 1 ) = r*vertices[i].x() + xx * dx + dx / 2;
+                    newVert( 2 ) = r*vertices[i].y() + yy * dy + dy / 2;
+                    newVert( 3 ) = r*vertices[i].z() + z;
 
-                    for ( int i = 0; i < vertices.size(); ++i )
-                    {
-                        newBall->addVertex( i, QVector3D( r(i+1)*vertices[i].x() + xx * dx + dx / 2,
-                                               r(i+1)*vertices[i].y() + yy * dy + dy / 2,
-                                               r(i+1)*vertices[i].z() + z ) );
-
-
-                    }
-                    int numVerts = vertices.size();
-                    for ( int i = 0; i < triangles.size(); ++i )
-                    {
-                        newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
-                    }
-
-                    balls.push_back( newBall );
+                    newBall->addVertex( i, QVector3D( newVert( 1 ), newVert( 2 ), newVert( 3 ) ) );
                 }
+
+                for ( int i = 0; i < triangles.size(); ++i )
+                {
+                    newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
+                }
+
+                balls.push_back( newBall );
             }
         }
     }
     else if ( renderOnSlice == 2 && ( metaChanged || yChanged || xSpanChanged || zSpanChanged ) )
     {
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-
-        QVector<ColumnVector>* data = m_dataset->getData();
-
-        Matrix m = base * data->at( 0 );
-
         for( int zz = lowerZ; zz < upperZ; ++zz )
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yi * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
+                Matrix D = data->at( xx + yi * xbi + zz * xbi * ybi );
+                TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+
+                for ( int i = 0; i < vertices.size(); ++i )
                 {
-                    ColumnVector dv = data->at( xx + yi * xbi + zz * xbi * ybi );
-                    ColumnVector r = base * dv;
+                    v1( 1 ) = vertices[i].x();
+                    v1( 2 ) = vertices[i].y();
+                    v1( 3 ) = vertices[i].z();
 
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-                    if ( minmaxScaling )
-                    {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = r(i+1) / max;
-                        }
-                    }
-                    TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+                    v2( 1 ) = vertices[i].x();
+                    v2( 2 ) = vertices[i].y();
+                    v2( 3 ) = vertices[i].z();
 
-                    for ( int i = 0; i < vertices.size(); ++i )
-                    {
-                        newBall->addVertex( i, QVector3D( r(i+1)*vertices[i].x() + xx * dx + dx / 2,
-                                               r(i+1)*vertices[i].y() + y,
-                                               r(i+1)*vertices[i].z() + zz * dz + dz / 2 ) );
+                    float r = DotProduct( v1 * D, v2 );
 
+                    newVert( 1 ) = r*vertices[i].x() + xx * dx + dx / 2;
+                    newVert( 2 ) = r*vertices[i].y() + y;
+                    newVert( 3 ) = r*vertices[i].z() + zz * dz + dz / 2;
 
-                    }
-                    int numVerts = vertices.size();
-                    for ( int i = 0; i < triangles.size(); ++i )
-                    {
-                        newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
-                    }
-
-                    balls.push_back( newBall );
+                    newBall->addVertex( i, QVector3D( newVert( 1 ), newVert( 2 ), newVert( 3 ) ) );
                 }
+
+                for ( int i = 0; i < triangles.size(); ++i )
+                {
+                    newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
+                }
+
+                balls.push_back( newBall );
             }
         }
     }
     else if ( renderOnSlice == 3 && ( metaChanged || xChanged || ySpanChanged || zSpanChanged ) )
     {
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-
-        QVector<ColumnVector>* data = m_dataset->getData();
-
-        Matrix m = base * data->at( 0 );
-
         for( int yy = lowerY; yy < upperY; ++yy )
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                if ( ( fabs( data->at( xi + yy * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
+                Matrix D = data->at( xi + yy * xbi + zz * xbi * ybi );
+                TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+
+                for ( int i = 0; i < vertices.size(); ++i )
                 {
-                    ColumnVector dv = data->at( xi + yy * xbi + zz * xbi * ybi );
-                    ColumnVector r = base * dv;
+                    v1( 1 ) = vertices[i].x();
+                    v1( 2 ) = vertices[i].y();
+                    v1( 3 ) = vertices[i].z();
 
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-                    if ( minmaxScaling )
-                    {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = r(i+1) / max;
-                        }
-                    }
-                    TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+                    v2( 1 ) = vertices[i].x();
+                    v2( 2 ) = vertices[i].y();
+                    v2( 3 ) = vertices[i].z();
 
-                    for ( int i = 0; i < vertices.size(); ++i )
-                    {
-                        newBall->addVertex( i, QVector3D( r(i+1)*vertices[i].x() + x,
-                                               r(i+1)*vertices[i].y() + yy * dy + dy / 2,
-                                               r(i+1)*vertices[i].z() + zz * dz + dz / 2 ) );
+                    float r = DotProduct( v1 * D, v2 );
 
+                    newVert( 1 ) = r*vertices[i].x() + x;
+                    newVert( 2 ) = r*vertices[i].y() + yy * dy + dy / 2;
+                    newVert( 3 ) = r*vertices[i].z() + zz * dz + dz / 2;
 
-                    }
-                    int numVerts = vertices.size();
-                    for ( int i = 0; i < triangles.size(); ++i )
-                    {
-                        newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
-                    }
-
-                    balls.push_back( newBall );
+                    newBall->addVertex( i, QVector3D( newVert( 1 ), newVert( 2 ), newVert( 3 ) ) );
                 }
+
+                for ( int i = 0; i < triangles.size(); ++i )
+                {
+                    newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
+                }
+
+                balls.push_back( newBall );
             }
         }
     }
@@ -426,7 +355,6 @@ void SHRenderer::initGeometry()
 
         delete balls[currBall];
     }
-
 
     m_tris1 = mesh->getTriSize() * balls.size() * 3;
     //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();

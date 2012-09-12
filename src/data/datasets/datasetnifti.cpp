@@ -5,11 +5,15 @@
  *      Author: schurade
  */
 
+#include <QtCore/QDebug>
+
 #include "datasetnifti.h"
 
 DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type ) :
     Dataset( filename, type ),
-    m_textureGLuint( 0 )
+    m_textureGLuint( 0 ),
+    m_qform( 3, 3 ),
+    m_sform( 3, 3 )
 {
 }
 
@@ -87,9 +91,35 @@ void DatasetNifti::parseNiftiHeader( nifti_image* header )
     //setProperty("aux_file", header->aux_file );
     setProperty( "swapsize", header->swapsize );
     setProperty( "byteorder", header->byteorder );
+
+    for ( int i = 0; i < 3; ++i )
+    {
+        for ( int j = 0; j < 3; ++j )
+        {
+            m_qform( i+1, j+1 ) =header->qto_xyz.m[i][j];
+        }
+    }
+
+    for ( int i = 0; i < 3; ++i )
+    {
+        for ( int j = 0; j < 3; ++j )
+        {
+            m_sform( i+1, j+1 ) =header->sto_xyz.m[i][j];
+        }
+    }
 }
 
 nifti_image* DatasetNifti::getHeader()
 {
     return m_header;
+}
+
+Matrix DatasetNifti::getQForm()
+{
+    return m_qform;
+}
+
+Matrix DatasetNifti::getSForm()
+{
+    return m_sform;
 }
