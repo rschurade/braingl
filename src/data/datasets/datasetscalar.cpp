@@ -116,6 +116,13 @@ void DatasetScalar::flipX()
             }
         }
     }
+
+    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
+    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
+    m_header->qto_xyz.m[0][3] = 0.0;
+    m_header->sto_xyz.m[0][3] = 0.0;
+
+
     m_data.clear();
     m_data = newData;
 }

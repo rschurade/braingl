@@ -157,6 +157,17 @@ void DatasetDWI::flipX()
             }
         }
     }
+
+    for( int i = 0; i < m_bvecs.size(); ++i )
+    {
+        m_bvecs[i].setX( m_bvecs[i].x() * -1.0 );
+    }
+
+    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
+    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
+    m_header->qto_xyz.m[0][3] = 0.0;
+    m_header->sto_xyz.m[0][3] = 0.0;
+
     m_data->clear();
     m_data = newData;
 }
