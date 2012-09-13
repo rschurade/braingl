@@ -29,28 +29,9 @@
 SHRenderer::SHRenderer() :
     ObjectRenderer(),
     vboIds( new GLuint[ 6 ] ),
-    m_x( 0. ),
-    m_y( 0. ),
-    m_z( 0. ),
     m_xb( 0. ),
     m_yb( 0. ),
     m_zb( 0. ),
-    m_xOld( -1 ),
-    m_yOld( -1 ),
-    m_zOld( -1 ),
-    m_xbOld( -1 ),
-    m_ybOld( -1 ),
-    m_zbOld( -1 ),
-    m_lodOld( -1 ),
-    m_scalingOld( -1 ),
-    m_renderSliceOld( 0 ),
-    m_minmaxScalingOld( false ),
-    m_lowerXOld( -1 ),
-    m_lowerYOld( -1 ),
-    m_lowerZOld( -1 ),
-    m_upperXOld( -1 ),
-    m_upperYOld( -1 ),
-    m_upperZOld( -1 ),
     m_tris1( 0 )
 {
     for ( int lod = 0; lod < 6; ++lod )
@@ -110,8 +91,8 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
 
         m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
 
-        int renderOnSlice = m_dataset->getProperty( "renderSlice" ).toInt();
-        if ( renderOnSlice == 0 )
+        int orient = m_dataset->getProperty( "renderSlice" ).toInt();
+        if ( orient == 0 )
         {
             return;
         }
@@ -143,12 +124,9 @@ void SHRenderer::setShaderVars()
 
 void SHRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
-    int xi = (int)m_x;
-    int yi = (int)m_y;
-    int zi = (int)m_z;
+    int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
+    int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
+    int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
     int xbi = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toInt();
     int ybi = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toInt();
     int zbi = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toInt();
@@ -165,35 +143,26 @@ void SHRenderer::initGeometry()
     int upperZ = m_dataset->getProperty( "renderUpperZ" ).toInt();
 
     int order = m_dataset->getProperty( "order" ).toInt();
-
     int lod = m_dataset->getProperty( "lod" ).toInt();
-    float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
-    int renderOnSlice = m_dataset->getProperty( "renderSlice" ).toInt();
+    float scaling = m_dataset->getProperty( "scaling" ).toFloat();
+    int orient = m_dataset->getProperty( "renderSlice" ).toInt();
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
-    bool minmaxScalingChanged = ( m_minmaxScalingOld != minmaxScaling );
 
-    float x = m_x * dx + dx / 2.;
-    float y = m_y * dy + dy / 2.;
-    float z = m_z * dz + dz / 2.;
+    QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling);
+    if ( s == m_previousSettings )
+    {
+        return;
+    }
+    m_previousSettings = s;
 
-    bool datasetSizeChanged = ( xbi != m_xbOld || ybi != m_ybOld || zbi != m_zbOld );
-    bool orientChanged = ( m_renderSliceOld != renderOnSlice );
-    bool lodChanged = ( m_lodOld != lod );
+    float x = (float)xi * dx + dx / 2.;
+    float y = (float)yi * dy + dy / 2.;
+    float z = (float)zi * dz + dz / 2.;
 
-    bool xSpanChanged = ( lowerX != m_lowerXOld || upperX != m_upperXOld );
-    bool ySpanChanged = ( lowerY != m_lowerYOld || upperY != m_upperYOld );
-    bool zSpanChanged = ( lowerZ != m_lowerZOld || upperZ != m_upperZOld );
-
-    bool metaChanged = ( datasetSizeChanged || orientChanged || lodChanged || minmaxScalingChanged );
-
-    bool xChanged = ( xi != m_xOld );
-    bool yChanged = ( yi != m_yOld );
-    bool zChanged = ( zi != m_zOld );
 
     TriangleMesh* mesh = m_spheres[lod];
-    QVector<TriangleMesh*>balls;
     QVector< QVector3D > normals = mesh->getVertNormals();
 
     const Matrix* v1 = tess::vertices( lod );
@@ -205,7 +174,7 @@ void SHRenderer::initGeometry()
     int numVerts = mesh->getVertSize();
     int currentBall = 0;
 
-    if ( renderOnSlice == 1 && ( metaChanged || zChanged || xSpanChanged || ySpanChanged ) )
+    if ( orient == 1 )
     {
         qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
@@ -281,7 +250,7 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( renderOnSlice == 2 && ( metaChanged || yChanged || xSpanChanged || zSpanChanged ) )
+    else if ( orient == 2 )
     {
         qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
@@ -350,7 +319,7 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( renderOnSlice == 3 && ( metaChanged || xChanged || ySpanChanged || zSpanChanged ) )
+    else if ( orient == 3 )
     {
         qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
@@ -431,24 +400,6 @@ void SHRenderer::initGeometry()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-
-    m_xOld = xi;
-    m_yOld = yi;
-    m_zOld = zi;
-    m_xbOld = xbi;
-    m_ybOld = ybi;
-    m_zbOld = zbi;
-    m_lodOld = lod;
-    m_scalingOld = scaling;
-    m_renderSliceOld = renderOnSlice;
-    m_minmaxScalingOld = minmaxScaling;
-
-    m_lowerXOld = lowerX;
-    m_lowerYOld = lowerY;
-    m_lowerZOld = lowerZ;
-    m_upperXOld = upperX;
-    m_upperYOld = upperY;
-    m_upperZOld = upperZ;
 
     qDebug() << "QBall: end init geometry";
 }
