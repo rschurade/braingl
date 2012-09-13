@@ -32,11 +32,6 @@ protected:
     void initGeometry();
 
 private:
-    float m_xb;
-    float m_yb;
-    float m_zb;
-
-
     int m_tris1;
 
     GLuint *vboIds;

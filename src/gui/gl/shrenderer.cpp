@@ -28,11 +28,8 @@
 
 SHRenderer::SHRenderer() :
     ObjectRenderer(),
-    vboIds( new GLuint[ 6 ] ),
-    m_xb( 0. ),
-    m_yb( 0. ),
-    m_zb( 0. ),
-    m_tris1( 0 )
+    m_tris1( 0 ),
+    vboIds( new GLuint[ 6 ] )
 {
     for ( int lod = 0; lod < 6; ++lod )
     {
@@ -70,7 +67,6 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
     QList<int>rl;
 
     int countDatasets = model()->rowCount();
-    int allocatedTextureCount = 0;
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = model()->index( i, FNDSE_ACTIVE );
@@ -129,7 +125,7 @@ void SHRenderer::initGeometry()
     int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
     int xbi = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toInt();
     int ybi = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toInt();
-    int zbi = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toInt();
+    //int zbi = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toInt();
 
     float dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
     float dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
@@ -145,7 +141,7 @@ void SHRenderer::initGeometry()
     int order = m_dataset->getProperty( "order" ).toInt();
     int lod = m_dataset->getProperty( "lod" ).toInt();
 
-    float scaling = m_dataset->getProperty( "scaling" ).toFloat();
+    //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
     int orient = m_dataset->getProperty( "renderSlice" ).toInt();
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
