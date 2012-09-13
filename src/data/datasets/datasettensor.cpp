@@ -37,12 +37,9 @@ void DatasetTensor::examineDataset()
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
-    int size = nx * ny * nz * 9;
+    int size = nx * ny * nz;
 
-    m_properties["min"] = 1.0;
-    m_properties["max"] = -1.0;
-
-    m_properties["size"] = static_cast<int>( size * sizeof( float ) );
+    m_properties["size"] = static_cast<int>( 9 * size * sizeof( float ) );
 
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
@@ -62,6 +59,28 @@ void DatasetTensor::examineDataset()
         qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
+
+    float min = std::numeric_limits<float>::max();
+    float max = std::numeric_limits<float>::min();
+
+    for ( int i = 0; i < size; ++i )
+    {
+        min = qMin( min, (float)m_data->at( i )(1,1) );
+        max = qMax( max, (float)m_data->at( i )(1,1) );
+        min = qMin( min, (float)m_data->at( i )(1,2) );
+        max = qMax( max, (float)m_data->at( i )(1,2) );
+        min = qMin( min, (float)m_data->at( i )(1,3) );
+        max = qMax( max, (float)m_data->at( i )(1,3) );
+        min = qMin( min, (float)m_data->at( i )(2,2) );
+        max = qMax( max, (float)m_data->at( i )(2,2) );
+        min = qMin( min, (float)m_data->at( i )(2,3) );
+        max = qMax( max, (float)m_data->at( i )(2,3) );
+        min = qMin( min, (float)m_data->at( i )(3,3) );
+        max = qMax( max, (float)m_data->at( i )(3,3) );
+    }
+
+    m_properties["min"] = min;
+    m_properties["max"] = max;
 }
 
 void DatasetTensor::createTexture()

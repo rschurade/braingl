@@ -18,9 +18,11 @@
 #include "mesh/trianglemesh.h"
 #include "mesh/tesselation.h"
 
+#include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
-#include "datasets/dataset3d.h"
+#include "datasets/datasettensor.h"
+
 #include "qball.h"
 #include "dwialgos.h"
 
@@ -110,7 +112,7 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
 
 }
 
-DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
+DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
 {
     QVector<QVector3D>bvecs =  ds->getBvecs();
     QVector<int>bvals = ds->getBvals();
@@ -150,10 +152,10 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
     vector<double>log_s0_si_pixel( N );
 
     QVector<ColumnVector>* data = ds->getData();
-    QVector<ColumnVector>* tensors = new QVector<ColumnVector>();
+    QVector<Matrix>* tensors = new QVector<Matrix>();
     QVector<float> b0Images = ds->getB0Data();
 
-    ColumnVector blank( 6 );
+    Matrix blank(3,3);
     blank = 0.0;
 
     for ( int i = 0; i < data->size(); ++i )
@@ -190,7 +192,18 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
                 }
                 t( l+1 ) = (float) (value); // save the tensor components in a adjacent memory
             }
-            tensors->push_back( t );
+            Matrix m( 3, 3 );
+            m( 1, 1 ) = t( 1 );
+            m( 1, 2 ) = t( 2 );
+            m( 1, 3 ) = t( 3 );
+            m( 2, 1 ) = t( 2 );
+            m( 2, 2 ) = t( 4 );
+            m( 2, 3 ) = t( 5 );
+            m( 3, 1 ) = t( 3 );
+            m( 3, 2 ) = t( 5 );
+            m( 3, 3 ) = t( 6 );
+
+            tensors->push_back( m );
         } // end if s0 > 0
         else
         {
@@ -198,19 +211,19 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
         }
     }
 
-    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), tensors, ds->getB0Data(), ds->getBvals(), bvecs, ds->getHeader() );
+    DatasetTensor* out = new DatasetTensor( ds->getProperty( "fileName" ).toString(), tensors, ds->getHeader() );
     out->setProperty( "fileName", "Tensor" );
     out->setProperty( "name", "Tensor" );
     out->setProperty( "createdBy", FNALGO_TENSORFIT );
-    out->setProperty( "nt", 6 );
+    out->setProperty( "nt", 9 );
     out->setProperty( "datatype", DT_FLOAT);
     return out;
 }
 
 DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
 {
-    DatasetDWI* tensorDS = tensorFit( ds );
-    QVector<ColumnVector>* tensors = tensorDS->getData();
+    DatasetTensor* tensorDS = tensorFit( ds );
+    QVector<Matrix>* tensors = tensorDS->getData();
 
     int blockSize = tensorDS->getData()->size();
 
@@ -218,9 +231,9 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
     float value = 0;
     for ( int i = 0; i < blockSize; ++i )
     {
-        value = tensors->at( i )( 1 );
-        value += tensors->at( i )( 4 );
-        value += tensors->at( i )( 6 );
+        value = tensors->at( i )( 1,1 );
+        value += tensors->at( i )( 2,2 );
+        value += tensors->at( i )( 3,3 );
         trace[i] = value/3.0;
     }
 
@@ -230,12 +243,12 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        xx = tensors->at( i )(1);
-        xy = tensors->at( i )(2);
-        xz = tensors->at( i )(3);
-        yy = tensors->at( i )(4);
-        yz = tensors->at( i )(5);
-        zz = tensors->at( i )(6);
+        xx = tensors->at( i )(1,1);
+        xy = tensors->at( i )(1,2);
+        xz = tensors->at( i )(1,3);
+        yy = tensors->at( i )(2,2);
+        yz = tensors->at( i )(2,3);
+        zz = tensors->at( i )(3,3);
         tr = trace[i];
 
         AA = pow2( xx - tr ) + pow2( yy - tr ) + pow2( zz - tr ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
@@ -266,8 +279,8 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
     double i1, i2, i3, v, s, phi, l1, l2, l3;
     double ev1_x, ev1_y, ev1_z, ev2_x, ev2_y, ev2_z, ev3_x, ev3_y, ev3_z, vec_norm;
 
-    DatasetDWI* tensorDS = tensorFit( ds );
-    QVector<ColumnVector>* tensors = tensorDS->getData();
+    DatasetTensor* tensorDS = tensorFit( ds );
+    QVector<Matrix>* tensors = tensorDS->getData();
 
     int blockSize = tensorDS->getData()->size();
 
@@ -281,12 +294,12 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        xx = tensors->at( i )( 1 );
-        xy = tensors->at( i )( 2 );
-        xz = tensors->at( i )( 3 );
-        yy = tensors->at( i )( 4 );
-        yz = tensors->at( i )( 5 );
-        zz = tensors->at( i )( 6 );
+        xx = tensors->at( i )(1,1);
+        xy = tensors->at( i )(1,2);
+        xz = tensors->at( i )(1,3);
+        yy = tensors->at( i )(2,2);
+        yz = tensors->at( i )(2,3);
+        zz = tensors->at( i )(3,3);
 
         // three invariants of D (dt)
         // i1=l1+l2+l3 (trace)

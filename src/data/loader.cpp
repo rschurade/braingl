@@ -315,7 +315,7 @@ bool Loader::loadNiftiTensor( QString fileName )
                 ColumnVector v( dim );
                 for ( int j = 0; j < dim; ++j )
                 {
-                    v( j+1 ) = inputData[ j * blockSize + i ] * 500;
+                    v( j+1 ) = inputData[ j * blockSize + i ];
                 }
                 Matrix m( 3, 3 );
                 m( 1, 1 ) = v( 1 );

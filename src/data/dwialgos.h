@@ -10,9 +10,10 @@
 
 #include <QtCore/QList>
 
+class Dataset3D;
 class DatasetDWI;
 class DatasetNifti;
-class Dataset3D;
+class DatasetTensor;
 class TriangleMesh;
 
 class DWIAlgos
@@ -20,7 +21,7 @@ class DWIAlgos
 public:
     static DatasetDWI* qBall( DatasetDWI* ds );
     static DatasetDWI* qBallSharp( DatasetDWI* ds );
-    static DatasetDWI* tensorFit( DatasetDWI* ds );
+    static DatasetTensor* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );
 

@@ -4,8 +4,6 @@
  *  Created on: May 4, 2012
  *      Author: schurade
  */
-#include <limits>
-
 #include <QtCore/QDebug>
 
 #include "datasetscalar.h"
