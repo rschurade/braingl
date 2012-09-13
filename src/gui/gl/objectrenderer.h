@@ -33,7 +33,10 @@ public:
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
 protected:
-    QString createSettingsString( int x, int y, int z, int lod, int orient, int lx, int ux, int ly, int uy, int lz, int uz, bool scaling );
+    QString createSettingsString( int x, int y, int z,
+                                  int lod, int orient,
+                                  int lx, int ux, int ly, int uy, int lz, int uz,
+                                  bool scaling, int bValue );
     QString m_previousSettings;
 };
 

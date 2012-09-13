@@ -8,6 +8,7 @@
 #include <QxtGui/QxtSpanSlider>
 
 #include "../widgets/sliderwithedit.h"
+#include "../widgets/sliderwitheditint.h"
 #include "../widgets/selectwithlabel.h"
 #include "../widgets/checkboxwithlabel.h"
 #include "../../data/enums.h"
@@ -50,6 +51,13 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     connect( m_alphaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( alphaChanged( float ) ) );
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
+
+    m_bValueSlider = new SliderWithEditInt( tr( "bValue" ) );
+    connect( m_bValueSlider, SIGNAL( valueChanged( int ) ), this, SLOT( bValueChanged( int ) ) );
+    m_bValueSlider->setMin( 500.0 );
+    m_bValueSlider->setMax( 2000.0 );
+    m_bValueSlider->setStep( 500 );
+
 
     m_orderSelect = new SelectWithLabel( tr("order" ) );
     m_orderSelect->insertItem( 0, tr( "4" ) );
@@ -107,6 +115,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_orderSelect );
     m_layout->addWidget( m_lodSelect );
     m_layout->addWidget( m_sliceSelect );
+    m_layout->addWidget( m_bValueSlider );
     m_layout->addWidget( m_scalingSlider );
     m_layout->addWidget( m_spanSlider1 );
     m_layout->addWidget( m_spanSlider2 );
@@ -235,6 +244,10 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_LOD );
     m_lodSelect->setCurrentIndex( model()->data( index, Qt::EditRole ).toInt() );
 
+    index = getSelectedIndex( FNDSE_BVALUE );
+    m_bValueSlider->setValue( model()->data( index, Qt::EditRole ).toInt() );
+
+
     m_scalingSlider->setMin( 0.1 );
     m_scalingSlider->setMax( 10 );
     index = getSelectedIndex( FNDSE_SCALING );
@@ -295,6 +308,8 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_colormapSelect->setHidden( true );
     m_textureInterpolation->setHidden( true );
     m_alphaSlider->setHidden( true );
+    m_orderSelect->setHidden( true );
+    m_bValueSlider->setHidden( true );
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
@@ -312,9 +327,8 @@ void DatasetPropertyView::updateWidgetVisibility()
     }
 
     int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
-    if ( created == FNALGO_QBALL || created == FNALGO_TENSORFIT )
+    if ( created == FNALGO_QBALL )
     {
-        m_scalingSlider->setHidden( false );
         m_orderSelect->setHidden( false );
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
@@ -323,6 +337,16 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_spanSlider2->setHidden( false );
 
         m_qBallScaling->setHidden( false );
+    }
+
+    if ( created == FNALGO_TENSORFIT )
+    {
+        m_lodSelect->setHidden( false );
+        m_sliceSelect->setHidden( false );
+        m_bValueSlider->setHidden( false );
+
+        m_spanSlider1->setHidden( false );
+        m_spanSlider2->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -384,6 +408,12 @@ void DatasetPropertyView::alphaChanged( float value )
 {
     model()->setData( getSelectedIndex( FNDSE_ALPHA ), value );
 }
+
+void DatasetPropertyView::bValueChanged( int value )
+{
+    model()->setData( getSelectedIndex( FNDSE_BVALUE ), value );
+}
+
 
 void DatasetPropertyView::orderChanged( int index )
 {

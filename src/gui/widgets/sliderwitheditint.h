@@ -28,6 +28,7 @@ public:
 
    void setMin( int min );
    void setMax( int max );
+   void setStep( int step );
 
 public slots:
     void sliderMoved( int value );

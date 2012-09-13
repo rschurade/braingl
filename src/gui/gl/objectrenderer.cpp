@@ -60,7 +60,10 @@ QRegion ObjectRenderer::visualRegionForSelection( const QItemSelection &selectio
     return QRegion();
 }
 
-QString ObjectRenderer::createSettingsString( int x, int y, int z, int lod, int orient, int lx, int ux, int ly, int uy, int lz, int uz, bool scaling )
+QString ObjectRenderer::createSettingsString( int x, int y, int z,
+                                              int lod, int orient,
+                                              int lx, int ux, int ly, int uy, int lz, int uz,
+                                              bool scaling, int bValue )
 {
     QString result("");
     result += QString::number( x );
@@ -75,5 +78,6 @@ QString ObjectRenderer::createSettingsString( int x, int y, int z, int lod, int 
     result += QString::number( lz );
     result += QString::number( uz );
     result += QString::number( scaling );
+    result += QString::number( bValue );
     return result;
 }

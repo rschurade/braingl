@@ -16,6 +16,7 @@ class QLineEdit;
 class QHBoxLayout;
 class QVBoxLayout;
 class SliderWithEdit;
+class SliderWithEditInt;
 class SelectWithLabel;
 class CheckboxWithLabel;
 class QxtSpanSlider;
@@ -53,6 +54,7 @@ private slots:
     void activeStateChanged( int state );
 
     void alphaChanged( float value );
+    void bValueChanged( int value );
 
     void orderChanged( int index );
     void lodChanged( int index );
@@ -94,6 +96,8 @@ private:
 
     QxtSpanSlider* m_spanSlider1;
     QxtSpanSlider* m_spanSlider2;
+
+    SliderWithEditInt* m_bValueSlider;
 
     CheckboxWithLabel* m_qBallScaling;
 };
