@@ -67,9 +67,9 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
     Matrix out = B.i() * SH.t();
 
     // the Funk-Radon transformation:
-    for ( unsigned long i = 0; i < B.Nrows(); ++i )
+    for ( int i = 0; i < B.Nrows(); ++i )
     {
-        for ( unsigned long j = 0; j < out.Ncols(); ++j )
+        for ( int j = 0; j < out.Ncols(); ++j )
         {
             out( i+1, j+1 ) *= FRT( i+1 );
         }

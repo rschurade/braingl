@@ -30,11 +30,11 @@
 
 SingleSHRenderer::SingleSHRenderer( QString name ) :
     ObjectRenderer(),
+    vboIds( new GLuint[ 2 ] ),
     m_name( name ),
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
-    vboIds( new GLuint[ 2 ] ),
     m_x( 0. ),
     m_y( 0. ),
     m_z( 0. ),
@@ -167,16 +167,8 @@ void SingleSHRenderer::initGeometry()
     int ybi = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toInt();
     int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
 
-    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
-
     int lod = m_dataset->getProperty( "lod" ).toInt();
     float scaling = m_dataset->getProperty( "scaling" ).toFloat();
-
-    float x = m_x * dx + dx / 2.;
-    float y = m_y * dy + dy / 2.;
-    float z = m_z * dz + dz / 2.;
 
     TriangleMesh* mesh = m_spheres[lod];
 
@@ -241,7 +233,6 @@ void SingleSHRenderer::initGeometry()
 
 
             }
-            int numVerts = vertices.size();
             for ( int i = 0; i < triangles.size(); ++i )
             {
                 newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
@@ -252,7 +243,6 @@ void SingleSHRenderer::initGeometry()
         verts.reserve( mesh->getVertSize() * 6 );
         std::vector<int>indexes;
         indexes.reserve( mesh->getTriSize() * 3 );
-        int numVerts = mesh->getVertSize();
 
         for ( int i = 0; i < mesh->getVertSize(); ++ i )
         {
@@ -309,7 +299,6 @@ void SingleSHRenderer::draw()
     QList<int>rl;
 
     int countDatasets = model()->rowCount();
-    int allocatedTextureCount = 0;
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = model()->index( i, 55 );

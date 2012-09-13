@@ -45,6 +45,8 @@ private:
 
     void calcMVPMatrix();
 
+    GLuint *vboIds;
+
     QString m_name;
 
     int m_width;
@@ -76,7 +78,7 @@ private:
 
     ArcBall* m_arcBall;
 
-    GLuint *vboIds;
+
 
     DatasetDWI* m_dataset;
 

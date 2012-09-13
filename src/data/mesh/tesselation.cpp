@@ -39,7 +39,7 @@ namespace tess
 ///* 
 ///* @return Matrix: vertices of the tesselation with n subdivison steps.
 ///*****************************************************************************
-const Matrix* vertices( const unsigned long steps )
+const Matrix* vertices( const int steps )
 {
     switch ( steps )
     {
@@ -65,6 +65,7 @@ const Matrix* vertices( const unsigned long steps )
             //throw std::range_error( "Number of subdivision steps out of range!" );
             break;
     }
+    return set_vertices( __TESS_ZERO_V, __TESS_ZERO_V_SIZE );
 }
 //******************************************************************************
 
@@ -82,7 +83,7 @@ const Matrix* vertices( const unsigned long steps )
 ///* 
 ///* @return Matrix: faces of the tesselation with n subdivison steps.
 ///*****************************************************************************
-const int* faces( const unsigned long steps )
+const int* faces( const int steps )
 {
     switch ( steps )
     {
@@ -108,6 +109,7 @@ const int* faces( const unsigned long steps )
             //throw std::range_error( "Number of subdivision steps out of range!" );
             break;
     }
+    return __TESS_ZERO_F; //set_faces( __TESS_ZERO_F, __TESS_ZERO_F_SIZE );
 }
 //******************************************************************************
 
@@ -124,7 +126,7 @@ const int* faces( const unsigned long steps )
 ///* 
 ///* @return Scalar: number of faces.
 ///*****************************************************************************
-const unsigned long n_faces( const unsigned long steps )
+const unsigned long n_faces( const int steps )
 {
     switch ( steps )
     {
@@ -150,6 +152,7 @@ const unsigned long n_faces( const unsigned long steps )
             //throw std::range_error( "Number of subdivision steps out of range!" );
             break;
     }
+    return __TESS_ZERO_F_SIZE;
 }
 //******************************************************************************
 
@@ -167,7 +170,7 @@ const unsigned long n_faces( const unsigned long steps )
 ///* 
 ///* @return Scalar: number of vertices.
 ///*****************************************************************************
-const unsigned long n_vertices( const unsigned long steps )
+const unsigned long n_vertices( const int steps )
 {
     switch ( steps )
     {
@@ -193,6 +196,7 @@ const unsigned long n_vertices( const unsigned long steps )
            //throw std::range_error( "Number of subdivision steps out of range!" );
             break;
     }
+    return __TESS_ZERO_V_SIZE;
 }
 
 //******************************************************************************
@@ -212,7 +216,7 @@ const unsigned long n_vertices( const unsigned long steps )
 ///* 
 ///* @return Matrix: including tesselation data.
 ///*****************************************************************************
-const Matrix* set_vertices( const double input[], const unsigned long size )
+const Matrix* set_vertices( const double input[], const int size )
 {
     // allocate output object.
     Matrix* result( new Matrix( size, 3 ) );

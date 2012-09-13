@@ -119,7 +119,6 @@ bool Loader::loadNiftiScalar( QString fileName )
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
-    size_t dim = m_header->dim[4];
 
     QVector<float> data( blockSize );
 
@@ -203,7 +202,6 @@ bool Loader::loadNiftiVector3D( QString fileName )
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
-    size_t dim = m_header->dim[4];
 
     QVector<QVector3D> data( blockSize );
 
@@ -298,8 +296,8 @@ bool Loader::loadNiftiVector3D( QString fileName )
 bool Loader::loadNiftiTensor( QString fileName )
 {
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
-    size_t dim = m_header->dim[4];
+    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dim = m_header->dim[4];
 
     QVector<Matrix>* dataVector = new QVector<Matrix>();
 
@@ -430,8 +428,8 @@ bool Loader::loadNiftiDWI( QString fileName )
     }
 
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
-    size_t dim = m_header->dim[4];
+    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dim = m_header->dim[4];
 
     int numData = dim - numB0;
 
@@ -442,7 +440,6 @@ bool Loader::loadNiftiDWI( QString fileName )
     {
         case NIFTI_TYPE_INT16:
         {
-            int16_t* data = new int16_t[ blockSize * numData ];
             QVector<float> b0data( blockSize );
             int16_t* inputData;
 
@@ -504,8 +501,6 @@ bool Loader::loadMeshBinary()
     file.open(QIODevice::ReadOnly);
     QDataStream in(&file);
     char* s = new char[29];
-    int len = 29;
-    int c = in.readRawData( s, len );
     char* s1 = new char[10];
     for ( int i = 0; i < 9; ++i )
     {
@@ -531,7 +526,6 @@ bool Loader::loadMeshBinary()
     m_datasetType = FNDT_MESH_BINARY;
 
     in.setFloatingPointPrecision( QDataStream::SinglePrecision );
-    float fVal;
     qint32 iVal;
     TriangleMesh* tmesh = new TriangleMesh();
     in >> iVal;

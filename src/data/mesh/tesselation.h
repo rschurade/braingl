@@ -37,22 +37,22 @@ namespace tess
  * Look-up-table access functions by depth:
  * 
  * ****************************************************************************/
-const Matrix* vertices( const unsigned long );
+const Matrix* vertices( const int );
 
-const int* faces( const unsigned long );
+const int* faces( const int );
 
-const unsigned long n_vertices( const unsigned long );
+const unsigned long n_vertices( const int );
 
-const unsigned long n_faces( const unsigned long );
+const unsigned long n_faces( const int );
 
-const Matrix* set_vertices( const double input[], const unsigned long size );
+const Matrix* set_vertices( const double input[], const int size );
 
-const Matrix* set_faces( const unsigned long input[], const unsigned long size );
+const Matrix* set_faces( const unsigned long input[], const int size );
 
 //******************************************************************************
 
 // coordinates of an icosahedron with 12 vertices
-const unsigned long __TESS_ZERO_V_SIZE = 12;
+const int __TESS_ZERO_V_SIZE = 12;
 const double __TESS_ZERO_V[__TESS_ZERO_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -69,7 +69,7 @@ const double __TESS_ZERO_V[__TESS_ZERO_V_SIZE*3] = {
 };
 
 // the 20 faces of an icosahedron with 12 vertices
-const unsigned long __TESS_ZERO_F_SIZE = 20;
+const int __TESS_ZERO_F_SIZE = 20;
 const int __TESS_ZERO_F[__TESS_ZERO_F_SIZE*3] = {
   4, 8, 7,
   4, 7, 9,
@@ -98,7 +98,7 @@ const int __TESS_ZERO_F[__TESS_ZERO_F_SIZE*3] = {
 
 
 // coordinates of an icosahedron with 42 vertices
-const unsigned long __TESS_ONE_V_SIZE = 42;
+const int __TESS_ONE_V_SIZE = 42;
 const double __TESS_ONE_V[__TESS_ONE_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -145,7 +145,7 @@ const double __TESS_ONE_V[__TESS_ONE_V_SIZE*3] = {
 };
 
 // the 80 faces of an icosahedron with 42 vertices
-const unsigned long __TESS_ONE_F_SIZE = 80;
+const int __TESS_ONE_F_SIZE = 80;
 const int __TESS_ONE_F[__TESS_ONE_F_SIZE*3] = {
   4, 12, 14,
   14, 12, 13,
@@ -233,7 +233,7 @@ const int __TESS_ONE_F[__TESS_ONE_F_SIZE*3] = {
 
 
 // coordinates of an icosahedron with 162 vertices
-const unsigned long __TESS_TWO_V_SIZE = 162;
+const int __TESS_TWO_V_SIZE = 162;
 const double __TESS_TWO_V[__TESS_TWO_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -400,7 +400,7 @@ const double __TESS_TWO_V[__TESS_TWO_V_SIZE*3] = {
 };
 
 // the 320 faces of an icosahedron with 162 vertices
-const unsigned long __TESS_TWO_F_SIZE = 320;
+const int __TESS_TWO_F_SIZE = 320;
 const int __TESS_TWO_F[__TESS_TWO_F_SIZE*3] = {
   4, 42, 44,
   44, 42, 43,
@@ -728,7 +728,7 @@ const int __TESS_TWO_F[__TESS_TWO_F_SIZE*3] = {
 
 
 // coordinates of an icosahedron with 642 vertices
-const unsigned long __TESS_THREE_V_SIZE = 642;
+const int __TESS_THREE_V_SIZE = 642;
 const double __TESS_THREE_V[__TESS_THREE_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -1374,7 +1374,7 @@ const double __TESS_THREE_V[__TESS_THREE_V_SIZE*3] = {
   -0.34615299105644226074, -0.78345173597335815430, -0.51612162590026855469
 };
 // the 1280 faces of an icosahedron with 642 vertices
-const unsigned long __TESS_THREE_F_SIZE = 1280;
+const int __TESS_THREE_F_SIZE = 1280;
 const int __TESS_THREE_F[__TESS_THREE_F_SIZE*3] = {
   4, 162, 164,
   164, 162, 163,
@@ -2660,7 +2660,7 @@ const int __TESS_THREE_F[__TESS_THREE_F_SIZE*3] = {
 //******************************************************************************
 
 // coordinates of an icosahedron with 2,562 vertices
-const unsigned long __TESS_FOUR_V_SIZE = 2562;
+const int __TESS_FOUR_V_SIZE = 2562;
 const double __TESS_FOUR_V[__TESS_FOUR_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -5226,7 +5226,7 @@ const double __TESS_FOUR_V[__TESS_FOUR_V_SIZE*3] = {
   -0.17253169417381286621, -0.83081215620040893555, -0.52913498878479003906
 };
 // the 5120 faces of an icosahedron with 2,562 vertices
-const unsigned long __TESS_FOUR_F_SIZE = 5120;
+const int __TESS_FOUR_F_SIZE = 5120;
 const int __TESS_FOUR_F[__TESS_FOUR_F_SIZE*3] = {
   4, 642, 644,
   644, 642, 643,
@@ -10353,7 +10353,7 @@ const int __TESS_FOUR_F[__TESS_FOUR_F_SIZE*3] = {
 
 
 // coordinates of an icosahedron with 10242 vertices
-const unsigned long __TESS_FIVE_V_SIZE = 10242;
+const int __TESS_FIVE_V_SIZE = 10242;
 const double __TESS_FIVE_V[__TESS_FIVE_V_SIZE*3] = {
   0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
   -0.85065078735351562500, 0.52573108673095703125, 0.00000000000000000000,
@@ -20600,7 +20600,7 @@ const double __TESS_FIVE_V[__TESS_FIVE_V_SIZE*3] = {
 };
 
 // the 20480 faces of an icosahedron with 10242 vertices
-const unsigned long __TESS_FIVE_F_SIZE = 20480;
+const int __TESS_FIVE_F_SIZE = 20480;
 const int __TESS_FIVE_F[__TESS_FIVE_F_SIZE*3] = {
   4, 2562, 2564,
   2564, 2562, 2563,
