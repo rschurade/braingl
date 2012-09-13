@@ -32,31 +32,10 @@ protected:
     void initGeometry();
 
 private:
-    float m_x;
-    float m_y;
-    float m_z;
     float m_xb;
     float m_yb;
     float m_zb;
 
-    int m_xOld;
-    int m_yOld;
-    int m_zOld;
-    int m_xbOld;
-    int m_ybOld;
-    int m_zbOld;
-
-    int m_lodOld;
-    float m_scalingOld;
-    int m_renderSliceOld;
-    bool m_minmaxScalingOld;
-
-    int m_lowerXOld;
-    int m_lowerYOld;
-    int m_lowerZOld;
-    int m_upperXOld;
-    int m_upperYOld;
-    int m_upperZOld;
 
     int m_tris1;
 

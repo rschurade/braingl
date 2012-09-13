@@ -7,6 +7,7 @@
 #include <QtCore/QDebug>
 
 #include "../../data/datastore.h"
+#include "../../data/enums.h"
 
 #include "arcball.h"
 #include "slicerenderer.h"
@@ -104,12 +105,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::calcMVPMatrix()
 {
-    m_datasetSizeX = m_dataStore->data( m_dataStore->index( 0, 103 ), Qt::UserRole ).toFloat();
-    m_datasetSizeY = m_dataStore->data( m_dataStore->index( 0, 104 ), Qt::UserRole ).toFloat();
-    m_datasetSizeZ = m_dataStore->data( m_dataStore->index( 0, 105 ), Qt::UserRole ).toFloat();
-    float dx = m_dataStore->data( m_dataStore->index( 0, 106 ), Qt::UserRole ).toFloat();
-    float dy = m_dataStore->data( m_dataStore->index( 0, 107 ), Qt::UserRole ).toFloat();
-    float dz = m_dataStore->data( m_dataStore->index( 0, 108 ), Qt::UserRole ).toFloat();
+    m_datasetSizeX = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
+    m_datasetSizeY = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
+    m_datasetSizeZ = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
+    float dx = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
+    float dy = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
+    float dz = m_dataStore->data( m_dataStore->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
     m_datasetSizeX *= dx;
     m_datasetSizeY *= dy;
     m_datasetSizeZ *= dz;
