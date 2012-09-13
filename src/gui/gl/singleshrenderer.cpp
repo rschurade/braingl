@@ -165,10 +165,10 @@ void SingleSHRenderer::initGeometry()
     int zi = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toInt();
     int xbi = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toInt();
     int ybi = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toInt();
-    int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
+    //int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
 
     int lod = m_dataset->getProperty( "lod" ).toInt();
-    float scaling = m_dataset->getProperty( "scaling" ).toFloat();
+    //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
     TriangleMesh* mesh = m_spheres[lod];
 
@@ -177,112 +177,88 @@ void SingleSHRenderer::initGeometry()
     const Matrix* v1 = tess::vertices( lod );
     Matrix base = ( QBall::sh_base( (*v1), order ) );
 
-
-    bool needsRedraw = ( xi != m_xOld  || xbi != m_xbOld || yi != m_yOld || ybi != m_ybOld || zi != m_zOld || zbi != m_zbOld || m_lodOld != lod || m_scalingOld != scaling );
-
-
-    if ( needsRedraw )
+    QString s = createSettingsString( xi, yi, zi, lod, 0, 0, 0, 0, 0, 0, 0, false);
+    if ( s == m_previousSettings )
     {
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
+        return;
+    }
+    m_previousSettings = s;
 
-        QVector<ColumnVector>* data = m_dataset->getData();
+    QVector< QVector3D > vertices = mesh->getVertices();
+    QVector< Triangle > triangles = mesh->getTriangles();
+
+    QVector<ColumnVector>* data = m_dataset->getData();
 
 
-        QVector< QVector3D > normals = mesh->getVertNormals();
+    QVector< QVector3D > normals = mesh->getVertNormals();
 
-        TriangleMesh* newBall = new TriangleMesh( vertices.size(), triangles.size() );
+    Matrix m = base * data->at( 0 );
 
-        Matrix m = base * data->at( 0 );
+    std::vector<float>verts;
+    verts.reserve( mesh->getVertSize() * 10 );
+    std::vector<int>indexes;
+    indexes.reserve( mesh->getTriSize() * 3 );
 
-        if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+    if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+    {
+        ColumnVector dv = data->at( xi + yi * xbi + zi * xbi * ybi );
+        ColumnVector r = base * dv;
+
+        float max = 0;
+        float min = std::numeric_limits<float>::max();
+        for ( int i = 0; i < r.Nrows(); ++i )
         {
-            ColumnVector dv = data->at( xi + yi * xbi + zi * xbi * ybi );
-            ColumnVector r = base * dv;
+            max = qMax( max, (float)r(i+1) );
+            min = qMin( min, (float)r(i+1) );
+        }
 
-            float max = 0;
-            float min = std::numeric_limits<float>::max();
+        bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
+        if ( minmaxScaling )
+        {
+            max = max - min;
             for ( int i = 0; i < r.Nrows(); ++i )
             {
-                max = qMax( max, (float)r(i+1) );
-                min = qMin( min, (float)r(i+1) );
+                r(i+1) = ( r(i+1) - min ) / max;
             }
-
-            bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
-            if ( minmaxScaling )
+        }
+        else
+        {
+            for ( int i = 0; i < r.Nrows(); ++i )
             {
-                max = max - min;
-                for ( int i = 0; i < r.Nrows(); ++i )
-                {
-                    r(i+1) = ( r(i+1) - min ) / max;
-                }
-            }
-            else
-            {
-                for ( int i = 0; i < r.Nrows(); ++i )
-                {
-                    r(i+1) = r(i+1) / max;
-                }
-            }
-
-            for ( int i = 0; i < vertices.size(); ++i )
-            {
-                newBall->addVertex( i, QVector3D( r(i+1)*vertices[i].x(),
-                                       r(i+1)*vertices[i].y(),
-                                       r(i+1)*vertices[i].z() ) );
-
-
-            }
-            for ( int i = 0; i < triangles.size(); ++i )
-            {
-                newBall->addTriangle( i, Triangle({triangles[i].v0,triangles[i].v1,triangles[i].v2} ) );
+                r(i+1) = r(i+1) / max;
             }
         }
 
-        std::vector<float>verts;
-        verts.reserve( mesh->getVertSize() * 6 );
-        std::vector<int>indexes;
-        indexes.reserve( mesh->getTriSize() * 3 );
-
-        for ( int i = 0; i < mesh->getVertSize(); ++ i )
+        for ( int i = 0; i < vertices.size(); ++i )
         {
-            verts.push_back( newBall->getVertices()[i].x() + 1.0 );
-            verts.push_back( newBall->getVertices()[i].y() + 1.0 );
-            verts.push_back( newBall->getVertices()[i].z() + 1.0 );
-//                verts.push_back( balls[currBall]->getVertNormals()[i].x() );
-//                verts.push_back( balls[currBall]->getVertNormals()[i].y() );
-//                verts.push_back( balls[currBall]->getVertNormals()[i].z() );
+            verts.push_back( vertices[i].x() );
+            verts.push_back( vertices[i].y() );
+            verts.push_back( vertices[i].z() );
             verts.push_back( normals[i].x() );
             verts.push_back( normals[i].y() );
             verts.push_back( normals[i].z() );
+            verts.push_back( 1.0 );
+            verts.push_back( 1.0 );
+            verts.push_back( 1.0 );
+            verts.push_back( r(i + 1) );
         }
-        for ( int i = 0; i < mesh->getTriSize(); ++ i )
+        for ( int i = 0; i < triangles.size(); ++i )
         {
-            indexes.push_back( newBall->getTriangles()[i].v0 );
-            indexes.push_back( newBall->getTriangles()[i].v1 );
-            indexes.push_back( newBall->getTriangles()[i].v2 );
+            indexes.push_back( triangles[i].v0 );
+            indexes.push_back( triangles[i].v1 );
+            indexes.push_back( triangles[i].v2 );
         }
-
-        delete newBall;
-
-        m_tris1 = triangles.size() * 3;
-        //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
     }
 
-    m_xOld = xi;
-    m_yOld = yi;
-    m_zOld = zi;
-    m_xbOld = xbi;
-    m_ybOld = ybi;
-    m_zbOld = zbi;
-    m_lodOld = lod;
-    m_scalingOld = scaling;
+    m_tris1 = triangles.size() * 3;
+    //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+
 }
 
 void SingleSHRenderer::setupTextures()
