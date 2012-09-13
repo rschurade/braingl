@@ -64,16 +64,6 @@ private:
     float m_yb;
     float m_zb;
 
-    int m_xOld;
-    int m_yOld;
-    int m_zOld;
-    int m_xbOld;
-    int m_ybOld;
-    int m_zbOld;
-
-    int m_lodOld;
-    float m_scalingOld;
-
     int m_tris1;
 
     ArcBall* m_arcBall;
