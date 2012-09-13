@@ -147,7 +147,7 @@ void SHRenderer::initGeometry()
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
     QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling);
-    if ( s == m_previousSettings )
+    if ( s == m_previousSettings || orient == 0 )
     {
         return;
     }
