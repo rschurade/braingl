@@ -10,6 +10,7 @@
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
+#include "datasets/datasettensor.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
