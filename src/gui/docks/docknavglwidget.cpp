@@ -31,7 +31,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
 
     m_layout = new QVBoxLayout();
 
-    QHBoxLayout* sliderLayout = new QHBoxLayout();
+    //QHBoxLayout* sliderLayout = new QHBoxLayout();
     m_slider = new SliderWithEditInt2();
 
     m_slider->setMin( 0 );

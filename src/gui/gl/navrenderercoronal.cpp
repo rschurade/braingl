@@ -111,7 +111,7 @@ void NavRendererCoronal::initGeometry()
         float y = m_y * m_yd;
         float z = m_z * m_zd;
         float xb = m_xb * m_xd;
-        float yb = m_yb * m_yd;
+        //float yb = m_yb * m_yd;
         float zb = m_zb * m_zd;
 
         VertexData vertices[] =

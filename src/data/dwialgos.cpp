@@ -56,7 +56,6 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
 
     QVector<ColumnVector>* qballVector = new QVector<ColumnVector>();
-    QVector<QPair<float, float> >* minmaxVector = new QVector<QPair<float, float> >;
 
     for ( int i = 0; i < data->size(); ++i )
     {
@@ -185,7 +184,7 @@ DatasetDWI* DWIAlgos::tensorFit( DatasetDWI* ds )
             for( int l=0; l<6; l++ )
             {
                 value=0;
-                for( size_t m = 1; m <= N; ++m )
+                for( int m = 1; m <= N; ++m )
                 {
                     value += BI(l+1,m) * log_s0_si_pixel[m-1];
                 }
@@ -217,7 +216,7 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
 
     QVector<float> trace( blockSize );
     float value = 0;
-    for ( size_t i = 0; i < blockSize; ++i )
+    for ( int i = 0; i < blockSize; ++i )
     {
         value = tensors->at( i )( 1 );
         value += tensors->at( i )( 4 );
@@ -229,7 +228,7 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
 
     double xx,xy,xz,yy,yz,zz,tr,AA,DD;
 
-    for ( size_t i = 0; i < blockSize; ++i )
+    for ( int i = 0; i < blockSize; ++i )
     {
         xx = tensors->at( i )(1);
         xy = tensors->at( i )(2);
@@ -280,7 +279,7 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
     QVector<QVector3D> evec2( blockSize );
     QVector<QVector3D> evec3( blockSize );
 
-    for ( size_t i = 0; i < blockSize; ++i )
+    for ( int i = 0; i < blockSize; ++i )
     {
         xx = tensors->at( i )( 1 );
         xy = tensors->at( i )( 2 );

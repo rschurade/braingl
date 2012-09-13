@@ -48,15 +48,15 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
     TRIANGLEVECTOR trivec;
 
     // Generate isosurface.
-    for ( unsigned int z = 0; z < nZ; z++ )
+    for ( int z = 0; z < nZ; z++ )
     {
-        for ( unsigned int y = 0; y < nY; y++ )
+        for ( int y = 0; y < nY; y++ )
         {
-            for ( unsigned int x = 0; x < nX; x++ )
+            for ( int x = 0; x < nX; x++ )
             {
                 // Calculate table lookup index from those
                 // vertices which are below the isolevel.
-                unsigned int tableIndex = 0;
+                int tableIndex = 0;
                 if ( scalarField[z * nPointsInSlice + y * nPointsInXDirection + x] < isoLevel )
                     tableIndex |= 1;
                 if ( scalarField[z * nPointsInSlice + ( y + 1 ) * nPointsInXDirection + x] < isoLevel )
@@ -81,19 +81,19 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
                     if ( edgeTable[tableIndex] & 8 )
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 3, scalarFieldPtr );
-                        unsigned int id = getEdgeID( x, y, z, 3 );
+                        int id = getEdgeID( x, y, z, 3 );
                         i2pt3idVertices.insert( id, pt );
                     }
                     if ( edgeTable[tableIndex] & 1 )
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 0, scalarFieldPtr );
-                        unsigned int id = getEdgeID( x, y, z, 0 );
+                        int id = getEdgeID( x, y, z, 0 );
                         i2pt3idVertices.insert( id, pt );
                     }
                     if ( edgeTable[tableIndex] & 256 )
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 8, scalarFieldPtr );
-                        unsigned int id = getEdgeID( x, y, z, 8 );
+                        int id = getEdgeID( x, y, z, 8 );
                         i2pt3idVertices.insert( id, pt );
                     }
 
@@ -102,13 +102,13 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
                         if ( edgeTable[tableIndex] & 4 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 2, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 2 );
+                            int id = getEdgeID( x, y, z, 2 );
                             i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[tableIndex] & 2048 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 11, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 11 );
+                            int id = getEdgeID( x, y, z, 11 );
                             i2pt3idVertices.insert( id, pt );
                         }
                     }
@@ -117,13 +117,13 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
                         if ( edgeTable[tableIndex] & 2 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 1, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 1 );
+                            int id = getEdgeID( x, y, z, 1 );
                             i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[tableIndex] & 512 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 9, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 9 );
+                            int id = getEdgeID( x, y, z, 9 );
                             i2pt3idVertices.insert( id, pt );
                         }
                     }
@@ -132,13 +132,13 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
                         if ( edgeTable[tableIndex] & 16 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 4, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 4 );
+                            int id = getEdgeID( x, y, z, 4 );
                             i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[tableIndex] & 128 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 7, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 7 );
+                            int id = getEdgeID( x, y, z, 7 );
                             i2pt3idVertices.insert( id, pt );
                         }
                     }
@@ -146,28 +146,28 @@ TriangleMesh* IsoSurface::generateSurface( DatasetScalar* ds, float isoValue )
                         if ( edgeTable[tableIndex] & 1024 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 10, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 10 );
+                            int id = getEdgeID( x, y, z, 10 );
                             i2pt3idVertices.insert( id, pt );
                         }
                     if ( ( x == nX - 1 ) && ( z == nZ - 1 ) )
                         if ( edgeTable[tableIndex] & 64 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 6, scalarFieldPtr);
-                            unsigned int id = getEdgeID( x, y, z, 6 );
+                            int id = getEdgeID( x, y, z, 6 );
                             i2pt3idVertices.insert( id, pt );
                         }
                     if ( ( y == nY - 1 ) && ( z == nZ - 1 ) )
                         if ( edgeTable[tableIndex] & 32 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 5, scalarFieldPtr );
-                            unsigned int id = getEdgeID( x, y, z, 5 );
+                            int id = getEdgeID( x, y, z, 5 );
                             i2pt3idVertices.insert( id, pt );
                         }
 
                     for ( int i = 0; triTable[tableIndex][i] != -1; i += 3 )
                     {
                         TRIANGLE triangle;
-                        unsigned int pointID0, pointID1, pointID2;
+                        int pointID0, pointID1, pointID2;
                         pointID0 = getEdgeID( x, y, z, triTable[tableIndex][i] );
                         pointID1 = getEdgeID( x, y, z, triTable[tableIndex][i + 1] );
                         pointID2 = getEdgeID( x, y, z, triTable[tableIndex][i + 2] );

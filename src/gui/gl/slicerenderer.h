@@ -35,6 +35,8 @@ private:
 	void drawCoronal();
 	void drawSagittal();
 
+	GLuint *vboIds;
+
 	float m_x;
 	float m_y;
 	float m_z;
@@ -48,8 +50,6 @@ private:
     int m_xbOld;
     int m_ybOld;
     int m_zbOld;
-
-	GLuint *vboIds;
 };
 
 #endif /* SLICERENDERER_H_ */
