@@ -18,6 +18,13 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_properties["createdBy"] = FNALGO_TENSORFIT;
 
     examineDataset();
+
+    m_properties["renderLowerX"] = 30;
+    m_properties["renderLowerY"] = 60;
+    m_properties["renderLowerZ"] = 30;
+    m_properties["renderUpperX"] = m_properties["nx"].toInt() - 30;
+    m_properties["renderUpperY"] = m_properties["ny"].toInt() - 20;
+    m_properties["renderUpperZ"] = m_properties["nz"].toInt() - 30;
 }
 
 DatasetTensor::~DatasetTensor()
@@ -27,7 +34,6 @@ DatasetTensor::~DatasetTensor()
 
 void DatasetTensor::examineDataset()
 {
-    int type = getProperty( "datatype" ).toInt();
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
@@ -46,7 +52,7 @@ void DatasetTensor::examineDataset()
     m_properties["renderSlice"] = 1;
     m_properties["scaling"] = 1.0;
     m_properties["nt"] = 9;
-    //m_properties["datatype"] = DT_FLOAT;
+
     m_properties["renderUpperX"] = nx - 1;
     m_properties["renderUpperY"] = ny - 1;
     m_properties["renderUpperZ"] = nz - 1;
