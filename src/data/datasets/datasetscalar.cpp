@@ -34,13 +34,12 @@ void DatasetScalar::examineDataset()
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
-    int type = getProperty( "datatype" ).toInt();
 
     float min = std::numeric_limits<float>::max();
     float max = 0;
 
     int size = nx * ny * nz;
-    for ( size_t i = 0; i < size; ++i )
+    for ( int i = 0; i < size; ++i )
     {
         min = qMin( min, m_data[ i ] );
         max = qMax( max, m_data[ i ] );
@@ -78,7 +77,6 @@ void DatasetScalar::createTexture()
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
-    int type = getProperty( "datatype" ).toInt();
 
     float max = m_properties["max"].toFloat();
 

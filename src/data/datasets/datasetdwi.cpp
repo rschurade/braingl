@@ -77,7 +77,7 @@ void DatasetDWI::examineDataset()
         float max = -32767;
         float min = 32768;
 
-        for ( size_t i = 0; i < m_b0Data.size(); ++i )
+        for ( int i = 0; i < m_b0Data.size(); ++i )
         {
             min = qMin( min, m_b0Data[ i ] );
             max = qMax( max, m_b0Data[ i ] );
@@ -123,9 +123,6 @@ void DatasetDWI::createTexture()
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
-    int type = getProperty( "datatype" ).toInt();
-
-    int mult = 65535 / m_properties["max"].toFloat();
 
     float* tmpData = new float[nx*ny*nz];
     float max = m_properties["max"].toFloat();

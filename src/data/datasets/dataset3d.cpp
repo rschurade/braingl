@@ -83,7 +83,7 @@ void Dataset3D::createTexture()
         float* data = new float[nx*ny*nz*3];
 
         int size = nx * ny * nz * 3;
-        for ( size_t i = 0; i < size; ++i )
+        for ( int i = 0; i < size; ++i )
         {
             data[i] = qMax( data[i], data[i] * -1.0f ) / 255;
         }
@@ -95,7 +95,7 @@ void Dataset3D::createTexture()
         int blockSize = nx*ny*nz;
         float* data = new float[blockSize*3];
 
-        for ( size_t i = 0; i < blockSize; ++i )
+        for ( int i = 0; i < blockSize; ++i )
         {
             data[i*3] = fabs( m_data[i].x() );
             data[i*3+1] = fabs( m_data[i].y() );
