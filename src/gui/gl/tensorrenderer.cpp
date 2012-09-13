@@ -139,6 +139,8 @@ void TensorRenderer::initGeometry()
     int upperY = m_dataset->getProperty( "renderUpperY" ).toInt();
     int upperZ = m_dataset->getProperty( "renderUpperZ" ).toInt();
 
+    int bValue = m_dataset->getProperty( "bValue" ).toInt();
+
     int lod = m_dataset->getProperty( "lod" ).toInt();
 
     //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
@@ -146,7 +148,7 @@ void TensorRenderer::initGeometry()
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
-    QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling);
+    QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, bValue);
     if ( s == m_previousSettings )
     {
         return;
@@ -199,7 +201,7 @@ void TensorRenderer::initGeometry()
                     v2( 2 ) = vertices[i].y();
                     v2( 3 ) = vertices[i].z();
 
-                    float r = DotProduct( v1 * D, v2 );
+                    float r = DotProduct( v1 * D, v2 ) * bValue;
 
                     float locX = xx * dx + dx / 2;
                     float locY =  + yy * dy + dy / 2;

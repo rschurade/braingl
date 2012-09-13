@@ -16,6 +16,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
     m_properties["createdBy"] = FNALGO_TENSORFIT;
+    m_properties["bValue"] = 500;
 
     examineDataset();
 

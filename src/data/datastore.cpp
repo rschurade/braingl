@@ -257,6 +257,8 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
                 break;
             case FNDSE_MINMAX_SCALING:
                 return ds->getProperty( "minmaxScaling" ).toBool();
+            case FNDSE_BVALUE:
+                return ds->getProperty( "bValue" ).toInt();
                 break;
 
         }
@@ -379,6 +381,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_MINMAX_SCALING:
                 m_datasetList.at( index.row() )->setProperty( "minmaxScaling", value.toBool() );
+                break;
+            case FNDSE_BVALUE:
+                m_datasetList.at( index.row() )->setProperty( "bValue", value.toInt() );
                 break;
             }
         }

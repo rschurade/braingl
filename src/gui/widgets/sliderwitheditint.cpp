@@ -21,8 +21,8 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
     m_slider->setOrientation( Qt::Horizontal );
 
     m_edit = new QLineEdit();
-    m_edit->setMaxLength( 3 );
-    m_edit->setMaximumWidth( 35 );
+    m_edit->setMaxLength( 4 );
+    m_edit->setMaximumWidth( 45 );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
@@ -42,9 +42,9 @@ SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
 
     layout->addWidget( m_label, 20 );
     layout->addWidget( m_button1 );
-    layout->addWidget( m_slider, 60 );
+    layout->addWidget( m_slider, 55 );
     layout->addWidget( m_button2 );
-    layout->addWidget( m_edit, 20 );
+    layout->addWidget( m_edit, 25 );
 
     setLayout( layout );
 }
@@ -94,6 +94,11 @@ void SliderWithEditInt::setMax( int max )
     m_slider->repaint();
 }
 
+void SliderWithEditInt::setStep( int step )
+{
+    m_slider->setSingleStep( step );
+}
+
 void SliderWithEditInt::minusPressed()
 {
     int current = m_slider->value();
@@ -101,7 +106,7 @@ void SliderWithEditInt::minusPressed()
     {
         return;
     }
-    int value = current - 1;
+    int value = current - m_slider->singleStep();
     m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
@@ -115,7 +120,7 @@ void SliderWithEditInt::plusPressed()
     {
         return;
     }
-    int value = current + 1;
+    int value = current + m_slider->singleStep();
     m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
