@@ -246,7 +246,7 @@ void TensorRenderer::initGeometry()
                     v2( 2 ) = vertices[i].y();
                     v2( 3 ) = vertices[i].z();
 
-                    float r = DotProduct( v1 * D, v2 );
+                    float r = DotProduct( v1 * D, v2 ) * bValue;
 
                     float locX = xx * dx + dx / 2;
                     float locZ = zz * dz + dz / 2;
@@ -291,7 +291,7 @@ void TensorRenderer::initGeometry()
                     v2( 2 ) = vertices[i].y();
                     v2( 3 ) = vertices[i].z();
 
-                    float r = DotProduct( v1 * D, v2 );
+                    float r = DotProduct( v1 * D, v2 ) * bValue;
 
                     float locY = yy * dy + dy / 2;
                     float locZ = zz * dz + dz / 2;
