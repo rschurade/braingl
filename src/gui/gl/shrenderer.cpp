@@ -153,6 +153,9 @@ void SHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
+    lod = qMin( lod, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) );
+    qDebug() << "SH Renderer: using lod " << lod;
+
     float x = (float)xi * dx + dx / 2.;
     float y = (float)yi * dy + dy / 2.;
     float z = (float)zi * dz + dz / 2.;

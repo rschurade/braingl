@@ -37,6 +37,8 @@ protected:
                                   int lod, int orient,
                                   int lx, int ux, int ly, int uy, int lz, int uz,
                                   bool scaling, int bValue );
+    int getMaxLod( int orient, int lx, int ux, int ly, int uy, int lz, int uz );
+
     QString m_previousSettings;
 };
 

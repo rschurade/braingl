@@ -149,15 +149,15 @@ void TensorRenderer::initGeometry()
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
     QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, bValue);
-    if ( s == m_previousSettings )
+    if ( s == m_previousSettings || orient == FN_NONE )
     {
         return;
     }
     m_previousSettings = s;
 
-    float x = (float)xi * dx + dx / 2.;
-    float y = (float)yi * dy + dy / 2.;
-    float z = (float)zi * dz + dz / 2.;
+    lod = qMin( lod, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) );
+    qDebug() << "Tensor Renderer: using lod " << lod;
+
 
     TriangleMesh* mesh = m_spheres[lod];
     QVector< QVector3D > normals = mesh->getVertNormals();
@@ -173,6 +173,10 @@ void TensorRenderer::initGeometry()
     ColumnVector v2( 3 );
 
     ColumnVector newVert( 3 );
+
+    float x = (float)xi * dx + dx / 2.;
+    float y = (float)yi * dy + dy / 2.;
+    float z = (float)zi * dz + dz / 2.;
 
     int numVerts = mesh->getVertSize();
     int currentBall = 0;
