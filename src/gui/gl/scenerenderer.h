@@ -34,6 +34,7 @@ public:
 	void middleMouseDown( int x, int y );
 	void middleMouseDrag( int x, int y );
 	void mouseWheel( int step );
+	void setView( int view );
 
 	void calcMVPMatrix();
 

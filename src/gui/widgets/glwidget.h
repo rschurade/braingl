@@ -19,6 +19,8 @@ public:
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
+    void setView( int view );
+
 public slots:
     void update();
 

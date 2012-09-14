@@ -6,6 +6,8 @@
  */
 #include <QtCore/QDebug>
 
+#include <math.h>
+
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
 
@@ -148,6 +150,36 @@ void SceneRenderer::draw()
     m_sliceRenderer->draw( m_mvpMatrix );
     m_shRenderer->draw( m_mvpMatrix );
     m_tensorRenderer->draw( m_mvpMatrix );
+}
+
+void SceneRenderer::setView( int view )
+{
+    m_zoom = 1.0;
+    m_moveX = 0;
+    m_moveY = 0;
+    m_moveXOld = 0;
+    m_moveYOld = 0;
+    m_thisRot.setToIdentity();
+    m_lastRot.setToIdentity();
+    m_arcBall = new ArcBall( m_width, m_height);
+
+    QQuaternion rotx( sqrt(0.5), 0, 0, sqrt(0.5) );
+    QQuaternion rot_x( -sqrt(0.5), 0, 0, sqrt(0.5) );
+    QQuaternion roty( 0, sqrt(0.5), 0, sqrt(0.5) );
+    QQuaternion rot_y( 0, -sqrt(0.5), 0, sqrt(0.5) );
+    QQuaternion rotz( 0, 0, sqrt(0.5), sqrt(0.5) );
+
+    if ( view == 2 )
+    {
+        m_lastRot.rotate( rotz );
+        m_lastRot.rotate( rotx );
+        m_lastRot.rotate( rotx );
+    }
+    if ( view == 3 )
+    {
+        m_lastRot.rotate( rot_x );
+        m_lastRot.rotate( rot_y );
+    }
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
