@@ -5,6 +5,7 @@
  *      Author: Ralph
  */
 
+#include <QtCore/QDebug>
 #include "objectrenderer.h"
 
 ObjectRenderer::ObjectRenderer() :
@@ -80,4 +81,38 @@ QString ObjectRenderer::createSettingsString( int x, int y, int z,
     result += QString::number( scaling );
     result += QString::number( bValue );
     return result;
+}
+
+int ObjectRenderer::getMaxLod( int orient, int lx, int ux, int ly, int uy, int lz, int uz )
+{
+    int maxO = 5;
+    int x = ( ux - lx);
+    int y = ( uy - ly);
+    int z = ( uz - lz);
+    int count = 0;
+    switch( orient )
+    {
+        case 1:
+            count = x*y;
+            break;
+        case 2:
+            count = x*z;
+            break;
+        case 3:
+            count = z*y;
+            break;
+    }
+    if ( count > 2000 )
+    {
+        maxO = 2;
+    }
+    else if ( count > 1000 )
+    {
+        maxO = 3;
+    }
+    else if ( count > 400 )
+    {
+        maxO = 4;
+    }
+    return maxO;
 }

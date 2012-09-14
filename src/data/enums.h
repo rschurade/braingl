@@ -83,4 +83,12 @@ enum FN_DATASET_EDITABLE
     FNDSE_BVALUE
 };
 
+enum FN_ORIENT
+{
+    FN_NONE,
+    FN_AXIAL,
+    FN_CORONAL,
+    FN_SAGITTAL
+};
+
 #endif /* ENUMS_H_ */
