@@ -124,8 +124,8 @@ void SceneRenderer::calcMVPMatrix()
     pMatrix.ortho( 0, m_boundingbox, 0, m_boundingbox, -3000, 3000 );
     pMatrix.translate( m_boundingbox / 2, m_boundingbox / 2, 0 );
 
-    pMatrix.translate( static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / m_boundingbox ),
-                       static_cast<float>( m_moveY ) / ( static_cast<float>( m_height ) / m_boundingbox ), 0 );
+    pMatrix.translate( static_cast<float>( m_moveX * m_zoom ) / ( static_cast<float>( m_width ) / m_boundingbox ),
+                       static_cast<float>( m_moveY * m_zoom ) / ( static_cast<float>( m_height ) / m_boundingbox ), 0 );
 
     pMatrix.scale( m_zoom );
 
