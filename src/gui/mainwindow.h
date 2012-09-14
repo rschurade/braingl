@@ -39,6 +39,11 @@ private slots:
     void slotToggleCoronalSlice();
     void slotToggleSagittalSlice();
 
+    void slotStandardAxialView();
+    void slotStandardCoronalView();
+    void slotStandardSagittalView();
+
+
 private:
     void createActions();
     void createMenus();
@@ -78,6 +83,10 @@ private:
     QAction* addTabSagittal;
     QAction* addTabCoronal;
     QAction* addTabAxial;
+
+    QAction* standardViewAxialAct;
+    QAction* standardViewCoronalAct;
+    QAction* standardViewSagittalAct;
 };
 
 #endif

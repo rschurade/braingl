@@ -1,6 +1,7 @@
 #include <QtGui/QtGui>
 
 #include "../data/datastore.h"
+#include "../data/enums.h"
 
 #include "docks/datasetlistwidget.h"
 #include "docks/datasetinfowidget.h"
@@ -210,6 +211,18 @@ void MainWindow::createActions()
     showSagittalAct->setChecked( true );
     connect( showSagittalAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleSagittalSlice() ) );
 
+    standardViewAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Axial View" ), this );
+    standardViewAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
+    connect( standardViewAxialAct, SIGNAL( triggered() ), this, SLOT( slotStandardAxialView() ) );
+
+    standardViewCoronalAct = new QAction( QIcon( ":/icons/coronal.png" ), tr( "Coronal View" ), this );
+    standardViewCoronalAct->setStatusTip( tr( "Toggle rendering of the coronal slice." ) );
+    connect( standardViewCoronalAct, SIGNAL( triggered() ), this, SLOT( slotStandardCoronalView() ) );
+
+    standardViewSagittalAct = new QAction( QIcon( ":/icons/sagittal.png" ), tr( "Sagittal view" ), this );
+    standardViewSagittalAct->setStatusTip( tr( "Toggle rendering of the sagittal slice." ) );
+    connect( standardViewSagittalAct, SIGNAL( triggered() ), this, SLOT( slotStandardSagittalView() ) );
+
 }
 
 void MainWindow::createMenus()
@@ -251,6 +264,9 @@ void MainWindow::createToolBars()
     editToolBar->addAction( showAxialAct );
     editToolBar->addAction( showCoronalAct );
     editToolBar->addAction( showSagittalAct );
+    editToolBar->addAction( standardViewAxialAct );
+    editToolBar->addAction( standardViewCoronalAct );
+    editToolBar->addAction( standardViewSagittalAct );
     editToolBar->setObjectName( "editToolbar");
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ) );
@@ -364,4 +380,19 @@ void MainWindow::slotToggleSagittalSlice()
 {
     QModelIndex mi = m_dataStore->index( 0, 113 );
     m_dataStore->setData( mi, showSagittalAct->isChecked(), Qt::UserRole );
+}
+
+void  MainWindow::slotStandardAxialView()
+{
+    mainGLWidget->setView( 1 );
+}
+
+void  MainWindow::slotStandardCoronalView()
+{
+    mainGLWidget->setView( 2 );
+}
+
+void  MainWindow::slotStandardSagittalView()
+{
+    mainGLWidget->setView( 3 );
 }

@@ -87,3 +87,9 @@ void GLWidget::update()
     m_sceneRenderer->calcMVPMatrix();
     updateGL();
 }
+
+void GLWidget::setView( int view )
+{
+    m_sceneRenderer->setView( view );
+    update();
+}
