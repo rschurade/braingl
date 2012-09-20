@@ -143,6 +143,7 @@ void DatasetDWI::flipX()
     int zDim = m_properties["nz"].toInt();
 
     QVector<ColumnVector>* newData = new QVector<ColumnVector>();
+    QVector<float>newB0Data;
 
     for( int z = 0; z < zDim; ++z )
     {
@@ -151,6 +152,7 @@ void DatasetDWI::flipX()
             for( int x = xDim -1; x >= 0; --x )
             {
                 newData->push_back( m_data->at( x + y * xDim + z * xDim * yDim ) );
+                newB0Data.push_back( m_b0Data[x + y * xDim + z * xDim * yDim]);
             }
         }
     }
@@ -167,4 +169,5 @@ void DatasetDWI::flipX()
 
     m_data->clear();
     m_data = newData;
+    m_b0Data = newB0Data;
 }
