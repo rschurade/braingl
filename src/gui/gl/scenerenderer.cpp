@@ -123,25 +123,33 @@ void SceneRenderer::calcMVPMatrix()
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
-    pMatrix.ortho( 0, m_boundingbox, 0, m_boundingbox, -3000, 3000 );
-    pMatrix.translate( m_boundingbox / 2, m_boundingbox / 2, 0 );
-
-    pMatrix.translate( static_cast<float>( m_moveX * m_zoom ) / ( static_cast<float>( m_width ) / m_boundingbox ),
-                       static_cast<float>( m_moveY * m_zoom ) / ( static_cast<float>( m_height ) / m_boundingbox ), 0 );
-
-    pMatrix.scale( m_zoom );
+    float bbX = 0;
+    float bbY = 0;
 
     if ( m_ratio >= 1.0 )
     {
-        pMatrix.scale( 1.0 / m_ratio, 1.0, 1.0 );
+        bbX = m_boundingbox * m_ratio;
+        bbY = m_boundingbox;
     }
     else
     {
-        pMatrix.scale( 1.0, m_ratio, 1.0 );
+        bbX = m_boundingbox;
+        bbY = m_boundingbox / m_ratio;
     }
+    pMatrix.ortho( 0, bbX, 0, bbY, -3000, 3000 );
+    pMatrix.translate( bbX / 2, bbY / 2, 0 );
+
+    float moveX = static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / bbX );
+    float moveY = static_cast<float>( m_moveY ) / ( static_cast<float>( m_height ) / bbY );
+
+    pMatrix.translate( moveX*m_zoom, moveY*m_zoom, 0);
+    //pMatrix.translate( moveX, moveY, 0);
+    pMatrix.scale( m_zoom );
 
     m_thisRot.translate( m_datasetSizeX / -2, m_datasetSizeY / -2, m_datasetSizeZ / -2 );
     m_mvpMatrix = pMatrix * m_thisRot;
+
+    m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
 }
 
 void SceneRenderer::draw()
@@ -205,15 +213,15 @@ void SceneRenderer::middleMouseDown( int x, int y )
 
 void SceneRenderer::middleMouseDrag( int x, int y )
 {
-    m_moveX = m_moveXOld - ( m_middleDownX - x );
-    m_moveY = m_moveYOld + m_middleDownY - y;
+    m_moveX = ( m_moveXOld - ( m_middleDownX - x ) / m_zoom );
+    m_moveY = ( m_moveYOld + ( m_middleDownY - y ) / m_zoom );
     calcMVPMatrix();
 }
 
 void SceneRenderer::mouseWheel( int step )
 {
     m_zoom += step;
-    m_zoom = qMax( 1, m_zoom );
+    m_zoom = qMax( 1.0f, m_zoom );
 
     calcMVPMatrix();
 }

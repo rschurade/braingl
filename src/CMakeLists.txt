@@ -72,10 +72,10 @@ INCLUDE( Utils )
 # include the boost headers
 # INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
-FIND_PACKAGE( Qxt REQUIRED )
-INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH} )
-INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtGui )
-INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtCore )
+#FIND_PACKAGE( Qxt REQUIRED )
+#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH} )
+#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtGui )
+#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtCore )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
@@ -112,10 +112,12 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 
-	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${QXT_LIBS} )
+	#TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${QXT_LIBS} )
+	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${QXT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
+	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${QXT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 ENDIF()
 

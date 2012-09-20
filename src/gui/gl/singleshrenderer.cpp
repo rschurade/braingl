@@ -177,7 +177,7 @@ void SingleSHRenderer::initGeometry()
     const Matrix* v1 = tess::vertices( lod );
     Matrix base = ( QBall::sh_base( (*v1), order ) );
 
-    QString s = createSettingsString( xi, yi, zi, lod, 0, 0, 0, 0, 0, 0, 0, false, 0);
+    QString s = createSettingsString( xi, yi, zi, 0, 0, 0, 0, 0, 0, 0, false, 0);
     if ( s == m_previousSettings )
     {
         return;

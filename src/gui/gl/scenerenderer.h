@@ -60,7 +60,7 @@ private:
 
 	QMatrix4x4 m_mvpMatrix;
 
-	int m_zoom;
+	float m_zoom;
 	int m_middleDownX;
 	int m_middleDownY;
 	int m_moveX;
