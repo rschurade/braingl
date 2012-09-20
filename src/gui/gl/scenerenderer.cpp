@@ -150,6 +150,7 @@ void SceneRenderer::calcMVPMatrix()
     m_mvpMatrix = pMatrix * m_thisRot;
 
     m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
+    m_shRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
 }
 
 void SceneRenderer::draw()
