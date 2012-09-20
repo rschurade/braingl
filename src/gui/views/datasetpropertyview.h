@@ -19,7 +19,7 @@ class SliderWithEdit;
 class SliderWithEditInt;
 class SelectWithLabel;
 class CheckboxWithLabel;
-class QxtSpanSlider;
+//class QxtSpanSlider;
 
 class DatasetPropertyView : public QAbstractItemView
 {
@@ -94,8 +94,8 @@ private:
     SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;
 
-    QxtSpanSlider* m_spanSlider1;
-    QxtSpanSlider* m_spanSlider2;
+    //QxtSpanSlider* m_spanSlider1;
+    //QxtSpanSlider* m_spanSlider2;
 
     SliderWithEditInt* m_bValueSlider;
 

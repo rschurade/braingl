@@ -123,39 +123,39 @@ void TensorRenderer::initGeometry()
     int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
     int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
     int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
-    int xbi = m_dataset->getProperty( "nx" ).toInt();
-    int ybi = m_dataset->getProperty( "ny" ).toInt();
-    //int zbi = m_dataset->getProperty( "nz" ).toInt();
+    int nx = m_dataset->getProperty( "nx" ).toInt();
+    int ny = m_dataset->getProperty( "ny" ).toInt();
+    int nz = m_dataset->getProperty( "nz" ).toInt();
+    float dx = m_dataset->getProperty( "dx" ).toFloat();
+    float dy = m_dataset->getProperty( "dy" ).toFloat();
+    float dz = m_dataset->getProperty( "dz" ).toFloat();
 
-    float dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
+    int orient = m_dataset->getProperty( "renderSlice" ).toInt();
 
+    calcBounds( nx, ny, nz, dx, dy, dz, orient );
 
-    int lowerX = m_dataset->getProperty( "renderLowerX" ).toInt();
-    int lowerY = m_dataset->getProperty( "renderLowerY" ).toInt();
-    int lowerZ = m_dataset->getProperty( "renderLowerZ" ).toInt();
-    int upperX = m_dataset->getProperty( "renderUpperX" ).toInt();
-    int upperY = m_dataset->getProperty( "renderUpperY" ).toInt();
-    int upperZ = m_dataset->getProperty( "renderUpperZ" ).toInt();
+    int lowerX = m_visibleArea[0];
+    int lowerY = m_visibleArea[2];
+    int lowerZ = m_visibleArea[4];
+    int upperX = m_visibleArea[1];
+    int upperY = m_visibleArea[3];
+    int upperZ = m_visibleArea[5];
 
     int bValue = m_dataset->getProperty( "bValue" ).toInt();
 
-    int lod = m_dataset->getProperty( "lod" ).toInt();
-
     //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
-    int orient = m_dataset->getProperty( "renderSlice" ).toInt();
+
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
-    QString s = createSettingsString( xi, yi, zi, lod, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, bValue);
+    QString s = createSettingsString( xi, yi, zi, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, bValue);
     if ( s == m_previousSettings || orient == FN_NONE )
     {
         return;
     }
     m_previousSettings = s;
 
-    lod = qMin( lod, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) );
+    int lod = getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ );
     qDebug() << "Tensor Renderer: using lod " << lod;
 
 
@@ -183,7 +183,7 @@ void TensorRenderer::initGeometry()
 
     if ( orient == 1 )
     {
-        qDebug() << "Tensor Renderer: start init geometry";
+        //qDebug() << "Tensor Renderer: start init geometry";
 
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         verts.reserve( mesh->getVertSize() * glyphs * 10 );
@@ -193,7 +193,7 @@ void TensorRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                Matrix D = data->at( xx + yy * xbi + zi * xbi * ybi );
+                Matrix D = data->at( xx + yy * nx + zi * nx * ny );
 
                 for ( int i = 0; i < vertices.size(); ++i )
                 {
@@ -233,12 +233,12 @@ void TensorRenderer::initGeometry()
     }
     else if ( orient == 2 )
     {
-        qDebug() << "Tensor Renderer: start init geometry";
+        //qDebug() << "Tensor Renderer: start init geometry";
         for( int zz = lowerZ; zz < upperZ; ++zz )
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                Matrix D = data->at( xx + yi * xbi + zz * xbi * ybi );
+                Matrix D = data->at( xx + yi * nx + zz * nx * ny );
 
                 for ( int i = 0; i < vertices.size(); ++i )
                 {
@@ -278,12 +278,12 @@ void TensorRenderer::initGeometry()
     }
     else if ( orient == 3 )
     {
-        qDebug() << "Tensor Renderer: start init geometry";
+        //qDebug() << "Tensor Renderer: start init geometry";
         for( int yy = lowerY; yy < upperY; ++yy )
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                Matrix D = data->at( xi + yy * xbi + zz * xbi * ybi );
+                Matrix D = data->at( xi + yy * nx + zz * nx * ny );
 
                 for ( int i = 0; i < vertices.size(); ++i )
                 {
@@ -334,5 +334,5 @@ void TensorRenderer::initGeometry()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 
-    qDebug() << "Tensor Renderer: end init geometry";
+    //qDebug() << "Tensor Renderer: end init geometry";
 }

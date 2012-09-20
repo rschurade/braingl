@@ -10,7 +10,8 @@
 
 ObjectRenderer::ObjectRenderer() :
 	QAbstractItemView(),
-	m_previousSettings( "" )
+	m_previousSettings( "" ),
+	m_visibleArea( 6 )
 {
 }
 
@@ -61,8 +62,7 @@ QRegion ObjectRenderer::visualRegionForSelection( const QItemSelection &selectio
     return QRegion();
 }
 
-QString ObjectRenderer::createSettingsString( int x, int y, int z,
-                                              int lod, int orient,
+QString ObjectRenderer::createSettingsString( int x, int y, int z, int orient,
                                               int lx, int ux, int ly, int uy, int lz, int uz,
                                               bool scaling, int bValue )
 {
@@ -70,7 +70,6 @@ QString ObjectRenderer::createSettingsString( int x, int y, int z,
     result += QString::number( x );
     result += QString::number( y );
     result += QString::number( z );
-    result += QString::number( lod );
     result += QString::number( orient );
     result += QString::number( lx );
     result += QString::number( ux );
@@ -102,17 +101,103 @@ int ObjectRenderer::getMaxLod( int orient, int lx, int ux, int ly, int uy, int l
             count = z*y;
             break;
     }
-    if ( count > 2000 )
+    if ( count > 800 )
+    {
+        maxO = 1;
+    }
+    else if ( count > 400 )
     {
         maxO = 2;
     }
-    else if ( count > 1000 )
+    else if ( count > 200 )
     {
         maxO = 3;
     }
-    else if ( count > 400 )
+    else if ( count > 100 )
     {
         maxO = 4;
     }
     return maxO;
+}
+
+void ObjectRenderer::setSceneStats( float zoom, int moveX, int moveY, float bbX, float bbY )
+{
+    m_zoom = zoom;
+    m_moveX = moveX;
+    m_moveY = moveY;
+    m_bbX = bbX;
+    m_bbY = bbY;
+}
+
+void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, float dz, int orient )
+{
+    switch( orient )
+    {
+        case 1:
+        {
+            int xVisible = qMin( nx-1, (int)( ( m_bbX/dx ) / m_zoom ) );
+            int yVisible = qMin( ny-1, (int)( ( m_bbY/dy ) / m_zoom ) );
+            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 )                    - (int)( m_moveX/dx + 1 ) );
+            m_visibleArea[1] = qMin( nx, ( ( ( nx - xVisible ) / 2 ) + xVisible + 1 ) - (int)( m_moveX/dx ) );
+            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 )                    - (int)( m_moveY/dy + 1 ) );
+            m_visibleArea[3] = qMin( ny, ( ( ny - yVisible ) / 2 ) + yVisible + 1     - (int)( m_moveY/dy ) );
+
+            if ( xVisible >= nx-1 )
+            {
+                m_visibleArea[0] = 0;
+                m_visibleArea[1] = nx-1;
+            }
+
+            if ( yVisible >= ny-1 )
+            {
+                m_visibleArea[2] = 0;
+                m_visibleArea[3] = ny-1;
+            }
+            break;
+        }
+        case 2:
+        {
+            int xVisible = qMin( nx-1, (int)( ( m_bbX/dx ) / m_zoom ) );
+            int zVisible = qMin( nz-1, (int)( ( m_bbY/dz ) / m_zoom ) );
+            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 )                    - (int)( m_moveX/dx + 1 ) );
+            m_visibleArea[1] = qMin( nx, ( ( ( nx - xVisible ) / 2 ) + xVisible + 1 ) - (int)( m_moveX/dx ) );
+            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 )                    - (int)( m_moveY/dz + 1 ) );
+            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1     - (int)( m_moveY/dz ) );
+
+            if ( xVisible >= nx-1 )
+            {
+                m_visibleArea[0] = 0;
+                m_visibleArea[1] = nx-1;
+            }
+
+            if ( zVisible >= nz-1 )
+            {
+                m_visibleArea[4] = 0;
+                m_visibleArea[5] = nz-1;
+            }
+            break;
+        }
+        case 3:
+        {
+            int yVisible = qMin( ny-1, (int)( ( m_bbX/dy ) / m_zoom ) );
+            int zVisible = qMin( nz-1, (int)( ( m_bbY/dz ) / m_zoom ) );
+            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 )                    - (int)( m_moveX/dy + 1 ) );
+            m_visibleArea[3] = qMin( ny, ( ( ( ny - yVisible ) / 2 ) + yVisible + 1 ) - (int)( m_moveX/dy ) );
+            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 )                    - (int)( m_moveY/dz + 1 ) );
+            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1     - (int)( m_moveY/dz ) );
+
+            if ( yVisible >= ny-1 )
+            {
+                m_visibleArea[2] = 0;
+                m_visibleArea[3] = ny-1;
+            }
+
+            if ( zVisible >= nz-1 )
+            {
+                m_visibleArea[4] = 0;
+                m_visibleArea[5] = nz-1;
+            }
+            break;
+        }
+    }
 }

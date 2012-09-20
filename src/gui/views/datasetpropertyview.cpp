@@ -5,7 +5,7 @@
  *      Author: Ralph
  */
 #include <QtGui/QtGui>
-#include <QxtGui/QxtSpanSlider>
+// #include <QxtGui/QxtSpanSlider>
 
 #include "../widgets/sliderwithedit.h"
 #include "../widgets/sliderwitheditint.h"
@@ -83,7 +83,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 
     m_scalingSlider = new SliderWithEdit( tr( "qball scaling" ) );
     connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
-
+/*
     m_spanSlider1 = new QxtSpanSlider( Qt::Horizontal );
     m_spanSlider1->setMinimum( 0 );
     m_spanSlider1->setMaximum( 100 );
@@ -101,7 +101,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_spanSlider2->setHandleMovementMode( QxtSpanSlider::NoOverlapping );
     connect( m_spanSlider2, SIGNAL( lowerPositionChanged( int ) ), this, SLOT( lower2Changed( int ) ) );
     connect( m_spanSlider2, SIGNAL( upperPositionChanged( int ) ), this, SLOT( upper2Changed( int ) ) );
-
+*/
     m_qBallScaling = new CheckboxWithLabel( tr("min-max scqaling"));
     connect( m_qBallScaling, SIGNAL( stateChanged( int ) ), this, SLOT( qballScalingChanged( int ) ) );
 
@@ -117,8 +117,8 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_sliceSelect );
     m_layout->addWidget( m_bValueSlider );
     m_layout->addWidget( m_scalingSlider );
-    m_layout->addWidget( m_spanSlider1 );
-    m_layout->addWidget( m_spanSlider2 );
+    //m_layout->addWidget( m_spanSlider1 );
+    //m_layout->addWidget( m_spanSlider2 );
     m_layout->addWidget( m_qBallScaling );
     m_layout->addStretch( 0 );
 
@@ -130,8 +130,8 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
-    m_spanSlider1->setHidden( true );
-    m_spanSlider2->setHidden( true );
+    //m_spanSlider1->setHidden( true );
+    //m_spanSlider2->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     m_widget->setLayout( m_layout );
@@ -254,7 +254,7 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
     m_sliceSelect->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() );
-
+/*
     int lowerX = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_X ), Qt::EditRole ).toInt();
     int lowerY = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), Qt::EditRole ).toInt();
     int lowerZ = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), Qt::EditRole ).toInt();
@@ -293,7 +293,7 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
             m_spanSlider2->setUpperPosition( upperZ );
             break;
     }
-
+*/
     index = getSelectedIndex( FNDSE_MINMAX_SCALING );
     m_qBallScaling->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
@@ -313,8 +313,8 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
-    m_spanSlider1->setHidden( true );
-    m_spanSlider2->setHidden( true );
+    //m_spanSlider1->setHidden( true );
+    //m_spanSlider2->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     if ( dim == 1 )
@@ -333,20 +333,16 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
 
-        m_spanSlider1->setHidden( false );
-        m_spanSlider2->setHidden( false );
+        //m_spanSlider1->setHidden( false );
+        //m_spanSlider2->setHidden( false );
 
         m_qBallScaling->setHidden( false );
     }
 
     if ( created == FNALGO_TENSORFIT )
     {
-        m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
         m_bValueSlider->setHidden( false );
-
-        m_spanSlider1->setHidden( false );
-        m_spanSlider2->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -360,8 +356,8 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
         m_scalingSlider->setHidden( false );
-        m_spanSlider1->setHidden( false );
-        m_spanSlider2->setHidden( false );
+        //m_spanSlider1->setHidden( false );
+        //m_spanSlider2->setHidden( false );
         m_qBallScaling->setHidden( false );
     }
 }
@@ -434,7 +430,7 @@ void DatasetPropertyView::scalingChanged( float value )
 void DatasetPropertyView::renderSliceChanged( int index )
 {
     model()->setData( getSelectedIndex( FNDSE_RENDER_SLICE ), index );
-
+/*
     int lowerX = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_X ), Qt::EditRole ).toInt();
     int lowerY = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), Qt::EditRole ).toInt();
     int lowerZ = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), Qt::EditRole ).toInt();
@@ -474,6 +470,7 @@ void DatasetPropertyView::renderSliceChanged( int index )
             m_spanSlider2->setUpperPosition( upperZ );
             break;
     }
+    */
 }
 
 void DatasetPropertyView::lower1Changed( int value )
