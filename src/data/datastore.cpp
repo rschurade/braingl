@@ -260,7 +260,24 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_BVALUE:
                 return ds->getProperty( "bValue" ).toInt();
                 break;
-
+            case FNDSE_CALC_LOWER_X:
+                return ds->getProperty( "calcLowerX" ).toInt();
+                break;
+            case FNDSE_CALC_UPPER_X:
+                return ds->getProperty( "calcUpperX" ).toInt();
+                break;
+            case FNDSE_CALC_LOWER_Y:
+                return ds->getProperty( "calcLowerY" ).toInt();
+                break;
+            case FNDSE_CALC_UPPER_Y:
+                return ds->getProperty( "calcUpperY" ).toInt();
+                break;
+            case FNDSE_CALC_LOWER_Z:
+                return ds->getProperty( "calcLowerZ" ).toInt();
+                break;
+            case FNDSE_CALC_UPPER_Z:
+                return ds->getProperty( "calcUpperZ" ).toInt();
+                break;
         }
     }
     return QVariant();
@@ -384,6 +401,24 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_BVALUE:
                 m_datasetList.at( index.row() )->setProperty( "bValue", value.toInt() );
+                break;
+            case FNDSE_CALC_LOWER_X:
+                m_datasetList.at( index.row() )->setProperty( "calcLowerX", value.toInt() );
+                break;
+            case FNDSE_CALC_UPPER_X:
+                m_datasetList.at( index.row() )->setProperty( "calcUpperX", value.toInt() );
+                break;
+            case FNDSE_CALC_LOWER_Y:
+                m_datasetList.at( index.row() )->setProperty( "calcLowerY", value.toInt() );
+                break;
+            case FNDSE_CALC_UPPER_Y:
+                m_datasetList.at( index.row() )->setProperty( "calcUpperY", value.toInt() );
+                break;
+            case FNDSE_CALC_LOWER_Z:
+                m_datasetList.at( index.row() )->setProperty( "calcLowerZ", value.toInt() );
+                break;
+            case FNDSE_CALC_UPPER_Z:
+                m_datasetList.at( index.row() )->setProperty( "calcUpperZ", value.toInt() );
                 break;
             }
         }
