@@ -123,26 +123,23 @@ void SHRenderer::initGeometry()
     int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
     int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
     int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
-    int xbi = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toInt();
-    int ybi = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toInt();
-    //int zbi = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toInt();
+    int nx = m_dataset->getProperty( "nx" ).toInt();
+    int ny = m_dataset->getProperty( "ny" ).toInt();
+    int nz = m_dataset->getProperty( "nz" ).toInt();
+    float dx = m_dataset->getProperty( "dx" ).toFloat();
+    float dy = m_dataset->getProperty( "dy" ).toFloat();
+    float dz = m_dataset->getProperty( "dz" ).toFloat();
 
-    float dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
-
-    int lowerX = m_dataset->getProperty( "renderLowerX" ).toInt();
-    int lowerY = m_dataset->getProperty( "renderLowerY" ).toInt();
-    int lowerZ = m_dataset->getProperty( "renderLowerZ" ).toInt();
-    int upperX = m_dataset->getProperty( "renderUpperX" ).toInt();
-    int upperY = m_dataset->getProperty( "renderUpperY" ).toInt();
-    int upperZ = m_dataset->getProperty( "renderUpperZ" ).toInt();
-
-    int order = m_dataset->getProperty( "order" ).toInt();
-    int lod = m_dataset->getProperty( "lod" ).toInt();
-
-    //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
     int orient = m_dataset->getProperty( "renderSlice" ).toInt();
+
+    calcBounds( nx, ny, nz, dx, dy, dz, orient );
+
+    int lowerX = m_visibleArea[0];
+    int lowerY = m_visibleArea[2];
+    int lowerZ = m_visibleArea[4];
+    int upperX = m_visibleArea[1];
+    int upperY = m_visibleArea[3];
+    int upperZ = m_visibleArea[5];
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
@@ -153,7 +150,7 @@ void SHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    lod = qMin( lod, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) );
+    int lod = getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ );
     qDebug() << "SH Renderer: using lod " << lod;
 
     float x = (float)xi * dx + dx / 2.;
@@ -164,6 +161,7 @@ void SHRenderer::initGeometry()
     TriangleMesh* mesh = m_spheres[lod];
     QVector< QVector3D > normals = mesh->getVertNormals();
 
+    int order = m_dataset->getProperty( "order" ).toInt();
     const Matrix* v1 = tess::vertices( lod );
     Matrix base = ( QBall::sh_base( (*v1), order ) );
 
@@ -191,9 +189,9 @@ void SHRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+                if ( ( fabs( data->at( xx + yy * nx + zi * nx * ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xx + yy * xbi + zi * xbi * ybi );
+                    ColumnVector dv = data->at( xx + yy * nx + zi * nx * ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
@@ -263,9 +261,9 @@ void SHRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yi * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
+                if ( ( fabs( data->at( xx + yi * nx + zz * nx * ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xx + yi * xbi + zz * xbi * ybi );
+                    ColumnVector dv = data->at( xx + yi * nx + zz * nx * ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
@@ -332,9 +330,9 @@ void SHRenderer::initGeometry()
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                if ( ( fabs( data->at( xi + yy * xbi + zz * xbi * ybi )(1) ) > 0.0001 ) )
+                if ( ( fabs( data->at( xi + yy * nx + zz * nx * ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xi + yy * xbi + zz * xbi * ybi );
+                    ColumnVector dv = data->at( xi + yy * nx + zz * nx * ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
