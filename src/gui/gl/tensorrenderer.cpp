@@ -336,3 +336,11 @@ void TensorRenderer::initGeometry()
 
     //qDebug() << "Tensor Renderer: end init geometry";
 }
+
+void TensorRenderer::setView( int view )
+{
+    if ( m_dataset )
+    {
+        m_dataset->setProperty( "renderSlice", view );
+    }
+}
