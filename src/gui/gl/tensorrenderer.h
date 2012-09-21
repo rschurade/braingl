@@ -25,6 +25,8 @@ public:
 
     void draw( QMatrix4x4 mvp_matrix );
 
+    void setView( int view );
+
 protected:
     void setupTextures();
     void setShaderVars();

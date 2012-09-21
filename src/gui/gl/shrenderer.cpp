@@ -400,3 +400,11 @@ void SHRenderer::initGeometry()
 
     qDebug() << "QBall: end init geometry";
 }
+
+void SHRenderer::setView( int view )
+{
+    if ( m_dataset )
+    {
+        m_dataset->setProperty( "renderSlice", view );
+    }
+}

@@ -189,6 +189,8 @@ void SceneRenderer::setView( int view )
         m_lastRot.rotate( rot_x );
         m_lastRot.rotate( rot_y );
     }
+    m_tensorRenderer->setView( view );
+    m_shRenderer->setView( view );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
