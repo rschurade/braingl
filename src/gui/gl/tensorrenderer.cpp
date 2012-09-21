@@ -135,10 +135,10 @@ void TensorRenderer::initGeometry()
     calcBounds( nx, ny, nz, dx, dy, dz, orient );
 
     int lowerX = m_visibleArea[0];
-    int lowerY = m_visibleArea[2];
-    int lowerZ = m_visibleArea[4];
     int upperX = m_visibleArea[1];
+    int lowerY = m_visibleArea[2];
     int upperY = m_visibleArea[3];
+    int lowerZ = m_visibleArea[4];
     int upperZ = m_visibleArea[5];
 
     int bValue = m_dataset->getProperty( "bValue" ).toInt();
