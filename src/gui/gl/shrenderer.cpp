@@ -143,14 +143,16 @@ void SHRenderer::initGeometry()
 
     bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
 
-    QString s = createSettingsString( xi, yi, zi, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, 0);
+    int _lod = m_dataset->getProperty("lod").toInt() - 2;
+
+    QString s = createSettingsString( xi, yi, zi, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, 0, _lod);
     if ( s == m_previousSettings || orient == 0 )
     {
         return;
     }
     m_previousSettings = s;
 
-    int lod = getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ );
+    int lod = qMin( 5, qMax( 0, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
     qDebug() << "SH Renderer: using lod " << lod;
 
     float x = (float)xi * dx + dx / 2.;
