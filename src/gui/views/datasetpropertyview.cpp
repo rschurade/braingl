@@ -65,13 +65,12 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_orderSelect->insertItem( 2, tr( "8" ) );
     connect( m_orderSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( orderChanged( int ) ) );
 
-    m_lodSelect = new SelectWithLabel( tr("level of detail" ) );
-    m_lodSelect->insertItem( 0, tr( "0" ) );
-    m_lodSelect->insertItem( 1, tr( "1" ) );
-    m_lodSelect->insertItem( 2, tr( "2" ) );
-    m_lodSelect->insertItem( 3, tr( "3" ) );
-    m_lodSelect->insertItem( 4, tr( "4" ) );
-    m_lodSelect->insertItem( 5, tr( "5" ) );
+    m_lodSelect = new SelectWithLabel( tr("quality" ) );
+    m_lodSelect->insertItem( 0, tr( "lowest" ) );
+    m_lodSelect->insertItem( 1, tr( "lower" ) );
+    m_lodSelect->insertItem( 2, tr( "normal" ) );
+    m_lodSelect->insertItem( 3, tr( "higher" ) );
+    m_lodSelect->insertItem( 4, tr( "highest" ) );
     connect( m_lodSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( lodChanged( int ) ) );
 
     m_sliceSelect = new SelectWithLabel( tr("render on slice" ) );

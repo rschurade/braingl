@@ -13,6 +13,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
+#include "../../algos/fmath.h"
+
 #include "../../data/datasets/datasettensor.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
@@ -193,7 +195,14 @@ void TensorRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                Matrix D = data->at( xx + yy * nx + zi * nx * ny );
+                Matrix D = data->at( xx + yy * nx + zi * nx * ny ) * 1000;
+
+                Matrix Di = D.i();
+                float detD = D.Determinant();
+
+                float lhs = 1.0 / ( pow( 2 * M_PI, 3.0/2.0 ) * pow( fabs(detD), 0.5 ) );
+
+                float maxR = std::numeric_limits<float>::min();
 
                 for ( int i = 0; i < vertices.size(); ++i )
                 {
@@ -205,7 +214,23 @@ void TensorRenderer::initGeometry()
                     v2( 2 ) = vertices[i].y();
                     v2( 3 ) = vertices[i].z();
 
-                    float r = DotProduct( v1 * D, v2 ) * bValue;
+                    float r = lhs * exp( -0.5 * DotProduct( v1 * Di, v2 ) );
+                    maxR = max( r, maxR );
+                }
+
+                for ( int i = 0; i < vertices.size(); ++i )
+                {
+                    v1( 1 ) = vertices[i].x();
+                    v1( 2 ) = vertices[i].y();
+                    v1( 3 ) = vertices[i].z();
+
+                    v2( 1 ) = vertices[i].x();
+                    v2( 2 ) = vertices[i].y();
+                    v2( 3 ) = vertices[i].z();
+
+                    float r = lhs * exp( -0.5 * DotProduct( v1 * Di, v2 ) );
+
+                    //float r = DotProduct( v1 * D, v2 ) * bValue;
 
                     float locX = xx * dx + dx / 2;
                     float locY =  + yy * dy + dy / 2;
