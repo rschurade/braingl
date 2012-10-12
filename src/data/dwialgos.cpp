@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include <math.h>
+#include "../algos/fmath.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QVector>
