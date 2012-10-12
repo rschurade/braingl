@@ -10,6 +10,8 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
+#define M_PI 3.14159265359
+
 class FMath
 {
 public:
