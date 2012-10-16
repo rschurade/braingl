@@ -30,12 +30,7 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
     m_datasetSizeZ( 160 ),
     m_width( 1 ),
     m_height( 1 ),
-    m_ratio( 1.0 ),
-    m_zoom( 1 ),
-    m_moveX( 0 ),
-    m_moveY( 0 ),
-    m_moveXOld( 0 ),
-    m_moveYOld( 0 )
+    m_ratio( 1.0 )
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( m_dataStore );
@@ -48,9 +43,7 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
 
     m_arcBall = new ArcBall( 400, 400 );
 
-    m_thisRot.setToIdentity();
-    m_thisRot.translate( -80.0, -100.0, -80.0 );
-    m_lastRot.setToIdentity();
+    m_mvMatrix.setToIdentity();
 }
 
 SceneRenderer::~SceneRenderer()
@@ -117,41 +110,31 @@ void SceneRenderer::calcMVPMatrix()
     m_datasetSizeY *= dy;
     m_datasetSizeZ *= dz;
 
+    m_arcBall->setRotCenter( m_datasetSizeX / 2., m_datasetSizeY / 2., m_datasetSizeZ / 2. );
+
     m_boundingbox = qMax ( m_datasetSizeX, qMax( m_datasetSizeY, m_datasetSizeZ ) );
 
-    m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
+
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
-    float bbX = 0;
-    float bbY = 0;
+
+    float halfBB = m_boundingbox / 2.0;
 
     if ( m_ratio >= 1.0 )
     {
-        bbX = m_boundingbox * m_ratio;
-        bbY = m_boundingbox;
+        pMatrix.ortho( -halfBB * m_ratio, halfBB * m_ratio, -halfBB, halfBB, -3000, 3000 );
     }
     else
     {
-        bbX = m_boundingbox;
-        bbY = m_boundingbox / m_ratio;
+        pMatrix.ortho( -halfBB, halfBB, -halfBB / m_ratio, halfBB / m_ratio, -3000, 3000 );
     }
-    pMatrix.ortho( 0, bbX, 0, bbY, -3000, 3000 );
-    pMatrix.translate( bbX / 2, bbY / 2, 0 );
 
-    float moveX = static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / bbX );
-    float moveY = static_cast<float>( m_moveY ) / ( static_cast<float>( m_height ) / bbY );
+    m_mvMatrix = m_arcBall->getMVMat();
+    m_mvpMatrix = pMatrix * m_mvMatrix;
 
-    pMatrix.translate( moveX*m_zoom, moveY*m_zoom, 0);
-    //pMatrix.translate( moveX, moveY, 0);
-    pMatrix.scale( m_zoom );
-
-    m_thisRot.translate( m_datasetSizeX / -2, m_datasetSizeY / -2, m_datasetSizeZ / -2 );
-    m_mvpMatrix = pMatrix * m_thisRot;
-    m_mvMatrixInverse = m_thisRot.inverted();
-
-    m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
-    m_shRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
+//    m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
+//    m_shRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
 }
 
 void SceneRenderer::draw()
@@ -164,40 +147,13 @@ void SceneRenderer::draw()
 
 void SceneRenderer::setView( int view )
 {
-    m_zoom = 1.0;
-    m_moveX = 0;
-    m_moveY = 0;
-    m_moveXOld = 0;
-    m_moveYOld = 0;
-    m_thisRot.setToIdentity();
-    m_lastRot.setToIdentity();
-    m_arcBall = new ArcBall( m_width, m_height);
-
-    QQuaternion rotx( sqrt(0.5), 0, 0, sqrt(0.5) );
-    QQuaternion rot_x( -sqrt(0.5), 0, 0, sqrt(0.5) );
-    QQuaternion roty( 0, sqrt(0.5), 0, sqrt(0.5) );
-    QQuaternion rot_y( 0, -sqrt(0.5), 0, sqrt(0.5) );
-    QQuaternion rotz( 0, 0, sqrt(0.5), sqrt(0.5) );
-
-    if ( view == 2 )
-    {
-        m_lastRot.rotate( rotz );
-        m_lastRot.rotate( rotx );
-        m_lastRot.rotate( rotx );
-    }
-    if ( view == 3 )
-    {
-        m_lastRot.rotate( rot_x );
-        m_lastRot.rotate( rot_y );
-    }
-    m_tensorRenderer->setView( view );
-    m_shRenderer->setView( view );
+    m_arcBall->setView( view );
+//    m_tensorRenderer->setView( view );
+//    m_shRenderer->setView( view );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
 {
-    m_lastRot = m_thisRot;
-    m_lastRot.translate( m_datasetSizeX / 2, m_datasetSizeY / 2, m_datasetSizeZ / 2 );
     m_arcBall->click( x, y );
 }
 
@@ -209,23 +165,18 @@ void SceneRenderer::leftMouseDrag( int x, int y )
 
 void SceneRenderer::middleMouseDown( int x, int y )
 {
-    m_moveXOld = m_moveX;
-    m_moveYOld = m_moveY;
-    m_middleDownX = x;
-    m_middleDownY = y;
+    m_arcBall->midClick( x, y );
+    calcMVPMatrix();
 }
 
 void SceneRenderer::middleMouseDrag( int x, int y )
 {
-    m_moveX = ( m_moveXOld - ( m_middleDownX - x ) / m_zoom );
-    m_moveY = ( m_moveYOld + ( m_middleDownY - y ) / m_zoom );
+    m_arcBall->midDrag( x, y );
     calcMVPMatrix();
 }
 
 void SceneRenderer::mouseWheel( int step )
 {
-    m_zoom += step;
-    m_zoom = qMax( 1.0f, m_zoom );
-
+    m_arcBall->mouseWheel( step );
     calcMVPMatrix();
 }

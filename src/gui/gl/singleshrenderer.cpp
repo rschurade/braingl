@@ -130,7 +130,7 @@ void SingleSHRenderer::adjustRatios()
 
     pMatrix.ortho( -1, 1, -1, 1, -3000, 3000 );
 
-    m_thisRot = m_arcBall->getRotMat() *  m_lastRot;
+    m_thisRot = m_arcBall->getMVMat() *  m_lastRot;
     m_thisRot.translate( -1.0, -1.0, -1.0 );
     m_mvpMatrix = pMatrix * m_thisRot;
 }
