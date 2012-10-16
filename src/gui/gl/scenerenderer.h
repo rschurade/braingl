@@ -55,20 +55,10 @@ private:
 	int m_height;
 	float m_ratio;
 
-	QMatrix4x4 m_lastRot;
-	QMatrix4x4 m_thisRot;
+	QMatrix4x4 m_mvMatrix;
 
 	QMatrix4x4 m_mvpMatrix;
 	QMatrix4x4 m_mvMatrixInverse;
-
-	float m_zoom;
-	int m_middleDownX;
-	int m_middleDownY;
-	int m_moveX;
-	int m_moveY;
-	int m_moveXOld;
-    int m_moveYOld;
-
 };
 
 #endif /* SCENERENDERER_H_ */

@@ -20,12 +20,19 @@ public:
 
     void set_win_size( int width,  int height );
 
+    void click( int x, int y );
     void drag( int x, int y );
 
-    void click( int x, int y );
+    void midClick( int x, int y );
+    void midDrag( int x, int y );
 
-    QQuaternion getRotQuat();
-    QMatrix4x4 getRotMat();
+    void mouseWheel( int step );
+
+    void setRotCenter( float x, float y, float z );
+
+    QMatrix4x4 getMVMat();
+
+    void setView( int view );
 
 private:
     QVector3D map_sphere( int x, int y );
@@ -38,10 +45,22 @@ private:
 
     QVector3D v_mouse_current;      // mouse position at the beginning of dragging
     QVector3D v_mouse_down;         // mouse position at the beginning of dragging
-    QQuaternion q_current_rotation; // current rotation
-    QMatrix4x4 m_currentRot;               // current rotation matrix
-
     QVector3D v_from;
+
+    QQuaternion q_current_rotation; // current rotation
+
+    QMatrix4x4 m_currentRot;               // current rotation matrix
+    QMatrix4x4 m_lastRot;               // current rotation matrix
+
+    int m_moveX;
+    int m_moveY;
+    int m_oldMoveX;
+    int m_oldMoveY;
+    int m_midClickX;
+    int m_midClickY;
+    float m_zoom;
+
+    QVector3D m_rotCenter;
 };
 
 #endif /* ARCBALL_H_ */
