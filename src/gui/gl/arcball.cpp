@@ -168,7 +168,9 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = m_currentRot * mv ;
 
-    QVector3D halfMove( -m_moveX * m_zoom/2, m_moveY * m_zoom/2, 0 );
+    float _zoom = m_zoom * m_zoom * 0.1 + 1.0;
+
+    QVector3D halfMove( -m_moveX * _zoom/2, m_moveY * _zoom/2, 0 );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
@@ -176,7 +178,9 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = mv + tmp;
 
-    QVector3D scale( m_zoom, m_zoom, m_zoom );
+
+
+    QVector3D scale( _zoom, _zoom, _zoom );
     mv.scale( scale );
 
 
