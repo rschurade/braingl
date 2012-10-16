@@ -223,7 +223,7 @@ void SHRenderer::initGeometry()
                     }
 
                     float locX = xx * dx + dx / 2;
-                    float locY =  + yy * dy + dy / 2;
+                    float locY = yy * dy + dy / 2;
 
                     for ( int i = 0; i < vertices.size(); ++i )
                     {

@@ -59,6 +59,7 @@ private:
 	QMatrix4x4 m_thisRot;
 
 	QMatrix4x4 m_mvpMatrix;
+	QMatrix4x4 m_mvMatrixInverse;
 
 	float m_zoom;
 	int m_middleDownX;
