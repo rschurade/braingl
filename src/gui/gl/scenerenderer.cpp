@@ -148,6 +148,7 @@ void SceneRenderer::calcMVPMatrix()
 
     m_thisRot.translate( m_datasetSizeX / -2, m_datasetSizeY / -2, m_datasetSizeZ / -2 );
     m_mvpMatrix = pMatrix * m_thisRot;
+    m_mvMatrixInverse = m_thisRot.inverted();
 
     m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
     m_shRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
@@ -158,7 +159,7 @@ void SceneRenderer::draw()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_sliceRenderer->draw( m_mvpMatrix );
     m_shRenderer->draw( m_mvpMatrix );
-    m_tensorRenderer->draw( m_mvpMatrix );
+    m_tensorRenderer->draw( m_mvpMatrix, m_mvMatrixInverse );
 }
 
 void SceneRenderer::setView( int view )

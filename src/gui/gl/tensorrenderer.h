@@ -23,7 +23,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 mvp_matrix );
+    void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
 
     void setView( int view );
 
@@ -32,9 +32,10 @@ protected:
     void setShaderVars();
 
     void initGeometry();
+    void addGlyph( std::vector<float>* verts, std::vector<int>* indexes, int offset, float xPos, float yPos, float zPos, Matrix tensor );
 
 private:
-    int m_tris1;
+    int m_tris;
 
     GLuint *vboIds;
 

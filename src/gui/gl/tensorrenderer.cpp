@@ -29,29 +29,9 @@
 
 TensorRenderer::TensorRenderer() :
     ObjectRenderer(),
-    m_tris1( 0 ),
+    m_tris( 0 ),
     vboIds( new GLuint[ 6 ] )
 {
-    for ( int lod = 0; lod < 6; ++lod )
-    {
-        const Matrix* vertices = tess::vertices( lod );
-        const int* faces = tess::faces( lod );
-        int numVerts = tess::n_vertices( lod );
-        int numTris = tess::n_faces( lod );
-
-        TriangleMesh* mesh = new TriangleMesh( numVerts, numTris );
-
-        for ( int i = 0; i < numVerts; ++i )
-        {
-            mesh->addVertex( i, QVector3D( (*vertices)( i+1, 1 ), (*vertices)( i+1, 2 ), (*vertices)( i+1, 3 ) ) );
-        }
-        for ( int i = 0; i < numTris; ++i )
-        {
-            Triangle tri = {faces[i*3], faces[i*3+1], faces[i*3+2]};
-            mesh->addTriangle( i, tri );
-        }
-        m_spheres.push_back( mesh );
-    }
 }
 
 TensorRenderer::~TensorRenderer()
@@ -63,7 +43,7 @@ void TensorRenderer::init()
     glGenBuffers( 6, vboIds );
 }
 
-void TensorRenderer::draw( QMatrix4x4 mvp_matrix )
+void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 {
     QList<int>rl;
 
@@ -95,9 +75,10 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix )
             return;
         }
 
-        GLFunctions::getShader( "qball" )->bind();
+        GLFunctions::getShader( "superquadric" )->bind();
         // Set modelview-projection matrix
-        GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", mvp_matrix );
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", mvp_matrix );
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
 
 
         initGeometry();
@@ -105,7 +86,21 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix )
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
         setShaderVars();
-        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+
+        GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
+        glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+
+        glDrawElements( GL_TRIANGLES, m_tris, GL_UNSIGNED_INT, 0 );
+
+
+        GLenum error;
+        int i = 0;
+        while ((error = glGetError()) != GL_NO_ERROR) {
+            qDebug() << error;
+            i++;
+        }
+
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
@@ -117,7 +112,7 @@ void TensorRenderer::setupTextures()
 
 void TensorRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "qball", model() );
+    GLFunctions::setShaderVars( "superquadric", model() );
 }
 
 void TensorRenderer::initGeometry()
@@ -134,41 +129,22 @@ void TensorRenderer::initGeometry()
 
     int orient = m_dataset->getProperty( "renderSlice" ).toInt();
 
-    calcBounds( nx, ny, nz, dx, dy, dz, orient );
-
-    int lowerX = m_visibleArea[0];
-    int upperX = m_visibleArea[1];
-    int lowerY = m_visibleArea[2];
-    int upperY = m_visibleArea[3];
-    int lowerZ = m_visibleArea[4];
-    int upperZ = m_visibleArea[5];
-
     int bValue = m_dataset->getProperty( "bValue" ).toInt();
 
     //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
-
-    bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
-
-    QString s = createSettingsString( xi, yi, zi, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, bValue);
-    if ( s == m_previousSettings || orient == FN_NONE )
+    QString s = createSettingsString( xi, yi, zi, orient, 0, 0, 0, 0, 0, 0, false, bValue, 0);
+    if ( s == m_previousSettings || orient == 0 )
     {
         return;
     }
     m_previousSettings = s;
 
-    int lod = getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ );
-    qDebug() << "Tensor Renderer: using lod " << lod;
-
-
-    TriangleMesh* mesh = m_spheres[lod];
-    QVector< QVector3D > normals = mesh->getVertNormals();
+    qDebug() << "Tensor Renderer: begin init geometry";
 
     std::vector<float>verts;
     std::vector<int>indexes;
 
-    QVector< QVector3D > vertices = mesh->getVertices();
-    QVector< Triangle > triangles = mesh->getTriangles();
 
     QVector<Matrix>* data = m_dataset->getData();
     RowVector v1( 3 );
@@ -180,178 +156,36 @@ void TensorRenderer::initGeometry()
     float y = (float)yi * dy + dy / 2.;
     float z = (float)zi * dz + dz / 2.;
 
-    int numVerts = mesh->getVertSize();
-    int currentBall = 0;
+    int offset = 0;
 
-    if ( orient == 1 )
+    if ( orient == 5 )
     {
-        //qDebug() << "Tensor Renderer: start init geometry";
-
-        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
-        verts.reserve( mesh->getVertSize() * glyphs * 10 );
-        indexes.reserve( triangles.size() * glyphs * 3 );
-
-        for( int yy = lowerY; yy < upperY; ++yy )
+        for( int yy = 0; yy < ny; ++yy )
         {
-            for ( int xx = lowerX; xx < upperX; ++xx )
+            for ( int xx = 0; xx < nx; ++xx )
             {
-                Matrix D = data->at( xx + yy * nx + zi * nx * ny ) * 1000;
+                Matrix tensor = data->at( xx + yy * nx + zi * nx * ny ) * 1000;
 
-                Matrix Di = D.i();
-                float detD = D.Determinant();
+                float locX = xx * dx + dx / 2;
+                float locY = yy * dy + dy / 2;
 
-                float lhs = 1.0 / ( pow( 2 * M_PI, 3.0/2.0 ) * pow( fabs(detD), 0.5 ) );
-
-                float maxR = std::numeric_limits<float>::min();
-
-                for ( int i = 0; i < vertices.size(); ++i )
-                {
-                    v1( 1 ) = vertices[i].x();
-                    v1( 2 ) = vertices[i].y();
-                    v1( 3 ) = vertices[i].z();
-
-                    v2( 1 ) = vertices[i].x();
-                    v2( 2 ) = vertices[i].y();
-                    v2( 3 ) = vertices[i].z();
-
-                    float r = lhs * exp( -0.5 * DotProduct( v1 * Di, v2 ) );
-                    maxR = max( r, maxR );
-                }
-
-                for ( int i = 0; i < vertices.size(); ++i )
-                {
-                    v1( 1 ) = vertices[i].x();
-                    v1( 2 ) = vertices[i].y();
-                    v1( 3 ) = vertices[i].z();
-
-                    v2( 1 ) = vertices[i].x();
-                    v2( 2 ) = vertices[i].y();
-                    v2( 3 ) = vertices[i].z();
-
-                    float r = lhs * exp( -0.5 * DotProduct( v1 * Di, v2 ) );
-
-                    //float r = DotProduct( v1 * D, v2 ) * bValue;
-
-                    float locX = xx * dx + dx / 2;
-                    float locY =  + yy * dy + dy / 2;
-
-                    verts.push_back( vertices[i].x() );
-                    verts.push_back( vertices[i].y() );
-                    verts.push_back( vertices[i].z() );
-                    verts.push_back( normals[i].x() );
-                    verts.push_back( normals[i].y() );
-                    verts.push_back( normals[i].z() );
-                    verts.push_back( locX );
-                    verts.push_back( locY );
-                    verts.push_back( z );
-                    verts.push_back( r );
-                }
-                for ( int i = 0; i < triangles.size(); ++i )
-                {
-                    indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v2 + numVerts * currentBall );
-                }
-                ++currentBall;
+                addGlyph( &verts, &indexes, offset, locX, locY, z, tensor );
+                offset += 24;
             }
         }
     }
     else if ( orient == 2 )
     {
-        //qDebug() << "Tensor Renderer: start init geometry";
-        for( int zz = lowerZ; zz < upperZ; ++zz )
-        {
-            for ( int xx = lowerX; xx < upperX; ++xx )
-            {
-                Matrix D = data->at( xx + yi * nx + zz * nx * ny );
 
-                for ( int i = 0; i < vertices.size(); ++i )
-                {
-                    v1( 1 ) = vertices[i].x();
-                    v1( 2 ) = vertices[i].y();
-                    v1( 3 ) = vertices[i].z();
-
-                    v2( 1 ) = vertices[i].x();
-                    v2( 2 ) = vertices[i].y();
-                    v2( 3 ) = vertices[i].z();
-
-                    float r = DotProduct( v1 * D, v2 ) * bValue;
-
-                    float locX = xx * dx + dx / 2;
-                    float locZ = zz * dz + dz / 2;
-
-                    verts.push_back( vertices[i].x() );
-                    verts.push_back( vertices[i].y() );
-                    verts.push_back( vertices[i].z() );
-                    verts.push_back( normals[i].x() );
-                    verts.push_back( normals[i].y() );
-                    verts.push_back( normals[i].z() );
-                    verts.push_back( locX );
-                    verts.push_back( y );
-                    verts.push_back( locZ );
-                    verts.push_back( r );
-                }
-                for ( int i = 0; i < triangles.size(); ++i )
-                {
-                    indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v2 + numVerts * currentBall );
-                }
-                ++currentBall;
-            }
-        }
     }
     else if ( orient == 3 )
     {
-        //qDebug() << "Tensor Renderer: start init geometry";
-        for( int yy = lowerY; yy < upperY; ++yy )
-        {
-            for ( int zz = lowerZ; zz < upperZ; ++zz )
-            {
-                Matrix D = data->at( xi + yy * nx + zz * nx * ny );
 
-                for ( int i = 0; i < vertices.size(); ++i )
-                {
-                    v1( 1 ) = vertices[i].x();
-                    v1( 2 ) = vertices[i].y();
-                    v1( 3 ) = vertices[i].z();
-
-                    v2( 1 ) = vertices[i].x();
-                    v2( 2 ) = vertices[i].y();
-                    v2( 3 ) = vertices[i].z();
-
-                    float r = DotProduct( v1 * D, v2 ) * bValue;
-
-                    float locY = yy * dy + dy / 2;
-                    float locZ = zz * dz + dz / 2;
-
-                    verts.push_back( vertices[i].x() );
-                    verts.push_back( vertices[i].y() );
-                    verts.push_back( vertices[i].z() );
-                    verts.push_back( normals[i].x() );
-                    verts.push_back( normals[i].y() );
-                    verts.push_back( normals[i].z() );
-                    verts.push_back( x );
-                    verts.push_back( locY );
-                    verts.push_back( locZ );
-                    verts.push_back( r );
-                }
-                for ( int i = 0; i < triangles.size(); ++i )
-                {
-                    indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                    indexes.push_back( triangles[i].v2 + numVerts * currentBall );
-                }
-                ++currentBall;
-            }
-        }
     }
     else
     {
         return;
     }
-
-    m_tris1 = mesh->getTriSize() * currentBall * 3;
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
@@ -359,7 +193,348 @@ void TensorRenderer::initGeometry()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 
-    //qDebug() << "Tensor Renderer: end init geometry";
+    m_tris = indexes.size() * 3;
+    qDebug() << "Tensor Renderer: end init geometry";
+}
+
+void TensorRenderer::addGlyph( std::vector<float>* verts, std::vector<int>* indexes, int offset, float xPos, float yPos, float zPos, Matrix tensor )
+{
+    float d0 = tensor( 1, 1 );
+    float d1 = tensor( 2, 2 );
+    float d2 = tensor( 3, 3 );
+    float o0 = tensor( 1, 2 );
+    float o1 = tensor( 1, 3 );
+    float o2 = tensor( 2, 3 );
+
+    // Front Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    // Back Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    // Top Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    // Bottom Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    // Left Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    // Right Face
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+    verts->push_back( xPos );
+    verts->push_back( yPos );
+    verts->push_back( zPos );
+    verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
+    verts->push_back( 1.0 );
+    verts->push_back( d0 );
+    verts->push_back( d1 );
+    verts->push_back( d2 );
+    verts->push_back( o0 );
+    verts->push_back( o1 );
+    verts->push_back( o2 );
+
+
+    for ( int i = 0; i < 6; ++i )
+    {
+        indexes->push_back( offset );
+        indexes->push_back( offset + 1 );
+        indexes->push_back( offset + 2 );
+        indexes->push_back( offset );
+        indexes->push_back( offset + 2 );
+        indexes->push_back( offset + 3 );
+        offset += 4;
+    }
 }
 
 void TensorRenderer::setView( int view )

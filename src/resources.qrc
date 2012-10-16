@@ -24,6 +24,8 @@
 	<file>shaders/slice.fs</file>
 	<file>shaders/qball.vs</file>
 	<file>shaders/qball.fs</file>
+	<file>shaders/superquadric.vs</file>
+    <file>shaders/superquadric.fs</file>
 	<file>shaders/crosshair.vs</file>
     <file>shaders/crosshair.fs</file>
  </qresource>
