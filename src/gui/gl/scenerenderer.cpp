@@ -131,6 +131,7 @@ void SceneRenderer::calcMVPMatrix()
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
+    m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
 //    m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
@@ -148,8 +149,8 @@ void SceneRenderer::draw()
 void SceneRenderer::setView( int view )
 {
     m_arcBall->setView( view );
-//    m_tensorRenderer->setView( view );
-//    m_shRenderer->setView( view );
+    m_tensorRenderer->setView( view );
+    m_shRenderer->setView( view );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )
