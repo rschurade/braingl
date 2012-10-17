@@ -113,7 +113,7 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
 
 // tollerance value for float comparisons
-float zeroTolerance = 0.01;
+float zeroTolerance = 0.001;
 
 #define RenderMode_Superquadric
 //#define RenderMode_Ellipsoid

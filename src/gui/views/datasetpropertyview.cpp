@@ -240,21 +240,21 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     m_bValueSlider->setValue( model()->data( index, Qt::EditRole ).toInt() );
 
     m_scalingSlider->setMin( 0.1 );
-    m_scalingSlider->setMax( 10 );
+    m_scalingSlider->setMax( 1.5 );
     index = getSelectedIndex( FNDSE_SCALING );
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
     m_faThresholdSlider->setMin( 0.01 );
-    m_faThresholdSlider->setMax( 10.0 );
+    m_faThresholdSlider->setMax( 1.0 );
     index = getSelectedIndex( FNDSE_FA_THRESHOLD );
     m_faThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    m_evThresholdSlider->setMin( 0.01 );
-    m_evThresholdSlider->setMax( 10.0 );
+    m_evThresholdSlider->setMin( 0.001 );
+    m_evThresholdSlider->setMax( 1.0 );
     index = getSelectedIndex( FNDSE_EV_THRESHOLD );
     m_evThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    m_gammaSlider->setMin( 0.1 );
+    m_gammaSlider->setMin( 0.01 );
     m_gammaSlider->setMax( 10.0 );
     index = getSelectedIndex( FNDSE_GAMMA );
     m_gammaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
@@ -306,7 +306,7 @@ void DatasetPropertyView::updateWidgetVisibility()
 
     if ( created == FNALGO_TENSORFIT )
     {
-        //m_sliceSelect->setHidden( false );
+        m_sliceSelect->setHidden( false );
         //m_bValueSlider->setHidden( false );
         m_scalingSlider->setHidden( false );
         m_faThresholdSlider->setHidden( false );

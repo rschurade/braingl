@@ -167,18 +167,41 @@ void TensorRenderer::initGeometry()
                 float locX = xx * dx + dx / 2;
                 float locY = yy * dy + dy / 2;
 
-                addGlyph( &verts, locX, locY, z + 1, tensor );
+                addGlyph( &verts, locX, locY, z + dz/2 , tensor );
                 m_quads += 24;
             }
         }
     }
     else if ( orient == 2 )
     {
+        for( int xx = 0; xx < nx; ++xx )
+        {
+            for ( int zz = 0; zz < nz; ++zz )
+            {
+                Matrix tensor = data->at( xx + yi * nx + zz * nx * ny ) * 1000;
 
+                float locX = xx * dx + dx / 2;
+                float locZ = zz * dz + dz / 2;
+
+                addGlyph( &verts, locX, y - 1, locZ, tensor );
+                m_quads += 24;
+            }
+        }
     }
     else if ( orient == 3 )
     {
+        for( int yy = 0; yy < ny; ++yy )
+        {
+            for ( int zz = 0; zz < nz; ++zz )
+            {
+                Matrix tensor = data->at( xi + yy * nx + zz * nx * ny ) * 1000;
+                float locY = yy * dy + dy / 2;
+                float locZ = zz * dz + dz / 2;
 
+                addGlyph( &verts, x -1, locY, locZ, tensor );
+                m_quads += 24;
+            }
+        }
     }
     else
     {

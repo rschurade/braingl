@@ -310,10 +310,10 @@ void main()
     evals.z = ( evals.z / evals.x );
     evals.y = ( evals.y / evals.x );
     evals.x = 1.0;
-    if( evals.z <= u_evThreshold )
-    {
-        v_alphaBeta.w = 1.0;
-    }
+//    if( evals.z <= u_evThreshold )
+    //{
+        //v_alphaBeta.w = 1.0;
+    //}
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 4: now span the quad according to bounding box, so that the fragment shader can render
