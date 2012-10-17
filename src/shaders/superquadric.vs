@@ -121,47 +121,23 @@ float getMajorEigenvalue( vec3 diag, vec3 offdiag )
   return getEigenvalues( diag, offdiag )[0];
 }
 
-/**
- * use the above if more than one eigenvector is required and only use this if you need exactly one value
- */
-float getMajorEigenvalueOld( vec3 diag, vec3 offdiag )
-{
-  const float PiThird = 3.14159265358979323846264/3.;
-  float I1 = diag.x + diag.y + diag.z;
-  float I2 = diag.x * diag.y + diag.x * diag.z + diag.y * diag.z - dot( offdiag, offdiag );
-  float I3 = diag.x * diag.y * diag.z + 2. * offdiag.x * offdiag.y * offdiag.z
-      - ( diag.x * offdiag.x * offdiag.x + diag.y * offdiag.y * offdiag.y + diag.z * offdiag.z * offdiag.z );
-
-  const float third = 1. / 3.;
-  float I1third = I1 * third;
-  float I1thirdsqr = I1third * I1third;
-  float I2third = I2 * third;
-  float v  = I1thirdsqr - I2third;
-
-  vec3 lambda;
-
-  float s  = I1thirdsqr * I1third - I1 * I2 / 6. + 0.5 * I3;
-
-  // for real eigenvalues: v>0, s^2 < v^3
-  float sqrtv = sqrt( v );
-  float phi= acos( s / ( v * sqrtv ) ) * third;
-
-  float sqrtv2 = 2. * sqrtv;
-
-  // due to the cosine function and the fact, that 0 <= phi <= pi/3
-  // it is obvious that the eigenvalues need no further sorting
-  return I1third + sqrtv2 * cos( phi );
-}
-
 // compute vector direction depending on information computed by getEigenvalues
 // before (Hasan et al. 2001)
 vec3 getEigenvector( vec3 ABC /*diag without eigenalue i*/, vec3 offdiag )
 {
+  //ev1_x = (xy*yz-(yy-l1)*xz)* (xz*yz-(zz-l1)*xy);
+  //ev1_y = (xz*yz-(zz-l1)*xy)* (xz*xy-(xx-l1)*yz);
+  //ev1_z = (xy*yz-(yy-l1)*xz)* (xz*xy-(xx-l1)*yz);
+
   vec3 vec;
-  vec.x = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.z * offdiag.z ); // FIXME
+  vec.x = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.z * offdiag.x );
+  vec.y = ( offdiag.y * offdiag.z - ABC.z * offdiag.x ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
+  vec.z = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
+    
+  //vec.x = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.z * offdiag.z ); // FIXME
   //< last component is missing in the paper! there is only a Dx?
-  vec.y = ( offdiag.y * offdiag.x - ABC.z * offdiag.z ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
-  vec.z = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
+  //vec.y = ( offdiag.y * offdiag.x - ABC.z * offdiag.z ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
+  //vec.z = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
 
   return normalize( vec );
 }
