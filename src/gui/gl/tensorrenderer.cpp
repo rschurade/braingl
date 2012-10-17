@@ -29,7 +29,7 @@
 
 TensorRenderer::TensorRenderer() :
     ObjectRenderer(),
-    m_tris( 0 ),
+    m_quads( 0 ),
     vboIds( new GLuint[ 6 ] )
 {
 }
@@ -80,18 +80,22 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
         GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", mvp_matrix );
         GLFunctions::getShader( "superquadric" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
 
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "u_scaling", m_dataset->getProperty( "scaling" ).toFloat() );
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "u_faThreshold", m_dataset->getProperty( "faThreshold" ).toFloat() );
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "u_evThreshold", m_dataset->getProperty( "evThreshold" ).toFloat() );
+        GLFunctions::getShader( "superquadric" )->setUniformValue( "u_gamma", m_dataset->getProperty( "gamma" ).toFloat() );
+
 
         initGeometry();
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
         setShaderVars();
 
         GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
         glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
 
-        glDrawElements( GL_TRIANGLES, m_tris, GL_UNSIGNED_INT, 0 );
+        glDrawArrays( GL_QUADS, 0, m_quads );
 
 
         GLenum error;
@@ -100,8 +104,6 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
             qDebug() << error;
             i++;
         }
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 }
@@ -140,11 +142,7 @@ void TensorRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    qDebug() << "Tensor Renderer: begin init geometry";
-
     std::vector<float>verts;
-    std::vector<int>indexes;
-
 
     QVector<Matrix>* data = m_dataset->getData();
     RowVector v1( 3 );
@@ -156,9 +154,9 @@ void TensorRenderer::initGeometry()
     float y = (float)yi * dy + dy / 2.;
     float z = (float)zi * dz + dz / 2.;
 
-    int offset = 0;
+    m_quads = 0;
 
-    if ( orient == 5 )
+    if ( orient == 1 )
     {
         for( int yy = 0; yy < ny; ++yy )
         {
@@ -169,8 +167,8 @@ void TensorRenderer::initGeometry()
                 float locX = xx * dx + dx / 2;
                 float locY = yy * dy + dy / 2;
 
-                addGlyph( &verts, &indexes, offset, locX, locY, z, tensor );
-                offset += 24;
+                addGlyph( &verts, locX, locY, z + 1, tensor );
+                m_quads += 24;
             }
         }
     }
@@ -188,16 +186,10 @@ void TensorRenderer::initGeometry()
     }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-
-    m_tris = indexes.size() * 3;
-    qDebug() << "Tensor Renderer: end init geometry";
 }
 
-void TensorRenderer::addGlyph( std::vector<float>* verts, std::vector<int>* indexes, int offset, float xPos, float yPos, float zPos, Matrix tensor )
+void TensorRenderer::addGlyph( std::vector<float>* verts, float xPos, float yPos, float zPos, Matrix tensor )
 {
     float d0 = tensor( 1, 1 );
     float d1 = tensor( 2, 2 );
@@ -276,8 +268,8 @@ void TensorRenderer::addGlyph( std::vector<float>* verts, std::vector<int>* inde
     verts->push_back( xPos );
     verts->push_back( yPos );
     verts->push_back( zPos );
-    verts->push_back( -1.0 );
     verts->push_back( 1.0 );
+    verts->push_back( -1.0 );
     verts->push_back( 1.0 );
     verts->push_back( d0 );
     verts->push_back( d1 );
@@ -523,18 +515,6 @@ void TensorRenderer::addGlyph( std::vector<float>* verts, std::vector<int>* inde
     verts->push_back( o0 );
     verts->push_back( o1 );
     verts->push_back( o2 );
-
-
-    for ( int i = 0; i < 6; ++i )
-    {
-        indexes->push_back( offset );
-        indexes->push_back( offset + 1 );
-        indexes->push_back( offset + 2 );
-        indexes->push_back( offset );
-        indexes->push_back( offset + 2 );
-        indexes->push_back( offset + 3 );
-        offset += 4;
-    }
 }
 
 void TensorRenderer::setView( int view )

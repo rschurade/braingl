@@ -80,29 +80,20 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_sliceSelect->insertItem( 3, tr( "sagittal" ) );
     connect( m_sliceSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( renderSliceChanged( int ) ) );
 
-    m_scalingSlider = new SliderWithEdit( tr( "qball scaling" ) );
+    m_scalingSlider = new SliderWithEdit( tr( "scaling" ) );
     connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
-/*
-    m_spanSlider1 = new QxtSpanSlider( Qt::Horizontal );
-    m_spanSlider1->setMinimum( 0 );
-    m_spanSlider1->setMaximum( 100 );
-    m_spanSlider1->setLowerPosition( 20 );
-    m_spanSlider1->setUpperPosition( 80 );
-    m_spanSlider1->setHandleMovementMode( QxtSpanSlider::NoOverlapping );
-    connect( m_spanSlider1, SIGNAL( lowerPositionChanged( int ) ), this, SLOT( lower1Changed( int ) ) );
-    connect( m_spanSlider1, SIGNAL( upperPositionChanged( int ) ), this, SLOT( upper1Changed( int ) ) );
 
-    m_spanSlider2 = new QxtSpanSlider( Qt::Horizontal );
-    m_spanSlider2->setMinimum( 0 );
-    m_spanSlider2->setMaximum( 100 );
-    m_spanSlider2->setLowerPosition( 20 );
-    m_spanSlider2->setUpperPosition( 80 );
-    m_spanSlider2->setHandleMovementMode( QxtSpanSlider::NoOverlapping );
-    connect( m_spanSlider2, SIGNAL( lowerPositionChanged( int ) ), this, SLOT( lower2Changed( int ) ) );
-    connect( m_spanSlider2, SIGNAL( upperPositionChanged( int ) ), this, SLOT( upper2Changed( int ) ) );
-*/
     m_qBallScaling = new CheckboxWithLabel( tr("min-max scqaling"));
     connect( m_qBallScaling, SIGNAL( stateChanged( int ) ), this, SLOT( qballScalingChanged( int ) ) );
+
+    m_faThresholdSlider = new SliderWithEdit( tr( "fa threshold" ) );
+    connect( m_faThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( faThresholdChanged( float ) ) );;
+
+    m_evThresholdSlider = new SliderWithEdit( tr( "ev threshold" ) );
+    connect( m_evThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( evThresholdChanged( float ) ) );;
+
+    m_gammaSlider = new SliderWithEdit( tr( "gamma" ) );
+    connect( m_gammaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( gammaChanged( float ) ) );;
 
     m_layout->addLayout( layout1 );
     m_layout->addWidget( m_textureActive );
@@ -116,8 +107,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_sliceSelect );
     m_layout->addWidget( m_bValueSlider );
     m_layout->addWidget( m_scalingSlider );
-    //m_layout->addWidget( m_spanSlider1 );
-    //m_layout->addWidget( m_spanSlider2 );
+    m_layout->addWidget( m_faThresholdSlider );
+    m_layout->addWidget( m_evThresholdSlider );
+    m_layout->addWidget( m_gammaSlider );
     m_layout->addWidget( m_qBallScaling );
     m_layout->addStretch( 0 );
 
@@ -129,8 +121,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
-    //m_spanSlider1->setHidden( true );
-    //m_spanSlider2->setHidden( true );
+    m_faThresholdSlider->setHidden( true );
+    m_evThresholdSlider->setHidden( true );
+    m_gammaSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     m_widget->setLayout( m_layout );
@@ -246,53 +239,29 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_BVALUE );
     m_bValueSlider->setValue( model()->data( index, Qt::EditRole ).toInt() );
 
-
     m_scalingSlider->setMin( 0.1 );
     m_scalingSlider->setMax( 10 );
     index = getSelectedIndex( FNDSE_SCALING );
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
+    m_faThresholdSlider->setMin( 0.01 );
+    m_faThresholdSlider->setMax( 10.0 );
+    index = getSelectedIndex( FNDSE_FA_THRESHOLD );
+    m_faThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    m_evThresholdSlider->setMin( 0.01 );
+    m_evThresholdSlider->setMax( 10.0 );
+    index = getSelectedIndex( FNDSE_EV_THRESHOLD );
+    m_evThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    m_gammaSlider->setMin( 0.1 );
+    m_gammaSlider->setMax( 10.0 );
+    index = getSelectedIndex( FNDSE_GAMMA );
+    m_gammaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+
     m_sliceSelect->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() );
-/*
-    int lowerX = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_X ), Qt::EditRole ).toInt();
-    int lowerY = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), Qt::EditRole ).toInt();
-    int lowerZ = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), Qt::EditRole ).toInt();
-    int upperX = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_X ), Qt::EditRole ).toInt();
-    int upperY = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_Y ), Qt::EditRole ).toInt();
-    int upperZ = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_Z ), Qt::EditRole ).toInt();
 
-    int maxX = model()->data( getSelectedIndex( FNDSP_NX ), Qt::DisplayRole ).toInt() - 1;
-    int maxY = model()->data( getSelectedIndex( FNDSP_NY ), Qt::DisplayRole ).toInt() - 1;
-    int maxZ = model()->data( getSelectedIndex( FNDSP_NZ ), Qt::DisplayRole ).toInt() - 1;
-
-    switch ( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
-    {
-        case 1:
-            m_spanSlider1->setMaximum( maxX );
-            m_spanSlider2->setMaximum( maxY );
-            m_spanSlider1->setLowerPosition( lowerX );
-            m_spanSlider1->setUpperPosition( upperX );
-            m_spanSlider2->setLowerPosition( lowerY );
-            m_spanSlider2->setUpperPosition( upperY );
-            break;
-        case 2:
-            m_spanSlider1->setMaximum( maxX );
-            m_spanSlider2->setMaximum( maxZ );
-            m_spanSlider1->setLowerPosition( lowerX );
-            m_spanSlider1->setUpperPosition( upperX );
-            m_spanSlider2->setLowerPosition( lowerZ );
-            m_spanSlider2->setUpperPosition( upperZ );
-            break;
-        case 3:
-            m_spanSlider1->setMaximum( maxY );
-            m_spanSlider2->setMaximum( maxZ );
-            m_spanSlider1->setLowerPosition( lowerY );
-            m_spanSlider1->setUpperPosition( upperY );
-            m_spanSlider2->setLowerPosition( lowerZ );
-            m_spanSlider2->setUpperPosition( upperZ );
-            break;
-    }
-*/
     index = getSelectedIndex( FNDSE_MINMAX_SCALING );
     m_qBallScaling->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
@@ -312,8 +281,9 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
-    //m_spanSlider1->setHidden( true );
-    //m_spanSlider2->setHidden( true );
+    m_faThresholdSlider->setHidden( true );
+    m_evThresholdSlider->setHidden( true );
+    m_gammaSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     if ( dim == 1 )
@@ -331,17 +301,17 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_orderSelect->setHidden( false );
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
-
-        //m_spanSlider1->setHidden( false );
-        //m_spanSlider2->setHidden( false );
-
         m_qBallScaling->setHidden( false );
     }
 
     if ( created == FNALGO_TENSORFIT )
     {
-        m_sliceSelect->setHidden( false );
-        m_bValueSlider->setHidden( false );
+        //m_sliceSelect->setHidden( false );
+        //m_bValueSlider->setHidden( false );
+        m_scalingSlider->setHidden( false );
+        m_faThresholdSlider->setHidden( false );
+        m_evThresholdSlider->setHidden( false );
+        m_gammaSlider->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -355,8 +325,6 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_lodSelect->setHidden( false );
         m_sliceSelect->setHidden( false );
         m_scalingSlider->setHidden( false );
-        //m_spanSlider1->setHidden( false );
-        //m_spanSlider2->setHidden( false );
         m_qBallScaling->setHidden( false );
     }
 }
@@ -426,50 +394,25 @@ void DatasetPropertyView::scalingChanged( float value )
     model()->setData( getSelectedIndex( FNDSE_SCALING ), value );
 }
 
+void DatasetPropertyView::faThresholdChanged( float value )
+{
+    model()->setData( getSelectedIndex( FNDSE_FA_THRESHOLD ), value );
+}
+
+void DatasetPropertyView::evThresholdChanged( float value )
+{
+    model()->setData( getSelectedIndex( FNDSE_EV_THRESHOLD ), value );
+}
+
+void DatasetPropertyView::gammaChanged( float value )
+{
+    model()->setData( getSelectedIndex( FNDSE_GAMMA ), value );
+}
+
+
 void DatasetPropertyView::renderSliceChanged( int index )
 {
     model()->setData( getSelectedIndex( FNDSE_RENDER_SLICE ), index );
-/*
-    int lowerX = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_X ), Qt::EditRole ).toInt();
-    int lowerY = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), Qt::EditRole ).toInt();
-    int lowerZ = model()->data( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), Qt::EditRole ).toInt();
-    int upperX = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_X ), Qt::EditRole ).toInt();
-    int upperY = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_Y ), Qt::EditRole ).toInt();
-    int upperZ = model()->data( getSelectedIndex( FNDSE_RENDER_UPPER_Z ), Qt::EditRole ).toInt();
-
-    int maxX = model()->data( getSelectedIndex( FNDSP_NX ), Qt::DisplayRole ).toInt() - 1;
-    int maxY = model()->data( getSelectedIndex( FNDSP_NY ), Qt::DisplayRole ).toInt() - 1;
-    int maxZ = model()->data( getSelectedIndex( FNDSP_NZ ), Qt::DisplayRole ).toInt() - 1;
-
-
-    switch ( index )
-    {
-        case 1:
-            m_spanSlider1->setMaximum( maxX );
-            m_spanSlider2->setMaximum( maxY );
-            m_spanSlider1->setLowerPosition( lowerX );
-            m_spanSlider1->setUpperPosition( upperX );
-            m_spanSlider2->setLowerPosition( lowerY );
-            m_spanSlider2->setUpperPosition( upperY );
-            break;
-        case 2:
-            m_spanSlider1->setMaximum( maxX );
-            m_spanSlider2->setMaximum( maxZ );
-            m_spanSlider1->setLowerPosition( lowerX );
-            m_spanSlider1->setUpperPosition( upperX );
-            m_spanSlider2->setLowerPosition( lowerZ );
-            m_spanSlider2->setUpperPosition( upperZ );
-            break;
-        case 3:
-            m_spanSlider1->setMaximum( maxY );
-            m_spanSlider2->setMaximum( maxZ );
-            m_spanSlider1->setLowerPosition( lowerY );
-            m_spanSlider1->setUpperPosition( upperY );
-            m_spanSlider2->setLowerPosition( lowerZ );
-            m_spanSlider2->setUpperPosition( upperZ );
-            break;
-    }
-    */
 }
 
 void DatasetPropertyView::lower1Changed( int value )
