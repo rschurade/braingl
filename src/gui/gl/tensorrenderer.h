@@ -32,10 +32,10 @@ protected:
     void setShaderVars();
 
     void initGeometry();
-    void addGlyph( std::vector<float>* verts, std::vector<int>* indexes, int offset, float xPos, float yPos, float zPos, Matrix tensor );
+    void addGlyph( std::vector<float>* verts, float xPos, float yPos, float zPos, Matrix tensor );
 
 private:
-    int m_tris;
+    int m_quads;
 
     GLuint *vboIds;
 

@@ -203,11 +203,6 @@ void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemM
     int radiusLocation = program->attributeLocation("a_offdiag");
     program->enableAttributeArray(radiusLocation);
     glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
-
-    program->setUniformValue( "u_scaling", 0.5f );
-    program->setUniformValue( "u_faThreshold", 0.01f );
-    program->setUniformValue( "u_evThreshold", 0.01f );
-    program->setUniformValue( "u_gamma", 10.0f );
 }
 
 void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )

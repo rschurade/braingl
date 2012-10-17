@@ -61,12 +61,18 @@ private slots:
     void renderSliceChanged( int index );
     void scalingChanged( float value );
 
+    void faThresholdChanged( float value );
+    void evThresholdChanged( float value );
+    void gammaChanged( float value );
+
     void lower1Changed( int value );
     void upper1Changed( int value );
     void lower2Changed( int value );
     void upper2Changed( int value );
 
     void qballScalingChanged( int state );
+
+
 
 
 private:
@@ -94,12 +100,13 @@ private:
     SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;
 
-    //QxtSpanSlider* m_spanSlider1;
-    //QxtSpanSlider* m_spanSlider2;
-
     SliderWithEditInt* m_bValueSlider;
 
     CheckboxWithLabel* m_qBallScaling;
+
+    SliderWithEdit* m_faThresholdSlider;
+    SliderWithEdit* m_evThresholdSlider;
+    SliderWithEdit* m_gammaSlider;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

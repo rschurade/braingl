@@ -113,7 +113,7 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
 
 // tollerance value for float comparisons
-float zeroTollerance = 0.01;
+float zeroTolerance = 0.01;
 
 #define RenderMode_Superquadric
 //#define RenderMode_Ellipsoid
@@ -276,7 +276,7 @@ void main( void )
 
         // near enough?
         // or has t not changed much since last iteration?
-        if( !hit && ( ( abs( sq ) <= zeroTollerance ) || ( abs( newT - lastT ) < zeroTollerance ) ) )
+        if( !hit && ( ( abs( sq ) <= zeroTolerance ) || ( abs( newT - lastT ) < zeroTolerance ) ) )
         {
             hit = true;
             break;

@@ -234,6 +234,15 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_SCALING:
                 return ds->getProperty( "scaling" ).toFloat();
                 break;
+            case FNDSE_FA_THRESHOLD:
+                return ds->getProperty( "faThreshold" ).toFloat();
+                break;
+            case FNDSE_EV_THRESHOLD:
+                return ds->getProperty( "evThreshold" ).toFloat();
+                break;
+            case FNDSE_GAMMA:
+                return ds->getProperty( "gamma" ).toFloat();
+                break;
             case FNDSE_RENDER_SLICE:
                 return ds->getProperty( "renderSlice" ).toInt();
                 break;
@@ -374,6 +383,15 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_SCALING:
                 m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
+                break;
+            case FNDSE_FA_THRESHOLD:
+                m_datasetList.at( index.row() )->setProperty( "faThreshold", value.toFloat() );
+                break;
+            case FNDSE_EV_THRESHOLD:
+                m_datasetList.at( index.row() )->setProperty( "evThreshold", value.toFloat() );
+                break;
+            case FNDSE_GAMMA:
+                m_datasetList.at( index.row() )->setProperty( "gamma", value.toFloat() );
                 break;
             case FNDSE_RENDER_SLICE:
                 m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
