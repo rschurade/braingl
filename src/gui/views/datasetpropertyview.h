@@ -64,6 +64,7 @@ private slots:
     void faThresholdChanged( float value );
     void evThresholdChanged( float value );
     void gammaChanged( float value );
+    void offsetChanged( float value );
 
     void lower1Changed( int value );
     void upper1Changed( int value );
@@ -107,6 +108,7 @@ private:
     SliderWithEdit* m_faThresholdSlider;
     SliderWithEdit* m_evThresholdSlider;
     SliderWithEdit* m_gammaSlider;
+    SliderWithEdit* m_glyphOffsetSlider;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

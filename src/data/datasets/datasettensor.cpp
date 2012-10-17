@@ -20,6 +20,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_properties["faThreshold"] = 0.01;
     m_properties["evThreshold"] = 0.01;
     m_properties["gamma"] = 0.1;
+    m_properties["offset"] = 0.0;
     m_properties["scaling"] = 0.5;
 
     examineDataset();

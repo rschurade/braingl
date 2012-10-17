@@ -243,6 +243,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_GAMMA:
                 return ds->getProperty( "gamma" ).toFloat();
                 break;
+            case FNDSE_OFFSET:
+                return ds->getProperty( "offset" ).toFloat();
+                break;
             case FNDSE_RENDER_SLICE:
                 return ds->getProperty( "renderSlice" ).toInt();
                 break;
@@ -392,6 +395,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_GAMMA:
                 m_datasetList.at( index.row() )->setProperty( "gamma", value.toFloat() );
+                break;
+            case FNDSE_OFFSET:
+                m_datasetList.at( index.row() )->setProperty( "offset", value.toFloat() );
                 break;
             case FNDSE_RENDER_SLICE:
                 m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );

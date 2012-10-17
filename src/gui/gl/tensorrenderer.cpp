@@ -133,9 +133,9 @@ void TensorRenderer::initGeometry()
 
     int bValue = m_dataset->getProperty( "bValue" ).toInt();
 
-    //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
+    float offset = m_dataset->getProperty( "offset" ).toFloat();
 
-    QString s = createSettingsString( xi, yi, zi, orient, 0, 0, 0, 0, 0, 0, false, bValue, 0);
+    QString s = createSettingsString( xi, yi, zi, orient, offset, 0, 0, 0, 0, 0, false, bValue, 0);
     if ( s == m_previousSettings || orient == 0 )
     {
         return;
@@ -167,7 +167,7 @@ void TensorRenderer::initGeometry()
                 float locX = xx * dx + dx / 2;
                 float locY = yy * dy + dy / 2;
 
-                addGlyph( &verts, locX, locY, z + dz/2 , tensor );
+                addGlyph( &verts, locX, locY, z + offset * dz , tensor );
                 m_quads += 24;
             }
         }
@@ -183,7 +183,7 @@ void TensorRenderer::initGeometry()
                 float locX = xx * dx + dx / 2;
                 float locZ = zz * dz + dz / 2;
 
-                addGlyph( &verts, locX, y - 1, locZ, tensor );
+                addGlyph( &verts, locX, y + offset * dy, locZ, tensor );
                 m_quads += 24;
             }
         }
@@ -198,7 +198,7 @@ void TensorRenderer::initGeometry()
                 float locY = yy * dy + dy / 2;
                 float locZ = zz * dz + dz / 2;
 
-                addGlyph( &verts, x -1, locY, locZ, tensor );
+                addGlyph( &verts, x + offset * dx, locY, locZ, tensor );
                 m_quads += 24;
             }
         }

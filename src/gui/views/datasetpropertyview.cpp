@@ -95,6 +95,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_gammaSlider = new SliderWithEdit( tr( "gamma" ) );
     connect( m_gammaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( gammaChanged( float ) ) );;
 
+    m_glyphOffsetSlider = new SliderWithEdit( tr( "offset" ) );
+    connect( m_glyphOffsetSlider, SIGNAL( valueChanged( float ) ), this, SLOT( offsetChanged( float ) ) );;
+
     m_layout->addLayout( layout1 );
     m_layout->addWidget( m_textureActive );
     m_layout->addWidget( m_lowerThresholdSlider );
@@ -110,6 +113,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_faThresholdSlider );
     m_layout->addWidget( m_evThresholdSlider );
     m_layout->addWidget( m_gammaSlider );
+    m_layout->addWidget( m_glyphOffsetSlider );
     m_layout->addWidget( m_qBallScaling );
     m_layout->addStretch( 0 );
 
@@ -124,6 +128,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_faThresholdSlider->setHidden( true );
     m_evThresholdSlider->setHidden( true );
     m_gammaSlider->setHidden( true );
+    m_glyphOffsetSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     m_widget->setLayout( m_layout );
@@ -259,6 +264,11 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_GAMMA );
     m_gammaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
+    m_glyphOffsetSlider->setMin( -1.0 );
+    m_glyphOffsetSlider->setMax( 1.0 );
+    index = getSelectedIndex( FNDSE_OFFSET );
+    m_glyphOffsetSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
 
     m_sliceSelect->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() );
 
@@ -284,6 +294,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_faThresholdSlider->setHidden( true );
     m_evThresholdSlider->setHidden( true );
     m_gammaSlider->setHidden( true );
+    m_glyphOffsetSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
 
     if ( dim == 1 )
@@ -312,6 +323,7 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_faThresholdSlider->setHidden( false );
         m_evThresholdSlider->setHidden( false );
         m_gammaSlider->setHidden( false );
+        m_glyphOffsetSlider->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -409,6 +421,10 @@ void DatasetPropertyView::gammaChanged( float value )
     model()->setData( getSelectedIndex( FNDSE_GAMMA ), value );
 }
 
+void DatasetPropertyView::offsetChanged( float value )
+{
+    model()->setData( getSelectedIndex( FNDSE_OFFSET ), value );
+}
 
 void DatasetPropertyView::renderSliceChanged( int index )
 {
@@ -483,3 +499,5 @@ void DatasetPropertyView::qballScalingChanged( int state )
 {
     model()->setData( getSelectedIndex( FNDSE_MINMAX_SCALING ), ( state == Qt::Checked ) );
 }
+
+
