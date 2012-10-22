@@ -269,7 +269,6 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_OFFSET );
     m_glyphOffsetSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-
     m_sliceSelect->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() );
 
     index = getSelectedIndex( FNDSE_MINMAX_SCALING );

@@ -78,6 +78,12 @@ float sqr( float a )
     return a * a;
 }
 
+float sqr3( float a )
+{
+    return a * a * a;
+}
+
+
 vec3 getEigenvaluesCardano( in vec3 diag, in vec3 offdiag )
 {
   const float M_SQRT3 = 1.73205080756887729352744634151;
@@ -111,9 +117,52 @@ vec3 getEigenvaluesCardano( in vec3 diag, in vec3 offdiag )
   return w;
 }
 
+vec3 getEigenvaluesAlfredo( in vec3 diag, in vec3 offdiag )
+{
+    float M_PI = 3.14159265359;
+    float xx = diag.x;
+    float xy = offdiag.x;
+    float xz = offdiag.y;
+    float yy = diag.y;
+    float yz = offdiag.z;
+    float zz = diag.z;
+
+    float i1 = xx + yy + zz;
+    float i2 = xx*yy + xx*zz + yy*zz - ( sqr(xy) + sqr(xz) + sqr(yz) );
+    float i3 = xx*yy*zz+ 2.*xy*xz*yz - ( zz*sqr(xy) + yy*sqr(xz) + xx*sqr(yz));
+
+    float v = sqr(i1/3)-i2/3;
+    float s = sqr3(i1/3)-i1*i2/6+i3/2;
+    
+    float phi = 0;
+    float l1 = 0;
+    float l2 = 0;
+    float l3 = 0;
+    
+    if ((v > 0) && (sqr(s) < sqr3(v)))
+      phi = acos( s/v * sqrt( 1./v ) ) /3;
+    else phi = 0;
+
+    // eigenvalues
+    if (phi !=0) {
+      l1 = i1/3+2 * sqrt(v) * cos(phi);
+      l2 = i1/3-2 * sqrt(v) * cos(M_PI/3. + phi);
+      l3 = i1/3-2 * sqrt(v) * cos(M_PI/3. - phi);
+    }
+    else
+      l1=l2=l3=0.0;
+
+    vec3 w;
+    w.x = l1;
+    w.y = l2;
+    w.z = l3;
+    return w;
+}
+
 vec3 getEigenvalues( in vec3 diag, in vec3 offdiag )
 {
-  return getEigenvaluesCardano( diag, offdiag );
+  //return getEigenvaluesCardano( diag, offdiag );
+  return getEigenvaluesAlfredo( diag, offdiag );
 }
 
 float getMajorEigenvalue( vec3 diag, vec3 offdiag )
@@ -130,12 +179,11 @@ vec3 getEigenvector( vec3 ABC /*diag without eigenalue i*/, vec3 offdiag )
   //ev1_z = (xy*yz-(yy-l1)*xz)* (xz*xy-(xx-l1)*yz);
 
   vec3 vec;
-  vec.x = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.z * offdiag.x );
-  vec.y = ( offdiag.y * offdiag.z - ABC.z * offdiag.x ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
-  vec.z = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
+    vec.x = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.z * offdiag.x );
+    vec.y = ( offdiag.y * offdiag.z - ABC.z * offdiag.x ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
+    vec.z = ( offdiag.x * offdiag.z - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.x * offdiag.z );
     
-  //vec.x = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.z * offdiag.z ); // FIXME
-  //< last component is missing in the paper! there is only a Dx?
+  //vec.x = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.x - ABC.z * offdiag.z );
   //vec.y = ( offdiag.y * offdiag.x - ABC.z * offdiag.z ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
   //vec.z = ( offdiag.z * offdiag.x - ABC.y * offdiag.y ) * ( offdiag.y * offdiag.z - ABC.x * offdiag.x );
 
