@@ -110,13 +110,8 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
     return vec4( ambientV + ( diffuseV + specularV ) * lightColor, 1.0 );
 }
 
-
-
 // tollerance value for float comparisons
 float zeroTolerance = 0.001;
-
-#define RenderMode_Superquadric
-//#define RenderMode_Ellipsoid
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // GPU Super Quadrics -- fragment shader -- sPow
@@ -254,8 +249,6 @@ void main( void )
     bool hit = false;
     vec3 hitPoint = vec3( 0.0, 0.0, 0.0 );
 
-#ifdef RenderMode_Superquadric // Superquadric based rendermode
-
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 2: newton iteration to determine roots of the superquadric-ray intersection
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,48 +284,6 @@ void main( void )
         lastT = newT;
     }
 
-#endif
-
-#ifdef RenderMode_Ellipsoid // Render ellipsoids
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// 2: solve ellipsoid equation to determine roots of the intersection
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-    float A = dot( v_viewDir.xyz, v_viewDir.xyz );
-    float B = 2.0 * dot( v_viewDir.xyz, v_planePoint.xyz );
-    float C = dot( v_planePoint.xyz, v_planePoint.xyz ) - 1.0;
-
-    // try to solve At^2 + Bt + C = 0
-    float discriminant = ( B * B ) - ( 4.0 * A * C );
-
-    // no solution
-    if( discriminant <= 0.0 )
-    {
-        discard;
-    }
-
-    // there will be a solution
-    hit = true;
-
-    // use solution formula
-    float twoAinv = 1.0 / ( 2.0 * A );
-    float root = sqrt( discriminant );
-    float t1 = ( -B + root ) * twoAinv;
-    float t2 = ( -B - root ) * twoAinv;
-
-    lastT = min( t1, t2 );
-    if( lastT < 0.0 )
-    {
-        discard;
-    }
-
-    // on a sphere surface the normal is allways the vector from the middle point (in our case (0,0,0))
-    // to the surface point
-    grad = -( v_planePoint.xyz + v_viewDir.xyz * lastT );
-
-#endif
-
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 3: draw or discard the pixel
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,20 +292,20 @@ void main( void )
     {
         // draw shaded pixel
         gl_FragColor = blinnPhongIllumination(
-            // material properties
-            gl_Color.rgb * 0.2,                    // ambient color
-            gl_Color.rgb * 2.0,                    // diffuse color
-            gl_Color.rgb,                          // specular color
-            30.0,                                  // shininess
+        // material properties
+        gl_Color.rgb * 0.2,                    // ambient color
+        gl_Color.rgb * 2.0,                    // diffuse color
+        gl_Color.rgb,                          // specular color
+        30.0,                                  // shininess
 
-            // light color properties
-            gl_LightSource[0].diffuse.rgb,         // light color
-            gl_LightSource[0].ambient.rgb,         // ambient light
+        // light color properties
+        gl_LightSource[0].diffuse.rgb,         // light color
+        gl_LightSource[0].ambient.rgb,         // ambient light
 
-            // directions
-            normalize( grad ),                     // normal
-            v_viewDir.xyz,                         // viewdir
-            v_lightDir.xyz );                      // light direction
+        // directions
+        normalize( grad ),                     // normal
+        v_viewDir.xyz,                         // viewdir
+        v_lightDir.xyz );                      // light direction
     }
     else // no hit: discard
     {

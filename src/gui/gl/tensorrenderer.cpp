@@ -167,7 +167,7 @@ void TensorRenderer::initGeometry()
                 float locX = xx * dx + dx / 2;
                 float locY = yy * dy + dy / 2;
 
-                addGlyph( &verts, locX, locY, z + offset * dz , tensor );
+                addGlyph( &verts, locX, locY, z - offset * dz , tensor );
                 m_quads += 24;
             }
         }
