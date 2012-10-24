@@ -107,6 +107,14 @@ void DatasetNifti::parseNiftiHeader( )
             m_sform( i+1, j+1 ) =m_header->sto_xyz.m[i][j];
         }
     }
+
+    m_header->descrip[0] = 'f';
+    m_header->descrip[1] = 'n';
+    m_header->descrip[2] = 'a';
+    m_header->descrip[3] = 'v';
+    m_header->descrip[4] = '2';
+    m_header->descrip[5] = 0;
+
 }
 
 nifti_image* DatasetNifti::getHeader()

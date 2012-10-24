@@ -25,6 +25,8 @@ public:
 private:
     Dataset* m_dataset;
     QString m_fileName;
+
+    nifti_image* createHeader();
 };
 
 #endif /* WRITER_H_ */
