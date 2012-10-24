@@ -121,7 +121,7 @@ int ObjectRenderer::getMaxLod( int orient, int lx, int ux, int ly, int uy, int l
     return maxO;
 }
 
-void ObjectRenderer::setSceneStats( float zoom, int moveX, int moveY, float bbX, float bbY )
+void ObjectRenderer::setSceneStats( float zoom, float moveX, float moveY, float bbX, float bbY )
 {
     m_zoom = zoom;
     m_moveX = moveX;
@@ -136,12 +136,14 @@ void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, flo
     {
         case 1:
         {
-            int xVisible = qMin( nx-1, (int)( ( m_bbX/dx ) / m_zoom ) );
-            int yVisible = qMin( ny-1, (int)( ( m_bbY/dy ) / m_zoom ) );
-            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 )                - (int)( m_moveX/dx + 1 ) );
-            m_visibleArea[1] = qMin( nx, ( ( nx - xVisible ) / 2 ) + xVisible + 1 - (int)( m_moveX/dx ) );
-            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 )                - (int)( m_moveY/dy + 1 ) );
-            m_visibleArea[3] = qMin( ny, ( ( ny - yVisible ) / 2 ) + yVisible + 1 - (int)( m_moveY/dy ) );
+            int xVisible = qMin( nx, (int)( ( m_bbX/dx ) / m_zoom ) );
+            int yVisible = qMin( ny, (int)( ( m_bbY/dy ) / m_zoom ) );
+            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 ) - 1             + (int)( m_moveX  / ( 3.4 * dx * m_zoom) ) );
+            m_visibleArea[1] = qMin( nx, ( ( nx - xVisible ) / 2 ) + xVisible + 1  + (int)( m_moveX  / ( 3.4 * dx * m_zoom) ) );
+            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 ) - 1             - (int)( m_moveY  / ( 3.4 * dy * m_zoom) ) );
+            m_visibleArea[3] = qMin( ny, ( ( ny - yVisible ) / 2 ) + yVisible + 1  - (int)( m_moveY  / ( 3.4 * dy * m_zoom) ) );
+
+            //qDebug() << m_moveX << m_zoom << m_moveX  / dx << m_moveX  / ( 3.4 * dx * m_zoom)   ;
 
             if ( xVisible >= nx-1 )
             {
@@ -154,16 +156,17 @@ void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, flo
                 m_visibleArea[2] = 0;
                 m_visibleArea[3] = ny-1;
             }
+            //qDebug() << m_visibleArea[0] << m_visibleArea[1] << m_visibleArea[2] << m_visibleArea[3];
             break;
         }
         case 2:
         {
-            int xVisible = qMin( nx-1, (int)( ( m_bbX/dx ) / m_zoom ) );
-            int zVisible = qMin( nz-1, (int)( ( m_bbY/dz ) / m_zoom ) );
-            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 )                - (int)( m_moveX/dx + 1 ) );
-            m_visibleArea[1] = qMin( nx, ( ( nx - xVisible ) / 2 ) + xVisible + 1 - (int)( m_moveX/dx ) );
-            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 )                - (int)( m_moveY/dz + 1 ) );
-            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1 - (int)( m_moveY/dz ) );
+            int xVisible = qMin( nx, (int)( ( m_bbX/dx ) / m_zoom ) );
+            int zVisible = qMin( nz, (int)( ( m_bbY/dz ) / m_zoom ) );
+            m_visibleArea[0] = qMax( 0,  ( ( nx - xVisible ) / 2 ) - 1            + (int)( m_moveX  / ( 3.4 * dx * m_zoom) ) );
+            m_visibleArea[1] = qMin( nx, ( ( nx - xVisible ) / 2 ) + xVisible + 1 + (int)( m_moveX  / ( 3.4 * dx * m_zoom) ) );
+            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 ) - 1            - (int)( m_moveY  / ( 3.4 * dz * m_zoom) ) );
+            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1 - (int)( m_moveY  / ( 3.4 * dz * m_zoom) ) );
 
             if ( xVisible >= nx-1 )
             {
@@ -180,12 +183,12 @@ void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, flo
         }
         case 3:
         {
-            int yVisible = qMin( ny-1, (int)( ( m_bbX/dy ) / m_zoom ) );
-            int zVisible = qMin( nz-1, (int)( ( m_bbY/dz ) / m_zoom ) );
-            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 )                + (int)( m_moveX/dy ) );
-            m_visibleArea[3] = qMin( ny, ( ( ny - yVisible ) / 2 ) + yVisible + 2 + (int)( m_moveX/dy ) );
-            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 )                - (int)( m_moveY/dz + 1 ) );
-            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1 - (int)( m_moveY/dz ) );
+            int yVisible = qMin( ny, (int)( ( m_bbX/dy ) / m_zoom ) );
+            int zVisible = qMin( nz, (int)( ( m_bbY/dz ) / m_zoom ) );
+            m_visibleArea[2] = qMax( 0,  ( ( ny - yVisible ) / 2 ) - 1            - (int)( m_moveX  / ( 3.4 * dy * m_zoom) ) );
+            m_visibleArea[3] = qMin( ny, ( ( ny - yVisible ) / 2 ) + yVisible + 1 - (int)( m_moveX  / ( 3.4 * dy * m_zoom) ) );
+            m_visibleArea[4] = qMax( 0,  ( ( nz - zVisible ) / 2 ) - 1            - (int)( m_moveY  / ( 3.4 * dz * m_zoom) ) );
+            m_visibleArea[5] = qMin( nz, ( ( nz - zVisible ) / 2 ) + zVisible + 1 - (int)( m_moveY  / ( 3.4 * dz * m_zoom) ) );
 
             if ( yVisible >= ny-1 )
             {
@@ -198,7 +201,6 @@ void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, flo
                 m_visibleArea[4] = 0;
                 m_visibleArea[5] = nz-1;
             }
-            qDebug() << m_visibleArea[2] << m_visibleArea[3];
             break;
         }
     }
