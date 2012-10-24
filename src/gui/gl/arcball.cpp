@@ -122,8 +122,8 @@ void ArcBall::mouseWheel( int step )
 
 void ArcBall::midDrag( int x, int y )
 {
-    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / m_zoom );
-    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / m_zoom );
+    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) );
+    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) );
 }
 
 void ArcBall::setRotCenter( float x, float y, float z )
@@ -168,9 +168,9 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = m_currentRot * mv ;
 
-    float _zoom = m_zoom * m_zoom * 0.1 + 1.0;
+    m_zoom2 = m_zoom * m_zoom * 0.1 + 1.0;
 
-    QVector3D halfMove( -m_moveX * _zoom/2, m_moveY * _zoom/2, 0 );
+    QVector3D halfMove( -m_moveX /1.7, m_moveY /1.7, 0 );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
@@ -178,15 +178,25 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = mv + tmp;
 
-
-
-    QVector3D scale( _zoom, _zoom, _zoom );
+    QVector3D scale( m_zoom2, m_zoom2, m_zoom2 );
     mv.scale( scale );
 
-
     mv.translate( m_rotCenter );
-
 
     return mv;
 }
 
+float ArcBall::getZoom()
+{
+    return m_zoom2;
+}
+
+float ArcBall::getMoveX()
+{
+    return m_moveX;
+}
+
+float ArcBall::getMoveY()
+{
+    return m_moveY;
+}

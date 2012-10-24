@@ -114,28 +114,31 @@ void SceneRenderer::calcMVPMatrix()
 
     m_boundingbox = qMax ( m_datasetSizeX, qMax( m_datasetSizeY, m_datasetSizeZ ) );
 
-
     // Reset projection
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
     float halfBB = m_boundingbox / 2.0;
 
+    float bbx = m_boundingbox;
+    float bby = m_boundingbox;
+
     if ( m_ratio >= 1.0 )
     {
         pMatrix.ortho( -halfBB * m_ratio, halfBB * m_ratio, -halfBB, halfBB, -3000, 3000 );
+        bbx = m_boundingbox * m_ratio;
     }
     else
     {
         pMatrix.ortho( -halfBB, halfBB, -halfBB / m_ratio, halfBB / m_ratio, -3000, 3000 );
+        bby = m_boundingbox / m_ratio;
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
-//    m_tensorRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
-//    m_shRenderer->setSceneStats( m_zoom, (int)(moveX), (int)(moveY), bbX, bbY );
+    m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
 
 void SceneRenderer::draw()

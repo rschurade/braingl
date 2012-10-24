@@ -175,7 +175,7 @@ void SHRenderer::initGeometry()
 
     if ( orient == 1 )
     {
-        qDebug() << "QBall: start init geometry";
+        //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
@@ -251,7 +251,7 @@ void SHRenderer::initGeometry()
     }
     else if ( orient == 2 )
     {
-        qDebug() << "QBall: start init geometry";
+        //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
@@ -320,7 +320,7 @@ void SHRenderer::initGeometry()
     }
     else if ( orient == 3 )
     {
-        qDebug() << "QBall: start init geometry";
+        //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
@@ -400,7 +400,7 @@ void SHRenderer::initGeometry()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 
-    qDebug() << "QBall: end init geometry";
+    //qDebug() << "QBall: end init geometry";
 }
 
 void SHRenderer::setView( int view )

@@ -34,6 +34,10 @@ public:
 
     void setView( int view );
 
+    float getZoom();
+    float getMoveX();
+    float getMoveY();
+
 private:
     QVector3D map_sphere( int x, int y );
 
@@ -52,13 +56,14 @@ private:
     QMatrix4x4 m_currentRot;               // current rotation matrix
     QMatrix4x4 m_lastRot;               // current rotation matrix
 
-    int m_moveX;
-    int m_moveY;
+    float m_moveX;
+    float m_moveY;
     int m_oldMoveX;
     int m_oldMoveY;
     int m_midClickX;
     int m_midClickY;
     float m_zoom;
+    float m_zoom2;
 
     QVector3D m_rotCenter;
 };
