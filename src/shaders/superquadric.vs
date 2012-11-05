@@ -252,7 +252,7 @@ void main()
     float cl =       ( evals.x - evals.y ) / evalSum;
     float cp = 2.0 * ( evals.y - evals.z ) / evalSum;
     float cs = 3.0 * ( evals.z )           / evalSum;
-
+    
     // by default we use ellipsoids
     float kmAlpha = 1.0;
     float kmBeta = 1.0;
@@ -279,9 +279,9 @@ void main()
     v_alphaBeta.y = 2.0 / kmBeta;
     v_alphaBeta.z = kmAlpha / kmBeta;
 
-    evals.z = ( evals.z / evals.x );
-    evals.y = ( evals.y / evals.x );
-    evals.x = 1.0;
+    //evals.z = ( evals.z / evals.x );
+    //evals.y = ( evals.y / evals.x );
+    //evals.x = 1.0;
     if( evals.z <= u_evThreshold )
     {
         v_alphaBeta.w = 1.0;

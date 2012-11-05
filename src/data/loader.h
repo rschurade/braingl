@@ -9,6 +9,7 @@
 #define LOADER_H_
 
 #include <QtCore/QDir>
+#include <QtCore/QVector>
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
@@ -22,7 +23,8 @@ public:
 
     bool load();
 
-    Dataset* getDataset();
+    Dataset* getDataset( int id = 0 );
+    int getNumDatasets();
 
     bool succes();
 private:
@@ -34,6 +36,7 @@ private:
     bool loadNiftiScalar( QString fileName );
     bool loadNiftiVector3D( QString fileName );
     bool loadNiftiTensor( QString fileName );
+    bool loadNiftiQBall( QString fileName );
     bool loadNiftiDWI( QString fileName );
 
 
@@ -42,9 +45,9 @@ private:
 
     nifti_image* m_header;
     QDir m_fileName;
-    FN_DATASET_TYPE m_datasetType;
 
-    Dataset* m_dataset;
+    FN_DATASET_TYPE m_datasetType;
+    QVector<Dataset*> m_dataset;
 
     bool m_success;
 

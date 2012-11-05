@@ -14,13 +14,14 @@ class Dataset3D;
 class DatasetDWI;
 class DatasetNifti;
 class DatasetTensor;
+class DatasetQBall;
 class TriangleMesh;
 
 class DWIAlgos
 {
 public:
-    static DatasetDWI* qBall( DatasetDWI* ds );
-    static DatasetDWI* qBallSharp( DatasetDWI* ds );
+    static DatasetQBall* qBall( DatasetDWI* ds );
+    static DatasetQBall* qBallSharp( DatasetDWI* ds );
     static DatasetTensor* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );

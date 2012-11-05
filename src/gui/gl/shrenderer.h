@@ -12,7 +12,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class DatasetDWI;
+class DatasetQBall;
 class TriangleMesh;
 
 class SHRenderer : public ObjectRenderer
@@ -38,7 +38,7 @@ private:
 
     GLuint *vboIds;
 
-    DatasetDWI* m_dataset;
+    DatasetQBall* m_dataset;
 
     QVector<TriangleMesh*> m_spheres;
 };

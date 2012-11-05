@@ -8,7 +8,10 @@
 #include <QtCore/QDebug>
 
 #include "datasets/datasetnifti.h"
+#include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
+#include "datasets/datasettensor.h"
+#include "datasets/datasetqball.h"
 
 #include "writer.h"
 
@@ -28,7 +31,7 @@ bool Writer::save()
     {
         case FNDT_NIFTI_SCALAR:
         {
-            nifti_image* out = createHeader();
+            nifti_image* out = createHeader( 1 );
 
             QVector<float> data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
 
@@ -46,26 +49,96 @@ bool Writer::save()
         break;
         case FNDT_NIFTI_VECTOR:
         {
-            /*
-            qDebug() << "writing nifti file";
-            DatasetNifti* dsNifti = dynamic_cast<DatasetNifti*>( m_dataset );
-            nifti_image* out =  nifti_copy_nim_info( dsNifti->getHeader() );
-            out->data = dsNifti->getData();
+
+        }
+        break;
+        case FNDT_NIFTI_TENSOR:
+        {
+            nifti_image* out = createHeader( 6 );
+
+            QVector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
+
+            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
+            QVector<float>outData( img->nx * img->ny * img->nz * 6 );
+
+            int blockSize = img->nx * img->ny * img->nz;
+            setDescrip( out, "fnav2 tensor" );
+
+            for ( int z = 0; z < img->nz; ++z )
+            {
+                for ( int y = 0; y < img->ny; ++y )
+                {
+                    for ( int x = 0; x < img->nx; ++x )
+                    {
+                        Matrix tensor = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny )                 ] = tensor( 1, 1 );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny ) + blockSize     ] = tensor( 1, 2 );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 2 ] = tensor( 1, 3 );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 3 ] = tensor( 2, 2 );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 4 ] = tensor( 2, 3 );
+                        outData[ ( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 5 ] = tensor( 3, 3 );
+                    }
+                }
+            }
+            out->data = &(outData[0]);
+
             if( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem";
+                qDebug() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
-            break;
-            */
+
+            out->data = NULL;
+            nifti_image_free( out );
+        }
+        break;
+        case FNDT_NIFTI_QBALL:
+        {
+            QVector<ColumnVector>* data = dynamic_cast<DatasetQBall*>( m_dataset )->getData();
+
+            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
+
+            int dim = data->at( 0 ).Nrows();
+            nifti_image* out = createHeader( dim );
+            QVector<float>outData( img->nx * img->ny * img->nz * dim );
+
+            int blockSize = img->nx * img->ny * img->nz;
+            setDescrip( out, "fnav2 qball" );
+
+            for ( int z = 0; z < img->nz; ++z )
+            {
+                for ( int y = 0; y < img->ny; ++y )
+                {
+                    for ( int x = 0; x < img->nx; ++x )
+                    {
+                        ColumnVector vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+
+                        for ( int i = 0; i < dim; ++i )
+                        {
+                            outData[ ( x + y * img->nx + z * img->nx * img->ny + i * blockSize ) ] = vData( i + 1 );
+                        }
+                    }
+                }
+            }
+            out->data = &(outData[0]);
+
+            if( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            {
+                qDebug() << "NIfTI filename Problem" << endl;
+            }
+
+            nifti_image_write( out );
+
+            out->data = NULL;
+            nifti_image_free( out );
         }
         break;
     }
     return true;
 }
 
-nifti_image* Writer::createHeader()
+nifti_image* Writer::createHeader( int dim )
 {
     nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
@@ -75,7 +148,7 @@ nifti_image* Writer::createHeader()
     out->ny = img->ny;
     out->nz = img->nz;
 
-    out->nvox = img->nvox;
+    out->nvox = img->nx * img->ny * img->nz * dim;
 
     out->dx = img->dx;
     out->dy = img->dy;
@@ -90,7 +163,7 @@ nifti_image* Writer::createHeader()
     out->qform_code = 1;
     out->sform_code = 1;
 
-    out->nt = img->nt;
+    out->nt = dim;
     out->nv = 4;
     out->ndim = 4;
 
@@ -120,4 +193,21 @@ nifti_image* Writer::createHeader()
     out->datatype = DT_FLOAT;
 
     return out;
+}
+
+void Writer::setDescrip( nifti_image* hdr, QString descrip )
+{
+    if ( descrip.length() > 80 )
+    {
+        qDebug() << "Writer: descrip too long ";
+        return;
+    }
+    for ( int i = 0; i < 80; ++i )
+    {
+        hdr->descrip[i] = 0;
+    }
+    for ( int i = 0; i < descrip.length(); ++i )
+    {
+        hdr->descrip[i] = descrip.at( i ).toLatin1();
+    }
 }

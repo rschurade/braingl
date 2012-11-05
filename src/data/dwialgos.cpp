@@ -23,6 +23,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
+#include "datasets/datasetqball.h"
 
 #include "qball.h"
 #include "dwialgos.h"
@@ -36,7 +37,7 @@ DWIAlgos::~DWIAlgos()
 {
 }
 
-DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
+DatasetQBall* DWIAlgos::qBall( DatasetDWI* ds )
 {
     qDebug() << "start calculating qBall";
     QVector<QVector3D>bvecs =  ds->getBvecs();
@@ -58,14 +59,14 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
 
     QVector<ColumnVector>* data = ds->getData();
 
-    QVector<ColumnVector>* qballVector = new QVector<ColumnVector>();
+    QVector<ColumnVector>* qBallVector = new QVector<ColumnVector>();
 
     for ( int i = 0; i < data->size(); ++i )
     {
-        qballVector->push_back( qBallBase * data->at( i ) );
+        qBallVector->push_back( qBallBase * data->at( i ) );
     }
 
-    DatasetDWI* out = new DatasetDWI( ds->getProperty( "fileName" ).toString(), qballVector, ds->getB0Data(), ds->getBvals(), bvecs, ds->getHeader() );
+    DatasetQBall* out = new DatasetQBall( "Q-Ball", qBallVector, ds->getHeader() );
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
@@ -73,24 +74,21 @@ DatasetDWI* DWIAlgos::qBall( DatasetDWI* ds )
     out->setProperty( "order", 0 );
     out->setProperty( "renderSlice", 1 );
     out->setProperty( "scaling", 1.0 );
-    out->setProperty( "nt", qballVector->at(0).Nrows() );
+    out->setProperty( "nt", qBallVector->at(0).Nrows() );
     out->setProperty( "datatype", DT_FLOAT);
-    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 1 );
-    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 1 );
-    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 1 );
 
     qDebug() << "finished calculating qBall";
 
     return out;
 }
 
-DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
+DatasetQBall* DWIAlgos::qBallSharp( DatasetDWI* ds )
 {
     int order = ds->getProperty("order").toInt();
 
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
     qDebug() << "create dataset";
-    DatasetDWI* out = new DatasetDWI( "Q-Ball", qBallVector, ds->getB0Data(), ds->getBvals(), ds->getBvecs(), ds->getHeader() );
+    DatasetQBall* out = new DatasetQBall( "Q-Ball", qBallVector, ds->getHeader() );
     out->setProperty( "fileName", "Q-Ball" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
@@ -100,12 +98,6 @@ DatasetDWI* DWIAlgos::qBallSharp( DatasetDWI* ds )
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qBallVector->at(0).Nrows() );
     out->setProperty( "datatype", DT_FLOAT);
-    out->setProperty( "renderLowerX", 30 );
-    out->setProperty( "renderLowerY", 60 );
-    out->setProperty( "renderLowerZ", 30 );
-    out->setProperty( "renderUpperX", ds->getProperty( "nx").toInt() - 30 );
-    out->setProperty( "renderUpperY", ds->getProperty( "ny").toInt() - 20);
-    out->setProperty( "renderUpperZ", ds->getProperty( "nz").toInt() - 30 );
 
     qDebug() << "finished calculating qBall";
 

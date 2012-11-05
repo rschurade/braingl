@@ -13,6 +13,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
+#include "datasets/datasetqball.h"
 #include "mesh/trianglemesh.h"
 
 #include "loader.h"
@@ -33,9 +34,14 @@ bool Loader::succes()
 	return m_success;
 }
 
-Dataset* Loader::getDataset()
+Dataset* Loader::getDataset( int id )
 {
-	return m_dataset;
+	return m_dataset[ id ];
+}
+
+int Loader::getNumDatasets()
+{
+    return m_dataset.size();
 }
 
 bool Loader::load()
@@ -84,6 +90,11 @@ bool Loader::loadNifti()
     {
         m_datasetType = FNDT_NIFTI_TENSOR;
         return loadNiftiTensor( fn );
+    }
+    else if ( m_header->dim[4] == 15 )
+    {
+        m_datasetType = FNDT_NIFTI_QBALL;
+        return loadNiftiQBall( fn );
     }
     else if ( m_header->dim[4] > 3 )
     {
@@ -193,7 +204,7 @@ bool Loader::loadNiftiScalar( QString fileName )
     }
 
     DatasetScalar* dataset = new DatasetScalar( fileName, data, m_header );
-    m_dataset = dataset;
+    m_dataset.push_back( dataset );
     return true;
 }
 
@@ -289,7 +300,7 @@ bool Loader::loadNiftiVector3D( QString fileName )
     }
 
     Dataset3D* dataset = new Dataset3D( fileName, data, m_header );
-    m_dataset = dataset;
+    m_dataset.push_back( dataset );
     return true;
 }
 
@@ -332,7 +343,54 @@ bool Loader::loadNiftiTensor( QString fileName )
             }
 
             DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
-            m_dataset = dataset;
+            m_dataset.push_back( dataset );
+
+            nifti_image_free( filedata );
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+bool Loader::loadNiftiQBall( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dim = m_header->dim[4];
+
+    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_FLOAT32:
+        {
+            float* inputData;
+
+            inputData = reinterpret_cast<float*>( filedata->data );
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                ColumnVector v( dim );
+                for ( int j = 0; j < dim; ++j )
+                {
+                    v( j+1 ) = inputData[ j * blockSize + i ];
+                }
+
+
+                dataVector->push_back( v );
+            }
+
+            DatasetQBall* out = new DatasetQBall( m_fileName.path(), dataVector, m_header );
+            out->setProperty( "name", "QBall" );
+            out->setProperty( "createdBy", FNALGO_QBALL );
+            out->setProperty( "lod", 2 );
+            out->setProperty( "order", 4 );
+            out->setProperty( "renderSlice", 1 );
+
+            m_dataset.push_back( out );
 
             nifti_image_free( filedata );
             qDebug() << "end loading data";
@@ -477,8 +535,12 @@ bool Loader::loadNiftiDWI( QString fileName )
             }
             qDebug() << "extract data done";
 
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, m_header );
-            m_dataset = dataset;
+            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
+            m_dataset.push_back( dataset );
+            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+            DatasetScalar* datasetB0 = new DatasetScalar( m_fileName.path() + "_b0", b0data, b0Hdr );
+            m_dataset.push_back( datasetB0 );
 
             nifti_image_free( filedata );
             qDebug() << "end loading data";
