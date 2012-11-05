@@ -13,7 +13,7 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../data/datasets/datasetdwi.h"
+#include "../../data/datasets/datasetqball.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
 #include "../../data/qball.h"
@@ -85,7 +85,7 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
     {
         //qDebug() << "sh draw";
 
-        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
+        m_dataset = VPtr<DatasetQBall>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
 
         int orient = m_dataset->getProperty( "renderSlice" ).toInt();
         if ( orient == 0 )
@@ -104,6 +104,7 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
         setShaderVars();
         glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }

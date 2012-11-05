@@ -11,6 +11,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
+#include "datasets/datasetqball.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
@@ -73,7 +74,10 @@ bool DataStore::load( QDir fileName )
     Loader loader( fileName );
     if ( loader.load() )
     {
-        addDataset( loader.getDataset() );
+        for ( int i = 0; i < loader.getNumDatasets(); ++i )
+        {
+            addDataset( loader.getDataset( i ) );
+        }
     }
     return loader.succes();
 }
@@ -129,7 +133,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_QBALL )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 
@@ -190,7 +194,7 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI  || type == FNDT_NIFTI_QBALL )
     {
         DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
 

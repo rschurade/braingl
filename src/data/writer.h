@@ -26,7 +26,9 @@ private:
     Dataset* m_dataset;
     QString m_fileName;
 
-    nifti_image* createHeader();
+    nifti_image* createHeader( int dim );
+
+    void setDescrip( nifti_image* hdr, QString descrip );
 };
 
 #endif /* WRITER_H_ */

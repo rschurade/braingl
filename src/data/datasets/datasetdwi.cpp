@@ -58,7 +58,8 @@ void DatasetDWI::examineDataset()
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
-    int dim = getProperty( "nt" ).toInt();
+    int dim = m_data->at( 0 ).Nrows();
+    m_properties["nt"] = dim;
     int size = nx * ny * nz * dim;
 
     if ( type == DT_UNSIGNED_CHAR )
