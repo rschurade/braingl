@@ -154,6 +154,16 @@ void SceneRenderer::draw()
 void SceneRenderer::setView( int view )
 {
     m_arcBall->setView( view );
+    int countDatasets = m_dataStore->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = m_dataStore->index( i, FNDSE_ACTIVE );
+        if ( m_dataStore->data( index, Qt::EditRole ).toBool() )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, 2 ), Qt::EditRole ) );
+            ds->setProperty( "renderSlice", view );
+        }
+    }
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )

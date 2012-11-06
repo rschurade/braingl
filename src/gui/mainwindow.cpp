@@ -366,33 +366,39 @@ void MainWindow::slotAddTabAxial()
 
 void MainWindow::slotToggleAxialSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, 115 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_AXIAL );
     m_dataStore->setData( mi, showAxialAct->isChecked(), Qt::UserRole );
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, 114 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_CORONAL );
     m_dataStore->setData( mi, showCoronalAct->isChecked(), Qt::UserRole );
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, 113 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_SAGITTAL );
     m_dataStore->setData( mi, showSagittalAct->isChecked(), Qt::UserRole );
 }
 
 void  MainWindow::slotStandardAxialView()
 {
-    mainGLWidget->setView( 1 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
+    m_dataStore->setData( mi, FN_AXIAL );
+    mainGLWidget->setView( FN_AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    mainGLWidget->setView( 2 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
+    m_dataStore->setData( mi, FN_CORONAL );
+    mainGLWidget->setView( FN_CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    mainGLWidget->setView( 3 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
+    m_dataStore->setData( mi, FN_SAGITTAL );
+    mainGLWidget->setView( FN_SAGITTAL );
 }

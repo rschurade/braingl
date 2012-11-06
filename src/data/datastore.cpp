@@ -342,6 +342,9 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
         case FNGLOBAL_SHOW_AXIAL:
             return m_globals[ "showAxial" ];
             break;
+        case FNGLOBAL_VIEW:
+            return m_globals[ "view" ];
+            break;
     }
     return QVariant();
 }
@@ -554,6 +557,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNGLOBAL_SHOW_AXIAL:
                 m_globals[ "showAxial" ] = value.toBool();
+                break;
+            case FNGLOBAL_VIEW:
+                m_globals[ "view" ] = value.toInt();
                 break;
         }
         emit( dataChanged( index, index ) );
