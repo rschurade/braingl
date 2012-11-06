@@ -12,20 +12,19 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class DatasetQBall;
 class TriangleMesh;
 
 class SHRenderer : public ObjectRenderer
 {
 public:
-    SHRenderer();
+    SHRenderer( QVector<ColumnVector>* data, int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~SHRenderer();
 
     void init();
 
     void draw( QMatrix4x4 mvp_matrix );
 
-    void setView( int view );
+    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling );
 
 protected:
     void setupTextures();
@@ -38,9 +37,23 @@ private:
 
     GLuint *vboIds;
 
-    DatasetQBall* m_dataset;
+    QVector<ColumnVector>* m_data;
 
     QVector<TriangleMesh*> m_spheres;
+
+    int m_nx;
+    int m_ny;
+    int m_nz;
+    float m_dx;
+    float m_dy;
+    float m_dz;
+
+    float m_scaling;
+    int m_orient;
+    float m_offset;
+    float m_lodAdjust;
+    bool m_minMaxScaling;
+
 };
 
 #endif /* SHRENDERER_H_ */

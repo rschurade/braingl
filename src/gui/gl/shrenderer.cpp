@@ -26,10 +26,22 @@
 #include "glfunctions.h"
 #include "shrenderer.h"
 
-SHRenderer::SHRenderer() :
+SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris1( 0 ),
-    vboIds( new GLuint[ 6 ] )
+    vboIds( new GLuint[ 6 ] ),
+    m_data( data ),
+    m_nx( m_nx ),
+    m_ny( m_ny ),
+    m_nz( m_nz ),
+    m_dx( m_dx ),
+    m_dy( m_dy ),
+    m_dz( m_dz ),
+    m_scaling( 1.0 ),
+    m_orient( 0 ),
+    m_offset( 0.0 ),
+    m_lodAdjust( 0 ),
+    m_minMaxScaling( false )
 {
     for ( int lod = 0; lod < 6; ++lod )
     {
@@ -64,50 +76,25 @@ void SHRenderer::init()
 
 void SHRenderer::draw( QMatrix4x4 mvp_matrix )
 {
-    QList<int>rl;
-
-    int countDatasets = model()->rowCount();
-    for ( int i = 0; i < countDatasets; ++i )
+    if ( m_orient == 0 )
     {
-        QModelIndex index = model()->index( i, FNDSE_ACTIVE );
-        if ( model()->data( index, Qt::EditRole ).toBool() )
-        {
-            index = model()->index( i, FNDSP_CREATED_BY );
-            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNALGO_QBALL )
-            {
-                rl.push_back( i );
-                //qDebug() << "found QBall to render";
-            }
-        }
+        return;
     }
 
-    if ( rl.size() > 0 )
-    {
-        //qDebug() << "sh draw";
-
-        m_dataset = VPtr<DatasetQBall>::asPtr( model()->data( model()->index( rl[0], 2 ), Qt::EditRole ) );
-
-        int orient = m_dataset->getProperty( "renderSlice" ).toInt();
-        if ( orient == 0 )
-        {
-            return;
-        }
-
-        GLFunctions::getShader( "qball" )->bind();
-        // Set modelview-projection matrix
-        GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "qball" )->bind();
+    // Set modelview-projection matrix
+    GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", mvp_matrix );
 
 
-        initGeometry();
+    initGeometry();
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-        setShaderVars();
-        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    setShaderVars();
+    glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    }
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SHRenderer::setupTextures()
@@ -124,16 +111,9 @@ void SHRenderer::initGeometry()
     int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
     int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
     int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
-    int nx = m_dataset->getProperty( "nx" ).toInt();
-    int ny = m_dataset->getProperty( "ny" ).toInt();
-    int nz = m_dataset->getProperty( "nz" ).toInt();
-    float dx = m_dataset->getProperty( "dx" ).toFloat();
-    float dy = m_dataset->getProperty( "dy" ).toFloat();
-    float dz = m_dataset->getProperty( "dz" ).toFloat();
 
-    int orient = m_dataset->getProperty( "renderSlice" ).toInt();
 
-    calcBounds( nx, ny, nz, dx, dy, dz, orient );
+    calcBounds( m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_orient );
 
     int lowerX = m_visibleArea[0];
     int lowerY = m_visibleArea[2];
@@ -142,29 +122,28 @@ void SHRenderer::initGeometry()
     int upperY = m_visibleArea[3];
     int upperZ = m_visibleArea[5];
 
-    bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
+    int _lod = m_lodAdjust - 2;
 
-    int _lod = m_dataset->getProperty("lod").toInt() - 2;
-
-    QString s = createSettingsString( xi, yi, zi, orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, minmaxScaling, 0, _lod);
-    if ( s == m_previousSettings || orient == 0 )
+    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, _lod);
+    if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
     }
     m_previousSettings = s;
 
-    int lod = qMin( 5, qMax( 0, getMaxLod( orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
+    int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
     qDebug() << "SH Renderer: using lod " << lod;
 
-    float x = (float)xi * dx + dx / 2.;
-    float y = (float)yi * dy + dy / 2.;
-    float z = (float)zi * dz + dz / 2.;
+    float x = (float)xi * m_dx + m_dx / 2.;
+    float y = (float)yi * m_dy + m_dy / 2.;
+    float z = (float)zi * m_dz + m_dz / 2.;
 
 
     TriangleMesh* mesh = m_spheres[lod];
     QVector< QVector3D > normals = mesh->getVertNormals();
 
-    int order = m_dataset->getProperty( "order" ).toInt();
+    // TODO
+    int order = 4;
     const Matrix* v1 = tess::vertices( lod );
     Matrix base = ( QBall::sh_base( (*v1), order ) );
 
@@ -174,27 +153,25 @@ void SHRenderer::initGeometry()
     int numVerts = mesh->getVertSize();
     int currentBall = 0;
 
-    if ( orient == 1 )
+    if ( m_orient == 1 )
     {
         //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
-        QVector<ColumnVector>* data = m_dataset->getData();
-
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         verts.reserve( mesh->getVertSize() * glyphs * 10 );
         indexes.reserve( triangles.size() * glyphs * 3 );
 
-        Matrix m = base * data->at( 0 );
+        Matrix m = base * m_data->at( 0 );
 
         for( int yy = lowerY; yy < upperY; ++yy )
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yy * nx + zi * nx * ny )(1) ) > 0.0001 ) )
+                if ( ( fabs( m_data->at( xx + yy * m_nx + zi * m_nx * m_ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xx + yy * nx + zi * nx * ny );
+                    ColumnVector dv = m_data->at( xx + yy * m_nx + zi * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
@@ -205,7 +182,7 @@ void SHRenderer::initGeometry()
                         min = qMin( min, (float)r(i+1) );
                     }
 
-                    if ( minmaxScaling )
+                    if ( m_minMaxScaling )
                     {
                         max = max - min;
                         for ( int i = 0; i < r.Nrows(); ++i )
@@ -223,8 +200,8 @@ void SHRenderer::initGeometry()
                         }
                     }
 
-                    float locX = xx * dx + dx / 2;
-                    float locY = yy * dy + dy / 2;
+                    float locX = xx * m_dx + m_dx / 2;
+                    float locY = yy * m_dy + m_dy / 2;
 
                     for ( int i = 0; i < vertices.size(); ++i )
                     {
@@ -250,23 +227,21 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( orient == 2 )
+    else if ( m_orient == 2 )
     {
         //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
-        QVector<ColumnVector>* data = m_dataset->getData();
-
-        Matrix m = base * data->at( 0 );
+        Matrix m = base * m_data->at( 0 );
 
         for( int zz = lowerZ; zz < upperZ; ++zz )
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( data->at( xx + yi * nx + zz * nx * ny )(1) ) > 0.0001 ) )
+                if ( ( fabs( m_data->at( xx + yi * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xx + yi * nx + zz * nx * ny );
+                    ColumnVector dv = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
@@ -276,7 +251,7 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    if ( minmaxScaling )
+                    if ( m_minMaxScaling )
                     {
                         max = max - min;
                         for ( int i = 0; i < r.Nrows(); ++i )
@@ -292,8 +267,8 @@ void SHRenderer::initGeometry()
                         }
                     }
 
-                    float locX = xx * dx + dx / 2;
-                    float locZ = zz * dz + dz / 2;
+                    float locX = xx * m_dx + m_dx / 2;
+                    float locZ = zz * m_dz + m_dz / 2;
 
                     for ( int i = 0; i < vertices.size(); ++i )
                     {
@@ -319,23 +294,21 @@ void SHRenderer::initGeometry()
             }
         }
     }
-    else if ( orient == 3 )
+    else if ( m_orient == 3 )
     {
         //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
 
-        QVector<ColumnVector>* data = m_dataset->getData();
-
-        Matrix m = base * data->at( 0 );
+        Matrix m = base * m_data->at( 0 );
 
         for( int yy = lowerY; yy < upperY; ++yy )
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                if ( ( fabs( data->at( xi + yy * nx + zz * nx * ny )(1) ) > 0.0001 ) )
+                if ( ( fabs( m_data->at( xi + yy * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
                 {
-                    ColumnVector dv = data->at( xi + yy * nx + zz * nx * ny );
+                    ColumnVector dv = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
                     float max = 0;
@@ -345,7 +318,7 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    if ( minmaxScaling )
+                    if ( m_minMaxScaling )
                     {
                         max = max - min;
                         for ( int i = 0; i < r.Nrows(); ++i )
@@ -361,8 +334,8 @@ void SHRenderer::initGeometry()
                         }
                     }
 
-                    float locY = yy * dy + dy / 2;
-                    float locZ = zz * dz + dz / 2;
+                    float locY = yy * m_dy + m_dy / 2;
+                    float locZ = zz * m_dz + m_dz / 2;
 
                     for ( int i = 0; i < vertices.size(); ++i )
                     {
@@ -404,10 +377,11 @@ void SHRenderer::initGeometry()
     //qDebug() << "QBall: end init geometry";
 }
 
-void SHRenderer::setView( int view )
+void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling )
 {
-    if ( m_dataset )
-    {
-        m_dataset->setProperty( "renderSlice", view );
-    }
+    m_scaling = scaling;
+    m_orient = orient;
+    m_offset = offset;
+    m_lodAdjust = lodAdjust;
+    m_minMaxScaling = minMaxScaling;
 }

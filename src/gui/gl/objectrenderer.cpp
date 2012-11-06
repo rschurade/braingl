@@ -8,6 +8,8 @@
 #include <QtCore/QDebug>
 #include "objectrenderer.h"
 
+#include "../../data/enums.h"
+
 ObjectRenderer::ObjectRenderer() :
 	QAbstractItemView(),
 	m_previousSettings( "" ),
@@ -121,17 +123,15 @@ int ObjectRenderer::getMaxLod( int orient, int lx, int ux, int ly, int uy, int l
     return maxO;
 }
 
-void ObjectRenderer::setSceneStats( float zoom, float moveX, float moveY, float bbX, float bbY )
-{
-    m_zoom = zoom;
-    m_moveX = moveX;
-    m_moveY = moveY;
-    m_bbX = bbX;
-    m_bbY = bbY;
-}
-
 void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, float dz, int orient )
 {
+    m_zoom = model()->data( model()->index( 0, FNGLOBAL_ZOOM ), Qt::UserRole ).toFloat();
+    m_moveX = model()->data( model()->index( 0, FNGLOBAL_MOVEX ), Qt::UserRole ).toFloat();
+    m_moveY = model()->data( model()->index( 0, FNGLOBAL_MOVEY ), Qt::UserRole ).toFloat();
+    m_bbX = model()->data( model()->index( 0, FNGLOBAL_BBX ), Qt::UserRole ).toFloat();
+    m_bbY = model()->data( model()->index( 0, FNGLOBAL_BBY ), Qt::UserRole ).toFloat();
+
+
     switch( orient )
     {
         case 1:

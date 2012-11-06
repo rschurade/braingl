@@ -345,6 +345,21 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
         case FNGLOBAL_VIEW:
             return m_globals[ "view" ];
             break;
+        case FNGLOBAL_MOVEX:
+            return m_globals[ "moveX" ];
+            break;
+        case FNGLOBAL_MOVEY:
+            return m_globals[ "moveY" ];
+            break;
+        case FNGLOBAL_BBX:
+            return m_globals[ "bbX" ];
+            break;
+        case FNGLOBAL_BBY:
+            return m_globals[ "bbY" ];
+            break;
+        case FNGLOBAL_ZOOM:
+            return m_globals[ "zoom" ];
+            break;
     }
     return QVariant();
 }
@@ -561,8 +576,28 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNGLOBAL_VIEW:
                 m_globals[ "view" ] = value.toInt();
                 break;
+            case FNGLOBAL_ZOOM:
+                m_globals[ "zoom" ] = value.toFloat();
+                break;
+            case FNGLOBAL_MOVEX:
+                m_globals[ "moveX" ] = value.toFloat();
+                break;
+            case FNGLOBAL_MOVEY:
+                m_globals[ "moveY" ] = value.toFloat();
+                break;
+            case FNGLOBAL_BBX:
+                m_globals[ "bbX" ] = value.toFloat();
+                break;
+            case FNGLOBAL_BBY:
+                m_globals[ "bbY" ] = value.toFloat();
+                break;
+
         }
-        emit( dataChanged( index, index ) );
+        // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
+        if ( index.column() < FNGLOBAL_ZOOM )
+        {
+            emit( dataChanged( index, index ) );
+        }
 
         return true;
     }
