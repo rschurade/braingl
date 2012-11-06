@@ -29,6 +29,8 @@ public:
     Matrix getQForm();
     Matrix getSForm();
 
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
+
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;

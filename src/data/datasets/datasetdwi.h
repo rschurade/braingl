@@ -34,6 +34,8 @@ public:
 
     QVector<QVector3D> getBvecs();
 
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+
 private:
     void examineDataset();
     void createTexture();

@@ -172,3 +172,7 @@ void DatasetDWI::flipX()
     m_data = newData;
     m_b0Data = newB0Data;
 }
+
+void DatasetDWI::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+{
+}

@@ -19,3 +19,6 @@ DatasetMesh::~DatasetMesh()
 {
 }
 
+void DatasetMesh::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+{
+}

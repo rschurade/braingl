@@ -5,18 +5,21 @@
  *      Author: schurade
  */
 
+#include "../datastore.h"
+#include "../../gui/gl/tensorrenderer.h"
+
 #include "datasettensor.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
-        m_data( data )
+        m_data( data ),
+        m_renderer( 0 )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
     m_properties["createdBy"] = FNALGO_TENSORFIT;
-    m_properties["bValue"] = 500;
     m_properties["faThreshold"] = 0.01;
     m_properties["evThreshold"] = 0.01;
     m_properties["gamma"] = 0.1;
@@ -24,13 +27,6 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_properties["scaling"] = 0.5;
 
     examineDataset();
-
-    m_properties["renderLowerX"] = 30;
-    m_properties["renderLowerY"] = 60;
-    m_properties["renderLowerZ"] = 30;
-    m_properties["renderUpperX"] = m_properties["nx"].toInt() - 30;
-    m_properties["renderUpperY"] = m_properties["ny"].toInt() - 20;
-    m_properties["renderUpperZ"] = m_properties["nz"].toInt() - 30;
 }
 
 DatasetTensor::~DatasetTensor()
@@ -124,4 +120,25 @@ void DatasetTensor::flipX()
 
     m_data->clear();
     m_data = newData;
+}
+
+void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
+{
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new TensorRenderer( m_data,
+                                         m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                                         m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer->setModel( dataStore );
+        m_renderer->init();
+    }
+
+    m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
+                                 m_properties["faThreshold"].toFloat(),
+                                 m_properties["evThreshold"].toFloat(),
+                                 m_properties["gamma"].toFloat(),
+                                 m_properties["renderSlice"].toInt(),
+                                 m_properties["offset"].toFloat() );
+
+    m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }

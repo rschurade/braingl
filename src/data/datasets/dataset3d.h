@@ -19,6 +19,8 @@ public:
     Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
 
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+
 private:
     void examineDataset();
     void createTexture();

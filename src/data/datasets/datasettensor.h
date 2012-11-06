@@ -15,6 +15,8 @@
 
 #include "datasetnifti.h"
 
+class TensorRenderer;
+
 class DatasetTensor : public DatasetNifti
 {
 public:
@@ -23,6 +25,8 @@ public:
 
     QVector<Matrix>* getData();
 
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
+
 private:
     void createTexture();
     void examineDataset();
@@ -30,6 +34,8 @@ private:
     void flipX();
 
     QVector<Matrix>* m_data;
+
+    TensorRenderer* m_renderer;
 };
 
 #endif /* DATASETTensor_H_ */

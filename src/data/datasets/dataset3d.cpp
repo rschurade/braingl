@@ -132,3 +132,7 @@ void Dataset3D::flipX()
     m_data.clear();
     m_data = newData;
 }
+
+void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+{
+}
