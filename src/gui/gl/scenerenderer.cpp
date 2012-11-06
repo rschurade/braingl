@@ -10,11 +10,12 @@
 
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
+#include "../../data/datasets/dataset.h"
 
 #include "arcball.h"
 #include "slicerenderer.h"
-#include "shrenderer.h"
-#include "tensorrenderer.h"
+
+#include "../../data/vptr.h"
 
 #include "scenerenderer.h"
 
@@ -34,12 +35,6 @@ SceneRenderer::SceneRenderer( DataStore* dataStore ) :
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( m_dataStore );
-
-    m_shRenderer = new SHRenderer();
-    m_shRenderer->setModel( m_dataStore );
-
-    m_tensorRenderer = new TensorRenderer();
-    m_tensorRenderer->setModel( m_dataStore );
 
     m_arcBall = new ArcBall( 400, 400 );
 
@@ -82,8 +77,6 @@ void SceneRenderer::initGL()
 
     calcMVPMatrix();
     m_sliceRenderer->init();
-    m_shRenderer->init();
-    m_tensorRenderer->init();
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -138,22 +131,29 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
-    m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
+    //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
 
 void SceneRenderer::draw()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_sliceRenderer->draw( m_mvpMatrix );
-    m_shRenderer->draw( m_mvpMatrix );
-    m_tensorRenderer->draw( m_mvpMatrix, m_mvMatrixInverse );
+
+    int countDatasets = m_dataStore->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = m_dataStore->index( i, FNDSE_ACTIVE );
+        if ( m_dataStore->data( index, Qt::EditRole ).toBool() )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, 2 ), Qt::EditRole ) );
+            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_dataStore );
+        }
+    }
 }
 
 void SceneRenderer::setView( int view )
 {
     m_arcBall->setView( view );
-    m_tensorRenderer->setView( view );
-    m_shRenderer->setView( view );
 }
 
 void SceneRenderer::leftMouseDown( int x, int y )

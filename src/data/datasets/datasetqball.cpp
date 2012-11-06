@@ -109,3 +109,8 @@ void DatasetQBall::flipX()
     m_data->clear();
     m_data = newData;
 }
+
+void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+{
+
+}
