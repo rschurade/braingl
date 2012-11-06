@@ -15,6 +15,8 @@
 
 #include "datasetnifti.h"
 
+class SHRenderer;
+
 class DatasetQBall : public DatasetNifti
 {
 public:
@@ -32,6 +34,8 @@ private:
     void flipX();
 
     QVector<ColumnVector>* m_data;
+
+    SHRenderer* m_renderer;
 };
 
 #endif /* DATASETQBALL_H_ */

@@ -21,7 +21,6 @@ public:
 	virtual void initGeometry() = 0;
 	virtual void setShaderVars() = 0;
 	//virtual void draw() = 0;
-	void setSceneStats( float zoom, float moveX, float moveY, float bbX, float bbY );
 
 	// methods that must be implemented for QAbstractItemView
 	QRect visualRect( const QModelIndex &index ) const;

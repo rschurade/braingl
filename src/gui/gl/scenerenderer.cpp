@@ -131,6 +131,12 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
+    m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_ZOOM ), m_arcBall->getZoom(), Qt::UserRole );
+    m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_MOVEX ), m_arcBall->getMoveX(), Qt::UserRole );
+    m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_MOVEY ), m_arcBall->getMoveY(), Qt::UserRole );
+    m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_BBX ), bbx, Qt::UserRole );
+    m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_BBY ), bby, Qt::UserRole );
+
     //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
 

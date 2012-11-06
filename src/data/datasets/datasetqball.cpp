@@ -5,11 +5,15 @@
  *      Author: schurade
  */
 
+#include "../datastore.h"
+#include "../../gui/gl/shrenderer.h"
+
 #include "datasetqball.h"
 
 DatasetQBall::DatasetQBall( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_QBALL, header ),
-        m_data( data )
+        m_data( data ),
+        m_renderer( 0 )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -110,7 +114,22 @@ void DatasetQBall::flipX()
     m_data = newData;
 }
 
-void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
 {
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new SHRenderer( m_data,
+                                     m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                                     m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer->setModel( dataStore );
+        m_renderer->init();
+    }
 
+    m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
+                                 m_properties["renderSlice"].toInt(),
+                                 m_properties["offset"].toFloat(),
+                                 m_properties["lod"].toInt(),
+                                 m_properties["minmaxScaling"].toBool() );
+
+    m_renderer->draw( mvpMatrix );
 }
