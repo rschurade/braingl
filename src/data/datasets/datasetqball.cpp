@@ -44,7 +44,7 @@ void DatasetQBall::examineDataset()
     m_properties["order"] = 0;
     m_properties["renderSlice"] = 1;
     m_properties["scaling"] = 1.0;
-    m_properties["nt"] = 9;
+    m_properties["nt"] = dim;
 
     m_properties["renderUpperX"] = nx - 1;
     m_properties["renderUpperY"] = ny - 1;
