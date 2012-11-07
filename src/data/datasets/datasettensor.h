@@ -16,6 +16,7 @@
 #include "datasetnifti.h"
 
 class TensorRenderer;
+class TensorRendererEV;
 
 class DatasetTensor : public DatasetNifti
 {
@@ -36,6 +37,9 @@ private:
     QVector<Matrix>* m_data;
 
     TensorRenderer* m_renderer;
+    TensorRendererEV* m_rendererEV;
+
+    bool m_renderGlpyhs;
 };
 
 #endif /* DATASETTensor_H_ */

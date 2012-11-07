@@ -7,13 +7,16 @@
 
 #include "../datastore.h"
 #include "../../gui/gl/tensorrenderer.h"
+#include "../../gui/gl/tensorrendererev.h"
 
 #include "datasettensor.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
         m_data( data ),
-        m_renderer( 0 )
+        m_renderer( 0 ),
+        m_rendererEV( 0 ),
+        m_renderGlpyhs( false )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -25,6 +28,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_properties["gamma"] = 0.1;
     m_properties["offset"] = 0.0;
     m_properties["scaling"] = 0.5;
+    m_properties["tensorRenderMode"] = 0;
 
     examineDataset();
 }
@@ -124,21 +128,45 @@ void DatasetTensor::flipX()
 
 void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
 {
-    if ( m_renderer == 0 )
+    if ( m_properties["tensorRenderMode"].toInt() == 0 )
     {
-        m_renderer = new TensorRenderer( m_data,
-                                         m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                                         m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
-        m_renderer->setModel( dataStore );
-        m_renderer->init();
+        if ( m_renderer == 0 )
+        {
+            m_renderer = new TensorRenderer( m_data,
+                                             m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                                             m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+            m_renderer->setModel( dataStore );
+            m_renderer->init();
+        }
+
+        m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
+                                     m_properties["faThreshold"].toFloat(),
+                                     m_properties["evThreshold"].toFloat(),
+                                     m_properties["gamma"].toFloat(),
+                                     m_properties["renderSlice"].toInt(),
+                                     m_properties["offset"].toFloat() );
+
+        m_renderer->draw( mvpMatrix, mvMatrixInverse );
     }
+    else
+    {
+        if ( m_rendererEV == 0 )
+        {
+            m_rendererEV = new TensorRendererEV( m_data,
+                                             m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                                             m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+            m_rendererEV->setModel( dataStore );
+            m_rendererEV->init();
+        }
 
-    m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
-                                 m_properties["faThreshold"].toFloat(),
-                                 m_properties["evThreshold"].toFloat(),
-                                 m_properties["gamma"].toFloat(),
-                                 m_properties["renderSlice"].toInt(),
-                                 m_properties["offset"].toFloat() );
+        m_rendererEV->setRenderParams( m_properties["scaling"].toFloat(),
+                                       m_properties["faThreshold"].toFloat(),
+                                       m_properties["evThreshold"].toFloat(),
+                                       m_properties["renderSlice"].toInt(),
+                                       m_properties["offset"].toFloat(),
+                                       m_properties["tensorRenderMode"].toInt() );
 
-    m_renderer->draw( mvpMatrix, mvMatrixInverse );
+
+        m_rendererEV->draw( mvpMatrix, mvMatrixInverse );
+    }
 }
