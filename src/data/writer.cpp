@@ -62,7 +62,7 @@ bool Writer::save()
             QVector<float>outData( img->nx * img->ny * img->nz * 6 );
 
             int blockSize = img->nx * img->ny * img->nz;
-            setDescrip( out, "fnav2 tensor" );
+            setDescrip( out, "fnav2_tensor" );
 
             for ( int z = 0; z < img->nz; ++z )
             {
@@ -104,7 +104,7 @@ bool Writer::save()
             QVector<float>outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
-            setDescrip( out, "fnav2 qball" );
+            setDescrip( out, "fnav2_qball" );
 
             for ( int z = 0; z < img->nz; ++z )
             {

@@ -89,7 +89,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_faThresholdSlider = new SliderWithEdit( tr( "fa threshold" ) );
     connect( m_faThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( faThresholdChanged( float ) ) );;
 
-    m_evThresholdSlider = new SliderWithEdit( tr( "ev threshold" ) );
+    m_evThresholdSlider = new SliderWithEdit( tr( "md threshold" ) );
     connect( m_evThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( evThresholdChanged( float ) ) );;
 
     m_gammaSlider = new SliderWithEdit( tr( "gamma" ) );
@@ -100,9 +100,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 
     m_tensorRendorMode = new SelectWithLabel( tr("render mode" ) );
     m_tensorRendorMode->insertItem( 0, tr( "glyph" ) );
-    m_tensorRendorMode->insertItem( 1, tr( "ev0" ) );
-    m_tensorRendorMode->insertItem( 2, tr( "ev1" ) );
-    m_tensorRendorMode->insertItem( 3, tr( "ev2" ) );
+    m_tensorRendorMode->insertItem( 1, tr( "ev1" ) );
+    m_tensorRendorMode->insertItem( 2, tr( "ev2" ) );
+    m_tensorRendorMode->insertItem( 3, tr( "ev3" ) );
     connect( m_tensorRendorMode, SIGNAL( currentIndexChanged( int ) ), this, SLOT( tensorRenderModeChanged( int ) ) );
 
 
@@ -262,8 +262,8 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_FA_THRESHOLD );
     m_faThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    m_evThresholdSlider->setMin( 0.001 );
-    m_evThresholdSlider->setMax( 1.0 );
+    m_evThresholdSlider->setMin( 0.0 );
+    m_evThresholdSlider->setMax( 10.0 );
     index = getSelectedIndex( FNDSE_EV_THRESHOLD );
     m_evThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
