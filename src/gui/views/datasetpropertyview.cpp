@@ -98,6 +98,14 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_glyphOffsetSlider = new SliderWithEdit( tr( "offset" ) );
     connect( m_glyphOffsetSlider, SIGNAL( valueChanged( float ) ), this, SLOT( offsetChanged( float ) ) );;
 
+    m_tensorRendorMode = new SelectWithLabel( tr("render mode" ) );
+    m_tensorRendorMode->insertItem( 0, tr( "glyph" ) );
+    m_tensorRendorMode->insertItem( 1, tr( "ev0" ) );
+    m_tensorRendorMode->insertItem( 2, tr( "ev1" ) );
+    m_tensorRendorMode->insertItem( 3, tr( "ev2" ) );
+    connect( m_tensorRendorMode, SIGNAL( currentIndexChanged( int ) ), this, SLOT( tensorRenderModeChanged( int ) ) );
+
+
     m_layout->addLayout( layout1 );
     m_layout->addWidget( m_textureActive );
     m_layout->addWidget( m_lowerThresholdSlider );
@@ -115,6 +123,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_gammaSlider );
     m_layout->addWidget( m_glyphOffsetSlider );
     m_layout->addWidget( m_qBallScaling );
+    m_layout->addWidget( m_tensorRendorMode );
     m_layout->addStretch( 0 );
 
     m_lowerThresholdSlider->setHidden( true );
@@ -130,10 +139,9 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_gammaSlider->setHidden( true );
     m_glyphOffsetSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
+    m_tensorRendorMode->setHidden( true );
 
     m_widget->setLayout( m_layout );
-
-
 }
 
 DatasetPropertyView::~DatasetPropertyView()
@@ -271,6 +279,8 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     m_sliceSelect->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() );
 
+    m_tensorRendorMode->setCurrentIndex( model()->data( getSelectedIndex( FNDSE_TENSOR_RENDERMODE ), Qt::EditRole ).toInt() );
+
     index = getSelectedIndex( FNDSE_MINMAX_SCALING );
     m_qBallScaling->setChecked( model()->data( index, Qt::EditRole ).toBool() );
 }
@@ -295,6 +305,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_gammaSlider->setHidden( true );
     m_glyphOffsetSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
+    m_tensorRendorMode->setHidden( true );
 
     if ( dim == 1 )
     {
@@ -323,6 +334,7 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_evThresholdSlider->setHidden( false );
         m_gammaSlider->setHidden( false );
         m_glyphOffsetSlider->setHidden( false );
+        m_tensorRendorMode->setHidden( false );
     }
 
     if ( dim == 999999 ) // simply for copy&paste
@@ -429,6 +441,12 @@ void DatasetPropertyView::renderSliceChanged( int index )
 {
     model()->setData( getSelectedIndex( FNDSE_RENDER_SLICE ), index );
 }
+
+void DatasetPropertyView::tensorRenderModeChanged( int index )
+{
+    model()->setData( getSelectedIndex( FNDSE_TENSOR_RENDERMODE ), index );
+}
+
 
 void DatasetPropertyView::lower1Changed( int value )
 {

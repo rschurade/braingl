@@ -294,6 +294,9 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             case FNDSE_CALC_UPPER_Z:
                 return ds->getProperty( "calcUpperZ" ).toInt();
                 break;
+            case FNDSE_TENSOR_RENDERMODE:
+                return ds->getProperty( "tensorRenderMode" ).toInt();
+                break;
         }
     }
     return QVariant();
@@ -465,6 +468,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             case FNDSE_CALC_UPPER_Z:
                 m_datasetList.at( index.row() )->setProperty( "calcUpperZ", value.toInt() );
+                break;
+            case FNDSE_TENSOR_RENDERMODE:
+                m_datasetList.at( index.row() )->setProperty( "tensorRenderMode", value.toInt() );
                 break;
             }
         }

@@ -73,7 +73,7 @@ private slots:
 
     void qballScalingChanged( int state );
 
-
+    void tensorRenderModeChanged( int );
 
 
 private:
@@ -109,6 +109,8 @@ private:
     SliderWithEdit* m_evThresholdSlider;
     SliderWithEdit* m_gammaSlider;
     SliderWithEdit* m_glyphOffsetSlider;
+
+    SelectWithLabel* m_tensorRendorMode;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

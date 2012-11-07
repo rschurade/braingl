@@ -15,12 +15,7 @@
 
 #include "../../algos/fmath.h"
 
-#include "../../data/datasets/datasettensor.h"
 #include "../../data/enums.h"
-#include "../../data/vptr.h"
-
-#include "../../data/mesh/tesselation.h"
-#include "../../data/mesh/trianglemesh.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -30,7 +25,7 @@
 TensorRenderer::TensorRenderer( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),
     m_quads( 0 ),
-    vboIds( new GLuint[ 6 ] ),
+    vboIds( new GLuint[ 1 ] ),
     m_data( data ),
     m_nx( nx ),
     m_ny( ny ),
@@ -53,7 +48,7 @@ TensorRenderer::~TensorRenderer()
 
 void TensorRenderer::init()
 {
-    glGenBuffers( 6, vboIds );
+    glGenBuffers( 1, vboIds );
 }
 
 void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
@@ -68,7 +63,6 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_evThreshold", m_evThreshold );
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_gamma", m_gamma );
 
-
     initGeometry();
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -77,9 +71,7 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-
     glDrawArrays( GL_QUADS, 0, m_quads );
-
 
     GLenum error;
     int i = 0;

@@ -5,24 +5,24 @@
  *      Author: Ralph
  */
 
-#ifndef TENSORRENDERER_H_
-#define TENSORRENDERER_H_
+#ifndef TENSORRENDEREREV_H_
+#define TENSORRENDEREREV_H_
 
 #include "objectrenderer.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class TensorRenderer : public ObjectRenderer
+class TensorRendererEV : public ObjectRenderer
 {
 public:
-    TensorRenderer( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz );
-    virtual ~TensorRenderer();
+    TensorRendererEV( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    virtual ~TensorRendererEV();
 
     void init();
 
     void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
 
-    void setRenderParams( float scaling, float faThreshold, float evThreshold, float gamma, int orient, float offset );
+    void setRenderParams( float scaling, float faThreshold, float evThreshold, int orient, float offset, int evSelect );
 
 protected:
     void setupTextures();
@@ -48,9 +48,9 @@ private:
     float m_scaling;
     float m_faThreshold;
     float m_evThreshold;
-    float m_gamma;
     int m_orient;
     float m_offset;
+    int m_evSelect;
 };
 
-#endif /* TENSORRENDERER_H_ */
+#endif /* TENSORRENDEREREV_H_ */

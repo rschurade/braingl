@@ -28,5 +28,7 @@
     <file>shaders/superquadric.fs</file>
 	<file>shaders/crosshair.vs</file>
     <file>shaders/crosshair.fs</file>
+    <file>shaders/tensorev.vs</file>
+    <file>shaders/tensorev.fs</file>
  </qresource>
  </RCC>

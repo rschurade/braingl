@@ -123,6 +123,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaders["qball"] = initShader( "qball" );
         GLFunctions::m_shaders["crosshair"] = initShader( "crosshair" );
         GLFunctions::m_shaders["superquadric"] = initShader( "superquadric" );
+        GLFunctions::m_shaders["tensorev"] = initShader( "tensorev" );
     }
 }
 
@@ -177,6 +178,10 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
     {
         setTensorShaderVars( m_shaders[name], model );
     }
+    if ( name == "tensorev" )
+    {
+        setTensorShaderVarsEV( m_shaders[name], model );
+    }
 }
 
 void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
@@ -185,13 +190,14 @@ void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemM
 
     int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
+
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 
     offset += sizeof(float)*3;
     int normalLocation = program->attributeLocation("a_normal");
-    program->enableAttributeArray(normalLocation);
+    program->enableAttributeArray( normalLocation );
     glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
 
     offset += sizeof(float)*3;
@@ -203,6 +209,33 @@ void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemM
     int radiusLocation = program->attributeLocation("a_offdiag");
     program->enableAttributeArray(radiusLocation);
     glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
+}
+
+void GLFunctions::setTensorShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel* model )
+{
+    program->bind();
+
+    int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    offset += sizeof(float)*3;
+    int dirLocation = program->attributeLocation("a_dir");
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer(dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+
+    offset += sizeof(float)*1;
+    int offsetLocation = program->attributeLocation("a_diag");
+    program->enableAttributeArray(offsetLocation);
+    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+
+    offset += sizeof(float)*3;
+    int radiusLocation = program->attributeLocation("a_offdiag");
+    program->enableAttributeArray(radiusLocation);
+    glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
 }
 
 void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
