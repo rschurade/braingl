@@ -22,6 +22,8 @@ uniform float u_evThreshold;
 
 uniform int u_evSelect;
 
+varying float v_discard;
+
 // (c) 2007 by Mario Hlawitschka
 
 // tensors have to be stored in the following way:
@@ -193,9 +195,22 @@ void main()
     vec3 ev2 = cross( ev0.xyz, ev1.xyz ); // as they are orthogonal
 
     // glyphs color and anisotropy
-    //float FA = getFA( evals );
+    float FA = getFA( evals );
     //FA = clamp( FA, 0.0, 1.000 ); // filter out invalid FA values later
     //gl_FrontColor = getColor( ev0.xyz, FA );
+    
+    float evalSum =    evals.x + evals.y + evals.z;
+    
+    v_discard = 0.;
+    if( evalSum > u_evThreshold )
+    {
+        v_discard = 1.;
+    }
+    
+    if( FA <= u_faThreshold )
+    {
+        v_discard = 1.;
+    }
 
     vec4 evtmp = vec4( 0.0 );
     if ( u_evSelect == 1 )
