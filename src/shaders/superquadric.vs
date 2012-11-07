@@ -240,8 +240,10 @@ void main()
     }
     if( evals.z <= 0.0 )
     {
-        v_alphaBeta.w = 1.0;
+        evals.z = 0.01;
+        //v_alphaBeta.w = 1.0;
     }
+    
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 3: precalculate some glyph characteristics
@@ -282,7 +284,7 @@ void main()
     //evals.z = ( evals.z / evals.x );
     //evals.y = ( evals.y / evals.x );
     //evals.x = 1.0;
-    if( evals.z <= u_evThreshold )
+    if( evalSum > u_evThreshold )
     {
         v_alphaBeta.w = 1.0;
     }

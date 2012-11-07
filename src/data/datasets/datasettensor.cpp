@@ -18,13 +18,14 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
         m_rendererEV( 0 ),
         m_renderGlpyhs( false )
 {
+    //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
     m_properties["createdBy"] = FNALGO_TENSORFIT;
     m_properties["faThreshold"] = 0.01;
-    m_properties["evThreshold"] = 0.01;
+    m_properties["evThreshold"] = 10.0;
     m_properties["gamma"] = 0.1;
     m_properties["offset"] = 0.0;
     m_properties["scaling"] = 0.5;
