@@ -257,7 +257,7 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     index = getSelectedIndex( FNDSE_SCALING );
     m_scalingSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
-    m_faThresholdSlider->setMin( 0.01 );
+    m_faThresholdSlider->setMin( 0.0 );
     m_faThresholdSlider->setMax( 1.0 );
     index = getSelectedIndex( FNDSE_FA_THRESHOLD );
     m_faThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );

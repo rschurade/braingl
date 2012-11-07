@@ -96,7 +96,7 @@ void TensorRendererEV::initGeometry()
     int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
     int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, m_offset, 0, 0, 0, 0, 0, false, 0, 0);
+    QString s = createSettingsString( xi, yi, zi, m_orient, 0, 0, 0, 0, 0, 0, false, 0, 0, m_offset);
 
     if ( s == m_previousSettings || m_orient == 0 )
     {

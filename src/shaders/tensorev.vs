@@ -200,17 +200,17 @@ void main()
     vec4 evtmp = vec4( 0.0 );
     if ( u_evSelect == 1 )
     {
-        evtmp = vec4( ev0.rgb, 0.0 ) * dir;
+        evtmp = vec4( ev0.rgb, 0.0 ) * dir * u_scaling;
         gl_FrontColor = getColor( ev0.xyz, 1.0 );
     }
     else if ( u_evSelect == 2 )
     {
-        evtmp = vec4( ev1.rgb, 0.0 ) * dir;
+        evtmp = vec4( ev1.rgb, 0.0 ) * dir * u_scaling;
         gl_FrontColor = getColor( ev1.xyz, 1.0 );
     }
     else if ( u_evSelect == 3 )
     {
-        evtmp = vec4( ev2.rgb, 0.0 ) * dir;
+        evtmp = vec4( ev2.rgb, 0.0 ) * dir * u_scaling;
         gl_FrontColor = getColor( ev2.xyz, 1.0 );
     }
     gl_Position = mvp_matrix * ( a_position + evtmp );
