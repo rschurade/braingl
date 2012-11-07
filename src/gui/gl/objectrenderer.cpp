@@ -66,7 +66,7 @@ QRegion ObjectRenderer::visualRegionForSelection( const QItemSelection &selectio
 
 QString ObjectRenderer::createSettingsString( int x, int y, int z, int orient,
                                               int lx, int ux, int ly, int uy, int lz, int uz,
-                                              bool scaling, int bValue, int lod )
+                                              bool scaling, int bValue, int lod, float offset )
 {
     QString result("");
     result += QString::number( x );
@@ -82,6 +82,7 @@ QString ObjectRenderer::createSettingsString( int x, int y, int z, int orient,
     result += QString::number( scaling );
     result += QString::number( bValue );
     result += QString::number( lod );
+    result += QString::number( offset );
     return result;
 }
 
