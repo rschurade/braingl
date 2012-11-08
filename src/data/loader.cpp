@@ -476,7 +476,7 @@ bool Loader::loadNiftiDWI( QString fileName )
             nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
 
             qDebug() << "extract data ";
-#if 1
+
             dataVector->reserve( blockSize );
             if ( m_header->qto_xyz.m[0][0] < 0 || m_header->sto_xyz.m[0][0] < 0 )
             {
@@ -534,33 +534,26 @@ bool Loader::loadNiftiDWI( QString fileName )
                     }
                 }
             }
-#else
 
-            for ( int i = 0; i < blockSize; ++i )
-            {
-                ColumnVector v( numData );
-                int dataIndex = 1;
-                for ( int j = 0; j < dim; ++j )
-                {
-                    if ( bvals[j] > 100 )
-                    {
-                        v( dataIndex ) = inputData[ j * blockSize + i ];
-                        ++dataIndex;
-                    }
-                }
-                dataVector->push_back( v );
-            }
-#endif
             qDebug() << "extract data done";
             nifti_image_free( filedata );
+
+            QString b0fn = m_fileName.path();
+            if ( m_fileName.path().endsWith(".nii.gz") )
+            {
+                b0fn.replace( ".nii.gz", "_b0.nii.gz" );
+            }
+            if ( m_fileName.path().endsWith(".nii") )
+            {
+                b0fn.replace( ".nii.gz", "_b0.nii" );
+            }
+
+            DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
+            m_dataset.push_back( datasetB0 );
 
             nifti_image* dsHdr = nifti_copy_nim_info( m_header );
             DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
             m_dataset.push_back( dataset );
-
-            DatasetScalar* datasetB0 = new DatasetScalar( m_fileName.path() + "_b0", b0data, b0Hdr );
-            m_dataset.push_back( datasetB0 );
-
 
             qDebug() << "end loading data";
             return true;
