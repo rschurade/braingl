@@ -88,7 +88,7 @@ void DockNavGLWidget::settingChanged()
         mi = m_dataStore->index( 0, 103 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
         }
     }
     else if ( m_name == "coronal" )
@@ -101,7 +101,7 @@ void DockNavGLWidget::settingChanged()
         mi = m_dataStore->index( 0, 104 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
         }
     }
     else if ( m_name == "axial" )
@@ -114,7 +114,7 @@ void DockNavGLWidget::settingChanged()
         mi = m_dataStore->index( 0, 105 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
         }
     }
 }
