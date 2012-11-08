@@ -57,7 +57,8 @@ void DataStore::addDataset( Dataset* dataset )
     if ( m_datasetList.size() == 1 )
     {
         Dataset* ds = m_datasetList.first();
-        if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
+        int dt = ds->getProperty( "type" ).toInt();
+        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_QBALL || dt == FNDT_NIFTI_DWI )
         {
             m_globals[ "axial" ] = ds->getProperty( "nz" ).toInt() / 2;
             m_globals[ "coronal" ] = ds->getProperty( "ny" ).toInt() / 2;
