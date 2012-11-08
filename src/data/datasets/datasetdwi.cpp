@@ -143,38 +143,6 @@ void DatasetDWI::createTexture()
 
 void DatasetDWI::flipX()
 {
-    int xDim = m_properties["nx"].toInt();
-    int yDim = m_properties["ny"].toInt();
-    int zDim = m_properties["nz"].toInt();
-
-    QVector<ColumnVector>* newData = new QVector<ColumnVector>();
-    QVector<float>newB0Data;
-
-    for( int z = 0; z < zDim; ++z )
-    {
-        for( int y = 0; y < yDim; ++y )
-        {
-            for( int x = xDim -1; x >= 0; --x )
-            {
-                newData->push_back( m_data->at( x + y * xDim + z * xDim * yDim ) );
-                newB0Data.push_back( m_b0Data[x + y * xDim + z * xDim * yDim]);
-            }
-        }
-    }
-
-    for( int i = 0; i < m_bvecs.size(); ++i )
-    {
-        m_bvecs[i].setX( m_bvecs[i].x() * -1.0 );
-    }
-
-    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
-    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
-    m_header->qto_xyz.m[0][3] = 0.0;
-    m_header->sto_xyz.m[0][3] = 0.0;
-
-    m_data->clear();
-    m_data = newData;
-    m_b0Data = newB0Data;
 }
 
 void DatasetDWI::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )

@@ -464,14 +464,14 @@ bool Loader::loadNiftiDWI( QString fileName )
             {
                 if ( bvals[i] < 100 )
                 {
-                    foundB0 = true;
+                    //foundB0 = true;
                     //qDebug() << "extract b0 at image " << i;
                     for ( int j = 0; j < blockSize; ++j )
                     {
-                        b0data[ j ] = inputData[ i * blockSize + j ];
+                        b0data[ j ] += inputData[ i * blockSize + j ]/numB0;
                     }
                 }
-                if ( foundB0 ) break;
+                //if ( foundB0 ) break;
             }
             nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
 
@@ -500,11 +500,29 @@ bool Loader::loadNiftiDWI( QString fileName )
                             dataVector->push_back( v );
                         }
                     }
+                    QVector<float>newB0Data;
+
+                    for( int z = 0; z < dimZ; ++z )
+                    {
+                        for( int y = 0; y < dimY; ++y )
+                        {
+                            for( int x = dimX -1; x >= 0; --x )
+                            {
+                                newB0Data.push_back( b0data[x + y * dimX + z * dimX * dimY]);
+                            }
+                        }
+                    }
+                    b0data = newB0Data;
                 }
                 m_header->qto_xyz.m[0][0] = fabs( m_header->qto_xyz.m[0][0] );
                 m_header->sto_xyz.m[0][0] = fabs( m_header->sto_xyz.m[0][0] );
                 m_header->qto_xyz.m[0][3] = 0.0;
                 m_header->sto_xyz.m[0][3] = 0.0;
+
+                b0Hdr->qto_xyz.m[0][0] = fabs( m_header->qto_xyz.m[0][0] );
+                b0Hdr->sto_xyz.m[0][0] = fabs( m_header->sto_xyz.m[0][0] );
+                b0Hdr->qto_xyz.m[0][3] = 0.0;
+                b0Hdr->sto_xyz.m[0][3] = 0.0;
 
                 for( int i = 0; i < bvecs.size(); ++i )
                 {
