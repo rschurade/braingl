@@ -21,7 +21,7 @@ public:
     DatasetDWI( QString filename,
                 QVector<ColumnVector>* data,
                 QVector<float> b0Data,
-                QVector<int>bvals,
+                QVector<float>bvals,
                 QVector<QVector3D>bvecs,
                 nifti_image* header );
     virtual ~DatasetDWI();
@@ -30,7 +30,7 @@ public:
 
     QVector<float> getB0Data();
 
-    QVector<int> getBvals();
+    QVector<float> getBvals();
 
     QVector<QVector3D> getBvecs();
 
@@ -44,7 +44,7 @@ private:
 
     QVector<ColumnVector>* m_data;
     QVector<float> m_b0Data;
-    QVector<int>m_bvals;
+    QVector<float> m_bvals;
     QVector<QVector3D>m_bvecs;
 
 };

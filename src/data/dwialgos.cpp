@@ -108,7 +108,7 @@ DatasetQBall* DWIAlgos::qBallSharp( DatasetDWI* ds )
 DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
 {
     QVector<QVector3D>bvecs =  ds->getBvecs();
-    QVector<int>bvals = ds->getBvals();
+    QVector<float>bvals = ds->getBvals();
 
     int N = bvecs.size();
 
@@ -122,7 +122,7 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
 
     for ( int i=0; i < N; ++i )
     {
-        mult_c = (float)bvals[i] / (float)( bvecs[i].x()*bvecs[i].x() + bvecs[i].y()*bvecs[i].y() + bvecs[i].z()*bvecs[i].z() );
+        mult_c = bvals[i] / (float)( bvecs[i].x()*bvecs[i].x() + bvecs[i].y()*bvecs[i].y() + bvecs[i].z()*bvecs[i].z() );
 
         B(i+1,1) =   mult_c * bvecs[i].x() * bvecs[i].x();
         B(i+1,2) = 2*mult_c * bvecs[i].x() * bvecs[i].y();
