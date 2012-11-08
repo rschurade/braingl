@@ -341,11 +341,11 @@ bool Loader::loadNiftiTensor( QString fileName )
 
                 dataVector->push_back( m );
             }
+            nifti_image_free( filedata );
 
             DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
             m_dataset.push_back( dataset );
 
-            nifti_image_free( filedata );
             qDebug() << "end loading data";
             return true;
             break;
@@ -382,6 +382,7 @@ bool Loader::loadNiftiQBall( QString fileName )
 
                 dataVector->push_back( v );
             }
+            nifti_image_free( filedata );
 
             DatasetQBall* out = new DatasetQBall( m_fileName.path(), dataVector, m_header );
             out->setProperty( "name", "QBall" );
@@ -392,7 +393,6 @@ bool Loader::loadNiftiQBall( QString fileName )
 
             m_dataset.push_back( out );
 
-            nifti_image_free( filedata );
             qDebug() << "end loading data";
             return true;
             break;
@@ -404,13 +404,111 @@ bool Loader::loadNiftiQBall( QString fileName )
 
 bool Loader::loadNiftiDWI( QString fileName )
 {
-    QStringList slBvals;
-    QStringList slBvecs;
+    QVector<float> bvals = loadBvals( fileName );
 
+    if ( bvals.size() == 0 || bvals.size() != m_header->dim[4] )
+    {
+        qDebug() << "*** ERROR *** while loading dwi dataset, count bvals doesn't match nifti image dim!";
+        return false;
+    }
     int numB0 = 0;
-    QVector<int> bvals;
-    QVector<int>bvals2;
-    QVector<QVector3D> bvecs;
+    QVector<float> bvals2;
+    for ( int i = 0; i < bvals.size(); ++i )
+    {
+        if ( bvals[i] < 100 )
+        {
+            bvals2.push_back( bvals[i] );
+            ++numB0;
+        }
+    }
+    qDebug() << "num b0:" << numB0;
+
+    QVector<QVector3D> bvecs = loadBvecs( fileName, bvals );
+    if ( bvecs.size() == 0 )
+    {
+        qDebug() << "*** ERROR *** while loading bvecs!";
+        return false;
+    }
+
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dim = m_header->dim[4];
+    int numData = dim - numB0;
+    qDebug() << "num data:" << numData;
+
+    if ( numData > dim )
+    {
+        qDebug() << "*** ERROR *** parsing bval and bvec files!";
+        return false;
+    }
+
+    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_INT16:
+        {
+            QVector<float> b0data( blockSize );
+            qDebug()<< "block size: " << blockSize;
+            int16_t* inputData;
+
+            inputData = reinterpret_cast<int16_t*>( filedata->data );
+
+            bool foundB0 = false;
+            for ( int i = 0; i < dim; ++i )
+            {
+                if ( bvals[i] < 100 )
+                {
+                    foundB0 = true;
+                    //qDebug() << "extract b0 at image " << i;
+                    for ( int j = 0; j < blockSize; ++j )
+                    {
+                        b0data[ j ] = inputData[ i * blockSize + j ];
+                    }
+                }
+                if ( foundB0 ) break;
+            }
+
+            qDebug() << "extract data ";
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                ColumnVector v( numData );
+                int dataIndex = 1;
+                for ( int j = 0; j < dim; ++j )
+                {
+                    if ( bvals[j] < 100 )
+                    {
+                        v( dataIndex ) = inputData[ j * blockSize + i ];
+                        ++dataIndex;
+                    }
+                }
+                dataVector->push_back( v );
+            }
+            qDebug() << "extract data done";
+            nifti_image_free( filedata );
+
+            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
+            m_dataset.push_back( dataset );
+            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+            DatasetScalar* datasetB0 = new DatasetScalar( m_fileName.path() + "_b0", b0data, b0Hdr );
+            m_dataset.push_back( datasetB0 );
+
+
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+QVector<float> Loader::loadBvals( QString fileName )
+{
+    QStringList slBvals;
+    QVector<float> bvals;
 
     QString fn = m_fileName.path();
     fn.replace( ".nii.gz", ".bval" );
@@ -423,35 +521,55 @@ bool Loader::loadNiftiDWI( QString fileName )
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
             qDebug() << "couldn't open " << fn;
-            return false;
+            return bvals;
         }
 
         QTextStream in( &file );
         if ( !in.atEnd() )
         {
-            slBvals = in.readLine().split( " " );
+            slBvals = in.readLine().split( " ", QString::SkipEmptyParts );
             for ( int i = 0; i < slBvals.size(); ++i )
             {
-                bvals.push_back( slBvals[i].toInt() );
+                bool ok;
+                //qDebug() << slBvals[i] << slBvals[i].toFloat( &ok );
+                bvals.push_back( slBvals[i].toFloat( &ok ) );
+                if ( !ok )
+                {
+                    qDebug() << "error while parsing bvals (" << i << "), conversion failure string to float";
+                    bvals.clear();
+                    return bvals;
+                }
+
             }
 
         }
+        return bvals;
     }
     else
     {
         qDebug() << "couldn't open " << fn;
-        return false;
+        return bvals;
     }
+}
 
-    fn.replace( ".bval", ".bvec" );
+QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
+{
+    QString fn = m_fileName.path();
+    fn.replace( ".nii.gz", ".bvec" );
+    fn.replace( ".nii", ".bvec" );
     QDir dir2( fn );
+
+    QVector<QVector3D> bvecs;
+
     if ( dir2.exists( dir2.absolutePath() ) )
     {
+        QStringList slBvecs;
+
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
             qDebug() << "couldn't open " << fn;
-            return false;
+            return bvecs;
         }
 
         QTextStream in( &file );
@@ -462,93 +580,37 @@ bool Loader::loadNiftiDWI( QString fileName )
         QString sX = slBvecs[0];
         QString sY = slBvecs[1];
         QString sZ = slBvecs[2];
-        QStringList slX = sX.split( " " );
-        QStringList slY = sY.split( " " );
-        QStringList slZ = sZ.split( " " );
+        QStringList slX = sX.split( " ", QString::SkipEmptyParts );
+        QStringList slY = sY.split( " ", QString::SkipEmptyParts );
+        QStringList slZ = sZ.split( " ", QString::SkipEmptyParts );
+
+        if ( bvals.size() != slX.size() || bvals.size() != slY.size() || bvals.size() != slZ.size() )
+        {
+            qDebug() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
+            return bvecs;
+        }
 
         for ( int i = 0; i < slX.size(); ++i )
         {
-            if ( bvals[i] != 0 )
+            if ( bvals[i] < 100 )
             {
-                bvecs.push_back( QVector3D( slX[i].toDouble(), slY[i].toDouble(), slZ[i].toDouble() ) );
-                bvals2.push_back( bvals[i] );
-            }
-            else
-            {
-                ++numB0;
+                bool okX, okY, okZ;
+                bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
+                if ( !( okX && okY && okZ ) )
+                {
+                    qDebug() << "error while parsing bvecs(" << i << "), conversion failure string to float";
+                    bvecs.clear();
+                    return bvecs;
+                }
             }
         }
+        return bvecs;
     }
     else
     {
         qDebug() << "couldn't open " << fn;
-        return false;
+        return bvecs;
     }
-
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
-    int dim = m_header->dim[4];
-
-    int numData = dim - numB0;
-
-    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
-
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
-    {
-        case NIFTI_TYPE_INT16:
-        {
-            QVector<float> b0data( blockSize );
-            int16_t* inputData;
-
-            int b0Index = 0;
-
-            inputData = reinterpret_cast<int16_t*>( filedata->data );
-
-            for ( int i = 0; i < dim; ++i )
-            {
-                if ( bvals[i] == 0 )
-                {
-                    //qDebug() << "extract b0 at image " << i;
-                    for ( int j = 0; j < blockSize; ++j )
-                    {
-                        b0data[ j ] += inputData[ i * blockSize + j ] / numB0;
-                    }
-                    ++b0Index;
-                }
-            }
-
-            qDebug() << "extract data ";
-            for ( int i = 0; i < blockSize; ++i )
-            {
-                ColumnVector v( numData );
-                int dataIndex = 1;
-                for ( int j = 0; j < dim; ++j )
-                {
-                    if ( bvals[j] != 0 )
-                    {
-                        v( dataIndex ) = inputData[ j * blockSize + i ];
-                        ++dataIndex;
-                    }
-                }
-                dataVector->push_back( v );
-            }
-            qDebug() << "extract data done";
-
-            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
-            m_dataset.push_back( dataset );
-            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
-            DatasetScalar* datasetB0 = new DatasetScalar( m_fileName.path() + "_b0", b0data, b0Hdr );
-            m_dataset.push_back( datasetB0 );
-
-            nifti_image_free( filedata );
-            qDebug() << "end loading data";
-            return true;
-            break;
-        }
-    }
-    return false;
 }
 
 bool Loader::loadMesh()

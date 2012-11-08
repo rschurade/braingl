@@ -38,6 +38,9 @@ private:
     bool loadNiftiTensor( QString fileName );
     bool loadNiftiQBall( QString fileName );
     bool loadNiftiDWI( QString fileName );
+    QVector<float> loadBvals( QString fileName );
+    QVector<QVector3D>loadBvecs( QString fileName, QVector<float> bvals );
+
 
 
     bool loadMesh();
