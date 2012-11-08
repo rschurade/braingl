@@ -99,11 +99,15 @@ void DatasetDWI::examineDataset()
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
 
+
+    // deprecated, flipping for dwi datasets happens in the loader
+    /*
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
         qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
+    */
 }
 
 void DatasetDWI::createTexture()

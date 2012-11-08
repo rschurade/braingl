@@ -378,8 +378,6 @@ bool Loader::loadNiftiQBall( QString fileName )
                 {
                     v( j+1 ) = inputData[ j * blockSize + i ];
                 }
-
-
                 dataVector->push_back( v );
             }
             nifti_image_free( filedata );
@@ -415,9 +413,12 @@ bool Loader::loadNiftiDWI( QString fileName )
     QVector<float> bvals2;
     for ( int i = 0; i < bvals.size(); ++i )
     {
-        if ( bvals[i] < 100 )
+        if ( bvals[i] > 100 )
         {
             bvals2.push_back( bvals[i] );
+        }
+        else
+        {
             ++numB0;
         }
     }
@@ -431,12 +432,15 @@ bool Loader::loadNiftiDWI( QString fileName )
     }
 
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    int blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
     int numData = dim - numB0;
     qDebug() << "num data:" << numData;
 
-    if ( numData > dim )
+    if ( numData > dim || bvals2.size() != bvecs.size() )
     {
         qDebug() << "*** ERROR *** parsing bval and bvec files!";
         return false;
@@ -469,8 +473,68 @@ bool Loader::loadNiftiDWI( QString fileName )
                 }
                 if ( foundB0 ) break;
             }
+            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
 
             qDebug() << "extract data ";
+#if 1
+            dataVector->reserve( blockSize );
+            if ( m_header->qto_xyz.m[0][0] < 0 || m_header->sto_xyz.m[0][0] < 0 )
+            {
+                qDebug() << fileName << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+                for( int z = 0; z < dimZ; ++z )
+                {
+                    for( int y = 0; y < dimY; ++y )
+                    {
+                        for( int x = dimX - 1; x >= 0; --x )
+                        {
+                            ColumnVector v( numData );
+                            int dataIndex = 1;
+                            for ( int j = 0; j < dim; ++j )
+                            {
+                                if ( bvals[j] > 100 )
+                                {
+                                    v( dataIndex )= inputData[ j * blockSize + x + y * dimX + z * dimX * dimY ];
+                                    ++dataIndex;
+                                }
+                            }
+                            dataVector->push_back( v );
+                        }
+                    }
+                }
+                m_header->qto_xyz.m[0][0] = fabs( m_header->qto_xyz.m[0][0] );
+                m_header->sto_xyz.m[0][0] = fabs( m_header->sto_xyz.m[0][0] );
+                m_header->qto_xyz.m[0][3] = 0.0;
+                m_header->sto_xyz.m[0][3] = 0.0;
+
+                for( int i = 0; i < bvecs.size(); ++i )
+                {
+                    bvecs[i].setX( bvecs[i].x() * -1.0 );
+                }
+            }
+            else
+            {
+                for( int z = 0; z < dimZ; ++z )
+                {
+                    for( int y = 0; y < dimY; ++y )
+                    {
+                        for( int x = 0; x < dimX; ++x )
+                        {
+                            ColumnVector v( numData );
+                            int dataIndex = 1;
+                            for ( int j = 0; j < dim; ++j )
+                            {
+                                if ( bvals[j] > 100 )
+                                {
+                                    v( dataIndex )= inputData[ j * blockSize + x + y * dimX + z * dimX * dimY ];
+                                    ++dataIndex;
+                                }
+                            }
+                            dataVector->push_back( v );
+                        }
+                    }
+                }
+            }
+#else
 
             for ( int i = 0; i < blockSize; ++i )
             {
@@ -478,7 +542,7 @@ bool Loader::loadNiftiDWI( QString fileName )
                 int dataIndex = 1;
                 for ( int j = 0; j < dim; ++j )
                 {
-                    if ( bvals[j] < 100 )
+                    if ( bvals[j] > 100 )
                     {
                         v( dataIndex ) = inputData[ j * blockSize + i ];
                         ++dataIndex;
@@ -486,13 +550,14 @@ bool Loader::loadNiftiDWI( QString fileName )
                 }
                 dataVector->push_back( v );
             }
+#endif
             qDebug() << "extract data done";
             nifti_image_free( filedata );
 
             nifti_image* dsHdr = nifti_copy_nim_info( m_header );
             DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
             m_dataset.push_back( dataset );
-            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+
             DatasetScalar* datasetB0 = new DatasetScalar( m_fileName.path() + "_b0", b0data, b0Hdr );
             m_dataset.push_back( datasetB0 );
 
@@ -531,7 +596,7 @@ QVector<float> Loader::loadBvals( QString fileName )
             for ( int i = 0; i < slBvals.size(); ++i )
             {
                 bool ok;
-                //qDebug() << slBvals[i] << slBvals[i].toFloat( &ok );
+                //qDebug() << i << slBvals[i] << slBvals[i].toFloat( &ok );
                 bvals.push_back( slBvals[i].toFloat( &ok ) );
                 if ( !ok )
                 {
@@ -584,6 +649,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
         QStringList slY = sY.split( " ", QString::SkipEmptyParts );
         QStringList slZ = sZ.split( " ", QString::SkipEmptyParts );
 
+        //qDebug() << "count bvals" << bvals.size() << bvals;
         if ( bvals.size() != slX.size() || bvals.size() != slY.size() || bvals.size() != slZ.size() )
         {
             qDebug() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
@@ -592,7 +658,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
 
         for ( int i = 0; i < slX.size(); ++i )
         {
-            if ( bvals[i] < 100 )
+            if ( bvals[i] > 100 )
             {
                 bool okX, okY, okZ;
                 bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
@@ -602,6 +668,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
                     bvecs.clear();
                     return bvecs;
                 }
+                //qDebug() << bvecs.last();
             }
         }
         return bvecs;
