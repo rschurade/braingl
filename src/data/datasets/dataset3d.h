@@ -21,6 +21,8 @@ public:
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
 
+    QVector<QVector3D>* getData();
+
 private:
     void examineDataset();
     void createTexture();

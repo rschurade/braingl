@@ -133,6 +133,11 @@ void Dataset3D::flipX()
     m_data = newData;
 }
 
+QVector<QVector3D>* Dataset3D::getData()
+{
+    return &m_data;
+}
+
 void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
 {
 }
