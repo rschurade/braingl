@@ -29,6 +29,8 @@ private:
     QAction* m_scalarAction1;
     QAction* m_vectorAction1;
     QAction* m_multiAction1;
+    QAction* m_multiAction1_2;
+    QAction* m_multiAction1_3;
     QAction* m_multiAction2;
     QAction* m_multiAction3;
     QAction* m_multiAction4;
@@ -41,6 +43,8 @@ private slots:
     void slotScalar1();
     void slotVector1();
     void slotMulti1();
+    void slotMulti1_2();
+    void slotMulti1_3();
     void slotMulti2();
     void slotMulti3();
     void slotMulti4();

@@ -41,7 +41,8 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
     m_orient( 0 ),
     m_offset( 0.0 ),
     m_lodAdjust( 0 ),
-    m_minMaxScaling( false )
+    m_minMaxScaling( false ),
+    m_order( 4 )
 {
     for ( int lod = 0; lod < 6; ++lod )
     {
@@ -143,9 +144,8 @@ void SHRenderer::initGeometry()
     QVector< QVector3D > normals = mesh->getVertNormals();
 
     // TODO
-    int order = 4;
     const Matrix* v1 = tess::vertices( lod );
-    Matrix base = ( QBall::sh_base( (*v1), order ) );
+    Matrix base = ( QBall::sh_base( (*v1), m_order ) );
 
     std::vector<float>verts;
     std::vector<int>indexes;
@@ -377,11 +377,12 @@ void SHRenderer::initGeometry()
     //qDebug() << "QBall: end init geometry";
 }
 
-void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling )
+void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
 {
     m_scaling = scaling;
     m_orient = orient;
     m_offset = offset;
     m_lodAdjust = lodAdjust;
     m_minMaxScaling = minMaxScaling;
+    m_order = order;
 }

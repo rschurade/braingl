@@ -21,7 +21,7 @@ class DWIAlgos
 {
 public:
     static DatasetQBall* qBall( DatasetDWI* ds );
-    static DatasetQBall* qBallSharp( DatasetDWI* ds );
+    static DatasetQBall* qBallSharp( DatasetDWI* ds, int order );
     static DatasetTensor* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );

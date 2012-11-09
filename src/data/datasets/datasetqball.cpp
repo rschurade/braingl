@@ -129,7 +129,8 @@ void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataS
                                  m_properties["renderSlice"].toInt(),
                                  m_properties["offset"].toFloat(),
                                  m_properties["lod"].toInt(),
-                                 m_properties["minmaxScaling"].toBool() );
+                                 m_properties["minmaxScaling"].toBool(),
+                                 m_properties["order"].toInt() );
 
     m_renderer->draw( mvpMatrix );
 }

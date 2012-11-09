@@ -53,9 +53,19 @@ void ToolBar::createActions()
     m_vectorAction1->setStatusTip( tr( "Vector Action 1" ) );
     connect( m_vectorAction1, SIGNAL( triggered() ), this, SLOT( slotVector1() ) );
 
-    m_multiAction1 = new QAction( QIcon( ":/icons/qball.png" ), tr( "QBall" ), this );
-    m_multiAction1->setStatusTip( tr( "QBall" ) );
+    m_multiAction1 = new QAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this );
+    m_multiAction1->setStatusTip( tr( "QBall 4th order" ) );
     connect( m_multiAction1, SIGNAL( triggered() ), this, SLOT( slotMulti1() ) );
+
+    m_multiAction1_2 = new QAction( QIcon( ":/icons/qball6.png" ), tr( "QBall 6th order" ), this );
+    m_multiAction1_2->setStatusTip( tr( "QBall 6th order" ) );
+    connect( m_multiAction1_2, SIGNAL( triggered() ), this, SLOT( slotMulti1_2() ) );
+
+    m_multiAction1_3 = new QAction( QIcon( ":/icons/qball8.png" ), tr( "QBall 8th order" ), this );
+    m_multiAction1_3->setStatusTip( tr( "QBall 8th order" ) );
+    connect( m_multiAction1_3, SIGNAL( triggered() ), this, SLOT( slotMulti1_3() ) );
+
+
 
     m_multiAction2 = new QAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this );
     m_multiAction2->setStatusTip( tr( "tensor fit" ) );
@@ -90,8 +100,19 @@ void ToolBar::slotVector1()
 
 void ToolBar::slotMulti1()
 {
-    m_toolBarView->activateAlgo( FNALGO_QBALL );
+    m_toolBarView->activateAlgo( FNALGO_QBALL4 );
 }
+
+void ToolBar::slotMulti1_2()
+{
+    m_toolBarView->activateAlgo( FNALGO_QBALL6 );
+}
+
+void ToolBar::slotMulti1_3()
+{
+    m_toolBarView->activateAlgo( FNALGO_QBALL8 );
+}
+
 
 void ToolBar::slotMulti2()
 {
@@ -138,6 +159,8 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_NIFTI_DWI:
         {
             this->addAction( m_multiAction1 );
+            this->addAction( m_multiAction1_2 );
+            this->addAction( m_multiAction1_3 );
             this->addAction( m_multiAction2 );
             this->addAction( m_multiAction3 );
             this->addAction( m_multiAction4 );

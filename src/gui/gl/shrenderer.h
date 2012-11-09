@@ -24,7 +24,7 @@ public:
 
     void draw( QMatrix4x4 mvp_matrix );
 
-    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling );
+    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order );
 
 protected:
     void setupTextures();
@@ -53,6 +53,7 @@ private:
     float m_offset;
     float m_lodAdjust;
     bool m_minMaxScaling;
+    int m_order;
 
 };
 
