@@ -485,12 +485,30 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         int algo = index.column();
         switch( algo )
         {
-            case FNALGO_QBALL:
+            case FNALGO_QBALL4:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
                 {
-                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ) ) );
+                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 4 ) );
+                }
+                break;
+            }
+            case FNALGO_QBALL6:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                {
+                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 6 ) );
+                }
+                break;
+            }
+            case FNALGO_QBALL8:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                {
+                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 8 ) );
                 }
                 break;
             }

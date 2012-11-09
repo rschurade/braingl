@@ -82,15 +82,15 @@ DatasetQBall* DWIAlgos::qBall( DatasetDWI* ds )
     return out;
 }
 
-DatasetQBall* DWIAlgos::qBallSharp( DatasetDWI* ds )
+DatasetQBall* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
 {
-    int order = ds->getProperty("order").toInt();
-
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
     qDebug() << "create dataset";
     DatasetQBall* out = new DatasetQBall( "Q-Ball", qBallVector, ds->getHeader() );
     out->setProperty( "fileName", "Q-Ball" );
-    out->setProperty( "name", "QBall" );
+
+    QString name = QString ("Qball_" + QString::number(order) + "_" + ds->getProperty("name").toString() );
+    out->setProperty( "name", name );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
     out->setProperty( "order", order );
