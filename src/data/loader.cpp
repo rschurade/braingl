@@ -91,7 +91,7 @@ bool Loader::loadNifti()
         m_datasetType = FNDT_NIFTI_TENSOR;
         return loadNiftiTensor( fn );
     }
-    else if ( m_header->dim[4] == 15 )
+    else if ( m_header->dim[4] == 15 || m_header->dim[4] == 28 || m_header->dim[4] == 45 )
     {
         m_datasetType = FNDT_NIFTI_QBALL;
         return loadNiftiQBall( fn );
@@ -359,6 +359,19 @@ bool Loader::loadNiftiQBall( QString fileName )
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     int dim = m_header->dim[4];
+    int order = 4;
+    if ( dim == 15 )
+    {
+        order = 4;
+    }
+    else if ( dim == 28 )
+    {
+        order = 6;
+    }
+    else // dim == 45
+    {
+        order = 8;
+    }
 
     QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
 
@@ -386,7 +399,7 @@ bool Loader::loadNiftiQBall( QString fileName )
             out->setProperty( "name", "QBall" );
             out->setProperty( "createdBy", FNALGO_QBALL );
             out->setProperty( "lod", 2 );
-            out->setProperty( "order", 4 );
+            out->setProperty( "order", order );
             out->setProperty( "renderSlice", 1 );
 
             m_dataset.push_back( out );
