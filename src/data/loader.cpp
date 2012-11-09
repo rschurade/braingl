@@ -484,7 +484,7 @@ bool Loader::loadNiftiDWI( QString fileName )
                                 }
                                 else
                                 {
-                                    b0data[ x + y * dimX + z * dimX * dimY ] += inputData[ j * blockSize + x + y * dimX + z * dimX * dimY ]/numB0;
+                                    b0data[ ( dimX - x - 1 ) + y * dimX + z * dimX * dimY ] += inputData[ j * blockSize + x + y * dimX + z * dimX * dimY ]/numB0;
                                 }
                             }
                             dataVector->push_back( v );
