@@ -134,3 +134,8 @@ void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataS
 
     m_renderer->draw( mvpMatrix );
 }
+
+QString DatasetQBall::getValueAsString( int x, int y, int z )
+{
+    return QString( "" );
+}

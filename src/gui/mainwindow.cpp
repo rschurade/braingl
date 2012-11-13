@@ -15,6 +15,7 @@
 #include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
 #include "widgets/toolbar.h"
+#include "widgets/statusbar.h"
 
 #include "mainwindow.h"
 
@@ -33,11 +34,12 @@ MainWindow::MainWindow( DataStore* dataStore ) :
     createActions();
     createMenus();
     createToolBars();
-    createStatusBar();
     createDockWindows();
 
     // this needs to be done after the view is created
     m_toolsToolBar->setSelectionModel( m_datasetWidget->selectionModel() );
+
+    createStatusBar();
 
     setWindowTitle( tr( "Fibernavigator 2" ) );
 
@@ -276,7 +278,10 @@ void MainWindow::createToolBars()
 
 void MainWindow::createStatusBar()
 {
-    statusBar()->showMessage( tr( "Ready" ) );
+    StatusBar* sbar = new StatusBar( this );
+    sbar->setModel( m_dataStore );
+    sbar->setSelectionModel( m_datasetWidget->selectionModel() );
+    this->setStatusBar( sbar );
 }
 
 void MainWindow::createDockWindows()

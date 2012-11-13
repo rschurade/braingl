@@ -21,6 +21,7 @@ public:
     virtual ~DatasetMesh();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    QString getValueAsString( int x, int y, int z );
 
 private:
     TriangleMesh* m_mesh;

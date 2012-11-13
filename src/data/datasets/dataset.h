@@ -32,6 +32,8 @@ public:
 
     virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
 
+    virtual QString getValueAsString( int x, int y, int z ) = 0;
+
 protected:
     QHash< QString, QVariant >m_properties;
 };

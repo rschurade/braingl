@@ -30,6 +30,7 @@ public:
     Matrix getSForm();
 
     virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
+    virtual QString getValueAsString( int x, int y, int z ) = 0;
 
 protected:
     virtual void createTexture() = 0;

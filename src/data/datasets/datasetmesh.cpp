@@ -22,3 +22,8 @@ DatasetMesh::~DatasetMesh()
 void DatasetMesh::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
 {
 }
+
+QString DatasetMesh::getValueAsString( int x, int y, int z )
+{
+    return QString( "" );
+}

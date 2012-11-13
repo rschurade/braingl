@@ -128,3 +128,12 @@ void DatasetScalar::flipX()
 void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
 {
 }
+
+QString DatasetScalar::getValueAsString( int x, int y, int z )
+{
+    int nx = getProperty( "nx" ).toInt();
+    int ny = getProperty( "ny" ).toInt();
+    int nz = getProperty( "nz" ).toInt();
+    float data = m_data[ x + y * nx + z * nx * ny ];
+    return QString::number( data );
+}
