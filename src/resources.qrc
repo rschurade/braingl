@@ -33,5 +33,7 @@
     <file>shaders/crosshair.fs</file>
     <file>shaders/tensorev.vs</file>
     <file>shaders/tensorev.fs</file>
+    <file>shaders/ev.vs</file>
+    <file>shaders/ev.fs</file>
  </qresource>
  </RCC>

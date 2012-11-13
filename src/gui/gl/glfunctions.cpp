@@ -124,6 +124,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaders["crosshair"] = initShader( "crosshair" );
         GLFunctions::m_shaders["superquadric"] = initShader( "superquadric" );
         GLFunctions::m_shaders["tensorev"] = initShader( "tensorev" );
+        GLFunctions::m_shaders["ev"] = initShader( "ev" );
     }
 }
 
@@ -182,6 +183,10 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
     {
         setTensorShaderVarsEV( m_shaders[name], model );
     }
+    if ( name == "ev" )
+    {
+        setShaderVarsEV( m_shaders[name], model );
+    }
 }
 
 void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
@@ -236,6 +241,28 @@ void GLFunctions::setTensorShaderVarsEV( QGLShaderProgram* program, QAbstractIte
     int radiusLocation = program->attributeLocation("a_offdiag");
     program->enableAttributeArray(radiusLocation);
     glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+}
+
+void GLFunctions::setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel* model )
+{
+    program->bind();
+
+    int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+
+    offset += sizeof(float)*3;
+    int dirLocation = program->attributeLocation("a_dir");
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer(dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *)offset );
+
+    offset += sizeof(float)*1;
+    int offsetLocation = program->attributeLocation("a_vec");
+    program->enableAttributeArray(offsetLocation);
+    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *)offset );
 }
 
 void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
