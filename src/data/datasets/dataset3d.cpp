@@ -5,11 +5,15 @@
  *      Author: schurade
  */
 
+#include "../datastore.h"
+#include "../../gui/gl/evrenderer.h"
+
 #include "dataset3d.h"
 
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ),
-        m_data( data )
+        m_data( data ),
+        m_renderer( 0 )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -140,4 +144,18 @@ QVector<QVector3D>* Dataset3D::getData()
 
 void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
 {
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new EVRenderer( &m_data,
+                                     m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                                     m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer->setModel( datastore );
+        m_renderer->init();
+    }
+
+    m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
+                                   m_properties["renderSlice"].toInt(),
+                                   m_properties["offset"].toFloat() );
+
+    m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }

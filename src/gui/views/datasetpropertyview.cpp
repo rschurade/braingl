@@ -316,6 +316,15 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_alphaSlider->setHidden( false );
     }
 
+    if ( dim == 3 )
+    {
+        m_colormapSelect->setHidden( false );
+        m_textureInterpolation->setHidden( false );
+        m_alphaSlider->setHidden( false );
+        m_scalingSlider->setHidden( false );
+        m_glyphOffsetSlider->setHidden( false );
+    }
+
     int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
     if ( created == FNALGO_QBALL )
     {

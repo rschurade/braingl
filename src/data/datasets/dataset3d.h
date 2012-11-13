@@ -13,6 +13,8 @@
 
 #include "datasetnifti.h"
 
+class EVRenderer;
+
 class Dataset3D : public DatasetNifti
 {
 public:
@@ -30,6 +32,8 @@ private:
     void flipX();
 
     QVector<QVector3D> m_data;
+
+    EVRenderer* m_renderer;
 };
 
 #endif /* DATASET3D_H_ */
