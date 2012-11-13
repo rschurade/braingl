@@ -171,3 +171,14 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
         m_rendererEV->draw( mvpMatrix, mvMatrixInverse );
     }
 }
+
+QString DatasetTensor::getValueAsString( int x, int y, int z )
+{
+    int nx = getProperty( "nx" ).toInt();
+    int ny = getProperty( "ny" ).toInt();
+    int nz = getProperty( "nz" ).toInt();
+    Matrix data = m_data->at( x + y * nx + z * nx * ny );
+    return QString::number( data(1,1) ) + ", " + QString::number( data( 2,2 ) ) + ", " + QString::number( data(3,3) ) + ", " +
+           QString::number( data(1,2) ) + ", " + QString::number( data( 1,3 ) ) + ", " + QString::number( data(2,3) );                                                                                                        ;
+}
+

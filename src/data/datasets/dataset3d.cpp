@@ -19,6 +19,9 @@ Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* he
     m_properties["colormap"] = 0;
     m_properties["interpolation"] = false;
     m_properties["alpha"] = 1.0;
+    m_properties["renderSlice"] = 1;
+    m_properties["scaling"] = 1.0;
+    m_properties["offset"] = 0.0;
 
     examineDataset();
 }
@@ -158,4 +161,12 @@ void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
                                    m_properties["offset"].toFloat() );
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
+}
+
+QString Dataset3D::getValueAsString( int x, int y, int z )
+{
+    int nx = getProperty( "nx" ).toInt();
+    int ny = getProperty( "ny" ).toInt();
+    QVector3D data = m_data[ x + y * nx + z * nx * ny ];
+    return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }

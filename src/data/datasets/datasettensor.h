@@ -27,6 +27,7 @@ public:
     QVector<Matrix>* getData();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
+    QString getValueAsString( int x, int y, int z );
 
 private:
     void createTexture();

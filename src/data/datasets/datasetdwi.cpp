@@ -148,3 +148,8 @@ void DatasetDWI::flipX()
 void DatasetDWI::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
 {
 }
+
+QString DatasetDWI::getValueAsString( int x, int y, int z )
+{
+    return QString( "" );
+}
