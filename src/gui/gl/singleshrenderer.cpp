@@ -64,9 +64,6 @@ SingleSHRenderer::SingleSHRenderer( QString name ) :
     }
 
     m_arcBall = new ArcBall( 50, 50 );
-    m_thisRot.setToIdentity();
-    m_thisRot.translate( -1.0, -1.0, -1.0 );
-    m_lastRot.setToIdentity();
 }
 
 SingleSHRenderer::~SingleSHRenderer()
@@ -115,43 +112,44 @@ void SingleSHRenderer::resizeGL( int width, int height )
 
     m_arcBall->set_win_size( width, height );
 
-    adjustRatios();
-}
-
-void SingleSHRenderer::adjustRatios()
-{
-    glViewport( 0, 0, m_width, m_height );
-
-    m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
-
-    // Reset projection
-    QMatrix4x4 pMatrix;
-    pMatrix.setToIdentity();
-
-    pMatrix.ortho( -1, 1, -1, 1, -3000, 3000 );
-
-    m_thisRot = m_arcBall->getMVMat() *  m_lastRot;
-    m_thisRot.translate( -1.0, -1.0, -1.0 );
-    m_mvpMatrix = pMatrix * m_thisRot;
+    calcMVPMatrix();
 }
 
 void SingleSHRenderer::leftMouseDown( int x, int y )
 {
-    m_lastRot = m_thisRot;
-    m_lastRot.translate( 1.0, 1.0, 1.0 );
     m_arcBall->click( x, y );
+    calcMVPMatrix();
 }
 
 void SingleSHRenderer::leftMouseDrag( int x, int y )
 {
     m_arcBall->drag( x, y );
-    adjustRatios();
     calcMVPMatrix();
 }
 
 void SingleSHRenderer::calcMVPMatrix()
 {
+    glViewport( 0, 0, m_width, m_height );
+    m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
 
+    m_arcBall->setRotCenter( 1., 1., 1. );
+
+    // Reset projection
+    QMatrix4x4 pMatrix;
+    pMatrix.setToIdentity();
+
+
+    if ( m_ratio >= 1.0 )
+    {
+        pMatrix.ortho( -m_ratio, m_ratio, -1., 1., -3000, 3000 );
+    }
+    else
+    {
+        pMatrix.ortho( -1., 1., -1. / m_ratio, 1. / m_ratio, -3000, 3000 );
+
+    }
+
+    m_mvpMatrix = pMatrix * m_arcBall->getMVMat();
 }
 
 
@@ -167,7 +165,7 @@ void SingleSHRenderer::initGeometry()
     int ybi = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toInt();
     //int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
 
-    int lod = m_dataset->getProperty( "lod" ).toInt();
+    int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
     //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
     TriangleMesh* mesh = m_spheres[lod];

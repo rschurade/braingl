@@ -73,7 +73,7 @@ void DatasetDWI::examineDataset()
 
     if ( type == DT_SIGNED_SHORT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
+        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
 
         float max = -32767;
         float min = 32768;
