@@ -168,7 +168,6 @@ void TriangleMesh::recalcNormals()
 
 void TriangleMesh::recalcNeighbors()
 {
-    qDebug() << "recall neighbors";
     QSet<int> v;
     for ( int i = 0; i < m_vertices.size(); ++i )
     {
