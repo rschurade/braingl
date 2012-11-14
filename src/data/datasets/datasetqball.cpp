@@ -132,7 +132,7 @@ void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataS
                                  m_properties["minmaxScaling"].toBool(),
                                  m_properties["order"].toInt() );
 
-    m_renderer->draw( mvpMatrix );
+    m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
 
 QString DatasetQBall::getValueAsString( int x, int y, int z )

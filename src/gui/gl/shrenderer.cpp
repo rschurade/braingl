@@ -63,6 +63,25 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
             mesh->addTriangle( i, tri );
         }
         m_spheres.push_back( mesh );
+
+        /*
+        if ( lod < 3 )
+        {
+            QVector<QSet<int> > neighs = m_spheres[lod]->getNeighbors();
+
+            for ( int i = 0; i < neighs.size(); ++i )
+            {
+                QSet<int>n = neighs[i];
+                QString s( "" );
+                foreach (const int &value, n)
+                {
+                    s += QString::number( value );
+                    s += " ";
+                }
+                qDebug() << s;
+            }
+        }
+        */
     }
 }
 
@@ -75,7 +94,7 @@ void SHRenderer::init()
     glGenBuffers( 6, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 mvp_matrix )
+void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 {
     if ( m_orient == 0 )
     {
@@ -85,6 +104,8 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix )
     GLFunctions::getShader( "qball" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
+    GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_minMaxScaling );
 
 
     initGeometry();
@@ -125,7 +146,7 @@ void SHRenderer::initGeometry()
 
     int _lod = m_lodAdjust - 2;
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, _lod);
+    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, false, 0, _lod);
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
@@ -158,6 +179,7 @@ void SHRenderer::initGeometry()
         //qDebug() << "QBall: start init geometry";
         QVector< QVector3D > vertices = mesh->getVertices();
         QVector< Triangle > triangles = mesh->getTriangles();
+        QVector< QSet<int> > neighbors = mesh->getNeighbors();
 
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         verts.reserve( mesh->getVertSize() * glyphs * 10 );
@@ -182,22 +204,10 @@ void SHRenderer::initGeometry()
                         min = qMin( min, (float)r(i+1) );
                     }
 
-                    if ( m_minMaxScaling )
+
+                    for ( int i = 0; i < r.Nrows(); ++i )
                     {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max * 0.8;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            //r(i+1) *= -1.0;
-                            //if ( r( i + 1) < 0.0 ) r( i+1 ) = 0.0;
-                            r(i+1) = r(i+1) / max * 0.8;
-                        }
+                        r(i+1) = r(i+1) / max * 0.8;
                     }
 
                     float locX = xx * m_dx + m_dx / 2;
@@ -251,20 +261,10 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    if ( m_minMaxScaling )
+
+                    for ( int i = 0; i < r.Nrows(); ++i )
                     {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = r(i+1) / max;
-                        }
+                        r(i+1) = r(i+1) / max;
                     }
 
                     float locX = xx * m_dx + m_dx / 2;
@@ -318,20 +318,10 @@ void SHRenderer::initGeometry()
                         max = qMax( max, (float)r(i+1) );
                         min = qMin( min, (float)r(i+1) );
                     }
-                    if ( m_minMaxScaling )
+
+                    for ( int i = 0; i < r.Nrows(); ++i )
                     {
-                        max = max - min;
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = ( r(i+1) - min ) / max;
-                        }
-                    }
-                    else
-                    {
-                        for ( int i = 0; i < r.Nrows(); ++i )
-                        {
-                            r(i+1) = r(i+1) / max;
-                        }
+                        r(i+1) = r(i+1) / max;
                     }
 
                     float locY = yy * m_dy + m_dy / 2;

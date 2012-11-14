@@ -83,7 +83,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_scalingSlider = new SliderWithEdit( tr( "scaling" ) );
     connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
 
-    m_qBallScaling = new CheckboxWithLabel( tr("min-max scqaling"));
+    m_qBallScaling = new CheckboxWithLabel( tr("hide negative lobes"));
     connect( m_qBallScaling, SIGNAL( stateChanged( int ) ), this, SLOT( qballScalingChanged( int ) ) );
 
     m_faThresholdSlider = new SliderWithEdit( tr( "fa threshold" ) );

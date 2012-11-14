@@ -48,30 +48,6 @@ uniform float u_evThreshold;
 // sharpnes parameter
 uniform float u_gamma;
 
-
-
-/**
- * A struct containing the needed light and material parameters commonly used in most shaders.
- *
- * \note This is for evaluating the phong equation for 1 channel only.
- */
-struct wge_LightIntensityParameter
-{
-    // These 4 parameters are similar to those in gl_MaterialParameters
-    float materialAmbient;  //!< Material ambient intensity.
-    float materialDiffuse;  //!< Material diffuse intensity.
-    float materialSpecular; //!< Material Specular intensity.
-    float materialShinines; //!< Material shinines factor
-
-    // These 4 parametes are a stripped down version of gl_LightSourceParameters
-    float lightDiffuse;     //!< Light diffuse intensity.
-    float lightAmbient;     //!< Light ambient intensity.
-    vec3  lightPosition;    //!< Light position in world-space
-
-    vec3  viewDirection;    //!< View direction vector. Well this actually is -vec3( 0.0, 0.0, -1.0 )
-};
-
-
 /**
  * Function to calculate lighting based on "Real-Time Volume Graphics, p 119, chapter 5.4, Listing 5.1".
  *

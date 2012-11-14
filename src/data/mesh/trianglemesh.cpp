@@ -7,6 +7,8 @@
 
 #include "trianglemesh.h"
 
+#include <QtCore/QDebug>
+
 TriangleMesh::TriangleMesh(  int vertSize, int triSize ) :
     m_dirty( true ),
     m_reservedForVerts( 50 ),
@@ -17,12 +19,14 @@ TriangleMesh::TriangleMesh(  int vertSize, int triSize ) :
         m_vertices.resize( vertSize );
         m_vertNormals.resize( vertSize );
         m_vertColors.resize( vertSize );
+        m_neighbors.resize( vertSize );
     }
     else
     {
         m_vertices.reserve( m_reservedForVerts );
         m_vertNormals.reserve( m_reservedForVerts );
         m_vertColors.reserve( m_reservedForVerts );
+        m_neighbors.reserve( m_reservedForVerts );
     }
     if ( triSize > 0 )
     {
@@ -162,6 +166,27 @@ void TriangleMesh::recalcNormals()
     }
 }
 
+void TriangleMesh::recalcNeighbors()
+{
+    qDebug() << "recall neighbors";
+    QSet<int> v;
+    for ( int i = 0; i < m_vertices.size(); ++i )
+    {
+        m_neighbors[i] = v;
+    }
+    for ( int i = 0; i < m_triangles.size(); ++i )
+    {
+        m_neighbors[ m_triangles[i].v0 ].insert( m_triangles[i].v1 );
+        m_neighbors[ m_triangles[i].v0 ].insert( m_triangles[i].v2 );
+
+        m_neighbors[ m_triangles[i].v1 ].insert( m_triangles[i].v0 );
+        m_neighbors[ m_triangles[i].v1 ].insert( m_triangles[i].v2 );
+
+        m_neighbors[ m_triangles[i].v2 ].insert( m_triangles[i].v0 );
+        m_neighbors[ m_triangles[i].v2 ].insert( m_triangles[i].v1 );
+    }
+}
+
 void TriangleMesh::removeTriangle( int index )
 {
     if ( index >= 0 && index < m_triangles.size() )
@@ -207,7 +232,7 @@ void TriangleMesh::removeVertex( int index )
 void TriangleMesh::clearDirty()
 {
     recalcNormals();
-
+    recalcNeighbors();
     m_dirty = false;
 }
 
@@ -231,4 +256,13 @@ QVector< QColor >& TriangleMesh::getVertColors()
 QVector< Triangle >& TriangleMesh::getTriangles()
 {
     return m_triangles;
+}
+
+QVector< QSet<int> >& TriangleMesh::getNeighbors()
+{
+    if ( m_dirty )
+    {
+        clearDirty();
+    }
+    return m_neighbors;
 }
