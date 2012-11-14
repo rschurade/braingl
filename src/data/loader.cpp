@@ -396,7 +396,7 @@ bool Loader::loadNiftiQBall( QString fileName )
             nifti_image_free( filedata );
 
             DatasetQBall* out = new DatasetQBall( m_fileName.path(), dataVector, m_header );
-            out->setProperty( "name", "QBall" );
+            //out->setProperty( "name", "QBall" );
             out->setProperty( "createdBy", FNALGO_QBALL );
             out->setProperty( "lod", 2 );
             out->setProperty( "order", order );

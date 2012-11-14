@@ -22,7 +22,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 mvp_matrix );
+    void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
 
     void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order );
 

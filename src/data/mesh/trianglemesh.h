@@ -41,10 +41,11 @@ public:
     void removeTriangle( int index );
     void removeVertex( int index );
 
-    QVector<QVector3D>& getVertices();
-    QVector<QVector3D>& getVertNormals();
-    QVector<QColor>&    getVertColors();
-    QVector<Triangle>&  getTriangles();
+    QVector<QVector3D>&      getVertices();
+    QVector<QVector3D>&      getVertNormals();
+    QVector<QColor>&         getVertColors();
+    QVector<Triangle>&       getTriangles();
+    QVector<QSet<int> >&  getNeighbors();
 
 
 
@@ -55,6 +56,8 @@ private:
     QVector3D calcVertNormal( int vertex );
     void recalcNormals();
 
+    void recalcNeighbors();
+
     void clearDirty();
 
     QVector<QVector3D> m_vertices;
@@ -64,6 +67,7 @@ private:
     QVector<Triangle>  m_triangles;
     QVector<QVector3D> m_triNormals;
     QVector<QColor>    m_triColors;
+    QVector<QSet<int> > m_neighbors;
 
     int m_reservedForVerts;
     int m_reservedForTris;
