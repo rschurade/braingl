@@ -7,7 +7,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT( Fibernavigator2 )
 
-
 # where to find our utils and cmake modules?
 SET( FN_TOOLS_DIR ${PROJECT_SOURCE_DIR}/../tools )
 
@@ -23,7 +22,6 @@ ENDIF()
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 SET( BinName "fnav" )
-
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Setup QT4
@@ -72,11 +70,6 @@ FIND_PACKAGE( Boost 1.46.0 )
 # include the boost headers
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
-#FIND_PACKAGE( Qxt REQUIRED )
-#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH} )
-#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtGui )
-#INCLUDE_DIRECTORIES( ${QXT_INCLUDE_PATH}/QxtCore )
-
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,9 +86,9 @@ COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_F
 
 SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
 
-IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-    QT4_AUTOMOC( ${TARGET_CPP_FILES} )
-ENDIF()
+#IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
+	QT4_AUTOMOC( ${TARGET_CPP_FILES} )
+#ENDIF()
 
 # This is needed since the mocs will be generated there
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -103,7 +96,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
-    QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
+    #QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 ENDIF()
 
 ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
@@ -111,13 +104,10 @@ ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-
-	#TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} ${QXT_LIBS} )
 	TARGET_LINK_LIBRARIES( ${BinName} ${GLEW_LIBRARY} ${QT_LIBS} )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${QXT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 ENDIF()
 
