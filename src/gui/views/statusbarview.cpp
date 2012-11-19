@@ -80,10 +80,18 @@ void StatusBarView::selectionChanged( const QItemSelection &selected, const QIte
 
         emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo ) );
     }
+    else
+    {
+        m_selected = -1;
+    }
 }
 
 void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
+    if ( m_selected == -1 )
+    {
+        return;
+    }
     m_globalInfo = "[";
 
     QModelIndex mi;
@@ -112,7 +120,10 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     }
 
     Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, 2 ), Qt::EditRole ) );
-    m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
+    if ( ds )
+    {
+        m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
+    }
 
     emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo ) );
 }
