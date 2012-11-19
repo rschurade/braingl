@@ -98,8 +98,17 @@ bool Loader::loadNifti()
     }
     else if ( m_header->dim[4] > 3 )
     {
-        m_datasetType = FNDT_NIFTI_DWI;
-        return loadNiftiDWI( fn );
+        if ( QString( m_header->descrip ) == QString("fnav2_dwi") )
+        {
+            qDebug() << "fnav2 dwi dataset found";
+            m_datasetType = FNDT_NIFTI_DWI;
+            return loadNiftiDWI_FNAV2( fn );
+        }
+        else
+        {
+            m_datasetType = FNDT_NIFTI_DWI;
+            return loadNiftiDWI( fn );
+        }
     }
 
     return false;
@@ -564,6 +573,102 @@ bool Loader::loadNiftiDWI( QString fileName )
             m_dataset.push_back( datasetB0 );
 
             nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
+            m_dataset.push_back( dataset );
+
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+bool Loader::loadNiftiDWI_FNAV2( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    int blockSize = dimX * dimY * dimZ;
+    int dim = m_header->dim[4] - 1;
+
+    qDebug() << "num data:" << dim;
+
+    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_FLOAT32:
+        {
+            QVector<float> b0data( blockSize );
+            qDebug()<< "block size: " << blockSize;
+            float* inputData;
+
+            inputData = reinterpret_cast<float*>( filedata->data );
+
+            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+
+            qDebug() << "extract data ";
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                b0data[i] = inputData[i];
+            }
+
+            dataVector->reserve( blockSize );
+
+            for( int z = 0; z < dimZ; ++z )
+            {
+                for( int y = 0; y < dimY; ++y )
+                {
+                    for( int x = 0; x < dimX; ++x )
+                    {
+                        ColumnVector v( dim );
+                        for ( int j = 1; j < dim + 1; ++j )
+                        {
+                            v( j )= inputData[ j * blockSize + x + y * dimX + z * dimX * dimY ];
+                        }
+                        dataVector->push_back( v );
+                    }
+                }
+            }
+
+
+            qDebug() << "extract data done";
+            nifti_image_free( filedata );
+
+            QString b0fn = m_fileName.path();
+            if ( m_fileName.path().endsWith(".nii.gz") )
+            {
+                b0fn.replace( ".nii.gz", "_b0.nii.gz" );
+            }
+            if ( m_fileName.path().endsWith(".nii") )
+            {
+                b0fn.replace( ".nii.gz", "_b0.nii" );
+            }
+
+            DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
+            m_dataset.push_back( datasetB0 );
+
+            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+
+            QVector<float> bvals2;
+            QVector<QVector3D> bvecs;
+
+            float* extData = reinterpret_cast<float*>(m_header->ext_list[0].edata);
+            for ( int i = 0; i < dim; ++i )
+            {
+                bvals2.push_back( extData[i] );
+            }
+
+            for ( int i = 0; i < dim; ++i )
+            {
+                QVector3D v( extData[dim + 3*i], extData[dim + 3*i+1], extData[dim + 3*i+2] );
+                bvecs.push_back( v );
+            }
+
             DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
             m_dataset.push_back( dataset );
 

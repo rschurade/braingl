@@ -170,6 +170,68 @@ bool Writer::save()
             nifti_image_free( out );
         }
         break;
+        case FNDT_NIFTI_DWI:
+        {
+            QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
+            QVector<float> b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
+
+            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
+
+            int dim = data->at( 0 ).Nrows() + 1;
+            nifti_image* out = createHeader( dim );
+            QVector<float>outData( img->nx * img->ny * img->nz * dim );
+
+            QVector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
+            QVector<QVector3D>bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
+            QVector<float>bvalOut;
+            for ( int i = 0; i < bvals.size(); ++i )
+            {
+                bvalOut.push_back( bvals[i] );
+            }
+            for ( int i = 0; i < bvecs.size(); ++i )
+            {
+                bvalOut.push_back( bvecs[i].x() );
+                bvalOut.push_back( bvecs[i].y() );
+                bvalOut.push_back( bvecs[i].z() );
+            }
+            char* extData = reinterpret_cast<char*>( &bvalOut[0] );
+            nifti_add_extension( out, extData, bvalOut.size() * 4, 0 );
+
+            int blockSize = img->nx * img->ny * img->nz;
+            setDescrip( out, "fnav2_dwi" );
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                outData[i] = b0data[i];
+            }
+
+            for ( int z = 0; z < img->nz; ++z )
+            {
+                for ( int y = 0; y < img->ny; ++y )
+                {
+                    for ( int x = 0; x < img->nx; ++x )
+                    {
+                        ColumnVector vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        for ( int i = 1; i < dim; ++i )
+                        {
+                            outData[ ( x + y * img->nx + z * img->nx * img->ny + i * blockSize ) ] = vData( i );
+                        }
+                    }
+                }
+            }
+            out->data = &(outData[0]);
+
+            if( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            {
+                qDebug() << "NIfTI filename Problem" << endl;
+            }
+
+            nifti_image_write( out );
+
+            out->data = NULL;
+            nifti_image_free( out );
+        }
+        break;
     }
     return true;
 }
