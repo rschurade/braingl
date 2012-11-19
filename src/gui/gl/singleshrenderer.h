@@ -17,7 +17,6 @@
 
 class ArcBall;
 class DatasetDWI;
-class TriangleMesh;
 
 class SingleSHRenderer : public ObjectRenderer
 {
@@ -66,11 +65,7 @@ private:
 
     ArcBall* m_arcBall;
 
-
-
     DatasetDWI* m_dataset;
-
-    QVector<TriangleMesh*> m_spheres;
 };
 
 #endif /* SINGLESHRENDERER_H_ */

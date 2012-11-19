@@ -19,7 +19,6 @@
 #include "../../data/qball.h"
 
 #include "../../data/mesh/tesselation.h"
-#include "../../data/mesh/trianglemesh.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -44,45 +43,6 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
     m_minMaxScaling( false ),
     m_order( 4 )
 {
-    for ( int lod = 0; lod < 6; ++lod )
-    {
-        const Matrix* vertices = tess::vertices( lod );
-        const int* faces = tess::faces( lod );
-        int numVerts = tess::n_vertices( lod );
-        int numTris = tess::n_faces( lod );
-
-        TriangleMesh* mesh = new TriangleMesh( numVerts, numTris );
-
-        for ( int i = 0; i < numVerts; ++i )
-        {
-            mesh->addVertex( i, QVector3D( (*vertices)( i+1, 1 ), (*vertices)( i+1, 2 ), (*vertices)( i+1, 3 ) ) );
-        }
-        for ( int i = 0; i < numTris; ++i )
-        {
-            Triangle tri = {faces[i*3], faces[i*3+1], faces[i*3+2]};
-            mesh->addTriangle( i, tri );
-        }
-        m_spheres.push_back( mesh );
-
-        /*
-        if ( lod < 3 )
-        {
-            QVector<QSet<int> > neighs = m_spheres[lod]->getNeighbors();
-
-            for ( int i = 0; i < neighs.size(); ++i )
-            {
-                QSet<int>n = neighs[i];
-                QString s( "" );
-                foreach (const int &value, n)
-                {
-                    s += QString::number( value );
-                    s += " ";
-                }
-                qDebug() << s;
-            }
-        }
-        */
-    }
 }
 
 SHRenderer::~SHRenderer()
@@ -160,32 +120,24 @@ void SHRenderer::initGeometry()
     float y = (float)yi * m_dy + m_dy / 2.;
     float z = (float)zi * m_dz + m_dz / 2.;
 
-
-    TriangleMesh* mesh = m_spheres[lod];
-    QVector< QVector3D > normals = mesh->getVertNormals();
-
     // TODO
-    const Matrix* v1 = tess::vertices( lod );
-    Matrix base = ( QBall::sh_base( (*v1), m_order ) );
+    const Matrix* vertices = tess::vertices( lod );
+    const int* faces = tess::faces( lod );
+    int numVerts = tess::n_vertices( lod );
+    int numTris = tess::n_faces( lod );
+
+    Matrix base = ( QBall::sh_base( (*vertices), m_order ) );
 
     std::vector<float>verts;
     std::vector<int>indexes;
 
-    int numVerts = mesh->getVertSize();
     int currentBall = 0;
 
     if ( m_orient == 1 )
     {
-        //qDebug() << "QBall: start init geometry";
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-        QVector< QSet<int> > neighbors = mesh->getNeighbors();
-
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
-        verts.reserve( mesh->getVertSize() * glyphs * 10 );
-        indexes.reserve( triangles.size() * glyphs * 3 );
-
-        Matrix m = base * m_data->at( 0 );
+        verts.reserve( numVerts * glyphs * 10 );
+        indexes.reserve( numTris * glyphs * 3 );
 
         for( int yy = lowerY; yy < upperY; ++yy )
         {
@@ -213,24 +165,24 @@ void SHRenderer::initGeometry()
                     float locX = xx * m_dx + m_dx / 2;
                     float locY = yy * m_dy + m_dy / 2;
 
-                    for ( int i = 0; i < vertices.size(); ++i )
+                    for ( int i = 0; i < numVerts; ++i )
                     {
-                        verts.push_back( vertices[i].x() );
-                        verts.push_back( vertices[i].y() );
-                        verts.push_back( vertices[i].z() );
-                        verts.push_back( normals[i].x() );
-                        verts.push_back( normals[i].y() );
-                        verts.push_back( normals[i].z() );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
                         verts.push_back( locX );
                         verts.push_back( locY );
                         verts.push_back( z );
                         verts.push_back( r(i + 1) );
                     }
-                    for ( int i = 0; i < triangles.size(); ++i )
+                    for ( int i = 0; i < numTris; ++i )
                     {
-                        indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v2 + numVerts * currentBall );
+                        indexes.push_back( faces[i*3] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
                     }
                     ++currentBall;
                 }
@@ -239,11 +191,9 @@ void SHRenderer::initGeometry()
     }
     else if ( m_orient == 2 )
     {
-        //qDebug() << "QBall: start init geometry";
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-
-        Matrix m = base * m_data->at( 0 );
+        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
+        verts.reserve( numVerts * glyphs * 10 );
+        indexes.reserve( numTris * glyphs * 3 );
 
         for( int zz = lowerZ; zz < upperZ; ++zz )
         {
@@ -270,24 +220,24 @@ void SHRenderer::initGeometry()
                     float locX = xx * m_dx + m_dx / 2;
                     float locZ = zz * m_dz + m_dz / 2;
 
-                    for ( int i = 0; i < vertices.size(); ++i )
+                    for ( int i = 0; i < numVerts; ++i )
                     {
-                        verts.push_back( vertices[i].x() );
-                        verts.push_back( vertices[i].y() );
-                        verts.push_back( vertices[i].z() );
-                        verts.push_back( normals[i].x() );
-                        verts.push_back( normals[i].y() );
-                        verts.push_back( normals[i].z() );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
                         verts.push_back( locX );
                         verts.push_back( y );
                         verts.push_back( locZ );
                         verts.push_back( r(i + 1) );
                     }
-                    for ( int i = 0; i < triangles.size(); ++i )
+                    for ( int i = 0; i < numTris; ++i )
                     {
-                        indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v2 + numVerts * currentBall );
+                        indexes.push_back( faces[i*3] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
                     }
                     ++currentBall;
                 }
@@ -296,11 +246,9 @@ void SHRenderer::initGeometry()
     }
     else if ( m_orient == 3 )
     {
-        //qDebug() << "QBall: start init geometry";
-        QVector< QVector3D > vertices = mesh->getVertices();
-        QVector< Triangle > triangles = mesh->getTriangles();
-
-        Matrix m = base * m_data->at( 0 );
+        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
+        verts.reserve( numVerts * glyphs * 10 );
+        indexes.reserve( numTris * glyphs * 3 );
 
         for( int yy = lowerY; yy < upperY; ++yy )
         {
@@ -327,24 +275,24 @@ void SHRenderer::initGeometry()
                     float locY = yy * m_dy + m_dy / 2;
                     float locZ = zz * m_dz + m_dz / 2;
 
-                    for ( int i = 0; i < vertices.size(); ++i )
+                    for ( int i = 0; i < numVerts; ++i )
                     {
-                        verts.push_back( vertices[i].x() );
-                        verts.push_back( vertices[i].y() );
-                        verts.push_back( vertices[i].z() );
-                        verts.push_back( normals[i].x() );
-                        verts.push_back( normals[i].y() );
-                        verts.push_back( normals[i].z() );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
+                        verts.push_back( (*vertices)( i+1, 1 ) );
+                        verts.push_back( (*vertices)( i+1, 2 ) );
+                        verts.push_back( (*vertices)( i+1, 3 ) );
                         verts.push_back( x );
                         verts.push_back( locY );
                         verts.push_back( locZ );
                         verts.push_back( r(i + 1) );
                     }
-                    for ( int i = 0; i < triangles.size(); ++i )
+                    for ( int i = 0; i < numTris; ++i )
                     {
-                        indexes.push_back( triangles[i].v0 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v1 + numVerts * currentBall );
-                        indexes.push_back( triangles[i].v2 + numVerts * currentBall );
+                        indexes.push_back( faces[i*3] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
                     }
                     ++currentBall;
                 }
@@ -356,15 +304,13 @@ void SHRenderer::initGeometry()
         return;
     }
 
-    m_tris1 = mesh->getTriSize() * currentBall * 3;
+    m_tris1 = numTris * currentBall * 3;
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-
-    //qDebug() << "QBall: end init geometry";
 }
 
 void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )

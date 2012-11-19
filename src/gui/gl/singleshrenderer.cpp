@@ -19,7 +19,6 @@
 #include "../../data/qball.h"
 
 #include "../../data/mesh/tesselation.h"
-#include "../../data/mesh/trianglemesh.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -42,27 +41,6 @@ SingleSHRenderer::SingleSHRenderer( QString name ) :
     m_yb( 0 ),
     m_zb( 0 )
 {
-    for ( int lod = 0; lod < 6; ++lod )
-    {
-        const Matrix* vertices = tess::vertices( lod );
-        const int* faces = tess::faces( lod );
-        int numVerts = tess::n_vertices( lod );
-        int numTris = tess::n_faces( lod );
-
-        TriangleMesh* mesh = new TriangleMesh( numVerts, numTris );
-
-        for ( int i = 0; i < numVerts; ++i )
-        {
-            mesh->addVertex( i, QVector3D( (*vertices)( i+1, 1 ), (*vertices)( i+1, 2 ), (*vertices)( i+1, 3 ) ) );
-        }
-        for ( int i = 0; i < numTris; ++i )
-        {
-            Triangle tri = {faces[i*3], faces[i*3+1], faces[i*3+2]};
-            mesh->addTriangle( i, tri );
-        }
-        m_spheres.push_back( mesh );
-    }
-
     m_arcBall = new ArcBall( 50, 50 );
 }
 
@@ -166,14 +144,15 @@ void SingleSHRenderer::initGeometry()
     //int zbi = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
-    //float scaling = m_dataset->getProperty( "scaling" ).toFloat();
 
-    TriangleMesh* mesh = m_spheres[lod];
+    const Matrix* vertices = tess::vertices( lod );
+     const int* faces = tess::faces( lod );
+     int numVerts = tess::n_vertices( lod );
+     int numTris = tess::n_faces( lod );
 
     int order = m_dataset->getProperty( "order" ).toInt();
 
-    const Matrix* v1 = tess::vertices( lod );
-    Matrix base = ( QBall::sh_base( (*v1), order ) );
+    Matrix base = ( QBall::sh_base( (*vertices), order ) );
 
     QString s = createSettingsString( xi, yi, zi, 0, 0, 0, 0, 0, 0, 0, false, 0);
     if ( s == m_previousSettings )
@@ -182,20 +161,14 @@ void SingleSHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    QVector< QVector3D > vertices = mesh->getVertices();
-    QVector< Triangle > triangles = mesh->getTriangles();
-
     QVector<ColumnVector>* data = m_dataset->getData();
-
-
-    QVector< QVector3D > normals = mesh->getVertNormals();
 
     Matrix m = base * data->at( 0 );
 
     std::vector<float>verts;
-    verts.reserve( mesh->getVertSize() * 10 );
+    verts.reserve( numVerts * 10 );
     std::vector<int>indexes;
-    indexes.reserve( mesh->getTriSize() * 3 );
+    indexes.reserve( numTris * 3 );
 
     if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
     {
@@ -210,45 +183,33 @@ void SingleSHRenderer::initGeometry()
             min = qMin( min, (float)r(i+1) );
         }
 
-        bool minmaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
-        if ( minmaxScaling )
+        for ( int i = 0; i < r.Nrows(); ++i )
         {
-            max = max - min;
-            for ( int i = 0; i < r.Nrows(); ++i )
-            {
-                r(i+1) = ( r(i+1) - min ) / max;
-            }
-        }
-        else
-        {
-            for ( int i = 0; i < r.Nrows(); ++i )
-            {
-                r(i+1) = r(i+1) / max;
-            }
+            r(i+1) = r(i+1) / max * 0.8;
         }
 
-        for ( int i = 0; i < vertices.size(); ++i )
+        for ( int i = 0; i < numVerts; ++i )
         {
-            verts.push_back( vertices[i].x() );
-            verts.push_back( vertices[i].y() );
-            verts.push_back( vertices[i].z() );
-            verts.push_back( normals[i].x() );
-            verts.push_back( normals[i].y() );
-            verts.push_back( normals[i].z() );
+            verts.push_back( (*vertices)( i+1, 1 ) );
+            verts.push_back( (*vertices)( i+1, 2 ) );
+            verts.push_back( (*vertices)( i+1, 3 ) );
+            verts.push_back( (*vertices)( i+1, 1 ) );
+            verts.push_back( (*vertices)( i+1, 2 ) );
+            verts.push_back( (*vertices)( i+1, 3 ) );
             verts.push_back( 1.0 );
             verts.push_back( 1.0 );
             verts.push_back( 1.0 );
             verts.push_back( r(i + 1) );
         }
-        for ( int i = 0; i < triangles.size(); ++i )
+        for ( int i = 0; i < numTris; ++i )
         {
-            indexes.push_back( triangles[i].v0 );
-            indexes.push_back( triangles[i].v1 );
-            indexes.push_back( triangles[i].v2 );
+            indexes.push_back( faces[i*3] );
+            indexes.push_back( faces[i*3+1] );
+            indexes.push_back( faces[i*3+2] );
         }
     }
 
-    m_tris1 = triangles.size() * 3;
+    m_tris1 = numTris * 3;
     //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -294,6 +255,10 @@ void SingleSHRenderer::draw()
         GLFunctions::getShader( "qball" )->bind();
         // Set modelview-projection matrix
         GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
+        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
+
+        bool minMaxScaling = m_dataset->getProperty( "minmaxScaling" ).toBool();
+        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", minMaxScaling );
 
         initGeometry();
 
