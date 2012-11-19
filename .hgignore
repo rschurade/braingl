@@ -6,5 +6,4 @@ syntax: blob
 syntax: regexp
 ^build$
 syntax: regexp
-^src/tmp$
-
+^tmp$

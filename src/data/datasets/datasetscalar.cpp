@@ -133,7 +133,6 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
 {
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
     float data = m_data[ x + y * nx + z * nx * ny ];
     return QString::number( data );
 }

@@ -193,7 +193,7 @@ void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemM
 {
     program->bind();
 
-    int offset = 0;
+    long int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int vertexLocation = program->attributeLocation( "a_position" );
@@ -220,7 +220,7 @@ void GLFunctions::setTensorShaderVarsEV( QGLShaderProgram* program, QAbstractIte
 {
     program->bind();
 
-    int offset = 0;
+    long int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int vertexLocation = program->attributeLocation( "a_position" );
@@ -247,7 +247,7 @@ void GLFunctions::setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel
 {
     program->bind();
 
-    int offset = 0;
+    long int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int vertexLocation = program->attributeLocation( "a_position" );
@@ -269,7 +269,7 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
 {
     program->bind();
     // Offset for position
-    int offset = 0;
+    long int offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
@@ -393,7 +393,7 @@ void GLFunctions::setQBallShaderVars( QGLShaderProgram* program, QAbstractItemMo
 {
     program->bind();
 
-    int offset = 0;
+    long int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
