@@ -172,7 +172,7 @@ void NavRendererAxial::draw()
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-    int offset = 0;
+    long int offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
     GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
