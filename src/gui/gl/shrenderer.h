@@ -12,8 +12,6 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class TriangleMesh;
-
 class SHRenderer : public ObjectRenderer
 {
 public:
@@ -38,8 +36,6 @@ private:
     GLuint *vboIds;
 
     QVector<ColumnVector>* m_data;
-
-    QVector<TriangleMesh*> m_spheres;
 
     int m_nx;
     int m_ny;
