@@ -18,9 +18,9 @@
 
 class Dataset;
 
-class DataStore : public QAbstractItemModel
+class DataStore: public QAbstractItemModel
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
     DataStore();
@@ -32,35 +32,34 @@ public:
     void addDataset( Dataset* dataset );
 
     // reimplemented from QAbstractItemModel
-	int rowCount( const QModelIndex &parent = QModelIndex() ) const;
-	int columnCount( const QModelIndex &parent = QModelIndex() ) const;
-	QVariant data( const QModelIndex &index, int role ) const;
-	QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-	QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
-	QModelIndex parent ( const QModelIndex & index ) const;
+    int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+    int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+    QVariant data( const QModelIndex &index, int role ) const;
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+    QModelIndex index( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
+    QModelIndex parent( const QModelIndex & index ) const;
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::EditRole );
 
 public slots:
-	void moveItemUp( int row );
-	void moveItemDown( int row );
-	void deleteItem( int row );
+    void moveItemUp( int row );
+    void moveItemDown( int row );
+    void deleteItem( int row );
 
-	void setGlobal( QString key, QVariant data );
+    void setGlobal( QString key, QVariant data );
 
 private:
-	QVariant getDatasetInfo( const QModelIndex &index ) const;
-	QVariant getGlobal( const QModelIndex &index ) const;
-	QVariant getDatasetEditables( const QModelIndex &index ) const;
+    QVariant getDatasetInfo( const QModelIndex &index ) const;
+    QVariant getGlobal( const QModelIndex &index ) const;
+    QVariant getDatasetEditables( const QModelIndex &index ) const;
 
-
-	QString getNiftiDataType( const int type ) const;
+    QString getNiftiDataType( const int type ) const;
 
     void updateGlobals();
-	void updateSliceGlobals();
+    void updateSliceGlobals();
 
-    QList< Dataset* >m_datasetList;
+    QList<Dataset*> m_datasetList;
 
-    QHash< QString, QVariant >m_globals;
+    QHash<QString, QVariant> m_globals;
 
 signals:
 };

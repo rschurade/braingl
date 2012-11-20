@@ -23,22 +23,22 @@
 
 DataStore::DataStore()
 {
-    m_globals[ "axial" ] = 0;
-    m_globals[ "coronal" ] = 0;
-    m_globals[ "sagittal" ] = 0;
-    m_globals[ "max_axial" ] = 1;
-    m_globals[ "max_coronal" ] = 1;
-    m_globals[ "max_sagittal" ] = 1;
-    m_globals[ "min_axial" ] = 0;
-    m_globals[ "min_coronal" ] = 0;
-    m_globals[ "min_sagittal" ] = 0;
-    m_globals[ "slice_dx" ] = 1.0;
-    m_globals[ "slice_dy" ] = 1.0;
-    m_globals[ "slice_dz" ] = 1.0;
-    m_globals[ "lastPath" ] = "";
-    m_globals[ "showAxial" ] = true;
-    m_globals[ "showCoronal" ] = true;
-    m_globals[ "showSagittal" ] = true;
+    m_globals["axial"] = 0;
+    m_globals["coronal"] = 0;
+    m_globals["sagittal"] = 0;
+    m_globals["max_axial"] = 1;
+    m_globals["max_coronal"] = 1;
+    m_globals["max_sagittal"] = 1;
+    m_globals["min_axial"] = 0;
+    m_globals["min_coronal"] = 0;
+    m_globals["min_sagittal"] = 0;
+    m_globals["slice_dx"] = 1.0;
+    m_globals["slice_dy"] = 1.0;
+    m_globals["slice_dz"] = 1.0;
+    m_globals["lastPath"] = "";
+    m_globals["showAxial"] = true;
+    m_globals["showCoronal"] = true;
+    m_globals["showSagittal"] = true;
 
 }
 
@@ -60,14 +60,14 @@ void DataStore::addDataset( Dataset* dataset )
         int dt = ds->getProperty( "type" ).toInt();
         if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_QBALL || dt == FNDT_NIFTI_DWI )
         {
-            m_globals[ "axial" ] = ds->getProperty( "nz" ).toInt() / 2;
-            m_globals[ "coronal" ] = ds->getProperty( "ny" ).toInt() / 2;
-            m_globals[ "sagittal" ] = ds->getProperty( "nx" ).toInt() / 2;
+            m_globals["axial"] = ds->getProperty( "nz" ).toInt() / 2;
+            m_globals["coronal"] = ds->getProperty( "ny" ).toInt() / 2;
+            m_globals["sagittal"] = ds->getProperty( "nx" ).toInt() / 2;
         }
     }
     updateGlobals();
 
-    emit ( dataChanged( index( m_datasetList.size()- 1, 0 ), index( m_datasetList.size()- 1, 0 ) ) );
+    emit ( dataChanged( index( m_datasetList.size() - 1, 0 ), index( m_datasetList.size() - 1, 0 ) ) );
 }
 
 bool DataStore::load( QDir fileName )
@@ -112,7 +112,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     if ( index.row() < 0 || index.row() > m_datasetList.size() - 1 )
         return QVariant();
 
-    switch( role )
+    switch ( role )
     {
         case Qt::DisplayRole:
             return getDatasetInfo( index );
@@ -132,11 +132,11 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
 QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
-    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+    FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
     if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_QBALL )
     {
-        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+        DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
         switch ( index.column() )
         {
@@ -193,11 +193,11 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 {
 
-    FN_DATASET_TYPE type = static_cast< FN_DATASET_TYPE >( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+    FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI  || type == FNDT_NIFTI_QBALL )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_QBALL )
     {
-        DatasetNifti* ds = dynamic_cast< DatasetNifti* >( m_datasetList.at( index.row() ) );
+        DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
         switch ( index.column() )
         {
@@ -225,8 +225,8 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
                 return ds->getProperty( "interpolation" ).toBool();
                 break;
             case FNDSE_ALPHA:
-               return ds->getProperty( "alpha" ).toFloat();
-               break;
+                return ds->getProperty( "alpha" ).toFloat();
+                break;
             case FNDSE_ACTIVE:
                 return ds->getProperty( "active" ).toBool();
                 break;
@@ -308,61 +308,61 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
     switch ( index.column() )
     {
         case FNGLOBAL_SAGITTAL:
-            return m_globals[ "sagittal" ];
+            return m_globals["sagittal"];
             break;
         case FNGLOBAL_CORONAL:
-            return m_globals[ "coronal" ];
+            return m_globals["coronal"];
             break;
         case FNGLOBAL_AXIAL:
-            return m_globals[ "axial" ];
+            return m_globals["axial"];
             break;
         case FNGLOBAL_MAX_SAGITTAL:
-            return m_globals[ "max_sagittal" ];
+            return m_globals["max_sagittal"];
             break;
         case FNGLOBAL_MAX_CORONAL:
-            return m_globals[ "max_coronal" ];
+            return m_globals["max_coronal"];
             break;
         case FNGLOBAL_MAX_AXIAL:
-            return m_globals[ "max_axial" ];
+            return m_globals["max_axial"];
             break;
         case FNGLOBAL_SLICE_DX:
-            return m_globals[ "slice_dx" ];
+            return m_globals["slice_dx"];
             break;
         case FNGLOBAL_SLICE_DY:
-            return m_globals[ "slice_dy" ];
+            return m_globals["slice_dy"];
             break;
         case FNGLOBAL_SLICE_DZ:
-            return m_globals[ "slice_dz" ];
+            return m_globals["slice_dz"];
             break;
         case FNGLOBAL_LAST_PATH:
-            return m_globals[ "lastPath" ];
+            return m_globals["lastPath"];
             break;
         case FNGLOBAL_SHOW_SAGITTAL:
-            return m_globals[ "showSagittal" ];
+            return m_globals["showSagittal"];
             break;
         case FNGLOBAL_SHOW_CORONAL:
-            return m_globals[ "showCoronal" ];
+            return m_globals["showCoronal"];
             break;
         case FNGLOBAL_SHOW_AXIAL:
-            return m_globals[ "showAxial" ];
+            return m_globals["showAxial"];
             break;
         case FNGLOBAL_VIEW:
-            return m_globals[ "view" ];
+            return m_globals["view"];
             break;
         case FNGLOBAL_MOVEX:
-            return m_globals[ "moveX" ];
+            return m_globals["moveX"];
             break;
         case FNGLOBAL_MOVEY:
-            return m_globals[ "moveY" ];
+            return m_globals["moveY"];
             break;
         case FNGLOBAL_BBX:
-            return m_globals[ "bbX" ];
+            return m_globals["bbX"];
             break;
         case FNGLOBAL_BBY:
-            return m_globals[ "bbY" ];
+            return m_globals["bbY"];
             break;
         case FNGLOBAL_ZOOM:
-            return m_globals[ "zoom" ];
+            return m_globals["zoom"];
             break;
     }
     return QVariant();
@@ -382,97 +382,97 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         {
             switch ( index.column() )
             {
-            case 0:
-                m_datasetList.at( index.row() )->setProperty( "name", value.toString() );
-                break;
+                case 0:
+                    m_datasetList.at( index.row() )->setProperty( "name", value.toString() );
+                    break;
 
-            case FNDSE_LOWER_THRESHOLD:
-                m_datasetList.at( index.row() )->setProperty( "lowerThreshold", value.toFloat() );
-                break;
-            case FNDSE_UPPER_THRESHOLD:
-                m_datasetList.at( index.row() )->setProperty( "upperThreshold", value.toFloat() );
-                break;
-            case FNDSE_COLORMAP:
-                m_datasetList.at( index.row() )->setProperty( "colormap", value.toInt() );
-                break;
-            case FNDSE_INTERPOLATION:
-                m_datasetList.at( index.row() )->setProperty( "interpolation", value.toBool() );
-                break;
-            case FNDSE_ALPHA:
-                m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
-                break;
-            case FNDSE_ACTIVE:
-                m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
-                break;
-            case FNDSE_ORDER:
-                m_datasetList.at( index.row() )->setProperty( "order", value.toInt() );
-                break;
-            case FNDSE_LOD:
-                m_datasetList.at( index.row() )->setProperty( "lod", value.toInt() );
-                break;
-            case FNDSE_SCALING:
-                m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
-                break;
-            case FNDSE_FA_THRESHOLD:
-                m_datasetList.at( index.row() )->setProperty( "faThreshold", value.toFloat() );
-                break;
-            case FNDSE_EV_THRESHOLD:
-                m_datasetList.at( index.row() )->setProperty( "evThreshold", value.toFloat() );
-                break;
-            case FNDSE_GAMMA:
-                m_datasetList.at( index.row() )->setProperty( "gamma", value.toFloat() );
-                break;
-            case FNDSE_OFFSET:
-                m_datasetList.at( index.row() )->setProperty( "offset", value.toFloat() );
-                break;
-            case FNDSE_RENDER_SLICE:
-                m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
-                break;
-            case FNDSE_RENDER_LOWER_X:
-                m_datasetList.at( index.row() )->setProperty( "renderLowerX", value.toInt() );
-                break;
-            case FNDSE_RENDER_UPPER_X:
-                m_datasetList.at( index.row() )->setProperty( "renderUpperX", value.toInt() );
-                break;
-            case FNDSE_RENDER_LOWER_Y:
-                m_datasetList.at( index.row() )->setProperty( "renderLowerY", value.toInt() );
-                break;
-            case FNDSE_RENDER_UPPER_Y:
-                m_datasetList.at( index.row() )->setProperty( "renderUpperY", value.toInt() );
-                break;
-            case FNDSE_RENDER_LOWER_Z:
-                m_datasetList.at( index.row() )->setProperty( "renderLowerZ", value.toInt() );
-                break;
-            case FNDSE_RENDER_UPPER_Z:
-                m_datasetList.at( index.row() )->setProperty( "renderUpperZ", value.toInt() );
-                break;
-            case FNDSE_MINMAX_SCALING:
-                m_datasetList.at( index.row() )->setProperty( "minmaxScaling", value.toBool() );
-                break;
-            case FNDSE_BVALUE:
-                m_datasetList.at( index.row() )->setProperty( "bValue", value.toInt() );
-                break;
-            case FNDSE_CALC_LOWER_X:
-                m_datasetList.at( index.row() )->setProperty( "calcLowerX", value.toInt() );
-                break;
-            case FNDSE_CALC_UPPER_X:
-                m_datasetList.at( index.row() )->setProperty( "calcUpperX", value.toInt() );
-                break;
-            case FNDSE_CALC_LOWER_Y:
-                m_datasetList.at( index.row() )->setProperty( "calcLowerY", value.toInt() );
-                break;
-            case FNDSE_CALC_UPPER_Y:
-                m_datasetList.at( index.row() )->setProperty( "calcUpperY", value.toInt() );
-                break;
-            case FNDSE_CALC_LOWER_Z:
-                m_datasetList.at( index.row() )->setProperty( "calcLowerZ", value.toInt() );
-                break;
-            case FNDSE_CALC_UPPER_Z:
-                m_datasetList.at( index.row() )->setProperty( "calcUpperZ", value.toInt() );
-                break;
-            case FNDSE_TENSOR_RENDERMODE:
-                m_datasetList.at( index.row() )->setProperty( "tensorRenderMode", value.toInt() );
-                break;
+                case FNDSE_LOWER_THRESHOLD:
+                    m_datasetList.at( index.row() )->setProperty( "lowerThreshold", value.toFloat() );
+                    break;
+                case FNDSE_UPPER_THRESHOLD:
+                    m_datasetList.at( index.row() )->setProperty( "upperThreshold", value.toFloat() );
+                    break;
+                case FNDSE_COLORMAP:
+                    m_datasetList.at( index.row() )->setProperty( "colormap", value.toInt() );
+                    break;
+                case FNDSE_INTERPOLATION:
+                    m_datasetList.at( index.row() )->setProperty( "interpolation", value.toBool() );
+                    break;
+                case FNDSE_ALPHA:
+                    m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
+                    break;
+                case FNDSE_ACTIVE:
+                    m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
+                    break;
+                case FNDSE_ORDER:
+                    m_datasetList.at( index.row() )->setProperty( "order", value.toInt() );
+                    break;
+                case FNDSE_LOD:
+                    m_datasetList.at( index.row() )->setProperty( "lod", value.toInt() );
+                    break;
+                case FNDSE_SCALING:
+                    m_datasetList.at( index.row() )->setProperty( "scaling", value.toFloat() );
+                    break;
+                case FNDSE_FA_THRESHOLD:
+                    m_datasetList.at( index.row() )->setProperty( "faThreshold", value.toFloat() );
+                    break;
+                case FNDSE_EV_THRESHOLD:
+                    m_datasetList.at( index.row() )->setProperty( "evThreshold", value.toFloat() );
+                    break;
+                case FNDSE_GAMMA:
+                    m_datasetList.at( index.row() )->setProperty( "gamma", value.toFloat() );
+                    break;
+                case FNDSE_OFFSET:
+                    m_datasetList.at( index.row() )->setProperty( "offset", value.toFloat() );
+                    break;
+                case FNDSE_RENDER_SLICE:
+                    m_datasetList.at( index.row() )->setProperty( "renderSlice", value.toInt() );
+                    break;
+                case FNDSE_RENDER_LOWER_X:
+                    m_datasetList.at( index.row() )->setProperty( "renderLowerX", value.toInt() );
+                    break;
+                case FNDSE_RENDER_UPPER_X:
+                    m_datasetList.at( index.row() )->setProperty( "renderUpperX", value.toInt() );
+                    break;
+                case FNDSE_RENDER_LOWER_Y:
+                    m_datasetList.at( index.row() )->setProperty( "renderLowerY", value.toInt() );
+                    break;
+                case FNDSE_RENDER_UPPER_Y:
+                    m_datasetList.at( index.row() )->setProperty( "renderUpperY", value.toInt() );
+                    break;
+                case FNDSE_RENDER_LOWER_Z:
+                    m_datasetList.at( index.row() )->setProperty( "renderLowerZ", value.toInt() );
+                    break;
+                case FNDSE_RENDER_UPPER_Z:
+                    m_datasetList.at( index.row() )->setProperty( "renderUpperZ", value.toInt() );
+                    break;
+                case FNDSE_MINMAX_SCALING:
+                    m_datasetList.at( index.row() )->setProperty( "minmaxScaling", value.toBool() );
+                    break;
+                case FNDSE_BVALUE:
+                    m_datasetList.at( index.row() )->setProperty( "bValue", value.toInt() );
+                    break;
+                case FNDSE_CALC_LOWER_X:
+                    m_datasetList.at( index.row() )->setProperty( "calcLowerX", value.toInt() );
+                    break;
+                case FNDSE_CALC_UPPER_X:
+                    m_datasetList.at( index.row() )->setProperty( "calcUpperX", value.toInt() );
+                    break;
+                case FNDSE_CALC_LOWER_Y:
+                    m_datasetList.at( index.row() )->setProperty( "calcLowerY", value.toInt() );
+                    break;
+                case FNDSE_CALC_UPPER_Y:
+                    m_datasetList.at( index.row() )->setProperty( "calcUpperY", value.toInt() );
+                    break;
+                case FNDSE_CALC_LOWER_Z:
+                    m_datasetList.at( index.row() )->setProperty( "calcLowerZ", value.toInt() );
+                    break;
+                case FNDSE_CALC_UPPER_Z:
+                    m_datasetList.at( index.row() )->setProperty( "calcUpperZ", value.toInt() );
+                    break;
+                case FNDSE_TENSOR_RENDERMODE:
+                    m_datasetList.at( index.row() )->setProperty( "tensorRenderMode", value.toInt() );
+                    break;
             }
         }
         emit( dataChanged( index, index ) );
@@ -483,12 +483,12 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     if ( role == Qt::UserRole && index.column() < 100 )
     {
         int algo = index.column();
-        switch( algo )
+        switch ( algo )
         {
             case FNALGO_QBALL4:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 4 ) );
                 }
@@ -497,7 +497,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNALGO_QBALL6:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 6 ) );
                 }
@@ -506,7 +506,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNALGO_QBALL8:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 8 ) );
                 }
@@ -515,7 +515,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNALGO_TENSORFIT:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::tensorFit( dynamic_cast<DatasetDWI*>( ds ) ) );
                 }
@@ -524,7 +524,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNALGO_FA:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::calcFA( dynamic_cast<DatasetDWI*>( ds ) ) );
                 }
@@ -533,7 +533,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             case FNALGO_EV:
             {
                 Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->getProperty("type") == FNDT_NIFTI_DWI )
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
                     addDataset( DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) )[0] );
                     addDataset( DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) )[1] );
@@ -548,73 +548,73 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         switch ( index.column() )
         {
             case FNGLOBAL_SAGITTAL:
-                m_globals[ "sagittal" ] = value.toInt();
+                m_globals["sagittal"] = value.toInt();
                 break;
             case FNGLOBAL_CORONAL:
-                m_globals[ "coronal" ] = value.toInt();
+                m_globals["coronal"] = value.toInt();
                 break;
             case FNGLOBAL_AXIAL:
-                m_globals[ "axial" ] = value.toInt();
+                m_globals["axial"] = value.toInt();
                 break;
             case FNGLOBAL_MAX_SAGITTAL:
-                m_globals[ "max_sagittal" ] = value.toInt();
+                m_globals["max_sagittal"] = value.toInt();
                 break;
             case FNGLOBAL_MAX_CORONAL:
-                m_globals[ "max_coronal" ] = value.toInt();
+                m_globals["max_coronal"] = value.toInt();
                 break;
             case FNGLOBAL_MAX_AXIAL:
-                m_globals[ "max_axial" ] = value.toInt();
+                m_globals["max_axial"] = value.toInt();
                 break;
             case FNGLOBAL_SLICE_DX:
-                m_globals[ "slice_dx" ] = value.toInt();
+                m_globals["slice_dx"] = value.toInt();
                 break;
             case FNGLOBAL_SLICE_DY:
-                m_globals[ "slice_dy" ] = value.toInt();
+                m_globals["slice_dy"] = value.toInt();
                 break;
             case FNGLOBAL_SLICE_DZ:
-                m_globals[ "slice_dz" ] = value.toInt();
+                m_globals["slice_dz"] = value.toInt();
                 break;
             case FNGLOBAL_CORONAL_AXIAL:
-                m_globals[ "coronal" ] = value.toPoint().x();
-                m_globals[ "axial" ] = value.toPoint().y();
+                m_globals["coronal"] = value.toPoint().x();
+                m_globals["axial"] = value.toPoint().y();
                 break;
             case FNGLOBAL_SAGITTAL_AXIAL:
-                m_globals[ "sagittal" ] = value.toPoint().x();
-                m_globals[ "axial" ] = value.toPoint().y();
+                m_globals["sagittal"] = value.toPoint().x();
+                m_globals["axial"] = value.toPoint().y();
                 break;
             case FNGLOBAL_SAGITTAL_CORONAL:
-                m_globals[ "sagittal" ] = value.toPoint().x();
-                m_globals[ "coronal" ] = value.toPoint().y();
+                m_globals["sagittal"] = value.toPoint().x();
+                m_globals["coronal"] = value.toPoint().y();
                 break;
             case FNGLOBAL_LAST_PATH:
-                m_globals[ "lastPath"] = value.toString();
+                m_globals["lastPath"] = value.toString();
                 break;
             case FNGLOBAL_SHOW_SAGITTAL:
-                m_globals[ "showSagittal" ] = value.toBool();
+                m_globals["showSagittal"] = value.toBool();
                 break;
             case FNGLOBAL_SHOW_CORONAL:
-                m_globals[ "showCoronal" ] = value.toBool();
+                m_globals["showCoronal"] = value.toBool();
                 break;
             case FNGLOBAL_SHOW_AXIAL:
-                m_globals[ "showAxial" ] = value.toBool();
+                m_globals["showAxial"] = value.toBool();
                 break;
             case FNGLOBAL_VIEW:
-                m_globals[ "view" ] = value.toInt();
+                m_globals["view"] = value.toInt();
                 break;
             case FNGLOBAL_ZOOM:
-                m_globals[ "zoom" ] = value.toFloat();
+                m_globals["zoom"] = value.toFloat();
                 break;
             case FNGLOBAL_MOVEX:
-                m_globals[ "moveX" ] = value.toFloat();
+                m_globals["moveX"] = value.toFloat();
                 break;
             case FNGLOBAL_MOVEY:
-                m_globals[ "moveY" ] = value.toFloat();
+                m_globals["moveY"] = value.toFloat();
                 break;
             case FNGLOBAL_BBX:
-                m_globals[ "bbX" ] = value.toFloat();
+                m_globals["bbX"] = value.toFloat();
                 break;
             case FNGLOBAL_BBY:
-                m_globals[ "bbY" ] = value.toFloat();
+                m_globals["bbY"] = value.toFloat();
                 break;
 
         }
@@ -626,7 +626,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
 
         return true;
     }
-
 
     return false;
 }
@@ -730,7 +729,7 @@ void DataStore::moveItemUp( int row )
         m_datasetList.swap( row, row - 1 );
         endMoveRows();
         updateGlobals();
-        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
 
@@ -742,7 +741,7 @@ void DataStore::moveItemDown( int row )
         m_datasetList.swap( row, row + 1 );
         endMoveRows();
         updateGlobals();
-        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
 
@@ -760,7 +759,7 @@ void DataStore::deleteItem( int row )
 
         delete toDelete;
         updateGlobals();
-        emit ( dataChanged( index( 0, 0 ), index(0, 0) ) );
+        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
 
@@ -814,12 +813,12 @@ void DataStore::updateSliceGlobals()
         Dataset* ds = m_datasetList.first();
         if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            m_globals[ "max_axial" ] = ds->getProperty( "nz" ).toInt();
-            m_globals[ "max_coronal" ] = ds->getProperty( "ny" ).toInt();
-            m_globals[ "max_sagittal" ] = ds->getProperty( "nx" ).toInt();
-            m_globals[ "slice_dx" ] = ds->getProperty( "dx" ).toFloat();
-            m_globals[ "slice_dy" ] = ds->getProperty( "dy" ).toFloat();
-            m_globals[ "slice_dz" ] = ds->getProperty( "dz" ).toFloat();
+            m_globals["max_axial"] = ds->getProperty( "nz" ).toInt();
+            m_globals["max_coronal"] = ds->getProperty( "ny" ).toInt();
+            m_globals["max_sagittal"] = ds->getProperty( "nx" ).toInt();
+            m_globals["slice_dx"] = ds->getProperty( "dx" ).toFloat();
+            m_globals["slice_dy"] = ds->getProperty( "dy" ).toFloat();
+            m_globals["slice_dz"] = ds->getProperty( "dz" ).toFloat();
 
             emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
         }
@@ -829,6 +828,6 @@ void DataStore::updateSliceGlobals()
 void DataStore::setGlobal( QString key, QVariant data )
 {
     //qDebug() << "set global: " << key << "," << data;
-    m_globals[ key ] = data;
+    m_globals[key] = data;
     emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
 }

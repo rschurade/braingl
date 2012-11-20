@@ -16,7 +16,7 @@
 
 #include "dataset.h"
 
-class DatasetNifti : public Dataset
+class DatasetNifti: public Dataset
 {
 public:
     DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header );

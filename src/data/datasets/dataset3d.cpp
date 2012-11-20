@@ -11,9 +11,7 @@
 #include "dataset3d.h"
 
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ),
-        m_data( data ),
-        m_renderer( 0 )
+        DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -41,16 +39,15 @@ void Dataset3D::examineDataset()
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
+        m_properties["size"] = static_cast<int>( size * sizeof(unsigned char) );
 
         m_properties["min"] = 0;
         m_properties["max"] = 255;
     }
 
-
     if ( type == DT_FLOAT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
+        m_properties["size"] = static_cast<int>( size * sizeof(float) );
 
         m_properties["min"] = 1.0;
         m_properties["max"] = -1.0;
@@ -79,7 +76,6 @@ void Dataset3D::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
@@ -87,7 +83,7 @@ void Dataset3D::createTexture()
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        float* data = new float[nx*ny*nz*3];
+        float* data = new float[nx * ny * nz * 3];
 
         int size = nx * ny * nz * 3;
         for ( int i = 0; i < size; ++i )
@@ -99,14 +95,14 @@ void Dataset3D::createTexture()
 
     if ( type == DT_FLOAT )
     {
-        int blockSize = nx*ny*nz;
-        float* data = new float[blockSize*3];
+        int blockSize = nx * ny * nz;
+        float* data = new float[blockSize * 3];
 
         for ( int i = 0; i < blockSize; ++i )
         {
-            data[i*3] = fabs( m_data[i].x() );
-            data[i*3+1] = fabs( m_data[i].y() );
-            data[i*3+2] = fabs( m_data[i].z() );
+            data[i * 3] = fabs( m_data[i].x() );
+            data[i * 3 + 1] = fabs( m_data[i].y() );
+            data[i * 3 + 2] = fabs( m_data[i].z() );
         }
         glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
     }
@@ -120,13 +116,13 @@ void Dataset3D::flipX()
 
     QVector<QVector3D> newData;
 
-    for( int z = 0; z < zDim; ++z )
+    for ( int z = 0; z < zDim; ++z )
     {
-        for( int y = 0; y < yDim; ++y )
+        for ( int y = 0; y < yDim; ++y )
         {
-            for( int x = xDim -1; x >= 0; --x )
+            for ( int x = xDim - 1; x >= 0; --x )
             {
-                newData.push_back( m_data[ x + y * xDim + z * xDim * yDim ] );
+                newData.push_back( m_data[x + y * xDim + z * xDim * yDim] );
             }
         }
     }
@@ -149,16 +145,13 @@ void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new EVRenderer( &m_data,
-                                     m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                                     m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer = new EVRenderer( &m_data, m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
+                m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
         m_renderer->setModel( datastore );
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties["scaling"].toFloat(),
-                                   m_properties["renderSlice"].toInt(),
-                                   m_properties["offset"].toFloat() );
+    m_renderer->setRenderParams( m_properties["scaling"].toFloat(), m_properties["renderSlice"].toInt(), m_properties["offset"].toFloat() );
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
@@ -167,6 +160,6 @@ QString Dataset3D::getValueAsString( int x, int y, int z )
 {
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
-    QVector3D data = m_data[ x + y * nx + z * nx * ny ];
+    QVector3D data = m_data[x + y * nx + z * nx * ny];
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }

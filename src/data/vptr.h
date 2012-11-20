@@ -8,17 +8,17 @@
 #ifndef VPTR_H_
 #define VPTR_H_
 
-template <class T> class VPtr
+template<class T> class VPtr
 {
 public:
-    static T* asPtr(QVariant v)
+    static T* asPtr( QVariant v )
     {
-    return  (T *) v.value<void *>();
+        return (T *) v.value<void *>();
     }
 
-    static QVariant asQVariant(T* ptr)
+    static QVariant asQVariant( T* ptr )
     {
-    return qVariantFromValue((void *) ptr);
+        return qVariantFromValue( (void *) ptr );
     }
 };
 

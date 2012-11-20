@@ -26,14 +26,18 @@ public:
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );
 
-
 private:
     DWIAlgos();
     virtual ~DWIAlgos();
 
-    static double pow2( double v ) {return v*v;};
-    static double pow3( double v ) {return v*v*v;};
-
+    static double pow2( double v )
+    {
+        return v * v;
+    };
+    static double pow3( double v )
+    {
+        return v * v * v;
+    };
 };
 
 #endif /* DWIALGOS_H_ */

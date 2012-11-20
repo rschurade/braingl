@@ -14,10 +14,10 @@
 
 class TriangleMesh;
 
-class DatasetMesh : public Dataset
+class DatasetMesh: public Dataset
 {
 public:
-    DatasetMesh( TriangleMesh* mesh, QString filename = QString("new mesh") );
+    DatasetMesh( TriangleMesh* mesh, QString filename = QString( "new mesh" ) );
     virtual ~DatasetMesh();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );

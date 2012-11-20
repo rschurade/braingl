@@ -15,7 +15,7 @@
 
 class EVRenderer;
 
-class Dataset3D : public DatasetNifti
+class Dataset3D: public DatasetNifti
 {
 public:
     Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );

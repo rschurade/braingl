@@ -18,7 +18,7 @@
 class TensorRenderer;
 class TensorRendererEV;
 
-class DatasetTensor : public DatasetNifti
+class DatasetTensor: public DatasetNifti
 {
 public:
     DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header );

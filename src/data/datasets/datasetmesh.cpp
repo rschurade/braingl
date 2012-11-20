@@ -10,8 +10,7 @@
 #include "datasetmesh.h"
 
 DatasetMesh::DatasetMesh( TriangleMesh* mesh, QString fileName ) :
-    Dataset( fileName, FNDT_MESH_BINARY ),
-    m_mesh( mesh )
+        Dataset( fileName, FNDT_MESH_BINARY ), m_mesh( mesh )
 {
 }
 
