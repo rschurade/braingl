@@ -35,7 +35,7 @@ public:
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
 protected:
-    QHash< QString, QVariant >m_properties;
+    QHash<QString, QVariant> m_properties;
 };
 
 #endif /* DATASET_H_ */

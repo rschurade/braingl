@@ -40,9 +40,7 @@ private:
     bool loadNiftiDWI( QString fileName );
     bool loadNiftiDWI_FNAV2( QString fileName );
     QVector<float> loadBvals( QString fileName );
-    QVector<QVector3D>loadBvecs( QString fileName, QVector<float> bvals );
-
-
+    QVector<QVector3D> loadBvecs( QString fileName, QVector<float> bvals );
 
     bool loadMesh();
     bool loadMeshBinary();

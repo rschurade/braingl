@@ -8,12 +8,8 @@
 
 #include "datasetdwi.h"
 
-DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<float>bvals, QVector<QVector3D>bvecs, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_DWI, header ),
-        m_data( data ),
-        m_b0Data( b0Data ),
-        m_bvals( bvals ),
-        m_bvecs( bvecs )
+DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -64,34 +60,32 @@ void DatasetDWI::examineDataset()
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( unsigned char ) );
+        m_properties["size"] = static_cast<int>( size * sizeof(unsigned char) );
 
         m_properties["min"] = 0;
         m_properties["max"] = 255;
     }
 
-
     if ( type == DT_SIGNED_SHORT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
+        m_properties["size"] = static_cast<int>( size * sizeof(float) );
 
         float max = -32767;
         float min = 32768;
 
         for ( int i = 0; i < m_b0Data.size(); ++i )
         {
-            min = qMin( min, m_b0Data[ i ] );
-            max = qMax( max, m_b0Data[ i ] );
+            min = qMin( min, m_b0Data[i] );
+            max = qMax( max, m_b0Data[i] );
         }
         m_properties["min"] = min;
         m_properties["max"] = max;
 
     }
 
-
     if ( type == DT_FLOAT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof( float ) );
+        m_properties["size"] = static_cast<int>( size * sizeof(float) );
 
         m_properties["min"] = -1.0;
         m_properties["max"] = 1.0;
@@ -99,15 +93,14 @@ void DatasetDWI::examineDataset()
     m_properties["lowerThreshold"] = m_properties["min"].toFloat();
     m_properties["upperThreshold"] = m_properties["max"].toFloat();
 
-
     // deprecated, flipping for dwi datasets happens in the loader
     /*
-    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
-    {
-        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
-        flipX();
-    }
-    */
+     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+     {
+     qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+     flipX();
+     }
+     */
 }
 
 void DatasetDWI::createTexture()
@@ -124,14 +117,13 @@ void DatasetDWI::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
     int nz = getProperty( "nz" ).toInt();
 
-    float* tmpData = new float[nx*ny*nz];
+    float* tmpData = new float[nx * ny * nz];
     float max = m_properties["max"].toFloat();
-    for ( int i = 0; i < nx*ny*nz; ++i )
+    for ( int i = 0; i < nx * ny * nz; ++i )
     {
         tmpData[i] = m_b0Data[i] / max;
     }

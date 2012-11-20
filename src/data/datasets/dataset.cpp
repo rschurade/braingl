@@ -12,7 +12,7 @@ Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type )
 {
     m_properties["fileName"] = fileName.path();
     m_properties["type"] = type;
-    m_properties["name"] = fileName.path().split("/").last();
+    m_properties["name"] = fileName.path().split( "/" ).last();
     m_properties["size"] = -1;
     m_properties["createdBy"] = FNALGO_NONE;
 

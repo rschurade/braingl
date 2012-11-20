@@ -10,7 +10,7 @@
 
 #include "datasetnifti.h"
 
-class DatasetScalar : public DatasetNifti
+class DatasetScalar: public DatasetNifti
 {
 public:
     DatasetScalar( QString filename, QVector<float> data, nifti_image* header );
@@ -22,7 +22,7 @@ public:
     QString getValueAsString( int x, int y, int z );
 
 private:
-    QVector<float>m_data;
+    QVector<float> m_data;
 
     void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
     void createTexture();

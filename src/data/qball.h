@@ -12,8 +12,6 @@
 #include <QtCore/QVector>
 #include "datasets/datasetdwi.h"
 
-
-
 class QBall
 {
 public:
@@ -29,8 +27,14 @@ private:
     static void regularize_sqball( const double par_1, const double par_2, ColumnVector& data );
     static double sh_base_function( int order, int degree, double theta, double phi );
 
-    static double pow2( double v ) {return v*v;};
-    static double pow3( double v ) {return v*v*v;};
+    static double pow2( double v )
+    {
+        return v * v;
+    };
+    static double pow3( double v )
+    {
+        return v * v * v;
+    };
 };
 
 #endif /* QBALL_H_ */

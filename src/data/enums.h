@@ -1,7 +1,6 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
-
 enum FN_DATASET_TYPE
 {
     FNDT_UNKNOWN,

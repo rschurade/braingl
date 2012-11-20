@@ -10,11 +10,7 @@
 #include "datasetnifti.h"
 
 DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header ) :
-    Dataset( filename, type ),
-    m_header( header ),
-    m_textureGLuint( 0 ),
-    m_qform( 3, 3 ),
-    m_sform( 3, 3 )
+        Dataset( filename, type ), m_header( header ), m_textureGLuint( 0 ), m_qform( 3, 3 ), m_sform( 3, 3 )
 {
     parseNiftiHeader();
 }
@@ -32,7 +28,7 @@ GLuint DatasetNifti::getTextureGLuint()
     return m_textureGLuint;
 }
 
-void DatasetNifti::parseNiftiHeader( )
+void DatasetNifti::parseNiftiHeader()
 {
     setProperty( "ndim", m_header->ndim );
     setProperty( "nx", m_header->nx );
@@ -96,7 +92,7 @@ void DatasetNifti::parseNiftiHeader( )
     {
         for ( int j = 0; j < 3; ++j )
         {
-            m_qform( i+1, j+1 ) =m_header->qto_xyz.m[i][j];
+            m_qform( i + 1, j + 1 ) = m_header->qto_xyz.m[i][j];
         }
     }
 
@@ -104,7 +100,7 @@ void DatasetNifti::parseNiftiHeader( )
     {
         for ( int j = 0; j < 3; ++j )
         {
-            m_sform( i+1, j+1 ) =m_header->sto_xyz.m[i][j];
+            m_sform( i + 1, j + 1 ) = m_header->sto_xyz.m[i][j];
         }
     }
 

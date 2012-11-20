@@ -17,7 +17,7 @@
 
 class SHRenderer;
 
-class DatasetQBall : public DatasetNifti
+class DatasetQBall: public DatasetNifti
 {
 public:
     DatasetQBall( QString filename, QVector<ColumnVector>* data, nifti_image* header );
