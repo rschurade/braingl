@@ -197,25 +197,29 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     // Compiling vertex shader
     if ( !program->addShaderFromSourceCode( QGLShader::Vertex, GLFunctions::m_shaderSources[name + "_vs"] ) )
     {
-        exit( false );
+        qCritical() << "Error while compiling vertex shader: " << name << "!";
+        //exit( false );
     }
 
     // Compiling fragment shader
     if ( !program->addShaderFromSourceCode( QGLShader::Fragment, GLFunctions::m_shaderSources[name + "_fs"] ) )
     {
-        exit( false );
+        qCritical() << "Error while compiling fragment shader: " << name << "!";
+        //exit( false );
     }
 
     // Linking shader pipeline
     if ( !program->link() )
     {
-        exit( false );
+        qCritical() << "Error while linking shader: " << name << "!";
+        //exit( false );
     }
 
     // Binding shader pipeline for use
     if ( !program->bind() )
     {
-        exit( false );
+        qCritical() << "Error while binding shader: " << name << "!";
+        //exit( false );
     }
 
     // Restore system locale
