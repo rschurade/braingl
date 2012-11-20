@@ -59,6 +59,7 @@ int main( int argc, char *argv[] )
     #ifdef QT_DEBUG_OUTPUT
     out = new QTextStream( stdout );
     qInstallMsgHandler( logOutput );
+    qDebug() << "Debug version";
     #else
     for ( int i = 1; i < args.size(); ++i )
     {
@@ -70,13 +71,13 @@ int main( int argc, char *argv[] )
     }
     #endif
 
+    MainWindow mainWin( dataStore );
+    mainWin.show();
+
     for ( int i = 1; i < args.size(); ++i )
     {
         dataStore->load( QDir( args.at( i ) ) );
     }
-
-    MainWindow mainWin( dataStore );
-    mainWin.show();
 
     return app.exec();
 }

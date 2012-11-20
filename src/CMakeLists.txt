@@ -46,7 +46,13 @@ SET(QtIcon_RCCS resources.qrc)
 
 IF( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
     ADD_DEFINITIONS( -DQT_DEBUG_OUTPUT )
+    ADD_DEFINITIONS( -D__DEBUG__ )
 ENDIF()
+
+IF( ${CMAKE_BUILD_TYPE} STREQUAL "Release" )
+    ADD_DEFINITIONS( -D__RELEASE__ )
+ENDIF()
+
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 #
