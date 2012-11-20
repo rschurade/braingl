@@ -6,7 +6,7 @@
 #include "data/datastore.h"
 #include "gui/mainwindow.h"
 
-#ifndef QT_NO_DEBUG_OUTPUT
+
 
 QTextStream *out = 0;
 
@@ -35,29 +35,13 @@ void logOutput(QtMsgType type, const char *msg)
         abort();
     }
 }
-#endif
+
+void noOutput(QtMsgType type, const char *msg) {}
+
 
 int main( int argc, char *argv[] )
 {
     QApplication app( argc, argv );
-
-
-#ifndef QT_NO_DEBUG_OUTPUT
-//    QString fileName = QCoreApplication::applicationFilePath().replace( ".exe", ".log" );
-//    QFile *log = new QFile( fileName );
-//    if ( log->open( QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text ) )
-//    {
-//        out = new QTextStream( stdout );
-//        qInstallMsgHandler( logOutput );
-//    }
-//    else
-//    {
-//        qDebug() << "Error opening log file '" << fileName << "'. All debug output redirected to console.";
-//    }
-#endif
-    out = new QTextStream( stdout );
-    qInstallMsgHandler( logOutput );
-
 
     QCoreApplication::setOrganizationDomain( "OrgDomain" );
 	QCoreApplication::setOrganizationName( "OrgName" );
@@ -70,6 +54,22 @@ int main( int argc, char *argv[] )
 
     DataStore* dataStore = new DataStore();
 
+    qInstallMsgHandler( noOutput );
+
+    #ifdef QT_DEBUG_OUTPUT
+    out = new QTextStream( stdout );
+    qInstallMsgHandler( logOutput );
+    #else
+    for ( int i = 1; i < args.size(); ++i )
+    {
+        if ( args.at( i ) == "-v" )
+        {
+            out = new QTextStream( stdout );
+            qInstallMsgHandler( logOutput );
+        }
+    }
+    #endif
+
     for ( int i = 1; i < args.size(); ++i )
     {
         dataStore->load( QDir( args.at( i ) ) );
@@ -77,7 +77,6 @@ int main( int argc, char *argv[] )
 
     MainWindow mainWin( dataStore );
     mainWin.show();
-
 
     return app.exec();
 }

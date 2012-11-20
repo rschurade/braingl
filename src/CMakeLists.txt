@@ -44,6 +44,10 @@ SET( QT_LIBS ${QT_QTCORE_LIBRARY}
 # Resources
 SET(QtIcon_RCCS resources.qrc)
 
+IF( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
+    ADD_DEFINITIONS( -DQT_DEBUG_OUTPUT )
+ENDIF()
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 #
 # REQUIRED third party libs
