@@ -44,7 +44,7 @@ private:
     static float dY;
     static float dZ;
 
-    static int nPointsInXDirection;;
+    static int nPointsInXDirection;
     static int nPointsInSlice;
 };
 
