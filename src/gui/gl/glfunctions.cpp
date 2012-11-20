@@ -8,6 +8,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QHash>
+#include <QtCore/QFile>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
@@ -18,6 +19,8 @@
 
 bool GLFunctions::shadersLoaded = false;
 QHash<QString, QGLShaderProgram*> GLFunctions::m_shaders;
+QHash<QString, QString> GLFunctions::m_shaderSources;
+QVector<QString> GLFunctions::m_shaderNames;
 
 GLFunctions::GLFunctions()
 {
@@ -115,17 +118,73 @@ QGLShaderProgram* GLFunctions::getShader( QString name )
     return m_shaders[name];
 }
 
+QVector<QString> GLFunctions::getShaderNames()
+{
+    return m_shaderNames;
+}
+
+QString GLFunctions::getShaderCode( QString name )
+{
+    return m_shaderSources[name];
+}
+
+void GLFunctions::setShaderCode( QString name,  QString source )
+{
+    GLFunctions::m_shaderSources[name] = source;
+    reloadShaders();
+}
+
+void GLFunctions::reloadShaders()
+{
+    for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+    {
+        GLFunctions::m_shaders[GLFunctions::m_shaderNames[i]] = initShader( GLFunctions::m_shaderNames[i] );
+    }
+}
+
 void GLFunctions::loadShaders()
 {
     if ( !GLFunctions::shadersLoaded )
     {
-        GLFunctions::m_shaders["slice"] = initShader( "slice" );
-        GLFunctions::m_shaders["qball"] = initShader( "qball" );
-        GLFunctions::m_shaders["crosshair"] = initShader( "crosshair" );
-        GLFunctions::m_shaders["superquadric"] = initShader( "superquadric" );
-        GLFunctions::m_shaders["tensorev"] = initShader( "tensorev" );
-        GLFunctions::m_shaders["ev"] = initShader( "ev" );
+        GLFunctions::m_shaderNames.push_back( "slice" );
+        GLFunctions::m_shaderNames.push_back( "qball" );
+        GLFunctions::m_shaderNames.push_back( "crosshair" );
+        GLFunctions::m_shaderNames.push_back( "superquadric" );
+        GLFunctions::m_shaderNames.push_back( "tensorev" );
+        GLFunctions::m_shaderNames.push_back( "ev" );
+
+        for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+        {
+            copyShaderToString( GLFunctions::m_shaderNames[i] );
+            GLFunctions::m_shaders[GLFunctions::m_shaderNames[i]] = initShader( GLFunctions::m_shaderNames[i] );
+        }
+
+        GLFunctions::shadersLoaded = true;
     }
+}
+
+void GLFunctions::copyShaderToString( QString name )
+{
+    QFile fileVS( ":/shaders/" + name + ".vs" );
+    fileVS.open(QIODevice::ReadOnly);
+    QTextStream inVS( &fileVS );
+    QString codeVS( "" );
+    while ( !inVS.atEnd() )
+    {
+        codeVS += inVS.readLine();
+        codeVS += "\n";
+    }
+    GLFunctions::m_shaderSources[name + "_vs"] = codeVS;
+    QFile fileFS( ":/shaders/" + name + ".fs" );
+    fileFS.open(QIODevice::ReadOnly);
+    QTextStream inFS( &fileFS );
+    QString codeFS( "" );
+    while ( !inFS.atEnd() )
+    {
+        codeFS += inFS.readLine();
+        codeFS += "\n";
+    }
+    GLFunctions::m_shaderSources[name + "_fs"] = codeFS;
 }
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
@@ -136,13 +195,13 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     setlocale( LC_NUMERIC, "C" );
 
     // Compiling vertex shader
-    if ( !program->addShaderFromSourceFile( QGLShader::Vertex, ":/shaders/" + name + ".vs" ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Vertex, GLFunctions::m_shaderSources[name + "_vs"] ) )
     {
         exit( false );
     }
 
     // Compiling fragment shader
-    if ( !program->addShaderFromSourceFile( QGLShader::Fragment, ":/shaders/" + name + ".fs" ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Fragment, GLFunctions::m_shaderSources[name + "_fs"] ) )
     {
         exit( false );
     }

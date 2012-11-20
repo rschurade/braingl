@@ -8,6 +8,7 @@ class QListView;
 class DatasetListWidget;
 class QTabWidget;
 class QTableView;
+class ShaderEditWidget;
 class QMenu;
 
 class DataStore;
@@ -42,7 +43,7 @@ private slots:
     void slotStandardAxialView();
     void slotStandardCoronalView();
     void slotStandardSagittalView();
-
+    void slotToggleShaderEdit();
 
 private:
     void createActions();
@@ -58,6 +59,8 @@ private:
     DatasetListWidget* m_datasetWidget;
 
     QTabWidget* m_centralTabWidget;
+
+    ShaderEditWidget* m_shaderEditWidget;
 
     QMenu* fileMenu;
     QMenu* editMenu;
@@ -78,6 +81,8 @@ private:
     QAction* showAxialAct;
     QAction* showCoronalAct;
     QAction* showSagittalAct;
+
+    QAction* toggleShaderEditAct;
 
     QAction* addTabCombined;
     QAction* addTabSagittal;

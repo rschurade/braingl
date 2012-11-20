@@ -16,6 +16,7 @@
 #include "widgets/combinednavglwidget.h"
 #include "widgets/toolbar.h"
 #include "widgets/statusbar.h"
+#include "widgets/shadereditwidget.h"
 
 #include "mainwindow.h"
 
@@ -225,6 +226,9 @@ void MainWindow::createActions()
     standardViewSagittalAct->setStatusTip( tr( "Toggle rendering of the sagittal slice." ) );
     connect( standardViewSagittalAct, SIGNAL( triggered() ), this, SLOT( slotStandardSagittalView() ) );
 
+    toggleShaderEditAct = new QAction( QIcon( ":/icons/cat.png" ), tr( "Toggle shader edit" ), this );
+    toggleShaderEditAct->setStatusTip( tr( "Toggle the shader edit widget." ) );
+    connect( toggleShaderEditAct, SIGNAL( triggered() ), this, SLOT( slotToggleShaderEdit() ) );
 }
 
 void MainWindow::createMenus()
@@ -259,7 +263,8 @@ void MainWindow::createToolBars()
     fileToolBar = addToolBar( tr( "File" ) );
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
-    fileToolBar->addAction( printAct );
+    //fileToolBar->addAction( printAct );
+    fileToolBar->addAction( toggleShaderEditAct );
     fileToolBar->setObjectName( "fileToolbar");
 
     editToolBar = addToolBar( tr( "Edit" ) );
@@ -406,4 +411,11 @@ void  MainWindow::slotStandardSagittalView()
     QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
     m_dataStore->setData( mi, FN_SAGITTAL );
     mainGLWidget->setView( FN_SAGITTAL );
+}
+
+void MainWindow::slotToggleShaderEdit()
+{
+    m_shaderEditWidget = new ShaderEditWidget( this );
+    m_centralTabWidget->addTab( m_shaderEditWidget, "shader edit" );
+    m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
 }
