@@ -264,7 +264,9 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
     //fileToolBar->addAction( printAct );
+#ifdef __DEBUG__
     fileToolBar->addAction( toggleShaderEditAct );
+#endif
     fileToolBar->setObjectName( "fileToolbar");
 
     editToolBar = addToolBar( tr( "Edit" ) );
