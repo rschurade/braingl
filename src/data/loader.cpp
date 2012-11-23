@@ -74,7 +74,7 @@ bool Loader::loadNifti()
         return false;
     }
 
-    if ( m_header->dim[4] == 1 )
+    if ( m_header->dim[4] == 1 || m_header->dim[4] == 0 )
     {
         m_datasetType = FNDT_NIFTI_SCALAR;
         return loadNiftiScalar( fn );
