@@ -23,7 +23,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
-#include "datasets/datasetqball.h"
+#include "datasets/datasetsh.h"
 
 #include "qball.h"
 #include "dwialgos.h"
@@ -36,7 +36,7 @@ DWIAlgos::~DWIAlgos()
 {
 }
 
-DatasetQBall* DWIAlgos::qBall( DatasetDWI* ds )
+DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
 {
     qDebug() << "start calculating qBall";
     QVector<QVector3D> bvecs = ds->getBvecs();
@@ -65,12 +65,12 @@ DatasetQBall* DWIAlgos::qBall( DatasetDWI* ds )
         qBallVector->push_back( qBallBase * data->at( i ) );
     }
 
-    DatasetQBall* out = new DatasetQBall( "Q-Ball", qBallVector, ds->getHeader() );
+    DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
     out->setProperty( "fileName", "QBall" );
     out->setProperty( "name", "QBall" );
     out->setProperty( "createdBy", FNALGO_QBALL );
     out->setProperty( "lod", 2 );
-    out->setProperty( "order", 0 );
+    out->setProperty( "order", order );
     out->setProperty( "renderSlice", 1 );
     out->setProperty( "scaling", 1.0 );
     out->setProperty( "nt", qBallVector->at( 0 ).Nrows() );
@@ -81,11 +81,11 @@ DatasetQBall* DWIAlgos::qBall( DatasetDWI* ds )
     return out;
 }
 
-DatasetQBall* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
+DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
 {
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
     qDebug() << "create dataset";
-    DatasetQBall* out = new DatasetQBall( "Q-Ball", qBallVector, ds->getHeader() );
+    DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
     out->setProperty( "fileName", "Q-Ball" );
 
     QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->getProperty( "name" ).toString() );
@@ -396,4 +396,9 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
     l.push_back( out2 );
 
     return l;
+}
+
+QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
+{
+    //calc_bingham( sh, depth, neighbourhood, n_peaks, bingham );
 }

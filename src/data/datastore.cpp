@@ -11,7 +11,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
-#include "datasets/datasetqball.h"
+#include "datasets/datasetsh.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
@@ -58,7 +58,7 @@ void DataStore::addDataset( Dataset* dataset )
     {
         Dataset* ds = m_datasetList.first();
         int dt = ds->getProperty( "type" ).toInt();
-        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_QBALL || dt == FNDT_NIFTI_DWI )
+        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_SH || dt == FNDT_NIFTI_DWI )
         {
             m_globals["axial"] = ds->getProperty( "nz" ).toInt() / 2;
             m_globals["coronal"] = ds->getProperty( "ny" ).toInt() / 2;
@@ -134,7 +134,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_QBALL )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH )
     {
         DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
@@ -195,7 +195,7 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_QBALL )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH )
     {
         DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
@@ -490,6 +490,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
+                    //addDataset( DWIAlgos::qBall( dynamic_cast<DatasetDWI*>( ds ) ) );
                     addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 4 ) );
                 }
                 break;
@@ -535,8 +536,19 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
-                    addDataset( DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) )[0] );
-                    addDataset( DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) )[1] );
+                    QList<Dataset*> ev = DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) );
+                    addDataset( ev[0] );
+                    addDataset( ev[1] );
+                }
+                break;
+            }
+            case FNALGO_BINGHAM:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_SH )
+                {
+                    QList<Dataset*> bings = DWIAlgos::fitBingham( dynamic_cast<DatasetSH*>( ds ) );
+                    //addDataset( bings[0] );
                 }
                 break;
             }

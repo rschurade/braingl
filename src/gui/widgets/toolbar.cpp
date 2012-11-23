@@ -53,31 +53,35 @@ void ToolBar::createActions()
     m_vectorAction1->setStatusTip( tr( "Vector Action 1" ) );
     connect( m_vectorAction1, SIGNAL( triggered() ), this, SLOT( slotVector1() ) );
 
-    m_multiAction1 = new QAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this );
-    m_multiAction1->setStatusTip( tr( "QBall 4th order" ) );
-    connect( m_multiAction1, SIGNAL( triggered() ), this, SLOT( slotMulti1() ) );
+    m_qball4Act = new QAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this );
+    m_qball4Act->setStatusTip( tr( "QBall 4th order" ) );
+    connect( m_qball4Act, SIGNAL( triggered() ), this, SLOT( slotQBall4() ) );
 
-    m_multiAction1_2 = new QAction( QIcon( ":/icons/qball6.png" ), tr( "QBall 6th order" ), this );
-    m_multiAction1_2->setStatusTip( tr( "QBall 6th order" ) );
-    connect( m_multiAction1_2, SIGNAL( triggered() ), this, SLOT( slotMulti1_2() ) );
+    m_qball6Act = new QAction( QIcon( ":/icons/qball6.png" ), tr( "QBall 6th order" ), this );
+    m_qball6Act->setStatusTip( tr( "QBall 6th order" ) );
+    connect( m_qball6Act, SIGNAL( triggered() ), this, SLOT( slotQBall6() ) );
 
-    m_multiAction1_3 = new QAction( QIcon( ":/icons/qball8.png" ), tr( "QBall 8th order" ), this );
-    m_multiAction1_3->setStatusTip( tr( "QBall 8th order" ) );
-    connect( m_multiAction1_3, SIGNAL( triggered() ), this, SLOT( slotMulti1_3() ) );
+    m_qball8Act = new QAction( QIcon( ":/icons/qball8.png" ), tr( "QBall 8th order" ), this );
+    m_qball8Act->setStatusTip( tr( "QBall 8th order" ) );
+    connect( m_qball8Act, SIGNAL( triggered() ), this, SLOT( slotQBall8() ) );
 
 
 
-    m_multiAction2 = new QAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this );
-    m_multiAction2->setStatusTip( tr( "tensor fit" ) );
-    connect( m_multiAction2, SIGNAL( triggered() ), this, SLOT( slotMulti2() ) );
+    m_tensorAct = new QAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this );
+    m_tensorAct->setStatusTip( tr( "tensor fit" ) );
+    connect( m_tensorAct, SIGNAL( triggered() ), this, SLOT( slotTensor() ) );
 
-    m_multiAction3 = new QAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this );
-    m_multiAction3->setStatusTip( tr( "calc FA" ) );
-    connect( m_multiAction3, SIGNAL( triggered() ), this, SLOT( slotMulti3() ) );
+    m_faAct = new QAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this );
+    m_faAct->setStatusTip( tr( "calc FA" ) );
+    connect( m_faAct, SIGNAL( triggered() ), this, SLOT( slotFA() ) );
 
-    m_multiAction4 = new QAction( QIcon( ":/icons/eigenvector.png" ), tr( "Calc Eigen Vector" ), this );
-    m_multiAction4->setStatusTip( tr( "calc Eigen Vector" ) );
-    connect( m_multiAction4, SIGNAL( triggered() ), this, SLOT( slotMulti4() ) );
+    m_evAct = new QAction( QIcon( ":/icons/eigenvector.png" ), tr( "Calc Eigen Vector" ), this );
+    m_evAct->setStatusTip( tr( "calc Eigen Vector" ) );
+    connect( m_evAct, SIGNAL( triggered() ), this, SLOT( slotEV() ) );
+
+    m_binghamAction = new QAction( QIcon( ":/icons/tmpx.png" ), tr( "Fit Bingham" ), this );
+    m_binghamAction->setStatusTip( tr( "fit bingham distribution" ) );
+    connect( m_binghamAction, SIGNAL( triggered() ), this, SLOT( slotBingham() ) );
 
     m_meshAction1 = new QAction( QIcon( ":/icons/tmpm.png" ), tr( "Mesh 1" ), this );
     m_meshAction1->setStatusTip( tr( "Mesh Action 1" ) );
@@ -98,37 +102,41 @@ void ToolBar::slotVector1()
     qDebug() << "vector button pressed";
 }
 
-void ToolBar::slotMulti1()
+void ToolBar::slotQBall4()
 {
     m_toolBarView->activateAlgo( FNALGO_QBALL4 );
 }
 
-void ToolBar::slotMulti1_2()
+void ToolBar::slotQBall6()
 {
     m_toolBarView->activateAlgo( FNALGO_QBALL6 );
 }
 
-void ToolBar::slotMulti1_3()
+void ToolBar::slotQBall8()
 {
     m_toolBarView->activateAlgo( FNALGO_QBALL8 );
 }
 
 
-void ToolBar::slotMulti2()
+void ToolBar::slotTensor()
 {
     m_toolBarView->activateAlgo( FNALGO_TENSORFIT );
 }
 
-void ToolBar::slotMulti3()
+void ToolBar::slotFA()
 {
     m_toolBarView->activateAlgo( FNALGO_FA );
 }
 
-void ToolBar::slotMulti4()
+void ToolBar::slotEV()
 {
     m_toolBarView->activateAlgo( FNALGO_EV );
 }
 
+void ToolBar::slotBingham()
+{
+    m_toolBarView->activateAlgo( FNALGO_BINGHAM );
+}
 
 
 void ToolBar::slotMesh1()
@@ -148,22 +156,31 @@ void ToolBar::slotSelectionChanged( int type )
     {
         case FNDT_NIFTI_SCALAR:
         {
-            this->addAction( m_scalarAction1 );
+            //this->addAction( m_scalarAction1 );
             break;
         }
         case FNDT_NIFTI_VECTOR:
         {
-            this->addAction( m_vectorAction1 );
+            //this->addAction( m_vectorAction1 );
+            break;
+        }
+        case FNDT_NIFTI_TENSOR:
+        {
+            break;
+        }
+        case FNDT_NIFTI_SH:
+        {
+            this->addAction( m_binghamAction );
             break;
         }
         case FNDT_NIFTI_DWI:
         {
-            this->addAction( m_multiAction1 );
-            this->addAction( m_multiAction1_2 );
-            this->addAction( m_multiAction1_3 );
-            this->addAction( m_multiAction2 );
-            this->addAction( m_multiAction3 );
-            this->addAction( m_multiAction4 );
+            this->addAction( m_qball4Act );
+            this->addAction( m_qball6Act );
+            this->addAction( m_qball8Act );
+            this->addAction( m_tensorAct );
+            this->addAction( m_faAct );
+            this->addAction( m_evAct );
             break;
         }
         default:

@@ -13,7 +13,7 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../data/datasets/datasetqball.h"
+#include "../../data/datasets/datasetsh.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
 #include "../../data/qball.h"
