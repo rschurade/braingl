@@ -14,17 +14,18 @@ class Dataset3D;
 class DatasetDWI;
 class DatasetNifti;
 class DatasetTensor;
-class DatasetQBall;
+class DatasetSH;
 class TriangleMesh;
 
 class DWIAlgos
 {
 public:
-    static DatasetQBall* qBall( DatasetDWI* ds );
-    static DatasetQBall* qBallSharp( DatasetDWI* ds, int order );
+    static DatasetSH* qBall( DatasetDWI* ds );
+    static DatasetSH* qBallSharp( DatasetDWI* ds, int order );
     static DatasetTensor* tensorFit( DatasetDWI* ds );
     static DatasetScalar* calcFA( DatasetDWI* ds );
     static QList<Dataset*> calcEV( DatasetDWI* ds );
+    static QList<Dataset*> fitBingham( DatasetSH* ds );
 
 private:
     DWIAlgos();

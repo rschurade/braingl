@@ -12,7 +12,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
-#include "datasets/datasetqball.h"
+#include "datasets/datasetsh.h"
 
 #include "writer.h"
 
@@ -128,9 +128,9 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_QBALL:
+        case FNDT_NIFTI_SH:
         {
-            QVector<ColumnVector>* data = dynamic_cast<DatasetQBall*>( m_dataset )->getData();
+            QVector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 

@@ -8,10 +8,10 @@
 #include "../datastore.h"
 #include "../../gui/gl/shrenderer.h"
 
-#include "datasetqball.h"
+#include "datasetsh.h"
 
-DatasetQBall::DatasetQBall( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_QBALL, header ), m_data( data ), m_renderer( 0 )
+DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties["active"] = true;
     m_properties["colormap"] = 0;
@@ -24,12 +24,12 @@ DatasetQBall::DatasetQBall( QString filename, QVector<ColumnVector>* data, nifti
     examineDataset();
 }
 
-DatasetQBall::~DatasetQBall()
+DatasetSH::~DatasetSH()
 {
     m_data->clear();
 }
 
-void DatasetQBall::examineDataset()
+void DatasetSH::examineDataset()
 {
     int nx = getProperty( "nx" ).toInt();
     int ny = getProperty( "ny" ).toInt();
@@ -75,16 +75,16 @@ void DatasetQBall::examineDataset()
     m_properties["max"] = max;
 }
 
-void DatasetQBall::createTexture()
+void DatasetSH::createTexture()
 {
 }
 
-QVector<ColumnVector>* DatasetQBall::getData()
+QVector<ColumnVector>* DatasetSH::getData()
 {
     return m_data;
 }
 
-void DatasetQBall::flipX()
+void DatasetSH::flipX()
 {
     int xDim = m_properties["nx"].toInt();
     int yDim = m_properties["ny"].toInt();
@@ -112,7 +112,7 @@ void DatasetQBall::flipX()
     m_data = newData;
 }
 
-void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
+void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
 {
     if ( m_renderer == 0 )
     {
@@ -128,7 +128,7 @@ void DatasetQBall::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataS
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
 
-QString DatasetQBall::getValueAsString( int x, int y, int z )
+QString DatasetSH::getValueAsString( int x, int y, int z )
 {
     return QString( "" );
 }

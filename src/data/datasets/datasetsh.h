@@ -5,8 +5,8 @@
  *      Author: schurade
  */
 
-#ifndef DATASETQBALL_H_
-#define DATASETQBALL_H_
+#ifndef DATASETSH_H_
+#define DATASETSH_H_
 
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
@@ -17,11 +17,11 @@
 
 class SHRenderer;
 
-class DatasetQBall: public DatasetNifti
+class DatasetSH: public DatasetNifti
 {
 public:
-    DatasetQBall( QString filename, QVector<ColumnVector>* data, nifti_image* header );
-    virtual ~DatasetQBall();
+    DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header );
+    virtual ~DatasetSH();
 
     QVector<ColumnVector>* getData();
 
@@ -39,4 +39,4 @@ private:
     SHRenderer* m_renderer;
 };
 
-#endif /* DATASETQBALL_H_ */
+#endif /* DATASETSH_H_ */

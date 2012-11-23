@@ -13,7 +13,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
-#include "datasets/datasetqball.h"
+#include "datasets/datasetsh.h"
 #include "mesh/trianglemesh.h"
 
 #include "loader.h"
@@ -91,7 +91,7 @@ bool Loader::loadNifti()
     }
     else if ( m_header->dim[4] == 15 || m_header->dim[4] == 28 || m_header->dim[4] == 45 )
     {
-        m_datasetType = FNDT_NIFTI_QBALL;
+        m_datasetType = FNDT_NIFTI_SH;
         return loadNiftiQBall( fn );
     }
     else if ( m_header->dim[4] > 3 )
@@ -402,7 +402,7 @@ bool Loader::loadNiftiQBall( QString fileName )
             }
             nifti_image_free( filedata );
 
-            DatasetQBall* out = new DatasetQBall( m_fileName.path(), dataVector, m_header );
+            DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
             //out->setProperty( "name", "QBall" );
             out->setProperty( "createdBy", FNALGO_QBALL );
             out->setProperty( "lod", 2 );
