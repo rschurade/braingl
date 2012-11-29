@@ -20,13 +20,16 @@
 #include "mesh/tesselation.h"
 
 #include "datasets/dataset3d.h"
+#include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 
-#include "qball.h"
+#include "../algos/qball.h"
+#include "../algos/bingham.h"
 #include "dwialgos.h"
+
 
 DWIAlgos::DWIAlgos()
 {
@@ -400,5 +403,39 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
 
 QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
 {
-    //calc_bingham( sh, depth, neighbourhood, n_peaks, bingham );
+    int depth = 3;
+    int neighbourhood = 2;
+    int n_peaks = 3;
+
+    QList<Dataset*> l= Bingham::calc_bingham( ds, depth, neighbourhood, n_peaks );
+    if ( l.size() > 0 )
+    {
+        l[0]->setProperty( "name", "bingham" );
+        l[0]->setProperty( "createdBy", FNALGO_BINGHAM );
+        l[0]->setProperty( "nt", 42 );
+        l[0]->setProperty( "datatype", DT_FLOAT );
+    }
+    if ( l.size() > 1 )
+    {
+        l[1]->setProperty( "name", "bingham tensor 1" );
+        l[1]->setProperty( "createdBy", FNALGO_TENSORFIT );
+        l[1]->setProperty( "nt", 6 );
+        l[1]->setProperty( "datatype", DT_FLOAT );
+    }
+    if ( l.size() > 2 )
+    {
+        l[2]->setProperty( "name", "bingham tensor 2" );
+        l[2]->setProperty( "createdBy", FNALGO_TENSORFIT );
+        l[2]->setProperty( "nt", 6 );
+        l[2]->setProperty( "datatype", DT_FLOAT );
+    }
+    if ( l.size() > 3 )
+    {
+        l[3]->setProperty( "name", "bingham tensor 3" );
+        l[3]->setProperty( "createdBy", FNALGO_TENSORFIT );
+        l[3]->setProperty( "nt", 6 );
+        l[3]->setProperty( "datatype", DT_FLOAT );
+    }
+
+    return l;
 }

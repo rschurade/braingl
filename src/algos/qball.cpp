@@ -8,7 +8,9 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
-#include "../algos/fmath.h"
+#include "../data/datasets/datasetdwi.h"
+
+#include "fmath.h"
 
 #include "qball.h"
 
@@ -33,7 +35,7 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
         throw std::invalid_argument( "Gradients have to be 3D." );
 
     // calculate spherical harmonics base:
-    Matrix SH = sh_base( gradients, maxOrder );
+    Matrix SH = FMath::sh_base( gradients, maxOrder );
 
     // calculate the Laplace-Beltrami and the Funk-Radon transformation:
     ColumnVector LBT( sh_size );
@@ -110,7 +112,7 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
 
     // inverse direction matrix for calculation:
     //const matrixT A( pseudoinverse (sh_base( gradients, order ) ) );
-    Matrix B = sh_base( gradients, order );
+    Matrix B = FMath::sh_base( gradients, order );
     Matrix A = ( B.t() * B ).i() * B.t();
 
     QVector<ColumnVector>* qBallVector = new QVector<ColumnVector>();
@@ -174,66 +176,4 @@ void QBall::regularize_sqball( const double par_1, const double par_2, ColumnVec
             data( i ) = 1.0 - 0.5 * par_2;
         }
     }
-}
-
-Matrix QBall::sh_base( Matrix g, int maxOrder )
-{
-    //qDebug() << "start calculating sh base";
-    // allcoate result matrix
-    unsigned long sh_dirs( ( maxOrder + 2 ) * ( maxOrder + 1 ) / 2 );
-    Matrix out( g.Nrows(), sh_dirs );
-    out = 0.0;
-
-    // for each direction
-    for ( int i = 0; i < g.Nrows(); ++i )
-    {
-        // transform current direction to polar coordinates
-        double theta( acos( g( i + 1, 3 ) ) );
-        double phi( atan2( g( i + 1, 2 ), g( i + 1, 1 ) ) );
-
-        // calculate spherical harmonic base
-        for ( int order = 0, j = 0; order <= maxOrder; order += 2 )
-        {
-            for ( int degree( -order ); degree <= order; ++degree, ++j )
-            {
-                out( i + 1, j + 1 ) = sh_base_function( order, degree, theta, phi );
-            }
-        }
-    }
-    //qDebug() << "finished calculating sh base";
-    return out;
-}
-
-double QBall::sh_base_function( int order, int degree, double theta, double phi )
-{
-    using namespace boost::math;
-#if 0
-    double P = legendre_p<double>( order, abs(degree), cos(theta) );
-
-    if ( degree > 0 )
-    {
-        return P * cos( degree * phi );
-    }
-    else if ( degree < 0 )
-    {
-        return P * sin( -degree * phi );
-    }
-    else
-    {
-        return P;
-    }
-#else
-    if ( degree > 0 )
-    {
-        return spherical_harmonic_r( order, abs( degree ), theta, phi );
-    }
-    else if ( degree < 0 )
-    {
-        return spherical_harmonic_i( order, abs( degree ), theta, phi );
-    }
-    else
-    {
-        return spherical_harmonic_r( order, 0, theta, phi );
-    }
-#endif
 }

@@ -58,7 +58,7 @@ void DataStore::addDataset( Dataset* dataset )
     {
         Dataset* ds = m_datasetList.first();
         int dt = ds->getProperty( "type" ).toInt();
-        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_SH || dt == FNDT_NIFTI_DWI )
+        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_SH || dt == FNDT_NIFTI_DWI || dt == FNDT_NIFTI_BINGHAM )
         {
             m_globals["axial"] = ds->getProperty( "nz" ).toInt() / 2;
             m_globals["coronal"] = ds->getProperty( "ny" ).toInt() / 2;
@@ -134,7 +134,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
     FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH || type == FNDT_NIFTI_BINGHAM )
     {
         DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
@@ -195,7 +195,7 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH )
+    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH || type == FNDT_NIFTI_BINGHAM )
     {
         DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
 
@@ -548,7 +548,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_SH )
                 {
                     QList<Dataset*> bings = DWIAlgos::fitBingham( dynamic_cast<DatasetSH*>( ds ) );
-                    //addDataset( bings[0] );
+                    addDataset( bings[0] );
+                    addDataset( bings[1] );
+                    addDataset( bings[2] );
+                    addDataset( bings[3] );
                 }
                 break;
             }

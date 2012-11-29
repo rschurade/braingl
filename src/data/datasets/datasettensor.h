@@ -22,6 +22,7 @@ class DatasetTensor: public DatasetNifti
 {
 public:
     DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header );
+    DatasetTensor( QString filename, QVector<QVector<float> >* data, nifti_image* header );
     virtual ~DatasetTensor();
 
     QVector<Matrix>* getData();
