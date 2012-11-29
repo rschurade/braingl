@@ -8,15 +8,23 @@
 #ifndef BINGHAM_H_
 #define BINGHAM_H_
 
+#include <QtCore/QList>
+
+#include "../thirdparty/newmat10/newmat.h"
+#include "../thirdparty/newmat10/newmatap.h"
+
+class Dataset;
+class DatasetSH;
+
 class Bingham
 {
 public:
     Bingham();
     virtual ~Bingham();
 
+    static QList<Dataset*> calc_bingham( DatasetSH* sh, const int lod, const int neighbourhood, const int num_max );
+    static QVector<QVector<float> > fit_bingham( const ColumnVector& sh_data, const Matrix& tess, const QVector< QSet< int > >& adj, const Matrix& base, const int neighborhood, const int num_max );
 
-    //static void calc_bingham( const Image& sh, const unsigned long depth, const unsigned long neighbourhood, const unsigned long num_max, Image& bingham );
-    //static std::shared_ptr<Vector> fit_bingham( const Vector& sh_data, const Matrix& tess, const Matrix& adj, const Matrix& base, const unsigned long neighborhood, const unsigned long num_max )
 
 };
 

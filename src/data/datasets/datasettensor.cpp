@@ -30,6 +30,44 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     examineDataset();
 }
 
+DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> >* data, nifti_image* header ) :
+        DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
+{
+    QVector<Matrix>* mData = new QVector<Matrix>();
+    for ( int i = 0; i < data->size(); ++i )
+    {
+        Matrix m( 3, 3 );
+        m( 1, 1 ) = data->at( i )[0];
+        m( 1, 2 ) = data->at( i )[1];
+        m( 1, 3 ) = data->at( i )[2];
+        m( 2, 1 ) = data->at( i )[1];
+        m( 2, 2 ) = data->at( i )[3];
+        m( 2, 3 ) = data->at( i )[4];
+        m( 3, 1 ) = data->at( i )[2];
+        m( 3, 2 ) = data->at( i )[4];
+        m( 3, 3 ) = data->at( i )[5];
+
+        mData->push_back( m );
+    }
+    m_data = mData;
+
+    //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
+    m_properties["active"] = true;
+    m_properties["colormap"] = 0;
+    m_properties["interpolation"] = false;
+    m_properties["alpha"] = 1.0;
+    m_properties["createdBy"] = FNALGO_TENSORFIT;
+    m_properties["faThreshold"] = 0.01;
+    m_properties["evThreshold"] = 10.0;
+    m_properties["gamma"] = 0.1;
+    m_properties["offset"] = 0.0;
+    m_properties["scaling"] = 0.5;
+    m_properties["tensorRenderMode"] = 0;
+
+    examineDataset();
+}
+
+
 DatasetTensor::~DatasetTensor()
 {
     m_data->clear();

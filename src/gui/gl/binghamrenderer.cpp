@@ -1,5 +1,5 @@
 /*
- * shrenderer.cpp
+ * BinghamRenderer.cpp
  *
  *  Created on: 03.07.2012
  *      Author: Ralph
@@ -24,9 +24,9 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include "glfunctions.h"
-#include "shrenderer.h"
+#include "binghamrenderer.h"
 
-SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
+BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris1( 0 ),
     vboIds( new GLuint[ 6 ] ),
@@ -46,16 +46,16 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
 {
 }
 
-SHRenderer::~SHRenderer()
+BinghamRenderer::~BinghamRenderer()
 {
 }
 
-void SHRenderer::init()
+void BinghamRenderer::init()
 {
     glGenBuffers( 6, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void BinghamRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 {
     if ( m_orient == 0 )
     {
@@ -80,16 +80,16 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void SHRenderer::setupTextures()
+void BinghamRenderer::setupTextures()
 {
 }
 
-void SHRenderer::setShaderVars()
+void BinghamRenderer::setShaderVars()
 {
     GLFunctions::setShaderVars( "qball", model() );
 }
 
-void SHRenderer::initGeometry()
+void BinghamRenderer::initGeometry()
 {
     int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
     int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
@@ -144,41 +144,59 @@ void SHRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( m_data->at( xx + yy * m_nx + zi * m_nx * m_ny )(1) ) > 0.0001 ) )
+                int dataPos = xx + yy * m_nx + zi * m_nx * m_ny;
+                if ( ( fabs( m_data->at( dataPos )[0] ) > 0.0001 ) )
                 {
-                    ColumnVector dv = m_data->at( xx + yy * m_nx + zi * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-
-
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max * 0.8;
-                    }
-
+                    qDebug() << "hier ist einer";
                     float locX = xx * m_dx + m_dx / 2;
                     float locY = yy * m_dy + m_dy / 2;
 
-                    for ( int i = 0; i < numVerts; ++i )
+
+                    for( int i = 0; i < numVerts; ++i )
                     {
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( locX );
-                        verts.push_back( locY );
-                        verts.push_back( z );
-                        verts.push_back( r(i + 1) );
+                        ColumnVector cur( 3 );
+                        cur( 1 ) = (*vertices)( i+1, 1 );
+                        cur( 2 ) = (*vertices)( i+1, 2 );
+                        cur( 3 ) = (*vertices)( i+1, 3 );
+
+                        ColumnVector m1( 3 );
+                        m1( 1 ) = m_data->at( dataPos )[3];
+                        m1( 2 ) = m_data->at( dataPos )[4];
+                        m1( 3 ) = m_data->at( dataPos )[5];
+
+                        ColumnVector m2( 3 );
+                        m2( 1 ) = m_data->at( dataPos )[6];
+                        m2( 2 ) = m_data->at( dataPos )[7];
+                        m2( 3 ) = m_data->at( dataPos )[8];
+
+                        double val_1( FMath::iprod( m1, cur ) );
+                        double val_2( FMath::iprod( m2, cur ) );
+
+                        double radius( 0.0 );
+                        double k1 = m_data->at( dataPos )[9];
+                        double k2 = m_data->at( dataPos )[10];
+                        double f0 = m_data->at( dataPos )[11];
+
+                        radius =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+
+                        radius = radius / 4.0;
+
+                        for ( int i = 0; i < numVerts; ++i )
+                        {
+                            verts.push_back( (*vertices)( i+1, 1 ) );
+                            verts.push_back( (*vertices)( i+1, 2 ) );
+                            verts.push_back( (*vertices)( i+1, 3 ) );
+                            verts.push_back( (*vertices)( i+1, 1 ) );
+                            verts.push_back( (*vertices)( i+1, 2 ) );
+                            verts.push_back( (*vertices)( i+1, 3 ) );
+                            verts.push_back( locX );
+                            verts.push_back( locY );
+                            verts.push_back( z );
+                            verts.push_back( radius );
+                        }
+
                     }
+
                     for ( int i = 0; i < numTris; ++i )
                     {
                         indexes.push_back( faces[i*3] + numVerts * currentBall );
@@ -192,6 +210,7 @@ void SHRenderer::initGeometry()
     }
     else if ( m_orient == 2 )
     {
+        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         verts.reserve( numVerts * glyphs * 10 );
         indexes.reserve( numTris * glyphs * 3 );
@@ -200,7 +219,7 @@ void SHRenderer::initGeometry()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( m_data->at( xx + yi * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
+                if ( ( fabs( m_data->at( xx + yi * m_nx + zz * m_nx * m_ny )[0] ) > 0.0001 ) )
                 {
                     ColumnVector dv = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
@@ -244,9 +263,11 @@ void SHRenderer::initGeometry()
                 }
             }
         }
+        */
     }
     else if ( m_orient == 3 )
     {
+        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         verts.reserve( numVerts * glyphs * 10 );
         indexes.reserve( numTris * glyphs * 3 );
@@ -255,7 +276,7 @@ void SHRenderer::initGeometry()
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                if ( ( fabs( m_data->at( xi + yy * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
+                if ( ( fabs( m_data->at( xi + yy * m_nx + zz * m_nx * m_ny )[0] ) > 0.0001 ) )
                 {
                     ColumnVector dv = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
@@ -299,6 +320,7 @@ void SHRenderer::initGeometry()
                 }
             }
         }
+        */
     }
     else
     {
@@ -314,7 +336,7 @@ void SHRenderer::initGeometry()
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 }
 
-void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
+void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
 {
     m_scaling = scaling;
     m_orient = orient;

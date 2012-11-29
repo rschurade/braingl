@@ -16,7 +16,8 @@
 #include "../../data/datasets/datasetdwi.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
-#include "../../data/qball.h"
+#include "../../algos/fmath.h"
+#include "../../algos/qball.h"
 
 #include "../../data/mesh/tesselation.h"
 
@@ -152,7 +153,7 @@ void SingleSHRenderer::initGeometry()
 
     int order = m_dataset->getProperty( "order" ).toInt();
 
-    Matrix base = ( QBall::sh_base( (*vertices), order ) );
+    Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
     QString s = createSettingsString( xi, yi, zi, 0, 0, 0, 0, 0, 0, 0, false, 0);
     if ( s == m_previousSettings )

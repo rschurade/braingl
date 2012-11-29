@@ -8,6 +8,7 @@
 #include <QtCore/QDebug>
 
 #include "datasets/dataset3d.h"
+#include "datasets/datasetbingham.h"
 #include "datasets/datasetnifti.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetscalar.h"
@@ -152,6 +153,47 @@ bool Writer::save()
                         for ( int i = 0; i < dim; ++i )
                         {
                             outData[( x + y * img->nx + z * img->nx * img->ny + i * blockSize )] = vData( i + 1 );
+                        }
+                    }
+                }
+            }
+            out->data = &( outData[0] );
+
+            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            {
+                qDebug() << "NIfTI filename Problem" << endl;
+            }
+
+            nifti_image_write( out );
+
+            out->data = NULL;
+            nifti_image_free( out );
+        }
+            break;
+        case FNDT_NIFTI_BINGHAM:
+        {
+            QVector<QVector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
+
+            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
+
+            int dim = data->at( 0 ).size();
+            nifti_image* out = createHeader( dim );
+            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+
+            int blockSize = img->nx * img->ny * img->nz;
+            setDescrip( out, "fnav2_bingham" );
+
+            for ( int z = 0; z < img->nz; ++z )
+            {
+                for ( int y = 0; y < img->ny; ++y )
+                {
+                    for ( int x = 0; x < img->nx; ++x )
+                    {
+                        QVector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+
+                        for ( int i = 0; i < dim; ++i )
+                        {
+                            outData[( x + y * img->nx + z * img->nx * img->ny + i * blockSize )] = vData[i];
                         }
                     }
                 }
