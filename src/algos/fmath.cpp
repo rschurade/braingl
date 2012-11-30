@@ -9,6 +9,12 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include "../thirdparty/newmat10/newmatap.h"
+#include "../thirdparty/newmat10/newmatio.h"
+#include "../thirdparty/newmat10/newmatrm.h"
+#include "../thirdparty/newmat10/precisio.h"
+
+
 #include "fmath.h"
 
 FMath::FMath() {}
@@ -443,4 +449,22 @@ Matrix FMath::RotationMatrix( const double angle, const ColumnVector& axis )
     R( 3, 3 ) = c + axis( 3 ) * axis( 3 ) * d;
 
     return R;
+}
+
+void FMath::debugColumnVector3( const ColumnVector& v, QString name )
+{
+    if ( v.Nrows() != 3 )
+    {
+        qDebug() << name << "error not 3 elements in vector";
+    }
+    qDebug() << name << v( 1 ) << v( 2 ) << v( 3 );
+}
+
+Matrix FMath::pseudoInverse( const Matrix& A )
+{
+    Matrix U( A.Nrows(), A.Ncols() );
+    DiagonalMatrix D( A.Ncols() );
+    Matrix V( A.Ncols(), A.Ncols() );
+    SVD( A, D, U, V );
+    return ( V * ( D.t() * D ).i() * D.t() * U.t() );
 }

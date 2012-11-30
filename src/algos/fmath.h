@@ -11,6 +11,7 @@
 #include "../thirdparty/newmat10/newmat.h"
 
 #include <QtCore/QVector>
+#include <QtCore/QString>
 
 #ifdef __WINDOWS__
     #define M_PI 3.14159265359
@@ -40,6 +41,10 @@ public:
     static double sh_eval( const ColumnVector& position, const ColumnVector& coeff );
 
     static Matrix RotationMatrix( const double angle, const ColumnVector& axis );
+
+    static void debugColumnVector3( const ColumnVector& v, QString name = QString( "" ) );
+
+    static Matrix pseudoInverse( const Matrix& A );
 
 private:
     FMath();

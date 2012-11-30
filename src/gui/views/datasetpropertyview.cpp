@@ -326,7 +326,7 @@ void DatasetPropertyView::updateWidgetVisibility()
     }
 
     int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
-    if ( created == FNALGO_QBALL )
+    if ( created == FNALGO_QBALL || created == FNALGO_BINGHAM  )
     {
         //m_orderSelect->setHidden( false );
         m_lodSelect->setHidden( false );

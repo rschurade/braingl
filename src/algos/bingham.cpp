@@ -32,7 +32,7 @@ Bingham::~Bingham()
 
 QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int neighbourhood, const int num_max )
 {
-    QList<Dataset*>dsout;
+    QList<Dataset*> dsout;
     QVector<ColumnVector>* data = sh->getData();
     QVector<QVector<float> >* binghamData = new QVector<QVector<float> >;
     QVector<QVector<float> >* tensorData = new QVector<QVector<float> >;
@@ -48,10 +48,10 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at(0).Nrows() + 1 ) ) ) / 2 );
+    const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     qDebug() << "calculated order from sh: " << order;
 
-    QVector< QSet< int > >neighs;
+    QVector<QSet<int> > neighs;
 
     QSet<int> v;
     for ( int i = 0; i < numVerts; ++i )
@@ -61,23 +61,23 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 
     for ( int i = 0; i < numTris; ++i )
     {
-        int v1 = faces[i*3];
-        int v2 = faces[i*3+1];
-        int v3 = faces[i*3+2];
+        int v1 = faces[i * 3];
+        int v2 = faces[i * 3 + 1];
+        int v3 = faces[i * 3 + 2];
 
-        neighs[ v1 ].insert( v2 );
-        neighs[ v1 ].insert( v3 );
+        neighs[v1].insert( v2 );
+        neighs[v1].insert( v3 );
 
-        neighs[ v2 ].insert( v1 );
-        neighs[ v2 ].insert( v3 );
+        neighs[v2].insert( v1 );
+        neighs[v2].insert( v3 );
 
-        neighs[ v3 ].insert( v2 );
-        neighs[ v3 ].insert( v1 );
+        neighs[v3].insert( v2 );
+        neighs[v3].insert( v1 );
     }
 
     for ( int i = 0; i < neighs.size(); ++i )
     {
-        QSet<int>n = neighs[i];
+        QSet<int> n = neighs[i];
         QString s( "" );
         foreach (const int &value, n)
         {
@@ -87,7 +87,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         //qDebug() << s;
     }
 
-    Matrix base = ( FMath::sh_base( (*vertices), order ) );
+    Matrix base = ( FMath::sh_base( ( *vertices ), order ) );
 
     QVector<float> bv( 3 * 14, 0 );
     QVector<float> tv( 6, 0 );
@@ -103,7 +103,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 //    fit_bingham( data->at( data->size() / 2 + 50 ), *vertices, neighs, base, neighbourhood, num_max );
 //    qDebug() << "*** end ***";
 
-    // For all voxels:
+// For all voxels:
     int percent = 1;
     int done = 0;
     omp_set_num_threads( 8 );
@@ -112,7 +112,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     for ( int i = 496203; i < 506991; ++i )
     {
         {
-            QVector<QVector<float> >v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
+            QVector<QVector<float> > v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
             binghamData->replace( i, v[0] );
             tensorData->replace( i, v[1].mid( 0, 6 ) );
             tensorData2->replace( i, v[1].mid( 6, 6 ) );
@@ -122,12 +122,11 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 //                qDebug() << tensorData->at( i );
 //            }
 
-
             ++done;
         }
 
         //if ( done % ( data->size() / 100 ) == 0 )
-        if ( done % ( (506991-496203) / 100 ) == 0 )
+        if ( done % ( ( 506991 - 496203 ) / 100 ) == 0 )
         {
             qDebug() << percent << "% done";
             ++percent;
@@ -145,9 +144,9 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     return dsout;
 }
 
-QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, const Matrix& tess, const QVector< QSet< int > >& adj, const Matrix& base, const int neighborhood, const int num_max )
+QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, const Matrix& tess, const QVector<QSet<int> >& adj, const Matrix& base, const int neighborhood, const int num_max )
 {
-    QVector<QVector<float> >out;
+    QVector<QVector<float> > out;
     unsigned int mod = 14;
 
     // reserve memory:
@@ -165,14 +164,14 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
     // get maxima:
     ColumnVector radius = base * sh_data;
 
-    QVector<float>qfRadius( radius.Nrows() );
-    for ( int i = 0;i < qfRadius.size(); ++i )
+    QVector<float> qfRadius( radius.Nrows() );
+    for ( int i = 0; i < qfRadius.size(); ++i )
     {
-        qfRadius[i] = radius( i +1 );
+        qfRadius[i] = radius( i + 1 );
     }
 
-    QVector<int>qiRadius( radius.Nrows() );
-    for ( int i = 0;i < qiRadius.size(); ++i )
+    QVector<int> qiRadius( radius.Nrows() );
+    for ( int i = 0; i < qiRadius.size(); ++i )
     {
         qiRadius[i] = i;
     }
@@ -180,7 +179,7 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
     QVector<int> maxima;
     for ( int i = 0; i < qfRadius.size(); ++i )
     {
-        QSet<int> n = adj[ i ];
+        QSet<int> n = adj[i];
         float r = qfRadius[i];
         if ( r > 0 )
         {
@@ -213,7 +212,8 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
     // For all maxima:
     for ( int n_max = 0; ( n_max < maxima.size() / 2 ) && ( n_max < num_max ); n_max++ )
     {
-        QSet<int> g = adj[ maxima[2*n_max ] ];
+        // add all maxima and there surrounding points within range of (neighborhood) to the vector gv
+        QSet<int> g = adj[maxima[2 * n_max]];
         for ( int neighborIterations = 0; neighborIterations < neighborhood; ++neighborIterations )
         {
             QSet<int> h( g );
@@ -224,7 +224,7 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
             g.unite( h );
         }
 
-        QSet<int> g2 = adj[ maxima[2*n_max+1 ] ];
+        QSet<int> g2 = adj[maxima[2 * n_max + 1]];
         for ( int neighborIterations = 0; neighborIterations < neighborhood; ++neighborIterations )
         {
             QSet<int> h( g2 );
@@ -235,10 +235,12 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
             g2.unite( h );
         }
         g.unite( g2 );
-//        qDebug() << g;
 
         QVector<int> gv = g.toList().toVector();
+
+        // sort maxima biggest radi first
         Sorts::quickSort( &gv, &qfRadius, 0, gv.size() - 1 );
+
 //        qDebug() << "=================================================";
 //        for ( int i = 0; i < gv.size(); ++i )
 //        {
@@ -246,32 +248,31 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
 //        }
 //        qDebug() << "=================================================";
 
-
         // preprocessing for moment of inertia matrix:
         ColumnVector values( gv.size() );
         QVector<ColumnVector> points;
         ColumnVector maxV( 3 );
 
-        maxV( 1 ) = tess( gv[0]+1, 1 );
-        maxV( 2 ) = tess( gv[0]+1, 2 );
-        maxV( 3 ) = tess( gv[0]+1, 3 );
+        maxV( 1 ) = tess( gv[0] + 1, 1 );
+        maxV( 2 ) = tess( gv[0] + 1, 2 );
+        maxV( 3 ) = tess( gv[0] + 1, 3 );
 
-        double f0 = qfRadius[ gv[0] ];
+        double f0 = qfRadius[gv[0]];
 
         for ( int i = 0, j = 0; i < gv.size(); ++i )
         {
             ColumnVector cur( 3 );
-            cur( 1 ) = tess( gv[i]+1, 1 );
-            cur( 2 ) = tess( gv[i]+1, 2 );
-            cur( 3 ) = tess( gv[i]+1, 3 );
+            cur( 1 ) = tess( gv[i] + 1, 1 );
+            cur( 2 ) = tess( gv[i] + 1, 2 );
+            cur( 3 ) = tess( gv[i] + 1, 3 );
 
-            double temp = qfRadius[ gv[i] ];
+            double temp = qfRadius[gv[i]];
 
             if ( temp > 0.0 && temp <= f0 )
             {
                 if ( FMath::iprod( cur, maxV ) < 0 )
                 {
-                    cur = cur *  -1 ;
+                    cur = cur * -1;
                 }
                 //qDebug() << cur( 1 ) << cur( 2 ) << cur( 3 );
                 points.push_back( cur );
@@ -281,12 +282,11 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
         }
 
         // calculate moment_of_inertia and extract values:
-        //qDebug() << "calculate moment_of_inertia";
         ColumnVector m_inertia( FMath::moment_of_inertia( values, points ) );
 
         for ( int i = 0; i < 6; ++i )
         {
-            tensor[ n_max * 6 + i ] = m_inertia( i + 1 )/ 50;
+            tensor[n_max * 6 + i] = m_inertia( i + 1 ) / 50;
         }
 
         QVector<ColumnVector> vecs;
@@ -333,18 +333,18 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
             for ( int i = 0; i < gv.size(); ++i )
             {
                 ColumnVector cur( 3 );
-                cur( 1 ) = tess( gv[i]+1, 1 );
-                cur( 2 ) = tess( gv[i]+1, 2 );
-                cur( 3 ) = tess( gv[i]+1, 3 );
+                cur( 1 ) = tess( gv[i] + 1, 1 );
+                cur( 2 ) = tess( gv[i] + 1, 2 );
+                cur( 3 ) = tess( gv[i] + 1, 3 );
 
-                double f( radius( gv[i]+1 ) );
+                double f( radius( gv[i] + 1 ) );
                 if ( f0 > f && f > 0.0 )
                 {
-                    A_tmp( i+1, 1 ) = -FMath::iprod( vecs[1], cur ) * FMath::iprod( vecs[1], cur );
-                    A_tmp( i+1, 2 ) = -FMath::iprod( vecs[2], cur ) * FMath::iprod( vecs[2], cur );
-                    b_tmp( i+1 ) = log( f / f0 );
+                    A_tmp( i + 1, 1 ) = -FMath::iprod( vecs[1], cur ) * FMath::iprod( vecs[1], cur );
+                    A_tmp( i + 1, 2 ) = -FMath::iprod( vecs[2], cur ) * FMath::iprod( vecs[2], cur );
+                    b_tmp( i + 1 ) = log( f / f0 );
                     size++;
-                    index( i+1 ) = 1.0;
+                    index( i + 1 ) = 1.0;
                 }
             }
 
@@ -356,11 +356,11 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
                 size = 0;
                 for ( int i = 0; i < gv.size(); ++i )
                 {
-                    if ( index( i+1 ) != 0.0 )
+                    if ( index( i + 1 ) != 0.0 )
                     {
-                        A( size+1, 1 ) = A_tmp( i+1, 1 );
-                        A( size+1, 2 ) = A_tmp( i+1, 2 );
-                        b( size+1 ) = b_tmp( i+1 );
+                        A( size + 1, 1 ) = A_tmp( i + 1, 1 );
+                        A( size + 1, 2 ) = A_tmp( i + 1, 2 );
+                        b( size + 1 ) = b_tmp( i + 1 );
                         size++;
                     }
                 }
@@ -373,12 +373,12 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
 
             if ( size > 2 )
             {
-                Matrix piA = A * A.t(); //pseudoinverse(A);
-
-                ColumnVector k_s( piA * b  );
+                //FMath::debugColumnVector( b, "b" );
+                ColumnVector k_s( FMath::pseudoInverse( A ) * b );
 
                 if ( k_s( 1 ) > 0.0 && k_s( 2 ) > 0.0 )
                 {
+                    //qDebug() << "hallo";
                     // order accordingly:
                     if ( k_s( 1 ) > k_s( 2 ) )
                     {
@@ -391,30 +391,29 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
                     }
 
                     // format output:
-                    result[ n_max * mod + 0 ] = vecs[0]( 1 );
-                    result[ n_max * mod + 1 ] = vecs[0]( 2 );
-                    result[ n_max * mod + 2 ] = vecs[0]( 3 );
+                    result[n_max * mod + 0] = vecs[0]( 1 );
+                    result[n_max * mod + 1] = vecs[0]( 2 );
+                    result[n_max * mod + 2] = vecs[0]( 3 );
 
-                    result[ n_max * mod + 3 ] = vecs[1]( 1 );
-                    result[ n_max * mod + 4 ] = vecs[1]( 2 );
-                    result[ n_max * mod + 5 ] = vecs[1]( 3 );
+                    result[n_max * mod + 3] = vecs[1]( 1 );
+                    result[n_max * mod + 4] = vecs[1]( 2 );
+                    result[n_max * mod + 5] = vecs[1]( 3 );
 
-                    result[ n_max * mod + 6 ] = vecs[2]( 1 );
-                    result[ n_max * mod + 7 ] = vecs[2]( 2 );
-                    result[ n_max * mod + 8 ] = vecs[2]( 3 );
+                    result[n_max * mod + 6] = vecs[2]( 1 );
+                    result[n_max * mod + 7] = vecs[2]( 2 );
+                    result[n_max * mod + 8] = vecs[2]( 3 );
 
-                    result[ n_max * mod + 9 ] = k_s( 1 );
-                    result[ n_max * mod + 10 ] = k_s( 2 );
+                    result[n_max * mod + 9] = k_s( 1 );
+                    result[n_max * mod + 10] = k_s( 2 );
 
-                    result[ n_max * mod + 11 ] = f0;
+                    result[n_max * mod + 11] = f0;
 
-                    result[ n_max * mod + 12 ] = 0.0;    //maxI;
-                    result[ n_max * mod + 13 ] = 0.0;    //angle;
+                    result[n_max * mod + 12] = 0.0;    //maxI;
+                    result[n_max * mod + 13] = 0.0;    //angle;
                 }
             }
         }
     }
-
 
     out.push_back( result );
     out.push_back( tensor );
