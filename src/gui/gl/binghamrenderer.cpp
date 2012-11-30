@@ -115,7 +115,7 @@ void BinghamRenderer::initGeometry()
     m_previousSettings = s;
 
     int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
-    qDebug() << "SH Renderer: using lod " << lod;
+    qDebug() << "Bingham Renderer: using lod " << lod;
 
     float x = (float)xi * m_dx + m_dx / 2.;
     float y = (float)yi * m_dy + m_dy / 2.;
@@ -134,6 +134,8 @@ void BinghamRenderer::initGeometry()
 
     int currentBall = 0;
 
+    qDebug() << lowerX << upperX << lowerY << upperY;
+
     if ( m_orient == 1 )
     {
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
@@ -147,7 +149,6 @@ void BinghamRenderer::initGeometry()
                 int dataPos = xx + yy * m_nx + zi * m_nx * m_ny;
                 if ( ( fabs( m_data->at( dataPos )[0] ) > 0.0001 ) )
                 {
-                    qDebug() << "hier ist einer";
                     float locX = xx * m_dx + m_dx / 2;
                     float locY = yy * m_dy + m_dy / 2;
 
@@ -195,15 +196,14 @@ void BinghamRenderer::initGeometry()
                             verts.push_back( radius );
                         }
 
+                        for ( int i = 0; i < numTris; ++i )
+                        {
+                            indexes.push_back( faces[i*3] + numVerts * currentBall );
+                            indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+                            indexes.push_back( faces[i*3+2] + numVerts * currentBall );
+                        }
+                        ++currentBall;
                     }
-
-                    for ( int i = 0; i < numTris; ++i )
-                    {
-                        indexes.push_back( faces[i*3] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
-                    }
-                    ++currentBall;
                 }
             }
         }
