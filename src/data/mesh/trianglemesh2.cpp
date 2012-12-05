@@ -26,6 +26,7 @@ TriangleMesh2::~TriangleMesh2()
 void TriangleMesh2::finalize()
 {
     calcTriNormals();
+    calcVertNormals();
 }
 
 void TriangleMesh2::addVertex( int id, float x, float y, float z )

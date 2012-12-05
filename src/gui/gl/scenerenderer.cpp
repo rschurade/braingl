@@ -71,6 +71,15 @@ void SceneRenderer::initGL()
     glEnable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     glEnable( GL_MULTISAMPLE );
+
+//    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+//    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+//
+//    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+//    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+//    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+
     static GLfloat lightPosition[ 4 ] =
     { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
