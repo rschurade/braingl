@@ -58,13 +58,13 @@ void main()
     gl_FragColor = blinnPhongIllumination(
         // material properties
         gl_Color.rgb * 0.2,                    // ambient color
-        gl_Color.rgb * 2.0,                    // diffuse color
+        gl_Color.rgb,                    // diffuse color
         gl_Color.rgb,                          // specular color
-        30.0,                                  // shininess
+        1.0,                                  // shininess
 
         // light color properties
-        gl_LightSource[0].diffuse.rgb,         // light color
-        gl_LightSource[0].ambient.rgb,         // ambient light
+        gl_LightSource[0].diffuse.rgb * 0.5,         // light color
+        gl_LightSource[0].ambient.rgb * 0.5,         // ambient light
 
         // directions
         normalize( v_normal ),                 // normal
@@ -72,5 +72,5 @@ void main()
         v_lightDir.xyz );                    // light direction
 
     
-    gl_FragColor = gl_Color;
+    //gl_FragColor = gl_Color;
 }

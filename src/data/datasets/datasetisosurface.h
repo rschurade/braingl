@@ -33,12 +33,12 @@ protected:
     void createTexture() {};
 
 private:
-    TriangleMesh2* generateSurface( float isoValue );
+    void generateSurface();
     int getEdgeID( unsigned int nX, unsigned int nY, unsigned int nZ, unsigned int nEdgeNo );
     unsigned int getVertexID( unsigned int nX, unsigned int nY, unsigned int nZ );
     POINT3DID calculateIntersection( unsigned int nX, unsigned int nY, unsigned int nZ, unsigned int nEdgeNo );
     POINT3DID interpolate( float fX1, float fY1, float fZ1, float fX2, float fY2, float fZ2, float tVal1, float tVal2 );
-    TriangleMesh2* renameVerticesAndTriangles( ID2POINT3DID &id2point3did, TRIANGLEVECTOR &tvector );
+    void renameVerticesAndTriangles();
 
     QVector<float> m_scalarField;
 
@@ -49,6 +49,12 @@ private:
     float m_oldIsoValue;
 
     float m_isoLevel;
+    // List of POINT3Ds which form the isosurface.
+    ID2POINT3DID m_i2pt3idVertices;
+
+    // List of TRIANGLES which form the triangulation of the isosurface.
+    TRIANGLEVECTOR m_trivecTriangles;
+
 
     int m_nX;
     int m_nY;
