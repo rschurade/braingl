@@ -107,9 +107,9 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     int percent = 1;
     int done = 0;
     omp_set_num_threads( 8 );
-#pragma omp parallel for
+//#pragma omp parallel for
     //for ( int i = 0; i < data->size(); ++i )
-    for ( int i = 496203; i < 506991; ++i )
+    for ( int i = 496203 + 20*93; i < 506991 - 20*93; ++i )
     {
         {
             QVector<QVector<float> > v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
@@ -301,6 +301,7 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
 
         if ( angle > .1 * M_PI / 180. )
         {
+            qDebug() << "hallo wir sind drinnen";
             ColumnVector ax( FMath::cprod( maxV, vecs[0] ) ); //axis
 
             Matrix R( FMath::RotationMatrix( angle, ax ).i() );
@@ -373,9 +374,8 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
 
             if ( size > 2 )
             {
-                //FMath::debugColumnVector( b, "b" );
                 ColumnVector k_s( FMath::pseudoInverse( A ) * b );
-
+                //qDebug() << k_s(1) << k_s(2) << k_s.Nrows();
                 if ( k_s( 1 ) > 0.0 && k_s( 2 ) > 0.0 )
                 {
                     //qDebug() << "hallo";

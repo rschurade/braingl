@@ -8,8 +8,6 @@
 #ifndef DATASETNIFTI_H_
 #define DATASETNIFTI_H_
 
-#include "../../thirdparty/glew/include/glew.h"
-
 #include "../../thirdparty/nifti/nifti1_io.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
@@ -21,8 +19,6 @@ class DatasetNifti: public Dataset
 public:
     DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header );
     virtual ~DatasetNifti();
-
-    GLuint getTextureGLuint();
 
     nifti_image* getHeader();
 
@@ -39,8 +35,6 @@ protected:
     void parseNiftiHeader();
 
     nifti_image* m_header;
-
-    GLuint m_textureGLuint;
 
     Matrix m_qform;
     Matrix m_sform;

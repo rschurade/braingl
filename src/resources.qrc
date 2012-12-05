@@ -36,5 +36,7 @@
     <file>shaders/tensorev.fs</file>
     <file>shaders/ev.vs</file>
     <file>shaders/ev.fs</file>
+    <file>shaders/mesh.vs</file>
+    <file>shaders/mesh.fs</file>
  </qresource>
  </RCC>

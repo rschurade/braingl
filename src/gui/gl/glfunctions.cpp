@@ -152,6 +152,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "superquadric" );
         GLFunctions::m_shaderNames.push_back( "tensorev" );
         GLFunctions::m_shaderNames.push_back( "ev" );
+        GLFunctions::m_shaderNames.push_back( "mesh" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
@@ -250,6 +251,27 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
     {
         setShaderVarsEV( m_shaders[name], model );
     }
+    if ( name == "mesh" )
+    {
+        setShaderVarsMesh( m_shaders[name], model );
+    }
+}
+
+void GLFunctions::setShaderVarsMesh( QGLShaderProgram* program, QAbstractItemModel* model )
+{
+    program->bind();
+
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+
+    offset += sizeof(float)*3;
+    int normalLocation = program->attributeLocation("a_normal");
+    program->enableAttributeArray( normalLocation );
+    glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *)offset );
 }
 
 void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )

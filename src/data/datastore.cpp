@@ -18,6 +18,7 @@
 #include "enums.h"
 
 #include "dwialgos.h"
+#include "scalaralgos.h"
 
 #include "datastore.h"
 
@@ -132,61 +133,59 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
 QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 {
-    FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
+    //FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH || type == FNDT_NIFTI_BINGHAM )
+    Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
+
+    switch ( index.column() )
     {
-        DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
-
-        switch ( index.column() )
-        {
-            case FNDSP_NAME:
-                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-                break;
-            case FNDSP_DIM:
-                return ds->getProperty( "nt" ).toInt();
-                break;
-            case FNDSP_DATATYPE:
-                return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
-                break;
-            case FNDSP_SIZE:
-                QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
-                return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
-                break;
-            case FNDSP_NX:
-                return ds->getProperty( "nx" ).toInt();
-                break;
-            case FNDSP_NY:
-                return ds->getProperty( "ny" ).toInt();
-                break;
-            case FNDSP_NZ:
-                return ds->getProperty( "nz" ).toInt();
-                break;
-            case FNDSP_DX:
-                return ds->getProperty( "dx" ).toFloat();
-                break;
-            case FNDSP_DY:
-                return ds->getProperty( "dy" ).toFloat();
-                break;
-            case FNDSP_DZ:
-                return ds->getProperty( "dz" ).toFloat();
-                break;
-            case FNDSP_MIN:
-                return ds->getProperty( "min" ).toFloat();
-                break;
-            case FNDSP_MAX:
-                return ds->getProperty( "max" ).toFloat();
-                break;
-            case FNDSP_TYPE:
-                return ds->getProperty( "type" ).toInt();
-                break;
-            case FNDSP_CREATED_BY:
-                return ds->getProperty( "createdBy" ).toInt();
-                break;
-            default:
-                break;
-        }
+        case FNDSP_NAME:
+            return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+            break;
+        case FNDSP_DIM:
+            return ds->getProperty( "nt" ).toInt();
+            break;
+        case FNDSP_DATATYPE:
+            return getNiftiDataType( ds->getProperty( "datatype" ).toInt() );
+            break;
+        case FNDSP_SIZE:
+            QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
+            return QString( "%L1" ).arg( ds->getProperty( "size" ).toInt() );
+            break;
+        case FNDSP_NX:
+            return ds->getProperty( "nx" ).toInt();
+            break;
+        case FNDSP_NY:
+            return ds->getProperty( "ny" ).toInt();
+            break;
+        case FNDSP_NZ:
+            return ds->getProperty( "nz" ).toInt();
+            break;
+        case FNDSP_DX:
+            return ds->getProperty( "dx" ).toFloat();
+            break;
+        case FNDSP_DY:
+            return ds->getProperty( "dy" ).toFloat();
+            break;
+        case FNDSP_DZ:
+            return ds->getProperty( "dz" ).toFloat();
+            break;
+        case FNDSP_MIN:
+            return ds->getProperty( "min" ).toFloat();
+            break;
+        case FNDSP_MAX:
+            return ds->getProperty( "max" ).toFloat();
+            break;
+        case FNDSP_TYPE:
+            return ds->getProperty( "type" ).toInt();
+            break;
+        case FNDSP_CREATED_BY:
+            return ds->getProperty( "createdBy" ).toInt();
+            break;
+        default:
+            break;
     }
+
     return QVariant();
 }
 
@@ -195,111 +194,112 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 
     FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
 
-    if ( type == FNDT_NIFTI_SCALAR || type == FNDT_NIFTI_VECTOR || type == FNDT_NIFTI_TENSOR || type == FNDT_NIFTI_DWI || type == FNDT_NIFTI_SH || type == FNDT_NIFTI_BINGHAM )
-    {
-        DatasetNifti* ds = dynamic_cast<DatasetNifti*>( m_datasetList.at( index.row() ) );
+    Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
 
-        switch ( index.column() )
+    switch ( index.column() )
+    {
+        case 0:
+            return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
+            break;
+        case 1:
         {
-            case 0:
-                return m_datasetList.at( index.row() )->getProperty( "name" ).toString();
-                break;
-            case 1:
-            {
-                return ds->getTextureGLuint();
-            }
-            case 2:
-            {
-                return VPtr<DatasetNifti>::asQVariant( ds );
-            }
-            case FNDSE_LOWER_THRESHOLD:
-                return ds->getProperty( "lowerThreshold" ).toFloat();
-                break;
-            case FNDSE_UPPER_THRESHOLD:
-                return ds->getProperty( "upperThreshold" ).toFloat();
-                break;
-            case FNDSE_COLORMAP:
-                return ds->getProperty( "colormap" ).toInt();
-                break;
-            case FNDSE_INTERPOLATION:
-                return ds->getProperty( "interpolation" ).toBool();
-                break;
-            case FNDSE_ALPHA:
-                return ds->getProperty( "alpha" ).toFloat();
-                break;
-            case FNDSE_ACTIVE:
-                return ds->getProperty( "active" ).toBool();
-                break;
-            case FNDSE_ORDER:
-                return ds->getProperty( "order" ).toInt();
-                break;
-            case FNDSE_LOD:
-                return ds->getProperty( "lod" ).toInt();
-                break;
-            case FNDSE_SCALING:
-                return ds->getProperty( "scaling" ).toFloat();
-                break;
-            case FNDSE_FA_THRESHOLD:
-                return ds->getProperty( "faThreshold" ).toFloat();
-                break;
-            case FNDSE_EV_THRESHOLD:
-                return ds->getProperty( "evThreshold" ).toFloat();
-                break;
-            case FNDSE_GAMMA:
-                return ds->getProperty( "gamma" ).toFloat();
-                break;
-            case FNDSE_OFFSET:
-                return ds->getProperty( "offset" ).toFloat();
-                break;
-            case FNDSE_RENDER_SLICE:
-                return ds->getProperty( "renderSlice" ).toInt();
-                break;
-            case FNDSE_RENDER_LOWER_X:
-                return ds->getProperty( "renderLowerX" ).toInt();
-                break;
-            case FNDSE_RENDER_UPPER_X:
-                return ds->getProperty( "renderUpperX" ).toInt();
-                break;
-            case FNDSE_RENDER_LOWER_Y:
-                return ds->getProperty( "renderLowerY" ).toInt();
-                break;
-            case FNDSE_RENDER_UPPER_Y:
-                return ds->getProperty( "renderUpperY" ).toInt();
-                break;
-            case FNDSE_RENDER_LOWER_Z:
-                return ds->getProperty( "renderLowerZ" ).toInt();
-                break;
-            case FNDSE_RENDER_UPPER_Z:
-                return ds->getProperty( "renderUpperZ" ).toInt();
-                break;
-            case FNDSE_MINMAX_SCALING:
-                return ds->getProperty( "minmaxScaling" ).toBool();
-            case FNDSE_BVALUE:
-                return ds->getProperty( "bValue" ).toInt();
-                break;
-            case FNDSE_CALC_LOWER_X:
-                return ds->getProperty( "calcLowerX" ).toInt();
-                break;
-            case FNDSE_CALC_UPPER_X:
-                return ds->getProperty( "calcUpperX" ).toInt();
-                break;
-            case FNDSE_CALC_LOWER_Y:
-                return ds->getProperty( "calcLowerY" ).toInt();
-                break;
-            case FNDSE_CALC_UPPER_Y:
-                return ds->getProperty( "calcUpperY" ).toInt();
-                break;
-            case FNDSE_CALC_LOWER_Z:
-                return ds->getProperty( "calcLowerZ" ).toInt();
-                break;
-            case FNDSE_CALC_UPPER_Z:
-                return ds->getProperty( "calcUpperZ" ).toInt();
-                break;
-            case FNDSE_TENSOR_RENDERMODE:
-                return ds->getProperty( "tensorRenderMode" ).toInt();
-                break;
+            return ds->getTextureGLuint();
         }
+        case 2:
+        {
+            return VPtr<Dataset>::asQVariant( ds );
+        }
+        case FNDSE_LOWER_THRESHOLD:
+            return ds->getProperty( "lowerThreshold" ).toFloat();
+            break;
+        case FNDSE_UPPER_THRESHOLD:
+            return ds->getProperty( "upperThreshold" ).toFloat();
+            break;
+        case FNDSE_COLORMAP:
+            return ds->getProperty( "colormap" ).toInt();
+            break;
+        case FNDSE_INTERPOLATION:
+            return ds->getProperty( "interpolation" ).toBool();
+            break;
+        case FNDSE_ALPHA:
+            return ds->getProperty( "alpha" ).toFloat();
+            break;
+        case FNDSE_ISO_VALUE:
+            return ds->getProperty( "isoValue" ).toFloat();
+            break;
+        case FNDSE_ACTIVE:
+            return ds->getProperty( "active" ).toBool();
+            break;
+        case FNDSE_ORDER:
+            return ds->getProperty( "order" ).toInt();
+            break;
+        case FNDSE_LOD:
+            return ds->getProperty( "lod" ).toInt();
+            break;
+        case FNDSE_SCALING:
+            return ds->getProperty( "scaling" ).toFloat();
+            break;
+        case FNDSE_FA_THRESHOLD:
+            return ds->getProperty( "faThreshold" ).toFloat();
+            break;
+        case FNDSE_EV_THRESHOLD:
+            return ds->getProperty( "evThreshold" ).toFloat();
+            break;
+        case FNDSE_GAMMA:
+            return ds->getProperty( "gamma" ).toFloat();
+            break;
+        case FNDSE_OFFSET:
+            return ds->getProperty( "offset" ).toFloat();
+            break;
+        case FNDSE_RENDER_SLICE:
+            return ds->getProperty( "renderSlice" ).toInt();
+            break;
+        case FNDSE_RENDER_LOWER_X:
+            return ds->getProperty( "renderLowerX" ).toInt();
+            break;
+        case FNDSE_RENDER_UPPER_X:
+            return ds->getProperty( "renderUpperX" ).toInt();
+            break;
+        case FNDSE_RENDER_LOWER_Y:
+            return ds->getProperty( "renderLowerY" ).toInt();
+            break;
+        case FNDSE_RENDER_UPPER_Y:
+            return ds->getProperty( "renderUpperY" ).toInt();
+            break;
+        case FNDSE_RENDER_LOWER_Z:
+            return ds->getProperty( "renderLowerZ" ).toInt();
+            break;
+        case FNDSE_RENDER_UPPER_Z:
+            return ds->getProperty( "renderUpperZ" ).toInt();
+            break;
+        case FNDSE_MINMAX_SCALING:
+            return ds->getProperty( "minmaxScaling" ).toBool();
+        case FNDSE_BVALUE:
+            return ds->getProperty( "bValue" ).toInt();
+            break;
+        case FNDSE_CALC_LOWER_X:
+            return ds->getProperty( "calcLowerX" ).toInt();
+            break;
+        case FNDSE_CALC_UPPER_X:
+            return ds->getProperty( "calcUpperX" ).toInt();
+            break;
+        case FNDSE_CALC_LOWER_Y:
+            return ds->getProperty( "calcLowerY" ).toInt();
+            break;
+        case FNDSE_CALC_UPPER_Y:
+            return ds->getProperty( "calcUpperY" ).toInt();
+            break;
+        case FNDSE_CALC_LOWER_Z:
+            return ds->getProperty( "calcLowerZ" ).toInt();
+            break;
+        case FNDSE_CALC_UPPER_Z:
+            return ds->getProperty( "calcUpperZ" ).toInt();
+            break;
+        case FNDSE_TENSOR_RENDERMODE:
+            return ds->getProperty( "tensorRenderMode" ).toInt();
+            break;
     }
+
     return QVariant();
 }
 
@@ -400,6 +400,9 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                     break;
                 case FNDSE_ALPHA:
                     m_datasetList.at( index.row() )->setProperty( "alpha", value.toFloat() );
+                    break;
+                case FNDSE_ISO_VALUE:
+                    m_datasetList.at( index.row() )->setProperty( "isoValue", value.toFloat() );
                     break;
                 case FNDSE_ACTIVE:
                     m_datasetList.at( index.row() )->setProperty( "active", value.toBool() );
@@ -552,6 +555,16 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                     addDataset( bings[1] );
                     addDataset( bings[2] );
                     addDataset( bings[3] );
+                }
+                break;
+            }
+            case FNALGO_ISOSURFACE:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_SCALAR )
+                {
+                    QList<Dataset*> isos = ScalarAlgos::isoSurface( dynamic_cast<DatasetScalar*>( ds ) );
+                    addDataset( isos[0] );
                 }
                 break;
             }

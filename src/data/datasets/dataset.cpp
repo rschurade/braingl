@@ -8,7 +8,8 @@
 
 #include "dataset.h"
 
-Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type )
+Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type ) :
+    m_textureGLuint( 0 )
 {
     m_properties["fileName"] = fileName.path();
     m_properties["type"] = type;
@@ -40,4 +41,23 @@ QVariant Dataset::getProperty( QString name )
 void Dataset::setProperty( QString name, QVariant value )
 {
     m_properties[name] = value;
+}
+
+GLuint Dataset::getTextureGLuint()
+{
+    if ( m_textureGLuint == 0 )
+    {
+        createTexture();
+    }
+    return m_textureGLuint;
+}
+
+QHash<QString, QVariant> Dataset::getProperties()
+{
+    return m_properties;
+}
+
+void Dataset::setProperties( QHash<QString, QVariant> props )
+{
+    m_properties = props;
 }

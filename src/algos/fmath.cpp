@@ -462,9 +462,13 @@ void FMath::debugColumnVector3( const ColumnVector& v, QString name )
 
 Matrix FMath::pseudoInverse( const Matrix& A )
 {
+    /*
     Matrix U( A.Nrows(), A.Ncols() );
     DiagonalMatrix D( A.Ncols() );
     Matrix V( A.Ncols(), A.Ncols() );
     SVD( A, D, U, V );
-    return ( V * ( D.t() * D ).i() * D.t() * U.t() );
+    return ( V * ( D.t() * D ) * D.t() * U.t() );
+    */
+
+    return ( ( A.t() * A ).i() * A.t() );
 }

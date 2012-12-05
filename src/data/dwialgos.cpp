@@ -16,7 +16,6 @@
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
 
-#include "mesh/trianglemesh.h"
 #include "mesh/tesselation.h"
 
 #include "datasets/dataset3d.h"

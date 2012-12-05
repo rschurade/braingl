@@ -5,11 +5,11 @@
  *      Author: schurade
  */
 
-#include "../mesh/trianglemesh.h"
+#include "../mesh/trianglemesh2.h"
 
 #include "datasetmesh.h"
 
-DatasetMesh::DatasetMesh( TriangleMesh* mesh, QString fileName ) :
+DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
         Dataset( fileName, FNDT_MESH_BINARY ), m_mesh( mesh )
 {
 }

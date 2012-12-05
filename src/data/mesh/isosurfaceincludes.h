@@ -1,6 +1,9 @@
 #ifndef ISOSURFACEINCLUDES_H_
 #define ISOSURFACEINCLUDES_H_
 
+#include <map>
+#include <vector>
+
 #include <QtCore/QMap>
 #include <QtCore/QVector>
 
@@ -9,13 +12,13 @@ struct POINT3DID {
     float x, y, z;
 };
 
-typedef QMap<unsigned int, POINT3DID> ID2POINT3DID;
+typedef std::map<int, POINT3DID> ID2POINT3DID;
 
 struct TRIANGLE {
     unsigned int pointID[3];
 };
 
-typedef QVector<TRIANGLE> TRIANGLEVECTOR;
+typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
 
 
 const unsigned int edgeTable[256] =
