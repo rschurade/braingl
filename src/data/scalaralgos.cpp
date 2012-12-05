@@ -5,16 +5,23 @@
  *      Author: Ralph
  */
 
+#include "datasets/datasetscalar.h"
+#include "datasets/datasetisosurface.h"
+
 #include "scalaralgos.h"
 
 ScalarAlgos::ScalarAlgos()
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 ScalarAlgos::~ScalarAlgos()
 {
-    // TODO Auto-generated destructor stub
 }
 
+QList<Dataset*> ScalarAlgos::isoSurface( DatasetScalar* ds )
+{
+    DatasetIsosurface* iso = new DatasetIsosurface( ds );
+    QList<Dataset*> l;
+    l.push_back( iso );
+    return l;
+}

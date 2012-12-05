@@ -94,7 +94,7 @@ void ToolBar::createActions()
 
 void ToolBar::slotScalar1()
 {
-    qDebug() << "scalar button pressed";
+    m_toolBarView->activateAlgo( FNALGO_ISOSURFACE );
 }
 
 void ToolBar::slotVector1()
@@ -156,7 +156,7 @@ void ToolBar::slotSelectionChanged( int type )
     {
         case FNDT_NIFTI_SCALAR:
         {
-            //this->addAction( m_scalarAction1 );
+            this->addAction( m_scalarAction1 );
             break;
         }
         case FNDT_NIFTI_VECTOR:

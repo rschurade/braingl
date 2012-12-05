@@ -8,6 +8,8 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
+#include "../../thirdparty/glew/include/glew.h"
+
 #include <limits>
 
 #include <QtCore/QDebug>
@@ -29,13 +31,22 @@ public:
 
     QVariant getProperty( QString name );
     void setProperty( QString name, QVariant value );
+    QHash<QString, QVariant> getProperties();
+    void setProperties( QHash<QString, QVariant> props );
+
+
+    GLuint getTextureGLuint();
 
     virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
 
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
 protected:
+    virtual void createTexture() = 0;
+
     QHash<QString, QVariant> m_properties;
+
+    GLuint m_textureGLuint;
 };
 
 #endif /* DATASET_H_ */

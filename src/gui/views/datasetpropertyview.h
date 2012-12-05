@@ -54,6 +54,7 @@ private slots:
     void activeStateChanged( int state );
 
     void alphaChanged( float value );
+    void isoValueChanged( float value );
     void bValueChanged( int value );
 
     void orderChanged( int index );
@@ -100,6 +101,7 @@ private:
     SelectWithLabel* m_lodSelect;
     SelectWithLabel* m_sliceSelect;
     SliderWithEdit* m_scalingSlider;
+    SliderWithEdit* m_isoValueSlider;
 
     SliderWithEditInt* m_bValueSlider;
 

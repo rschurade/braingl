@@ -12,19 +12,19 @@
 
 #include "dataset.h"
 
-class TriangleMesh;
+class TriangleMesh2;
 
 class DatasetMesh: public Dataset
 {
 public:
-    DatasetMesh( TriangleMesh* mesh, QString filename = QString( "new mesh" ) );
+    DatasetMesh( TriangleMesh2* mesh, QString filename = QString( "new mesh" ) );
     virtual ~DatasetMesh();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
     QString getValueAsString( int x, int y, int z );
 
 private:
-    TriangleMesh* m_mesh;
+    TriangleMesh2* m_mesh;
 };
 
 #endif /* DATASETMESH_H_ */

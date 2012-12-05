@@ -10,22 +10,13 @@
 #include "datasetnifti.h"
 
 DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header ) :
-        Dataset( filename, type ), m_header( header ), m_textureGLuint( 0 ), m_qform( 3, 3 ), m_sform( 3, 3 )
+        Dataset( filename, type ), m_header( header ), m_qform( 3, 3 ), m_sform( 3, 3 )
 {
     parseNiftiHeader();
 }
 
 DatasetNifti::~DatasetNifti()
 {
-}
-
-GLuint DatasetNifti::getTextureGLuint()
-{
-    if ( m_textureGLuint == 0 )
-    {
-        createTexture();
-    }
-    return m_textureGLuint;
 }
 
 void DatasetNifti::parseNiftiHeader()

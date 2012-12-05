@@ -29,7 +29,7 @@
 SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris1( 0 ),
-    vboIds( new GLuint[ 6 ] ),
+    vboIds( new GLuint[ 2 ] ),
     m_data( data ),
     m_nx( m_nx ),
     m_ny( m_ny ),
@@ -52,7 +52,7 @@ SHRenderer::~SHRenderer()
 
 void SHRenderer::init()
 {
-    glGenBuffers( 6, vboIds );
+    glGenBuffers( 2, vboIds );
 }
 
 void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )

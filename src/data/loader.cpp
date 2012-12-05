@@ -14,7 +14,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
-#include "mesh/trianglemesh.h"
+#include "mesh/trianglemesh2.h"
 
 #include "loader.h"
 
@@ -794,6 +794,7 @@ bool Loader::loadMesh()
 
 bool Loader::loadMeshBinary()
 {
+    /*
     qDebug() << "load mesh";
     QFile file( m_fileName.path() );
     file.open( QIODevice::ReadOnly );
@@ -857,4 +858,5 @@ bool Loader::loadMeshBinary()
     }
 
     return false;
+    */
 }

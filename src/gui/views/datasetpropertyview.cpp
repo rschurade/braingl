@@ -58,6 +58,11 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_bValueSlider->setMax( 2000.0 );
     m_bValueSlider->setStep( 500 );
 
+    m_isoValueSlider = new SliderWithEdit( tr( "iso value" ) );
+    connect( m_isoValueSlider, SIGNAL( valueChanged( float ) ), this, SLOT( isoValueChanged( float ) ) );
+    m_alphaSlider->setMin( 0.0 );
+    m_alphaSlider->setMax( 1.0 );
+
 
     m_orderSelect = new SelectWithLabel( tr("order" ) );
     m_orderSelect->insertItem( 0, tr( "4" ) );
@@ -113,6 +118,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_layout->addWidget( m_colormapSelect );
     m_layout->addWidget( m_textureInterpolation );
     m_layout->addWidget( m_alphaSlider );
+    m_layout->addWidget( m_isoValueSlider );
     m_layout->addWidget( m_orderSelect );
     m_layout->addWidget( m_lodSelect );
     m_layout->addWidget( m_sliceSelect );
@@ -131,6 +137,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_colormapSelect->setHidden( true );
     m_textureInterpolation->setHidden( true );
     m_alphaSlider->setHidden( true );
+    m_isoValueSlider->setHidden( true );
     m_lodSelect->setHidden( true );
     m_sliceSelect->setHidden( true );
     m_scalingSlider->setHidden( true );
@@ -219,12 +226,16 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
     m_nameEdit->setText( model()->data( index, Qt::DisplayRole ).toString() );
 
     index = getSelectedIndex( FNDSP_MIN );
-    m_lowerThresholdSlider->setMin( model()->data( index, Qt::DisplayRole ).toFloat() );
-    m_upperThresholdSlider->setMin( model()->data( index, Qt::DisplayRole ).toFloat() );
+    float min = model()->data( index, Qt::DisplayRole ).toFloat();
+    m_lowerThresholdSlider->setMin( min );
+    m_upperThresholdSlider->setMin( min );
+    m_isoValueSlider->setMin( min );
 
     index = getSelectedIndex( FNDSP_MAX );
-    m_lowerThresholdSlider->setMax( model()->data( index, Qt::DisplayRole ).toFloat() );
-    m_upperThresholdSlider->setMax( model()->data( index, Qt::DisplayRole ).toFloat() );
+    float max = model()->data( index, Qt::DisplayRole ).toFloat();
+    m_lowerThresholdSlider->setMax( max );
+    m_upperThresholdSlider->setMax( max );
+    m_isoValueSlider->setMax( max );
 
     index = getSelectedIndex( FNDSE_LOWER_THRESHOLD );
     m_lowerThresholdSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
@@ -239,6 +250,9 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
     index = getSelectedIndex( FNDSE_ALPHA );
     m_alphaSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
+
+    index = getSelectedIndex( FNDSE_ISO_VALUE );
+    m_isoValueSlider->setValue( model()->data( index, Qt::EditRole ).toFloat() );
 
     index = getSelectedIndex( FNDSE_ACTIVE );
     m_textureActive->setChecked( model()->data( index, Qt::EditRole ).toBool() );
@@ -346,6 +360,11 @@ void DatasetPropertyView::updateWidgetVisibility()
         m_tensorRendorMode->setHidden( false );
     }
 
+    if ( created == FNALGO_ISOSURFACE )
+    {
+        m_isoValueSlider->setHidden( false );
+    }
+
     if ( dim == 999999 ) // simply for copy&paste
     {
         m_textureActive->setHidden( false );
@@ -402,6 +421,11 @@ void DatasetPropertyView::activeStateChanged( int state )
 void DatasetPropertyView::alphaChanged( float value )
 {
     model()->setData( getSelectedIndex( FNDSE_ALPHA ), value );
+}
+
+void DatasetPropertyView::isoValueChanged( float value )
+{
+    model()->setData( getSelectedIndex( FNDSE_ISO_VALUE ), value );
 }
 
 void DatasetPropertyView::bValueChanged( int value )
