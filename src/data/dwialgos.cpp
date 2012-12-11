@@ -121,7 +121,7 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
     return out;
 }
 
-DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
+DatasetScalar* DWIAlgos::calcFAFromDWI( DatasetDWI* ds )
 {
     QVector<QVector3D> bvecs = ds->getBvecs();
     QVector<float> bvals = ds->getBvals();
@@ -141,7 +141,7 @@ DatasetScalar* DWIAlgos::calcFA( DatasetDWI* ds )
     return out;
 }
 
-QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
+QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
 {
     QVector<QVector3D> bvecs = ds->getBvecs();
     QVector<float> bvals = ds->getBvals();
@@ -149,6 +149,52 @@ QList<Dataset*> DWIAlgos::calcEV( DatasetDWI* ds )
     QVector<float> b0Images = ds->getB0Data();
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
+
+    int blockSize = tensors->size();
+
+    QVector<QVector3D> evec1( blockSize );
+    QVector<float> eval1( blockSize );
+
+    FMath::evecs( tensors, evec1, eval1 );
+
+    QList<Dataset*> l;
+
+    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, ds->getHeader() );
+    out->setProperty( "name", "evec 1" );
+    out->setProperty( "createdBy", FNALGO_EV );
+    out->setProperty( "nt", 3 );
+    out->setProperty( "datatype", DT_FLOAT );
+
+    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, ds->getHeader() );
+    out2->setProperty( "name", "eval 1" );
+    out2->setProperty( "createdBy", FNALGO_EV );
+    out2->setProperty( "nt", 1 );
+    out2->setProperty( "datatype", DT_FLOAT );
+
+    l.push_back( out );
+    l.push_back( out2 );
+
+    return l;
+}
+
+DatasetScalar* DWIAlgos::calcFAFromTensor( DatasetTensor* ds )
+{
+    QVector<Matrix>* tensors = ds->getData();
+
+    QVector<float> fa = FMath::fa( tensors );
+
+    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
+    out->setProperty( "fileName", "FA" );
+    out->setProperty( "name", "FA" );
+    out->setProperty( "createdBy", FNALGO_FA );
+    out->setProperty( "nt", 1 );
+    out->setProperty( "datatype", DT_FLOAT );
+    return out;
+}
+
+QList<Dataset*> DWIAlgos::calcEVFromTensor( DatasetTensor* ds )
+{
+    QVector<Matrix>* tensors = ds->getData();
 
     int blockSize = tensors->size();
 

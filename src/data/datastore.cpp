@@ -530,7 +530,11 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
-                    addDataset( DWIAlgos::calcFA( dynamic_cast<DatasetDWI*>( ds ) ) );
+                    addDataset( DWIAlgos::calcFAFromDWI( dynamic_cast<DatasetDWI*>( ds ) ) );
+                }
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_TENSOR )
+                {
+                    addDataset( DWIAlgos::calcFAFromTensor( dynamic_cast<DatasetTensor*>( ds ) ) );
                 }
                 break;
             }
@@ -539,7 +543,13 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 Dataset* ds = m_datasetList.at( index.row() );
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_DWI )
                 {
-                    QList<Dataset*> ev = DWIAlgos::calcEV( dynamic_cast<DatasetDWI*>( ds ) );
+                    QList<Dataset*> ev = DWIAlgos::calcEVFromDWI( dynamic_cast<DatasetDWI*>( ds ) );
+                    addDataset( ev[0] );
+                    addDataset( ev[1] );
+                }
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_TENSOR )
+                {
+                    QList<Dataset*> ev = DWIAlgos::calcEVFromTensor( dynamic_cast<DatasetTensor*>( ds ) );
                     addDataset( ev[0] );
                     addDataset( ev[1] );
                 }
