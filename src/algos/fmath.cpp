@@ -615,13 +615,15 @@ QVector<float> FMath::fa( QVector<Matrix>* tensors )
     return fa;
 }
 
-void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1 )
+void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
+                                               QVector<QVector3D>& evec2, QVector<float>& eval2,
+                                               QVector<QVector3D>& evec3, QVector<float>& eval3 )
 {
     int blockSize = tensors->size();
 
     double xx, xy, xz, yy, yz, zz;
     double i1, i2, i3, v, s, phi, l1, l2, l3;
-    double vec_norm, ev1_x, ev1_y, ev1_z; //, ev2_x, ev2_y, ev2_z, ev3_x, ev3_y, ev3_z;
+    double vec_norm, ev1_x, ev1_y, ev1_z, ev2_x, ev2_y, ev2_z, ev3_x, ev3_y, ev3_z;
 
     for ( int i = 0; i < blockSize; ++i )
     {
@@ -658,21 +660,21 @@ void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<
             l1 = l2 = l3 = 0.0;
 
         eval1[i] = l1;
-//        eval2[i] = l2;
-//        eval3[i] = l3;
+        eval2[i] = l2;
+        eval3[i] = l3;
 
         // eigenvectors
         ev1_x = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * yz - ( zz - l1 ) * xy );
         ev1_y = ( xz * yz - ( zz - l1 ) * xy ) * ( xz * xy - ( xx - l1 ) * yz );
         ev1_z = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * xy - ( xx - l1 ) * yz );
 
-//        ev2_x = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * yz - ( zz - l2 ) * xy );
-//        ev2_y = ( xz * yz - ( zz - l2 ) * xy ) * ( xz * xy - ( xx - l2 ) * yz );
-//        ev2_z = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * xy - ( xx - l2 ) * yz );
-//
-//        ev3_x = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * yz - ( zz - l3 ) * xy );
-//        ev3_y = ( xz * yz - ( zz - l3 ) * xy ) * ( xz * xy - ( xx - l3 ) * yz );
-//        ev3_z = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * xy - ( xx - l3 ) * yz );
+        ev2_x = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * yz - ( zz - l2 ) * xy );
+        ev2_y = ( xz * yz - ( zz - l2 ) * xy ) * ( xz * xy - ( xx - l2 ) * yz );
+        ev2_z = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * xy - ( xx - l2 ) * yz );
+
+        ev3_x = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * yz - ( zz - l3 ) * xy );
+        ev3_y = ( xz * yz - ( zz - l3 ) * xy ) * ( xz * xy - ( xx - l3 ) * yz );
+        ev3_z = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * xy - ( xx - l3 ) * yz );
 
         vec_norm = sqrt( pow2( ev1_x ) + pow2( ev1_y ) + pow2( ev1_z ) );
 
@@ -685,36 +687,36 @@ void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<
         else
             ev1_x = ev1_y = ev1_z = 0.0;
 
-//        vec_norm = sqrt( pow2( ev2_x ) + pow2( ev2_y ) + pow2( ev2_z ) );
-//
-//        if ( vec_norm > 0 )
-//        {
-//            ev2_x = ev2_x / vec_norm;
-//            ev2_y = ev2_y / vec_norm;
-//            ev2_z = ev2_z / vec_norm;
-//        }
-//        else
-//            ev2_x = ev2_y = ev2_z = 0.0;
-//
-//        vec_norm = sqrt( pow2( ev3_x ) + pow2( ev3_y ) + pow2( ev3_z ) );
-//
-//        if ( vec_norm > 0 )
-//        {
-//            ev3_x = ev3_x / vec_norm;
-//            ev3_y = ev3_y / vec_norm;
-//            ev3_z = ev3_z / vec_norm;
-//        }
-//        else
-//            ev3_x = ev3_y = ev3_z = 0.0;
+        vec_norm = sqrt( pow2( ev2_x ) + pow2( ev2_y ) + pow2( ev2_z ) );
+
+        if ( vec_norm > 0 )
+        {
+            ev2_x = ev2_x / vec_norm;
+            ev2_y = ev2_y / vec_norm;
+            ev2_z = ev2_z / vec_norm;
+        }
+        else
+            ev2_x = ev2_y = ev2_z = 0.0;
+
+        vec_norm = sqrt( pow2( ev3_x ) + pow2( ev3_y ) + pow2( ev3_z ) );
+
+        if ( vec_norm > 0 )
+        {
+            ev3_x = ev3_x / vec_norm;
+            ev3_y = ev3_y / vec_norm;
+            ev3_z = ev3_z / vec_norm;
+        }
+        else
+            ev3_x = ev3_y = ev3_z = 0.0;
 
         evec1[i].setX( ev1_x );
         evec1[i].setY( ev1_y );
         evec1[i].setZ( ev1_z );
-//        evec2[i].setX( ev2_x );
-//        evec2[i].setY( ev2_y );
-//        evec2[i].setZ( ev2_z );
-//        evec3[i].setX( ev3_x );
-//        evec3[i].setY( ev3_y );
-//        evec3[i].setZ( ev3_z );
+        evec2[i].setX( ev2_x );
+        evec2[i].setY( ev2_y );
+        evec2[i].setZ( ev2_z );
+        evec3[i].setX( ev3_x );
+        evec3[i].setY( ev3_y );
+        evec3[i].setZ( ev3_z );
     }
 }
