@@ -26,6 +26,7 @@ public:
     virtual ~DatasetTensor();
 
     QVector<Matrix>* getData();
+    QVector<Matrix>* getLogData();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
     QString getValueAsString( int x, int y, int z );
@@ -34,9 +35,12 @@ private:
     void createTexture();
     void examineDataset();
 
+    void createLogTensors();
+
     void flipX();
 
     QVector<Matrix>* m_data;
+    QVector<Matrix>* m_logData;
 
     TensorRenderer* m_renderer;
     TensorRendererEV* m_rendererEV;

@@ -12,7 +12,12 @@
 #include "datasettensor.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ), m_data( data ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
+    DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
+    m_data( data ),
+    m_logData( 0 ),
+    m_renderer( 0 ),
+    m_rendererEV( 0 ),
+    m_renderGlpyhs( false )
 {
     //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
     m_properties["active"] = true;
@@ -131,6 +136,51 @@ void DatasetTensor::createTexture()
 QVector<Matrix>* DatasetTensor::getData()
 {
     return m_data;
+}
+
+QVector<Matrix>* DatasetTensor::getLogData()
+{
+    if ( !m_logData )
+    {
+        createLogTensors();
+    }
+    return m_data;
+}
+
+void DatasetTensor::createLogTensors()
+{
+    /*
+    m_logData = new QVector<Matrix>( m_data->size() );
+
+    //log(M) =Ulog(D)UT
+    Matrix U(3,3);
+    DiagonalMatrix D(3);
+    Matrix logM(3,3);
+    for ( size_t i = 0; i < m_logData->size(); ++i )
+    {
+        U( 1, 1 ) = evec1[3*i];
+        U( 2, 1 ) = evec1[3*i+1];
+        U( 3, 1 ) = evec1[3*i+2];
+        U( 1, 2 ) = evec2[3*i];
+        U( 2, 2 ) = evec2[3*i+1];
+        U( 3, 2 ) = evec2[3*i+2];
+        U( 1, 3 ) = evec3[3*i];
+        U( 2, 3 ) = evec3[3*i+1];
+        U( 3, 3 ) = evec3[3*i+2];
+        D(1) = log( eval1[i] );
+        D(2) = log( eval2[i] );
+        D(3) = log( eval3[i] );
+
+        logM = U*D*U.t();
+
+        logTensors[i*6] = logM(1,1);
+        logTensors[i*6+1] = logM(1,2);
+        logTensors[i*6+2] = logM(1,3);
+        logTensors[i*6+3] = logM(2,2);
+        logTensors[i*6+4] = logM(2,3);
+        logTensors[i*6+5] = logM(3,3);
+    }
+    */
 }
 
 void DatasetTensor::flipX()

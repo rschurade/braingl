@@ -12,6 +12,9 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QString>
+#include <QtCore/QVector>
+#include <QtGui/QVector3D>
+
 
 #ifdef __WINDOWS__
     #define M_PI 3.14159265359
@@ -45,6 +48,12 @@ public:
     static void debugColumnVector3( const ColumnVector& v, QString name = QString( "" ) );
 
     static Matrix pseudoInverse( const Matrix& A );
+
+    static QVector<Matrix>* fitTensors( QVector<ColumnVector>* data, QVector<float> b0Images, QVector<QVector3D> bvecs, QVector<float> bvals );
+
+    static QVector<float> fa( QVector<Matrix>* tensors );
+
+    static void evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1 );
 
 private:
     FMath();
