@@ -155,7 +155,13 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
     QVector<QVector3D> evec1( blockSize );
     QVector<float> eval1( blockSize );
 
-    FMath::evecs( tensors, evec1, eval1 );
+    QVector<QVector3D> evec2( blockSize );
+    QVector<float> eval2( blockSize );
+
+    QVector<QVector3D> evec3( blockSize );
+    QVector<float> eval3( blockSize );
+
+    FMath::evecs( tensors, evec1, eval2, evec1, eval2, evec3, eval3 );
 
     QList<Dataset*> l;
 
@@ -201,7 +207,13 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( DatasetTensor* ds )
     QVector<QVector3D> evec1( blockSize );
     QVector<float> eval1( blockSize );
 
-    FMath::evecs( tensors, evec1, eval1 );
+    QVector<QVector3D> evec2( blockSize );
+    QVector<float> eval2( blockSize );
+
+    QVector<QVector3D> evec3( blockSize );
+    QVector<float> eval3( blockSize );
+
+    FMath::evecs( tensors, evec1, eval2, evec1, eval2, evec3, eval3 );
 
     QList<Dataset*> l;
 

@@ -149,8 +149,20 @@ QVector<Matrix>* DatasetTensor::getLogData()
 
 void DatasetTensor::createLogTensors()
 {
-    /*
-    m_logData = new QVector<Matrix>( m_data->size() );
+    int blockSize = m_data->size();
+    m_logData = new QVector<Matrix>( blockSize );
+
+    QVector<QVector3D> evec1( blockSize );
+    QVector<float> eval1( blockSize );
+
+    QVector<QVector3D> evec2( blockSize );
+    QVector<float> eval2( blockSize );
+
+    QVector<QVector3D> evec3( blockSize );
+    QVector<float> eval3( blockSize );
+
+    FMath::evecs( m_data, evec1, eval2, evec1, eval2, evec3, eval3 );
+
 
     //log(M) =Ulog(D)UT
     Matrix U(3,3);
@@ -158,29 +170,23 @@ void DatasetTensor::createLogTensors()
     Matrix logM(3,3);
     for ( size_t i = 0; i < m_logData->size(); ++i )
     {
-        U( 1, 1 ) = evec1[3*i];
-        U( 2, 1 ) = evec1[3*i+1];
-        U( 3, 1 ) = evec1[3*i+2];
-        U( 1, 2 ) = evec2[3*i];
-        U( 2, 2 ) = evec2[3*i+1];
-        U( 3, 2 ) = evec2[3*i+2];
-        U( 1, 3 ) = evec3[3*i];
-        U( 2, 3 ) = evec3[3*i+1];
-        U( 3, 3 ) = evec3[3*i+2];
+        U( 1, 1 ) = evec1[i].x();
+        U( 2, 1 ) = evec1[i].y();
+        U( 3, 1 ) = evec1[i].z();
+        U( 1, 2 ) = evec2[i].x();
+        U( 2, 2 ) = evec2[i].y();
+        U( 3, 2 ) = evec2[i].z();
+        U( 1, 3 ) = evec3[i].x();
+        U( 2, 3 ) = evec3[i].y();
+        U( 3, 3 ) = evec3[i].z();
         D(1) = log( eval1[i] );
         D(2) = log( eval2[i] );
         D(3) = log( eval3[i] );
 
         logM = U*D*U.t();
 
-        logTensors[i*6] = logM(1,1);
-        logTensors[i*6+1] = logM(1,2);
-        logTensors[i*6+2] = logM(1,3);
-        logTensors[i*6+3] = logM(2,2);
-        logTensors[i*6+4] = logM(2,3);
-        logTensors[i*6+5] = logM(3,3);
+        m_logData->replace( i, logM );
     }
-    */
 }
 
 void DatasetTensor::flipX()
