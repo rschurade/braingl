@@ -23,8 +23,10 @@ public:
     static DatasetSH* qBall( DatasetDWI* ds );
     static DatasetSH* qBallSharp( DatasetDWI* ds, int order );
     static DatasetTensor* tensorFit( DatasetDWI* ds );
-    static DatasetScalar* calcFA( DatasetDWI* ds );
-    static QList<Dataset*> calcEV( DatasetDWI* ds );
+    static DatasetScalar* calcFAFromDWI( DatasetDWI* ds );
+    static QList<Dataset*> calcEVFromDWI( DatasetDWI* ds );
+    static DatasetScalar* calcFAFromTensor( DatasetTensor* ds );
+    static QList<Dataset*> calcEVFromTensor( DatasetTensor* ds );
     static QList<Dataset*> fitBingham( DatasetSH* ds );
 
 private:

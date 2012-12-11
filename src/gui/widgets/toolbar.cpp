@@ -166,6 +166,8 @@ void ToolBar::slotSelectionChanged( int type )
         }
         case FNDT_NIFTI_TENSOR:
         {
+            this->addAction( m_faAct );
+            this->addAction( m_evAct );
             break;
         }
         case FNDT_NIFTI_SH:
