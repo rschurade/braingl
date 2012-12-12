@@ -146,7 +146,7 @@ void ToolBar::slotMesh1()
 
 void ToolBar::slotFiber1()
 {
-    qDebug() << "fiber button pressed";
+    m_toolBarView->activateAlgo( FNALGO_TENSOR_TRACK );
 }
 
 void ToolBar::slotSelectionChanged( int type )
@@ -168,6 +168,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_faAct );
             this->addAction( m_evAct );
+            this->addAction( m_fiberAction1 );
             break;
         }
         case FNDT_NIFTI_SH:

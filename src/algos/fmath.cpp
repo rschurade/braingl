@@ -571,9 +571,11 @@ QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float> 
     return tensors;
 }
 
-QVector<float> FMath::fa( QVector<Matrix>* tensors )
+void FMath::fa( QVector<Matrix>* tensors, QVector<float>& faOut )
 {
     int blockSize = tensors->size();
+
+    faOut.resize( blockSize );
 
     QVector<float> trace( blockSize );
     float value = 0;
@@ -604,15 +606,13 @@ QVector<float> FMath::fa( QVector<Matrix>* tensors )
 
         if ( DD > 0 )
         {
-            fa[i] = (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) );
+            faOut[i] = (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) );
         }
         else
         {
-            fa[i] = 0.0;
+            faOut[i] = 0.0;
         }
     }
-
-    return fa;
 }
 
 void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
@@ -620,6 +620,13 @@ void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<
                                                QVector<QVector3D>& evec3, QVector<float>& eval3 )
 {
     int blockSize = tensors->size();
+
+    evec1.resize( blockSize );
+    evec2.resize( blockSize );
+    evec3.resize( blockSize );
+    eval1.resize( blockSize );
+    eval2.resize( blockSize );
+    eval3.resize( blockSize );
 
     double xx, xy, xz, yy, yz, zz;
     double i1, i2, i3, v, s, phi, l1, l2, l3;

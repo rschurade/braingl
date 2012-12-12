@@ -4,6 +4,10 @@
  *  Created on: Jun 1, 2012
  *      Author: schurade
  */
+#include <fstream>
+#include <iostream>
+#include <stdio.h>
+
 
 #include <QtCore/QDebug>
 
@@ -14,6 +18,7 @@
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
+#include "datasets/datasetfibers.h"
 
 #include "writer.h"
 
@@ -273,6 +278,11 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
+        case FNDT_FIBERS:
+        {
+            saveFibs( m_fileName.toStdString() );
+            break;
+        }
     }
     return true;
 }
@@ -345,4 +355,58 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
     {
         hdr->descrip[i] = descrip.at( i ).toLatin1();
     }
+}
+
+void Writer::saveFibs( string filename )
+{
+    QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
+
+    using std::fstream;
+    fstream out( filename.c_str(), fstream::out | fstream::in | fstream::trunc );
+    if( !out || out.bad() )
+    {
+        // error
+    }
+    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
+    char lineDelimiter = '\n';
+
+    out << "# vtk DataFile Version 3.0" << lineDelimiter;
+    out << "Fibers" << lineDelimiter;
+    out << "BINARY" << lineDelimiter;
+    out << "DATASET POLYDATA" << lineDelimiter;
+
+    unsigned int numPoints = 0;
+    unsigned int numLines = fibs.size();
+    for( size_t i = 0; i < fibs.size(); ++i )
+    {
+        numPoints += fibs[i].size()/3;
+    }
+    out << "POINTS " << numPoints << " float" << lineDelimiter;
+    unsigned int *rawLineData = new unsigned int[numPoints + numLines];
+    float *rawPointData = new float[numPoints * 3];
+
+    unsigned int pntPosOffset = 0;
+    unsigned int lnsPosOffset = 0;
+
+    for( size_t i = 0; i < fibs.size(); ++i )
+    {
+        QVector<float>fib = fibs[i];
+        rawLineData[lnsPosOffset++] = static_cast< unsigned int >( fib.size()/3 );
+        for( size_t j = 0; j < fib.size()/3; ++j )
+        {
+            rawLineData[lnsPosOffset++] = static_cast< unsigned int >( pntPosOffset / 3 );
+            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3] );
+            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+1] );
+            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+2] );
+        }
+    }
+
+    switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
+    switchByteOrderOfArray< unsigned int >( rawLineData, numLines + numPoints );
+    out.write( reinterpret_cast< char* >( rawPointData ), sizeof( float ) * numPoints * 3 );
+    out << lineDelimiter;
+    out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
+    out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
+    out << lineDelimiter;
+    out.close();
 }
