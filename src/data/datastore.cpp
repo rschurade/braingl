@@ -568,6 +568,16 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 }
                 break;
             }
+            case FNALGO_TENSOR_TRACK:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_TENSOR )
+                {
+                    QList<Dataset*> fibs = DWIAlgos::tensorTrack( dynamic_cast<DatasetTensor*>( ds ) );
+                    addDataset( fibs[0] );
+                }
+                break;
+            }
             case FNALGO_ISOSURFACE:
             {
                 Dataset* ds = m_datasetList.at( index.row() );

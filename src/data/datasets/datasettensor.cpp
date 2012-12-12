@@ -9,6 +9,8 @@
 #include "../../gui/gl/tensorrenderer.h"
 #include "../../gui/gl/tensorrendererev.h"
 
+#include "../../algos/fmath.h"
+
 #include "datasettensor.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
@@ -144,11 +146,13 @@ QVector<Matrix>* DatasetTensor::getLogData()
     {
         createLogTensors();
     }
-    return m_data;
+    return m_logData;
 }
 
 void DatasetTensor::createLogTensors()
 {
+    qDebug() << "create log tensors...";
+
     int blockSize = m_data->size();
     m_logData = new QVector<Matrix>( blockSize );
 
@@ -161,7 +165,7 @@ void DatasetTensor::createLogTensors()
     QVector<QVector3D> evec3( blockSize );
     QVector<float> eval3( blockSize );
 
-    FMath::evecs( m_data, evec1, eval2, evec1, eval2, evec3, eval3 );
+    FMath::evecs( m_data, evec1, eval1, evec2, eval2, evec3, eval3 );
 
 
     //log(M) =Ulog(D)UT
@@ -187,6 +191,7 @@ void DatasetTensor::createLogTensors()
 
         m_logData->replace( i, logM );
     }
+    qDebug() << "create log tensors done!";
 }
 
 void DatasetTensor::flipX()

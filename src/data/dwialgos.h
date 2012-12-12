@@ -29,6 +29,8 @@ public:
     static QList<Dataset*> calcEVFromTensor( DatasetTensor* ds );
     static QList<Dataset*> fitBingham( DatasetSH* ds );
 
+    static QList<Dataset*> tensorTrack( DatasetTensor* ds );
+
 private:
     DWIAlgos();
     virtual ~DWIAlgos();

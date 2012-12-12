@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include "../algos/fmath.h"
+#include "../algos/track.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QVector>
@@ -21,6 +22,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
+#include "datasets/datasetfibers.h"
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
@@ -130,7 +132,8 @@ DatasetScalar* DWIAlgos::calcFAFromDWI( DatasetDWI* ds )
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
 
-    QVector<float> fa = FMath::fa( tensors );
+    QVector<float> fa;
+    FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
     out->setProperty( "fileName", "FA" );
@@ -187,7 +190,8 @@ DatasetScalar* DWIAlgos::calcFAFromTensor( DatasetTensor* ds )
 {
     QVector<Matrix>* tensors = ds->getData();
 
-    QVector<float> fa = FMath::fa( tensors );
+    QVector<float> fa;
+    FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
     out->setProperty( "fileName", "FA" );
@@ -273,6 +277,18 @@ QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
         l[3]->setProperty( "datatype", DT_FLOAT );
         l[3]->setProperty( "active", false );
     }
+
+    return l;
+}
+
+QList<Dataset*> DWIAlgos::tensorTrack( DatasetTensor* ds )
+{
+    Track* tracker = new Track( ds );
+    tracker->startTracking();
+
+    QList<Dataset*> l;
+    DatasetFibers* fibs = new DatasetFibers( tracker->getFibs(), tracker->getNumPoints(), tracker->getNumLines() );
+    l.push_back( fibs );
 
     return l;
 }

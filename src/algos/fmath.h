@@ -51,15 +51,11 @@ public:
 
     static QVector<Matrix>* fitTensors( QVector<ColumnVector>* data, QVector<float> b0Images, QVector<QVector3D> bvecs, QVector<float> bvals );
 
-    static QVector<float> fa( QVector<Matrix>* tensors );
+    static void fa( QVector<Matrix>* tensors, QVector<float>& faOut );
 
     static void evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
                                                    QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                    QVector<QVector3D>& evec3, QVector<float>& eval3 );
-
-private:
-    FMath();
-    virtual ~FMath();
 
     static double pow2( double v )
     {
@@ -69,6 +65,12 @@ private:
     {
         return v * v * v;
     };
+
+private:
+    FMath();
+    virtual ~FMath();
+
+
 };
 
 #endif /* FMATH_H_ */
