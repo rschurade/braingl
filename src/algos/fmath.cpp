@@ -615,6 +615,72 @@ void FMath::fa( QVector<Matrix>* tensors, QVector<float>& faOut )
     }
 }
 
+void FMath::evec1( QVector<Matrix>* tensors, QVector<QVector3D>& evec1 )
+{
+    int blockSize = tensors->size();
+
+    evec1.resize( blockSize );
+
+    double xx, xy, xz, yy, yz, zz;
+    double i1, i2, i3, v, s, phi, l1, l2, l3;
+    double vec_norm, ev1_x, ev1_y, ev1_z;
+
+    for ( int i = 0; i < blockSize; ++i )
+    {
+        xx = tensors->at( i )( 1, 1 );
+        xy = tensors->at( i )( 1, 2 );
+        xz = tensors->at( i )( 1, 3 );
+        yy = tensors->at( i )( 2, 2 );
+        yz = tensors->at( i )( 2, 3 );
+        zz = tensors->at( i )( 3, 3 );
+
+        // three invariants of D (dt)
+        // i1=l1+l2+l3 (trace)
+        // i2=l1*l2+l1*l3+l2*l3
+        // i3=l1*l2*l3 (determinante)
+        i1 = xx + yy + zz;
+        i2 = xx * yy + xx * zz + yy * zz - ( pow2( xy ) + pow2( xz ) + pow2( yz ) );
+        i3 = xx * yy * zz + 2. * xy * xz * yz - ( zz * pow2( xy ) + yy * pow2( xz ) + xx * pow2( yz ) );
+
+        v = pow2( i1 / 3 ) - i2 / 3;
+        s = pow3( i1 / 3 ) - i1 * i2 / 6 + i3 / 2;
+        if ( ( v > 0 ) && ( pow2( s ) < pow3( v ) ) )
+            phi = acos( s / v * sqrt( 1. / v ) ) / 3;
+        else
+            phi = 0;
+
+        // eigenvalues
+        if ( phi != 0 )
+        {
+            l1 = i1 / 3 + 2 * sqrt( v ) * cos( phi );
+            l2 = i1 / 3 - 2 * sqrt( v ) * cos( M_PI / 3. + phi );
+            l3 = i1 / 3 - 2 * sqrt( v ) * cos( M_PI / 3. - phi );
+        }
+        else
+            l1 = l2 = l3 = 0.0;
+
+        // eigenvectors
+        ev1_x = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * yz - ( zz - l1 ) * xy );
+        ev1_y = ( xz * yz - ( zz - l1 ) * xy ) * ( xz * xy - ( xx - l1 ) * yz );
+        ev1_z = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * xy - ( xx - l1 ) * yz );
+
+        vec_norm = sqrt( pow2( ev1_x ) + pow2( ev1_y ) + pow2( ev1_z ) );
+
+        if ( vec_norm > 0 )
+        {
+            ev1_x = ev1_x / vec_norm;
+            ev1_y = ev1_y / vec_norm;
+            ev1_z = ev1_z / vec_norm;
+        }
+        else
+            ev1_x = ev1_y = ev1_z = 0.0;
+
+        evec1[i].setX( ev1_x );
+        evec1[i].setY( ev1_y );
+        evec1[i].setZ( ev1_z );
+    }
+}
+
 void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
                                                QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                QVector<QVector3D>& evec3, QVector<float>& eval3 )
@@ -727,3 +793,113 @@ void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<
         evec3[i].setZ( ev3_z );
     }
 }
+
+Matrix FMath::expT( Matrix& t )
+{
+    double xx, xy, xz, yy, yz, zz;
+    double i1, i2, i3, v, s, phi, l1, l2, l3;
+    double ev1_x, ev1_y, ev1_z, ev2_x, ev2_y, ev2_z, ev3_x, ev3_y, ev3_z, vec_norm;
+
+    xx = t( 1, 1 );
+    xy = t( 1, 2 );
+    xz = t( 1, 3 );
+    yy = t( 2, 2 );
+    yz = t( 2, 3 );
+    zz = t( 3, 3 );
+
+    // three invariants of D (dt)
+    // i1=l1+l2+l3 (trace)
+    // i2=l1*l2+l1*l3+l2*l3
+    // i3=l1*l2*l3 (determinante)
+    i1 = xx + yy + zz;
+    i2 = xx * yy + xx * zz + yy * zz - ( FMath::pow2( xy ) + FMath::pow2( xz ) + FMath::pow2( yz ) );
+    i3 = xx * yy * zz + 2. * xy * xz * yz - ( zz * FMath::pow2( xy ) + yy * FMath::pow2( xz ) + xx * FMath::pow2( yz ) );
+
+    v = FMath::pow2( i1 / 3 ) - i2 / 3;
+    s = FMath::pow3( i1 / 3 ) - i1 * i2 / 6 + i3 / 2;
+    if ( ( v > 0 ) && ( FMath::pow2( s ) < FMath::pow3( v ) ) )
+        phi = acos( s / v * sqrt( 1. / v ) ) / 3;
+    else
+        phi = 0;
+
+    // eigenvalues
+    if ( phi != 0 )
+    {
+        l1 = i1 / 3 + 2 * sqrt( v ) * cos( phi );
+        l2 = i1 / 3 - 2 * sqrt( v ) * cos( M_PI / 3. + phi );
+        l3 = i1 / 3 - 2 * sqrt( v ) * cos( M_PI / 3. - phi );
+    }
+    else
+        l1 = l2 = l3 = 0.0;
+    /*
+     eval1[i] = l1;
+     eval2[i] = l2;
+     eval3[i] = l3;
+     */
+    // eigenvectors
+    ev1_x = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * yz - ( zz - l1 ) * xy );
+    ev1_y = ( xz * yz - ( zz - l1 ) * xy ) * ( xz * xy - ( xx - l1 ) * yz );
+    ev1_z = ( xy * yz - ( yy - l1 ) * xz ) * ( xz * xy - ( xx - l1 ) * yz );
+
+    ev2_x = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * yz - ( zz - l2 ) * xy );
+    ev2_y = ( xz * yz - ( zz - l2 ) * xy ) * ( xz * xy - ( xx - l2 ) * yz );
+    ev2_z = ( xy * yz - ( yy - l2 ) * xz ) * ( xz * xy - ( xx - l2 ) * yz );
+
+    ev3_x = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * yz - ( zz - l3 ) * xy );
+    ev3_y = ( xz * yz - ( zz - l3 ) * xy ) * ( xz * xy - ( xx - l3 ) * yz );
+    ev3_z = ( xy * yz - ( yy - l3 ) * xz ) * ( xz * xy - ( xx - l3 ) * yz );
+
+    vec_norm = sqrt( FMath::pow2( ev1_x ) + FMath::pow2( ev1_y ) + FMath::pow2( ev1_z ) );
+
+    if ( vec_norm > 0 )
+    {
+        ev1_x = ev1_x / vec_norm;
+        ev1_y = ev1_y / vec_norm;
+        ev1_z = ev1_z / vec_norm;
+    }
+    else
+        ev1_x = ev1_y = ev1_z = 0.0;
+
+    vec_norm = sqrt( FMath::pow2( ev2_x ) + FMath::pow2( ev2_y ) + FMath::pow2( ev2_z ) );
+
+    if ( vec_norm > 0 )
+    {
+        ev2_x = ev2_x / vec_norm;
+        ev2_y = ev2_y / vec_norm;
+        ev2_z = ev2_z / vec_norm;
+    }
+    else
+        ev2_x = ev2_y = ev2_z = 0.0;
+
+    vec_norm = sqrt( FMath::pow2( ev3_x ) + FMath::pow2( ev3_y ) + FMath::pow2( ev3_z ) );
+
+    if ( vec_norm > 0 )
+    {
+        ev3_x = ev3_x / vec_norm;
+        ev3_y = ev3_y / vec_norm;
+        ev3_z = ev3_z / vec_norm;
+    }
+    else
+        ev3_x = ev3_y = ev3_z = 0.0;
+
+    Matrix U( 3, 3 );
+    DiagonalMatrix D( 3 );
+
+    U( 1, 1 ) = ev1_x;
+    U( 2, 1 ) = ev1_y;
+    U( 3, 1 ) = ev1_z;
+    U( 1, 2 ) = ev2_x;
+    U( 2, 2 ) = ev2_y;
+    U( 3, 2 ) = ev2_z;
+    U( 1, 3 ) = ev3_x;
+    U( 2, 3 ) = ev3_y;
+    U( 3, 3 ) = ev3_z;
+    D( 1 ) = exp( l1 );
+    D( 2 ) = exp( l2 );
+    D( 3 ) = exp( l3 );
+    Matrix expM(3,3);
+    expM = U * D * U.t();
+
+    return expM;
+}
+

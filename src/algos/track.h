@@ -29,29 +29,14 @@ public:
 private:
     void trackWholeBrain();
 
-    QVector<float> track( float xs, float ys, float zs, bool negDir );
-
-    int getID( float x, float y, float z );
-    float getInterpolatedFA( int id, float inx, float iny, float inz );
-
-    Matrix getInterpolatedTensor( int id, float inx, float iny, float inz );
-
-    Matrix expT( Matrix& t );
-
     DatasetTensor* m_dataset;
 
     QVector<Matrix>* m_tensors;
     QVector<Matrix>* m_logTensors;
+    // calculated fa and eigen vectors
+    QVector<float> m_fa;
+    QVector<QVector3D> m_evec1;
 
-    // calculated tensors, fa and eigen vectors
-    QVector<float>trace;
-    QVector<float>fa;
-    QVector<float>eval1;
-    QVector<float>eval2;
-    QVector<float>eval3;
-    QVector<QVector3D>evec1;
-    QVector<QVector3D>evec2;
-    QVector<QVector3D>evec3;
 
     QVector< QVector< float > >fibs;
 
@@ -72,9 +57,7 @@ private:
     float m_diag;
     int maxStepsInVoxel;
     float m_smoothness;
-    bool m_ignoreQForm;
-    bool m_debug;
-    bool m_verbose;
+
     int m_threads;
     int m_count;
     bool m_thinOut;
