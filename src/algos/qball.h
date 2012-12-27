@@ -22,18 +22,6 @@ public:
 private:
     QBall();
     virtual ~QBall();
-
-    static void regularize_sqball( const double par_1, const double par_2, ColumnVector& data );
-
-
-    static double pow2( double v )
-    {
-        return v * v;
-    };
-    static double pow3( double v )
-    {
-        return v * v * v;
-    };
 };
 
 #endif /* QBALL_H_ */
