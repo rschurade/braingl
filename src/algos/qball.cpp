@@ -126,5 +126,9 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
         *out += *( threads[i]->getQBallVector() );
     }
 
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        delete threads[i];
+    }
     return out;
 }

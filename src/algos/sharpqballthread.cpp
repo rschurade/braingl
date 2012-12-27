@@ -24,7 +24,7 @@ SharpQBallThread::SharpQBallThread( DatasetDWI* ds, int order, int id ) :
 
 SharpQBallThread::~SharpQBallThread()
 {
-    // TODO Auto-generated destructor stub
+    m_qBallVector->clear();
 }
 
 QVector<ColumnVector>* SharpQBallThread::getQBallVector()

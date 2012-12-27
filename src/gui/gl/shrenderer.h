@@ -30,6 +30,8 @@ protected:
 
     void initGeometry();
 
+    void initIndexBuffer( int lod );
+
 private:
     int m_tris1;
 
@@ -50,6 +52,8 @@ private:
     float m_lodAdjust;
     bool m_minMaxScaling;
     int m_order;
+
+    int m_oldLoD;
 
 };
 
