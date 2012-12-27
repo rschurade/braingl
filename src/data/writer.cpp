@@ -219,7 +219,7 @@ bool Writer::save()
         case FNDT_NIFTI_DWI:
         {
             QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
-            QVector<float> b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
+            QVector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
@@ -248,7 +248,7 @@ bool Writer::save()
 
             for ( int i = 0; i < blockSize; ++i )
             {
-                outData[i] = b0data[i];
+                outData[i] = b0data->at( i );
             }
 
             for ( int z = 0; z < img->nz; ++z )
