@@ -48,6 +48,7 @@ TrackThread::TrackThread( QVector<Matrix>* tensors,
 
 TrackThread::~TrackThread()
 {
+    fibs.clear();
 }
 
 QVector< QVector< float > > TrackThread::getFibs()
