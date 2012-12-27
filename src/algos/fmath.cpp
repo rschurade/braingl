@@ -474,7 +474,7 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float> b0Images, QVector<QVector3D> bvecs, QVector<float> bvals )
+QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float>* b0Images, QVector<QVector3D> bvecs, QVector<float> bvals )
 {
     int N = bvecs.size();
 
@@ -517,7 +517,7 @@ QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float> 
 
     for ( int i = 0; i < data->size(); ++i )
     {
-        s0 = b0Images[i];
+        s0 = b0Images->at( i );
 
         if ( s0 > 0 )
         {

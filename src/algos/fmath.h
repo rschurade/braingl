@@ -49,7 +49,7 @@ public:
 
     static Matrix pseudoInverse( const Matrix& A );
 
-    static QVector<Matrix>* fitTensors( QVector<ColumnVector>* data, QVector<float> b0Images, QVector<QVector3D> bvecs, QVector<float> bvals );
+    static QVector<Matrix>* fitTensors( QVector<ColumnVector>* data, QVector<float>* b0Images, QVector<QVector3D> bvecs, QVector<float> bvals );
 
     static void fa( QVector<Matrix>* tensors, QVector<float>& faOut );
 

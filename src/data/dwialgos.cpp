@@ -110,7 +110,7 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
     QVector<QVector3D> bvecs = ds->getBvecs();
     QVector<float> bvals = ds->getBvals();
     QVector<ColumnVector>* data = ds->getData();
-    QVector<float> b0Images = ds->getB0Data();
+    QVector<float>* b0Images = ds->getB0Data();
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
 
@@ -128,7 +128,7 @@ DatasetScalar* DWIAlgos::calcFAFromDWI( DatasetDWI* ds )
     QVector<QVector3D> bvecs = ds->getBvecs();
     QVector<float> bvals = ds->getBvals();
     QVector<ColumnVector>* data = ds->getData();
-    QVector<float> b0Images = ds->getB0Data();
+    QVector<float>* b0Images = ds->getB0Data();
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
 
@@ -149,7 +149,7 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
     QVector<QVector3D> bvecs = ds->getBvecs();
     QVector<float> bvals = ds->getBvals();
     QVector<ColumnVector>* data = ds->getData();
-    QVector<float> b0Images = ds->getB0Data();
+    QVector<float>* b0Images = ds->getB0Data();
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
 

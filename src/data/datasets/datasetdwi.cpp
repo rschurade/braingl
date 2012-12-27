@@ -33,9 +33,9 @@ QVector<ColumnVector>* DatasetDWI::getData()
     return m_data;
 }
 
-QVector<float> DatasetDWI::getB0Data()
+QVector<float>* DatasetDWI::getB0Data()
 {
-    return m_b0Data;
+    return &m_b0Data;
 }
 
 QVector<float> DatasetDWI::getBvals()

@@ -23,7 +23,7 @@ public:
 
     QVector<ColumnVector>* getData();
 
-    QVector<float> getB0Data();
+    QVector<float>* getB0Data();
 
     QVector<float> getBvals();
 

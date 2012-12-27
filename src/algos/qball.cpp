@@ -108,7 +108,7 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
     }
 
     QVector<ColumnVector>* data = ds->getData();
-    QVector<float> b0Data = ds->getB0Data();
+    QVector<float>* b0Data = ds->getB0Data();
 
     // inverse direction matrix for calculation:
     //const matrixT A( pseudoinverse (sh_base( gradients, order ) ) );
@@ -120,7 +120,7 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
     // for all voxels:
     for ( int i = 0; i < data->size(); ++i )
     {
-        ColumnVector voxel( data->at( i ) / b0Data[i] );
+        ColumnVector voxel( data->at( i ) / b0Data->at( i ) );
 
         // regularize data data:
         regularize_sqball( 0.15, 0.15, voxel );
@@ -139,7 +139,7 @@ QVector<ColumnVector>* QBall::sharpQBall( DatasetDWI* ds, int order )
             }
         }
 
-        if ( b0Data[i] > 0.0 )
+        if ( b0Data->at( i ) > 0.0 )
         {
             coeff( 1 ) = 1.0 / sqrt( 4. * M_PI );
         }
