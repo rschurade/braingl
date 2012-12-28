@@ -26,7 +26,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     setProperty( "createdBy", FNALGO_ISOSURFACE );
     setProperty( "type", FNDT_MESH_ISOSURFACE );
     setProperty( "name", "isosurface" );
-    setProperty( "isoValue", 200 );
+    setProperty( "isoValue", 80 );
 }
 
 DatasetIsosurface::~DatasetIsosurface()
@@ -73,11 +73,11 @@ void DatasetIsosurface::generateSurface()
     unsigned int nPointsInSlice = nPointsInXDirection * ( m_nY + 1 );
 
     // Generate isosurface.
-    for ( unsigned int z = 0; z < m_nZ; ++z )
+    for ( int z = 0; z < m_nZ; ++z )
     {
-        for ( unsigned int y = 0; y < m_nY; ++y )
+        for ( int y = 0; y < m_nY; ++y )
         {
-            for ( unsigned int x = 0; x < m_nX; ++x )
+            for ( int x = 0; x < m_nX; ++x )
             {
                 // Calculate table lookup index from those
                 // vertices which are below the isolevel.
@@ -107,19 +107,19 @@ void DatasetIsosurface::generateSurface()
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 3 );
                         unsigned int id = getEdgeID( x, y, z, 3 );
-                        m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                        m_i2pt3idVertices.insert( id, pt );
                     }
                     if ( edgeTable[ tableIndex ] & 1 )
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 0 );
                         unsigned int id = getEdgeID( x, y, z, 0 );
-                        m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                        m_i2pt3idVertices.insert( id, pt );
                     }
                     if ( edgeTable[ tableIndex ] & 256 )
                     {
                         POINT3DID pt = calculateIntersection( x, y, z, 8 );
                         unsigned int id = getEdgeID( x, y, z, 8 );
-                        m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                        m_i2pt3idVertices.insert( id, pt );
                     }
 
                     if ( x == m_nX - 1 )
@@ -128,13 +128,13 @@ void DatasetIsosurface::generateSurface()
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 2 );
                             unsigned int id = getEdgeID( x, y, z, 2 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[ tableIndex ] & 2048 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 11 );
                             unsigned int id = getEdgeID( x, y, z, 11 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                     }
                     if ( y == m_nY - 1 )
@@ -143,13 +143,13 @@ void DatasetIsosurface::generateSurface()
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 1 );
                             unsigned int id = getEdgeID( x, y, z, 1 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[ tableIndex ] & 512 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 9 );
                             unsigned int id = getEdgeID( x, y, z, 9 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                     }
                     if ( z == m_nZ - 1 )
@@ -158,13 +158,13 @@ void DatasetIsosurface::generateSurface()
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 4 );
                             unsigned int id = getEdgeID( x, y, z, 4 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                         if ( edgeTable[ tableIndex ] & 128 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 7 );
                             unsigned int id = getEdgeID( x, y, z, 7 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                     }
                     if ( ( x == m_nX - 1 ) && ( y == m_nY - 1 ) )
@@ -172,21 +172,21 @@ void DatasetIsosurface::generateSurface()
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 10 );
                             unsigned int id = getEdgeID( x, y, z, 10 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                     if ( ( x == m_nX - 1 ) && ( z == m_nZ - 1 ) )
                         if ( edgeTable[ tableIndex ] & 64 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 6 );
                             unsigned int id = getEdgeID( x, y, z, 6 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
                     if ( ( y == m_nY - 1 ) && ( z == m_nZ - 1 ) )
                         if ( edgeTable[ tableIndex ] & 32 )
                         {
                             POINT3DID pt = calculateIntersection( x, y, z, 5 );
                             unsigned int id = getEdgeID( x, y, z, 5 );
-                            m_i2pt3idVertices.insert( ID2POINT3DID::value_type( id, pt ) );
+                            m_i2pt3idVertices.insert( id, pt );
                         }
 
                     for ( int i = 0; triTable[ tableIndex ][ i ] != -1; i += 3 )
@@ -351,7 +351,7 @@ POINT3DID DatasetIsosurface::interpolate( float fX1, float fY1, float fZ1, float
 void DatasetIsosurface::renameVerticesAndTriangles()
 {
     unsigned int nextID = 0;
-    ID2POINT3DID::iterator mapIterator = m_i2pt3idVertices.begin();
+    QMap<int, POINT3DID>::iterator mapIterator = m_i2pt3idVertices.begin();
     TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
 
     m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
@@ -363,8 +363,8 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
-        ( *mapIterator ).second.newID = nextID;
-        m_mesh->addVertex( nextID, ( *mapIterator ).second.x + xOff, ( *mapIterator ).second.y + yOff, ( *mapIterator ).second.z + zOff );
+        ( *mapIterator ).newID = nextID;
+        m_mesh->addVertex( nextID, ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
         ++nextID;
         ++mapIterator;
     }
