@@ -10,8 +10,6 @@
 
 #include "../../thirdparty/glew/include/glew.h"
 
-#include "../../thirdparty/nifti/nifti1_io.h"
-
 #include "../mesh/isosurfaceincludes.h"
 
 #include "dataset.h"
@@ -19,6 +17,7 @@
 class DatasetScalar;
 class MeshRenderer;
 class TriangleMesh2;
+class IsoSurfaceThread;
 
 class DatasetIsosurface : public Dataset
 {
@@ -34,10 +33,6 @@ protected:
 
 private:
     void generateSurface();
-    int getEdgeID( unsigned int nX, unsigned int nY, unsigned int nZ, unsigned int nEdgeNo );
-    unsigned int getVertexID( unsigned int nX, unsigned int nY, unsigned int nZ );
-    POINT3DID calculateIntersection( unsigned int nX, unsigned int nY, unsigned int nZ, unsigned int nEdgeNo );
-    POINT3DID interpolate( float fX1, float fY1, float fZ1, float fX2, float fY2, float fZ2, float tVal1, float tVal2 );
     void renameVerticesAndTriangles();
 
     QVector<float> m_scalarField;
@@ -66,6 +61,9 @@ private:
 
     int m_nPointsInXDirection;
     int m_nPointsInSlice;
+
+    int m_numThreads;
+    QVector<IsoSurfaceThread*> m_threads;
 };
 
 #endif /* DATASETISOSURFACE_H_ */
