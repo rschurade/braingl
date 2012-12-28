@@ -35,6 +35,7 @@ SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny,
     m_orient( orient ),
     m_id( id )
 {
+    m_verts = new QVector<float>();
 }
 
 SHRendererThread::~SHRendererThread()
@@ -69,8 +70,6 @@ void SHRendererThread::run()
     float z = (float)m_zi * m_dz + m_dz / 2.;
 
     int numThreads = QThread::idealThreadCount();
-
-    m_verts = new QVector<float>();
 
     if ( m_orient == 1 )
     {
