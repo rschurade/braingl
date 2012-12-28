@@ -18,9 +18,9 @@
 #define NUM_TEXTURES 5
 
 bool GLFunctions::shadersLoaded = false;
-QHash<QString, QGLShaderProgram*> GLFunctions::m_shaders;
-QHash<QString, QString> GLFunctions::m_shaderSources;
-QVector<QString> GLFunctions::m_shaderNames;
+QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
+QHash< QString, QString > GLFunctions::m_shaderSources;
+QVector< QString > GLFunctions::m_shaderNames;
 
 GLFunctions::GLFunctions()
 {
@@ -32,7 +32,7 @@ GLFunctions::~GLFunctions()
 
 void GLFunctions::setupTextures( QAbstractItemModel* model )
 {
-    QList<int> tl = getTextureIndexes( model );
+    QList< int > tl = getTextureIndexes( model );
     QModelIndex index;
     int texIndex = 4;
     switch ( tl.size() )
@@ -41,7 +41,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 4;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -52,7 +52,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 3;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -63,7 +63,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 2;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -74,7 +74,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 1;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -85,7 +85,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 0;
             index = model->index( tl.at( texIndex ), 1 );
-            GLuint tex = static_cast<GLuint>( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE0 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -115,22 +115,22 @@ void GLFunctions::setTexInterpolation( QAbstractItemModel* model, int row )
 
 QGLShaderProgram* GLFunctions::getShader( QString name )
 {
-    return m_shaders[name];
+    return m_shaders[ name ];
 }
 
-QVector<QString> GLFunctions::getShaderNames()
+QVector< QString > GLFunctions::getShaderNames()
 {
     return m_shaderNames;
 }
 
 QString GLFunctions::getShaderCode( QString name )
 {
-    return m_shaderSources[name];
+    return m_shaderSources[ name ];
 }
 
-void GLFunctions::setShaderCode( QString name,  QString source )
+void GLFunctions::setShaderCode( QString name, QString source )
 {
-    GLFunctions::m_shaderSources[name] = source;
+    GLFunctions::m_shaderSources[ name ] = source;
     reloadShaders();
 }
 
@@ -138,7 +138,7 @@ void GLFunctions::reloadShaders()
 {
     for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
-        GLFunctions::m_shaders[GLFunctions::m_shaderNames[i]] = initShader( GLFunctions::m_shaderNames[i] );
+        GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
     }
 }
 
@@ -153,11 +153,12 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "tensorev" );
         GLFunctions::m_shaderNames.push_back( "ev" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
+        GLFunctions::m_shaderNames.push_back( "fiber" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
-            copyShaderToString( GLFunctions::m_shaderNames[i] );
-            GLFunctions::m_shaders[GLFunctions::m_shaderNames[i]] = initShader( GLFunctions::m_shaderNames[i] );
+            copyShaderToString( GLFunctions::m_shaderNames[ i ] );
+            GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
         }
 
         GLFunctions::shadersLoaded = true;
@@ -167,7 +168,7 @@ void GLFunctions::loadShaders()
 void GLFunctions::copyShaderToString( QString name )
 {
     QFile fileVS( ":/shaders/" + name + ".vs" );
-    fileVS.open(QIODevice::ReadOnly);
+    fileVS.open( QIODevice::ReadOnly );
     QTextStream inVS( &fileVS );
     QString codeVS( "" );
     while ( !inVS.atEnd() )
@@ -175,9 +176,9 @@ void GLFunctions::copyShaderToString( QString name )
         codeVS += inVS.readLine();
         codeVS += "\n";
     }
-    GLFunctions::m_shaderSources[name + "_vs"] = codeVS;
+    GLFunctions::m_shaderSources[ name + "_vs" ] = codeVS;
     QFile fileFS( ":/shaders/" + name + ".fs" );
-    fileFS.open(QIODevice::ReadOnly);
+    fileFS.open( QIODevice::ReadOnly );
     QTextStream inFS( &fileFS );
     QString codeFS( "" );
     while ( !inFS.atEnd() )
@@ -185,7 +186,7 @@ void GLFunctions::copyShaderToString( QString name )
         codeFS += inFS.readLine();
         codeFS += "\n";
     }
-    GLFunctions::m_shaderSources[name + "_fs"] = codeFS;
+    GLFunctions::m_shaderSources[ name + "_fs" ] = codeFS;
 }
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
@@ -196,14 +197,14 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     setlocale( LC_NUMERIC, "C" );
 
     // Compiling vertex shader
-    if ( !program->addShaderFromSourceCode( QGLShader::Vertex, GLFunctions::m_shaderSources[name + "_vs"] ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Vertex, GLFunctions::m_shaderSources[ name + "_vs" ] ) )
     {
         qCritical() << "Error while compiling vertex shader: " << name << "!";
         //exit( false );
     }
 
     // Compiling fragment shader
-    if ( !program->addShaderFromSourceCode( QGLShader::Fragment, GLFunctions::m_shaderSources[name + "_fs"] ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Fragment, GLFunctions::m_shaderSources[ name + "_fs" ] ) )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
         //exit( false );
@@ -233,27 +234,31 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
 {
     if ( name == "slice" )
     {
-        setSliceShaderVars( m_shaders[name], model );
+        setShaderVarsSlice( m_shaders[ name ], model );
     }
     if ( name == "qball" )
     {
-        setQBallShaderVars( m_shaders[name], model );
+        setShaderVarsQBall( m_shaders[ name ], model );
     }
     if ( name == "superquadric" )
     {
-        setTensorShaderVars( m_shaders[name], model );
+        setShaderVarsTensor( m_shaders[ name ], model );
     }
     if ( name == "tensorev" )
     {
-        setTensorShaderVarsEV( m_shaders[name], model );
+        setShaderVarsTensorEV( m_shaders[ name ], model );
     }
     if ( name == "ev" )
     {
-        setShaderVarsEV( m_shaders[name], model );
+        setShaderVarsEV( m_shaders[ name ], model );
     }
     if ( name == "mesh" )
     {
-        setShaderVarsMesh( m_shaders[name], model );
+        setShaderVarsMesh( m_shaders[ name ], model );
+    }
+    if ( name == "fiber" )
+    {
+        setShaderVarsFiber( m_shaders[ name ], model );
     }
 }
 
@@ -268,13 +273,35 @@ void GLFunctions::setShaderVarsMesh( QGLShaderProgram* program, QAbstractItemMod
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int normalLocation = program->attributeLocation("a_normal");
+    offset += sizeof(float) * 3;
+    int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *)offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
 }
 
-void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setShaderVarsFiber( QGLShaderProgram* program, QAbstractItemModel* model )
+{
+    program->bind();
+
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int normalLocation = program->attributeLocation( "a_normal" );
+    program->enableAttributeArray( normalLocation );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+}
+
+void GLFunctions::setShaderVarsTensor( QGLShaderProgram* program, QAbstractItemModel* model )
 {
     program->bind();
 
@@ -285,23 +312,23 @@ void GLFunctions::setTensorShaderVars( QGLShaderProgram* program, QAbstractItemM
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int normalLocation = program->attributeLocation("a_normal");
+    offset += sizeof(float) * 3;
+    int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int offsetLocation = program->attributeLocation("a_diag");
-    program->enableAttributeArray(offsetLocation);
-    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
+    offset += sizeof(float) * 3;
+    int offsetLocation = program->attributeLocation( "a_diag" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int radiusLocation = program->attributeLocation("a_offdiag");
-    program->enableAttributeArray(radiusLocation);
-    glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *)offset );
+    offset += sizeof(float) * 3;
+    int radiusLocation = program->attributeLocation( "a_offdiag" );
+    program->enableAttributeArray( radiusLocation );
+    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 }
 
-void GLFunctions::setTensorShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setShaderVarsTensorEV( QGLShaderProgram* program, QAbstractItemModel* model )
 {
     program->bind();
 
@@ -312,20 +339,20 @@ void GLFunctions::setTensorShaderVarsEV( QGLShaderProgram* program, QAbstractIte
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int dirLocation = program->attributeLocation("a_dir");
+    offset += sizeof(float) * 3;
+    int dirLocation = program->attributeLocation( "a_dir" );
     program->enableAttributeArray( dirLocation );
-    glVertexAttribPointer(dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    offset += sizeof(float)*1;
-    int offsetLocation = program->attributeLocation("a_diag");
-    program->enableAttributeArray(offsetLocation);
-    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    offset += sizeof(float) * 1;
+    int offsetLocation = program->attributeLocation( "a_diag" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int radiusLocation = program->attributeLocation("a_offdiag");
-    program->enableAttributeArray(radiusLocation);
-    glVertexAttribPointer(radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    offset += sizeof(float) * 3;
+    int radiusLocation = program->attributeLocation( "a_offdiag" );
+    program->enableAttributeArray( radiusLocation );
+    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
 void GLFunctions::setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel* model )
@@ -339,18 +366,18 @@ void GLFunctions::setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int dirLocation = program->attributeLocation("a_dir");
+    offset += sizeof(float) * 3;
+    int dirLocation = program->attributeLocation( "a_dir" );
     program->enableAttributeArray( dirLocation );
-    glVertexAttribPointer(dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *)offset );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 
-    offset += sizeof(float)*1;
-    int offsetLocation = program->attributeLocation("a_vec");
-    program->enableAttributeArray(offsetLocation);
-    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *)offset );
+    offset += sizeof(float) * 1;
+    int offsetLocation = program->attributeLocation( "a_vec" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 }
 
-void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model )
 {
     program->bind();
     // Offset for position
@@ -365,9 +392,9 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
     offset += sizeof(QVector3D);
 
     // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    glVertexAttribPointer(texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *)offset);
+    int texcoordLocation = program->attributeLocation( "a_texcoord" );
+    program->enableAttributeArray( texcoordLocation );
+    glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
     program->setUniformValue( "texture0", 0 );
     program->setUniformValue( "texture1", 1 );
@@ -381,8 +408,7 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
     program->setUniformValue( "u_texActive3", false );
     program->setUniformValue( "u_texActive4", false );
 
-
-    QList<int> tl = getTextureIndexes( model );
+    QList< int > tl = getTextureIndexes( model );
     QModelIndex index;
     int texIndex = 4;
     float texMax = 1;
@@ -474,7 +500,7 @@ void GLFunctions::setSliceShaderVars( QGLShaderProgram* program, QAbstractItemMo
     }
 }
 
-void GLFunctions::setQBallShaderVars( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setShaderVarsQBall( QGLShaderProgram* program, QAbstractItemModel* model )
 {
     program->bind();
 
@@ -485,27 +511,27 @@ void GLFunctions::setQBallShaderVars( QGLShaderProgram* program, QAbstractItemMo
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     // Offset for texture coordinate
-    offset += sizeof(float)*3;
+    offset += sizeof(float) * 3;
 
     // Tell OpenGL programmable pipeline how to locate vertex normal data
-    int normalLocation = program->attributeLocation("a_normal");
-    program->enableAttributeArray(normalLocation);
-    glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    int normalLocation = program->attributeLocation( "a_normal" );
+    program->enableAttributeArray( normalLocation );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int offsetLocation = program->attributeLocation("a_offset");
-    program->enableAttributeArray(offsetLocation);
-    glVertexAttribPointer(offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    offset += sizeof(float) * 3;
+    int offsetLocation = program->attributeLocation( "a_offset" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    offset += sizeof(float)*3;
-    int radiusLocation = program->attributeLocation("a_radius");
-    program->enableAttributeArray(radiusLocation);
-    glVertexAttribPointer(radiusLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *)offset );
+    offset += sizeof(float) * 3;
+    int radiusLocation = program->attributeLocation( "a_radius" );
+    program->enableAttributeArray( radiusLocation );
+    glVertexAttribPointer( radiusLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
-QList<int> GLFunctions::getTextureIndexes( QAbstractItemModel* model )
+QList< int > GLFunctions::getTextureIndexes( QAbstractItemModel* model )
 {
-    QList<int>tl;
+    QList< int > tl;
 
     int countDatasets = model->rowCount();
     int allocatedTextureCount = 0;

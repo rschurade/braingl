@@ -12,13 +12,15 @@
 
 #include "dataset.h"
 
+class FiberRenderer;
+
 class DatasetFibers: public Dataset
 {
 public:
     DatasetFibers( QVector< QVector< float > > fibs, int numPoints, int numLines );
     virtual ~DatasetFibers();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();
@@ -28,6 +30,8 @@ protected:
 
 private:
     QVector< QVector< float > > m_fibs;
+
+    FiberRenderer* m_renderer;
 };
 
 #endif /* DATASETFIBERS_H_ */
