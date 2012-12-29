@@ -11,6 +11,7 @@
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
 
+class MeshThread;
 
 class TriangleMesh2
 {
@@ -45,6 +46,8 @@ private:
     QVector<int>m_triangles;
     QVector<QVector3D>m_triNormals;
 
+    int m_numThreads;
+    QVector<MeshThread*> m_threads;
 };
 
 #endif /* TRIANGLEMESH2_H_ */

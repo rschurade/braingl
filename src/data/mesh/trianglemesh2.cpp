@@ -4,6 +4,9 @@
  *  Created on: Dec 4, 2012
  *      Author: schurade
  */
+#include <QtCore/QDebug>
+
+#include "meshthread.h"
 #include "trianglemesh2.h"
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
@@ -17,6 +20,14 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
 
     m_triangles.resize( numTris * 3 );
     m_triNormals.resize( numTris );
+
+    m_numThreads = QThread::idealThreadCount();
+
+    // create threads
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        m_threads.push_back( new MeshThread( &m_vertices, &m_triangles, m_numTris, i ) );
+    }
 }
 
 TriangleMesh2::~TriangleMesh2()
@@ -59,29 +70,27 @@ int* TriangleMesh2::getIndexes()
 
 void TriangleMesh2::calcTriNormals()
 {
-    float v1x, v1y, v1z;
-    float v2x, v2y, v2z;
-
-    for ( int i = 0; i < m_numTris; ++i )
+    // run threads
+    for ( int i = 0; i < m_numThreads; ++i )
     {
-        v1x = m_vertices[6 * m_triangles[3*i+1]  ] - m_vertices[6 * m_triangles[3*i]  ];
-        v1y = m_vertices[6 * m_triangles[3*i+1]+1] - m_vertices[6 * m_triangles[3*i]+1];
-        v1z = m_vertices[6 * m_triangles[3*i+1]+2] - m_vertices[6 * m_triangles[3*i]+2];
+        m_threads[i]->start();
+    }
 
-        v2x = m_vertices[6 * m_triangles[3*i+2]  ] - m_vertices[6 * m_triangles[3*i]  ];
-        v2y = m_vertices[6 * m_triangles[3*i+2]+1] - m_vertices[6 * m_triangles[3*i]+1];
-        v2z = m_vertices[6 * m_triangles[3*i+2]+2] - m_vertices[6 * m_triangles[3*i]+2];
-
-        m_triNormals[i].setX( v1y * v2z - v1z * v2y );
-        m_triNormals[i].setY( v1z * v2x - v1x * v2z );
-        m_triNormals[i].setZ( v1x * v2y - v1y * v2x );
-
-        m_triNormals[i].normalize();
+    // wait for all threads to finish
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        m_threads[i]->wait();
     }
 }
 
 void TriangleMesh2::calcVertNormals()
 {
+    m_triNormals.clear();
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        m_triNormals += *( m_threads[i]->getTriNormals() );
+    }
+
     QVector3D sum( 0, 0, 0 );
     for ( int i = 0; i < m_numVerts; ++i )
     {
