@@ -172,7 +172,7 @@ void DatasetTensor::createLogTensors()
     Matrix U(3,3);
     DiagonalMatrix D(3);
     Matrix logM(3,3);
-    for ( size_t i = 0; i < m_logData->size(); ++i )
+    for ( int i = 0; i < m_logData->size(); ++i )
     {
         U( 1, 1 ) = evec1[i].x();
         U( 2, 1 ) = evec1[i].y();

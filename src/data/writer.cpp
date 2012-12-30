@@ -377,7 +377,7 @@ void Writer::saveFibs( string filename )
 
     unsigned int numPoints = 0;
     unsigned int numLines = fibs.size();
-    for( size_t i = 0; i < fibs.size(); ++i )
+    for( int i = 0; i < fibs.size(); ++i )
     {
         numPoints += fibs[i].size()/3;
     }
@@ -388,11 +388,11 @@ void Writer::saveFibs( string filename )
     unsigned int pntPosOffset = 0;
     unsigned int lnsPosOffset = 0;
 
-    for( size_t i = 0; i < fibs.size(); ++i )
+    for( int i = 0; i < fibs.size(); ++i )
     {
         QVector<float>fib = fibs[i];
         rawLineData[lnsPosOffset++] = static_cast< unsigned int >( fib.size()/3 );
-        for( size_t j = 0; j < fib.size()/3; ++j )
+        for( int j = 0; j < fib.size()/3; ++j )
         {
             rawLineData[lnsPosOffset++] = static_cast< unsigned int >( pntPosOffset / 3 );
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3] );
