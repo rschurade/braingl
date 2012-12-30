@@ -856,7 +856,6 @@ bool Loader::loadMeshBinary()
         in >> v3;
         tmesh->addTriangle( v1, v2, v3 );
     }
-
+*/
     return false;
-    */
 }

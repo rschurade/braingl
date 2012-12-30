@@ -191,9 +191,6 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
 
 QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
 {
-
-    FN_DATASET_TYPE type = static_cast<FN_DATASET_TYPE>( m_datasetList.at( index.row() )->getProperty( "type" ).toInt() );
-
     Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
 
     switch ( index.column() )

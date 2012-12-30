@@ -117,8 +117,8 @@ void BinghamRenderer::initGeometry()
     int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
     qDebug() << "Bingham Renderer: using lod " << lod;
 
-    float x = (float)xi * m_dx + m_dx / 2.;
-    float y = (float)yi * m_dy + m_dy / 2.;
+    //float x = (float)xi * m_dx + m_dx / 2.;
+    //float y = (float)yi * m_dy + m_dy / 2.;
     float z = (float)zi * m_dz + m_dz / 2.;
 
     // TODO

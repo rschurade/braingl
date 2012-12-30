@@ -129,8 +129,6 @@ ColumnVector FMath::moment_of_inertia( const ColumnVector& values, const QVector
         double y( points[i]( 2 ) );
         double z( points[i]( 3 ) );
         double val = fabs( values( i + 1 ) );
-//        qDebug() << x << y << z;
-//        qDebug() << "val" << val;
 
         result( 1 ) += x * x * val;
         result( 2 ) += x * y * val;
@@ -142,7 +140,6 @@ ColumnVector FMath::moment_of_inertia( const ColumnVector& values, const QVector
         sum += val * val;
     }
     result = result / sum;
-    //qDebug() << result( 1 ) << result( 2 ) << result( 3 ) << result( 4 ) << result( 5 ) << result( 6 );
 
     return result;
 }
@@ -156,7 +153,7 @@ double FMath::iprod( const ColumnVector& v1, const ColumnVector& v2 )
         throw std::range_error( "Vectors in scalar product need same size!" );
     }
 
-    for ( unsigned long i( 1 ); i < v1.Nrows() + 1; i++ )
+    for ( int i = 1; i < v1.Nrows() + 1; ++i )
     {
         result += v1( i ) * v2( i );
     }

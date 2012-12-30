@@ -91,7 +91,7 @@ set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x -fopenmp" )
 # Add sources as target
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 SET ( CMAKE_AUTOMOC TRUE )
-SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
+SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-int-to-pointer-cast -Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
     ADD_DEFINITIONS( -D__LINUX__ )
