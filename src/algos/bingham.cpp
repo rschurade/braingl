@@ -4,8 +4,6 @@
  *  Created on: Nov 23, 2012
  *      Author: schurade
  */
-#include <omp.h>
-
 #include <QtCore/QDebug>
 
 #include "../data/mesh/tesselation.h"
@@ -106,8 +104,6 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 // For all voxels:
     int percent = 1;
     int done = 0;
-    omp_set_num_threads( 8 );
-//#pragma omp parallel for
     //for ( int i = 0; i < data->size(); ++i )
     for ( int i = 496203 + 20*93; i < 506991 - 20*93; ++i )
     {

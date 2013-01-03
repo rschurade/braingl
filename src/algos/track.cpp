@@ -4,8 +4,6 @@
  *  Created on: Dec 11, 2012
  *      Author: schurade
  */
-#include <omp.h>
-
 #include <QThread>
 
 #include "../data/datasets/datasettensor.h"

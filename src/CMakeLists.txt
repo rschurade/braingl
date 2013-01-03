@@ -77,15 +77,13 @@ INCLUDE( Utils )
 # find the boost packages
 FIND_PACKAGE( Boost 1.46.0 )
 
-FIND_PACKAGE( OpenMP )
-
 # include the boost headers
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x -fopenmp" )
+set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
