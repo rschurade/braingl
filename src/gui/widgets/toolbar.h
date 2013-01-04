@@ -26,7 +26,7 @@ public:
 private:
     ToolBarView* m_toolBarView;
 
-    QAction* m_scalarAction1;
+    QAction* m_isosurfaceAct;
     QAction* m_vectorAction1;
     QAction* m_qball4Act;
     QAction* m_qball6Act;
@@ -41,7 +41,7 @@ private:
     void createActions();
 
 private slots:
-    void slotScalar1();
+    void slotIsosurface();
     void slotVector1();
     void slotQBall4();
     void slotQBall6();

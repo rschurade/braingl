@@ -45,9 +45,9 @@ void ToolBar::setSelectionModel( QItemSelectionModel* selectionModel )
 
 void ToolBar::createActions()
 {
-    m_scalarAction1 = new QAction( QIcon( ":/icons/tmp1.png" ), tr( "Scalar 1" ), this );
-    m_scalarAction1->setStatusTip( tr( "Scalar Action 1" ) );
-    connect( m_scalarAction1, SIGNAL( triggered() ), this, SLOT( slotScalar1() ) );
+    m_isosurfaceAct = new QAction( QIcon( ":/icons/tmp1.png" ), tr( "Scalar 1" ), this );
+    m_isosurfaceAct->setStatusTip( tr( "Scalar Action 1" ) );
+    connect( m_isosurfaceAct, SIGNAL( triggered() ), this, SLOT( slotIsosurface() ) );
 
     m_vectorAction1 = new QAction( QIcon( ":/icons/tmp3.png" ), tr( "Vector 1" ), this );
     m_vectorAction1->setStatusTip( tr( "Vector Action 1" ) );
@@ -92,7 +92,7 @@ void ToolBar::createActions()
     connect( m_fiberAction1, SIGNAL( triggered() ), this, SLOT( slotFiber1() ) );
 }
 
-void ToolBar::slotScalar1()
+void ToolBar::slotIsosurface()
 {
     m_toolBarView->activateAlgo( FNALGO_ISOSURFACE );
 }
@@ -156,7 +156,7 @@ void ToolBar::slotSelectionChanged( int type )
     {
         case FNDT_NIFTI_SCALAR:
         {
-            this->addAction( m_scalarAction1 );
+            this->addAction( m_isosurfaceAct );
             break;
         }
         case FNDT_NIFTI_VECTOR:

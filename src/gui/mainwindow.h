@@ -20,7 +20,7 @@ class MainWindow: public QMainWindow
 Q_OBJECT
 
 public:
-    MainWindow( DataStore* dataStore );
+    MainWindow( DataStore* dataStore, bool debug = false );
 
     void closeEvent( QCloseEvent *event );
 
@@ -53,6 +53,8 @@ private:
     void createDockWindows();
 
     DataStore* m_dataStore;
+
+    bool m_debug;
 
     GLWidget* mainGLWidget;
 

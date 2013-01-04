@@ -55,12 +55,7 @@ int main( int argc, char *argv[] )
     DataStore* dataStore = new DataStore();
 
     qInstallMsgHandler( noOutput );
-
-    #ifdef QT_DEBUG_OUTPUT
-    out = new QTextStream( stdout );
-    qInstallMsgHandler( logOutput );
-    qDebug() << "Debug version";
-    #else
+    bool debug = false;
     for ( int i = 1; i < args.size(); ++i )
     {
         if ( args.at( i ) == "-v" )
@@ -68,10 +63,17 @@ int main( int argc, char *argv[] )
             out = new QTextStream( stdout );
             qInstallMsgHandler( logOutput );
         }
+        if ( args.at( i ) == "-d" )
+        {
+            debug = true;
+        }
     }
-    #endif
 
-    MainWindow mainWin( dataStore );
+#ifdef __DEBUG__
+    debug = true;
+#endif
+
+    MainWindow mainWin( dataStore, debug );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )
