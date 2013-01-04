@@ -30,8 +30,6 @@ protected:
 
     void initGeometry();
 
-    void initIndexBuffer( int lod );
-
 private:
     int m_tris1;
 

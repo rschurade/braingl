@@ -18,8 +18,6 @@ SharpQBallThread::SharpQBallThread( DatasetDWI* ds, int order, int id ) :
     m_order( order ),
     m_id( id )
 {
-    // TODO Auto-generated constructor stub
-
 }
 
 SharpQBallThread::~SharpQBallThread()
