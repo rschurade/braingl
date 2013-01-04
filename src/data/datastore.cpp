@@ -110,8 +110,8 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     if ( !index.isValid() )
         return QVariant();
 
-    if ( index.row() < 0 || index.row() > m_datasetList.size() - 1 )
-        return QVariant();
+//    if ( index.row() < 0 || index.row() > m_datasetList.size() - 1 )
+//        return QVariant();
 
     switch ( role )
     {
@@ -754,6 +754,10 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     if ( row < m_datasetList.size() )
     {
         return createIndex( row, column, m_datasetList.at( row ) );
+    }
+    else if ( m_datasetList.size() == 0 && column > 100 )
+    {
+        return createIndex( row, column, 0 );
     }
     else
     {
