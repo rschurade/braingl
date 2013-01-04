@@ -55,7 +55,7 @@ MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	if ( settings.contains( "lastPath" ) )
 	{
 	    QString lastPath = settings.value( "lastPath" ).toString();
-	    QModelIndex mi = m_dataStore->index( 0, 112 );
+	    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
 	}
 
@@ -66,7 +66,7 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	QSettings settings;
 	settings.setValue( "mainWindowGeometry", saveGeometry() );
 	settings.setValue( "mainWindowState", saveState() );
-	QModelIndex mi = m_dataStore->index( 0, 112 );
+	QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
 }
 
@@ -76,9 +76,8 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QModelIndex mi = m_dataStore->index( 0, 112 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
     QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
-
 
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
@@ -88,16 +87,15 @@ void MainWindow::open()
     	QFileInfo fi( fileName );
     	QDir dir = fi.absoluteDir();
     	QString lastPath = dir.absolutePath();
-
         m_dataStore->setData( mi, lastPath, Qt::UserRole );
     }
 }
 
 void MainWindow::save()
 {
-    QModelIndex mi = m_dataStore->index( 0, 112 );
+    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
     QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
-    QString fileName = QFileDialog::getOpenFileName( this, "Save File", fn );
+    QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
     if ( !fileName.isEmpty() )
     {
