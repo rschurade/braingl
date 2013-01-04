@@ -20,9 +20,10 @@
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow( DataStore* dataStore ) :
+MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	QMainWindow(),
-    m_dataStore( dataStore )
+    m_dataStore( dataStore ),
+    m_debug( debug )
 {
 	m_centralTabWidget = new QTabWidget( this );
 	setCentralWidget( m_centralTabWidget );
@@ -264,9 +265,10 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
     //fileToolBar->addAction( printAct );
-#ifdef __DEBUG__
-    fileToolBar->addAction( toggleShaderEditAct );
-#endif
+    if ( m_debug )
+    {
+        fileToolBar->addAction( toggleShaderEditAct );
+    }
     fileToolBar->setObjectName( "fileToolbar");
 
     editToolBar = addToolBar( tr( "Edit" ) );
