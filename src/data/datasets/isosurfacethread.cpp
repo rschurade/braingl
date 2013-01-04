@@ -4,7 +4,7 @@
  *  Created on: 28.12.2012
  *      Author: Ralph
  */
-#include <QDebug>
+#include <QtCore/QDebug>
 
 #include "isosurfacethread.h"
 

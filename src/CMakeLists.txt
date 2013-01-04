@@ -18,6 +18,11 @@ IF ( FN_VERBOSE_MAKEFILE MATCHES ON )
     set ( CMAKE_VERBOSE_MAKEFILE ON )
 ENDIF()
 
+IF (NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type selected, default to Release")
+    set(CMAKE_BUILD_TYPE "Release")
+ENDIF()
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
