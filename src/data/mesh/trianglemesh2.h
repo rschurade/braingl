@@ -20,7 +20,9 @@ public:
     virtual ~TriangleMesh2();
 
     void addVertex( int id, float x, float y, float z );
+    void addVertex( float x, float y, float z );
     void addTriangle( int id, int v0, int v1, int v2 );
+    void addTriangle( int v0, int v1, int v2 );
 
     void finalize();
 
@@ -48,6 +50,9 @@ private:
 
     int m_numThreads;
     QVector<MeshThread*> m_threads;
+
+    int m_vertexInsertId;
+    int m_triangleInsertId;
 };
 
 #endif /* TRIANGLEMESH2_H_ */

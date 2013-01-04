@@ -12,7 +12,7 @@ QTextStream *out = 0;
 
 void logOutput(QtMsgType type, const char *msg)
 {
-    QString debugdate = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
+    QString debugdate = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss:zzz");
     switch (type)
     {
     case QtDebugMsg:

@@ -83,6 +83,7 @@ QString DatasetIsosurface::getValueAsString( int x, int y, int z )
 
 void DatasetIsosurface::generateSurface()
 {
+    qDebug() << "start generate";
     for ( int i = 0; i < m_numThreads; ++i )
     {
         m_threads[i]->setIsoLevel( m_isoLevel );
@@ -103,6 +104,7 @@ void DatasetIsosurface::generateSurface()
 
 void DatasetIsosurface::renameVerticesAndTriangles()
 {
+    qDebug() << "start rename";
     unsigned int nextID = 0;
     QMap<int, POINT3DID>::iterator mapIterator = m_i2pt3idVertices.begin();
     TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
@@ -116,27 +118,25 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
-        ( *mapIterator ).newID = nextID;
-        m_mesh->addVertex( nextID, ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
-        ++nextID;
+        ( *mapIterator ).newID = nextID++;
+        m_mesh->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
         ++mapIterator;
     }
 
     // Now rename triangles.
-    int id = 0;
     while ( vecIterator != m_trivecTriangles.end() )
     {
-        for ( unsigned int i = 0; i < 3; i++ )
-        {
-            unsigned int newID = m_i2pt3idVertices[ ( *vecIterator ).pointID[ i ] ].newID;
-            ( *vecIterator ).pointID[ i ] = newID;
-        }
-        m_mesh->addTriangle( id, ( *vecIterator ).pointID[ 0 ], ( *vecIterator ).pointID[ 1 ], ( *vecIterator ).pointID[ 2 ] );
+        ( *vecIterator ).pointID[ 0 ] = m_i2pt3idVertices[ ( *vecIterator ).pointID[ 0 ] ].newID;
+        ( *vecIterator ).pointID[ 1 ] = m_i2pt3idVertices[ ( *vecIterator ).pointID[ 1 ] ].newID;
+        ( *vecIterator ).pointID[ 2 ] = m_i2pt3idVertices[ ( *vecIterator ).pointID[ 2 ] ].newID;
+
+        m_mesh->addTriangle( ( *vecIterator ).pointID[ 0 ], ( *vecIterator ).pointID[ 1 ], ( *vecIterator ).pointID[ 2 ] );
         ++vecIterator;
-        ++id;
     }
+    qDebug() << "finalize";
     m_mesh->finalize();
 
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
+    qDebug() << "end rename";
 }
