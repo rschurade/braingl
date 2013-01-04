@@ -71,7 +71,6 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
     GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_minMaxScaling );
 
-
     initGeometry();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -121,12 +120,6 @@ void SHRenderer::initGeometry()
 
     qDebug() << "SH Renderer: using lod " << lod;
 
-
-    if ( m_oldLoD != lod )
-    {
-        initIndexBuffer( lod );
-    }
-
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
@@ -165,23 +158,16 @@ void SHRenderer::initGeometry()
 
     int numBalls = verts.size() / ( numVerts * 3 );
 
-
     m_tris1 = numTris * numBalls * 3;
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
-}
 
-void SHRenderer::initIndexBuffer( int lod )
-{
     const int* faces = tess::faces( lod );
     std::vector<int>indexes;
+    indexes.reserve( m_tris1 );
 
-    int numBalls = FMath::pow2( max( max( m_nx, m_ny ), m_nz ) );
-    int numVerts = tess::n_vertices( lod );
-    int numTris = tess::n_faces( lod );
-
-    for ( int currentBall = 0; currentBall < numBalls; ++ currentBall )
+    for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
     {
         for ( int i = 0; i < numTris; ++i )
         {
@@ -193,8 +179,8 @@ void SHRenderer::initIndexBuffer( int lod )
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-}
 
+}
 
 void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
 {
