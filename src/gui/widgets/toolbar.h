@@ -10,6 +10,10 @@
 
 #include <QtGui/QtGui>
 
+#include "../../data/enums.h"
+
+#include "fnaction.h"
+
 class ToolBarView;
 
 class ToolBar : public QToolBar
@@ -26,34 +30,22 @@ public:
 private:
     ToolBarView* m_toolBarView;
 
-    QAction* m_isosurfaceAct;
-    QAction* m_vectorAction1;
-    QAction* m_qball4Act;
-    QAction* m_qball6Act;
-    QAction* m_qball8Act;
-    QAction* m_tensorAct;
-    QAction* m_faAct;
-    QAction* m_evAct;
-    QAction* m_meshAction1;
-    QAction* m_fiberAction1;
-    QAction* m_binghamAction;
+    FNAction* m_isosurfaceAct;
+    FNAction* m_vectorAction1;
+    FNAction* m_qball4Act;
+    FNAction* m_qball6Act;
+    FNAction* m_qball8Act;
+    FNAction* m_tensorAct;
+    FNAction* m_faAct;
+    FNAction* m_evAct;
+    FNAction* m_meshAction1;
+    FNAction* m_fiberAction1;
+    FNAction* m_binghamAction;
 
     void createActions();
 
 private slots:
-    void slotIsosurface();
-    void slotVector1();
-    void slotQBall4();
-    void slotQBall6();
-    void slotQBall8();
-    void slotTensor();
-    void slotFA();
-    void slotEV();
-    void slotBingham();
-
-    void slotMesh1();
-    void slotFiber1();
-
+    void slot( FN_ALGO algo );
     void slotSelectionChanged( int type );
 };
 
