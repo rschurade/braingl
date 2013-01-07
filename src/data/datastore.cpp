@@ -55,20 +55,42 @@ void DataStore::addDataset( Dataset* dataset )
 
     // TODO dont just use the first dataset
     // check if there is maybe first texture added
-    if ( m_datasetList.size() == 1 )
+//    if ( m_datasetList.size() == 1 )
+//    {
+//        Dataset* ds = m_datasetList.first();
+//        int dt = ds->getProperty( "type" ).toInt();
+//        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_SH || dt == FNDT_NIFTI_DWI || dt == FNDT_NIFTI_BINGHAM )
+//        {
+//            m_globals["axial"] = ds->getProperty( "nz" ).toInt() / 2;
+//            m_globals["coronal"] = ds->getProperty( "ny" ).toInt() / 2;
+//            m_globals["sagittal"] = ds->getProperty( "nx" ).toInt() / 2;
+//        }
+//    }
+    updateGlobals();
+
+    emit ( dataChanged( index( m_datasetList.size() - 1, 0 ), index( m_datasetList.size() - 1, 0 ) ) );
+}
+
+void DataStore::updateSliceGlobals()
+{
+    if ( m_datasetList.size() > 0 )
     {
         Dataset* ds = m_datasetList.first();
-        int dt = ds->getProperty( "type" ).toInt();
-        if ( dt == FNDT_NIFTI_SCALAR || dt == FNDT_NIFTI_VECTOR || dt == FNDT_NIFTI_TENSOR || dt == FNDT_NIFTI_SH || dt == FNDT_NIFTI_DWI || dt == FNDT_NIFTI_BINGHAM )
+        if ( ds->getProperty( "type" ).toInt() < FNDT_MESH_ASCII )
         {
             m_globals["axial"] = ds->getProperty( "nz" ).toInt() / 2;
             m_globals["coronal"] = ds->getProperty( "ny" ).toInt() / 2;
             m_globals["sagittal"] = ds->getProperty( "nx" ).toInt() / 2;
+            m_globals["max_axial"] = ds->getProperty( "nz" ).toInt();
+            m_globals["max_coronal"] = ds->getProperty( "ny" ).toInt();
+            m_globals["max_sagittal"] = ds->getProperty( "nx" ).toInt();
+            m_globals["slice_dx"] = ds->getProperty( "dx" ).toFloat();
+            m_globals["slice_dy"] = ds->getProperty( "dy" ).toFloat();
+            m_globals["slice_dz"] = ds->getProperty( "dz" ).toFloat();
+
+            emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
         }
     }
-    updateGlobals();
-
-    emit ( dataChanged( index( m_datasetList.size() - 1, 0 ), index( m_datasetList.size() - 1, 0 ) ) );
 }
 
 bool DataStore::load( QDir fileName )
@@ -853,25 +875,6 @@ QString DataStore::getNiftiDataType( const int type ) const
 void DataStore::updateGlobals()
 {
     updateSliceGlobals();
-}
-
-void DataStore::updateSliceGlobals()
-{
-    if ( m_datasetList.size() > 0 )
-    {
-        Dataset* ds = m_datasetList.first();
-        if ( ds->getProperty( "type" ).toInt() == FNDT_NIFTI_SCALAR )
-        {
-            m_globals["max_axial"] = ds->getProperty( "nz" ).toInt();
-            m_globals["max_coronal"] = ds->getProperty( "ny" ).toInt();
-            m_globals["max_sagittal"] = ds->getProperty( "nx" ).toInt();
-            m_globals["slice_dx"] = ds->getProperty( "dx" ).toFloat();
-            m_globals["slice_dy"] = ds->getProperty( "dy" ).toFloat();
-            m_globals["slice_dz"] = ds->getProperty( "dz" ).toFloat();
-
-            emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
-        }
-    }
 }
 
 void DataStore::setGlobal( QString key, QVariant data )
