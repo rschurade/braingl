@@ -147,6 +147,10 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     m_glyphOffsetSlider->setHidden( true );
     m_qBallScaling->setHidden( true );
     m_tensorRendorMode->setHidden( true );
+    m_orderSelect->setHidden( true );
+    m_bValueSlider->setHidden( true );
+//    m_textureActive->setHidden( true );
+//    m_nameEdit->setHidden( true );
 
     m_widget->setLayout( m_layout );
 }
