@@ -12,6 +12,7 @@
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
 #include "datasets/datasetdwi.h"
+#include "datasets/datasetfibers.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 #include "mesh/trianglemesh2.h"
@@ -55,6 +56,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".mesh" ) )
     {
         return loadMesh();
+    }
+
+    if ( m_fileName.path().endsWith( ".fib" ) )
+    {
+        return loadFib();
     }
 
     return false;
@@ -858,4 +864,106 @@ bool Loader::loadMeshBinary()
     }
 */
     return false;
+}
+
+bool Loader::loadFib()
+{
+    QString fn = m_fileName.path();
+
+    QDir dir( fn );
+
+    if ( dir.exists( dir.absolutePath() ) )
+    {
+        QFile file( fn );
+        if ( !file.open( QIODevice::ReadOnly ) )
+        {
+            qDebug() << "couldn't open " << fn;
+        }
+
+        QDataStream in( &file );
+        QString l0 = readLine( in );
+        QString l1 = readLine( in );
+        QString l2 = readLine( in );
+        QString l3 = readLine( in );
+
+        if ( !( ( l0 == "# vtk DataFile Version 3.0" ) && ( l3 == "DATASET POLYDATA" )  ) )
+        {
+            qDebug() << "unexpected fields in vtk fib file";
+            return false;
+        }
+        if ( l2 == "BINARY" )
+        {
+            qDebug() << "load binary fib file";
+            QString l4 = readLine( in );
+
+            if ( !( l4.startsWith( "POINTS") && l4.endsWith( "float") ) )
+            {
+                qDebug() << "unexpected fields in vtk fib file, no point definition";
+                return false;
+            }
+            QStringList psl = l4.split( ' ' );
+            int numPoints = psl[1].toInt();
+            qDebug() << numPoints << "points";
+            char* pointField = new char[numPoints * sizeof( float ) * 3];
+            in.readRawData( pointField, numPoints * sizeof( float ) * 3 );
+            readLine( in );
+            QString l5 = readLine( in );
+            if ( !( l5.startsWith( "LINES" ) ) )
+            {
+                qDebug() << "unexpected fields in vtk fib file, no line definition";
+                return false;
+            }
+            QStringList lsl = l5.split( ' ' );
+            int numLines = lsl[1].toInt();
+            int lineFieldSize = lsl[2].toInt();
+            qDebug() << numLines << "lines with a size of" << lineFieldSize;
+
+            char* lineField = new char[lineFieldSize * sizeof( int )];
+            in.readRawData( lineField, lineFieldSize * sizeof( int ) );
+
+            float* rawPointData = reinterpret_cast<float*>( pointField );
+            unsigned int * rawLineData = reinterpret_cast<unsigned int*>( lineField );
+            switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
+            switchByteOrderOfArray< unsigned int >( rawLineData, lineFieldSize );
+
+            QVector< QVector< float > > fibs;
+            int lc = 0;
+            int pc = 0;
+            for ( int i = 0; i < numLines; ++i )
+            {
+                QVector<float>fib;
+                int lineSize = rawLineData[lc];
+                for ( int k = 0; k < lineSize*3; ++k )
+                {
+                    fib.push_back( rawPointData[pc++] );
+                }
+                lc += lineSize+1;
+                fibs.push_back( fib );
+            }
+
+            DatasetFibers* dataset = new DatasetFibers( fibs, numPoints, numLines );
+            m_dataset.push_back( dataset );
+
+            return true;
+        }
+        else if ( l2 == "ASCII" )
+        {
+            qDebug() << "load ascii fib file";
+        }
+    }
+    return false;
+}
+
+QString Loader::readLine( QDataStream& in )
+{
+    char* s = new char[1];
+    QString out;
+    do
+    {
+        in.readRawData( s, 1 );
+        out += s[0];
+    }
+    while( s[0] != '\n' );
+
+    return out.mid( 0, out.size() - 1 );
 }

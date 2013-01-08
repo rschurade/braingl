@@ -295,18 +295,18 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
 
         double angle( acos( FMath::iprod( maxV, vecs[0] ) ) );
 
-        if ( angle > .1 * M_PI / 180. )
-        {
-            qDebug() << "hallo wir sind drinnen";
+        //if ( angle > .1 * 180. / M_PI )
+        //{
+            //qDebug() << "hallo wir sind drinnen";
             ColumnVector ax( FMath::cprod( maxV, vecs[0] ) ); //axis
 
-            Matrix R( FMath::RotationMatrix( angle, ax ).i() );
+            Matrix R( FMath::RotationMatrix( angle, ax ) );
 
             vecs[0] = maxV;
             vecs[1] = R * vecs[1];
             vecs[2] = R * vecs[2];
 
-        }
+        //}
 
         // copies of these vectors in spherical coordinates:
         ColumnVector z0( FMath::cart2sphere( vecs[0] ) );
