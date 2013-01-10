@@ -16,9 +16,9 @@ GlobalPropertyView::GlobalPropertyView( QWidget* parent )
 
     m_layout = new QVBoxLayout();
 
-    m_sagittalSlider = new SliderWithEditInt( "sagittal" );
-    m_coronalSlider = new SliderWithEditInt( "coronal" );
-    m_axialSlider = new SliderWithEditInt( "axial" );
+    m_sagittalSlider = new SliderWithEditInt( "sagittal", FNGLOBAL_SAGITTAL );
+    m_coronalSlider = new SliderWithEditInt( "coronal", FNGLOBAL_CORONAL );
+    m_axialSlider = new SliderWithEditInt( "axial", FNGLOBAL_AXIAL );
 
     m_layout->addWidget( m_sagittalSlider );
     m_layout->addWidget( m_coronalSlider );
@@ -27,9 +27,9 @@ GlobalPropertyView::GlobalPropertyView( QWidget* parent )
     m_layout->addStretch( 0 );
     m_widget->setLayout( m_layout );
 
-    connect( m_sagittalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( sagittalSliderChanged( int ) ) );
-    connect( m_coronalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( coronalSliderChanged( int ) ) );
-    connect( m_axialSlider, SIGNAL( valueChanged( int ) ), this, SLOT( axialSliderChanged( int ) ) );
+    connect( m_sagittalSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
+    connect( m_coronalSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
+    connect( m_axialSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
 }
 
 GlobalPropertyView::~GlobalPropertyView()
@@ -132,35 +132,7 @@ void GlobalPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIn
     }
 }
 
-void GlobalPropertyView::sagittalSliderChanged( int value )
+void GlobalPropertyView::sliderChanged( int value, int id )
 {
-    QModelIndex mi;
-
-    mi = model()->index( 0, FNGLOBAL_SAGITTAL );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, value, Qt::UserRole );
-    }
-}
-
-void GlobalPropertyView::coronalSliderChanged( int value )
-{
-    QModelIndex mi;
-
-    mi = model()->index( 0, FNGLOBAL_CORONAL );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, value, Qt::UserRole );
-    }
-}
-
-void GlobalPropertyView::axialSliderChanged( int value )
-{
-    QModelIndex mi;
-
-    mi = model()->index( 0, FNGLOBAL_AXIAL );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, value, Qt::UserRole );
-    }
+    model()->setData( model()->index( 0, id ), value, Qt::UserRole );
 }

@@ -44,38 +44,15 @@ public:
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 
-
 private slots:
     void nameEdited();
-    void lowerThresholdChanged( float value );
-    void upperThresholdChanged( float value );
-    void colormapChanged( int index );
-    void interpolationStateChanged( int state );
-    void activeStateChanged( int state );
 
-    void alphaChanged( float value );
-    void isoValueChanged( float value );
-    void bValueChanged( int value );
+    void floatChanged( float value, int id );
+    void checkBoxChanged( int state, int id );
+    void intChanged( int state, int id );
 
-    void orderChanged( int index );
-    void lodChanged( int index );
-    void renderSliceChanged( int index );
-    void scalingChanged( float value );
-
-    void faThresholdChanged( float value );
-    void evThresholdChanged( float value );
-    void gammaChanged( float value );
-    void offsetChanged( float value );
-
-    void lower1Changed( int value );
-    void upper1Changed( int value );
-    void lower2Changed( int value );
-    void upper2Changed( int value );
-
-    void qballScalingChanged( int state );
-
-    void tensorRenderModeChanged( int );
-
+    void lowerThresholdChanged( float value, int id );
+    void upperThresholdChanged( float value, int id );
 
 private:
     QModelIndex getSelectedIndex( int column );

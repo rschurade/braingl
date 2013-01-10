@@ -19,7 +19,7 @@ class CheckboxWithLabel  : public QWidget
     Q_OBJECT
 
 public:
-    CheckboxWithLabel(  QString label );
+    CheckboxWithLabel(  QString label, int id );
     virtual ~CheckboxWithLabel();
 
     void setChecked( bool state );
@@ -28,8 +28,10 @@ private:
     QLabel* m_label;
     QCheckBox* m_checkBox;
 
+    int m_id;
+
 signals:
-        void stateChanged( int );
+    void stateChanged( int, int );
 
 private slots:
     void slotStateChanged( int );

@@ -40,9 +40,8 @@ public:
 public slots:
     void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 
-    void sagittalSliderChanged( int value );
-    void coronalSliderChanged( int value );
-    void axialSliderChanged( int value );
+    void sliderChanged( int value, int id );
+
 
 private slots:
 

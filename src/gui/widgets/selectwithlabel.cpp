@@ -10,8 +10,10 @@
 
 #include "selectwithlabel.h"
 
-SelectWithLabel::SelectWithLabel( QString label )
+SelectWithLabel::SelectWithLabel( QString label, int id )
 {
+    m_id = id;
+
     QHBoxLayout* layout = new QHBoxLayout();
     m_comboBox = new QComboBox();
 
@@ -25,7 +27,6 @@ SelectWithLabel::SelectWithLabel( QString label )
 
 SelectWithLabel::~SelectWithLabel()
 {
-    // TODO Auto-generated destructor stub
 }
 
 void SelectWithLabel::insertItem( int index, QString label )
@@ -40,5 +41,5 @@ void SelectWithLabel::setCurrentIndex( int index )
 
 void SelectWithLabel::indexChanged( int index )
 {
-    emit( currentIndexChanged( index ) );
+    emit( currentIndexChanged( index, m_id ) );
 }

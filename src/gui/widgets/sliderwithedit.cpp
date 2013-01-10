@@ -12,9 +12,11 @@
 
 #include "sliderwithedit.h"
 
-SliderWithEdit::SliderWithEdit( QString name, QWidget* parent ) :
+SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     QWidget( parent )
 {
+    m_id = id;
+
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
 
@@ -54,14 +56,14 @@ void SliderWithEdit::sliderMoved( int value )
 {
     m_edit->setText( QString::number( static_cast<float>( value ) / 100., 'f', 2 ) );
     m_slider->repaint();
-    emit( valueChanged( static_cast<float>( value ) / 100.  ) );
+    emit( valueChanged( ( static_cast<float>( value ) / 100. ), m_id  ) );
 }
 
 void SliderWithEdit::editEdited()
 {
     QString text = m_edit->text();
     m_slider->setValue( static_cast<int>( text.toFloat() * 100 ) );
-    emit( valueChanged( text.toFloat() ) );
+    emit( valueChanged( text.toFloat(), m_id ) );
     m_slider->repaint();
 }
 

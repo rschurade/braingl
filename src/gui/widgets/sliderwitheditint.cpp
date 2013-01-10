@@ -14,9 +14,11 @@
 
 #include "sliderwitheditint.h"
 
-SliderWithEditInt::SliderWithEditInt( QString name, QWidget* parent ) :
+SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     QWidget( parent )
 {
+    m_id = id;
+
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
 
@@ -58,14 +60,14 @@ void SliderWithEditInt::sliderMoved( int value )
 {
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
-    emit( valueChanged( value ) );
+    emit( valueChanged( value, m_id ) );
 }
 
 void SliderWithEditInt::editEdited()
 {
     QString text = m_edit->text();
     m_slider->setValue( text.toInt() );
-    emit( valueChanged( text.toInt() ) );
+    emit( valueChanged( text.toInt(), m_id ) );
     m_slider->repaint();
 }
 
@@ -110,7 +112,7 @@ void SliderWithEditInt::minusPressed()
     m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
-    emit( valueChanged( value ) );
+    emit( valueChanged( value, m_id ) );
 }
 
 void SliderWithEditInt::plusPressed()
@@ -124,6 +126,6 @@ void SliderWithEditInt::plusPressed()
     m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
     m_slider->repaint();
-    emit( valueChanged( value ) );
+    emit( valueChanged( value, m_id ) );
 
 }

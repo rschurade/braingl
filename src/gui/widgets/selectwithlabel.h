@@ -18,7 +18,7 @@ class SelectWithLabel  : public QWidget
     Q_OBJECT
 
 public:
-    SelectWithLabel( QString label );
+    SelectWithLabel( QString label, int id );
     virtual ~SelectWithLabel();
 
     void insertItem( int index, QString label );
@@ -28,8 +28,10 @@ private:
     QLabel* m_label;
     QComboBox* m_comboBox;
 
+    int m_id;
+
 signals:
-    void currentIndexChanged( int );
+    void currentIndexChanged( int, int );
 
 private slots:
     void indexChanged( int index );
