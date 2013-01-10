@@ -15,7 +15,11 @@
 class BinghamRendererThread : public QThread
 {
 public:
-    BinghamRendererThread( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz, int xi, int yi, int zi, QVector<int> visibleArea, int lod, int order, int orient, int id );
+    BinghamRendererThread( QVector<QVector<float> >* data,
+            int m_nx, int m_ny, int m_nz,
+            float m_dx, float m_dy, float m_dz,
+            int xi, int yi, int zi,
+            QVector<int> visibleArea, int lod, int order, int orient, bool scaling, int id );
     virtual ~BinghamRendererThread();
 
     QVector<float>* getVerts();
@@ -40,6 +44,7 @@ private:
     int m_lod;
     int m_order;
     int m_orient;
+    bool m_scaling;
     int m_id;
 
     QVector<float>* m_verts;
