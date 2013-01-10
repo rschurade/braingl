@@ -118,7 +118,7 @@ void SHRenderer::initGeometry()
     m_previousSettings = s;
 
 
-    qDebug() << "SH Renderer: using lod " << lod;
+    //qDebug() << "SH Renderer: using lod " << lod;
 
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
@@ -156,7 +156,7 @@ void SHRenderer::initGeometry()
         delete threads[i];
     }
 
-    int numBalls = verts.size() / ( numVerts * 3 );
+    int numBalls = verts.size() / ( numVerts * 10 );
 
     m_tris1 = numTris * numBalls * 3;
 

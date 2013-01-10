@@ -24,6 +24,7 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include "glfunctions.h"
+#include "binghamrendererthread.h"
 #include "binghamrenderer.h"
 
 BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
@@ -52,7 +53,7 @@ BinghamRenderer::~BinghamRenderer()
 
 void BinghamRenderer::init()
 {
-    glGenBuffers( 6, vboIds );
+    glGenBuffers( 2, vboIds );
 }
 
 void BinghamRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
@@ -106,234 +107,75 @@ void BinghamRenderer::initGeometry()
     int upperZ = m_visibleArea[5];
 
     int _lod = m_lodAdjust - 2;
+    int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, false, 0, _lod);
+    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, false, 0, lod);
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
     }
     m_previousSettings = s;
 
-    int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
-    qDebug() << "Bingham Renderer: using lod " << lod;
+    //qDebug() << "Bingham Renderer: using lod " << lod;
 
-    //float x = (float)xi * m_dx + m_dx / 2.;
-    //float y = (float)yi * m_dy + m_dy / 2.;
-    float z = (float)zi * m_dz + m_dz / 2.;
-
-    // TODO
-    const Matrix* vertices = tess::vertices( lod );
-    const int* faces = tess::faces( lod );
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    Matrix base = ( FMath::sh_base( (*vertices), m_order ) );
+    int numThreads = QThread::idealThreadCount();
 
-    std::vector<float>verts;
+    QVector<BinghamRendererThread*> threads;
+    // create threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        threads.push_back( new BinghamRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, i ) );
+    }
+
+    // run threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        threads[i]->start();
+    }
+
+    // wait for all threads to finish
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        threads[i]->wait();
+    }
+
+    QVector<float> verts;
+    // combine verts from all threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        verts += *( threads[i]->getVerts() );
+    }
+
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        delete threads[i];
+    }
+
+    int numBalls = verts.size() / ( numVerts * 10 );
+    m_tris1 = numTris * numBalls * 3;
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+
+    const int* faces = tess::faces( lod );
     std::vector<int>indexes;
+    indexes.reserve( m_tris1 );
 
-    int currentBall = 0;
-
-    qDebug() << lowerX << upperX << lowerY << upperY;
-
-    if ( m_orient == 1 )
+    for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
     {
-        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
-        verts.reserve( numVerts * glyphs * 10 );
-        indexes.reserve( numTris * glyphs * 3 );
-
-        for( int yy = lowerY; yy < upperY; ++yy )
+        for ( int i = 0; i < numTris; ++i )
         {
-            for ( int xx = lowerX; xx < upperX; ++xx )
-            {
-                int dataPos = xx + yy * m_nx + zi * m_nx * m_ny;
-                if ( ( fabs( m_data->at( dataPos )[0] ) > 0.0001 ) )
-                {
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locY = yy * m_dy + m_dy / 2;
-
-
-                    for( int i = 0; i < numVerts; ++i )
-                    {
-                        ColumnVector cur( 3 );
-                        cur( 1 ) = (*vertices)( i+1, 1 );
-                        cur( 2 ) = (*vertices)( i+1, 2 );
-                        cur( 3 ) = (*vertices)( i+1, 3 );
-
-                        ColumnVector m1( 3 );
-                        m1( 1 ) = m_data->at( dataPos )[3];
-                        m1( 2 ) = m_data->at( dataPos )[4];
-                        m1( 3 ) = m_data->at( dataPos )[5];
-
-                        ColumnVector m2( 3 );
-                        m2( 1 ) = m_data->at( dataPos )[6];
-                        m2( 2 ) = m_data->at( dataPos )[7];
-                        m2( 3 ) = m_data->at( dataPos )[8];
-
-                        double val_1( FMath::iprod( m1, cur ) );
-                        double val_2( FMath::iprod( m2, cur ) );
-
-                        double radius( 0.0 );
-                        double k1 = m_data->at( dataPos )[9];
-                        double k2 = m_data->at( dataPos )[10];
-                        double f0 = m_data->at( dataPos )[11];
-
-                        radius =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
-
-                        radius = radius / 4.0;
-
-                        for ( int i = 0; i < numVerts; ++i )
-                        {
-                            verts.push_back( (*vertices)( i+1, 1 ) );
-                            verts.push_back( (*vertices)( i+1, 2 ) );
-                            verts.push_back( (*vertices)( i+1, 3 ) );
-                            verts.push_back( (*vertices)( i+1, 1 ) );
-                            verts.push_back( (*vertices)( i+1, 2 ) );
-                            verts.push_back( (*vertices)( i+1, 3 ) );
-                            verts.push_back( locX );
-                            verts.push_back( locY );
-                            verts.push_back( z );
-                            verts.push_back( radius );
-                        }
-
-                        for ( int i = 0; i < numTris; ++i )
-                        {
-                            indexes.push_back( faces[i*3] + numVerts * currentBall );
-                            indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-                            indexes.push_back( faces[i*3+2] + numVerts * currentBall );
-                        }
-                        ++currentBall;
-                    }
-                }
-            }
+            indexes.push_back( faces[i*3] + numVerts * currentBall );
+            indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+            indexes.push_back( faces[i*3+2] + numVerts * currentBall );
         }
     }
-    else if ( m_orient == 2 )
-    {
-        /*
-        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
-        verts.reserve( numVerts * glyphs * 10 );
-        indexes.reserve( numTris * glyphs * 3 );
-
-        for( int zz = lowerZ; zz < upperZ; ++zz )
-        {
-            for ( int xx = lowerX; xx < upperX; ++xx )
-            {
-                if ( ( fabs( m_data->at( xx + yi * m_nx + zz * m_nx * m_ny )[0] ) > 0.0001 ) )
-                {
-                    ColumnVector dv = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
-                    }
-
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locZ = zz * m_dz + m_dz / 2;
-
-                    for ( int i = 0; i < numVerts; ++i )
-                    {
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( locX );
-                        verts.push_back( y );
-                        verts.push_back( locZ );
-                        verts.push_back( r(i + 1) );
-                    }
-                    for ( int i = 0; i < numTris; ++i )
-                    {
-                        indexes.push_back( faces[i*3] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
-                    }
-                    ++currentBall;
-                }
-            }
-        }
-        */
-    }
-    else if ( m_orient == 3 )
-    {
-        /*
-        int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
-        verts.reserve( numVerts * glyphs * 10 );
-        indexes.reserve( numTris * glyphs * 3 );
-
-        for( int yy = lowerY; yy < upperY; ++yy )
-        {
-            for ( int zz = lowerZ; zz < upperZ; ++zz )
-            {
-                if ( ( fabs( m_data->at( xi + yy * m_nx + zz * m_nx * m_ny )[0] ) > 0.0001 ) )
-                {
-                    ColumnVector dv = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
-                    }
-
-                    float locY = yy * m_dy + m_dy / 2;
-                    float locZ = zz * m_dz + m_dz / 2;
-
-                    for ( int i = 0; i < numVerts; ++i )
-                    {
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( (*vertices)( i+1, 1 ) );
-                        verts.push_back( (*vertices)( i+1, 2 ) );
-                        verts.push_back( (*vertices)( i+1, 3 ) );
-                        verts.push_back( x );
-                        verts.push_back( locY );
-                        verts.push_back( locZ );
-                        verts.push_back( r(i + 1) );
-                    }
-                    for ( int i = 0; i < numTris; ++i )
-                    {
-                        indexes.push_back( faces[i*3] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-                        indexes.push_back( faces[i*3+2] + numVerts * currentBall );
-                    }
-                    ++currentBall;
-                }
-            }
-        }
-        */
-    }
-    else
-    {
-        return;
-    }
-
-    m_tris1 = numTris * currentBall * 3;
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 }
 
 void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
