@@ -168,7 +168,6 @@ void BinghamRendererThread::run()
     }
     else if ( m_orient == 2 )
     {
-        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
 
@@ -176,29 +175,75 @@ void BinghamRendererThread::run()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
+                int dataPos = xx + m_yi * m_nx + zz * m_nx * m_ny;
+                if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    ColumnVector dv = m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
-                    }
-
                     float locX = xx * m_dx + m_dx / 2;
                     float locZ = zz * m_dz + m_dz / 2;
 
-                    for ( int i = 0; i < numVerts; ++i )
+                    for( int i = 0; i < numVerts; ++i )
                     {
+                        double radius( 0.0 );
+                        if ( m_scaling )
+                        {
+                            QVector<double> radi( 3 );
+                            for ( int k = 0; k < 3; ++k )
+                            {
+                                ColumnVector cur( 3 );
+                                cur( 1 ) = (*vertices)( i+1, 1 );
+                                cur( 2 ) = (*vertices)( i+1, 2 );
+                                cur( 3 ) = (*vertices)( i+1, 3 );
+
+                                ColumnVector m1( 3 );
+                                m1( 1 ) = m_data->at( dataPos )[k*9];
+                                m1( 2 ) = m_data->at( dataPos )[k*9+1];
+                                m1( 3 ) = m_data->at( dataPos )[k*9+2];
+
+                                ColumnVector m2( 3 );
+                                m2( 1 ) = m_data->at( dataPos )[k*9+3];
+                                m2( 2 ) = m_data->at( dataPos )[k*9+4];
+                                m2( 3 ) = m_data->at( dataPos )[k*9+5];
+
+                                double val_1( FMath::iprod( m1, cur ) );
+                                double val_2( FMath::iprod( m2, cur ) );
+
+
+                                double k1 = m_data->at( dataPos )[k*9+6];
+                                double k2 = m_data->at( dataPos )[k*9+7];
+                                double f0 = m_data->at( dataPos )[k*9+8];
+
+                                radi[k] =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+                            }
+                            radius = qMax( qMax( radi[0], radi[1] ) , radi[2] );
+                        }
+                        else
+                        {
+                            ColumnVector cur( 3 );
+                            cur( 1 ) = (*vertices)( i+1, 1 );
+                            cur( 2 ) = (*vertices)( i+1, 2 );
+                            cur( 3 ) = (*vertices)( i+1, 3 );
+
+                            ColumnVector m1( 3 );
+                            m1( 1 ) = m_data->at( dataPos )[0];
+                            m1( 2 ) = m_data->at( dataPos )[1];
+                            m1( 3 ) = m_data->at( dataPos )[2];
+
+                            ColumnVector m2( 3 );
+                            m2( 1 ) = m_data->at( dataPos )[3];
+                            m2( 2 ) = m_data->at( dataPos )[4];
+                            m2( 3 ) = m_data->at( dataPos )[5];
+
+                            double val_1( FMath::iprod( m1, cur ) );
+                            double val_2( FMath::iprod( m2, cur ) );
+
+
+                            double k1 = m_data->at( dataPos )[6];
+                            double k2 = m_data->at( dataPos )[7];
+                            double f0 = m_data->at( dataPos )[8];
+
+                            radius =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+                        }
+
                         m_verts->push_back( (*vertices)( i+1, 1 ) );
                         m_verts->push_back( (*vertices)( i+1, 2 ) );
                         m_verts->push_back( (*vertices)( i+1, 3 ) );
@@ -208,16 +253,14 @@ void BinghamRendererThread::run()
                         m_verts->push_back( locX );
                         m_verts->push_back( y );
                         m_verts->push_back( locZ );
-                        m_verts->push_back( r(i + 1) );
+                        m_verts->push_back( radius );
                     }
                 }
             }
         }
-        */
     }
     else if ( m_orient == 3 )
     {
-        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
 
@@ -225,29 +268,75 @@ void BinghamRendererThread::run()
         {
             for ( int zz = lowerZ; zz < upperZ; ++zz )
             {
-                if ( ( fabs( m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny )(1) ) > 0.0001 ) )
+                int dataPos = m_xi + yy * m_nx + zz * m_nx * m_ny;
+                if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    ColumnVector dv = m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
-
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
-                    }
-
-                    float locY = yy * m_dy + m_dy / 2;
                     float locZ = zz * m_dz + m_dz / 2;
+                    float locY = yy * m_dy + m_dy / 2;
 
-                    for ( int i = 0; i < numVerts; ++i )
+                    for( int i = 0; i < numVerts; ++i )
                     {
+                        double radius( 0.0 );
+                        if ( m_scaling )
+                        {
+                            QVector<double> radi( 3 );
+                            for ( int k = 0; k < 3; ++k )
+                            {
+                                ColumnVector cur( 3 );
+                                cur( 1 ) = (*vertices)( i+1, 1 );
+                                cur( 2 ) = (*vertices)( i+1, 2 );
+                                cur( 3 ) = (*vertices)( i+1, 3 );
+
+                                ColumnVector m1( 3 );
+                                m1( 1 ) = m_data->at( dataPos )[k*9];
+                                m1( 2 ) = m_data->at( dataPos )[k*9+1];
+                                m1( 3 ) = m_data->at( dataPos )[k*9+2];
+
+                                ColumnVector m2( 3 );
+                                m2( 1 ) = m_data->at( dataPos )[k*9+3];
+                                m2( 2 ) = m_data->at( dataPos )[k*9+4];
+                                m2( 3 ) = m_data->at( dataPos )[k*9+5];
+
+                                double val_1( FMath::iprod( m1, cur ) );
+                                double val_2( FMath::iprod( m2, cur ) );
+
+
+                                double k1 = m_data->at( dataPos )[k*9+6];
+                                double k2 = m_data->at( dataPos )[k*9+7];
+                                double f0 = m_data->at( dataPos )[k*9+8];
+
+                                radi[k] =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+                            }
+                            radius = qMax( qMax( radi[0], radi[1] ) , radi[2] );
+                        }
+                        else
+                        {
+                            ColumnVector cur( 3 );
+                            cur( 1 ) = (*vertices)( i+1, 1 );
+                            cur( 2 ) = (*vertices)( i+1, 2 );
+                            cur( 3 ) = (*vertices)( i+1, 3 );
+
+                            ColumnVector m1( 3 );
+                            m1( 1 ) = m_data->at( dataPos )[0];
+                            m1( 2 ) = m_data->at( dataPos )[1];
+                            m1( 3 ) = m_data->at( dataPos )[2];
+
+                            ColumnVector m2( 3 );
+                            m2( 1 ) = m_data->at( dataPos )[3];
+                            m2( 2 ) = m_data->at( dataPos )[4];
+                            m2( 3 ) = m_data->at( dataPos )[5];
+
+                            double val_1( FMath::iprod( m1, cur ) );
+                            double val_2( FMath::iprod( m2, cur ) );
+
+
+                            double k1 = m_data->at( dataPos )[6];
+                            double k2 = m_data->at( dataPos )[7];
+                            double f0 = m_data->at( dataPos )[8];
+
+                            radius =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+                        }
+
                         m_verts->push_back( (*vertices)( i+1, 1 ) );
                         m_verts->push_back( (*vertices)( i+1, 2 ) );
                         m_verts->push_back( (*vertices)( i+1, 3 ) );
@@ -257,12 +346,11 @@ void BinghamRendererThread::run()
                         m_verts->push_back( x );
                         m_verts->push_back( locY );
                         m_verts->push_back( locZ );
-                        m_verts->push_back( r(i + 1) );
+                        m_verts->push_back( radius );
                     }
                 }
             }
         }
-        */
     }
     else
     {
