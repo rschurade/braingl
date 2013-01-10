@@ -110,7 +110,7 @@ void SHRenderer::initGeometry()
     int _lod = m_lodAdjust - 2;
     int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, false, 0, lod);
+    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod);
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
@@ -129,7 +129,7 @@ void SHRenderer::initGeometry()
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new SHRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, i ) );
+        threads.push_back( new SHRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, m_minMaxScaling, i ) );
     }
 
     // run threads
