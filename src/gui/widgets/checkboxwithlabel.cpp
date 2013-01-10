@@ -11,8 +11,10 @@
 
 #include "checkboxwithlabel.h"
 
-CheckboxWithLabel::CheckboxWithLabel( QString label )
+CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
 {
+    m_id = id;
+
     QHBoxLayout* layout = new QHBoxLayout();
     m_checkBox = new QCheckBox();
 
@@ -27,12 +29,11 @@ CheckboxWithLabel::CheckboxWithLabel( QString label )
 
 CheckboxWithLabel::~CheckboxWithLabel()
 {
-    // TODO Auto-generated destructor stub
 }
 
 void CheckboxWithLabel::slotStateChanged( int state )
 {
-    emit( stateChanged( state ) );
+    emit( stateChanged( state, m_id ) );
 }
 
 void CheckboxWithLabel::setChecked( bool state )

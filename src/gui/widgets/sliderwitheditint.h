@@ -20,7 +20,7 @@ class SliderWithEditInt : public QWidget
     Q_OBJECT
 
 public:
-    SliderWithEditInt( QString name, QWidget* parent = 0 );
+    SliderWithEditInt( QString name, int id, QWidget* parent = 0 );
     virtual ~SliderWithEditInt();
 
     void setValue( int value );
@@ -37,7 +37,7 @@ public slots:
     void plusPressed();
 
 signals:
-    void valueChanged( int value );
+    void valueChanged( int value, int );
 
 private:
    QSlider*  m_slider;
@@ -45,6 +45,8 @@ private:
    QLabel* m_label;
    QPushButton* m_button1;
    QPushButton* m_button2;
+
+   int m_id;
 
 };
 

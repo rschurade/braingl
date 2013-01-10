@@ -29,87 +29,85 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
     layout1->addWidget( m_nameEdit, 75 );
     connect( m_nameEdit, SIGNAL( editingFinished() ), this, SLOT( nameEdited() ) );
 
-    m_lowerThresholdSlider = new SliderWithEdit( tr( "lower threshold" ) );
-    connect( m_lowerThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( lowerThresholdChanged( float ) ) );
+    m_lowerThresholdSlider = new SliderWithEdit( tr( "lower threshold" ), FNDSE_LOWER_THRESHOLD );
+    connect( m_lowerThresholdSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( lowerThresholdChanged( float, int ) ) );
 
-    m_upperThresholdSlider = new SliderWithEdit( tr( "upper threshold" ) );
-    connect( m_upperThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( upperThresholdChanged( float ) ) );
+    m_upperThresholdSlider = new SliderWithEdit( tr( "upper threshold" ), FNDSE_UPPER_THRESHOLD );
+    connect( m_upperThresholdSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( upperThresholdChanged( float, int ) ) );
 
-    m_colormapSelect = new SelectWithLabel( tr("colormap" ) );
+    m_colormapSelect = new SelectWithLabel( tr("colormap" ), FNDSE_COLORMAP );
     m_colormapSelect->insertItem( 0, tr( "grey" ) );
     m_colormapSelect->insertItem( 1, tr( "rainbow" ) );
     m_colormapSelect->insertItem( 2, tr( "unused" ) );
-    connect( m_colormapSelect, SIGNAL( currentIndexChanged( int) ), this, SLOT( colormapChanged( int ) ) );
+    connect( m_colormapSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
-    m_textureInterpolation = new CheckboxWithLabel( tr("interpolation"));
-    connect( m_textureInterpolation, SIGNAL( stateChanged( int ) ), this, SLOT( interpolationStateChanged( int ) ) );
+    m_textureInterpolation = new CheckboxWithLabel( tr("interpolation"), FNDSE_INTERPOLATION );
+    connect( m_textureInterpolation, SIGNAL( stateChanged( int, int ) ), this, SLOT( checkBoxChanged( int, int ) ) );
 
-    m_textureActive = new CheckboxWithLabel( tr("active") );
-    connect( m_textureActive, SIGNAL( stateChanged( int ) ), this, SLOT( activeStateChanged( int ) ) );
+    m_textureActive = new CheckboxWithLabel( tr("active"), FNDSE_ACTIVE );
+    connect( m_textureActive, SIGNAL( stateChanged( int, int ) ), this, SLOT( checkBoxChanged( int, int ) ) );
 
-    m_alphaSlider = new SliderWithEdit( tr( "alpha" ) );
-    connect( m_alphaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( alphaChanged( float ) ) );
+    m_alphaSlider = new SliderWithEdit( tr( "alpha" ), FNDSE_ALPHA );
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
+    connect( m_alphaSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );
 
-    m_bValueSlider = new SliderWithEditInt( tr( "bValue" ) );
-    connect( m_bValueSlider, SIGNAL( valueChanged( int ) ), this, SLOT( bValueChanged( int ) ) );
+    m_bValueSlider = new SliderWithEditInt( tr( "bValue" ), FNDSE_BVALUE );
     m_bValueSlider->setMin( 500.0 );
     m_bValueSlider->setMax( 2000.0 );
     m_bValueSlider->setStep( 500 );
+    connect( m_bValueSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
-    m_isoValueSlider = new SliderWithEdit( tr( "iso value" ) );
-    connect( m_isoValueSlider, SIGNAL( valueChanged( float ) ), this, SLOT( isoValueChanged( float ) ) );
+    m_isoValueSlider = new SliderWithEdit( tr( "iso value" ), FNDSE_ISO_VALUE );
     m_alphaSlider->setMin( 0.0 );
     m_alphaSlider->setMax( 1.0 );
+    connect( m_isoValueSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );
 
-
-    m_orderSelect = new SelectWithLabel( tr("order" ) );
+    m_orderSelect = new SelectWithLabel( tr("order" ), FNDSE_ORDER );
     m_orderSelect->insertItem( 0, tr( "4" ) );
     m_orderSelect->insertItem( 1, tr( "6" ) );
     m_orderSelect->insertItem( 2, tr( "8" ) );
-    connect( m_orderSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( orderChanged( int ) ) );
+    connect( m_orderSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
-    m_lodSelect = new SelectWithLabel( tr("quality" ) );
+    m_lodSelect = new SelectWithLabel( tr("quality" ), FNDSE_LOD );
     m_lodSelect->insertItem( 0, tr( "lowest" ) );
     m_lodSelect->insertItem( 1, tr( "lower" ) );
     m_lodSelect->insertItem( 2, tr( "normal" ) );
     m_lodSelect->insertItem( 3, tr( "higher" ) );
     m_lodSelect->insertItem( 4, tr( "highest" ) );
-    connect( m_lodSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( lodChanged( int ) ) );
+    connect( m_lodSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
-    m_sliceSelect = new SelectWithLabel( tr("render on slice" ) );
+    m_sliceSelect = new SelectWithLabel( tr("render on slice" ), FNDSE_RENDER_SLICE );
     m_sliceSelect->insertItem( 0, tr( "none" ) );
     m_sliceSelect->insertItem( 1, tr( "axial" ) );
     m_sliceSelect->insertItem( 2, tr( "coronal" ) );
     m_sliceSelect->insertItem( 3, tr( "sagittal" ) );
-    connect( m_sliceSelect, SIGNAL( currentIndexChanged( int ) ), this, SLOT( renderSliceChanged( int ) ) );
+    connect( m_sliceSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
-    m_scalingSlider = new SliderWithEdit( tr( "scaling" ) );
-    connect( m_scalingSlider, SIGNAL( valueChanged( float ) ), this, SLOT( scalingChanged( float ) ) );
+    m_scalingSlider = new SliderWithEdit( tr( "scaling" ), FNDSE_SCALING );
+    connect( m_scalingSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );
 
-    m_qBallScaling = new CheckboxWithLabel( tr("hide negative lobes"));
-    connect( m_qBallScaling, SIGNAL( stateChanged( int ) ), this, SLOT( qballScalingChanged( int ) ) );
+    m_qBallScaling = new CheckboxWithLabel( tr("hide negative lobes"), FNDSE_MINMAX_SCALING );
+    connect( m_qBallScaling, SIGNAL( stateChanged( int, int ) ), this, SLOT( checkBoxChanged( int, int ) ) );
 
-    m_faThresholdSlider = new SliderWithEdit( tr( "fa threshold" ) );
-    connect( m_faThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( faThresholdChanged( float ) ) );;
+    m_faThresholdSlider = new SliderWithEdit( tr( "fa threshold" ), FNDSE_FA_THRESHOLD );
+    connect( m_faThresholdSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );;
 
-    m_evThresholdSlider = new SliderWithEdit( tr( "md threshold" ) );
-    connect( m_evThresholdSlider, SIGNAL( valueChanged( float ) ), this, SLOT( evThresholdChanged( float ) ) );;
+    m_evThresholdSlider = new SliderWithEdit( tr( "md threshold" ), FNDSE_EV_THRESHOLD );
+    connect( m_evThresholdSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );;
 
-    m_gammaSlider = new SliderWithEdit( tr( "gamma" ) );
-    connect( m_gammaSlider, SIGNAL( valueChanged( float ) ), this, SLOT( gammaChanged( float ) ) );;
+    m_gammaSlider = new SliderWithEdit( tr( "gamma" ), FNDSE_GAMMA );
+    connect( m_gammaSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );;
 
-    m_glyphOffsetSlider = new SliderWithEdit( tr( "offset" ) );
-    connect( m_glyphOffsetSlider, SIGNAL( valueChanged( float ) ), this, SLOT( offsetChanged( float ) ) );;
+    m_glyphOffsetSlider = new SliderWithEdit( tr( "offset" ), FNDSE_OFFSET );
+    connect( m_glyphOffsetSlider, SIGNAL( valueChanged( float, int ) ), this, SLOT( floatChanged( float, int ) ) );;
 
-    m_tensorRendorMode = new SelectWithLabel( tr("render mode" ) );
+    m_tensorRendorMode = new SelectWithLabel( tr("render mode" ), FNDSE_TENSOR_RENDERMODE );
     m_tensorRendorMode->insertItem( 0, tr( "glyph" ) );
     m_tensorRendorMode->insertItem( 1, tr( "ev1" ) );
     m_tensorRendorMode->insertItem( 2, tr( "ev2" ) );
     m_tensorRendorMode->insertItem( 3, tr( "ev3" ) );
-    connect( m_tensorRendorMode, SIGNAL( currentIndexChanged( int ) ), this, SLOT( tensorRenderModeChanged( int ) ) );
-
+    connect( m_tensorRendorMode, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( intChanged( int, int ) ) );
 
     m_layout->addLayout( layout1 );
     m_layout->addWidget( m_textureActive );
@@ -373,7 +371,22 @@ void DatasetPropertyView::nameEdited()
     model()->setData( getSelectedIndex( 0 ), m_nameEdit->text() );
 }
 
-void DatasetPropertyView::lowerThresholdChanged( float value )
+void DatasetPropertyView::floatChanged( float value, int id )
+{
+    model()->setData( getSelectedIndex( id ), value );
+}
+
+void DatasetPropertyView::checkBoxChanged( int state, int id )
+{
+    model()->setData( getSelectedIndex( id ), ( state == Qt::Checked ) );
+}
+
+void DatasetPropertyView::intChanged( int value, int id )
+{
+    model()->setData( getSelectedIndex( id ), value );
+}
+
+void DatasetPropertyView::lowerThresholdChanged( float value, int )
 {
     if ( value > m_upperThresholdSlider->getValue() )
     {
@@ -382,7 +395,7 @@ void DatasetPropertyView::lowerThresholdChanged( float value )
     model()->setData( getSelectedIndex( FNDSE_LOWER_THRESHOLD ), value );
 }
 
-void DatasetPropertyView::upperThresholdChanged( float value )
+void DatasetPropertyView::upperThresholdChanged( float value, int )
 {
     if ( value < m_lowerThresholdSlider->getValue() )
     {
@@ -390,152 +403,3 @@ void DatasetPropertyView::upperThresholdChanged( float value )
     }
     model()->setData( getSelectedIndex( FNDSE_UPPER_THRESHOLD ), value );
 }
-
-void DatasetPropertyView::colormapChanged( int index )
-{
-    model()->setData( getSelectedIndex( FNDSE_COLORMAP ), index );
-}
-
-void DatasetPropertyView::interpolationStateChanged( int state )
-{
-    model()->setData( getSelectedIndex( FNDSE_INTERPOLATION ), ( state == Qt::Checked ) );
-}
-
-void DatasetPropertyView::activeStateChanged( int state )
-{
-    model()->setData( getSelectedIndex( FNDSE_ACTIVE ), ( state == Qt::Checked ) );
-}
-
-void DatasetPropertyView::alphaChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_ALPHA ), value );
-}
-
-void DatasetPropertyView::isoValueChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_ISO_VALUE ), value );
-}
-
-void DatasetPropertyView::bValueChanged( int value )
-{
-    model()->setData( getSelectedIndex( FNDSE_BVALUE ), value );
-}
-
-
-void DatasetPropertyView::orderChanged( int index )
-{
-    model()->setData( getSelectedIndex( FNDSE_ORDER ), ( index + 2 ) * 2 );
-}
-
-
-void DatasetPropertyView::lodChanged( int index )
-{
-    model()->setData( getSelectedIndex( FNDSE_LOD ), index );
-}
-
-void DatasetPropertyView::scalingChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_SCALING ), value );
-}
-
-void DatasetPropertyView::faThresholdChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_FA_THRESHOLD ), value );
-}
-
-void DatasetPropertyView::evThresholdChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_EV_THRESHOLD ), value );
-}
-
-void DatasetPropertyView::gammaChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_GAMMA ), value );
-}
-
-void DatasetPropertyView::offsetChanged( float value )
-{
-    model()->setData( getSelectedIndex( FNDSE_OFFSET ), value );
-}
-
-void DatasetPropertyView::renderSliceChanged( int index )
-{
-    model()->setData( getSelectedIndex( FNDSE_RENDER_SLICE ), index );
-}
-
-void DatasetPropertyView::tensorRenderModeChanged( int index )
-{
-    model()->setData( getSelectedIndex( FNDSE_TENSOR_RENDERMODE ), index );
-}
-
-
-void DatasetPropertyView::lower1Changed( int value )
-{
-    switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
-    {
-        case 1:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_X ), value );
-            break;
-        case 2:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_X ), value );
-            break;
-        case 3:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), value );
-            break;
-    }
-}
-
-void DatasetPropertyView::upper1Changed( int value )
-{
-    switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
-    {
-        case 1:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_X ), value );
-            break;
-        case 2:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_X ), value );
-            break;
-        case 3:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_Y ), value );
-            break;
-    }
-}
-
-void DatasetPropertyView::lower2Changed( int value )
-{
-    switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
-    {
-        case 1:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_Y ), value );
-            break;
-        case 2:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), value );
-            break;
-        case 3:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_LOWER_Z ), value );
-            break;
-    }
-}
-
-void DatasetPropertyView::upper2Changed( int value )
-{
-    switch (  model()->data( getSelectedIndex( FNDSE_RENDER_SLICE ), Qt::EditRole ).toInt() )
-    {
-        case 1:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_Y ), value );
-            break;
-        case 2:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_Z ), value );
-            break;
-        case 3:
-            model()->setData( getSelectedIndex( FNDSE_RENDER_UPPER_Z ), value );
-            break;
-    }
-}
-
-void DatasetPropertyView::qballScalingChanged( int state )
-{
-    model()->setData( getSelectedIndex( FNDSE_MINMAX_SCALING ), ( state == Qt::Checked ) );
-}
-
-
