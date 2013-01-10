@@ -18,6 +18,7 @@ SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny,
                                                                 int lod,
                                                                 int order,
                                                                 int orient,
+                                                                bool scaling,
                                                                 int id ) :
     m_data( data ),
     m_nx( nx ),
@@ -33,6 +34,7 @@ SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny,
     m_lod( lod ),
     m_order( order ),
     m_orient( orient ),
+    m_scaling( scaling ),
     m_id( id )
 {
     m_verts = new QVector<float>();
@@ -85,20 +87,22 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
-//                    float max = 0;
-//                    float min = std::numeric_limits<float>::max();
-//                    for ( int i = 0; i < r.Nrows(); ++i )
-//                    {
-//                        max = qMax( max, (float)r(i+1) );
-//                        min = qMin( min, (float)r(i+1) );
-//                    }
-//
-//
-//                    for ( int i = 0; i < r.Nrows(); ++i )
-//                    {
-//                        r(i+1) = r(i+1) / max * 0.8;
-//                    }
+                    if ( m_scaling )
+                    {
+                        float max = 0;
+                        float min = std::numeric_limits<float>::max();
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            max = qMax( max, (float)r(i+1) );
+                            min = qMin( min, (float)r(i+1) );
+                        }
 
+
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max * 0.8;
+                        }
+                    }
                     float locX = xx * m_dx + m_dx / 2;
                     float locY = yy * m_dy + m_dy / 2;
 

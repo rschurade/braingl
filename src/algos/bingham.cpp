@@ -45,73 +45,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     const int* faces = tess::faces( lod );
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
-/*
-    ColumnVector tt( 6 );
-    tt( 1 ) = 1;
-    tt( 2 ) = 2;
-    tt( 3 ) = 3;
-    tt( 4 ) = 2;
-    tt( 5 ) = 1;
-    tt( 6 ) = 3;
-    QVector<ColumnVector> tvecs;
-    ColumnVector tvals( 3 );
-    FMath::evd3x3_2( tt, tvecs, tvals );
-    qDebug() << "==================================";
-    qDebug() << "Till";
-    qDebug() << tvecs[0](1) << tvecs[0](2) << tvecs[0](3);
-    qDebug() << tvecs[1](1) << tvecs[1](2) << tvecs[1](3);
-    qDebug() << tvecs[2](1) << tvecs[2](2) << tvecs[2](3);
-    qDebug() << tvals( 1 ) << tvals( 2 ) << tvals( 3 );
-    Matrix mv1( 3, 3 );
-    mv1( 1, 1 ) = tvecs[0](1);
-    mv1( 2, 1 ) = tvecs[0](2);
-    mv1( 3, 1 ) = tvecs[0](3);
-    mv1( 1, 2 ) = tvecs[1](1);
-    mv1( 2, 2 ) = tvecs[1](2);
-    mv1( 3, 2 ) = tvecs[1](3);
-    mv1( 1, 3 ) = tvecs[2](1);
-    mv1( 2, 3 ) = tvecs[2](2);
-    mv1( 3, 3 ) = tvecs[2](3);
-    DiagonalMatrix dm1( 3 );
-    dm1( 1 ) = tvals( 1 );
-    dm1( 2 ) = tvals( 2 );
-    dm1( 3 ) = tvals( 3 );
-    Matrix mvr1 = mv1 * dm1 * mv1.t();
-    qDebug() << mvr1( 1,1 ) << mvr1( 2,1 ) << mvr1( 3,1 );
-    qDebug() << mvr1( 1,2 ) << mvr1( 2,2 ) << mvr1( 3,2 );
-    qDebug() << mvr1( 1,3 ) << mvr1( 2,3 ) << mvr1( 3,3 );
 
-    qDebug() << "==================================";
-    FMath::evd3x3( tt, tvecs, tvals );
-    qDebug() << "Alfred";
-    qDebug() << tvecs[0](1) << tvecs[0](2) << tvecs[0](3);
-    qDebug() << tvecs[1](1) << tvecs[1](2) << tvecs[1](3);
-    qDebug() << tvecs[2](1) << tvecs[2](2) << tvecs[2](3);
-    qDebug() << tvals( 1 ) << tvals( 2 ) << tvals( 3 );
-    qDebug() << "==================================";
-
-    SymmetricMatrix tm( 3 );
-    tm( 1, 1) = 1;
-    tm( 1, 2) = 2;
-    tm( 1, 3) = 3;
-    tm( 2, 2) = 2;
-    tm( 2, 3) = 1;
-    tm( 3, 3) = 3;
-
-    DiagonalMatrix td( 3 );
-    Matrix mv( 3, 3 );
-    EigenValues( tm, td, mv );
-    qDebug() << "newmat";
-    qDebug() << mv( 1,1 ) << mv( 2,1 ) << mv( 3,1 );
-    qDebug() << mv( 1,2 ) << mv( 2,2 ) << mv( 3,2 );
-    qDebug() << mv( 1,3 ) << mv( 2,3 ) << mv( 3,3 );
-    qDebug() << td( 3 )  << td( 2 )  << td( 1 );
-    Matrix mvr = mv * td * mv.t();
-    qDebug() << mvr( 1,1 ) << mvr( 2,1 ) << mvr( 3,1 );
-    qDebug() << mvr( 1,2 ) << mvr( 2,2 ) << mvr( 3,2 );
-    qDebug() << mvr( 1,3 ) << mvr( 2,3 ) << mvr( 3,3 );
-    qDebug() << "==================================";
-*/
     const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     qDebug() << "calculated order from sh: " << order;
 
@@ -139,18 +73,6 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         neighs[v3].insert( v1 );
     }
 
-//    for ( int i = 0; i < neighs.size(); ++i )
-//    {
-//        QSet<int> n = neighs[i];
-//        QString s( "" );
-//        foreach (const int &value, n)
-//        {
-//            s += QString::number( value );
-//            s += " ";
-//        }
-//        qDebug() << s;
-//    }
-
     Matrix base = ( FMath::sh_base( ( *vertices ), order ) );
 
     QVector<float> bv( 3 * 9, 0 );
@@ -163,18 +85,12 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         tensorData3->replace( i, tv );
     }
 
-//    qDebug() << "*** start ***";
-//    fit_bingham( data->at( data->size() / 2 + 50 ), *vertices, neighs, base, neighbourhood, num_max );
-//    qDebug() << "*** end ***";
 
 // For all voxels:
     int percent = 0;
     int done = 0;
-
-    int offset = 0;
-
-    int start = 493923; // 0
-    int end = 506431; // data->size()
+    int start = 0; // 0
+    int end = data->size();
     int numVoxels = end - start;
     int onePercent = numVoxels / 100;
 
@@ -197,13 +113,14 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     }
 
     DatasetBingham* out1 = new DatasetBingham( "Bingham", binghamData, sh->getHeader() );
-    DatasetTensor* out2 = new DatasetTensor( "Tensor", tensorData, sh->getHeader() );
-    DatasetTensor* out3 = new DatasetTensor( "Tensor", tensorData2, sh->getHeader() );
-    DatasetTensor* out4 = new DatasetTensor( "Tensor", tensorData3, sh->getHeader() );
     dsout.push_back( out1 );
-    dsout.push_back( out2 );
-    dsout.push_back( out3 );
-    dsout.push_back( out4 );
+
+//    DatasetTensor* out2 = new DatasetTensor( "Tensor", tensorData, sh->getHeader() );
+//    DatasetTensor* out3 = new DatasetTensor( "Tensor", tensorData2, sh->getHeader() );
+//    DatasetTensor* out4 = new DatasetTensor( "Tensor", tensorData3, sh->getHeader() );
+//    dsout.push_back( out2 );
+//    dsout.push_back( out3 );
+//    dsout.push_back( out4 );
     return dsout;
 }
 
@@ -499,6 +416,6 @@ QVector<QVector<float> > Bingham::fit_bingham( const ColumnVector& sh_data, cons
     }
 
     out.push_back( result );
-    out.push_back( tensor );
+    //out.push_back( tensor );
     return out;
 }

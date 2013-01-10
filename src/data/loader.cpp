@@ -11,6 +11,7 @@
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
+#include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetfibers.h"
 #include "datasets/datasettensor.h"
@@ -94,6 +95,11 @@ bool Loader::loadNifti()
     {
         m_datasetType = FNDT_NIFTI_TENSOR;
         return loadNiftiTensor( fn );
+    }
+    else if ( m_header->dim[4] == 27 )
+    {
+        m_datasetType = FNDT_NIFTI_BINGHAM;
+        return loadNiftiBingham( fn );
     }
     else if ( m_header->dim[4] == 15 || m_header->dim[4] == 28 || m_header->dim[4] == 45 )
     {
@@ -413,6 +419,50 @@ bool Loader::loadNiftiQBall( QString fileName )
             out->setProperty( "createdBy", FNALGO_QBALL );
             out->setProperty( "lod", 2 );
             out->setProperty( "order", order );
+            out->setProperty( "renderSlice", 1 );
+
+            m_dataset.push_back( out );
+
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+bool Loader::loadNiftiBingham( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
+    int dim = m_header->dim[4];
+
+    QVector<QVector<float> >* dataVector = new QVector<QVector<float> >();
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_FLOAT32:
+        {
+            float* inputData;
+
+            inputData = reinterpret_cast<float*>( filedata->data );
+
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                QVector<float> v( dim );
+                for ( int j = 0; j < dim; ++j )
+                {
+                    v[j] = inputData[j * blockSize + i];
+                }
+                dataVector->push_back( v );
+            }
+            nifti_image_free( filedata );
+
+            DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
+            //out->setProperty( "name", "QBall" );
+            out->setProperty( "createdBy", FNALGO_BINGHAM );
+            out->setProperty( "lod", 2 );
             out->setProperty( "renderSlice", 1 );
 
             m_dataset.push_back( out );

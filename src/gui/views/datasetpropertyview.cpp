@@ -305,8 +305,8 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 
 void DatasetPropertyView::updateWidgetVisibility()
 {
-    QModelIndex index = getSelectedIndex( FNDSP_DIM );
-    int dim = model()->data( index, Qt::DisplayRole ).toInt();
+    QModelIndex index = getSelectedIndex( FNDSP_TYPE );
+    int type = model()->data( index, Qt::DisplayRole ).toInt();
 
     m_lowerThresholdSlider->setHidden( true );
     m_upperThresholdSlider->setHidden( true );
@@ -325,62 +325,46 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_qBallScaling->setHidden( true );
     m_tensorRendorMode->setHidden( true );
 
-    if ( dim == 1 )
+    switch ( type )
     {
-        m_lowerThresholdSlider->setHidden( false );
-        m_upperThresholdSlider->setHidden( false );
-        m_colormapSelect->setHidden( false );
-        m_textureInterpolation->setHidden( false );
-        m_alphaSlider->setHidden( false );
-    }
-
-    if ( dim == 3 )
-    {
-        m_colormapSelect->setHidden( false );
-        m_textureInterpolation->setHidden( false );
-        m_alphaSlider->setHidden( false );
-        m_scalingSlider->setHidden( false );
-        m_glyphOffsetSlider->setHidden( false );
-    }
-
-    int created = model()->data( getSelectedIndex( FNDSP_CREATED_BY ), Qt::DisplayRole ).toInt();
-    if ( created == FNALGO_QBALL || created == FNALGO_BINGHAM  )
-    {
-        //m_orderSelect->setHidden( false );
-        m_lodSelect->setHidden( false );
-        m_sliceSelect->setHidden( false );
-        m_qBallScaling->setHidden( false );
-    }
-
-    if ( created == FNALGO_TENSORFIT )
-    {
-        m_sliceSelect->setHidden( false );
-        //m_bValueSlider->setHidden( false );
-        m_scalingSlider->setHidden( false );
-        m_faThresholdSlider->setHidden( false );
-        m_evThresholdSlider->setHidden( false );
-        m_gammaSlider->setHidden( false );
-        m_glyphOffsetSlider->setHidden( false );
-        m_tensorRendorMode->setHidden( false );
-    }
-
-    if ( created == FNALGO_ISOSURFACE )
-    {
-        m_isoValueSlider->setHidden( false );
-    }
-
-    if ( dim == 999999 ) // simply for copy&paste
-    {
-        m_textureActive->setHidden( false );
-        m_lowerThresholdSlider->setHidden( false );
-        m_upperThresholdSlider->setHidden( false );
-        m_colormapSelect->setHidden( false );
-        m_textureInterpolation->setHidden( false );
-        m_alphaSlider->setHidden( false );
-        m_lodSelect->setHidden( false );
-        m_sliceSelect->setHidden( false );
-        m_scalingSlider->setHidden( false );
-        m_qBallScaling->setHidden( false );
+        case FNDT_NIFTI_SCALAR:
+            m_lowerThresholdSlider->setHidden( false );
+            m_upperThresholdSlider->setHidden( false );
+            m_colormapSelect->setHidden( false );
+            m_textureInterpolation->setHidden( false );
+            m_alphaSlider->setHidden( false );
+            break;
+        case FNDT_NIFTI_VECTOR:
+            m_colormapSelect->setHidden( false );
+            m_textureInterpolation->setHidden( false );
+            m_alphaSlider->setHidden( false );
+            m_scalingSlider->setHidden( false );
+            m_glyphOffsetSlider->setHidden( false );
+            break;
+        case FNDT_NIFTI_TENSOR:
+            m_sliceSelect->setHidden( false );
+            m_scalingSlider->setHidden( false );
+            m_faThresholdSlider->setHidden( false );
+            m_evThresholdSlider->setHidden( false );
+            m_gammaSlider->setHidden( false );
+            m_glyphOffsetSlider->setHidden( false );
+            m_tensorRendorMode->setHidden( false );
+            break;
+        case FNDT_NIFTI_SH:
+            m_lodSelect->setHidden( false );
+            m_sliceSelect->setHidden( false );
+            m_qBallScaling->setHidden( false );
+            break;
+        case FNDT_NIFTI_DWI:
+            break;
+        case FNDT_NIFTI_BINGHAM:
+            m_lodSelect->setHidden( false );
+            m_sliceSelect->setHidden( false );
+            m_qBallScaling->setHidden( false );
+            break;
+        case FNDT_MESH_ISOSURFACE:
+            m_isoValueSlider->setHidden( false );
+            break;
     }
 }
 
