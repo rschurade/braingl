@@ -7,6 +7,7 @@
 #include <QtCore/QDebug>
 
 #include <math.h>
+#include <float.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
@@ -118,9 +119,10 @@ double FMath::sh_base_function( int order, int degree, double theta, double phi 
 #endif
 }
 
-ColumnVector FMath::moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points )
+SymmetricMatrix FMath::moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points )
 {
-    ColumnVector result( 6 );
+    SymmetricMatrix result( 3 );
+    result = 0.0;
 
     double sum( 0.0 );
     for ( int i = 0; i < points.size(); ++i )
@@ -130,12 +132,12 @@ ColumnVector FMath::moment_of_inertia( const ColumnVector& values, const QVector
         double z( points[i]( 3 ) );
         double val = fabs( values( i + 1 ) );
 
-        result( 1 ) += x * x * val;
-        result( 2 ) += x * y * val;
-        result( 3 ) += x * z * val;
-        result( 4 ) += y * y * val;
-        result( 5 ) += y * z * val;
-        result( 6 ) += z * z * val;
+        result( 1, 1 ) += x * x * val;
+        result( 1, 2 ) += x * y * val;
+        result( 1, 3 ) += x * z * val;
+        result( 2, 2 ) += y * y * val;
+        result( 2, 3 ) += y * z * val;
+        result( 3, 3 ) += z * z * val;
 
         sum += val * val;
     }
@@ -279,9 +281,10 @@ void FMath::evd3x3( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVect
     ev3( 1 ) = ev3_x;
     ev3( 2 ) = ev3_y;
     ev3( 3 ) = ev1_z;
-    vecs.push_back( ev1 );
-    vecs.push_back( ev2 );
+    vecs.clear();
     vecs.push_back( ev3 );
+    vecs.push_back( ev2 );
+    vecs.push_back( ev1 );
 }
 
 ///* ***************************************************************************
@@ -357,7 +360,7 @@ ColumnVector FMath::SH_opt_max( const ColumnVector& startX, const ColumnVector& 
     while ( delta > precision && steps < 100 )
     {
         // Update old value
-        steps++;
+        ++steps;
         oldX = newX;
         double SH_old( sh_eval( oldX, coeff ) );
 
@@ -414,8 +417,8 @@ double FMath::sh_eval( const ColumnVector& position, const ColumnVector& coeff )
     }
 
     // for easier readability
-    const double theta( position( 1 ) );
-    const double phi( position( 2 ) );
+    const double theta( position( 2 ) );
+    const double phi( position( 3 ) );
 
     double result( 0 );
     for ( int order( 0 ), j( 1 ); order <= max_order; order += 2 )
@@ -899,4 +902,270 @@ Matrix FMath::expT( Matrix& t )
 
     return expM;
 }
+//void evd3x3_2( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals );
+void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector& val )
+{
+    if ( d.Nrows() != 6 )
+        throw std::invalid_argument( "Tensor (6-component vector) expected!" );
 
+    // calculate the eigenvalues:
+    val = ColumnVector( 3 );
+    vec.reserve( 3 );
+    std::vector<int> index( 3 );
+
+    ColumnVector e( 3 );
+    // Create work variables:
+    Matrix A( 3, 3 ), Q( 3, 3 );
+    A( 1, 1 ) = d( 1 );
+    A( 2, 1 ) = A( 1, 2 ) = d( 2 );
+    A( 3, 1 ) = A( 1, 3 ) = d( 3 );
+    A( 2, 2 ) = d( 4 );
+    A( 3, 2 ) = A( 2, 3 ) = d( 5 );
+    A( 3, 3 ) = d( 6 );
+
+    double m, c1, c0;
+
+    // Determine coefficients of characteristic poynomial. We write
+    //       | a   d   f  |
+    //  A =  | d*  b   e  |
+    //       | f*  e*  c  |
+    double de = A( 1, 2 ) * A( 2, 3 );                                    // d * e
+    double dd = A( 1, 2 ) * A( 1, 2 );                                         // d^2
+    double ee = A( 2, 3 ) * A( 2, 3 );                                         // e^2
+    double ff = A( 1, 3 ) * A( 1, 3 );                                         // f^2
+    m = A( 1, 1 ) + A( 2, 2 ) + A( 3, 3 );
+    c1 = ( A( 1, 1 ) * A( 2, 2 ) + A( 1, 1 ) * A( 3, 3 ) + A( 2, 2 ) * A( 3, 3 ) )        // a*b + a*c + b*c - d^2 - e^2 - f^2
+    - ( dd + ee + ff );
+    c0 = A( 3, 3 ) * dd + A( 1, 1 ) * ee + A( 2, 2 ) * ff - A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) - 2.0 * A( 1, 3 ) * de; // c*d^2 + a*e^2 + b*f^2 - a*b*c - 2*f*d*e)
+
+    double p, sqrt_p, q, c, s, phi;
+    p = m * m - 3.0 * c1;
+    q = m * ( p - ( 3.0 / 2.0 ) * c1 ) - ( 27.0 / 2.0 ) * c0;
+    sqrt_p = sqrt( fabs( p ) );
+
+    phi = 27.0 * ( 0.25 * c1 * c1 * ( p - c1 ) + c0 * ( q + 27.0 / 4.0 * c0 ) );
+    phi = ( 1.0 / 3.0 ) * atan2( sqrt( fabs( phi ) ), q );
+
+    c = sqrt_p * cos( phi );
+    s = ( 1.0 / sqrt( 3.0 ) ) * sqrt_p * sin( phi );
+
+    e( 2 ) = ( 1.0 / 3.0 ) * ( m - c );
+    e( 3 ) = e( 2 ) + s;
+    e( 1 ) = e( 2 ) + c;
+    e( 2 ) -= s;
+
+    if ( e( 1 ) > e( 2 ) )
+    {
+        if ( e( 1 ) > e( 3 ) )
+        {
+            if ( e( 2 ) > e( 3 ) )
+            {
+                index = { 0,1,2};
+            }
+            else
+            {
+                index = {0,2,1};
+            }
+        }
+        else
+        {
+            index = { 2,0,1};
+        }
+    }
+    else
+    {
+        if( e(2) > e(3) )
+        {
+            if( e(1) > e(3) )
+            {
+                index = {   1,0,2};
+            }
+            else
+            {
+                index = {   1,2,0};
+            }
+        }
+        else
+        {
+            index = {2,1,0};
+        }
+    }
+
+    for ( unsigned long i( 1 ); i < 4; ++i )
+        val( i ) = e( index[i-1]+1 );
+
+    double wmax = ( fabs( val( 1 ) ) > fabs( val( 3 ) ) ) ? val( 1 ) : val( 3 );
+    double thresh = ( 8.0 * DBL_EPSILON * wmax ) * ( 8.0 * DBL_EPSILON * wmax );
+
+    // Prepare calculation of eigenvectors:
+    double n0tmp = A( 1, 2 ) * A( 1, 2 ) + A( 1, 3 ) * A( 1, 3 );
+    double n1tmp = A( 1, 2 ) * A( 1, 2 ) + A( 2, 3 ) * A( 2, 3 );
+    Q( 1, 2 ) = A( 1, 2 ) * A( 2, 3 ) - A( 1, 3 ) * A( 2, 2 );
+    Q( 2, 2 ) = A( 1, 3 ) * A( 2, 1 ) - A( 2, 3 ) * A( 1, 1 );
+    Q( 3, 2 ) = A( 1, 2 ) * A( 1, 2 );
+
+    // Calculate first eigenvector by the formula
+    //   v(0) = (A - w(0)).e1 x (A - w(0)).e2
+    A( 1, 1 ) -= val( 1 );
+    A( 2, 2 ) -= val( 1 );
+    Q( 1, 1 ) = Q( 1, 2 ) + A( 1, 3 ) * val( 1 );
+    Q( 2, 1 ) = Q( 2, 2 ) + A( 2, 3 ) * val( 1 );
+    Q( 3, 1 ) = A( 1, 1 ) * A( 2, 2 ) - Q( 3, 2 );
+    double norm = Q( 1, 1 ) * Q( 1, 1 ) + Q( 2, 1 ) * Q( 2, 1 ) + Q( 3, 1 ) * Q( 3, 1 );
+    double n0 = n0tmp + A( 1, 1 ) * A( 1, 1 );
+    double n1 = n1tmp + A( 2, 2 ) * A( 2, 2 );
+    double error = n0 * n1;
+    double t( 0 ), f( 0 );
+    unsigned long i( 0 ), j( 0 );
+
+    if ( n0 <= thresh )         // If the first column is zero, then (1,0,0) is an eigenvector
+    {
+        Q( 1, 1 ) = 1.0;
+        Q( 2, 1 ) = 0.0;
+        Q( 3, 1 ) = 0.0;
+    }
+    else if ( n1 <= thresh )    // If the second column is zero, then (0,1,0) is an eigenvector
+    {
+        Q( 1, 1 ) = 0.0;
+        Q( 2, 1 ) = 1.0;
+        Q( 3, 1 ) = 0.0;
+    }
+    else if ( norm < 64.0 * 64.0 * DBL_EPSILON * DBL_EPSILON * error )
+    {                         // If angle between A(0) and A(1) is too small, don't use
+        t = A( 1, 2 ) * A( 1, 2 );       // cross product, but calculate v ~ (1, -A0/A1, 0)
+        f = -A( 1, 1 ) / A( 1, 2 );
+        if ( A( 2, 2 ) * A( 2, 2 ) > t )
+        {
+            t = A( 2, 2 ) * A( 2, 2 );
+            f = -A( 1, 2 ) / A( 2, 2 );
+        }
+        if ( A( 2, 3 ) * A( 2, 3 ) > t )
+            f = -A( 1, 3 ) / A( 2, 3 );
+        norm = 1.0 / sqrt( 1 + f * f );
+        Q( 1, 1 ) = norm;
+        Q( 2, 1 ) = f * norm;
+        Q( 3, 1 ) = 0.0;
+    }
+    else                      // This is the standard branch
+    {
+        norm = sqrt( 1.0 / norm );
+        for ( j = 1; j < 4; ++j )
+            Q( j, 1 ) = Q( j, 1 ) * norm;
+    }
+
+    // Prepare calculation of second eigenvector
+    t = val( 1 ) - val( 2 );
+    if ( fabs( t ) > 8.0 * DBL_EPSILON * wmax )
+    {
+        // For non-degenerate eigenvalue, calculate second eigenvector by the formula
+        //   v(1) = (A - w(1)).e1 x (A - w(1)).e2
+        A( 1, 1 ) += t;
+        A( 2, 2 ) += t;
+        Q( 1, 2 ) = Q( 1, 2 ) + A( 1, 3 ) * val( 1 );
+        Q( 2, 2 ) = Q( 2, 2 ) + A( 2, 3 ) * val( 1 );
+        Q( 3, 2 ) = A( 1, 1 ) * A( 2, 2 ) - Q( 3, 2 );
+        norm = Q( 1, 2 ) * Q( 1, 2 ) + Q( 2, 2 ) * Q( 2, 2 ) + Q( 3, 2 ) * Q( 3, 2 );
+        n0 = n0tmp + A( 1, 1 ) * A( 1, 1 );
+        n1 = n1tmp + A( 2, 2 ) * A( 2, 2 );
+        error = n0 * n1;
+
+        if ( n0 <= thresh )       // If the first column is zero, then (1,0,0) is an eigenvector
+        {
+            Q( 1, 2 ) = 1.0;
+            Q( 2, 2 ) = 0.0;
+            Q( 3, 2 ) = 0.0;
+        }
+        else if ( n1 <= thresh )  // If the second column is zero, then (0,1,0) is an eigenvector
+        {
+            Q( 1, 2 ) = 0.0;
+            Q( 2, 2 ) = 1.0;
+            Q( 3, 2 ) = 0.0;
+        }
+        else if ( norm < 64.0 * DBL_EPSILON * 64.0 * DBL_EPSILON * error )
+        {                       // If angle between A(0) and A(1) is too small, don't use
+            t = A( 1, 2 ) * A( 1, 2 );     // cross product, but calculate v ~ (1, -A0/A1, 0)
+            f = -A( 1, 1 ) / A( 1, 2 );
+            if ( A( 2, 2 ) * A( 2, 2 ) > t )
+            {
+                t = A( 2, 2 ) * A( 2, 2 );
+                f = -A( 1, 2 ) / A( 2, 2 );
+            }
+            if ( A( 2, 3 ) * A( 2, 3 ) > t )
+                f = -A( 1, 3 ) / A( 2, 3 );
+            norm = 1.0 / sqrt( 1 + f * f );
+            Q( 1, 2 ) = norm;
+            Q( 2, 2 ) = f * norm;
+            Q( 3, 2 ) = 0.0;
+        }
+        else
+        {
+            norm = sqrt( 1.0 / norm );
+            for ( j = 1; j < 4; ++j )
+                Q( j, 2 ) = Q( j, 2 ) * norm;
+        }
+    }
+    else
+    {
+        // For degenerate eigenvalue, calculate second eigenvector according to
+        //   v(1) = v(0) x (A - w(1)).e(i)
+        //
+        // This would really get to complicated if we could not assume all of A to
+        // contain meaningful values.
+        A( 2, 1 ) = A( 1, 2 );
+        A( 3, 1 ) = A( 1, 3 );
+        A( 3, 2 ) = A( 2, 3 );
+        A( 1, 1 ) += val( 1 );
+        A( 2, 2 ) += val( 1 );
+        for ( i = 1; i < 4; ++i )
+        {
+            A( i, i ) -= val( 2 );
+            n0 = A( 1, i ) * A( 1, i ) + A( 2, i ) * A( 2, i ) + A( 3, i ) * A( 3, i );
+            if ( n0 > thresh )
+            {
+                Q( 1, 2 ) = Q( 2, 1 ) * A( 3, i ) - Q( 3, 1 ) * A( 2, i );
+                Q( 2, 2 ) = Q( 3, 1 ) * A( 1, i ) - Q( 1, 1 ) * A( 3, i );
+                Q( 3, 2 ) = Q( 1, 1 ) * A( 2, i ) - Q( 2, 1 ) * A( 1, i );
+                norm = Q( 1, 2 ) * Q( 1, 2 ) + Q( 2, 2 ) * Q( 2, 2 ) + Q( 3, 2 ) * Q( 3, 2 );
+                if ( norm > 256.0 * DBL_EPSILON * 256.0 * DBL_EPSILON * n0 ) // Accept cross product only if the angle between
+                {                                         // the two vectors was not too small
+                    norm = sqrt( 1.0 / norm );
+                    for ( j = 1; j < 4; ++j )
+                        Q( j, 2 ) = Q( j, 2 ) * norm;
+                    break;
+                }
+            }
+        }
+
+        if ( i == 4 )    // This means that any vector orthogonal to v(0) is an EV.
+        {
+            for ( j = 1; j < 4; ++j )
+                if ( Q( j, 1 ) != 0.0 )                                   // Find nonzero element of v(0) ...
+                {                                                     // ... and swap it with the next one
+                    norm = 1.0 / sqrt( Q( j, 1 ) * Q( j, 1 ) + Q( ( j + 2 ) % 3 + 1, 1 ) * Q( ( j + 1 ) % 3 + 1, 1 ) );
+                    Q( j, 2 ) = Q( ( j + 1 ) % 3 + 1, 1 ) * norm;
+                    Q( ( j + 1 ) % 3 + 1, 2 ) = -Q( j, 1 ) * norm;
+                    Q( ( j + 2 ) % 3 + 1, 2 ) = 0.0;
+                    break;
+                }
+        }
+    }
+
+    // Calculate third eigenvector according to
+    //   v(2) = v(0) x v(1)
+    Q( 1, 3 ) = Q( 2, 1 ) * Q( 3, 2 ) - Q( 3, 1 ) * Q( 2, 2 );
+    Q( 2, 3 ) = Q( 3, 1 ) * Q( 1, 2 ) - Q( 1, 1 ) * Q( 3, 2 );
+    Q( 3, 3 ) = Q( 1, 1 ) * Q( 2, 2 ) - Q( 2, 1 ) * Q( 1, 2 );
+
+    vec.clear();
+    for ( int ii( 1 ); ii < 4; ++ii )
+    {
+        ColumnVector tmp( 3 );
+
+        tmp( 1 ) = Q( 1, ii );
+        tmp( 2 ) = Q( 2, ii );
+        tmp( 3 ) = Q( 3, ii );
+
+        vec.push_back( tmp );
+    }
+
+}

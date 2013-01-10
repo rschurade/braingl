@@ -97,6 +97,5 @@ QString DatasetBingham::getValueAsString( int x, int y, int z )
     QVector<float> data = m_data->at( x + y * nx + z * nx * ny );
     return QString::number( data[0] ) + ", " + QString::number( data[1] ) + ", " + QString::number( data[2] ) + ", " + QString::number( data[3] ) +
      ", " + QString::number( data[4] ) + ", " + QString::number( data[5] ) + ", " + QString::number( data[6] ) + ", " + QString::number( data[7] ) +
-     ", " + QString::number( data[8] ) + ", " + QString::number( data[9] ) + ", " + QString::number( data[10] ) + ", " + QString::number( data[11] ) +
-     ", " + QString::number( data[12] ) + ", " + QString::number( data[13] );
+     ", " + QString::number( data[8] );
 }

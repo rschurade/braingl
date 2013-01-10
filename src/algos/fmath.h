@@ -30,11 +30,13 @@ public:
     static Matrix sh_base( Matrix g, int max_order );
     static double sh_base_function( int order, int degree, double theta, double phi );
 
-    static ColumnVector moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points );
+    static SymmetricMatrix moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points );
     static double iprod( const ColumnVector& v1, const ColumnVector& v2 );
     static ColumnVector cprod( const ColumnVector& v1, const ColumnVector& v2 );
 
     static void evd3x3( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals );
+    static void evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vecs, ColumnVector& vals );
+
 
     static ColumnVector cart2sphere( const ColumnVector& input );
     static ColumnVector sphere2cart( const ColumnVector& input );

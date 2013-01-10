@@ -241,8 +241,8 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( DatasetTensor* ds )
 
 QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
 {
-    int depth = 3;
-    int neighbourhood = 2;
+    int depth = 5;
+    int neighbourhood = 3;
     int n_peaks = 3;
 
     QList<Dataset*> l= Bingham::calc_bingham( ds, depth, neighbourhood, n_peaks );
@@ -252,6 +252,7 @@ QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
         l[0]->setProperty( "createdBy", FNALGO_BINGHAM );
         l[0]->setProperty( "nt", 42 );
         l[0]->setProperty( "datatype", DT_FLOAT );
+        //l[0]->setProperty( "active", false );
     }
     if ( l.size() > 1 )
     {

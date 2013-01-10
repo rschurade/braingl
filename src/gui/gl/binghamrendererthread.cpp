@@ -9,9 +9,9 @@
 
 #include "../../algos/fmath.h"
 
-#include "shrendererthread.h"
+#include "binghamrendererthread.h"
 
-SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny, int nz,
+BinghamRendererThread::BinghamRendererThread( QVector<QVector<float> >* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
                                                                 QVector<int> visibleArea,
@@ -38,17 +38,17 @@ SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny,
     m_verts = new QVector<float>();
 }
 
-SHRendererThread::~SHRendererThread()
+BinghamRendererThread::~BinghamRendererThread()
 {
     m_verts->clear();
 }
 
-QVector<float>* SHRendererThread::getVerts()
+QVector<float>* BinghamRendererThread::getVerts()
 {
     return m_verts;
 }
 
-void SHRendererThread::run()
+void BinghamRendererThread::run()
 {
     // TODO
     const Matrix* vertices = tess::vertices( m_lod );
@@ -80,30 +80,41 @@ void SHRendererThread::run()
         {
             for ( int xx = lowerX; xx < upperX; ++xx )
             {
-                if ( ( fabs( m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny )(1) ) > 0.0001 ) )
+                int dataPos = xx + yy * m_nx + m_zi * m_nx * m_ny;
+                if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    ColumnVector dv = m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny );
-                    ColumnVector r = base * dv;
-
-//                    float max = 0;
-//                    float min = std::numeric_limits<float>::max();
-//                    for ( int i = 0; i < r.Nrows(); ++i )
-//                    {
-//                        max = qMax( max, (float)r(i+1) );
-//                        min = qMin( min, (float)r(i+1) );
-//                    }
-//
-//
-//                    for ( int i = 0; i < r.Nrows(); ++i )
-//                    {
-//                        r(i+1) = r(i+1) / max * 0.8;
-//                    }
-
                     float locX = xx * m_dx + m_dx / 2;
                     float locY = yy * m_dy + m_dy / 2;
 
-                    for ( int i = 0; i < numVerts; ++i )
+                    for( int i = 0; i < numVerts; ++i )
                     {
+                        ColumnVector cur( 3 );
+                        cur( 1 ) = (*vertices)( i+1, 1 );
+                        cur( 2 ) = (*vertices)( i+1, 2 );
+                        cur( 3 ) = (*vertices)( i+1, 3 );
+
+                        ColumnVector m1( 3 );
+                        m1( 1 ) = m_data->at( dataPos )[0];
+                        m1( 2 ) = m_data->at( dataPos )[1];
+                        m1( 3 ) = m_data->at( dataPos )[2];
+
+                        ColumnVector m2( 3 );
+                        m2( 1 ) = m_data->at( dataPos )[3];
+                        m2( 2 ) = m_data->at( dataPos )[4];
+                        m2( 3 ) = m_data->at( dataPos )[5];
+
+                        double val_1( FMath::iprod( m1, cur ) );
+                        double val_2( FMath::iprod( m2, cur ) );
+
+                        double radius( 0.0 );
+                        double k1 = m_data->at( dataPos )[6];
+                        double k2 = m_data->at( dataPos )[7];
+                        double f0 = m_data->at( dataPos )[8];
+
+                        radius =  f0 * exp( -( k1 * val_1 * val_1 + k2 * val_2 * val_2 ) ) ;
+
+                        //radius = radius;
+
                         m_verts->push_back( (*vertices)( i+1, 1 ) );
                         m_verts->push_back( (*vertices)( i+1, 2 ) );
                         m_verts->push_back( (*vertices)( i+1, 3 ) );
@@ -113,7 +124,7 @@ void SHRendererThread::run()
                         m_verts->push_back( locX );
                         m_verts->push_back( locY );
                         m_verts->push_back( z );
-                        m_verts->push_back( r(i + 1) );
+                        m_verts->push_back( radius );
                     }
                 }
             }
@@ -121,6 +132,7 @@ void SHRendererThread::run()
     }
     else if ( m_orient == 2 )
     {
+        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
 
@@ -165,9 +177,11 @@ void SHRendererThread::run()
                 }
             }
         }
+        */
     }
     else if ( m_orient == 3 )
     {
+        /*
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
 
@@ -212,6 +226,7 @@ void SHRendererThread::run()
                 }
             }
         }
+        */
     }
     else
     {
