@@ -254,31 +254,6 @@ QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
         l[0]->setProperty( "datatype", DT_FLOAT );
         //l[0]->setProperty( "active", false );
     }
-    if ( l.size() > 1 )
-    {
-        l[1]->setProperty( "name", "bingham tensor 1" );
-        l[1]->setProperty( "createdBy", FNALGO_TENSORFIT );
-        l[1]->setProperty( "nt", 6 );
-        l[1]->setProperty( "datatype", DT_FLOAT );
-        //l[1]->setProperty( "active", false );
-    }
-    if ( l.size() > 2 )
-    {
-        l[2]->setProperty( "name", "bingham tensor 2" );
-        l[2]->setProperty( "createdBy", FNALGO_TENSORFIT );
-        l[2]->setProperty( "nt", 6 );
-        l[2]->setProperty( "datatype", DT_FLOAT );
-        l[2]->setProperty( "active", false );
-    }
-    if ( l.size() > 3 )
-    {
-        l[3]->setProperty( "name", "bingham tensor 3" );
-        l[3]->setProperty( "createdBy", FNALGO_TENSORFIT );
-        l[3]->setProperty( "nt", 6 );
-        l[3]->setProperty( "datatype", DT_FLOAT );
-        l[3]->setProperty( "active", false );
-    }
-
     return l;
 }
 

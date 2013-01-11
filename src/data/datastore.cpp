@@ -580,10 +580,10 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 if ( ds->getProperty( "type" ) == FNDT_NIFTI_SH )
                 {
                     QList<Dataset*> bings = DWIAlgos::fitBingham( dynamic_cast<DatasetSH*>( ds ) );
-                    addDataset( bings[0] );
-                    addDataset( bings[1] );
-                    addDataset( bings[2] );
-                    addDataset( bings[3] );
+                    for ( int i = 0; i < bings.size(); ++i )
+                    {
+                        addDataset( bings[i] );
+                    }
                 }
                 break;
             }
