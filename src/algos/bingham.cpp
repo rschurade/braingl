@@ -6,14 +6,18 @@
  */
 #include <QtCore/QDebug>
 
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+
 #include "../data/mesh/tesselation.h"
 
 #include "../data/datasets/dataset.h"
+#include "../data/datasets/datasetdwi.h"
 #include "../data/datasets/datasetsh.h"
 #include "../data/datasets/datasetbingham.h"
 #include "../data/datasets/datasettensor.h"
 
 #include "fmath.h"
+#include "gradients.h"
 #include "sorts.h"
 
 #include "binghamthread.h"
@@ -85,6 +89,138 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 
     DatasetBingham* out1 = new DatasetBingham( "Bingham", out, sh->getHeader() );
     dsout.push_back( out1 );
+
+    return dsout;
+}
+
+QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
+{
+    qDebug() << "start bingham to dwi";
+    QVector< QVector<float> >* data = ds->getData();
+
+    QVector<ColumnVector>* signals1 = new QVector<ColumnVector>();
+    QVector<ColumnVector>* signals2 = new QVector<ColumnVector>();
+    QVector<ColumnVector>* signals3 = new QVector<ColumnVector>();
+
+    signals1->resize( data->size() );
+    signals2->resize( data->size() );
+    signals3->resize( data->size() );
+
+    float kernel[4] = { 258.747, -82.5396, 18.716, -2.35225 };
+
+    ColumnVector v( __GRADIENTS_60_SIZE );
+    v = 0.0;
+    for ( int i = 0; i < data->size(); ++i )
+    {
+        signals1->replace( i, v );
+        signals2->replace( i, v );
+        signals3->replace( i, v );
+    }
+
+    QVector< QVector<ColumnVector>* > sigs;
+    sigs.push_back( signals1 );
+    sigs.push_back( signals2 );
+    sigs.push_back( signals3 );
+
+    ColumnVector m1( 3 );
+    ColumnVector m2( 3 );
+    float k1;
+    float k2;
+    float f0;
+
+    //****************************************************************************
+    QVector<QVector3D>bvecs;
+    QVector<float>bvals;
+
+    const int max_ord = 6; //((-3+static_cast<int>(sqrt(8*((*sh.get(0,0,0)).size())+1)))/2);
+    Matrix gradients( __GRADIENTS_60_SIZE, 3 );
+    for ( int i = 0; i < __GRADIENTS_60_SIZE; ++i )
+    {
+        gradients( i + 1, 1 ) = __GRADIENTS_60[ i * 3 ];
+        gradients( i + 1, 2 ) = __GRADIENTS_60[ i * 3 + 1 ];
+        gradients( i + 1, 3 ) = __GRADIENTS_60[ i * 3 + 2 ];
+
+        QVector3D v( __GRADIENTS_60[ i * 3 ], __GRADIENTS_60[ i * 3+1 ], __GRADIENTS_60[ i * 3 + 2] );
+        bvecs.push_back( v );
+        bvals.push_back( 1000 );
+    }
+
+    Matrix base( FMath::sh_base( gradients, max_ord ) );
+    Matrix inv_base( FMath::pseudoInverse( base ) );
+
+    for ( int i = 0; i < data->size(); ++i ) // for all voxels
+    {
+        for ( int k = 0; k < 3; ++k ) // for all 3 bingham peaks
+        {
+            ColumnVector sig( __GRADIENTS_60_SIZE );
+            sig = 0.0;
+
+            f0 = data->at( i )[ k * 9 + 8 ];
+
+            if ( f0 > 0.0 )
+            {
+                m1( 1 ) = data->at( i )[ k * 9 ];
+                m1( 2 ) = data->at( i )[ k * 9 + 1 ];
+                m1( 3 ) = data->at( i )[ k * 9 + 2 ];
+                m2( 1 ) = data->at( i )[ k * 9 + 3 ];
+                m2( 2 ) = data->at( i )[ k * 9 + 4 ];
+                m2( 3 ) = data->at( i )[ k * 9 + 5 ];
+                k1 = data->at( i )[ k * 9 + 6 ];
+                k2 = data->at( i )[ k * 9 + 7 ];
+
+                ColumnVector tmp( __GRADIENTS_60_SIZE );
+                tmp = 0.0;
+
+                for ( int l = 0; l < __GRADIENTS_60_SIZE; ++l )
+                {
+                    ColumnVector cur_dir(3);
+                    cur_dir(1) = __GRADIENTS_60[l*3];
+                    cur_dir(2) = __GRADIENTS_60[l*3+1];
+                    cur_dir(3) = __GRADIENTS_60[l*3+2];
+
+                    tmp( l + 1 ) = f0 * exp( - ( k1 * FMath::iprod(cur_dir,m1) *
+                                                      FMath::iprod(cur_dir,m1) +
+                                                      k2 * FMath::iprod(cur_dir,m2) *
+                                                      FMath::iprod(cur_dir,m2) ) );
+
+                }
+                // transform to spherical harmonic space
+                ColumnVector sh_signal = inv_base * tmp;
+
+                //do the convolution
+                for( int order(0), j(0), i(0); order <= max_ord; order+=2, ++i )
+                {
+                    for( int degree( -order ); degree <= order; ++degree, ++j )
+                    {
+                        sh_signal(j+1) = sh_signal( j+1 ) * ( kernel[i] / boost::math::spherical_harmonic_r( order, 0, 0, 0 ) );
+                    }
+                }
+
+                // back transform to signal space
+                tmp = base * sh_signal;
+//                for ( int ii = 0; ii < tmp.Nrows(); ++ii )
+//                {
+//                    if ( tmp( ii + 1 ) > 1.0 )
+//                    {
+//                        tmp( ii + 1 ) = 1.0;
+//                    }
+//                }
+                sigs[k]->replace( i, tmp );
+            }
+
+        }
+    }
+
+    QVector<float> b0Data( data->size(), 258.747 );
+    QList<Dataset*> dsout;
+    for ( int i = 0; i < 3; ++i )
+    {
+        DatasetDWI* out = new DatasetDWI( "dwifrombingham", sigs[i], b0Data, bvals, bvecs, ds->getHeader() );
+
+        dsout.push_back( out );
+    }
+
+    qDebug() << "finished bingham to dwi";
 
     return dsout;
 }

@@ -57,6 +57,11 @@ double FMath::legendre_p( int k )
 
 }
 
+double FMath::boostLegendre_p( int order, int arg1, double arg2 )
+{
+    return boost::math::legendre_p<double>( order, arg1, arg2 );
+}
+
 Matrix FMath::sh_base( Matrix g, int maxOrder )
 {
     //qDebug() << "start calculating sh base";

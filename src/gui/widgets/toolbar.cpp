@@ -74,6 +74,10 @@ void ToolBar::createActions()
     m_fiberAction1 = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "Fiber 1" ), this, FNALGO_TENSOR_TRACK );
     m_fiberAction1->setStatusTip( tr( "Fiber Action 1" ) );
     connect( m_fiberAction1, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+
+    m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, FNALGO_BINGHAM_2_TENSOR );
+    m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
+    connect( m_bingham2tensorAction, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 }
 
 void ToolBar::slot( FN_ALGO algo )
@@ -116,6 +120,11 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_tensorAct );
             this->addAction( m_faAct );
             this->addAction( m_evAct );
+            break;
+        }
+        case FNDT_NIFTI_BINGHAM:
+        {
+            this->addAction( m_bingham2tensorAction );
             break;
         }
         default:
