@@ -11,6 +11,7 @@
 #include <QtCore/QList>
 
 class Dataset3D;
+class DatasetBingham;
 class DatasetDWI;
 class DatasetNifti;
 class DatasetTensor;
@@ -28,6 +29,7 @@ public:
     static DatasetScalar* calcFAFromTensor( DatasetTensor* ds );
     static QList<Dataset*> calcEVFromTensor( DatasetTensor* ds );
     static QList<Dataset*> fitBingham( DatasetSH* ds );
+    static QList<Dataset*> bingham2Tensor( DatasetBingham* ds );
 
     static QList<Dataset*> tensorTrack( DatasetTensor* ds );
 

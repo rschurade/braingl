@@ -26,6 +26,7 @@ public:
     static ColumnVector vlog( ColumnVector v );
 
     static double legendre_p( int k );
+    static double boostLegendre_p( int order, int arg1, double arg2 );
 
     static Matrix sh_base( Matrix g, int max_order );
     static double sh_base_function( int order, int degree, double theta, double phi );

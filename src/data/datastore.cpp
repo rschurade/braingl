@@ -9,6 +9,7 @@
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
+#include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
@@ -604,6 +605,19 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 {
                     QList<Dataset*> isos = ScalarAlgos::isoSurface( dynamic_cast<DatasetScalar*>( ds ) );
                     addDataset( isos[0] );
+                }
+                break;
+            }
+            case FNALGO_BINGHAM_2_TENSOR:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_BINGHAM )
+                {
+                    QList<Dataset*> tensors = DWIAlgos::bingham2Tensor( dynamic_cast<DatasetBingham*>( ds ) );
+                    for ( int i = 0; i < tensors.size(); ++i )
+                    {
+                        addDataset( tensors[i] );
+                    }
                 }
                 break;
             }

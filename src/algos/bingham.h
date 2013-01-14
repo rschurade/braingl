@@ -11,6 +11,7 @@
 #include <QtCore/QList>
 
 class Dataset;
+class DatasetBingham;
 class DatasetSH;
 
 class Bingham
@@ -20,6 +21,8 @@ public:
     virtual ~Bingham();
 
     static QList<Dataset*> calc_bingham( DatasetSH* sh, const int lod, const int neighbourhood, const int num_max );
+
+    static QList<Dataset*> bingham2Tensor( DatasetBingham* );
 };
 
 #endif /* BINGHAM_H_ */

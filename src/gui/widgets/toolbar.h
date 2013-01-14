@@ -41,6 +41,7 @@ private:
     FNAction* m_meshAction1;
     FNAction* m_fiberAction1;
     FNAction* m_binghamAction;
+    FNAction* m_bingham2tensorAction;
 
     void createActions();
 
