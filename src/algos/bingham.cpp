@@ -108,7 +108,10 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
 
     float kernel[4] = { 258.747, -82.5396, 18.716, -2.35225 };
 
-    ColumnVector v( __GRADIENTS_60_SIZE );
+    int gradientsSize = __GRADIENTS_60_SIZE;
+    int tessGradientsSize = tess::__TESS_THREE_V_SIZE;
+
+    ColumnVector v( gradientsSize );
     v = 0.0;
     for ( int i = 0; i < data->size(); ++i )
     {
@@ -132,9 +135,13 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QVector<QVector3D>bvecs;
     QVector<float>bvals;
 
-    const int max_ord = 6; //((-3+static_cast<int>(sqrt(8*((*sh.get(0,0,0)).size())+1)))/2);
-    Matrix gradients( __GRADIENTS_60_SIZE, 3 );
-    for ( int i = 0; i < __GRADIENTS_60_SIZE; ++i )
+    const int max_ord = 10; //((-3+static_cast<int>(sqrt(8*((*sh.get(0,0,0)).size())+1)))/2);
+
+
+    Matrix gradients( gradientsSize, 3 );
+    Matrix tessGradients( tessGradientsSize, 3 );
+
+    for ( int i = 0; i < gradientsSize; ++i )
     {
         gradients( i + 1, 1 ) = __GRADIENTS_60[ i * 3 ];
         gradients( i + 1, 2 ) = __GRADIENTS_60[ i * 3 + 1 ];
@@ -145,14 +152,22 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
         bvals.push_back( 1000 );
     }
 
+
+    for ( int i = 0; i < tessGradientsSize; ++i )
+    {
+        tessGradients( i + 1, 1 ) = tess::__TESS_THREE_V[ i * 3 ];
+        tessGradients( i + 1, 2 ) = tess::__TESS_THREE_V[ i * 3 + 1 ];
+        tessGradients( i + 1, 3 ) = tess::__TESS_THREE_V[ i * 3 + 2 ];
+    }
+
     Matrix base( FMath::sh_base( gradients, max_ord ) );
-    Matrix inv_base( FMath::pseudoInverse( base ) );
+    Matrix inv_base( FMath::pseudoInverse( FMath::sh_base( tessGradients, max_ord ) ) );
 
     for ( int i = 0; i < data->size(); ++i ) // for all voxels
     {
         for ( int k = 0; k < 3; ++k ) // for all 3 bingham peaks
         {
-            ColumnVector sig( __GRADIENTS_60_SIZE );
+            ColumnVector sig( gradientsSize );
             sig = 0.0;
 
             f0 = data->at( i )[ k * 9 + 8 ];
@@ -168,15 +183,15 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
                 k1 = data->at( i )[ k * 9 + 6 ];
                 k2 = data->at( i )[ k * 9 + 7 ];
 
-                ColumnVector tmp( __GRADIENTS_60_SIZE );
+                ColumnVector tmp( tessGradientsSize );
                 tmp = 0.0;
 
-                for ( int l = 0; l < __GRADIENTS_60_SIZE; ++l )
+                for ( int l = 0; l < tessGradientsSize; ++l )
                 {
                     ColumnVector cur_dir(3);
-                    cur_dir(1) = __GRADIENTS_60[l*3];
-                    cur_dir(2) = __GRADIENTS_60[l*3+1];
-                    cur_dir(3) = __GRADIENTS_60[l*3+2];
+                    cur_dir(1) = tess::__TESS_THREE_V[l*3];
+                    cur_dir(2) = tess::__TESS_THREE_V[l*3+1];
+                    cur_dir(3) = tess::__TESS_THREE_V[l*3+2];
 
                     tmp( l + 1 ) = f0 * exp( - ( k1 * FMath::iprod(cur_dir,m1) *
                                                       FMath::iprod(cur_dir,m1) +
@@ -197,21 +212,21 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
                 }
 
                 // back transform to signal space
-                tmp = base * sh_signal;
-//                for ( int ii = 0; ii < tmp.Nrows(); ++ii )
-//                {
-//                    if ( tmp( ii + 1 ) > 1.0 )
-//                    {
-//                        tmp( ii + 1 ) = 1.0;
-//                    }
-//                }
-                sigs[k]->replace( i, tmp );
+                ColumnVector tmp1 = base * sh_signal;
+                for ( int ii = 0; ii < tmp.Nrows(); ++ii )
+                {
+                    if ( tmp( ii + 1 ) > 1.0 )
+                    {
+                        tmp( ii + 1 ) = 1.0;
+                    }
+                }
+                sigs[k]->replace( i, tmp1 );
             }
 
         }
     }
 
-    QVector<float> b0Data( data->size(), 258.747 );
+    QVector<float> b0Data( data->size(), 220 );
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
