@@ -11,6 +11,8 @@
 #include <QtGui/QFontMetrics>
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QGroupBox>
 
 #include "sliderwitheditint.h"
 
@@ -29,10 +31,6 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
-    QHBoxLayout* layout = new QHBoxLayout();
-
-    m_label = new QLabel( name );
-
     m_button1 = new QPushButton( tr(" - ") );
     QFontMetrics _metrics( m_button1->fontMetrics() );
     m_button1->setMaximumWidth( _metrics.boundingRect("  -  ").width() );
@@ -42,13 +40,21 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     connect( m_button1, SIGNAL( clicked() ), this, SLOT( minusPressed() ) );
     connect( m_button2, SIGNAL( clicked() ), this, SLOT( plusPressed() ) );
 
-    layout->addWidget( m_label, 20 );
-    layout->addWidget( m_button1 );
-    layout->addWidget( m_slider, 55 );
-    layout->addWidget( m_button2 );
-    layout->addWidget( m_edit, 25 );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    QVBoxLayout* vLayout = new QVBoxLayout();
 
-    setLayout( layout );
+    QGroupBox* gb = new QGroupBox( name );
+    gb->setFlat( true );
+
+    hLayout->addWidget( m_button1 );
+    hLayout->addWidget( m_slider, 55 );
+    hLayout->addWidget( m_button2 );
+    hLayout->addWidget( m_edit, 25 );
+
+    gb->setLayout( hLayout );
+    vLayout->addWidget( gb );
+
+    setLayout( vLayout );
 }
 
 SliderWithEditInt::~SliderWithEditInt()

@@ -155,7 +155,6 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 
 DatasetPropertyView::~DatasetPropertyView()
 {
-    // TODO Auto-generated destructor stub
 }
 
 QWidget* DatasetPropertyView::getWidget()

@@ -6,6 +6,8 @@
  */
 
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QGroupBox>
 #include <QtGui/QCheckBox>
 #include <QtGui/QLabel>
 
@@ -15,13 +17,20 @@ CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
 {
     m_id = id;
 
-    QHBoxLayout* layout = new QHBoxLayout();
     m_checkBox = new QCheckBox();
 
-    layout->addWidget( new QLabel( label ), 25 );
-    layout->addWidget( m_checkBox, 75 );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    QVBoxLayout* vLayout = new QVBoxLayout();
 
-    setLayout( layout );
+    QGroupBox* gb = new QGroupBox( label );
+
+    hLayout->addWidget( m_checkBox );
+
+    gb->setLayout( hLayout );
+    gb->setFlat( true );
+    vLayout->addWidget( gb );
+
+    setLayout( vLayout );
 
     connect( m_checkBox, SIGNAL( stateChanged( int ) ), this, SLOT( slotStateChanged( int ) ) );
 }
