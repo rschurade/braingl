@@ -5,6 +5,8 @@
  *      Author: Ralph
  */
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QGroupBox>
 #include <QtGui/QComboBox>
 #include <QtGui/QLabel>
 
@@ -14,13 +16,19 @@ SelectWithLabel::SelectWithLabel( QString label, int id )
 {
     m_id = id;
 
-    QHBoxLayout* layout = new QHBoxLayout();
     m_comboBox = new QComboBox();
 
-    layout->addWidget( new QLabel( label ), 25 );
-    layout->addWidget( m_comboBox, 75 );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    QVBoxLayout* vLayout = new QVBoxLayout();
 
-    setLayout( layout );
+    QGroupBox* gb = new QGroupBox( label );
+    hLayout->addWidget( m_comboBox );
+
+    gb->setLayout( hLayout );
+    gb->setFlat( true );
+    vLayout->addWidget( gb );
+
+    setLayout( vLayout );
 
     connect( m_comboBox, SIGNAL( currentIndexChanged( int ) ), this, SLOT( indexChanged( int ) ) );
 }

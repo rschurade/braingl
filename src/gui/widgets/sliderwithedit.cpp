@@ -4,11 +4,13 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
+#include <QtGui/QGroupBox>
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
 
 #include "sliderwithedit.h"
 
@@ -28,15 +30,20 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
-    QHBoxLayout* layout = new QHBoxLayout();
+    QVBoxLayout* vLayout = new QVBoxLayout();
+    QHBoxLayout* hLayout = new QHBoxLayout();
 
     m_label = new QLabel( name );
 
-    layout->addWidget( m_label, 25 );
-    layout->addWidget( m_slider, 60 );
-    layout->addWidget( m_edit, 15 );
+    QGroupBox* gb = new QGroupBox( m_label->text() );
+    gb->setFlat( true );
 
-    setLayout( layout );
+    hLayout->addWidget( m_slider, 70 );
+    hLayout->addWidget( m_edit, 30 );
+    gb->setLayout( hLayout );
+    vLayout->addWidget( gb );
+
+    setLayout( vLayout );
 }
 
 SliderWithEdit::~SliderWithEdit()

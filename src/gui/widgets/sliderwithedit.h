@@ -19,7 +19,7 @@ class SliderWithEdit : public QWidget
     Q_OBJECT
 
 public:
-    SliderWithEdit( QString name, int id, QWidget* parent = 0 );
+    SliderWithEdit( QString name, int id = 0, QWidget* parent = 0 );
     virtual ~SliderWithEdit();
 
     void setValue( float value );
