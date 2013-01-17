@@ -4,9 +4,7 @@
  *  Created on: Jun 18, 2012
  *      Author: schurade
  */
-#include <stdexcept>
-
-#include <math.h>
+#include "enums.h"
 #include "../algos/fmath.h"
 #include "../algos/track.h"
 
@@ -16,6 +14,8 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
+
+#include "../gui/widgets/datasetselectionwidget.h"
 
 #include "mesh/tesselation.h"
 
@@ -281,4 +281,17 @@ QList<Dataset*> DWIAlgos::bingham2Tensor( DatasetBingham* ds )
         l[i]->setProperty( "datatype", DT_FLOAT );
     }
     return l;
+}
+
+QList<Dataset*> DWIAlgos::testAlgo( Dataset* ds, QList<Dataset*> &dsl )
+{
+    QVector< QPair<QString, FN_DATASET_TYPE> >filter;
+
+    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "a scalar dataset", FNDT_NIFTI_SCALAR ) );
+    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "another scalar dataset", FNDT_NIFTI_SCALAR ) );
+    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "a bingham dataset", FNDT_NIFTI_BINGHAM ) );
+    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "any nifti dataset", FNDT_NIFTI_ANY ) );
+
+    DatasetSelectionWidget* dsw = new DatasetSelectionWidget( filter, dsl );
+    dsw->show();
 }

@@ -621,6 +621,15 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 }
                 break;
             }
+            case FNALGO_TEST:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->getProperty( "type" ) == FNDT_NIFTI_SCALAR )
+                {
+                    DWIAlgos::testAlgo( ds, m_datasetList );
+                }
+                break;
+            }
         }
     }
 

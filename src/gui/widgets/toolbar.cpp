@@ -43,6 +43,10 @@ void ToolBar::createActions()
     m_isosurfaceAct->setStatusTip( tr( "Scalar Action 1" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 
+    m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, FNALGO_TEST );
+    m_testAct->setStatusTip( tr( "Test Action 1" ) );
+    connect( m_testAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+
     m_qball4Act = new FNAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this, FNALGO_QBALL4 );
     m_qball4Act->setStatusTip( tr( "QBall 4th order" ) );
     connect( m_qball4Act, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
@@ -93,6 +97,7 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_NIFTI_SCALAR:
         {
             this->addAction( m_isosurfaceAct );
+            this->addAction( m_testAct );
             break;
         }
         case FNDT_NIFTI_VECTOR:

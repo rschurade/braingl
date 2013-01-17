@@ -4,9 +4,6 @@
  *  Created on: 08.05.2012
  *      Author: Ralph
  */
-#include <string>
-#include <iostream>
-
 #include <QtGui/QtGui>
 
 #include "../views/datasetlistview.h"
