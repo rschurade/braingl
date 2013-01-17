@@ -31,6 +31,7 @@ private:
     ToolBarView* m_toolBarView;
 
     FNAction* m_isosurfaceAct;
+    FNAction* m_testAct;
     FNAction* m_vectorAction1;
     FNAction* m_qball4Act;
     FNAction* m_qball6Act;
