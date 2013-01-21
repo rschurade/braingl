@@ -67,15 +67,15 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
     }
 
     DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
-    out->setProperty( FNPROP_FILENAME, "QBall" );
-    out->setProperty( FNPROP_NAME, "QBall" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_QBALL );
-    out->setProperty( FNPROP_LOD, 2 );
-    out->setProperty( FNPROP_ORDER, order );
-    out->setProperty( FNPROP_RENDER_SLICE, 1 );
-    out->setProperty( FNPROP_SCALING, 1.0f );
-    out->setProperty( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties().set( FNPROP_FILENAME, "QBall" );
+    out->properties().set( FNPROP_NAME, "QBall" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_QBALL );
+    out->properties().set( FNPROP_LOD, 2 );
+    out->properties().set( FNPROP_ORDER, order );
+    out->properties().set( FNPROP_RENDER_SLICE, 1 );
+    out->properties().set( FNPROP_SCALING, 1.0f );
+    out->properties().set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     qDebug() << "finished calculating qBall";
 
@@ -87,17 +87,17 @@ DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
     QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
     qDebug() << "create dataset";
     DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
-    out->setProperty( FNPROP_FILENAME, "Q-Ball" );
+    out->properties().set( FNPROP_FILENAME, "Q-Ball" );
 
-    QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->getProperty( FNPROP_NAME ).toString() );
-    out->setProperty( FNPROP_NAME, name );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_QBALL );
-    out->setProperty( FNPROP_LOD, 2 );
-    out->setProperty( FNPROP_ORDER, order );
-    out->setProperty( FNPROP_RENDER_SLICE, 1 );
-    out->setProperty( FNPROP_SCALING, 1.0f );
-    out->setProperty( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->properties().get( FNPROP_NAME ).toString() );
+    out->properties().set( FNPROP_NAME, name );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_QBALL );
+    out->properties().set( FNPROP_LOD, 2 );
+    out->properties().set( FNPROP_ORDER, order );
+    out->properties().set( FNPROP_RENDER_SLICE, 1 );
+    out->properties().set( FNPROP_SCALING, 1.0f );
+    out->properties().set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     qDebug() << "finished calculating qBall";
 
@@ -114,12 +114,12 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
 
     QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
 
-    DatasetTensor* out = new DatasetTensor( ds->getProperty( FNPROP_FILENAME ).toString(), tensors, ds->getHeader() );
-    out->setProperty( FNPROP_FILENAME, "Tensor" );
-    out->setProperty( FNPROP_NAME, "Tensor" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
-    out->setProperty( FNPROP_DIM, 9 );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    DatasetTensor* out = new DatasetTensor( ds->properties().get( FNPROP_FILENAME ).toString(), tensors, ds->getHeader() );
+    out->properties().set( FNPROP_FILENAME, "Tensor" );
+    out->properties().set( FNPROP_NAME, "Tensor" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
+    out->properties().set( FNPROP_DIM, 9 );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
     return out;
 }
 
@@ -136,11 +136,11 @@ DatasetScalar* DWIAlgos::calcFAFromDWI( DatasetDWI* ds )
     FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
-    out->setProperty( FNPROP_FILENAME, "FA" );
-    out->setProperty( FNPROP_NAME, "FA" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_FA );
-    out->setProperty( FNPROP_DIM, 1 );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties().set( FNPROP_FILENAME, "FA" );
+    out->properties().set( FNPROP_NAME, "FA" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_FA );
+    out->properties().set( FNPROP_DIM, 1 );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
     return out;
 }
 
@@ -169,16 +169,16 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
     QList<Dataset*> l;
 
     Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, ds->getHeader() );
-    out->setProperty( FNPROP_NAME, "evec 1" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_EV );
-    out->setProperty( FNPROP_DIM, 3 );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties().set( FNPROP_NAME, "evec 1" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_EV );
+    out->properties().set( FNPROP_DIM, 3 );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, ds->getHeader() );
-    out2->setProperty( FNPROP_NAME, "eval 1" );
-    out2->setProperty( FNPROP_CREATED_BY, FNALGO_EV );
-    out2->setProperty( FNPROP_DIM, 1 );
-    out2->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out2->properties().set( FNPROP_NAME, "eval 1" );
+    out2->properties().set( FNPROP_CREATED_BY, FNALGO_EV );
+    out2->properties().set( FNPROP_DIM, 1 );
+    out2->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     l.push_back( out );
     l.push_back( out2 );
@@ -194,11 +194,11 @@ DatasetScalar* DWIAlgos::calcFAFromTensor( DatasetTensor* ds )
     FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, ds->getHeader() );
-    out->setProperty( FNPROP_FILENAME, "FA" );
-    out->setProperty( FNPROP_NAME, "FA" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_FA );
-    out->setProperty( FNPROP_DIM, 1 );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties().set( FNPROP_FILENAME, "FA" );
+    out->properties().set( FNPROP_NAME, "FA" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_FA );
+    out->properties().set( FNPROP_DIM, 1 );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
     return out;
 }
 
@@ -222,16 +222,16 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( DatasetTensor* ds )
     QList<Dataset*> l;
 
     Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, ds->getHeader() );
-    out->setProperty( FNPROP_NAME, "evec 1" );
-    out->setProperty( FNPROP_CREATED_BY, FNALGO_EV );
-    out->setProperty( FNPROP_DIM, 3 );
-    out->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties().set( FNPROP_NAME, "evec 1" );
+    out->properties().set( FNPROP_CREATED_BY, FNALGO_EV );
+    out->properties().set( FNPROP_DIM, 3 );
+    out->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, ds->getHeader() );
-    out2->setProperty( FNPROP_NAME, "eval 1" );
-    out2->setProperty( FNPROP_CREATED_BY, FNALGO_EV );
-    out2->setProperty( FNPROP_DIM, 1 );
-    out2->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+    out2->properties().set( FNPROP_NAME, "eval 1" );
+    out2->properties().set( FNPROP_CREATED_BY, FNALGO_EV );
+    out2->properties().set( FNPROP_DIM, 1 );
+    out2->properties().set( FNPROP_DATATYPE, DT_FLOAT );
 
     l.push_back( out );
     l.push_back( out2 );
@@ -248,11 +248,11 @@ QList<Dataset*> DWIAlgos::fitBingham( DatasetSH* ds )
     QList<Dataset*> l= Bingham::calc_bingham( ds, depth, neighbourhood, n_peaks );
     if ( l.size() > 0 )
     {
-        l[0]->setProperty( FNPROP_NAME, "bingham" );
-        l[0]->setProperty( FNPROP_CREATED_BY, FNALGO_BINGHAM );
-        l[0]->setProperty( FNPROP_DIM, 42 );
-        l[0]->setProperty( FNPROP_DATATYPE, DT_FLOAT );
-        //l[0]->setProperty( "active", false );
+        l[0]->properties().set( FNPROP_NAME, "bingham" );
+        l[0]->properties().set( FNPROP_CREATED_BY, FNALGO_BINGHAM );
+        l[0]->properties().set( FNPROP_DIM, 42 );
+        l[0]->properties().set( FNPROP_DATATYPE, DT_FLOAT );
+        //l[0]->properties().set( "active", false );
     }
     return l;
 }
@@ -274,11 +274,11 @@ QList<Dataset*> DWIAlgos::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> l= Bingham::bingham2Tensor( ds );
     for ( int i = 0; i < l.size(); ++i )
     {
-        l[i]->setProperty( FNPROP_FILENAME, "Tensor" );
-        l[i]->setProperty( FNPROP_NAME, "DWI FROM BINGHAM " + QString::number( i ) );
-        l[i]->setProperty( FNPROP_CREATED_BY, FNALGO_BINGHAM_2_TENSOR );
-        l[i]->setProperty( FNPROP_DIM, 9 );
-        l[i]->setProperty( FNPROP_DATATYPE, DT_FLOAT );
+        l[i]->properties().set( FNPROP_FILENAME, "Tensor" );
+        l[i]->properties().set( FNPROP_NAME, "DWI FROM BINGHAM " + QString::number( i ) );
+        l[i]->properties().set( FNPROP_CREATED_BY, FNALGO_BINGHAM_2_TENSOR );
+        l[i]->properties().set( FNPROP_DIM, 9 );
+        l[i]->properties().set( FNPROP_DATATYPE, DT_FLOAT );
     }
     return l;
 }

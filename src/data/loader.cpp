@@ -415,11 +415,11 @@ bool Loader::loadNiftiQBall( QString fileName )
             nifti_image_free( filedata );
 
             DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
-            //out->setProperty( "name", "QBall" );
-            out->setProperty( FNPROP_CREATED_BY, FNALGO_QBALL );
-            out->setProperty( FNPROP_LOD, 2 );
-            out->setProperty( FNPROP_ORDER, order );
-            out->setProperty( FNPROP_RENDER_SLICE, 1 );
+            //out->properties().set "name", "QBall" );
+            out->properties().set( FNPROP_CREATED_BY, FNALGO_QBALL );
+            out->properties().set( FNPROP_LOD, 2 );
+            out->properties().set( FNPROP_ORDER, order );
+            out->properties().set( FNPROP_RENDER_SLICE, 1 );
 
             m_dataset.push_back( out );
 
@@ -460,10 +460,10 @@ bool Loader::loadNiftiBingham( QString fileName )
             nifti_image_free( filedata );
 
             DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
-            //out->setProperty( "name", "QBall" );
-            out->setProperty( FNPROP_CREATED_BY, FNALGO_BINGHAM );
-            out->setProperty( FNPROP_LOD, 2 );
-            out->setProperty( FNPROP_RENDER_SLICE, 1 );
+            //out->properties().set "name", "QBall" );
+            out->properties().set( FNPROP_CREATED_BY, FNALGO_BINGHAM );
+            out->properties().set( FNPROP_LOD, 2 );
+            out->properties().set( FNPROP_RENDER_SLICE, 1 );
 
             m_dataset.push_back( out );
 

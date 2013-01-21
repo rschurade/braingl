@@ -26,17 +26,16 @@ public:
     bool contains( FN_PROPERTY name );
     QVariant get( FN_PROPERTY name );
 
-    void set( FN_PROPERTY name, bool value );
-    void set( FN_PROPERTY name, int value );
-    void set( FN_PROPERTY name, float value );
-    void set( FN_PROPERTY name, QString value );
+    void set( FN_PROPERTY name, bool value, bool visible = false );
+    void set( FN_PROPERTY name, int value, bool visible = false );
+    void set( FN_PROPERTY name, float value, bool visible = false );
+    void set( FN_PROPERTY name, QString value, bool visible = false );
 
-    QVariant getValue( FN_PROPERTY prop );
-
-    QHash<FN_PROPERTY, Property*>getAll();
+    QVariant getVisible();
 
 private:
     QHash<FN_PROPERTY, Property*> m_properties;
+    QList<QVariant>m_visible;
 };
 
 #endif /* PROPERTYGROUP_H_ */

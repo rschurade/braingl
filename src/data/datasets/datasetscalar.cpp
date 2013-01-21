@@ -11,11 +11,11 @@
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SCALAR, header ), m_data( data )
 {
-    setProperty( FNPROP_ACTIVE, true );
-    setProperty( FNPROP_COLORMAP, 0 );
-    setProperty( FNPROP_INTERPOLATION, false );
-    setProperty( FNPROP_ALPHA, 1.0f );
-    setProperty( FNPROP_DIM, 1 );
+    m_properties.set( FNPROP_ACTIVE, true );
+    m_properties.set( FNPROP_COLORMAP, 0 );
+    m_properties.set( FNPROP_INTERPOLATION, false );
+    m_properties.set( FNPROP_ALPHA, 1.0f );
+    m_properties.set( FNPROP_DIM, 1 );
 
     examineDataset();
 }
@@ -28,9 +28,9 @@ DatasetScalar::~DatasetScalar()
 
 void DatasetScalar::examineDataset()
 {
-    int nx = getProperty( FNPROP_NX ).toInt();
-    int ny = getProperty( FNPROP_NY ).toInt();
-    int nz = getProperty( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( FNPROP_NX ).toInt();
+    int ny = m_properties.get( FNPROP_NY ).toInt();
+    int nz = m_properties.get( FNPROP_NZ ).toInt();
 
     float min = std::numeric_limits<float>::max();
     float max = 0;
@@ -42,16 +42,16 @@ void DatasetScalar::examineDataset()
         max = qMax( max, m_data[i] );
     }
 
-    setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(float) ) );
-    setProperty( FNPROP_MIN, min );
-    setProperty( FNPROP_MAX, max );
+    m_properties.set( FNPROP_SIZE, static_cast<int>( size * sizeof(float) ) );
+    m_properties.set( FNPROP_MIN, min );
+    m_properties.set( FNPROP_MAX, max );
 
-    setProperty( FNPROP_LOWER_THRESHOLD, min );
-    setProperty( FNPROP_UPPER_THRESHOLD, max );
+    m_properties.set( FNPROP_LOWER_THRESHOLD, min );
+    m_properties.set( FNPROP_UPPER_THRESHOLD, max );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
-        qDebug() << getProperty( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << m_properties.get( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
 }
@@ -70,11 +70,11 @@ void DatasetScalar::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-    int nx = getProperty( FNPROP_NX ).toInt();
-    int ny = getProperty( FNPROP_NY ).toInt();
-    int nz = getProperty( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( FNPROP_NX ).toInt();
+    int ny = m_properties.get( FNPROP_NY ).toInt();
+    int nz = m_properties.get( FNPROP_NZ ).toInt();
 
-    float max = getProperty( FNPROP_MAX ).toFloat();
+    float max = m_properties.get( FNPROP_MAX ).toFloat();
 
     float* tmpData = new float[nx * ny * nz];
     for ( int i = 0; i < nx * ny * nz; ++i )
@@ -94,9 +94,9 @@ QVector<float> DatasetScalar::getData()
 
 void DatasetScalar::flipX()
 {
-    int nx = getProperty( FNPROP_NX ).toInt();
-    int ny = getProperty( FNPROP_NY ).toInt();
-    int nz = getProperty( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( FNPROP_NX ).toInt();
+    int ny = m_properties.get( FNPROP_NY ).toInt();
+    int nz = m_properties.get( FNPROP_NZ ).toInt();
 
     QVector<float> newData;
 
@@ -128,8 +128,8 @@ void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
 
 QString DatasetScalar::getValueAsString( int x, int y, int z )
 {
-    int nx = getProperty( FNPROP_NX ).toInt();
-    int ny = getProperty( FNPROP_NY ).toInt();
+    int nx = m_properties.get( FNPROP_NX ).toInt();
+    int ny = m_properties.get( FNPROP_NY ).toInt();
     float data = m_data[x + y * nx + z * nx * ny];
     return QString::number( data );
 }
