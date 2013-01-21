@@ -52,6 +52,7 @@ protected:
 
     //QHash<QString, QVariant> m_properties;
     PropertyGroup m_properties;
+    QVector<FN_PROPERTY>m_visibleProps;
 
     GLuint m_textureGLuint;
 };
