@@ -40,12 +40,12 @@ Track::Track( DatasetTensor* ds ) :
     m_tensors = ds->getData();
     m_logTensors = ds->getLogData();
 
-    m_nx = ds->getProperty( FNPROP_NX ).toInt();
-    m_ny = ds->getProperty( FNPROP_NY ).toInt();
-    m_nz = ds->getProperty( FNPROP_NZ ).toInt();
-    m_dx = ds->getProperty( FNPROP_DX ).toFloat();
-    m_dy = ds->getProperty( FNPROP_DY ).toFloat();
-    m_dz = ds->getProperty( FNPROP_DZ ).toFloat();
+    m_nx = ds->properties().get( FNPROP_NX ).toInt();
+    m_ny = ds->properties().get( FNPROP_NY ).toInt();
+    m_nz = ds->properties().get( FNPROP_NZ ).toInt();
+    m_dx = ds->properties().get( FNPROP_DX ).toFloat();
+    m_dy = ds->properties().get( FNPROP_DY ).toFloat();
+    m_dz = ds->properties().get( FNPROP_DZ ).toFloat();
 
     qDebug() << m_dx << m_dy << m_dz;
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );

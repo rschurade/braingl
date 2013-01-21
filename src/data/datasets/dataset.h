@@ -14,8 +14,8 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
+#include <QtCore/QList>
 #include <QtCore/QString>
-#include <QtCore/QHash>
 #include <QtCore/QVariant>
 #include <QtGui/QMatrix4x4>
 
@@ -31,15 +31,7 @@ public:
     Dataset( QDir fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    void setProperty( FN_PROPERTY name, bool value );
-    void setProperty( FN_PROPERTY name, int value );
-    void setProperty( FN_PROPERTY name, float value );
-    void setProperty( FN_PROPERTY name, QString value );
-
-    QVariant getProperty( FN_PROPERTY name );
-
-    PropertyGroup getProperties();
-    void setProperties( PropertyGroup props );
+    PropertyGroup properties();
 
     GLuint getTextureGLuint();
 
@@ -52,7 +44,6 @@ protected:
 
     //QHash<QString, QVariant> m_properties;
     PropertyGroup m_properties;
-    QVector<FN_PROPERTY>m_visibleProps;
 
     GLuint m_textureGLuint;
 };

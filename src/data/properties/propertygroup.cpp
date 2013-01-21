@@ -16,11 +16,6 @@ PropertyGroup::~PropertyGroup()
 {
 }
 
-QVariant PropertyGroup::getValue( FN_PROPERTY prop )
-{
-    return m_properties[prop]->getValue();
-}
-
 bool PropertyGroup::contains( FN_PROPERTY name )
 {
     return m_properties.contains( name );
@@ -38,7 +33,7 @@ QVariant PropertyGroup::get( FN_PROPERTY name )
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, bool value )
+void PropertyGroup::set( FN_PROPERTY name, bool value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -49,10 +44,14 @@ void PropertyGroup::set( FN_PROPERTY name, bool value )
     {
         qDebug() << get( FNPROP_NAME ).toString()  << "set Property Bool" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyBool( name, value );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, int value )
+void PropertyGroup::set( FN_PROPERTY name, int value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -63,10 +62,14 @@ void PropertyGroup::set( FN_PROPERTY name, int value )
     {
         qDebug() << get( FNPROP_NAME ).toString() << "set Property Int" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyInt( name, value );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, float value )
+void PropertyGroup::set( FN_PROPERTY name, float value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -77,10 +80,14 @@ void PropertyGroup::set( FN_PROPERTY name, float value )
     {
         qDebug() << get( FNPROP_NAME ).toString() << "set Property float" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyFloat( name, value );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, QString value )
+void PropertyGroup::set( FN_PROPERTY name, QString value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -91,10 +98,14 @@ void PropertyGroup::set( FN_PROPERTY name, QString value )
     {
         qDebug() << get( FNPROP_NAME ).toString() << "set Property string" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyString( name, value );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
     }
 }
 
-QHash<FN_PROPERTY, Property*> PropertyGroup::getAll()
+QVariant PropertyGroup::getVisible()
 {
-    return m_properties;
+    return QVariant( m_visible );
 }

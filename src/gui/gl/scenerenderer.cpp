@@ -176,7 +176,7 @@ void SceneRenderer::setView( int view )
         if ( m_dataStore->data( index, Qt::EditRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) );
-            ds->setProperty( FNPROP_RENDER_SLICE, view );
+            ds->properties().set( FNPROP_RENDER_SLICE, view );
         }
     }
 }
