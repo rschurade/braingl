@@ -10,13 +10,13 @@
 
 #include "propertyfloat.h"
 
-PropertyFloat::PropertyFloat( FN_PROPERTY name, QString label, float value, float min, float max ) :
-    Property( name, label ),
+PropertyFloat::PropertyFloat( FN_PROPERTY name, float value, float min, float max ) :
+    Property( name ),
     m_value( value ),
     m_min( min ),
     m_max( max )
 {
-    m_widget = new SliderWithEdit( label );
+    m_widget = new SliderWithEdit( m_label );
     connect( m_widget, SIGNAL( valueChanged( float, int ) ), this, SLOT( widgetChanged( float, int ) ) );
 }
 

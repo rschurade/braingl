@@ -8,13 +8,13 @@
 
 #include "propertyint.h"
 
-PropertyInt::PropertyInt( FN_PROPERTY name, QString label, int value, int min, int max ) :
-    Property( name, label ),
+PropertyInt::PropertyInt( FN_PROPERTY name, int value, int min, int max ) :
+    Property( name ),
     m_value( value ),
     m_min( min ),
     m_max( max )
 {
-    m_widget = new SliderWithEditInt( label );
+    m_widget = new SliderWithEditInt( m_label );
     connect( m_widget, SIGNAL( valueChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }
 

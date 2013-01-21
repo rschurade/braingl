@@ -19,7 +19,6 @@ class PropertyFloat :public Property
 
 public:
     PropertyFloat( FN_PROPERTY name,
-                     QString label,
                      float value = 0.0,
                      float min = std::numeric_limits<float>::min(),
                      float max = std::numeric_limits<float>::max() );

@@ -22,20 +22,27 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
         m_oldIsoValue( -1 )
 {
     m_scalarField = ds->getData();
-    setProperties( ds->getProperties() );
-    setProperty( "nt", 0 );
-    setProperty( "createdBy", FNALGO_ISOSURFACE );
-    setProperty( "type", FNDT_MESH_ISOSURFACE );
-    setProperty( "name", "isosurface" );
-    setProperty( "isoValue", 80 );
 
-    m_nX = getProperty( "nx" ).toInt() - 1;
-    m_nY = getProperty( "ny" ).toInt() - 1;
-    m_nZ = getProperty( "nz" ).toInt() - 1;
+    setProperty( FNPROP_NX, ds->getProperty( FNPROP_NX ).toInt() );
+    setProperty( FNPROP_NY, ds->getProperty( FNPROP_NY ).toInt() );
+    setProperty( FNPROP_NZ, ds->getProperty( FNPROP_NZ ).toInt() );
+    setProperty( FNPROP_DX, ds->getProperty( FNPROP_DX ).toFloat() );
+    setProperty( FNPROP_DY, ds->getProperty( FNPROP_DY ).toFloat() );
+    setProperty( FNPROP_DZ, ds->getProperty( FNPROP_DZ ).toFloat() );
 
-    m_dX = getProperty( "dx" ).toFloat();
-    m_dY = getProperty( "dy" ).toFloat();
-    m_dZ = getProperty( "dz" ).toFloat();
+    setProperty( FNPROP_DIM, 0 );
+    setProperty( FNPROP_CREATED_BY, FNALGO_ISOSURFACE );
+    setProperty( FNPROP_TYPE, FNDT_MESH_ISOSURFACE );
+    setProperty( FNPROP_NAME, QString( "isosurface" ) );
+    setProperty( FNPROP_ISO_VALUE, 80 );
+
+    m_nX = getProperty( FNPROP_NX ).toInt() - 1;
+    m_nY = getProperty( FNPROP_NY ).toInt() - 1;
+    m_nZ = getProperty( FNPROP_NZ ).toInt() - 1;
+
+    m_dX = getProperty( FNPROP_DX ).toFloat();
+    m_dY = getProperty( FNPROP_DY ).toFloat();
+    m_dZ = getProperty( FNPROP_DZ ).toFloat();
 
     m_nPointsInXDirection = ( m_nX + 1 );
     m_nPointsInSlice = m_nPointsInXDirection * ( m_nY + 1 );
@@ -64,7 +71,7 @@ void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, 
         m_renderer->init();
     }
 
-    m_isoLevel = getProperty( "isoValue" ).toFloat();
+    m_isoLevel = getProperty( FNPROP_ISO_VALUE ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh;

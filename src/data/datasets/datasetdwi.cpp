@@ -11,11 +11,11 @@
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
-    m_properties["active"] = true;
-    m_properties["colormap"] = 0;
-    m_properties["interpolation"] = false;
-    m_properties["alpha"] = 1.0;
-    m_properties["order"] = 4;
+    setProperty( FNPROP_ACTIVE, true );
+    setProperty( FNPROP_COLORMAP, 0 );
+    setProperty( FNPROP_INTERPOLATION, false );
+    setProperty( FNPROP_ALPHA, 1.0f );
+    setProperty( FNPROP_ORDER, 4 );
 
     examineDataset();
 }
@@ -50,25 +50,25 @@ QVector<QVector3D> DatasetDWI::getBvecs()
 
 void DatasetDWI::examineDataset()
 {
-    int type = getProperty( "datatype" ).toInt();
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
+    int datatype = getProperty( FNPROP_DATATYPE ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
+
+
     int dim = m_data->at( 0 ).Nrows();
-    m_properties["nt"] = dim;
+    setProperty( FNPROP_DIM, dim );
     int size = nx * ny * nz * dim;
 
-    if ( type == DT_UNSIGNED_CHAR )
+    if ( datatype == DT_UNSIGNED_CHAR )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof(unsigned char) );
+        setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
+        setProperty( FNPROP_MIN, 0 );
+        setProperty( FNPROP_MAX, 255 );    }
 
-        m_properties["min"] = 0;
-        m_properties["max"] = 255;
-    }
-
-    if ( type == DT_SIGNED_SHORT )
+    if ( datatype == DT_SIGNED_SHORT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof(float) );
+        setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(signed short) ) );
 
         float max = -32767;
         float min = 32768;
@@ -78,29 +78,19 @@ void DatasetDWI::examineDataset()
             min = qMin( min, m_b0Data[i] );
             max = qMax( max, m_b0Data[i] );
         }
-        m_properties["min"] = min;
-        m_properties["max"] = max;
-
+        setProperty( FNPROP_MIN, min );
+        setProperty( FNPROP_MAX, max );
     }
 
-    if ( type == DT_FLOAT )
+    if ( datatype == DT_FLOAT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof(float) );
+        setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(float) ) );
 
-        m_properties["min"] = -1.0;
-        m_properties["max"] = 1.0;
+        setProperty( FNPROP_MIN, -1.0f );
+        setProperty( FNPROP_MAX, 1.0f );
     }
-    m_properties["lowerThreshold"] = m_properties["min"].toFloat();
-    m_properties["upperThreshold"] = m_properties["max"].toFloat();
-
-    // deprecated, flipping for dwi datasets happens in the loader
-    /*
-     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
-     {
-     qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
-     flipX();
-     }
-     */
+    setProperty( FNPROP_LOWER_THRESHOLD, getProperty( FNPROP_MIN ).toFloat() );
+    setProperty( FNPROP_UPPER_THRESHOLD, getProperty( FNPROP_MAX ).toFloat() );
 }
 
 void DatasetDWI::createTexture()
@@ -117,12 +107,13 @@ void DatasetDWI::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
+
 
     float* tmpData = new float[nx * ny * nz];
-    float max = m_properties["max"].toFloat();
+    float max = getProperty( FNPROP_MAX ).toFloat();
     for ( int i = 0; i < nx * ny * nz; ++i )
     {
         tmpData[i] = m_b0Data[i] / max;

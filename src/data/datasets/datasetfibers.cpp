@@ -14,9 +14,9 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, int numPoints, i
     m_fibs( fibs ),
     m_renderer( 0 )
 {
-    setProperty( "numPoints", numPoints );
-    setProperty( "numLines", numLines );
-    m_properties["active"] = true;
+    setProperty( FNPROP_NUM_POINTS, numPoints );
+    setProperty( FNPROP_NUM_LINES, numLines );
+    setProperty( FNPROP_ACTIVE, true );
 }
 
 DatasetFibers::~DatasetFibers()

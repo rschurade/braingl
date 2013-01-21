@@ -19,6 +19,8 @@
 #include <QtCore/QVariant>
 #include <QtGui/QMatrix4x4>
 
+#include "../properties/propertygroup.h"
+
 #include "../enums.h"
 
 class DataStore;
@@ -29,11 +31,15 @@ public:
     Dataset( QDir fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    QVariant getProperty( QString name );
-    void setProperty( QString name, QVariant value );
-    QHash<QString, QVariant> getProperties();
-    void setProperties( QHash<QString, QVariant> props );
+    void setProperty( FN_PROPERTY name, bool value );
+    void setProperty( FN_PROPERTY name, int value );
+    void setProperty( FN_PROPERTY name, float value );
+    void setProperty( FN_PROPERTY name, QString value );
 
+    QVariant getProperty( FN_PROPERTY name );
+
+    PropertyGroup getProperties();
+    void setProperties( PropertyGroup props );
 
     GLuint getTextureGLuint();
 
@@ -44,7 +50,8 @@ public:
 protected:
     virtual void createTexture() = 0;
 
-    QHash<QString, QVariant> m_properties;
+    //QHash<QString, QVariant> m_properties;
+    PropertyGroup m_properties;
 
     GLuint m_textureGLuint;
 };
