@@ -4,7 +4,7 @@
  *  Created on: Dec 11, 2012
  *      Author: schurade
  */
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "../data/datasets/datasettensor.h"
 
@@ -40,12 +40,12 @@ Track::Track( DatasetTensor* ds ) :
     m_tensors = ds->getData();
     m_logTensors = ds->getLogData();
 
-    m_nx = ds->getProperty( "nx" ).toInt();
-    m_ny = ds->getProperty( "ny" ).toInt();
-    m_nz = ds->getProperty( "nz" ).toInt();
-    m_dx = ds->getProperty( "dx" ).toFloat();
-    m_dy = ds->getProperty( "dy" ).toFloat();
-    m_dz = ds->getProperty( "dz" ).toFloat();
+    m_nx = ds->getProperty( FNPROP_NX ).toInt();
+    m_ny = ds->getProperty( FNPROP_NY ).toInt();
+    m_nz = ds->getProperty( FNPROP_NZ ).toInt();
+    m_dx = ds->getProperty( FNPROP_DX ).toFloat();
+    m_dy = ds->getProperty( FNPROP_DY ).toFloat();
+    m_dz = ds->getProperty( FNPROP_DZ ).toFloat();
 
     qDebug() << m_dx << m_dy << m_dz;
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );

@@ -21,18 +21,18 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_rendererEV( 0 ),
     m_renderGlpyhs( false )
 {
-    //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
-    m_properties["active"] = true;
-    m_properties["colormap"] = 0;
-    m_properties["interpolation"] = false;
-    m_properties["alpha"] = 1.0;
-    m_properties["createdBy"] = FNALGO_TENSORFIT;
-    m_properties["faThreshold"] = 0.01;
-    m_properties["evThreshold"] = 10.0;
-    m_properties["gamma"] = 0.1;
-    m_properties["offset"] = 0.0;
-    m_properties["scaling"] = 0.5;
-    m_properties["tensorRenderMode"] = 0;
+    setProperty( FNPROP_ACTIVE, true );
+    setProperty( FNPROP_COLORMAP, 0 );
+    setProperty( FNPROP_INTERPOLATION, false );
+    setProperty( FNPROP_ALPHA, 1.0f );
+    setProperty( FNPROP_DIM, 1.0f );
+
+    setProperty( FNPROP_FA_THRESHOLD, 0.01f );
+    setProperty( FNPROP_EV_THRESHOLD, 10.0f );
+    setProperty( FNPROP_GAMMA, 0.1f );
+    setProperty( FNPROP_OFFSET, 0.0f );
+    setProperty( FNPROP_SCALING, 0.5f );
+    setProperty( FNPROP_TENSOR_RENDERMODE, 0 );
 
     examineDataset();
 }
@@ -59,17 +59,17 @@ DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> >* data, 
     m_data = mData;
 
     //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
-    m_properties["active"] = true;
-    m_properties["colormap"] = 0;
-    m_properties["interpolation"] = false;
-    m_properties["alpha"] = 1.0;
-    m_properties["createdBy"] = FNALGO_TENSORFIT;
-    m_properties["faThreshold"] = 0.01;
-    m_properties["evThreshold"] = 10.0;
-    m_properties["gamma"] = 0.1;
-    m_properties["offset"] = 0.0;
-    m_properties["scaling"] = 0.5;
-    m_properties["tensorRenderMode"] = 0;
+    setProperty( FNPROP_ACTIVE, true );
+    setProperty( FNPROP_COLORMAP, 0 );
+    setProperty( FNPROP_INTERPOLATION, false );
+    setProperty( FNPROP_ALPHA, 1.0f );
+    setProperty( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
+    setProperty( FNPROP_FA_THRESHOLD, 0.01f );
+    setProperty( FNPROP_EV_THRESHOLD, 10.0f );
+    setProperty( FNPROP_GAMMA, 0.1f );
+    setProperty( FNPROP_OFFSET, 0.0f );
+    setProperty( FNPROP_SCALING, 0.5f );
+    setProperty( FNPROP_TENSOR_RENDERMODE, 0 );
 
     examineDataset();
 }
@@ -82,29 +82,29 @@ DatasetTensor::~DatasetTensor()
 
 void DatasetTensor::examineDataset()
 {
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
     int size = nx * ny * nz;
 
-    m_properties["size"] = static_cast<int>( 9 * size * sizeof(float) );
+    setProperty( FNPROP_SIZE, static_cast<int>( 9 * size * sizeof(float) ) );
 
-    m_properties["lowerThreshold"] = m_properties["min"].toFloat();
-    m_properties["upperThreshold"] = m_properties["max"].toFloat();
+    setProperty( FNPROP_LOWER_THRESHOLD, getProperty( FNPROP_MIN ).toFloat() );
+    setProperty( FNPROP_UPPER_THRESHOLD, getProperty( FNPROP_MAX ).toFloat() );
 
-    m_properties["lod"] = 2;
-    m_properties["order"] = 0;
-    m_properties["renderSlice"] = 1;
-    m_properties["scaling"] = 1.0;
-    m_properties["nt"] = 9;
+    setProperty( FNPROP_LOD, 2 );
+    setProperty( FNPROP_ORDER, 0 );
+    setProperty( FNPROP_RENDER_SLICE, 1 );
+    setProperty( FNPROP_SCALING, 1.0f );
+    setProperty( FNPROP_DIM, 9 );
 
-    m_properties["renderUpperX"] = nx - 1;
-    m_properties["renderUpperY"] = ny - 1;
-    m_properties["renderUpperZ"] = nz - 1;
+    setProperty( FNPROP_RENDER_UPPER_X, nx - 1 );
+    setProperty( FNPROP_RENDER_UPPER_Y, ny - 1 );
+    setProperty( FNPROP_RENDER_UPPER_Z, nz - 1 );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
-        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << getProperty( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
 
@@ -127,8 +127,8 @@ void DatasetTensor::examineDataset()
         max = qMax( max, (float) m_data->at( i )( 3, 3 ) );
     }
 
-    m_properties["min"] = min;
-    m_properties["max"] = max;
+    setProperty( FNPROP_MIN, min );
+    setProperty( FNPROP_MAX, max );
 }
 
 void DatasetTensor::createTexture()
@@ -196,19 +196,19 @@ void DatasetTensor::createLogTensors()
 
 void DatasetTensor::flipX()
 {
-    int xDim = m_properties["nx"].toInt();
-    int yDim = m_properties["ny"].toInt();
-    int zDim = m_properties["nz"].toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
 
     QVector<Matrix>* newData = new QVector<Matrix>();
 
-    for ( int z = 0; z < zDim; ++z )
+    for ( int z = 0; z < nz; ++z )
     {
-        for ( int y = 0; y < yDim; ++y )
+        for ( int y = 0; y < ny; ++y )
         {
-            for ( int x = xDim - 1; x >= 0; --x )
+            for ( int x = nx - 1; x >= 0; --x )
             {
-                newData->push_back( m_data->at( x + y * xDim + z * xDim * yDim ) );
+                newData->push_back( m_data->at( x + y * nx + z * nx * ny ) );
             }
         }
     }
@@ -224,18 +224,18 @@ void DatasetTensor::flipX()
 
 void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
 {
-    if ( m_properties["tensorRenderMode"].toInt() == 0 )
+    if ( getProperty( FNPROP_TENSOR_RENDERMODE ).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new TensorRenderer( m_data, m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                    m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+            m_renderer = new TensorRenderer( m_data, getProperty( FNPROP_NX ).toInt(), getProperty( FNPROP_NY ).toInt(), getProperty( FNPROP_NZ ).toInt(),
+                    getProperty( FNPROP_DX ).toFloat(), getProperty( FNPROP_DY ).toFloat(), getProperty( FNPROP_DZ ).toFloat() );
             m_renderer->setModel( dataStore );
             m_renderer->init();
         }
 
-        m_renderer->setRenderParams( m_properties["scaling"].toFloat(), m_properties["faThreshold"].toFloat(), m_properties["evThreshold"].toFloat(),
-                m_properties["gamma"].toFloat(), m_properties["renderSlice"].toInt(), m_properties["offset"].toFloat() );
+        m_renderer->setRenderParams( getProperty( FNPROP_SCALING ).toFloat(), getProperty( FNPROP_FA_THRESHOLD ).toFloat(), getProperty( FNPROP_EV_THRESHOLD ).toFloat(),
+                getProperty( FNPROP_GAMMA ).toFloat(), getProperty( FNPROP_RENDER_SLICE ).toInt(), getProperty( FNPROP_OFFSET ).toFloat() );
 
         m_renderer->draw( mvpMatrix, mvMatrixInverse );
     }
@@ -243,15 +243,15 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
     {
         if ( m_rendererEV == 0 )
         {
-            m_rendererEV = new TensorRendererEV( m_data, m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                    m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+            m_rendererEV = new TensorRendererEV( m_data, getProperty( FNPROP_NX ).toInt(), getProperty( FNPROP_NY ).toInt(), getProperty( FNPROP_NZ ).toInt(),
+                    getProperty( FNPROP_DX ).toFloat(), getProperty( FNPROP_DY ).toFloat(), getProperty( FNPROP_DZ ).toFloat() );
             m_rendererEV->setModel( dataStore );
             m_rendererEV->init();
         }
 
-        m_rendererEV->setRenderParams( m_properties["scaling"].toFloat(), m_properties["faThreshold"].toFloat(),
-                m_properties["evThreshold"].toFloat(), m_properties["renderSlice"].toInt(), m_properties["offset"].toFloat(),
-                m_properties["tensorRenderMode"].toInt() );
+        m_rendererEV->setRenderParams( getProperty( FNPROP_SCALING ).toFloat(), getProperty( FNPROP_FA_THRESHOLD ).toFloat(),
+                getProperty( FNPROP_EV_THRESHOLD ).toFloat(), getProperty( FNPROP_RENDER_SLICE ).toInt(), getProperty( FNPROP_OFFSET ).toFloat(),
+                getProperty( FNPROP_TENSOR_RENDERMODE ).toInt() );
 
         m_rendererEV->draw( mvpMatrix, mvMatrixInverse );
     }
@@ -259,8 +259,8 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
 
 QString DatasetTensor::getValueAsString( int x, int y, int z )
 {
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
     Matrix data = m_data->at( x + y * nx + z * nx * ny );
     return QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
             + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );;

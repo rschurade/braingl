@@ -8,11 +8,11 @@
 
 #include "propertybool.h"
 
-PropertyBool::PropertyBool( FN_PROPERTY name, QString label, bool value ) :
-    Property( name, label ),
+PropertyBool::PropertyBool( FN_PROPERTY name, bool value ) :
+    Property( name ),
     m_value( value )
 {
-    m_widget = new CheckboxWithLabel( label );
+    m_widget = new CheckboxWithLabel( m_label );
     connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }
 

@@ -13,13 +13,13 @@
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties["active"] = true;
-    m_properties["colormap"] = 0;
-    m_properties["interpolation"] = false;
-    m_properties["alpha"] = 1.0;
-    m_properties["renderSlice"] = 1;
-    m_properties["scaling"] = 1.0;
-    m_properties["offset"] = 0.0;
+    setProperty( FNPROP_ACTIVE, true );
+    setProperty( FNPROP_COLORMAP, 0 );
+    setProperty( FNPROP_INTERPOLATION, false );
+    setProperty( FNPROP_ALPHA, 1.0f );
+    setProperty( FNPROP_RENDER_SLICE, 1 );
+    setProperty( FNPROP_SCALING, 1.0f );
+    setProperty( FNPROP_OFFSET, 0.0f );
 
     examineDataset();
 }
@@ -31,33 +31,32 @@ Dataset3D::~Dataset3D()
 
 void Dataset3D::examineDataset()
 {
-    int type = getProperty( "datatype" ).toInt();
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
+    int type = getProperty( FNPROP_DATATYPE ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
     int size = nx * ny * nz * 3;
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof(unsigned char) );
+        setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
 
-        m_properties["min"] = 0;
-        m_properties["max"] = 255;
+        setProperty( FNPROP_MIN, 0 );
+        setProperty( FNPROP_MAX, 255 );
     }
 
     if ( type == DT_FLOAT )
     {
-        m_properties["size"] = static_cast<int>( size * sizeof(float) );
-
-        m_properties["min"] = 1.0;
-        m_properties["max"] = -1.0;
+        setProperty( FNPROP_SIZE, static_cast<int>( size * sizeof(float) ) );
+        setProperty( FNPROP_MIN, -1.0f );
+        setProperty( FNPROP_MAX, 1.0f );
     }
-    m_properties["lowerThreshold"] = m_properties["min"].toFloat();
-    m_properties["upperThreshold"] = m_properties["max"].toFloat();
+    setProperty( FNPROP_LOWER_THRESHOLD, getProperty( FNPROP_MIN ).toFloat() );
+    setProperty( FNPROP_UPPER_THRESHOLD, getProperty( FNPROP_MAX ).toFloat() );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
-        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << getProperty( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
 }
@@ -76,10 +75,10 @@ void Dataset3D::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
-    int type = getProperty( "datatype" ).toInt();
+    int type = getProperty( FNPROP_DATATYPE ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
 
     if ( type == DT_UNSIGNED_CHAR )
     {
@@ -110,19 +109,19 @@ void Dataset3D::createTexture()
 
 void Dataset3D::flipX()
 {
-    int xDim = m_properties["nx"].toInt();
-    int yDim = m_properties["ny"].toInt();
-    int zDim = m_properties["nz"].toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
 
     QVector<QVector3D> newData;
 
-    for ( int z = 0; z < zDim; ++z )
+    for ( int z = 0; z < nz; ++z )
     {
-        for ( int y = 0; y < yDim; ++y )
+        for ( int y = 0; y < ny; ++y )
         {
-            for ( int x = xDim - 1; x >= 0; --x )
+            for ( int x = nx - 1; x >= 0; --x )
             {
-                newData.push_back( m_data[x + y * xDim + z * xDim * yDim] );
+                newData.push_back( m_data[x + y * nx + z * nx * ny] );
             }
         }
     }
@@ -145,21 +144,27 @@ void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new EVRenderer( &m_data, m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer = new EVRenderer( &m_data, getProperty( FNPROP_NX ).toInt(),
+                                              getProperty( FNPROP_NY ).toInt(),
+                                              getProperty( FNPROP_NZ ).toInt(),
+                                              getProperty( FNPROP_DX ).toFloat(),
+                                              getProperty( FNPROP_DY ).toFloat(),
+                                              getProperty( FNPROP_DZ ).toFloat() );
         m_renderer->setModel( datastore );
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties["scaling"].toFloat(), m_properties["renderSlice"].toInt(), m_properties["offset"].toFloat() );
+    m_renderer->setRenderParams( getProperty( FNPROP_SCALING ).toFloat(),
+                                 getProperty( FNPROP_RENDER_SLICE ).toInt(),
+                                 getProperty( FNPROP_OFFSET ).toFloat() );
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
 
 QString Dataset3D::getValueAsString( int x, int y, int z )
 {
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
     QVector3D data = m_data[x + y * nx + z * nx * ny];
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }

@@ -18,7 +18,7 @@ class PropertyBool : public Property
     Q_OBJECT
 
 public:
-    PropertyBool( FN_PROPERTY name, QString label, bool value = false );
+    PropertyBool( FN_PROPERTY name, bool value = false );
     virtual ~PropertyBool();
 
     QWidget* getWidget();

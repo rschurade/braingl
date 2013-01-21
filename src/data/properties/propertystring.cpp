@@ -8,11 +8,11 @@
 
 #include "propertystring.h"
 
-PropertyString::PropertyString( FN_PROPERTY name, QString label, QString value ) :
-    Property( name, label ),
+PropertyString::PropertyString( FN_PROPERTY name, QString value ) :
+    Property( name ),
     m_value( value )
 {
-    m_widget = new CheckboxWithLabel( label );
+    m_widget = new CheckboxWithLabel( m_label );
     connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }
 

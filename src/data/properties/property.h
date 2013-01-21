@@ -21,7 +21,7 @@ class QWidget;
 class Property : public QObject
 {
 public:
-    Property( FN_PROPERTY name, QString label );
+    Property( FN_PROPERTY name );
     virtual ~Property();
 
     FN_PROPERTY getName();
@@ -31,9 +31,14 @@ public:
     virtual QVariant getValue() = 0;
     virtual void setValue( QVariant value ) = 0;
 
-private:
+    static QString getNameAsString( FN_PROPERTY name );
+
+protected:
     FN_PROPERTY m_name; // used for access
     QString m_label; // used for label in the dataset property view
+
+private:
+
 };
 
 #endif /* PROPERTY_H_ */

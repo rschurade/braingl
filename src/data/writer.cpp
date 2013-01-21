@@ -33,7 +33,7 @@ Writer::~Writer()
 
 bool Writer::save()
 {
-    switch ( m_dataset->getProperty( "type" ).toInt() )
+    switch ( m_dataset->getProperty( FNPROP_TYPE ).toInt() )
     {
         case FNDT_NIFTI_SCALAR:
         {

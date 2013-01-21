@@ -416,10 +416,10 @@ bool Loader::loadNiftiQBall( QString fileName )
 
             DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
             //out->setProperty( "name", "QBall" );
-            out->setProperty( "createdBy", FNALGO_QBALL );
-            out->setProperty( "lod", 2 );
-            out->setProperty( "order", order );
-            out->setProperty( "renderSlice", 1 );
+            out->setProperty( FNPROP_CREATED_BY, FNALGO_QBALL );
+            out->setProperty( FNPROP_LOD, 2 );
+            out->setProperty( FNPROP_ORDER, order );
+            out->setProperty( FNPROP_RENDER_SLICE, 1 );
 
             m_dataset.push_back( out );
 
@@ -461,9 +461,9 @@ bool Loader::loadNiftiBingham( QString fileName )
 
             DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
             //out->setProperty( "name", "QBall" );
-            out->setProperty( "createdBy", FNALGO_BINGHAM );
-            out->setProperty( "lod", 2 );
-            out->setProperty( "renderSlice", 1 );
+            out->setProperty( FNPROP_CREATED_BY, FNALGO_BINGHAM );
+            out->setProperty( FNPROP_LOD, 2 );
+            out->setProperty( FNPROP_RENDER_SLICE, 1 );
 
             m_dataset.push_back( out );
 

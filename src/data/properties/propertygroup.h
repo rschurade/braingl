@@ -23,12 +23,17 @@ public:
     PropertyGroup();
     virtual ~PropertyGroup();
 
-    void addProperty( PropertyBool prop );
-    void addProperty( PropertyInt prop );
-    void addProperty( PropertyFloat prop );
-    void addProperty( PropertyString prop );
+    bool contains( FN_PROPERTY name );
+    QVariant get( FN_PROPERTY name );
+
+    void set( FN_PROPERTY name, bool value );
+    void set( FN_PROPERTY name, int value );
+    void set( FN_PROPERTY name, float value );
+    void set( FN_PROPERTY name, QString value );
 
     QVariant getValue( FN_PROPERTY prop );
+
+    QHash<FN_PROPERTY, Property*>getAll();
 
 private:
     QHash<FN_PROPERTY, Property*> m_properties;

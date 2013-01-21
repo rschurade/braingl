@@ -11,36 +11,54 @@
 Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type ) :
     m_textureGLuint( 0 )
 {
-    m_properties["fileName"] = fileName.path();
-    m_properties["type"] = type;
-    m_properties["name"] = fileName.path().split( "/" ).last();
-    m_properties["size"] = -1;
-    m_properties["createdBy"] = FNALGO_NONE;
+    // add standard properties
+    m_properties.set( FNPROP_ACTIVE, true );
+    m_properties.set( FNPROP_FILENAME, fileName.path() );
+    m_properties.set( FNPROP_TYPE, type );
+    m_properties.set( FNPROP_NAME, fileName.path().split( "/" ).last() );
+    m_properties.set( FNPROP_SIZE, -1 );
+    m_properties.set( FNPROP_CREATED_BY, FNALGO_NONE );
 
-    m_properties["renderLowerX"] = 0;
-    m_properties["renderLowerY"] = 0;
-    m_properties["renderLowerZ"] = 0;
-    m_properties["renderUpperX"] = 0;
-    m_properties["renderUpperY"] = 0;
-    m_properties["renderUpperZ"] = 0;
+    m_properties.set( FNPROP_RENDER_LOWER_X, 0 );
+    m_properties.set( FNPROP_RENDER_LOWER_Y, 0 );
+    m_properties.set( FNPROP_RENDER_LOWER_Z, 0 );
+    m_properties.set( FNPROP_RENDER_UPPER_X, 0 );
+    m_properties.set( FNPROP_RENDER_UPPER_Y, 0 );
+    m_properties.set( FNPROP_RENDER_UPPER_Z, 0 );
 }
 
 Dataset::~Dataset()
 {
 }
 
-QVariant Dataset::getProperty( QString name )
+void Dataset::setProperty( FN_PROPERTY name, bool value )
+{
+    m_properties.set( name, value );
+}
+
+void Dataset::setProperty( FN_PROPERTY name, int value )
+{
+    m_properties.set( name, value );
+}
+
+void Dataset::setProperty( FN_PROPERTY name, float value )
+{
+    m_properties.set( name, value );
+}
+
+void Dataset::setProperty( FN_PROPERTY name, QString value )
+{
+    m_properties.set( name, value );
+}
+
+
+QVariant Dataset::getProperty( FN_PROPERTY name )
 {
     if ( m_properties.contains( name ) )
     {
-        return m_properties[name];
+        return m_properties.getValue( name );
     }
     return QVariant();
-}
-
-void Dataset::setProperty( QString name, QVariant value )
-{
-    m_properties[name] = value;
 }
 
 GLuint Dataset::getTextureGLuint()
@@ -52,12 +70,12 @@ GLuint Dataset::getTextureGLuint()
     return m_textureGLuint;
 }
 
-QHash<QString, QVariant> Dataset::getProperties()
+PropertyGroup Dataset::getProperties()
 {
     return m_properties;
 }
 
-void Dataset::setProperties( QHash<QString, QVariant> props )
+void Dataset::setProperties( PropertyGroup props )
 {
     m_properties = props;
 }

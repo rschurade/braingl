@@ -13,13 +13,13 @@
 DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties["active"] = true;
-    m_properties["colormap"] = 0;
-    m_properties["interpolation"] = false;
-    m_properties["alpha"] = 1.0;
-    m_properties["createdBy"] = FNALGO_QBALL;
-    m_properties["offset"] = 0.0;
-    m_properties["scaling"] = 1.0;
+    setProperty( FNPROP_ACTIVE, true );
+    setProperty( FNPROP_COLORMAP, 0 );
+    setProperty( FNPROP_INTERPOLATION, false );
+    setProperty( FNPROP_ALPHA, 1.0f );
+    setProperty( FNPROP_CREATED_BY, FNALGO_QBALL );
+    setProperty( FNPROP_OFFSET, 0.0f );
+    setProperty( FNPROP_SCALING, 1.0f );
 
     examineDataset();
 }
@@ -31,30 +31,30 @@ DatasetSH::~DatasetSH()
 
 void DatasetSH::examineDataset()
 {
-    int nx = getProperty( "nx" ).toInt();
-    int ny = getProperty( "ny" ).toInt();
-    int nz = getProperty( "nz" ).toInt();
+    int nx = getProperty( FNPROP_NX ).toInt();
+    int ny = getProperty( FNPROP_NY ).toInt();
+    int nz = getProperty( FNPROP_NZ ).toInt();
     int size = nx * ny * nz;
     int dim = m_data->at( 0 ).Nrows();
 
-    m_properties["size"] = static_cast<int>( dim * size * sizeof(float) );
+    setProperty( FNPROP_SIZE, static_cast<int>( dim * size * sizeof(float) ) );
 
-    m_properties["lowerThreshold"] = m_properties["min"].toFloat();
-    m_properties["upperThreshold"] = m_properties["max"].toFloat();
+    setProperty( FNPROP_LOWER_THRESHOLD, getProperty( FNPROP_MIN ).toFloat() );
+    setProperty( FNPROP_UPPER_THRESHOLD, getProperty( FNPROP_MAX ).toFloat() );
 
-    m_properties["lod"] = 2;
-    m_properties["order"] = 0;
-    m_properties["renderSlice"] = 1;
-    m_properties["scaling"] = 1.0;
-    m_properties["nt"] = dim;
+    setProperty( FNPROP_LOD, 2 );
+    setProperty( FNPROP_ORDER, 0 );
+    setProperty( FNPROP_RENDER_SLICE, 1 );
+    setProperty( FNPROP_SCALING, 1.0f );
+    setProperty( FNPROP_DIM, dim );
 
-    m_properties["renderUpperX"] = nx - 1;
-    m_properties["renderUpperY"] = ny - 1;
-    m_properties["renderUpperZ"] = nz - 1;
+    setProperty( FNPROP_RENDER_UPPER_X, nx - 1 );
+    setProperty( FNPROP_RENDER_UPPER_Y, ny - 1 );
+    setProperty( FNPROP_RENDER_UPPER_Z, nz - 1 );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
-        qDebug() << m_properties["name"].toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << getProperty( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
 
@@ -71,8 +71,8 @@ void DatasetSH::examineDataset()
         }
     }
 
-    m_properties["min"] = min;
-    m_properties["max"] = max;
+    setProperty( FNPROP_MIN, min );
+    setProperty( FNPROP_MAX, max );
 }
 
 void DatasetSH::createTexture()
@@ -86,9 +86,9 @@ QVector<ColumnVector>* DatasetSH::getData()
 
 void DatasetSH::flipX()
 {
-    int xDim = m_properties["nx"].toInt();
-    int yDim = m_properties["ny"].toInt();
-    int zDim = m_properties["nz"].toInt();
+    int xDim = getProperty( FNPROP_NX ).toInt();
+    int yDim = getProperty( FNPROP_NY ).toInt();
+    int zDim = getProperty( FNPROP_NZ ).toInt();
 
     QVector<ColumnVector>* newData = new QVector<ColumnVector>();
 
@@ -116,14 +116,14 @@ void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( m_data, m_properties["nx"].toInt(), m_properties["ny"].toInt(), m_properties["nz"].toInt(),
-                m_properties["dx"].toFloat(), m_properties["dy"].toFloat(), m_properties["dz"].toFloat() );
+        m_renderer = new SHRenderer( m_data, getProperty( FNPROP_NX ).toInt(), getProperty( FNPROP_NY ).toInt(), getProperty( FNPROP_NZ ).toInt(),
+                getProperty( FNPROP_DX ).toFloat(), getProperty( FNPROP_DY ).toFloat(), getProperty( FNPROP_DZ ).toFloat() );
         m_renderer->setModel( dataStore );
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties["scaling"].toFloat(), m_properties["renderSlice"].toInt(), m_properties["offset"].toFloat(),
-            m_properties["lod"].toInt(), m_properties["minmaxScaling"].toBool(), m_properties["order"].toInt() );
+    m_renderer->setRenderParams( getProperty( FNPROP_SCALING ).toFloat(), getProperty( FNPROP_RENDER_SLICE ).toInt(), getProperty( FNPROP_OFFSET ).toFloat(),
+            getProperty( FNPROP_LOD ).toInt(), getProperty( FNPROP_MINMAX_SCALING ).toBool(), getProperty( FNPROP_ORDER ).toInt() );
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
