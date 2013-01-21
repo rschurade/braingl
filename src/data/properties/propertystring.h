@@ -32,7 +32,7 @@ public:
 private:
     QString m_value;
 
-    CheckboxWithLabel* m_widget;
+    EditWithLabel* m_widget;
 
 private slots:
     void widgetChanged( QString value, int id );

@@ -40,56 +40,56 @@ QVariant PropertyGroup::get( FN_PROPERTY name )
 
 void PropertyGroup::set( FN_PROPERTY name, bool value )
 {
-    qDebug() << "set Property Bool" << Property::getNameAsString( name );
     if ( m_properties.contains( name ) )
     {
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property Bool" << Property::getNameAsString( name );
         m_properties[name]->setValue( value );
     }
     else
     {
-        qDebug() << "set Property Bool" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
+        qDebug() << get( FNPROP_NAME ).toString()  << "set Property Bool" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyBool( name, value );
     }
 }
 
 void PropertyGroup::set( FN_PROPERTY name, int value )
 {
-    qDebug() << "set Property Int" << Property::getNameAsString( name );
     if ( m_properties.contains( name ) )
     {
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property Int" << Property::getNameAsString( name );
         m_properties[name]->setValue( value );
     }
     else
     {
-        qDebug() << "set Property Int" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property Int" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyInt( name, value );
     }
 }
 
 void PropertyGroup::set( FN_PROPERTY name, float value )
 {
-    qDebug() << "set Property float" << Property::getNameAsString( name );
     if ( m_properties.contains( name ) )
     {
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property float" << Property::getNameAsString( name );
         m_properties[name]->setValue( value );
     }
     else
     {
-        qDebug() << "set Property float" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property float" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyFloat( name, value );
     }
 }
 
 void PropertyGroup::set( FN_PROPERTY name, QString value )
 {
-    qDebug() << "set Property string" << Property::getNameAsString( name );
     if ( m_properties.contains( name ) )
     {
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property string" << Property::getNameAsString( name );
         m_properties[name]->setValue( value );
     }
     else
     {
-        qDebug() << "set Property string" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
+        qDebug() << get( FNPROP_NAME ).toString() << "set Property string" << Property::getNameAsString( name ) << "doesn\'t exist, create new";
         m_properties[name] = new PropertyString( name, value );
     }
 }

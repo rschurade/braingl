@@ -4,7 +4,7 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/checkboxwithlabel.h"
+#include "../../gui/widgets/editwithlabel.h"
 
 #include "propertystring.h"
 
@@ -12,8 +12,8 @@ PropertyString::PropertyString( FN_PROPERTY name, QString value ) :
     Property( name ),
     m_value( value )
 {
-    m_widget = new CheckboxWithLabel( m_label );
-    connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    m_widget = new EditWithLabel( m_label );
+    connect( m_widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );
 }
 
 PropertyString::~PropertyString()
