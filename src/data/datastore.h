@@ -48,9 +48,8 @@ public slots:
     void propChanged();
 
 private:
-    QVariant getDatasetInfo( const QModelIndex &index ) const;
+    QVariant getDatasetProperties( const QModelIndex &index ) const;
     QVariant getGlobal( const QModelIndex &index ) const;
-    QVariant getDatasetEditables( const QModelIndex &index ) const;
 
     void updateGlobals();
     void updateSliceGlobals();
