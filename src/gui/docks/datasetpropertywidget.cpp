@@ -15,6 +15,7 @@ DatasetPropertyWidget::DatasetPropertyWidget( QString name, QWidget* parent ) :
 
     m_propertyView = new DatasetPropertyView( this );
     setWidget( m_propertyView->getWidget() );
+    setContentsMargins( 0, 0, 0, 0 );
 }
 
 DatasetPropertyWidget::~DatasetPropertyWidget()

@@ -8,13 +8,13 @@
 #ifndef SLIDERWITHEDIT_H_
 #define SLIDERWITHEDIT_H_
 
-#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 
 class QSlider;
 class QLineEdit;
 class QLabel;
 
-class SliderWithEdit : public QWidget
+class SliderWithEdit : public QFrame
 {
     Q_OBJECT
 
