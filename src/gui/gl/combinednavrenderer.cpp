@@ -13,6 +13,7 @@
 #include <QtGui/QMatrix4x4>
 
 #include "../../data/datastore.h"
+#include "../../data/enums.h"
 
 #include "../gl/glfunctions.h"
 
@@ -149,16 +150,16 @@ void CombinedNavRenderer::leftMouseDrag( int x, int y )
 
 void CombinedNavRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();
-    m_xb = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toFloat();
-    m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
-    m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
+    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
+    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
+    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
+    m_xb = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
+    m_yb = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
+    m_zb = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
 
-    float dx = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
+    float dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
+    float dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
+    float dz = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
 
     m_x *= dx;
     m_y *= dy;

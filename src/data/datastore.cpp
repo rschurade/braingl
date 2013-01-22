@@ -77,7 +77,7 @@ void DataStore::updateSliceGlobals()
             m_globals["slice_dy"] = ds->properties()->get( FNPROP_DY ).toFloat();
             m_globals["slice_dz"] = ds->properties()->get( FNPROP_DZ ).toFloat();
 
-            emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
+            emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
     }
 }
@@ -242,7 +242,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         return true;
     }
 
-    if ( role == Qt::UserRole && index.column() < 100 )
+    if ( role == Qt::UserRole && index.column() < FNGLOBAL_SAGITTAL )
     {
         int algo = index.column();
         switch ( algo )
@@ -495,7 +495,7 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     {
         return createIndex( row, column, m_datasetList.at( row ) );
     }
-    else if ( m_datasetList.size() == 0 && column > 100 )
+    else if ( m_datasetList.size() == 0 && column > FNGLOBAL_SAGITTAL )
     {
         return createIndex( row, column, 0 );
     }

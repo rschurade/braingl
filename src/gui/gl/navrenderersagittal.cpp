@@ -12,6 +12,7 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
+#include "../../data/enums.h"
 #include "../gl/glfunctions.h"
 
 NavRendererSagittal::NavRendererSagittal( QString name ) :
@@ -80,7 +81,7 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
 
     QModelIndex mi;
     QPoint p( xout, yout );
-    mi = model()->index( 0, 109 );
+    mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
     if ( mi.isValid() )
     {
         model()->setData( mi, p, Qt::UserRole );
@@ -89,23 +90,22 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
 
 void NavRendererSagittal::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toFloat();
-
-    int xi = model()->data( model()->index( 0, 100 ), Qt::UserRole ).toInt();
-    int yi = model()->data( model()->index( 0, 101 ), Qt::UserRole ).toInt();
-    int zi = model()->data( model()->index( 0, 102 ), Qt::UserRole ).toInt();
+    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
+    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
+    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
+    int xi = m_x;
+    int yi = m_y;
+    int zi = m_z;
 
     if ( m_xOld != xi || m_yOld != yi || m_zOld != zi )
     {
-        m_xb = model()->data( model()->index( 0, 103 ), Qt::UserRole ).toFloat();
-        m_yb = model()->data( model()->index( 0, 104 ), Qt::UserRole ).toFloat();
-        m_zb = model()->data( model()->index( 0, 105 ), Qt::UserRole ).toFloat();
+        m_xb = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
+        m_yb = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
+        m_zb = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
 
-        m_xd = model()->data( model()->index( 0, 106 ), Qt::UserRole ).toFloat();
-        m_yd = model()->data( model()->index( 0, 107 ), Qt::UserRole ).toFloat();
-        m_zd = model()->data( model()->index( 0, 108 ), Qt::UserRole ).toFloat();
+        m_xd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
+        m_yd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
+        m_zd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
 
         float x = m_x * m_xd;
         float y = m_y * m_yd;
