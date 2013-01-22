@@ -53,8 +53,6 @@ private:
     QVariant getGlobal( const QModelIndex &index ) const;
     QVariant getDatasetEditables( const QModelIndex &index ) const;
 
-    QString getNiftiDataType( const int type ) const;
-
     void updateGlobals();
     void updateSliceGlobals();
 
