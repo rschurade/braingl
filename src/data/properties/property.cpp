@@ -166,7 +166,7 @@ QString Property::getNameAsString( FN_PROPERTY name )
         case FNPROP_ISO_VALUE:
             return "iso value";
             break;
-        case FNPROP_SAGITTAL:
+/*        case FNPROP_SAGITTAL:
             return "sagittal";
             break;
         case FNPROP_CORONAL:
@@ -222,7 +222,7 @@ QString Property::getNameAsString( FN_PROPERTY name )
             break;
         case FNPROP_VIEW:
             return "view";
-            break;
+            break; */
         default:
             return "no string set for property";
             break;

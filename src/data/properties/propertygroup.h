@@ -35,6 +35,7 @@ public:
     void set( FN_PROPERTY name, float value, bool visible = false );
     void set( FN_PROPERTY name, float value, float min, float max, bool visible = false );
     void set( FN_PROPERTY name, QString value, bool visible = false );
+    void set( FN_PROPERTY name, QVariant value );
 
     QList<FN_PROPERTY> getVisible();
     QWidget* getWidget( FN_PROPERTY name );
