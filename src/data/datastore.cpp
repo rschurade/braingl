@@ -155,7 +155,7 @@ QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
             return ds->properties()->get( FNPROP_DIM );
             break;
         case FNPROP_DATATYPE:
-            return getNiftiDataType( ds->properties()->get( FNPROP_DATATYPE ).toInt() );
+            return DatasetNifti::getNiftiDataType( ds->properties()->get( FNPROP_DATATYPE ).toInt() );
             break;
         case FNPROP_SIZE:
             QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
@@ -656,44 +656,6 @@ void DataStore::deleteItem( int row )
         updateGlobals();
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
-}
-
-QString DataStore::getNiftiDataType( const int type ) const
-{
-    switch ( type )
-    {
-        case 0:
-            return QString( "unknown" );
-            break;
-        case 1:
-            return QString( "binary" );
-            break;
-        case 2:
-            return QString( "unsigned char" );
-            break;
-        case 4:
-            return QString( "signed short" );
-            break;
-        case 8:
-            return QString( "signed int" );
-            break;
-        case 16:
-            return QString( "float" );
-            break;
-        case 32:
-            return QString( "complex" );
-            break;
-        case 64:
-            return QString( "double" );
-            break;
-        case 128:
-            return QString( "RGB" );
-            break;
-        default:
-            return QString( "unknown" );
-            break;
-    }
-    return QString( "unknown" );
 }
 
 void DataStore::updateGlobals()

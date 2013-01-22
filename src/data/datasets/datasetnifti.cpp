@@ -119,3 +119,41 @@ Matrix DatasetNifti::getSForm()
 {
     return m_sform;
 }
+
+QString DatasetNifti::getNiftiDataType( const int type )
+{
+    switch ( type )
+    {
+        case 0:
+            return QString( "unknown" );
+            break;
+        case 1:
+            return QString( "binary" );
+            break;
+        case 2:
+            return QString( "unsigned char" );
+            break;
+        case 4:
+            return QString( "signed short" );
+            break;
+        case 8:
+            return QString( "signed int" );
+            break;
+        case 16:
+            return QString( "float" );
+            break;
+        case 32:
+            return QString( "complex" );
+            break;
+        case 64:
+            return QString( "double" );
+            break;
+        case 128:
+            return QString( "RGB" );
+            break;
+        default:
+            return QString( "unknown" );
+            break;
+    }
+    return QString( "unknown" );
+}
