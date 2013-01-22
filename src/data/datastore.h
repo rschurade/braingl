@@ -45,6 +45,7 @@ public slots:
     void moveItemDown( int row );
     void deleteItem( int row );
 
+    void propChanged();
     void setGlobal( QString key, QVariant data );
 
 private:

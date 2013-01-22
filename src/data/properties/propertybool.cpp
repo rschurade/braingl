@@ -13,6 +13,7 @@ PropertyBool::PropertyBool( FN_PROPERTY name, bool value ) :
     m_value( value )
 {
     m_widget = new CheckboxWithLabel( m_label );
+    m_widget->setChecked( value );
     connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }
 
@@ -37,5 +38,6 @@ void PropertyBool::setValue( QVariant value )
 
 void PropertyBool::widgetChanged( int value, int id )
 {
+    m_value = value;
     emit( valueChanged() );
 }

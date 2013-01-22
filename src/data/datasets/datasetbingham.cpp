@@ -15,15 +15,11 @@ DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> >* data
     m_data( data ),
     m_renderer( 0 )
 {
-    m_properties.set( FNPROP_ACTIVE, true );
-    m_properties.set( FNPROP_COLORMAP, 0 );
-    m_properties.set( FNPROP_INTERPOLATION, false );
-    m_properties.set( FNPROP_ALPHA, 1.0f );
-    m_properties.set( FNPROP_RENDER_SLICE, 1 );
-    m_properties.set( FNPROP_SCALING, 1.0f );
-    m_properties.set( FNPROP_OFFSET, 0.0f );
+    m_properties.set( FNPROP_RENDER_SLICE, 1, 1, 3, true );
+    m_properties.set( FNPROP_SCALING, 1.0f, 0.0f, 2.0f );
+    m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
     m_properties.set( FNPROP_ORDER, 4 );
-    m_properties.set( FNPROP_LOD, 2 );
+    m_properties.set( FNPROP_LOD, 2, 0, 4, true );
 
     examineDataset();
 }

@@ -47,6 +47,8 @@ private:
     QWidget* m_widget;
 
     QVBoxLayout* m_layout;
+
+    QList<QWidget*>m_visibleWidgets;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

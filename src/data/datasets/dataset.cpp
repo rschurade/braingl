@@ -38,7 +38,7 @@ GLuint Dataset::getTextureGLuint()
     return m_textureGLuint;
 }
 
-PropertyGroup Dataset::properties()
+PropertyGroup* Dataset::properties()
 {
-    return m_properties;
+    return &m_properties;
 }

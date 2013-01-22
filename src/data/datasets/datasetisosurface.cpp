@@ -23,18 +23,18 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 {
     m_scalarField = ds->getData();
 
-    m_properties.set( FNPROP_NX, ds->properties().get( FNPROP_NX ).toInt() );
-    m_properties.set( FNPROP_NY, ds->properties().get( FNPROP_NY ).toInt() );
-    m_properties.set( FNPROP_NZ, ds->properties().get( FNPROP_NZ ).toInt() );
-    m_properties.set( FNPROP_DX, ds->properties().get( FNPROP_DX ).toFloat() );
-    m_properties.set( FNPROP_DY, ds->properties().get( FNPROP_DY ).toFloat() );
-    m_properties.set( FNPROP_DZ, ds->properties().get( FNPROP_DZ ).toFloat() );
+    m_properties.set( FNPROP_NX, ds->properties()->get( FNPROP_NX ).toInt() );
+    m_properties.set( FNPROP_NY, ds->properties()->get( FNPROP_NY ).toInt() );
+    m_properties.set( FNPROP_NZ, ds->properties()->get( FNPROP_NZ ).toInt() );
+    m_properties.set( FNPROP_DX, ds->properties()->get( FNPROP_DX ).toFloat() );
+    m_properties.set( FNPROP_DY, ds->properties()->get( FNPROP_DY ).toFloat() );
+    m_properties.set( FNPROP_DZ, ds->properties()->get( FNPROP_DZ ).toFloat() );
 
     m_properties.set( FNPROP_DIM, 0 );
     m_properties.set( FNPROP_CREATED_BY, FNALGO_ISOSURFACE );
     m_properties.set( FNPROP_TYPE, FNDT_MESH_ISOSURFACE );
     m_properties.set( FNPROP_NAME, QString( "isosurface" ) );
-    m_properties.set( FNPROP_ISO_VALUE, 80 );
+    m_properties.set( FNPROP_ISO_VALUE, 80.0f, ds->properties()->get( FNPROP_MIN ).toFloat(), ds->properties()->get( FNPROP_MAX ).toFloat(), true );
 
     m_nX = m_properties.get( FNPROP_NX ).toInt() - 1;
     m_nY = m_properties.get( FNPROP_NY ).toInt() - 1;

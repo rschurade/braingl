@@ -13,13 +13,14 @@
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties.set( FNPROP_ACTIVE, true );
-    m_properties.set( FNPROP_COLORMAP, 0 );
-    m_properties.set( FNPROP_INTERPOLATION, false );
-    m_properties.set( FNPROP_ALPHA, 1.0f );
-    m_properties.set( FNPROP_RENDER_SLICE, 1 );
-    m_properties.set( FNPROP_SCALING, 1.0f );
-    m_properties.set( FNPROP_OFFSET, 0.0f );
+    m_properties.set( FNPROP_COLORMAP, 0, 0, 2, true );
+    m_properties.set( FNPROP_INTERPOLATION, false, true );
+    m_properties.set( FNPROP_ALPHA, 1.0f, 0.0, 1.0, true );
+    m_properties.set( FNPROP_DIM, 3 );
+
+    m_properties.set( FNPROP_RENDER_SLICE, 1, 1, 3, true );
+    m_properties.set( FNPROP_SCALING, 1.0f, 0.0f, 2.0f, true );
+    m_properties.set( FNPROP_OFFSET, 0.0f, -0.5, 0.5, true );
 
     examineDataset();
 }

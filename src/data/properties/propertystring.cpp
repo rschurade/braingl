@@ -13,6 +13,7 @@ PropertyString::PropertyString( FN_PROPERTY name, QString value ) :
     m_value( value )
 {
     m_widget = new EditWithLabel( m_label );
+    m_widget->setText( value );
     connect( m_widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );
 }
 
@@ -37,5 +38,6 @@ void PropertyString::setValue( QVariant value )
 
 void PropertyString::widgetChanged( QString value, int id )
 {
+    m_value = value;
     emit( valueChanged() );
 }
