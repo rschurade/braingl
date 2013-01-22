@@ -397,21 +397,21 @@ void MainWindow::slotToggleSagittalSlice()
 void  MainWindow::slotStandardAxialView()
 {
     QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_AXIAL );
+    m_dataStore->setData( mi, FN_AXIAL, Qt::UserRole );
     mainGLWidget->setView( FN_AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
     QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_CORONAL );
+    m_dataStore->setData( mi, FN_CORONAL, Qt::UserRole );
     mainGLWidget->setView( FN_CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
     QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_SAGITTAL );
+    m_dataStore->setData( mi, FN_SAGITTAL, Qt::UserRole );
     mainGLWidget->setView( FN_SAGITTAL );
 }
 
