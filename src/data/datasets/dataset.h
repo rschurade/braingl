@@ -42,7 +42,6 @@ public:
 protected:
     virtual void createTexture() = 0;
 
-    //QHash<QString, QVariant> m_properties;
     PropertyGroup m_properties;
 
     GLuint m_textureGLuint;

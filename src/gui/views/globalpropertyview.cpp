@@ -39,12 +39,6 @@ GlobalPropertyView::~GlobalPropertyView()
 
 void GlobalPropertyView::init()
 {
-    QModelIndex mi;
-    mi = model()->index( 0, 99 );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, true, Qt::UserRole );
-    }
 }
 
 QWidget* GlobalPropertyView::getWidget()

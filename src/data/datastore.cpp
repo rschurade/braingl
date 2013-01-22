@@ -25,23 +25,29 @@
 
 DataStore::DataStore()
 {
-    m_globals["axial"] = 0;
-    m_globals["coronal"] = 0;
-    m_globals["sagittal"] = 0;
-    m_globals["max_axial"] = 1;
-    m_globals["max_coronal"] = 1;
-    m_globals["max_sagittal"] = 1;
-    m_globals["min_axial"] = 0;
-    m_globals["min_coronal"] = 0;
-    m_globals["min_sagittal"] = 0;
-    m_globals["slice_dx"] = 1.0;
-    m_globals["slice_dy"] = 1.0;
-    m_globals["slice_dz"] = 1.0;
-    m_globals["lastPath"] = "";
-    m_globals["showAxial"] = true;
-    m_globals["showCoronal"] = true;
-    m_globals["showSagittal"] = true;
-
+    m_globalProperties.set( FNPROP_NAME, QString("datastore") );
+    m_globalProperties.set( FNGLOBAL_AXIAL, 0 );
+    m_globalProperties.set( FNGLOBAL_CORONAL, 0 );
+    m_globalProperties.set( FNGLOBAL_SAGITTAL, 0 );
+    m_globalProperties.set( FNGLOBAL_MAX_AXIAL, 1 );
+    m_globalProperties.set( FNGLOBAL_MAX_CORONAL, 1 );
+    m_globalProperties.set( FNGLOBAL_MAX_SAGITTAL, 1 );
+    m_globalProperties.set( FNGLOBAL_SLICE_DX, 1.0f );
+    m_globalProperties.set( FNGLOBAL_SLICE_DY, 1.0f );
+    m_globalProperties.set( FNGLOBAL_SLICE_DZ, 1.0f );
+    m_globalProperties.set( FNGLOBAL_LAST_PATH, "" );
+    m_globalProperties.set( FNGLOBAL_SHOW_AXIAL, true );
+    m_globalProperties.set( FNGLOBAL_SHOW_CORONAL, true );
+    m_globalProperties.set( FNGLOBAL_SHOW_SAGITTAL, true );
+    m_globalProperties.set( FNGLOBAL_CORONAL_AXIAL, 0 );
+    m_globalProperties.set( FNGLOBAL_SAGITTAL_AXIAL, 0 );
+    m_globalProperties.set( FNGLOBAL_SAGITTAL_CORONAL, 0 );
+    m_globalProperties.set( FNGLOBAL_ZOOM, 1.0f );
+    m_globalProperties.set( FNGLOBAL_MOVEX, 0 );
+    m_globalProperties.set( FNGLOBAL_MOVEY, 0 );
+    m_globalProperties.set( FNGLOBAL_BBX, 0 );
+    m_globalProperties.set( FNGLOBAL_BBY, 0 );
+    m_globalProperties.set( FNGLOBAL_VIEW, 0 );
 }
 
 DataStore::~DataStore()
@@ -67,15 +73,15 @@ void DataStore::updateSliceGlobals()
         Dataset* ds = m_datasetList.first();
         if ( ds->properties()->get( FNPROP_TYPE ).toInt() < FNDT_MESH_ASCII )
         {
-            m_globals["axial"] = ds->properties()->get( FNPROP_NZ ).toInt() / 2;
-            m_globals["coronal"] = ds->properties()->get( FNPROP_NY ).toInt() / 2;
-            m_globals["sagittal"] = ds->properties()->get( FNPROP_NX ).toInt() / 2;
-            m_globals["max_axial"] = ds->properties()->get( FNPROP_NZ ).toInt();
-            m_globals["max_coronal"] = ds->properties()->get( FNPROP_NY ).toInt();
-            m_globals["max_sagittal"] = ds->properties()->get( FNPROP_NX ).toInt();
-            m_globals["slice_dx"] = ds->properties()->get( FNPROP_DX ).toFloat();
-            m_globals["slice_dy"] = ds->properties()->get( FNPROP_DY ).toFloat();
-            m_globals["slice_dz"] = ds->properties()->get( FNPROP_DZ ).toFloat();
+            m_globalProperties.set( FNGLOBAL_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
+            m_globalProperties.set( FNGLOBAL_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() / 2 );
+            m_globalProperties.set( FNGLOBAL_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() / 2 );
+            m_globalProperties.set( FNGLOBAL_MAX_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() );
+            m_globalProperties.set( FNGLOBAL_MAX_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() );
+            m_globalProperties.set( FNGLOBAL_MAX_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() );
+            m_globalProperties.set( FNGLOBAL_SLICE_DX, ds->properties()->get( FNPROP_DX ).toFloat() );
+            m_globalProperties.set( FNGLOBAL_SLICE_DY, ds->properties()->get( FNPROP_DY ).toFloat() );
+            m_globalProperties.set( FNGLOBAL_SLICE_DZ, ds->properties()->get( FNPROP_DZ ).toFloat() );
 
             emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
@@ -117,12 +123,8 @@ int DataStore::columnCount( const QModelIndex &parent ) const
 
 QVariant DataStore::data( const QModelIndex &index, int role ) const
 {
-    //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
     if ( !index.isValid() )
         return QVariant();
-
-//    if ( index.row() < 0 || index.row() > m_datasetList.size() - 1 )
-//        return QVariant();
 
     switch ( role )
     {
@@ -160,67 +162,7 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
 
 QVariant DataStore::getGlobal( const QModelIndex &index ) const
 {
-    switch ( index.column() )
-    {
-        case FNGLOBAL_SAGITTAL:
-            return m_globals["sagittal"];
-            break;
-        case FNGLOBAL_CORONAL:
-            return m_globals["coronal"];
-            break;
-        case FNGLOBAL_AXIAL:
-            return m_globals["axial"];
-            break;
-        case FNGLOBAL_MAX_SAGITTAL:
-            return m_globals["max_sagittal"];
-            break;
-        case FNGLOBAL_MAX_CORONAL:
-            return m_globals["max_coronal"];
-            break;
-        case FNGLOBAL_MAX_AXIAL:
-            return m_globals["max_axial"];
-            break;
-        case FNGLOBAL_SLICE_DX:
-            return m_globals["slice_dx"];
-            break;
-        case FNGLOBAL_SLICE_DY:
-            return m_globals["slice_dy"];
-            break;
-        case FNGLOBAL_SLICE_DZ:
-            return m_globals["slice_dz"];
-            break;
-        case FNGLOBAL_LAST_PATH:
-            return m_globals["lastPath"];
-            break;
-        case FNGLOBAL_SHOW_SAGITTAL:
-            return m_globals["showSagittal"];
-            break;
-        case FNGLOBAL_SHOW_CORONAL:
-            return m_globals["showCoronal"];
-            break;
-        case FNGLOBAL_SHOW_AXIAL:
-            return m_globals["showAxial"];
-            break;
-        case FNGLOBAL_VIEW:
-            return m_globals["view"];
-            break;
-        case FNGLOBAL_MOVEX:
-            return m_globals["moveX"];
-            break;
-        case FNGLOBAL_MOVEY:
-            return m_globals["moveY"];
-            break;
-        case FNGLOBAL_BBX:
-            return m_globals["bbX"];
-            break;
-        case FNGLOBAL_BBY:
-            return m_globals["bbY"];
-            break;
-        case FNGLOBAL_ZOOM:
-            return m_globals["zoom"];
-            break;
-    }
-    return QVariant();
+    return m_globalProperties.get( (FN_PROPERTY)index.column() );
 }
 
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
@@ -374,79 +316,22 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
 
     if ( role == Qt::UserRole )
     {
-        switch ( index.column() )
+        switch( index.column() )
         {
-            case FNGLOBAL_SAGITTAL:
-                m_globals["sagittal"] = value.toInt();
-                break;
-            case FNGLOBAL_CORONAL:
-                m_globals["coronal"] = value.toInt();
-                break;
-            case FNGLOBAL_AXIAL:
-                m_globals["axial"] = value.toInt();
-                break;
-            case FNGLOBAL_MAX_SAGITTAL:
-                m_globals["max_sagittal"] = value.toInt();
-                break;
-            case FNGLOBAL_MAX_CORONAL:
-                m_globals["max_coronal"] = value.toInt();
-                break;
-            case FNGLOBAL_MAX_AXIAL:
-                m_globals["max_axial"] = value.toInt();
-                break;
-            case FNGLOBAL_SLICE_DX:
-                m_globals["slice_dx"] = value.toInt();
-                break;
-            case FNGLOBAL_SLICE_DY:
-                m_globals["slice_dy"] = value.toInt();
-                break;
-            case FNGLOBAL_SLICE_DZ:
-                m_globals["slice_dz"] = value.toInt();
-                break;
             case FNGLOBAL_CORONAL_AXIAL:
-                m_globals["coronal"] = value.toPoint().x();
-                m_globals["axial"] = value.toPoint().y();
+                m_globalProperties.set( FNGLOBAL_CORONAL, value.toPoint().x() );
+                m_globalProperties.set( FNGLOBAL_AXIAL, value.toPoint().y() );
                 break;
             case FNGLOBAL_SAGITTAL_AXIAL:
-                m_globals["sagittal"] = value.toPoint().x();
-                m_globals["axial"] = value.toPoint().y();
+                m_globalProperties.set( FNGLOBAL_SAGITTAL, value.toPoint().x() );
+                m_globalProperties.set( FNGLOBAL_AXIAL, value.toPoint().y() );
                 break;
             case FNGLOBAL_SAGITTAL_CORONAL:
-                m_globals["sagittal"] = value.toPoint().x();
-                m_globals["coronal"] = value.toPoint().y();
+                m_globalProperties.set( FNGLOBAL_SAGITTAL, value.toPoint().x() );
+                m_globalProperties.set( FNGLOBAL_CORONAL, value.toPoint().y() );
                 break;
-            case FNGLOBAL_LAST_PATH:
-                m_globals["lastPath"] = value.toString();
-                break;
-            case FNGLOBAL_SHOW_SAGITTAL:
-                m_globals["showSagittal"] = value.toBool();
-                break;
-            case FNGLOBAL_SHOW_CORONAL:
-                m_globals["showCoronal"] = value.toBool();
-                break;
-            case FNGLOBAL_SHOW_AXIAL:
-                m_globals["showAxial"] = value.toBool();
-                break;
-            case FNGLOBAL_VIEW:
-                m_globals["view"] = value.toInt();
-                break;
-            case FNGLOBAL_ZOOM:
-                m_globals["zoom"] = value.toFloat();
-                break;
-            case FNGLOBAL_MOVEX:
-                m_globals["moveX"] = value.toFloat();
-                break;
-            case FNGLOBAL_MOVEY:
-                m_globals["moveY"] = value.toFloat();
-                break;
-            case FNGLOBAL_BBX:
-                m_globals["bbX"] = value.toFloat();
-                break;
-            case FNGLOBAL_BBY:
-                m_globals["bbY"] = value.toFloat();
-                break;
-
         }
+        m_globalProperties.set( (FN_PROPERTY)index.column(), value );
         // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
         if ( index.column() < FNGLOBAL_ZOOM )
         {

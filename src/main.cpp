@@ -69,6 +69,8 @@ int main( int argc, char *argv[] )
             debug = true;
         }
     }
+    out = new QTextStream( stdout );
+    qInstallMsgHandler( logOutput );
 
 #ifdef __DEBUG__
     debug = true;

@@ -21,7 +21,7 @@ bool PropertyGroup::contains( FN_PROPERTY name )
     return m_properties.contains( name );
 }
 
-QVariant PropertyGroup::get( FN_PROPERTY name )
+QVariant PropertyGroup::get( FN_PROPERTY name ) const
 {
     if ( m_properties.contains( name ) )
     {
@@ -29,7 +29,8 @@ QVariant PropertyGroup::get( FN_PROPERTY name )
     }
     else
     {
-        return QVariant();
+        qDebug() << "*** ERROR *** GET" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
+        exit( 0 );
     }
 }
 
@@ -41,7 +42,7 @@ void PropertyGroup::set( FN_PROPERTY name, QVariant value )
     }
     else
     {
-        qDebug() << "*** ERROR ***" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << "doesnt exist";
+        qDebug() << "*** ERROR *** SET" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
         exit( 0 );
     }
 }
