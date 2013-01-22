@@ -6,6 +6,7 @@
  */
 #include <QtGui/QtGui>
 
+#include "../../data/enums.h"
 #include "../../data/datastore.h"
 #include "../widgets/sliderwitheditint2.h"
 
@@ -51,7 +52,6 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     settingChanged();
 
     connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
-    connect( this, SIGNAL( sliderChange( QString, QVariant ) ), dataStore, SLOT( setGlobal( QString, QVariant ) ) );
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -71,8 +71,18 @@ QSize DockNavGLWidget::sizeHint() const
 
 void DockNavGLWidget::sliderChanged( int value )
 {
-    emit( sliderChange( m_name, value ) );
-    //qDebug() << value;
+    if  ( m_name == "sagittal")
+    {
+        m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_SAGITTAL ), value, Qt::UserRole );
+    }
+    else if ( m_name == "coronal" )
+    {
+        m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_CORONAL ), value, Qt::UserRole );
+    }
+    else if ( m_name == "axial" )
+    {
+        m_dataStore->setData( m_dataStore->index( 0, FNGLOBAL_AXIAL ), value, Qt::UserRole );
+    }
 }
 
 void DockNavGLWidget::settingChanged()
@@ -80,12 +90,12 @@ void DockNavGLWidget::settingChanged()
     QModelIndex mi;
     if  ( m_name == "sagittal")
     {
-        mi = m_dataStore->index( 0, 100 );
+        mi = m_dataStore->index( 0, FNGLOBAL_SAGITTAL );
         if ( mi.isValid() )
         {
             m_slider->setValue( m_dataStore->data( mi, Qt::UserRole ).toInt() );
         }
-        mi = m_dataStore->index( 0, 103 );
+        mi = m_dataStore->index( 0, FNGLOBAL_MAX_SAGITTAL );
         if ( mi.isValid() )
         {
             m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
@@ -93,12 +103,12 @@ void DockNavGLWidget::settingChanged()
     }
     else if ( m_name == "coronal" )
     {
-        mi = m_dataStore->index( 0, 101 );
+        mi = m_dataStore->index( 0, FNGLOBAL_CORONAL );
         if ( mi.isValid() )
         {
             m_slider->setValue( m_dataStore->data( mi, Qt::UserRole ).toInt() );
         }
-        mi = m_dataStore->index( 0, 104 );
+        mi = m_dataStore->index( 0, FNGLOBAL_MAX_CORONAL );
         if ( mi.isValid() )
         {
             m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
@@ -106,12 +116,12 @@ void DockNavGLWidget::settingChanged()
     }
     else if ( m_name == "axial" )
     {
-        mi = m_dataStore->index( 0, 102 );
+        mi = m_dataStore->index( 0, FNGLOBAL_AXIAL );
         if ( mi.isValid() )
         {
             m_slider->setValue( m_dataStore->data( mi, Qt::UserRole ).toInt() );
         }
-        mi = m_dataStore->index( 0, 105 );
+        mi = m_dataStore->index( 0, FNGLOBAL_MAX_AXIAL );
         if ( mi.isValid() )
         {
             m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );

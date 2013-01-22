@@ -46,7 +46,6 @@ public slots:
     void deleteItem( int row );
 
     void propChanged();
-    void setGlobal( QString key, QVariant data );
 
 private:
     QVariant getDatasetInfo( const QModelIndex &index ) const;
