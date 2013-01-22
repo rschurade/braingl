@@ -4,7 +4,6 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
-#include <QtGui/QGroupBox>
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
@@ -31,17 +30,23 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
     QVBoxLayout* vLayout = new QVBoxLayout();
+
     QHBoxLayout* hLayout = new QHBoxLayout();
-
     m_label = new QLabel( name );
+    hLayout->addWidget( m_label );
+    hLayout->addStretch();
 
-    QGroupBox* gb = new QGroupBox( m_label->text() );
-    gb->setFlat( true );
+    QHBoxLayout* hLayout2 = new QHBoxLayout();
+    hLayout2->addWidget( m_slider, 70 );
+    hLayout2->addWidget( m_edit, 30 );
 
-    hLayout->addWidget( m_slider, 70 );
-    hLayout->addWidget( m_edit, 30 );
-    gb->setLayout( hLayout );
-    vLayout->addWidget( gb );
+    vLayout->addLayout( hLayout );
+    vLayout->addLayout( hLayout2 );
+
+    hLayout->setContentsMargins( 0,0,0,0 );
+    hLayout2->setContentsMargins( 0,0,0,0 );
+    vLayout->setContentsMargins( 0,0,0,0 );
+
 
     setLayout( vLayout );
 }

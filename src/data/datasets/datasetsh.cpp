@@ -13,13 +13,8 @@
 DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties.set( FNPROP_ACTIVE, true );
-    m_properties.set( FNPROP_COLORMAP, 0 );
-    m_properties.set( FNPROP_INTERPOLATION, false );
-    m_properties.set( FNPROP_ALPHA, 1.0f );
-    m_properties.set( FNPROP_CREATED_BY, FNALGO_QBALL );
-    m_properties.set( FNPROP_OFFSET, 0.0f );
-    m_properties.set( FNPROP_SCALING, 1.0f );
+    m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
+    m_properties.set( FNPROP_SCALING, 1.0f, 0.0f, 2.0f, true );
 
     examineDataset();
 }

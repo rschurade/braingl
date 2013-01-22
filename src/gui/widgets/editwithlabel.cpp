@@ -17,18 +17,21 @@ EditWithLabel::EditWithLabel( QString label, int id )
 {
     m_id = id;
 
-    m_lineEdit = new QLineEdit();
-
-    QHBoxLayout* hLayout = new QHBoxLayout();
     QVBoxLayout* vLayout = new QVBoxLayout();
 
-    QGroupBox* gb = new QGroupBox( label );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    m_label = new QLabel( label );
+    hLayout->addWidget( m_label );
+    hLayout->addStretch();
 
-    hLayout->addWidget( m_lineEdit );
+    QHBoxLayout* hLayout2 = new QHBoxLayout();
+    m_lineEdit = new QLineEdit();
+    hLayout2->addWidget( m_lineEdit );
+    hLayout2->addStretch();
 
-    gb->setLayout( hLayout );
-    gb->setFlat( true );
-    vLayout->addWidget( gb );
+    vLayout->addLayout( hLayout );
+    vLayout->addLayout( hLayout2 );
+    vLayout->setContentsMargins( 0,0,0,0 );
 
     setLayout( vLayout );
 

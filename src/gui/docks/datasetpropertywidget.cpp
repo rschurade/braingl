@@ -19,7 +19,6 @@ DatasetPropertyWidget::DatasetPropertyWidget( QString name, QWidget* parent ) :
 
 DatasetPropertyWidget::~DatasetPropertyWidget()
 {
-    // TODO Auto-generated destructor stub
 }
 
 void DatasetPropertyWidget::setModel( QAbstractItemModel* model )
