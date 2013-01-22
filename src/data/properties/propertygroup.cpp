@@ -29,8 +29,9 @@ QVariant PropertyGroup::get( FN_PROPERTY name ) const
     }
     else
     {
-        qDebug() << "*** ERROR *** GET" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
-        exit( 0 );
+        return QVariant();
+//        qDebug() << "*** ERROR *** GET" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
+//        exit( 0 );
     }
 }
 
