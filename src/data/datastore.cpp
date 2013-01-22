@@ -126,15 +126,13 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
     switch ( role )
     {
+        case Qt::EditRole:
         case Qt::DisplayRole:
-            return getDatasetInfo( index );
+            return getDatasetProperties( index );
             break;
         case Qt::UserRole:
             return getGlobal( index );
             break;
-        case Qt::EditRole:
-            return getDatasetEditables( index );
-            break;
         default:
             break;
     }
@@ -142,71 +140,11 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
     return QVariant();
 }
 
-QVariant DataStore::getDatasetInfo( const QModelIndex &index ) const
+QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
 {
     Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
 
-    switch ( index.column() )
-    {
-        case FNPROP_NAME:
-            return m_datasetList.at( index.row() )->properties()->get( FNPROP_NAME );
-            break;
-        case FNPROP_DIM:
-            return ds->properties()->get( FNPROP_DIM );
-            break;
-        case FNPROP_DATATYPE:
-            return DatasetNifti::getNiftiDataType( ds->properties()->get( FNPROP_DATATYPE ).toInt() );
-            break;
-        case FNPROP_SIZE:
-            QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
-            return QString( "%L1" ).arg( ds->properties()->get( FNPROP_SIZE ).toInt() );
-            break;
-        case FNPROP_NX:
-            return ds->properties()->get( FNPROP_NX );
-            break;
-        case FNPROP_NY:
-            return ds->properties()->get( FNPROP_NY );
-            break;
-        case FNPROP_NZ:
-            return ds->properties()->get( FNPROP_NZ );
-            break;
-        case FNPROP_DX:
-            return ds->properties()->get( FNPROP_DX );
-            break;
-        case FNPROP_DY:
-            return ds->properties()->get( FNPROP_DY );
-            break;
-        case FNPROP_DZ:
-            return ds->properties()->get( FNPROP_DZ );
-            break;
-        case FNPROP_MIN:
-            return ds->properties()->get( FNPROP_MIN );
-            break;
-        case FNPROP_MAX:
-            return ds->properties()->get( FNPROP_MAX );
-            break;
-        case FNPROP_TYPE:
-            return ds->properties()->get( FNPROP_TYPE );
-            break;
-        case FNPROP_CREATED_BY:
-            return ds->properties()->get( FNPROP_CREATED_BY );
-            break;
-        default:
-            break;
-    }
-
-    return QVariant();
-}
-
-QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
-{
-    Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
-
-    if ( index.column() < FNPROP_TEXTURE_GLUINT )
-    {
-        return ds->properties()->get( (FN_PROPERTY)index.column() );
-    }
-
+    // handle props with special treatment
     switch ( index.column() )
     {
         case FNPROP_TEXTURE_GLUINT:
@@ -216,8 +154,8 @@ QVariant DataStore::getDatasetEditables( const QModelIndex &index ) const
             return VPtr<Dataset>::asQVariant( ds );
             break;
     }
-
-    return QVariant();
+    // everything else
+    return ds->properties()->get( (FN_PROPERTY)index.column() );
 }
 
 QVariant DataStore::getGlobal( const QModelIndex &index ) const
@@ -527,51 +465,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
     {
         if ( orientation == Qt::Horizontal )
         {
-            switch ( section )
-            {
-                case 0:
-                    return QString( "name" );
-                    break;
-                case 1:
-                    return QString( "dim" );
-                    break;
-                case 2:
-                    return QString( "data type" );
-                    break;
-                case 3:
-                    return QString( "size in byte" );
-                    break;
-                case 4:
-                    return QString( "nx" );
-                    break;
-                case 5:
-                    return QString( "ny" );
-                    break;
-                case 6:
-                    return QString( "nz" );
-                    break;
-                case 7:
-                    return QString( "dx" );
-                    break;
-                case 8:
-                    return QString( "dy" );
-                    break;
-                case 9:
-                    return QString( "dz" );
-                    break;
-                case 10:
-                    return QString( "min" );
-                    break;
-                case 11:
-                    return QString( "max" );
-                    break;
-                case 12:
-                    return QString( "internal type" );
-                    break;
-                case 13:
-                    return QString( "created by" );
-                    break;
-            }
+            return QString( Property::getNameAsString( (FN_PROPERTY)section ) );
         }
         else
         {

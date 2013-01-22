@@ -4,18 +4,18 @@
  *  Created on: 12.05.2012
  *      Author: Ralph
  */
-
+#include "intformatdelegate.h"
+#include "niftiformatdelegate.h"
 #include "datasetinfoview.h"
 
 DatasetInfoView::DatasetInfoView(  QWidget * parent ) :
     QTableView( parent )
 {
-    // TODO Auto-generated constructor stub
-
+    setItemDelegateForColumn( 2, new NiftiFormatDelegate() );
+    setItemDelegateForColumn( 3, new IntFormatDelegate() );
 }
 
 DatasetInfoView::~DatasetInfoView()
 {
-    // TODO Auto-generated destructor stub
 }
 
