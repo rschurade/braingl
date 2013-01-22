@@ -31,11 +31,13 @@ EditWithLabel::EditWithLabel( QString label, int id )
 
     vLayout->addLayout( hLayout );
     vLayout->addLayout( hLayout2 );
-    vLayout->setContentsMargins( 0,0,0,0 );
+    vLayout->setContentsMargins( 1,1,1,1 );
 
     setLayout( vLayout );
 
     connect( m_lineEdit, SIGNAL( textEdited( QString ) ), this, SLOT( slotTextChanged( QString ) ) );
+
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
 }
 
 

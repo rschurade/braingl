@@ -15,6 +15,7 @@ GlobalPropertyView::GlobalPropertyView( QWidget* parent )
     m_widget = new QWidget( this );
 
     m_layout = new QVBoxLayout();
+    m_layout->setContentsMargins( 1, 0, 1, 0 );
 
     m_sagittalSlider = new SliderWithEditInt( "sagittal", FNGLOBAL_SAGITTAL );
     m_coronalSlider = new SliderWithEditInt( "coronal", FNGLOBAL_CORONAL );

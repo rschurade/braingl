@@ -25,6 +25,7 @@ DatasetPropertyView::DatasetPropertyView( QWidget* parent ) :
 {
     m_widget = new QWidget( this );
     m_layout = new QVBoxLayout();
+    m_layout->setContentsMargins( 1, 0, 1, 0 );
     m_layout->addStretch();
     m_widget->setLayout( m_layout );
 }

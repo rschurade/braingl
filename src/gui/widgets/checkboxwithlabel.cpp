@@ -28,12 +28,14 @@ CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
     hLayout->addWidget( m_checkBox );
     vLayout->addLayout( hLayout );
 
-    hLayout->setContentsMargins( 0,0,0,0 );
-    vLayout->setContentsMargins( 0,0,0,0 );
+    hLayout->setContentsMargins( 1, 1, 1, 1 );
+    vLayout->setContentsMargins( 0, 0, 0, 0 );
 
     setLayout( vLayout );
 
     connect( m_checkBox, SIGNAL( stateChanged( int ) ), this, SLOT( slotStateChanged( int ) ) );
+
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
 }
 
 

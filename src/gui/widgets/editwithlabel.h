@@ -8,13 +8,13 @@
 #ifndef EDITWITHLABEL_H_
 #define EDITWITHLABEL_H_
 
-#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 
 class QLineEdit;
 class QLabel;
 
 
-class EditWithLabel  : public QWidget
+class EditWithLabel  : public QFrame
 {
     Q_OBJECT
 

@@ -14,7 +14,7 @@
 #include "sliderwithedit.h"
 
 SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
-    QWidget( parent )
+    QFrame( parent )
 {
     m_id = id;
 
@@ -45,10 +45,12 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
 
     hLayout->setContentsMargins( 0,0,0,0 );
     hLayout2->setContentsMargins( 0,0,0,0 );
-    vLayout->setContentsMargins( 0,0,0,0 );
+    vLayout->setContentsMargins( 1,1,1,1 );
 
 
     setLayout( vLayout );
+
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
 }
 
 SliderWithEdit::~SliderWithEdit()
