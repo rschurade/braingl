@@ -31,11 +31,6 @@ CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
     hLayout->setContentsMargins( 0,0,0,0 );
     vLayout->setContentsMargins( 0,0,0,0 );
 
-//    QHBoxLayout* hLayout2 = new QHBoxLayout();
-//
-//    hLayout2->addStretch();
-//    vLayout->addLayout( hLayout2 );
-
     setLayout( vLayout );
 
     connect( m_checkBox, SIGNAL( stateChanged( int ) ), this, SLOT( slotStateChanged( int ) ) );

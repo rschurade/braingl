@@ -33,6 +33,19 @@ QVariant PropertyGroup::get( FN_PROPERTY name )
     }
 }
 
+void PropertyGroup::set( FN_PROPERTY name, QVariant value )
+{
+    if ( m_properties.contains( name ) )
+    {
+        m_properties[name]->setValue( value );
+    }
+    else
+    {
+        qDebug() << "*** ERROR ***" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << "doesnt exist";
+        exit( 0 );
+    }
+}
+
 void PropertyGroup::set( FN_PROPERTY name, bool value, bool visible )
 {
     if ( m_properties.contains( name ) )
