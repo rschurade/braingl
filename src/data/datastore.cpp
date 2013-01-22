@@ -663,12 +663,6 @@ void DataStore::updateGlobals()
     updateSliceGlobals();
 }
 
-void DataStore::setGlobal( QString key, QVariant data )
-{
-    m_globals[key] = data;
-    emit dataChanged( index( 0, 100 ), index( 0, 108 ) );
-}
-
 void DataStore::propChanged()
 {
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
