@@ -21,18 +21,12 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     m_rendererEV( 0 ),
     m_renderGlpyhs( false )
 {
-    m_properties.set( FNPROP_ACTIVE, true );
-    m_properties.set( FNPROP_COLORMAP, 0 );
-    m_properties.set( FNPROP_INTERPOLATION, false );
-    m_properties.set( FNPROP_ALPHA, 1.0f );
-    m_properties.set( FNPROP_DIM, 1.0f );
-
-    m_properties.set( FNPROP_FA_THRESHOLD, 0.01f );
-    m_properties.set( FNPROP_EV_THRESHOLD, 10.0f );
-    m_properties.set( FNPROP_GAMMA, 0.1f );
-    m_properties.set( FNPROP_OFFSET, 0.0f );
-    m_properties.set( FNPROP_SCALING, 0.5f );
-    m_properties.set( FNPROP_TENSOR_RENDERMODE, 0 );
+    m_properties.set( FNPROP_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
+    m_properties.set( FNPROP_EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
+    m_properties.set( FNPROP_GAMMA, 0.1f, 0.0f, 10.0f, true );
+    m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
+    m_properties.set( FNPROP_SCALING, 0.5f, 0.0f, 2.0f, true );
+    m_properties.set( FNPROP_TENSOR_RENDERMODE, 0, 0, 3, true );
 
     examineDataset();
 }
@@ -58,18 +52,14 @@ DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> >* data, 
     }
     m_data = mData;
 
-    //disp_nifti_1_header( "", &nifti_convert_nim2nhdr( header ) );
-    m_properties.set( FNPROP_ACTIVE, true );
-    m_properties.set( FNPROP_COLORMAP, 0 );
-    m_properties.set( FNPROP_INTERPOLATION, false );
-    m_properties.set( FNPROP_ALPHA, 1.0f );
     m_properties.set( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
-    m_properties.set( FNPROP_FA_THRESHOLD, 0.01f );
-    m_properties.set( FNPROP_EV_THRESHOLD, 10.0f );
-    m_properties.set( FNPROP_GAMMA, 0.1f );
-    m_properties.set( FNPROP_OFFSET, 0.0f );
-    m_properties.set( FNPROP_SCALING, 0.5f );
-    m_properties.set( FNPROP_TENSOR_RENDERMODE, 0 );
+    m_properties.set( FNPROP_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
+    m_properties.set( FNPROP_EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
+    m_properties.set( FNPROP_GAMMA, 0.1f, 0.0f, 10.0f, true );
+    m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
+    m_properties.set( FNPROP_SCALING, 0.5f, 0.0f, 2.0f, true );
+    m_properties.set( FNPROP_TENSOR_RENDERMODE, 0, 0, 3, true );
+
 
     examineDataset();
 }
@@ -92,9 +82,7 @@ void DatasetTensor::examineDataset()
     m_properties.set( FNPROP_LOWER_THRESHOLD, m_properties.get( FNPROP_MIN ).toFloat() );
     m_properties.set( FNPROP_UPPER_THRESHOLD, m_properties.get( FNPROP_MAX ).toFloat() );
 
-    m_properties.set( FNPROP_LOD, 2 );
-    m_properties.set( FNPROP_ORDER, 0 );
-    m_properties.set( FNPROP_RENDER_SLICE, 1 );
+   m_properties.set( FNPROP_RENDER_SLICE, 1 );
     m_properties.set( FNPROP_SCALING, 1.0f );
     m_properties.set( FNPROP_DIM, 9 );
 

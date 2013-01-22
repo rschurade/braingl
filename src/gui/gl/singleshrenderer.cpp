@@ -151,7 +151,7 @@ void SingleSHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int order = m_dataset->properties().get( FNPROP_ORDER ).toInt();
+    int order = m_dataset->properties()->get( FNPROP_ORDER ).toInt();
 
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 

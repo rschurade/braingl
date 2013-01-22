@@ -15,6 +15,9 @@ PropertyInt::PropertyInt( FN_PROPERTY name, int value, int min, int max ) :
     m_max( max )
 {
     m_widget = new SliderWithEditInt( m_label );
+    m_widget->setMin( min );
+    m_widget->setMax( max );
+    m_widget->setValue( value );
     connect( m_widget, SIGNAL( valueChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }
 
@@ -57,5 +60,6 @@ void PropertyInt::setMax( int max )
 
 void PropertyInt::widgetChanged( int value, int id )
 {
+    m_value = value;
     emit( valueChanged() );
 }

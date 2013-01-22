@@ -17,6 +17,9 @@ PropertyFloat::PropertyFloat( FN_PROPERTY name, float value, float min, float ma
     m_max( max )
 {
     m_widget = new SliderWithEdit( m_label );
+    m_widget->setMin( min );
+    m_widget->setMax( max );
+    m_widget->setValue( value );
     connect( m_widget, SIGNAL( valueChanged( float, int ) ), this, SLOT( widgetChanged( float, int ) ) );
 }
 
@@ -46,6 +49,8 @@ void PropertyFloat::setMin( float min )
     {
         m_value = m_min;
     }
+    m_widget->setMin( min );
+    m_widget->setValue( m_value );
 }
 
 void PropertyFloat::setMax( float max )
@@ -55,9 +60,12 @@ void PropertyFloat::setMax( float max )
     {
         m_value = m_max;
     }
+    m_widget->setMax( max );
+    m_widget->setValue( m_value );
 }
 
 void PropertyFloat::widgetChanged( float value, int id )
 {
+    m_value = value;
     emit( valueChanged() );
 }

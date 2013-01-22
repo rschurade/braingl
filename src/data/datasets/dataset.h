@@ -31,7 +31,7 @@ public:
     Dataset( QDir fileName, FN_DATASET_TYPE type );
     virtual ~Dataset();
 
-    PropertyGroup properties();
+    PropertyGroup* properties();
 
     GLuint getTextureGLuint();
 

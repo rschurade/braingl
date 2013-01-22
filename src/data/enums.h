@@ -83,7 +83,6 @@ enum FN_PROPERTY
     FNPROP_ISO_VALUE,
     FNPROP_TEXTURE_GLUINT,
     FNPROP_DATASET_POINTER,
-    FNPROP_VISIBLE_PROPS,
     // end of dataset properties, begin global properties
     FNPROP_SAGITTAL = 100,
     FNPROP_CORONAL,
