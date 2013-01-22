@@ -40,12 +40,13 @@ signals:
     void valueChanged( int value, int );
 
 private:
-   QSlider*  m_slider;
-   QLineEdit* m_edit;
-   QPushButton* m_button1;
-   QPushButton* m_button2;
+    QLabel* m_label;
+    QSlider*  m_slider;
+    QLineEdit* m_edit;
+    QPushButton* m_button1;
+    QPushButton* m_button2;
 
-   int m_id;
+    int m_id;
 
 };
 
