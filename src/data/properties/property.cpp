@@ -166,63 +166,63 @@ QString Property::getNameAsString( FN_PROPERTY name )
         case FNPROP_ISO_VALUE:
             return "iso value";
             break;
-/*        case FNPROP_SAGITTAL:
+        case FNGLOBAL_SAGITTAL:
             return "sagittal";
             break;
-        case FNPROP_CORONAL:
+        case FNGLOBAL_CORONAL:
             return "coronal";
             break;
-        case FNPROP_AXIAL:
+        case FNGLOBAL_AXIAL:
             return "axial";
             break;
-        case FNPROP_MAX_SAGITTAL:
+        case FNGLOBAL_MAX_SAGITTAL:
             return "max saggital";
             break;
-        case FNPROP_MAX_CORONAL:
+        case FNGLOBAL_MAX_CORONAL:
             return "max coronal";
             break;
-        case FNPROP_MAX_AXIAL:
+        case FNGLOBAL_MAX_AXIAL:
             return "max axial";
             break;
-        case FNPROP_SLICE_DX:
+        case FNGLOBAL_SLICE_DX:
             return "slice dx";
             break;
-        case FNPROP_SLICE_DY:
+        case FNGLOBAL_SLICE_DY:
             return "slice dy";
             break;
-        case FNPROP_SLICE_DZ:
+        case FNGLOBAL_SLICE_DZ:
             return "slice dz";
             break;
-        case FNPROP_LAST_PATH:
+        case FNGLOBAL_LAST_PATH:
             return "last path";
             break;
-        case FNPROP_SHOW_SAGITTAL:
+        case FNGLOBAL_SHOW_SAGITTAL:
             return "show sagittal";
             break;
-        case FNPROP_SHOW_CORONAL:
+        case FNGLOBAL_SHOW_CORONAL:
             return "show coronal";
             break;
-        case FNPROP_SHOW_AXIAL:
+        case FNGLOBAL_SHOW_AXIAL:
             return "show axial";
             break;
-        case FNPROP_ZOOM:
+        case FNGLOBAL_ZOOM:
             return "zoom";
             break;
-        case FNPROP_MOVEX:
+        case FNGLOBAL_MOVEX:
             return "move x";
             break;
-        case FNPROP_MOVEY:
+        case FNGLOBAL_MOVEY:
             return "move y";
             break;
-        case FNPROP_BBX:
+        case FNGLOBAL_BBX:
             return "bounding box x";
             break;
-        case FNPROP_BBY:
+        case FNGLOBAL_BBY:
             return "bounding box y";
             break;
-        case FNPROP_VIEW:
+        case FNGLOBAL_VIEW:
             return "view";
-            break; */
+            break;
         default:
             return "no string set for property";
             break;

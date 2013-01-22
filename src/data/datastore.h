@@ -16,6 +16,8 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QVector3D>
 
+#include "properties/propertygroup.h"
+
 class Dataset;
 
 class DataStore: public QAbstractItemModel
@@ -56,7 +58,7 @@ private:
 
     QList<Dataset*> m_datasetList;
 
-    QHash<QString, QVariant> m_globals;
+    PropertyGroup m_globalProperties;
 
 signals:
 };
