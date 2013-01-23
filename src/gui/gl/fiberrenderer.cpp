@@ -24,6 +24,8 @@ FiberRenderer::FiberRenderer( QVector< QVector< float > >& data )  :
 
 FiberRenderer::~FiberRenderer()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
 }
 
 void FiberRenderer::init()

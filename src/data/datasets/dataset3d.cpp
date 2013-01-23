@@ -27,6 +27,8 @@ Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* he
 
 Dataset3D::~Dataset3D()
 {
+    m_properties.set( FNPROP_ACTIVE, false );
+    delete m_renderer;
     m_data.clear();
 }
 

@@ -84,6 +84,7 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 
 void TensorRenderer::setupTextures()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
 }
 
 void TensorRenderer::setShaderVars()

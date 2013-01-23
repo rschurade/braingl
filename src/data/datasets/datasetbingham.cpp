@@ -26,6 +26,9 @@ DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> >* data
 
 DatasetBingham::~DatasetBingham()
 {
+    m_properties.set( FNPROP_ACTIVE, false );
+    delete m_renderer;
+    delete m_data;
 }
 
 QVector<QVector<float> >* DatasetBingham::getData()

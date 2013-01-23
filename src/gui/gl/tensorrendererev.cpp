@@ -44,6 +44,7 @@ TensorRendererEV::TensorRendererEV( QVector<Matrix>* data, int nx, int ny, int n
 
 TensorRendererEV::~TensorRendererEV()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
 }
 
 void TensorRendererEV::init()

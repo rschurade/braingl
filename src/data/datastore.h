@@ -54,7 +54,6 @@ private:
     QVariant getGlobal( const QModelIndex &index ) const;
 
     void updateGlobals();
-    void updateSliceGlobals();
 
     QList<Dataset*> m_datasetList;
 
