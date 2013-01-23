@@ -83,6 +83,7 @@ private:
     QAction* showAxialAct;
     QAction* showCoronalAct;
     QAction* showSagittalAct;
+    QAction* toggleDockTitlesAct;
 
     QAction* toggleShaderEditAct;
 

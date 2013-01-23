@@ -39,6 +39,11 @@ private:
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
 
+    QWidget* m_titleWidget;
+
+public slots:
+    void toggleTitleWidget();
+
 private slots:
     void sliderChanged( int value );
     void settingChanged();

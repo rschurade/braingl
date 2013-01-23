@@ -27,11 +27,11 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	m_layout = new QVBoxLayout();
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
-	m_downButton = new QPushButton();
+	m_downButton = new QPushButton( this );
 	m_downButton->setText( QString( "down" ) );
-	m_upButton = new QPushButton();
+	m_upButton = new QPushButton( this );
 	m_upButton->setText( QString( "up" ) );
-	m_deleteButton = new QPushButton();
+	m_deleteButton = new QPushButton( this );
 	m_deleteButton->setText( QString( "delete" ) );
 
 	buttonLayout->addWidget( m_downButton );
@@ -44,8 +44,11 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 
 	connect( m_listView, SIGNAL(itemSelectionChanged( const QItemSelection ) ), this, SLOT( itemSelectionChanged( const QItemSelection ) ) );
 
+	buttonLayout->setContentsMargins( 0, 0, 0, 0 );
+
 	m_layout->addWidget( m_listView );
 	m_layout->addLayout( buttonLayout );
+	m_layout->setContentsMargins( 1, 0, 1, 0 );
 
 	panel->setLayout( m_layout );
 	setWidget( panel );
@@ -53,6 +56,8 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	m_upButton->setEnabled( false );
 	m_downButton->setEnabled( false );
 	m_deleteButton->setEnabled( false );
+
+	setStyleSheet( "QPushButton { font:  bold 12px; max-height: 14px; margin-top: -1px } " );
 }
 
 DatasetListWidget::~DatasetListWidget()
