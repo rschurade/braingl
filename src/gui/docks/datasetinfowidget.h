@@ -8,14 +8,14 @@
 #ifndef DATASETINFOWIDGET_H_
 #define DATASETINFOWIDGET_H_
 
-#include <QtGui/QDockWidget>
+#include "fndockwidget.h"
 
 class QAbstractItemModel;
 class QItemSelectionModel;
 class DatasetInfoView;
 
 
-class DatasetInfoWidget  : public QDockWidget
+class DatasetInfoWidget : public FNDockWidget
 {
     Q_OBJECT
 

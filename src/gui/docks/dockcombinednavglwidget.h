@@ -9,8 +9,9 @@
 #define DOCKCOMBINEDNAVGLWIDGET_H_
 
 #include <QtCore/QVariant>
-#include <QtGui/QDockWidget>
 #include <QtOpenGL/QGLWidget>
+
+#include "fndockwidget.h"
 
 class DataStore;
 class CombinedNavGLWidget;
@@ -20,7 +21,7 @@ class QVBoxLayout;
 class LineEdit;
 
 
-class DockCombinedNavGLWidget : public QDockWidget
+class DockCombinedNavGLWidget : public FNDockWidget
 {
     Q_OBJECT
 

@@ -8,13 +8,13 @@
 #ifndef GLOBALPROPERTYWIDGET_H_
 #define GLOBALPROPERTYWIDGET_H_
 
-#include <QtGui/QDockWidget>
+#include "fndockwidget.h"
 
 class GlobalPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
 
-class GlobalPropertyWidget : public QDockWidget
+class GlobalPropertyWidget : public FNDockWidget
 {
     Q_OBJECT
 

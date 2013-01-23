@@ -9,7 +9,7 @@
 #include "datasetinfowidget.h"
 
 DatasetInfoWidget::DatasetInfoWidget( QString name, QWidget* parent ) :
-QDockWidget( name, parent )
+    FNDockWidget( name, parent )
 {
     setObjectName( name );
 
