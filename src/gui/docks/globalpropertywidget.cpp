@@ -9,7 +9,7 @@
 #include "globalpropertywidget.h"
 
 GlobalPropertyWidget::GlobalPropertyWidget( QString name, QWidget* parent ) :
-    QDockWidget( name, parent )
+    FNDockWidget( name, parent )
 {
     setObjectName( name );
 

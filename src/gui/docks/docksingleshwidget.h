@@ -9,14 +9,15 @@
 #define DOCKSINGLESHWIDGET_H_
 
 #include <QtCore/QVariant>
-#include <QtGui/QDockWidget>
 #include <QtOpenGL/QGLWidget>
+
+#include "fndockwidget.h"
 
 class DataStore;
 class SingleSHWidget;
 class QVBoxLayout;
 
-class DockSingleSHWidget : public QDockWidget
+class DockSingleSHWidget : public FNDockWidget
 {
     Q_OBJECT
 

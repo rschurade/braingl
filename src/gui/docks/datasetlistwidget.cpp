@@ -11,7 +11,7 @@
 #include "datasetlistwidget.h"
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
-	QDockWidget( "Datasets", parent ),
+	FNDockWidget( "Datasets", parent ),
 	m_selected( -1 )
 {
 	setObjectName( "Dataset View Dock" );

@@ -13,7 +13,7 @@
 #include "dockcombinednavglwidget.h"
 
 DockCombinedNavGLWidget::DockCombinedNavGLWidget( DataStore* dataStore, QString name, QWidget* parent, const QGLWidget *shareWidget ) :
-    QDockWidget( name, parent ),
+    FNDockWidget( name, parent ),
     m_name( name )
 {
     setObjectName( QString("nav gl ") + name );

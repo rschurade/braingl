@@ -9,7 +9,7 @@
 #include "datasetpropertywidget.h"
 
 DatasetPropertyWidget::DatasetPropertyWidget( QString name, QWidget* parent ) :
-    QDockWidget( name, parent )
+    FNDockWidget( name, parent )
 {
     setObjectName( name );
 

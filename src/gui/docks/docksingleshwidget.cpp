@@ -14,7 +14,7 @@
 #include "docksingleshwidget.h"
 
 DockSingleSHWidget::DockSingleSHWidget( DataStore* dataStore, QString name, QWidget* parent, const QGLWidget *shareWidget ) :
-    QDockWidget( name, parent ),
+    FNDockWidget( name, parent ),
     m_name( name )
 {
 

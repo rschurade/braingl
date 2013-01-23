@@ -9,8 +9,9 @@
 #define NAVGLWIDGET_H_
 
 #include <QtCore/QVariant>
-#include <QtGui/QDockWidget>
 #include <QtOpenGL/QGLWidget>
+
+#include "fndockwidget.h"
 
 class DataStore;
 class NavGLWidget;
@@ -20,7 +21,7 @@ class QVBoxLayout;
 
 
 
-class DockNavGLWidget : public QDockWidget
+class DockNavGLWidget : public FNDockWidget
 {
     Q_OBJECT
 
@@ -38,11 +39,6 @@ private:
     NavFrame* m_glWidget;
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
-
-    QWidget* m_titleWidget;
-
-public slots:
-    void toggleTitleWidget();
 
 private slots:
     void sliderChanged( int value );

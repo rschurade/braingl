@@ -8,13 +8,13 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
-#include <QtGui/QDockWidget>
+#include "fndockwidget.h"
 
 class DatasetPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
 
-class DatasetPropertyWidget : public QDockWidget
+class DatasetPropertyWidget : public FNDockWidget
 {
     Q_OBJECT
 

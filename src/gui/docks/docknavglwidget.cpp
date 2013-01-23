@@ -17,7 +17,7 @@
 #include "docknavglwidget.h"
 
 DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
-    QDockWidget( name, parent ),
+    FNDockWidget( name, parent ),
     m_dataStore( dataStore ),
     m_name( name )
 {
@@ -56,8 +56,6 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     setContentsMargins( 0, 1, 0, 0 );
 
     connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
-
-    m_titleWidget = new QWidget(); /* where this a QMainWindow object */
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -133,11 +131,4 @@ void DockNavGLWidget::settingChanged()
             m_slider->setMax( m_dataStore->data( mi, Qt::UserRole ).toInt() - 1 );
         }
     }
-}
-
-void DockNavGLWidget::toggleTitleWidget()
-{
-    QWidget* tmp = titleBarWidget();
-    setTitleBarWidget( m_titleWidget );
-    m_titleWidget = tmp;
 }
