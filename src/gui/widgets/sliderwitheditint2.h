@@ -8,13 +8,13 @@
 #ifndef SLIDERWITHEDITINT2_H_
 #define SLIDERWITHEDITINT2_H_
 
-#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 
 class QSlider;
 class QLineEdit;
 class QPushButton;
 
-class SliderWithEditInt2 : public QWidget
+class SliderWithEditInt2 : public QFrame
 {
     Q_OBJECT
 

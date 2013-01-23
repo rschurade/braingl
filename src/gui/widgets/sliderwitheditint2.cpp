@@ -15,7 +15,7 @@
 #include "sliderwitheditint2.h"
 
 SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
-    QWidget( parent )
+    QFrame( parent )
 {
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
@@ -42,8 +42,10 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     layout->addWidget( m_slider );
     layout->addWidget( m_button2 );
     layout->addWidget( m_edit );
+    layout->setContentsMargins( 1,1,1,1 );
 
     setLayout( layout );
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
 }
 
 SliderWithEditInt2::~SliderWithEditInt2()
