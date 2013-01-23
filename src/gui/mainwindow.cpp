@@ -229,6 +229,9 @@ void MainWindow::createActions()
     toggleShaderEditAct = new QAction( QIcon( ":/icons/cat.png" ), tr( "Toggle shader edit" ), this );
     toggleShaderEditAct->setStatusTip( tr( "Toggle the shader edit widget." ) );
     connect( toggleShaderEditAct, SIGNAL( triggered() ), this, SLOT( slotToggleShaderEdit() ) );
+
+    toggleDockTitlesAct = new QAction( tr( "Toggle Dock Titles" ), this );
+    toggleDockTitlesAct->setStatusTip( tr( "Toggle the title widget of all dock widgets" ) );
 }
 
 void MainWindow::createMenus()
@@ -244,6 +247,7 @@ void MainWindow::createMenus()
     editMenu->addAction( undoAct );
 
     viewMenu = menuBar()->addMenu( tr( "&View" ) );
+    viewMenu->addAction( toggleDockTitlesAct );
 
     tabMenu = menuBar()->addMenu( tr( "&Tabs" ) );
     tabMenu->addAction( addTabCombined );
@@ -323,14 +327,17 @@ void MainWindow::createDockWindows()
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav1 );
     viewMenu->addAction( nav1->toggleViewAction() );
+    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav1, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), 0, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav2 );
     viewMenu->addAction( nav2->toggleViewAction() );
+    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav2, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), 1, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
+    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav3, SLOT( toggleTitleWidget() ) );
 
     DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav4 );
