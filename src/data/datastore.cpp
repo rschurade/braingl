@@ -66,7 +66,7 @@ void DataStore::addDataset( Dataset* dataset )
     emit ( dataChanged( index( m_datasetList.size() - 1, 0 ), index( m_datasetList.size() - 1, 0 ) ) );
 }
 
-void DataStore::updateSliceGlobals()
+void DataStore::updateGlobals()
 {
     if ( m_datasetList.size() > 0 )
     {
@@ -397,6 +397,7 @@ QModelIndex DataStore::parent( const QModelIndex & index ) const
 
 void DataStore::moveItemUp( int row )
 {
+    qDebug() << "move up";
     if ( row > 0 && row < m_datasetList.size() )
     {
         beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
@@ -430,16 +431,10 @@ void DataStore::deleteItem( int row )
         beginResetModel();
         reset();
         endResetModel();
-
+        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
         delete toDelete;
         updateGlobals();
-        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
-}
-
-void DataStore::updateGlobals()
-{
-    updateSliceGlobals();
 }
 
 void DataStore::propChanged()

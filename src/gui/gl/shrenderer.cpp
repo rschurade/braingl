@@ -51,6 +51,8 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
 
 SHRenderer::~SHRenderer()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
 }
 
 void SHRenderer::init()

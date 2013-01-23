@@ -20,6 +20,7 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, int numPoints, i
 
 DatasetFibers::~DatasetFibers()
 {
+    m_fibs.clear();
 }
 
 QVector< QVector< float > > DatasetFibers::getFibs()

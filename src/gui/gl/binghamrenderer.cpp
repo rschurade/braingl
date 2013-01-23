@@ -49,6 +49,8 @@ BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int 
 
 BinghamRenderer::~BinghamRenderer()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
 }
 
 void BinghamRenderer::init()
@@ -159,6 +161,7 @@ void BinghamRenderer::initGeometry()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    verts.clear();
 
     const int* faces = tess::faces( lod );
     std::vector<int>indexes;
@@ -176,6 +179,7 @@ void BinghamRenderer::initGeometry()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
+    indexes.clear();
 }
 
 void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )

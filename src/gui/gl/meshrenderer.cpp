@@ -31,6 +31,8 @@ MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
 
 MeshRenderer::~MeshRenderer()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
 }
 
 void MeshRenderer::setMesh( TriangleMesh2* mesh )
