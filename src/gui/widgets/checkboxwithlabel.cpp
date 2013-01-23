@@ -12,12 +12,13 @@
 
 #include "checkboxwithlabel.h"
 
-CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
+CheckboxWithLabel::CheckboxWithLabel( QString label, int id, QWidget* parent ) :
+    QFrame( parent )
 {
     m_id = id;
 
-    m_checkBox = new QCheckBox();
-    m_label = new QLabel( label );
+    m_checkBox = new QCheckBox( this );
+    m_label = new QLabel( label, this );
 
 
     QVBoxLayout* vLayout = new QVBoxLayout();
@@ -36,6 +37,8 @@ CheckboxWithLabel::CheckboxWithLabel( QString label, int id )
     connect( m_checkBox, SIGNAL( stateChanged( int ) ), this, SLOT( slotStateChanged( int ) ) );
 
     setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+    setStyleSheet( "QLabel { font:  bold 12px }" );
 }
 
 

@@ -24,6 +24,7 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     m_edit = new QLineEdit();
     m_edit->setMaxLength( 6 );
     m_edit->setMaximumWidth( 55 );
+    m_edit->setAlignment( Qt::AlignCenter );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
@@ -51,6 +52,11 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     setLayout( vLayout );
 
     setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+    setStyleSheet( "QLabel { font:  bold 12px; margin-bottom: -1px }"
+                     "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; margin-top: -1px } "
+                     "QSlider { max-height: 14px; margin-top: -1px }"
+                     "QLineEdit { font: 12px; max-height: 14px; margin-top: -1px }" );
 }
 
 SliderWithEdit::~SliderWithEdit()
