@@ -14,6 +14,7 @@
 
 class DataStore;
 class NavGLWidget;
+class NavFrame;
 class SliderWithEditInt2;
 class QVBoxLayout;
 
@@ -34,7 +35,7 @@ private:
     DataStore* m_dataStore;
     QString m_name;
 
-    NavGLWidget* m_glWidget;
+    NavFrame* m_glWidget;
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
 

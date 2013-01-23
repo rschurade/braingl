@@ -12,6 +12,7 @@
 
 
 #include "../widgets/navglwidget.h"
+#include "../widgets/navframe.h"
 
 #include "docknavglwidget.h"
 
@@ -22,7 +23,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
 {
     setObjectName( QString("nav gl ") + name );
 
-    m_glWidget = new NavGLWidget( dataStore, name, orient, this, shareWidget );
+    m_glWidget = new NavFrame( dataStore, name, orient, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     this->setAllowedAreas( Qt::AllDockWidgetAreas );
@@ -43,6 +44,8 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     m_layout->addWidget( m_glWidget );
     m_layout->addWidget( m_slider );
     m_layout->addStretch( 0 );
+    m_layout->setContentsMargins( 1, 1, 1, 1 );
+    m_layout->setSpacing( 1 );
 
     panel->setLayout( m_layout );
     setWidget( panel );
@@ -50,6 +53,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     m_glWidget->setMinimumSize( 50, 50 );
 
     settingChanged();
+    setContentsMargins( 0, 0, 0, 0 );
 
     connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
 }
