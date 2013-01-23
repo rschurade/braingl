@@ -35,7 +35,7 @@ DataStore::DataStore()
     m_globalProperties.set( FNGLOBAL_SLICE_DX, 1.0f );
     m_globalProperties.set( FNGLOBAL_SLICE_DY, 1.0f );
     m_globalProperties.set( FNGLOBAL_SLICE_DZ, 1.0f );
-    m_globalProperties.set( FNGLOBAL_LAST_PATH, "" );
+    m_globalProperties.set( FNGLOBAL_LAST_PATH, QString("") );
     m_globalProperties.set( FNGLOBAL_SHOW_AXIAL, true );
     m_globalProperties.set( FNGLOBAL_SHOW_CORONAL, true );
     m_globalProperties.set( FNGLOBAL_SHOW_SAGITTAL, true );

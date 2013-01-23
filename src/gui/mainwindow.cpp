@@ -55,6 +55,7 @@ MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	if ( settings.contains( "lastPath" ) )
 	{
 	    QString lastPath = settings.value( "lastPath" ).toString();
+	    qDebug() << "last path" << lastPath;
 	    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
 	}
