@@ -397,7 +397,6 @@ QModelIndex DataStore::parent( const QModelIndex & index ) const
 
 void DataStore::moveItemUp( int row )
 {
-    qDebug() << "move up";
     if ( row > 0 && row < m_datasetList.size() )
     {
         beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );

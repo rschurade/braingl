@@ -99,9 +99,10 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
 {
     m_selected = selected;
 
-    updateWidgetVisibility();
-
-
+    if ( m_selected.indexes().size() > 0 )
+    {
+        updateWidgetVisibility();
+    }
 }
 
 void DatasetPropertyView::updateWidgetVisibility()
