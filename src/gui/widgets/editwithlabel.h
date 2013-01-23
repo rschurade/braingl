@@ -19,7 +19,7 @@ class EditWithLabel  : public QFrame
     Q_OBJECT
 
 public:
-    EditWithLabel(  QString label, int id = 0 );
+    EditWithLabel(  QString label, int id = 0, QWidget* parent = 0 );
     virtual ~EditWithLabel();
 
     void setText( QString text );

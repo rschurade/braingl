@@ -17,20 +17,21 @@
 SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     QFrame( parent )
 {
-    m_slider = new QSlider();
+    m_slider = new QSlider( this );
     m_slider->setOrientation( Qt::Horizontal );
 
-    m_edit = new QLineEdit();
+    m_edit = new QLineEdit( this );
     m_edit->setMaxLength( 3 );
     m_edit->setMaximumWidth( 35 );
+    m_edit->setAlignment( Qt::AlignCenter );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
 
-    m_button1 = new QPushButton( tr(" - ") );
+    m_button1 = new QPushButton( tr(" - "), this );
     QFontMetrics _metrics( m_button1->fontMetrics() );
     m_button1->setMaximumWidth( _metrics.boundingRect("  -  ").width() );
-    m_button2 = new QPushButton( tr(" + ") );
+    m_button2 = new QPushButton( tr(" + "), this );
     m_button2->setMaximumWidth( _metrics.boundingRect("  +  ").width() );
 
     connect( m_button1, SIGNAL( clicked() ), this, SLOT( minusPressed() ) );
@@ -46,6 +47,10 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
 
     setLayout( layout );
     setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+    setStyleSheet( "QPushButton { font:  bold 10px; max-width: 12px; max-height: 12px; } "
+                     "QLineEdit { font: bold 10px; max-height: 12px }"
+                     "QSlider { max-height: 12px }");
 }
 
 SliderWithEditInt2::~SliderWithEditInt2()
