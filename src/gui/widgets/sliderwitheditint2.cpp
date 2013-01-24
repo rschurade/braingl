@@ -48,9 +48,10 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     setLayout( layout );
     setFrameStyle( QFrame::Panel | QFrame::Raised );
 
-    setStyleSheet( "QPushButton { font:  bold 10px; max-width: 12px; max-height: 12px; } "
-                     "QLineEdit { font: bold 10px; max-height: 12px }"
-                     "QSlider { max-height: 12px }");
+    setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } "
+                   "QLineEdit { font: 12px; max-height: 14px }"
+                   "QSlider { max-height: 14px }"
+                   "QLabel { font:  bold 12px; }" );
 }
 
 SliderWithEditInt2::~SliderWithEditInt2()
