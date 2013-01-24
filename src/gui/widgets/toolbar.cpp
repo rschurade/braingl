@@ -75,9 +75,13 @@ void ToolBar::createActions()
     m_binghamAction->setStatusTip( tr( "fit bingham distribution" ) );
     connect( m_binghamAction, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 
-    m_fiberAction1 = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "Fiber 1" ), this, FNALGO_TENSOR_TRACK );
-    m_fiberAction1->setStatusTip( tr( "Fiber Action 1" ) );
-    connect( m_fiberAction1, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    m_fiberTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking" ), this, FNALGO_TENSOR_TRACK );
+    m_fiberTrackingAct->setStatusTip( tr( "tensor tracking" ) );
+    connect( m_fiberTrackingAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+
+    m_fiberThinningAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "fiber thinning" ), this, FNALGO_FIBER_THINNING );
+    m_fiberThinningAct->setStatusTip( tr( "fiber thinning" ) );
+    connect( m_fiberThinningAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 
     m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, FNALGO_BINGHAM_2_TENSOR );
     m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
@@ -109,7 +113,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_faAct );
             this->addAction( m_evAct );
-            this->addAction( m_fiberAction1 );
+            this->addAction( m_fiberTrackingAct );
             break;
         }
         case FNDT_NIFTI_SH:
@@ -130,6 +134,11 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_NIFTI_BINGHAM:
         {
             this->addAction( m_bingham2tensorAction );
+            break;
+        }
+        case FNDT_FIBERS:
+        {
+            this->addAction( m_fiberThinningAct );
             break;
         }
         default:

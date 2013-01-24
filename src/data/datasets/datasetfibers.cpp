@@ -18,6 +18,21 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, int numPoints, i
     m_properties.set( FNPROP_NUM_LINES, numLines );
 }
 
+DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
+    Dataset( QString("fibers"), FNDT_FIBERS ),
+    m_fibs( fibs ),
+    m_renderer( 0 )
+{
+    int numPoints = 0;
+    for ( int i = 0; i < fibs.size(); ++i )
+    {
+        numPoints += fibs[i].size();
+    }
+    m_properties.set( FNPROP_NUM_POINTS, numPoints );
+    m_properties.set( FNPROP_NUM_LINES, fibs.size() );
+}
+
+
 DatasetFibers::~DatasetFibers()
 {
     m_fibs.clear();

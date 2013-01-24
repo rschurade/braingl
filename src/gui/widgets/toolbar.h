@@ -40,7 +40,8 @@ private:
     FNAction* m_faAct;
     FNAction* m_evAct;
     FNAction* m_meshAction1;
-    FNAction* m_fiberAction1;
+    FNAction* m_fiberTrackingAct;
+    FNAction* m_fiberThinningAct;
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
 
