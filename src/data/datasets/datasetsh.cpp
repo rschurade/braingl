@@ -23,6 +23,7 @@ DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image
 DatasetSH::~DatasetSH()
 {
     m_data->clear();
+    delete m_data;
 }
 
 void DatasetSH::examineDataset()

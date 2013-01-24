@@ -13,6 +13,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
+#include "datasets/datasetfibers.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
@@ -20,6 +21,7 @@
 
 #include "dwialgos.h"
 #include "scalaralgos.h"
+#include "fiberalgos.h"
 
 #include "datastore.h"
 
@@ -286,6 +288,16 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 {
                     QList<Dataset*> isos = ScalarAlgos::isoSurface( dynamic_cast<DatasetScalar*>( ds ) );
                     addDataset( isos[0] );
+                }
+                break;
+            }
+            case FNALGO_FIBER_THINNING:
+            {
+                Dataset* ds = m_datasetList.at( index.row() );
+                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_FIBERS )
+                {
+                    QList<Dataset*> fibs = FiberAlgos::thinOut( dynamic_cast<DatasetFibers*>( ds ) );
+                    addDataset( fibs[0] );
                 }
                 break;
             }
