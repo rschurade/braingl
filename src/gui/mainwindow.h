@@ -45,6 +45,8 @@ private slots:
     void slotStandardSagittalView();
     void slotToggleShaderEdit();
 
+    void slotToggleDockTitles();
+
 private:
     void createActions();
     void createMenus();
@@ -55,13 +57,11 @@ private:
     DataStore* m_dataStore;
 
     bool m_debug;
+    bool m_showDockTitles;
 
     GLWidget* mainGLWidget;
-
     DatasetListWidget* m_datasetWidget;
-
     QTabWidget* m_centralTabWidget;
-
     ShaderEditWidget* m_shaderEditWidget;
 
     QMenu* fileMenu;
@@ -69,9 +69,11 @@ private:
     QMenu* viewMenu;
     QMenu* tabMenu;
     QMenu* helpMenu;
+
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
     ToolBar* m_toolsToolBar;
+
     QAction* newLetterAct;
     QAction* openAct;
     QAction* saveAct;
