@@ -62,7 +62,7 @@ void NavRendererSagittal::adjustRatios()
 
 void NavRendererSagittal::leftMouseDown( int x, int y )
 {
-    float xf = static_cast<float>( m_width - x );
+    float xf = static_cast<float>( x );
     float yf = static_cast<float>( m_height - y );
 
     QVector4D test;
@@ -76,6 +76,7 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
     int xout = out.x() / m_yd;
     int yout = out.y() / m_zd;
 
+    xout = ( m_yb - 1 ) - xout;
     xout = qMax( 0, qMin( xout, static_cast<int>( m_yb - 1.0 ) ) );
     yout = qMax( 0, qMin( yout, static_cast<int>( m_zb - 1.0 ) ) );
 
