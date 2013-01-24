@@ -76,6 +76,7 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
     out->properties()->set( FNPROP_SCALING, 1.0f );
     out->properties()->set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
     out->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties()->set( FNPROP_MINMAX_SCALING, true );
 
     qDebug() << "finished calculating qBall";
 
@@ -98,6 +99,7 @@ DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
     out->properties()->set( FNPROP_SCALING, 1.0f );
     out->properties()->set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
     out->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
+    out->properties()->set( FNPROP_MINMAX_SCALING, true );
 
     qDebug() << "finished calculating qBall";
 

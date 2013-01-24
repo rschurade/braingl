@@ -15,6 +15,7 @@ DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image
 {
     m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
     m_properties.set( FNPROP_SCALING, 1.0f, 0.0f, 2.0f, true );
+    m_properties.set( FNPROP_LOD, 0, -2, 2, true );
 
     examineDataset();
 }
