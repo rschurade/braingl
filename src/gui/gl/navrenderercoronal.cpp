@@ -77,8 +77,8 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
     int xout = out.x() / m_xd;
     int yout = out.y() / m_zd;
 
-    xout = qMax( 0, qMin( xout, static_cast<int>( m_xb ) ) );
-    yout = qMax( 0, qMin( yout, static_cast<int>( m_zb ) ) );
+    xout = qMax( 0, qMin( xout, static_cast<int>( m_xb - 1.0 ) ) );
+    yout = qMax( 0, qMin( yout, static_cast<int>( m_zb - 1.0 ) ) );
 
     QModelIndex mi;
     QPoint p( xout, yout );
