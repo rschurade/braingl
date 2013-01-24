@@ -62,7 +62,6 @@ MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	}
 	if ( settings.contains( "showDockTitles") )
 	{
-	    qDebug() << m_showDockTitles;
 	    if ( !settings.value( "showDockTitles" ).toBool() )
 	    {
 	        toggleDockTitlesAct->activate( QAction::Trigger );
@@ -78,7 +77,6 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	settings.setValue( "mainWindowState", saveState() );
 	QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
-	qDebug() << "destructor" << m_showDockTitles;
 	settings.setValue( "showDockTitles", m_showDockTitles );
 }
 
@@ -451,5 +449,4 @@ void MainWindow::slotToggleShaderEdit()
 void MainWindow::slotToggleDockTitles()
 {
     m_showDockTitles = !m_showDockTitles;
-    qDebug() << "slot" << m_showDockTitles;
 }

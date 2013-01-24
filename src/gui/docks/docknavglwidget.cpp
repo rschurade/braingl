@@ -53,7 +53,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     m_glWidget->setMinimumSize( 50, 50 );
 
     settingChanged();
-    setContentsMargins( 0, 1, 0, 0 );
+    setContentsMargins( 1, 1, 1, 1 );
 
     connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
 }

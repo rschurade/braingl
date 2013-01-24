@@ -23,7 +23,7 @@ NavFrame::NavFrame( DataStore* dataStore, QString name, int orient, QWidget *par
 
     setLayout( layout );
 
-    setFrameStyle( QFrame::Panel | QFrame::Raised );
+    setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
 
 }
 
