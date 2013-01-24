@@ -76,8 +76,8 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
     int xout = out.x() / m_yd;
     int yout = out.y() / m_zd;
 
-    xout = qMax( 0, qMin( xout, static_cast<int>( m_yb ) ) );
-    yout = qMax( 0, qMin( yout, static_cast<int>( m_zb ) ) );
+    xout = qMax( 0, qMin( xout, static_cast<int>( m_yb - 1.0 ) ) );
+    yout = qMax( 0, qMin( yout, static_cast<int>( m_zb - 1.0 ) ) );
 
     QModelIndex mi;
     QPoint p( xout, yout );
