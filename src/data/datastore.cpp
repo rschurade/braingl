@@ -312,6 +312,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 break;
             }
         }
+        return true;
     }
 
     if ( role == Qt::UserRole )

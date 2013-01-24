@@ -82,7 +82,7 @@ void DatasetTensor::examineDataset()
     m_properties.set( FNPROP_LOWER_THRESHOLD, m_properties.get( FNPROP_MIN ).toFloat() );
     m_properties.set( FNPROP_UPPER_THRESHOLD, m_properties.get( FNPROP_MAX ).toFloat() );
 
-   m_properties.set( FNPROP_RENDER_SLICE, 1 );
+    m_properties.set( FNPROP_RENDER_SLICE, 1 );
     m_properties.set( FNPROP_SCALING, 1.0f );
     m_properties.set( FNPROP_DIM, 9 );
 
