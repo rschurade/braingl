@@ -153,6 +153,24 @@ void PropertyGroup::set( FN_PROPERTY name, QString value, bool visible )
     }
 }
 
+void PropertyGroup::set( FN_PROPERTY name, const char* value, bool visible )
+{
+    if ( m_properties.contains( name ) )
+    {
+        m_properties[name]->setValue( QString( value ) );
+    }
+    else
+    {
+        PropertyString* prop = new PropertyString( name, QString( value ) );
+        m_properties[name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+}
+
 QList<FN_PROPERTY> PropertyGroup::getVisible()
 {
     return m_visible;
