@@ -16,8 +16,18 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 {
 	setObjectName( "Dataset View Dock" );
 
-	m_listView = new DatasetListView( this );
+	QFrame* frame = new QFrame( this );
+
+	QVBoxLayout* layout = new QVBoxLayout();
+
+	m_listView = new DatasetListView( frame );
 	m_listView->setToolTip( QString( "datasets" ) );
+	m_listView->setStyleSheet( "border: none" );
+
+    layout->addWidget( m_listView );
+    layout->setContentsMargins( 0, 0, 0, 0 );
+    frame->setLayout( layout );
+    frame->setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
 
 	this->setAllowedAreas( Qt::AllDockWidgetAreas );
 	this->setFeatures( QDockWidget::AllDockWidgetFeatures );
@@ -46,9 +56,9 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 
 	buttonLayout->setContentsMargins( 0, 0, 0, 0 );
 
-	m_layout->addWidget( m_listView );
+	m_layout->addWidget( frame );
 	m_layout->addLayout( buttonLayout );
-	m_layout->setContentsMargins( 1, 0, 1, 0 );
+	m_layout->setContentsMargins( 1, 1, 1, 1 );
 
 	panel->setLayout( m_layout );
 	setWidget( panel );
