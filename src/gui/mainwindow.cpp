@@ -23,7 +23,8 @@
 MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
-    m_debug( debug )
+    m_debug( debug ),
+    m_showDockTitles( true )
 {
 	m_centralTabWidget = new QTabWidget( this );
 	setCentralWidget( m_centralTabWidget );
@@ -59,7 +60,15 @@ MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
 	}
+	if ( settings.contains( "showDockTitles") )
+	{
+	    qDebug() << m_showDockTitles;
+	    if ( !settings.value( "showDockTitles" ).toBool() )
+	    {
+	        toggleDockTitlesAct->activate( QAction::Trigger );
 
+	    }
+	}
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -69,6 +78,8 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	settings.setValue( "mainWindowState", saveState() );
 	QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
+	qDebug() << "destructor" << m_showDockTitles;
+	settings.setValue( "showDockTitles", m_showDockTitles );
 }
 
 void MainWindow::print()
@@ -232,6 +243,7 @@ void MainWindow::createActions()
 
     toggleDockTitlesAct = new QAction( tr( "Toggle Dock Titles" ), this );
     toggleDockTitlesAct->setStatusTip( tr( "Toggle the title widget of all dock widgets" ) );
+    connect( toggleDockTitlesAct, SIGNAL( triggered() ), this, SLOT( slotToggleDockTitles() ) );
 }
 
 void MainWindow::createMenus()
@@ -434,4 +446,10 @@ void MainWindow::slotToggleShaderEdit()
     m_shaderEditWidget = new ShaderEditWidget( this );
     m_centralTabWidget->addTab( m_shaderEditWidget, "shader edit" );
     m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
+}
+
+void MainWindow::slotToggleDockTitles()
+{
+    m_showDockTitles = !m_showDockTitles;
+    qDebug() << "slot" << m_showDockTitles;
 }
