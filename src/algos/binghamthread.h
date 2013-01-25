@@ -23,7 +23,7 @@ public:
     BinghamThread( DatasetSH* ds, int lod, int id );
     virtual ~BinghamThread();
 
-    QVector<QVector<float> >* getResultVector();
+    QVector<QVector<float> > getResultVector();
 
 private:
     void run();
@@ -41,7 +41,7 @@ private:
 
     int m_id;
 
-    QVector<QVector<float> >* m_resultVector;
+    QVector<QVector<float> > m_resultVector;
 };
 
 #endif /* BINGHAMTHREAD_H_ */
