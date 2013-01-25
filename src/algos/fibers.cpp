@@ -26,18 +26,21 @@ DatasetFibers* Fibers::thinOut()
     bool currentMerged = false;
     int iteration = 1;
     QVector< QVector< float > > fibs = m_dataset->getFibs();
-
     QVector< QVector< float > > mergedFibs;
+    QVector< QVector< float > > unmergedFibs;
 
     while ( merged )
     {
         qDebug() << "iteration:" << iteration;
         ++iteration;
         qDebug() << fibs.size() << "fibers before merging";
+
         merged = false;
+        QVector<bool>processed( fibs.size(), false );
+
         for ( int i = 0; i < fibs.size(); ++i )
         {
-            if ( i % 1000 == 0 ) qDebug() << i << fibs.size() << mergedFibs.size();
+            if ( i % 1000 == 0 ) qDebug() << i << fibs.size() << mergedFibs.size() << unmergedFibs.size();
             currentMerged = false;
             QVector< float > currentFib = fibs[ i ];
             for( int k = i + 1; k < fibs.size(); ++k )
@@ -50,21 +53,21 @@ DatasetFibers* Fibers::thinOut()
                         mergedFibs.push_back( mergeFibs( currentFib, fibs[k]) );
                         merged = true;
                         currentMerged = true;
-                        fibs.remove( k );
+                        processed[k] = true;
                         break;
                     }
                 }
             }
-            if ( !currentMerged )
+            if ( !currentMerged && !processed[i] )
             {
-                mergedFibs.push_back( currentFib );
+                unmergedFibs.push_back( currentFib );
             }
         }
         fibs = mergedFibs;
         mergedFibs.clear();
-        qDebug() << fibs.size() << "fibers after merging";
+        qDebug() << fibs.size() + unmergedFibs.size() << "fibers after merging";
     }
-    return new DatasetFibers( fibs );
+    return new DatasetFibers( fibs + unmergedFibs );
 }
 
 QVector<float> Fibers::mergeFibs( QVector< float >& lhs, QVector< float >& rhs )
