@@ -10,7 +10,7 @@
 
 #include "datasetbingham.h"
 
-DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> >* data, nifti_image* header ) :
+DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_BINGHAM, header ),
     m_data( data ),
     m_renderer( 0 )
@@ -28,12 +28,11 @@ DatasetBingham::~DatasetBingham()
 {
     m_properties.set( FNPROP_ACTIVE, false );
     delete m_renderer;
-    delete m_data;
 }
 
 QVector<QVector<float> >* DatasetBingham::getData()
 {
-    return m_data;
+    return &m_data;
 }
 
 void DatasetBingham::examineDataset()
@@ -42,7 +41,7 @@ void DatasetBingham::examineDataset()
     int nx = m_properties.get( FNPROP_NX ).toInt();
     int ny = m_properties.get( FNPROP_NY ).toInt();
     int nz = m_properties.get( FNPROP_NZ ).toInt();
-    int dim = m_data->at( 0 ).size();
+    int dim = m_data.at( 0 ).size();
     m_properties.set( FNPROP_DIM, dim );
     int size = nx * ny * nz * dim;
 
@@ -73,7 +72,7 @@ void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Dat
     if ( m_renderer == 0 )
     {
         qDebug() << "ds bingham init renderer";
-        m_renderer = new BinghamRenderer( m_data, m_properties.get( FNPROP_NX ).toInt(),
+        m_renderer = new BinghamRenderer( &m_data, m_properties.get( FNPROP_NX ).toInt(),
                                                   m_properties.get( FNPROP_NY ).toInt(),
                                                   m_properties.get( FNPROP_NZ ).toInt(),
                                                   m_properties.get( FNPROP_DX ).toFloat(),
@@ -98,7 +97,7 @@ QString DatasetBingham::getValueAsString( int x, int y, int z )
 {
     int nx = m_properties.get( FNPROP_NX ).toInt();
     int ny = m_properties.get( FNPROP_NY ).toInt();
-    QVector<float> data = m_data->at( x + y * nx + z * nx * ny );
+    QVector<float> data = m_data.at( x + y * nx + z * nx * ny );
     return QString::number( data[0] ) + ", " + QString::number( data[1] ) + ", " + QString::number( data[2] ) + ", " + QString::number( data[3] ) +
      ", " + QString::number( data[4] ) + ", " + QString::number( data[5] ) + ", " + QString::number( data[6] ) + ", " + QString::number( data[7] ) +
      ", " + QString::number( data[8] );

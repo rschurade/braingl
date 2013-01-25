@@ -223,6 +223,9 @@ QString Property::getNameAsString( FN_PROPERTY name )
         case FNGLOBAL_VIEW:
             return "view";
             break;
+        case FNSETTING_LOCK_WIDGETS:
+            return "lock widgets";
+            break;
         default:
             return "no string set for property";
             break;

@@ -20,7 +20,7 @@ class SHRenderer;
 class DatasetSH: public DatasetNifti
 {
 public:
-    DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header );
+    DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image* header );
     virtual ~DatasetSH();
 
     QVector<ColumnVector>* getData();
@@ -34,7 +34,7 @@ private:
 
     void flipX();
 
-    QVector<ColumnVector>* m_data;
+    QVector<ColumnVector> m_data;
 
     SHRenderer* m_renderer;
 };

@@ -686,11 +686,11 @@ void FMath::evec1( QVector<Matrix>* tensors, QVector<QVector3D>& evec1 )
     }
 }
 
-void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
+void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
                                                QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                QVector<QVector3D>& evec3, QVector<float>& eval3 )
 {
-    int blockSize = tensors->size();
+    int blockSize = tensors.size();
 
     evec1.resize( blockSize );
     evec2.resize( blockSize );
@@ -705,12 +705,12 @@ void FMath::evecs( QVector<Matrix>* tensors, QVector<QVector3D>& evec1, QVector<
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        xx = tensors->at( i )( 1, 1 );
-        xy = tensors->at( i )( 1, 2 );
-        xz = tensors->at( i )( 1, 3 );
-        yy = tensors->at( i )( 2, 2 );
-        yz = tensors->at( i )( 2, 3 );
-        zz = tensors->at( i )( 3, 3 );
+        xx = tensors.at( i )( 1, 1 );
+        xy = tensors.at( i )( 1, 2 );
+        xz = tensors.at( i )( 1, 3 );
+        yy = tensors.at( i )( 2, 2 );
+        yz = tensors.at( i )( 2, 3 );
+        zz = tensors.at( i )( 3, 3 );
 
         // three invariants of D (dt)
         // i1=l1+l2+l3 (trace)

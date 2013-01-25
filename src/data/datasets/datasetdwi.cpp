@@ -8,7 +8,7 @@
 
 #include "datasetdwi.h"
 
-DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
+DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
     examineDataset();
@@ -16,7 +16,7 @@ DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<f
 
 DatasetDWI::~DatasetDWI()
 {
-    m_data->clear();
+    m_data.clear();
     m_b0Data.clear();
     m_bvals.clear();
     m_bvecs.clear();
@@ -24,7 +24,7 @@ DatasetDWI::~DatasetDWI()
 
 QVector<ColumnVector>* DatasetDWI::getData()
 {
-    return m_data;
+    return &m_data;
 }
 
 QVector<float>* DatasetDWI::getB0Data()
@@ -50,7 +50,7 @@ void DatasetDWI::examineDataset()
     int nz = m_properties.get( FNPROP_NZ ).toInt();
 
 
-    int dim = m_data->at( 0 ).Nrows();
+    int dim = m_data.at( 0 ).Nrows();
     m_properties.set( FNPROP_DIM, dim );
     int size = nx * ny * nz * dim;
 

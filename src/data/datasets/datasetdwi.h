@@ -18,7 +18,7 @@
 class DatasetDWI: public DatasetNifti
 {
 public:
-    DatasetDWI( QString filename, QVector<ColumnVector>* data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
 
     QVector<ColumnVector>* getData();
@@ -38,7 +38,7 @@ private:
 
     void flipX();
 
-    QVector<ColumnVector>* m_data;
+    QVector<ColumnVector> m_data;
     QVector<float> m_b0Data;
     QVector<float> m_bvals;
     QVector<QVector3D> m_bvecs;

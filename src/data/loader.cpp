@@ -329,7 +329,8 @@ bool Loader::loadNiftiTensor( QString fileName )
     int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     int dim = m_header->dim[4];
 
-    QVector<Matrix>* dataVector = new QVector<Matrix>();
+    QVector<Matrix> dataVector;
+    dataVector.reserve( blockSize );
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -358,7 +359,7 @@ bool Loader::loadNiftiTensor( QString fileName )
                 m( 3, 2 ) = v( 5 );
                 m( 3, 3 ) = v( 6 );
 
-                dataVector->push_back( m );
+                dataVector.push_back( m );
             }
             nifti_image_free( filedata );
 
@@ -392,7 +393,8 @@ bool Loader::loadNiftiQBall( QString fileName )
         order = 8;
     }
 
-    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+    QVector<ColumnVector> dataVector;
+    dataVector.reserve( blockSize );
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -410,7 +412,7 @@ bool Loader::loadNiftiQBall( QString fileName )
                 {
                     v( j + 1 ) = inputData[j * blockSize + i];
                 }
-                dataVector->push_back( v );
+                dataVector.push_back( v );
             }
             nifti_image_free( filedata );
 
@@ -437,7 +439,8 @@ bool Loader::loadNiftiBingham( QString fileName )
     int blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
     int dim = m_header->dim[4];
 
-    QVector<QVector<float> >* dataVector = new QVector<QVector<float> >();
+    QVector<QVector<float> > dataVector;
+    dataVector.reserve( blockSize );
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -455,7 +458,7 @@ bool Loader::loadNiftiBingham( QString fileName )
                 {
                     v[j] = inputData[j * blockSize + i];
                 }
-                dataVector->push_back( v );
+                dataVector.push_back( v );
             }
             nifti_image_free( filedata );
 
@@ -521,7 +524,7 @@ bool Loader::loadNiftiDWI( QString fileName )
         return false;
     }
 
-    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+    QVector<ColumnVector> dataVector;
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -538,7 +541,7 @@ bool Loader::loadNiftiDWI( QString fileName )
 
             qDebug() << "extract data ";
 
-            dataVector->reserve( blockSize );
+            dataVector.reserve( blockSize );
             if ( m_header->qto_xyz.m[0][0] < 0 || m_header->sto_xyz.m[0][0] < 0 )
             {
                 qDebug() << fileName << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
@@ -563,7 +566,7 @@ bool Loader::loadNiftiDWI( QString fileName )
                                             / numB0;
                                 }
                             }
-                            dataVector->push_back( v );
+                            dataVector.push_back( v );
                         }
                     }
                 }
@@ -604,7 +607,7 @@ bool Loader::loadNiftiDWI( QString fileName )
                                     b0data[x + y * dimX + z * dimX * dimY] += inputData[j * blockSize + x + y * dimX + z * dimX * dimY] / numB0;
                                 }
                             }
-                            dataVector->push_back( v );
+                            dataVector.push_back( v );
                         }
                     }
                 }
@@ -649,7 +652,7 @@ bool Loader::loadNiftiDWI_FNAV2( QString fileName )
 
     qDebug() << "num data:" << dim;
 
-    QVector<ColumnVector>* dataVector = new QVector<ColumnVector>();
+    QVector<ColumnVector> dataVector;
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -671,7 +674,7 @@ bool Loader::loadNiftiDWI_FNAV2( QString fileName )
                 b0data[i] = inputData[i];
             }
 
-            dataVector->reserve( blockSize );
+            dataVector.reserve( blockSize );
 
             for ( int z = 0; z < dimZ; ++z )
             {
@@ -684,7 +687,7 @@ bool Loader::loadNiftiDWI_FNAV2( QString fileName )
                         {
                             v( j ) = inputData[j * blockSize + x + y * dimX + z * dimX * dimY];
                         }
-                        dataVector->push_back( v );
+                        dataVector.push_back( v );
                     }
                 }
             }
