@@ -143,7 +143,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 
     if ( maxima.size() > 2 )
     {
-        Sorts::quickSort( &maxima, &qfRadius, 0, maxima.size() - 1 );
+        Sorts::quickSort( maxima, qfRadius, 0, maxima.size() - 1 );
     }
 
 //    qDebug() << "found the following maxima:";
@@ -198,7 +198,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         }
 
         // sort maxima biggest radi first
-        Sorts::quickSort( &gv, &qfRadius, 0, gv.size() - 1 );
+        Sorts::quickSort( gv, qfRadius, 0, gv.size() - 1 );
 
 //        qDebug() << "=================================================";
 //        for ( int i = 0; i < gv.size(); ++i )
