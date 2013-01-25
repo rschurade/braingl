@@ -85,7 +85,8 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
 
 DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
 {
-    QVector<ColumnVector> qBallVector = *( QBall::sharpQBall( ds, order ) );
+    QVector<ColumnVector> qBallVector;
+    QBall::sharpQBall( ds, order, qBallVector );
     qDebug() << "create dataset";
     DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
     out->properties()->set( FNPROP_FILENAME, "Q-Ball" );
