@@ -479,7 +479,7 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float>* b0Images, QVector<QVector3D> bvecs, QVector<float> bvals )
+QVector<Matrix> FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals )
 {
     int N = bvecs.size();
 
@@ -515,14 +515,15 @@ QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float>*
     double si = 0.0;
     vector<double> log_s0_si_pixel( N );
 
-    QVector<Matrix>* tensors = new QVector<Matrix>();
+    QVector<Matrix> tensors;
+    tensors.reserve( data.size() );
 
     Matrix blank( 3, 3 );
     blank = 0.0;
 
-    for ( int i = 0; i < data->size(); ++i )
+    for ( int i = 0; i < data.size(); ++i )
     {
-        s0 = b0Images->at( i );
+        s0 = b0Images.at( i );
 
         if ( s0 > 0 )
         {
@@ -530,7 +531,7 @@ QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float>*
             s0 = log( s0 );
             for ( int j = 0; j < N; ++j )
             {
-                si = data->at( i )( j + 1 ); //dti[j*blockSize+i];
+                si = data.at( i )( j + 1 ); //dti[j*blockSize+i];
                 if ( si > 0 )
                 {
                     si = log( si );
@@ -565,20 +566,20 @@ QVector<Matrix>* FMath::fitTensors( QVector<ColumnVector>* data, QVector<float>*
             m( 3, 2 ) = t( 5 );
             m( 3, 3 ) = t( 6 );
 
-            tensors->push_back( m );
+            tensors.push_back( m );
         } // end if s0 > 0
         else
         {
-            tensors->push_back( blank );
+            tensors.push_back( blank );
         }
     }
 
     return tensors;
 }
 
-void FMath::fa( QVector<Matrix>* tensors, QVector<float>& faOut )
+void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
 {
-    int blockSize = tensors->size();
+    int blockSize = tensors.size();
 
     faOut.resize( blockSize );
 
@@ -586,9 +587,9 @@ void FMath::fa( QVector<Matrix>* tensors, QVector<float>& faOut )
     float value = 0;
     for ( int i = 0; i < blockSize; ++i )
     {
-        value = tensors->at( i )( 1, 1 );
-        value += tensors->at( i )( 2, 2 );
-        value += tensors->at( i )( 3, 3 );
+        value = tensors.at( i )( 1, 1 );
+        value += tensors.at( i )( 2, 2 );
+        value += tensors.at( i )( 3, 3 );
         trace[i] = value / 3.0;
     }
 
@@ -598,12 +599,12 @@ void FMath::fa( QVector<Matrix>* tensors, QVector<float>& faOut )
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        xx = tensors->at( i )( 1, 1 );
-        xy = tensors->at( i )( 1, 2 );
-        xz = tensors->at( i )( 1, 3 );
-        yy = tensors->at( i )( 2, 2 );
-        yz = tensors->at( i )( 2, 3 );
-        zz = tensors->at( i )( 3, 3 );
+        xx = tensors.at( i )( 1, 1 );
+        xy = tensors.at( i )( 1, 2 );
+        xz = tensors.at( i )( 1, 3 );
+        yy = tensors.at( i )( 2, 2 );
+        yz = tensors.at( i )( 2, 3 );
+        zz = tensors.at( i )( 3, 3 );
         tr = trace[i];
 
         AA = pow2( xx - tr ) + pow2( yy - tr ) + pow2( zz - tr ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
