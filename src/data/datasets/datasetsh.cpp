@@ -10,7 +10,7 @@
 
 #include "datasetsh.h"
 
-DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image* header ) :
+DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties.set( FNPROP_OFFSET, 0.0f, -0.5f, 0.5f, true );
@@ -22,8 +22,7 @@ DatasetSH::DatasetSH( QString filename, QVector<ColumnVector>* data, nifti_image
 
 DatasetSH::~DatasetSH()
 {
-    m_data->clear();
-    delete m_data;
+    m_data.clear();
 }
 
 void DatasetSH::examineDataset()
@@ -32,7 +31,7 @@ void DatasetSH::examineDataset()
     int ny = m_properties.get( FNPROP_NY ).toInt();
     int nz = m_properties.get( FNPROP_NZ ).toInt();
     int size = nx * ny * nz;
-    int dim = m_data->at( 0 ).Nrows();
+    int dim = m_data.at( 0 ).Nrows();
 
     m_properties.set( FNPROP_SIZE, static_cast<int>( dim * size * sizeof(float) ) );
 
@@ -60,7 +59,7 @@ void DatasetSH::examineDataset()
 
     for ( int i = 0; i < size; ++i )
     {
-        ColumnVector d = m_data->at( i );
+        ColumnVector d = m_data.at( i );
         for ( int j = 1; j < dim + 1; ++j )
         {
             min = qMin( min, (float) d( j ) );
@@ -78,7 +77,7 @@ void DatasetSH::createTexture()
 
 QVector<ColumnVector>* DatasetSH::getData()
 {
-    return m_data;
+    return &m_data;
 }
 
 void DatasetSH::flipX()
@@ -87,7 +86,7 @@ void DatasetSH::flipX()
     int yDim = m_properties.get( FNPROP_NY ).toInt();
     int zDim = m_properties.get( FNPROP_NZ ).toInt();
 
-    QVector<ColumnVector>* newData = new QVector<ColumnVector>();
+    QVector<ColumnVector> newData;
 
     for ( int z = 0; z < zDim; ++z )
     {
@@ -95,7 +94,7 @@ void DatasetSH::flipX()
         {
             for ( int x = xDim - 1; x >= 0; --x )
             {
-                newData->push_back( m_data->at( x + y * xDim + z * xDim * yDim ) );
+                newData.push_back( m_data.at( x + y * xDim + z * xDim * yDim ) );
             }
         }
     }
@@ -105,7 +104,7 @@ void DatasetSH::flipX()
     m_header->qto_xyz.m[0][3] = 0.0;
     m_header->sto_xyz.m[0][3] = 0.0;
 
-    m_data->clear();
+    m_data.clear();
     m_data = newData;
 }
 
@@ -113,7 +112,7 @@ void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
+        m_renderer = new SHRenderer( &m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
                 m_properties.get( FNPROP_DX ).toFloat(), m_properties.get( FNPROP_DY ).toFloat(), m_properties.get( FNPROP_DZ ).toFloat() );
         m_renderer->setModel( dataStore );
         m_renderer->init();

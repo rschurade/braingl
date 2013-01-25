@@ -21,8 +21,8 @@ class TensorRendererEV;
 class DatasetTensor: public DatasetNifti
 {
 public:
-    DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header );
-    DatasetTensor( QString filename, QVector<QVector<float> >* data, nifti_image* header );
+    DatasetTensor( QString filename, QVector<Matrix> data, nifti_image* header );
+    DatasetTensor( QString filename, QVector<QVector<float> > data, nifti_image* header );
     virtual ~DatasetTensor();
 
     QVector<Matrix>* getData();
@@ -39,8 +39,8 @@ private:
 
     void flipX();
 
-    QVector<Matrix>* m_data;
-    QVector<Matrix>* m_logData;
+    QVector<Matrix> m_data;
+    QVector<Matrix> m_logData;
 
     TensorRenderer* m_renderer;
     TensorRendererEV* m_rendererEV;

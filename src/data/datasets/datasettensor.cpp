@@ -13,7 +13,7 @@
 
 #include "datasettensor.h"
 
-DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_image* header ) :
+DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
     m_data( data ),
     m_logData( 0 ),
@@ -31,26 +31,24 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix>* data, nifti_ima
     examineDataset();
 }
 
-DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> >* data, nifti_image* header ) :
+DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> > data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
 {
-    QVector<Matrix>* mData = new QVector<Matrix>();
-    for ( int i = 0; i < data->size(); ++i )
+    for ( int i = 0; i < data.size(); ++i )
     {
         Matrix m( 3, 3 );
-        m( 1, 1 ) = data->at( i )[0];
-        m( 1, 2 ) = data->at( i )[1];
-        m( 1, 3 ) = data->at( i )[2];
-        m( 2, 1 ) = data->at( i )[1];
-        m( 2, 2 ) = data->at( i )[3];
-        m( 2, 3 ) = data->at( i )[4];
-        m( 3, 1 ) = data->at( i )[2];
-        m( 3, 2 ) = data->at( i )[4];
-        m( 3, 3 ) = data->at( i )[5];
+        m( 1, 1 ) = data.at( i )[0];
+        m( 1, 2 ) = data.at( i )[1];
+        m( 1, 3 ) = data.at( i )[2];
+        m( 2, 1 ) = data.at( i )[1];
+        m( 2, 2 ) = data.at( i )[3];
+        m( 2, 3 ) = data.at( i )[4];
+        m( 3, 1 ) = data.at( i )[2];
+        m( 3, 2 ) = data.at( i )[4];
+        m( 3, 3 ) = data.at( i )[5];
 
-        mData->push_back( m );
+        m_data.push_back( m );
     }
-    m_data = mData;
 
     m_properties.set( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
     m_properties.set( FNPROP_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
@@ -67,7 +65,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> >* data, 
 
 DatasetTensor::~DatasetTensor()
 {
-    m_data->clear();
+    m_data.clear();
 }
 
 void DatasetTensor::examineDataset()
@@ -101,18 +99,18 @@ void DatasetTensor::examineDataset()
 
     for ( int i = 0; i < size; ++i )
     {
-        min = qMin( min, (float) m_data->at( i )( 1, 1 ) );
-        max = qMax( max, (float) m_data->at( i )( 1, 1 ) );
-        min = qMin( min, (float) m_data->at( i )( 1, 2 ) );
-        max = qMax( max, (float) m_data->at( i )( 1, 2 ) );
-        min = qMin( min, (float) m_data->at( i )( 1, 3 ) );
-        max = qMax( max, (float) m_data->at( i )( 1, 3 ) );
-        min = qMin( min, (float) m_data->at( i )( 2, 2 ) );
-        max = qMax( max, (float) m_data->at( i )( 2, 2 ) );
-        min = qMin( min, (float) m_data->at( i )( 2, 3 ) );
-        max = qMax( max, (float) m_data->at( i )( 2, 3 ) );
-        min = qMin( min, (float) m_data->at( i )( 3, 3 ) );
-        max = qMax( max, (float) m_data->at( i )( 3, 3 ) );
+        min = qMin( min, (float) m_data.at( i )( 1, 1 ) );
+        max = qMax( max, (float) m_data.at( i )( 1, 1 ) );
+        min = qMin( min, (float) m_data.at( i )( 1, 2 ) );
+        max = qMax( max, (float) m_data.at( i )( 1, 2 ) );
+        min = qMin( min, (float) m_data.at( i )( 1, 3 ) );
+        max = qMax( max, (float) m_data.at( i )( 1, 3 ) );
+        min = qMin( min, (float) m_data.at( i )( 2, 2 ) );
+        max = qMax( max, (float) m_data.at( i )( 2, 2 ) );
+        min = qMin( min, (float) m_data.at( i )( 2, 3 ) );
+        max = qMax( max, (float) m_data.at( i )( 2, 3 ) );
+        min = qMin( min, (float) m_data.at( i )( 3, 3 ) );
+        max = qMax( max, (float) m_data.at( i )( 3, 3 ) );
     }
 
     m_properties.set( FNPROP_MIN, min );
@@ -125,24 +123,24 @@ void DatasetTensor::createTexture()
 
 QVector<Matrix>* DatasetTensor::getData()
 {
-    return m_data;
+    return &m_data;
 }
 
 QVector<Matrix>* DatasetTensor::getLogData()
 {
-    if ( !m_logData )
+    if ( m_logData.empty() )
     {
         createLogTensors();
     }
-    return m_logData;
+    return &m_logData;
 }
 
 void DatasetTensor::createLogTensors()
 {
     qDebug() << "create log tensors...";
 
-    int blockSize = m_data->size();
-    m_logData = new QVector<Matrix>( blockSize );
+    int blockSize = m_data.size();
+    m_logData.resize( blockSize );
 
     QVector<QVector3D> evec1( blockSize );
     QVector<float> eval1( blockSize );
@@ -160,7 +158,7 @@ void DatasetTensor::createLogTensors()
     Matrix U(3,3);
     DiagonalMatrix D(3);
     Matrix logM(3,3);
-    for ( int i = 0; i < m_logData->size(); ++i )
+    for ( int i = 0; i < m_logData.size(); ++i )
     {
         U( 1, 1 ) = evec1[i].x();
         U( 2, 1 ) = evec1[i].y();
@@ -177,7 +175,7 @@ void DatasetTensor::createLogTensors()
 
         logM = U*D*U.t();
 
-        m_logData->replace( i, logM );
+        m_logData.replace( i, logM );
     }
     qDebug() << "create log tensors done!";
 }
@@ -188,7 +186,7 @@ void DatasetTensor::flipX()
     int ny = m_properties.get( FNPROP_NY ).toInt();
     int nz = m_properties.get( FNPROP_NZ ).toInt();
 
-    QVector<Matrix>* newData = new QVector<Matrix>();
+    QVector<Matrix> newData;
 
     for ( int z = 0; z < nz; ++z )
     {
@@ -196,7 +194,7 @@ void DatasetTensor::flipX()
         {
             for ( int x = nx - 1; x >= 0; --x )
             {
-                newData->push_back( m_data->at( x + y * nx + z * nx * ny ) );
+                newData.push_back( m_data.at( x + y * nx + z * nx * ny ) );
             }
         }
     }
@@ -206,7 +204,7 @@ void DatasetTensor::flipX()
     m_header->qto_xyz.m[0][3] = 0.0;
     m_header->sto_xyz.m[0][3] = 0.0;
 
-    m_data->clear();
+    m_data.clear();
     m_data = newData;
 }
 
@@ -216,7 +214,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new TensorRenderer( m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
+            m_renderer = new TensorRenderer( &m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
                     m_properties.get( FNPROP_DX ).toFloat(), m_properties.get( FNPROP_DY ).toFloat(), m_properties.get( FNPROP_DZ ).toFloat() );
             m_renderer->setModel( dataStore );
             m_renderer->init();
@@ -231,7 +229,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Data
     {
         if ( m_rendererEV == 0 )
         {
-            m_rendererEV = new TensorRendererEV( m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
+            m_rendererEV = new TensorRendererEV( &m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
                     m_properties.get( FNPROP_DX ).toFloat(), m_properties.get( FNPROP_DY ).toFloat(), m_properties.get( FNPROP_DZ ).toFloat() );
             m_rendererEV->setModel( dataStore );
             m_rendererEV->init();
@@ -249,7 +247,7 @@ QString DatasetTensor::getValueAsString( int x, int y, int z )
 {
     int nx = m_properties.get( FNPROP_NX ).toInt();
     int ny = m_properties.get( FNPROP_NY ).toInt();
-    Matrix data = m_data->at( x + y * nx + z * nx * ny );
+    Matrix data = m_data.at( x + y * nx + z * nx * ny );
     return QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
             + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );;
 }

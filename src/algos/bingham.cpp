@@ -60,15 +60,15 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         threads[i]->wait();
     }
 
-    QVector<QVector<float> >* out = new QVector<QVector<float> >();
-    out->resize( data->size() );
+    QVector<QVector<float> > out;
+    out.resize( data->size() );
 
     // combine fibs from all threads
     qDebug() << "combining results";
     QVector<float> v( 27, 0 );
     for ( int i = 0; i < data->size(); ++i )
     {
-        out->replace( i, v );
+        out.replace( i, v );
     }
 
 
@@ -78,7 +78,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         qDebug() << i << result->size();
         for ( int k = 0, l = i; k < result->size(); ++k, l += numThreads )
         {
-            out->replace( l, result->at( k) );
+            out.replace( l, result->at( k) );
         }
     }
 
@@ -98,13 +98,13 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     qDebug() << "start bingham to dwi";
     QVector< QVector<float> >* data = ds->getData();
 
-    QVector<ColumnVector>* signals1 = new QVector<ColumnVector>();
-    QVector<ColumnVector>* signals2 = new QVector<ColumnVector>();
-    QVector<ColumnVector>* signals3 = new QVector<ColumnVector>();
+    QVector<ColumnVector> signals1;
+    QVector<ColumnVector> signals2;
+    QVector<ColumnVector> signals3;
 
-    signals1->resize( data->size() );
-    signals2->resize( data->size() );
-    signals3->resize( data->size() );
+    signals1.resize( data->size() );
+    signals2.resize( data->size() );
+    signals3.resize( data->size() );
 
     float kernel[4] = { 258.747, -82.5396, 18.716, -2.35225 };
 
@@ -115,15 +115,15 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     v = 0.0;
     for ( int i = 0; i < data->size(); ++i )
     {
-        signals1->replace( i, v );
-        signals2->replace( i, v );
-        signals3->replace( i, v );
+        signals1.replace( i, v );
+        signals2.replace( i, v );
+        signals3.replace( i, v );
     }
 
     QVector< QVector<ColumnVector>* > sigs;
-    sigs.push_back( signals1 );
-    sigs.push_back( signals2 );
-    sigs.push_back( signals3 );
+    sigs.push_back( &signals1 );
+    sigs.push_back( &signals2 );
+    sigs.push_back( &signals3 );
 
     ColumnVector m1( 3 );
     ColumnVector m2( 3 );
@@ -230,7 +230,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
-        DatasetDWI* out = new DatasetDWI( "dwifrombingham", sigs[i], b0Data, bvals, bvecs, ds->getHeader() );
+        DatasetDWI* out = new DatasetDWI( "dwifrombingham", *(sigs[i]), b0Data, bvals, bvecs, ds->getHeader() );
 
         dsout.push_back( out );
     }

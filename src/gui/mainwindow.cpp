@@ -239,8 +239,8 @@ void MainWindow::createActions()
     toggleShaderEditAct->setStatusTip( tr( "Toggle the shader edit widget." ) );
     connect( toggleShaderEditAct, SIGNAL( triggered() ), this, SLOT( slotToggleShaderEdit() ) );
 
-    toggleDockTitlesAct = new QAction( tr( "Toggle Dock Titles" ), this );
-    toggleDockTitlesAct->setStatusTip( tr( "Toggle the title widget of all dock widgets" ) );
+    toggleDockTitlesAct = new QAction( tr( "Lock Widgets" ), this );
+    toggleDockTitlesAct->setStatusTip( tr( "Lock all dock widgets in place" ) );
     connect( toggleDockTitlesAct, SIGNAL( triggered() ), this, SLOT( slotToggleDockTitles() ) );
 }
 

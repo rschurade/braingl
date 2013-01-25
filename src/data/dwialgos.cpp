@@ -59,11 +59,11 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
 
     QVector<ColumnVector>* data = ds->getData();
 
-    QVector<ColumnVector>* qBallVector = new QVector<ColumnVector>();
+    QVector<ColumnVector> qBallVector;
 
     for ( int i = 0; i < data->size(); ++i )
     {
-        qBallVector->push_back( qBallBase * data->at( i ) );
+        qBallVector.push_back( qBallBase * data->at( i ) );
     }
 
     DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
@@ -74,7 +74,7 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
     out->properties()->set( FNPROP_ORDER, order );
     out->properties()->set( FNPROP_RENDER_SLICE, 1 );
     out->properties()->set( FNPROP_SCALING, 1.0f );
-    out->properties()->set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
+    out->properties()->set( FNPROP_DIM, qBallVector.at( 0 ).Nrows() );
     out->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
     out->properties()->set( FNPROP_MINMAX_SCALING, true );
 
@@ -85,7 +85,7 @@ DatasetSH* DWIAlgos::qBall( DatasetDWI* ds )
 
 DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
 {
-    QVector<ColumnVector>* qBallVector = QBall::sharpQBall( ds, order );
+    QVector<ColumnVector> qBallVector = *( QBall::sharpQBall( ds, order ) );
     qDebug() << "create dataset";
     DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, ds->getHeader() );
     out->properties()->set( FNPROP_FILENAME, "Q-Ball" );
@@ -97,7 +97,7 @@ DatasetSH* DWIAlgos::qBallSharp( DatasetDWI* ds, int order )
     out->properties()->set( FNPROP_ORDER, order );
     out->properties()->set( FNPROP_RENDER_SLICE, 1 );
     out->properties()->set( FNPROP_SCALING, 1.0f );
-    out->properties()->set( FNPROP_DIM, qBallVector->at( 0 ).Nrows() );
+    out->properties()->set( FNPROP_DIM, qBallVector.at( 0 ).Nrows() );
     out->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
     out->properties()->set( FNPROP_MINMAX_SCALING, true );
 
@@ -114,7 +114,7 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
     QVector<float>* b0Images = ds->getB0Data();
 
-    QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
+    QVector<Matrix> tensors = *( FMath::fitTensors( data, b0Images, bvecs, bvals ) );
 
     DatasetTensor* out = new DatasetTensor( ds->properties()->get( FNPROP_FILENAME ).toString(), tensors, ds->getHeader() );
     out->properties()->set( FNPROP_FILENAME, "Tensor" );
@@ -153,9 +153,9 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
     QVector<float>* b0Images = ds->getB0Data();
 
-    QVector<Matrix>* tensors = FMath::fitTensors( data, b0Images, bvecs, bvals );
+    QVector<Matrix> tensors = *( FMath::fitTensors( data, b0Images, bvecs, bvals ) );
 
-    int blockSize = tensors->size();
+    int blockSize = tensors.size();
 
     QVector<QVector3D> evec1( blockSize );
     QVector<float> eval1( blockSize );
@@ -219,7 +219,7 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( DatasetTensor* ds )
     QVector<QVector3D> evec3( blockSize );
     QVector<float> eval3( blockSize );
 
-    FMath::evecs( tensors, evec1, eval2, evec1, eval2, evec3, eval3 );
+    FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
     QList<Dataset*> l;
 
