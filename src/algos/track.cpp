@@ -53,7 +53,7 @@ Track::Track( DatasetTensor* ds ) :
 
     blockSize = m_nx * m_ny * m_nz;
 
-    FMath::evec1( m_tensors, m_evec1 );
+    FMath::evec1( *m_tensors, m_evec1 );
     FMath::fa( *m_tensors, m_fa );
 }
 

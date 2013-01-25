@@ -56,7 +56,7 @@ public:
 
     static void fa( QVector<Matrix>& tensors, QVector<float>& faOut );
 
-    static void evec1( QVector<Matrix>* tensors, QVector<QVector3D>& evec1 );
+    static void evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 );
     static void evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
                                                  QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                  QVector<QVector3D>& evec3, QVector<float>& eval3 );
