@@ -22,10 +22,10 @@ BinghamThread::BinghamThread( DatasetSH* ds, int lod, int id ) :
 
 BinghamThread::~BinghamThread()
 {
-    m_resultVector->clear();
+    m_resultVector.clear();
 }
 
-QVector<QVector<float> >* BinghamThread::getResultVector()
+QVector<QVector<float> > BinghamThread::getResultVector()
 {
     return m_resultVector;
 }
@@ -71,8 +71,8 @@ void BinghamThread::run()
     Matrix base = ( FMath::sh_base( ( *vertices ), order ) );
 
     QVector<float> bv( 3 * 9, 0 );
-    m_resultVector = new QVector<QVector<float> >();
-    m_resultVector->reserve( data->size() / numThreads + numThreads );
+
+    m_resultVector.reserve( data->size() / numThreads + numThreads );
 
 // For all voxels:
     int done = 0;
@@ -80,7 +80,7 @@ void BinghamThread::run()
     {
         {
             QVector<float> v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
-            m_resultVector->push_back( v );
+            m_resultVector.push_back( v );
             ++done;
         }
     }

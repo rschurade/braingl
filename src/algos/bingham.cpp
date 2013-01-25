@@ -74,11 +74,11 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 
     for ( int i = 0; i < numThreads; ++i )
     {
-        QVector<QVector<float> >* result = threads[i]->getResultVector();
-        qDebug() << i << result->size();
-        for ( int k = 0, l = i; k < result->size(); ++k, l += numThreads )
+        QVector<QVector<float> > result = threads[i]->getResultVector();
+        qDebug() << i << result.size();
+        for ( int k = 0, l = i; k < result.size(); ++k, l += numThreads )
         {
-            out.replace( l, result->at( k) );
+            out.replace( l, result.at( k) );
         }
     }
 
