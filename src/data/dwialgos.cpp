@@ -114,7 +114,8 @@ DatasetTensor* DWIAlgos::tensorFit( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
     QVector<float>* b0Images = ds->getB0Data();
 
-    QVector<Matrix> tensors = FMath::fitTensors( *data, *b0Images, bvecs, bvals );
+    QVector<Matrix> tensors;
+    FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     DatasetTensor* out = new DatasetTensor( ds->properties()->get( FNPROP_FILENAME ).toString(), tensors, ds->getHeader() );
     out->properties()->set( FNPROP_FILENAME, "Tensor" );
@@ -132,7 +133,8 @@ DatasetScalar* DWIAlgos::calcFAFromDWI( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
     QVector<float>* b0Images = ds->getB0Data();
 
-    QVector<Matrix> tensors = FMath::fitTensors( *data, *b0Images, bvecs, bvals );
+    QVector<Matrix> tensors;
+    FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     QVector<float> fa;
     FMath::fa( tensors, fa );
@@ -153,7 +155,8 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( DatasetDWI* ds )
     QVector<ColumnVector>* data = ds->getData();
     QVector<float>* b0Images = ds->getB0Data();
 
-    QVector<Matrix> tensors = FMath::fitTensors( *data, *b0Images, bvecs, bvals );
+    QVector<Matrix> tensors;
+    FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     int blockSize = tensors.size();
 

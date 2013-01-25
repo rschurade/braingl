@@ -479,7 +479,7 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-QVector<Matrix> FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals )
+void FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals, QVector<Matrix>& out )
 {
     int N = bvecs.size();
 
@@ -515,8 +515,8 @@ QVector<Matrix> FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& 
     double si = 0.0;
     vector<double> log_s0_si_pixel( N );
 
-    QVector<Matrix> tensors;
-    tensors.reserve( data.size() );
+    out.clear();
+    out.reserve( data.size() );
 
     Matrix blank( 3, 3 );
     blank = 0.0;
@@ -566,15 +566,13 @@ QVector<Matrix> FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& 
             m( 3, 2 ) = t( 5 );
             m( 3, 3 ) = t( 6 );
 
-            tensors.push_back( m );
+            out.push_back( m );
         } // end if s0 > 0
         else
         {
-            tensors.push_back( blank );
+            out.push_back( blank );
         }
     }
-
-    return tensors;
 }
 
 void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
