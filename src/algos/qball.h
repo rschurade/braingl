@@ -17,7 +17,7 @@ class QBall
 {
 public:
     static Matrix calcQBallBase( Matrix gradients, double lambda, int maxOrder );
-    static QVector<ColumnVector>* sharpQBall( DatasetDWI* ds, int order );
+    static void sharpQBall( DatasetDWI* ds, int order, QVector<ColumnVector>& out );
 
 private:
     QBall();
