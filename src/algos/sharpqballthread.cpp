@@ -22,10 +22,10 @@ SharpQBallThread::SharpQBallThread( DatasetDWI* ds, int order, int id ) :
 
 SharpQBallThread::~SharpQBallThread()
 {
-    m_qBallVector->clear();
+    m_qBallVector.clear();
 }
 
-QVector<ColumnVector>* SharpQBallThread::getQBallVector()
+QVector<ColumnVector> SharpQBallThread::getQBallVector()
 {
     return m_qBallVector;
 }
@@ -45,7 +45,7 @@ void SharpQBallThread::run()
     QVector<ColumnVector>* data = m_ds->getData();
     QVector<float>* b0Data = m_ds->getB0Data();
 
-    m_qBallVector = new QVector<ColumnVector>();
+    m_qBallVector.clear();
 
     // inverse direction matrix for calculation:
     //const matrixT A( pseudoinverse (sh_base( gradients, order ) ) );
@@ -91,7 +91,7 @@ void SharpQBallThread::run()
             coeff( 1 ) = 1.0 / sqrt( 4. * M_PI );
         }
 
-        m_qBallVector->push_back( coeff );
+        m_qBallVector.push_back( coeff );
     }
 }
 

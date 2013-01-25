@@ -122,7 +122,7 @@ void QBall::sharpQBall( DatasetDWI* ds, int order, QVector<ColumnVector>& out )
     // combine fibs from all threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        out += *( threads[i]->getQBallVector() );
+        out += threads[i]->getQBallVector();
     }
 
     for ( int i = 0; i < numThreads; ++i )
