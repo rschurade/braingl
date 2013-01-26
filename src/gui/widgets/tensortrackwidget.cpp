@@ -18,7 +18,7 @@
 
 #include "tensortrackwidget.h"
 
-TensorTrackWidget::TensorTrackWidget( Dataset* ds, QVector< QPair<QString, FN_DATASET_TYPE> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
+TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<Dataset*> &dsl, QWidget* parent ) :
     m_progress( 0 )
 {
     m_tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
@@ -27,19 +27,28 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QVector< QPair<QString, FN_DA
 
     m_layout = new QVBoxLayout();
 
-    for ( int i = 0; i < filter.size(); ++i )
+    SelectWithLabel* sel = new SelectWithLabel( QString( "optional: mask (not yet implemented)" ), 1 );
+    sel->insertItem( 0, QString("none") );
+    for ( int k = 0; k < dsl.size(); ++k )
     {
-        SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
-        sel->insertItem( -1, QString("none") );
-        for ( int k = 0; k < dsl.size(); ++k )
+        if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == filter[i].second || filter[i].second == FNDT_NIFTI_ANY )
-            {
-                sel->insertItem( k, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
-            }
+            sel->insertItem( k+1, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
         }
-        m_layout->addWidget( sel );
     }
+    m_layout->addWidget( sel );
+
+    SelectWithLabel* sel2 = new SelectWithLabel( QString( "optional: roi (not yet implemented)" ), 1 );
+    sel2->insertItem( 0, QString("none") );
+    for ( int k = 0; k < dsl.size(); ++k )
+    {
+        if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
+        {
+            sel2->insertItem( k+1, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
+        }
+    }
+    m_layout->addWidget( sel2 );
+
     QHBoxLayout* hLayout = new QHBoxLayout();
     m_startButton = new QPushButton( tr("Start") );
     connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
