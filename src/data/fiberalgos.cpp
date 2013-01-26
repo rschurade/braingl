@@ -19,9 +19,9 @@ FiberAlgos::~FiberAlgos()
 {
 }
 
-QList<Dataset*> FiberAlgos::thinOut( DatasetFibers* ds )
+QList<Dataset*> FiberAlgos::thinOut( Dataset* ds )
 {
-    Fibers* fa = new Fibers( ds );
+    Fibers* fa = new Fibers( dynamic_cast<DatasetFibers*>( ds ) );
     DatasetFibers* out = fa->thinOut();
     QList<Dataset*> l;
     l.push_back( out );

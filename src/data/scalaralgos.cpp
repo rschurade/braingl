@@ -18,9 +18,9 @@ ScalarAlgos::~ScalarAlgos()
 {
 }
 
-QList<Dataset*> ScalarAlgos::isoSurface( DatasetScalar* ds )
+QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds )
 {
-    DatasetIsosurface* iso = new DatasetIsosurface( ds );
+    DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( ds ) );
     QList<Dataset*> l;
     l.push_back( iso );
     return l;
