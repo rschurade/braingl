@@ -31,7 +31,6 @@ public:
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
     int getSelected();
-    void activateAlgo( FN_ALGO algo );
 
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );

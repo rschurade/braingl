@@ -4,10 +4,15 @@
  *  Created on: 14.06.2012
  *      Author: Ralph
  */
-#include "../views/toolbarview.h"
+#include <QtCore/QVariant>
+
+#include "../../data/vptr.h"
+#include "../../data/dwialgos.h"
+#include "../../data/scalaralgos.h"
+#include "../../data/fiberalgos.h"
 #include "../../data/datasets/dataset.h"
 
-
+#include "../views/toolbarview.h"
 
 #include "toolbar.h"
 
@@ -15,7 +20,7 @@ ToolBar::ToolBar( const QString &title, QWidget* parent ) :
     QToolBar( title, parent )
 {
     setObjectName( title );
-    m_toolBarView = new ToolBarView();
+    m_toolBarView = new ToolBarView( this );
 
     connect( m_toolBarView, SIGNAL( sigSelectionChanged( int ) ), this, SLOT( slotSelectionChanged( int ) ) );
 
@@ -90,7 +95,68 @@ void ToolBar::createActions()
 
 void ToolBar::slot( FN_ALGO algo )
 {
-    m_toolBarView->activateAlgo( algo );
+    //m_toolBarView->activateAlgo( algo );
+
+    QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), FNPROP_DATASET_POINTER );
+    QList<Dataset*>l;
+    Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::EditRole ) );
+    switch ( algo )
+    {
+        case FNALGO_QBALL4:
+            l = DWIAlgos::qBallSharp( ds, 4 );
+            break;
+        case FNALGO_QBALL6:
+            l = DWIAlgos::qBallSharp( ds, 6 );
+            break;
+        case FNALGO_QBALL8:
+            l = DWIAlgos::qBallSharp( ds, 8 );
+            break;
+        case FNALGO_TENSORFIT:
+            l = DWIAlgos::tensorFit( ds );
+            break;
+        case FNALGO_FA:
+            l = DWIAlgos::calcFAFromDWI( ds );
+            break;
+        case FNALGO_EV:
+            l = DWIAlgos::calcEVFromDWI( ds );
+            break;
+        case FNALGO_BINGHAM:
+            l = DWIAlgos::fitBingham( ds );
+            break;
+        case FNALGO_TENSOR_TRACK:
+            l = DWIAlgos::tensorTrack( ds );
+            break;
+        case FNALGO_ISOSURFACE:
+            l = ScalarAlgos::isoSurface( ds );
+            break;
+        case FNALGO_FIBER_THINNING:
+            l = FiberAlgos::thinOut( ds );
+            break;
+        case FNALGO_BINGHAM_2_TENSOR:
+            l = DWIAlgos::bingham2Tensor( ds );
+            break;
+        case FNALGO_TEST:
+        {
+            QList<Dataset*>dsList;
+            int numDS = m_toolBarView->model()->rowCount();
+            for ( int i = 0; i < numDS; ++i )
+            {
+                dsList.push_back( VPtr<Dataset>::asPtr( m_toolBarView->model()->data( m_toolBarView->model()->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) ) );
+            }
+            DWIAlgos::testAlgo( ds, dsList );
+            break;
+
+        }
+        case FNALGO_NONE:
+            break;
+        case FNALGO_QBALL:
+            break;
+    }
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+    }
+
 }
 
 void ToolBar::slotSelectionChanged( int type )
@@ -101,7 +167,6 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_NIFTI_SCALAR:
         {
             this->addAction( m_isosurfaceAct );
-            this->addAction( m_testAct );
             break;
         }
         case FNDT_NIFTI_VECTOR:
@@ -114,6 +179,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_faAct );
             this->addAction( m_evAct );
             this->addAction( m_fiberTrackingAct );
+            this->addAction( m_testAct );
             break;
         }
         case FNDT_NIFTI_SH:

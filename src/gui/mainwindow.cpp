@@ -293,7 +293,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction( standardViewSagittalAct );
     editToolBar->setObjectName( "editToolbar");
 
-    m_toolsToolBar = new ToolBar( tr( "Tools" ) );
+    m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
     m_toolsToolBar->setModel( m_dataStore );
     addToolBar( m_toolsToolBar );
 }
