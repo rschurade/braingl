@@ -133,10 +133,7 @@ void ToolBar::slot( FN_ALGO algo )
                 dsList.push_back( VPtr<Dataset>::asPtr( m_toolBarView->model()->data( m_toolBarView->model()->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) ) );
             }
 
-            QVector< QPair<QString, FN_DATASET_TYPE> >filter;
-            filter.push_back( QPair<QString, FN_DATASET_TYPE>( "optional: mask", FNDT_NIFTI_SCALAR ) );
-
-            m_ttw = new TensorTrackWidget( ds, filter, dsList, this->parentWidget() );
+            m_ttw = new TensorTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ttw, SIGNAL( finished() ), this, SLOT( tensorTrackFinished() ) );
             m_ttw->show();
             break;
