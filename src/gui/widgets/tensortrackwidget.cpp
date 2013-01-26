@@ -1,0 +1,104 @@
+/*
+ * tensortrackwidget.cpp
+ *
+ *  Created on: 26.01.2013
+ *      Author: Ralph
+ */
+#include <QtGui/QPushButton>
+#include <QtGui/QProgressBar>
+
+#include "sliderwithedit.h"
+#include "selectwithlabel.h"
+
+#include "../../algos/track.h"
+#include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasetFibers.h"
+#include "../../data/datasets/datasetTensor.h"
+
+#include "tensortrackwidget.h"
+
+TensorTrackWidget::TensorTrackWidget( Dataset* ds, QVector< QPair<QString, FN_DATASET_TYPE> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
+    m_progress( 0 )
+{
+    m_layout = new QVBoxLayout();
+
+    for ( int i = 0; i < filter.size(); ++i )
+    {
+        SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
+        sel->insertItem( -1, QString("none") );
+        for ( int k = 0; k < dsl.size(); ++k )
+        {
+            if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == filter[i].second || filter[i].second == FNDT_NIFTI_ANY )
+            {
+                sel->insertItem( k, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
+            }
+        }
+        m_layout->addWidget( sel );
+    }
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    m_startButton = new QPushButton( tr("Start") );
+    connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
+
+    SliderWithEdit* minFA = new SliderWithEdit( QString("min FA for Start Voxels") );
+    minFA->setMin( 0.01f );
+    minFA->setMax( 1.0f );
+    minFA->setValue( 0.2f );
+    m_layout->addWidget( minFA );
+
+    SliderWithEdit* stopFA = new SliderWithEdit( QString("min FA to keep tracking") );
+    stopFA->setMin( 0.01f );
+    stopFA->setMax( 1.0f );
+    stopFA->setValue( 0.2f );
+    m_layout->addWidget( stopFA );
+
+    int numVoxels = ds->properties()->get( FNPROP_NX ).toInt() * ds->properties()->get( FNPROP_NY ).toInt() * ds->properties()->get( FNPROP_NZ ).toInt();
+
+
+    m_progressBar = new QProgressBar( this );
+    m_progressBar->setValue( 0 );
+    m_progressBar->setMaximum( numVoxels );
+
+    m_layout->addWidget( m_progressBar );
+
+    hLayout->addStretch();
+    hLayout->addWidget( m_startButton );
+
+    m_layout->addLayout( hLayout );
+
+    m_layout->addStretch();
+    setLayout( m_layout );
+
+    m_tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
+    connect( m_tracker, SIGNAL( progress() ), this, SLOT( slotProgress() ) );
+    connect( m_tracker, SIGNAL( finished() ), this, SLOT( slotFinished() ) );
+
+}
+
+TensorTrackWidget::~TensorTrackWidget()
+{
+}
+
+QList<Dataset*> TensorTrackWidget::getFibs()
+{
+    QList<Dataset*> l;
+    DatasetFibers* fibs = new DatasetFibers( m_tracker->getFibs() );
+    l.push_back( fibs );
+    return l;
+}
+
+void TensorTrackWidget::start()
+{
+    qDebug() << "tensor track widget start";
+    m_startButton->hide();
+    m_tracker->startTracking();
+}
+
+void TensorTrackWidget::slotProgress()
+{
+    m_progressBar->setValue( ++m_progress );
+}
+
+void TensorTrackWidget::slotFinished()
+{
+    emit( finished() );
+}

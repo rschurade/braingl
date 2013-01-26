@@ -58,7 +58,7 @@ QVector< QVector< float > > TrackThread::getFibs()
 
 void TrackThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = QThread::idealThreadCount() - 1;
 
     for ( int i = m_id; i < m_blockSize;  i += numThreads )
     {
@@ -93,7 +93,9 @@ void TrackThread::run()
 
             fibs.push_back( fib2r );
         }
+        emit( progress() );
     }
+    emit( finished() );
 }
 
 QVector<float> TrackThread::track( int id, bool negDir )

@@ -12,10 +12,15 @@
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
 
-class DatasetTensor;
+#include "fmath.h"
 
-class Track
+class DatasetTensor;
+class TrackThread;
+
+class Track : public QObject
 {
+    Q_OBJECT
+
 public:
     Track( DatasetTensor* ds );
     virtual ~Track();
@@ -37,6 +42,7 @@ private:
     QVector<float> m_fa;
     QVector<QVector3D> m_evec1;
 
+    QVector<TrackThread*> m_threads;
 
     QVector< QVector< float > >fibs;
 
@@ -58,11 +64,18 @@ private:
     int maxStepsInVoxel;
     float m_smoothness;
 
-    int m_threads;
-    int m_count;
+    int m_threadsRunning;
     bool m_thinOut;
     int m_numPoints;
     int m_numLines;
+
+private slots:
+    void slotProgress();
+    void slotThreadFinished();
+
+signals:
+    void progress();
+    void finished();
 };
 
 #endif /* TRACK_H_ */
