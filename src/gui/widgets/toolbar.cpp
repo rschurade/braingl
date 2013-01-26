@@ -125,18 +125,6 @@ void ToolBar::slot( FN_ALGO algo )
             l = DWIAlgos::fitBingham( ds );
             break;
         case FNALGO_TENSOR_TRACK:
-            l = DWIAlgos::tensorTrack( ds );
-            break;
-        case FNALGO_ISOSURFACE:
-            l = ScalarAlgos::isoSurface( ds );
-            break;
-        case FNALGO_FIBER_THINNING:
-            l = FiberAlgos::thinOut( ds );
-            break;
-        case FNALGO_BINGHAM_2_TENSOR:
-            l = DWIAlgos::bingham2Tensor( ds );
-            break;
-        case FNALGO_TEST:
         {
             QList<Dataset*>dsList;
             int numDS = m_toolBarView->model()->rowCount();
@@ -154,6 +142,17 @@ void ToolBar::slot( FN_ALGO algo )
             break;
 
         }
+        case FNALGO_ISOSURFACE:
+            l = ScalarAlgos::isoSurface( ds );
+            break;
+        case FNALGO_FIBER_THINNING:
+            l = FiberAlgos::thinOut( ds );
+            break;
+        case FNALGO_BINGHAM_2_TENSOR:
+            l = DWIAlgos::bingham2Tensor( ds );
+            break;
+        case FNALGO_TEST:
+            break;
         case FNALGO_NONE:
             break;
         case FNALGO_QBALL:
@@ -186,7 +185,6 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_faAct );
             this->addAction( m_evAct );
             this->addAction( m_fiberTrackingAct );
-            this->addAction( m_testAct );
             break;
         }
         case FNDT_NIFTI_SH:
