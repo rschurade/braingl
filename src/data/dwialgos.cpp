@@ -308,4 +308,6 @@ QList<Dataset*> DWIAlgos::testAlgo( Dataset* ds, QList<Dataset*> &dsl )
 
     DatasetSelectionWidget* dsw = new DatasetSelectionWidget( filter, dsl );
     dsw->show();
+    QList<Dataset*>l;
+    return l;
 }
