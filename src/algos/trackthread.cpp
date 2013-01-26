@@ -131,6 +131,12 @@ QVector<float> TrackThread::track( int id, bool negDir )
     float x = xs * m_dx;
     float y = ys * m_dy;
     float z = zs * m_dz;
+    float curFA = getInterpolatedFA( id, x, y, z );
+
+    if ( curFA < m_minStartFA )
+    {
+        return result;
+    }
 
     if ( negDir )
     {
@@ -148,7 +154,7 @@ QVector<float> TrackThread::track( int id, bool negDir )
     dirX = dirX / norm;
     dirY = dirY / norm;
     dirZ = dirZ / norm;
-    float curFA;
+
     int lc = 0;
     while ( true )
     {
