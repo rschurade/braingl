@@ -280,7 +280,7 @@ bool Writer::save()
             break;
         case FNDT_FIBERS:
         {
-            saveFibs( m_fileName.toStdString() );
+            saveFibs( m_fileName );
             break;
         }
     }
@@ -357,12 +357,12 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
     }
 }
 
-void Writer::saveFibs( string filename )
+void Writer::saveFibs( QString filename )
 {
     QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
 
     using std::fstream;
-    fstream out( filename.c_str(), fstream::out | fstream::in | fstream::trunc );
+    fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
     if( !out || out.bad() )
     {
         // error

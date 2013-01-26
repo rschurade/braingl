@@ -10,7 +10,7 @@
 
 #include <QtCore/QList>
 
-class DatasetScalar;
+class Dataset;
 
 class ScalarAlgos
 {
@@ -18,7 +18,7 @@ public:
     ScalarAlgos();
     virtual ~ScalarAlgos();
 
-    static QList<Dataset*> isoSurface( DatasetScalar* ds );
+    static QList<Dataset*> isoSurface( Dataset* ds );
 };
 
 #endif /* SCALARALGOS_H_ */

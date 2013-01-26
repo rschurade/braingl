@@ -7,21 +7,10 @@
 #include <QtCore/QLocale>
 #include <QtCore/QDebug>
 
-#include "datasets/datasetscalar.h"
-#include "datasets/dataset3d.h"
-#include "datasets/datasetbingham.h"
-#include "datasets/datasetdwi.h"
-#include "datasets/datasettensor.h"
-#include "datasets/datasetsh.h"
-#include "datasets/datasetfibers.h"
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
 #include "enums.h"
-
-#include "dwialgos.h"
-#include "scalaralgos.h"
-#include "fiberalgos.h"
 
 #include "datastore.h"
 
@@ -177,153 +166,21 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
 
     if ( role == Qt::EditRole )
     {
+        // handle props with special treatment
+        if ( index.column() == FNPROP_DATASET_POINTER )
+        {
+            addDataset( VPtr<Dataset>::asPtr( value ) );
+            emit( dataChanged( index, index ) );
+            emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
+            return true;
+        }
+        // everything else
         if ( index.row() >= 0 && index.row() < m_datasetList.size() )
         {
             m_datasetList.at( index.row() )->properties()->set( (FN_PROPERTY)index.column(), value );
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
-        return true;
-    }
-
-    if ( role == Qt::UserRole && index.column() < FNGLOBAL_SAGITTAL )
-    {
-        int algo = index.column();
-        switch ( algo )
-        {
-            case FNALGO_QBALL4:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    //addDataset( DWIAlgos::qBall( dynamic_cast<DatasetDWI*>( ds ) ) );
-                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 4 ) );
-                }
-                break;
-            }
-            case FNALGO_QBALL6:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 6 ) );
-                }
-                break;
-            }
-            case FNALGO_QBALL8:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    addDataset( DWIAlgos::qBallSharp( dynamic_cast<DatasetDWI*>( ds ), 8 ) );
-                }
-                break;
-            }
-            case FNALGO_TENSORFIT:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    addDataset( DWIAlgos::tensorFit( dynamic_cast<DatasetDWI*>( ds ) ) );
-                }
-                break;
-            }
-            case FNALGO_FA:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    addDataset( DWIAlgos::calcFAFromDWI( dynamic_cast<DatasetDWI*>( ds ) ) );
-                }
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
-                {
-                    addDataset( DWIAlgos::calcFAFromTensor( dynamic_cast<DatasetTensor*>( ds ) ) );
-                }
-                break;
-            }
-            case FNALGO_EV:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
-                {
-                    QList<Dataset*> ev = DWIAlgos::calcEVFromDWI( dynamic_cast<DatasetDWI*>( ds ) );
-                    addDataset( ev[0] );
-                    addDataset( ev[1] );
-                }
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
-                {
-                    QList<Dataset*> ev = DWIAlgos::calcEVFromTensor( dynamic_cast<DatasetTensor*>( ds ) );
-                    addDataset( ev[0] );
-                    addDataset( ev[1] );
-                }
-                break;
-            }
-            case FNALGO_BINGHAM:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SH )
-                {
-                    QList<Dataset*> bings = DWIAlgos::fitBingham( dynamic_cast<DatasetSH*>( ds ) );
-                    for ( int i = 0; i < bings.size(); ++i )
-                    {
-                        addDataset( bings[i] );
-                    }
-                }
-                break;
-            }
-            case FNALGO_TENSOR_TRACK:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
-                {
-                    QList<Dataset*> fibs = DWIAlgos::tensorTrack( dynamic_cast<DatasetTensor*>( ds ) );
-                    addDataset( fibs[0] );
-                }
-                break;
-            }
-            case FNALGO_ISOSURFACE:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SCALAR )
-                {
-                    QList<Dataset*> isos = ScalarAlgos::isoSurface( dynamic_cast<DatasetScalar*>( ds ) );
-                    addDataset( isos[0] );
-                }
-                break;
-            }
-            case FNALGO_FIBER_THINNING:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_FIBERS )
-                {
-                    QList<Dataset*> fibs = FiberAlgos::thinOut( dynamic_cast<DatasetFibers*>( ds ) );
-                    addDataset( fibs[0] );
-                }
-                break;
-            }
-            case FNALGO_BINGHAM_2_TENSOR:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_BINGHAM )
-                {
-                    QList<Dataset*> tensors = DWIAlgos::bingham2Tensor( dynamic_cast<DatasetBingham*>( ds ) );
-                    for ( int i = 0; i < tensors.size(); ++i )
-                    {
-                        addDataset( tensors[i] );
-                    }
-                }
-                break;
-            }
-            case FNALGO_TEST:
-            {
-                Dataset* ds = m_datasetList.at( index.row() );
-                if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SCALAR )
-                {
-                    DWIAlgos::testAlgo( ds, m_datasetList );
-                }
-                break;
-            }
-        }
         return true;
     }
 

@@ -10,28 +10,22 @@
 
 #include <QtCore/QList>
 
-class Dataset3D;
-class DatasetBingham;
-class DatasetDWI;
-class DatasetNifti;
-class DatasetTensor;
-class DatasetSH;
-class TriangleMesh;
+class Dataset;
 
 class DWIAlgos
 {
 public:
-    static DatasetSH* qBall( DatasetDWI* ds );
-    static DatasetSH* qBallSharp( DatasetDWI* ds, int order );
-    static DatasetTensor* tensorFit( DatasetDWI* ds );
-    static DatasetScalar* calcFAFromDWI( DatasetDWI* ds );
-    static QList<Dataset*> calcEVFromDWI( DatasetDWI* ds );
-    static DatasetScalar* calcFAFromTensor( DatasetTensor* ds );
-    static QList<Dataset*> calcEVFromTensor( DatasetTensor* ds );
-    static QList<Dataset*> fitBingham( DatasetSH* ds );
-    static QList<Dataset*> bingham2Tensor( DatasetBingham* ds );
+    static QList<Dataset*> qBall( Dataset* ds );
+    static QList<Dataset*> qBallSharp( Dataset* ds, int order );
+    static QList<Dataset*> tensorFit( Dataset* ds );
+    static QList<Dataset*> calcFAFromDWI( Dataset* ds );
+    static QList<Dataset*> calcEVFromDWI( Dataset* ds );
+    static QList<Dataset*> calcFAFromTensor( Dataset* ds );
+    static QList<Dataset*> calcEVFromTensor( Dataset* ds );
+    static QList<Dataset*> fitBingham( Dataset* ds );
+    static QList<Dataset*> bingham2Tensor( Dataset* ds );
 
-    static QList<Dataset*> tensorTrack( DatasetTensor* ds );
+    static QList<Dataset*> tensorTrack( Dataset* ds );
 
     static QList<Dataset*> testAlgo( Dataset* ds, QList<Dataset*> &dsl );
 

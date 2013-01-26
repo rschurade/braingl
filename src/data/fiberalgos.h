@@ -10,7 +10,7 @@
 
 #include <QtCore/QList>
 
-class DatasetFibers;
+class Dataset;
 
 class FiberAlgos
 {
@@ -18,7 +18,7 @@ public:
     FiberAlgos();
     virtual ~FiberAlgos();
 
-    static QList<Dataset*> thinOut( DatasetFibers* ds );
+    static QList<Dataset*> thinOut( Dataset* ds );
 };
 
 #endif /* FIBERALGOS_H_ */

@@ -30,7 +30,7 @@ private:
 
     void setDescrip( nifti_image* hdr, QString descrip );
 
-    void saveFibs( string filename );
+    void saveFibs( QString filename );
 
     template< class T > T switchByteOrder( const T value )
     {

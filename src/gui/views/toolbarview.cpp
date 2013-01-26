@@ -7,6 +7,11 @@
 #include <QtCore/QDebug>
 
 #include "../../data/enums.h"
+#include "../../data/vptr.h"
+#include "../../data/dwialgos.h"
+#include "../../data/scalaralgos.h"
+#include "../../data/fiberalgos.h"
+#include "../../data/datasets/dataset.h"
 
 #include "toolbarview.h"
 
@@ -81,6 +86,129 @@ int ToolBarView::getSelected()
 
 void ToolBarView::activateAlgo( FN_ALGO algo )
 {
-    QModelIndex index = model()->index( m_selected, algo );
-    model()->setData( index, 0, Qt::UserRole );
+    QModelIndex index = model()->index( m_selected, FNPROP_DATASET_POINTER );
+    QList<Dataset*>l;
+    switch ( algo )
+    {
+        case FNALGO_QBALL4:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::qBallSharp( ds, 4 );
+            }
+            break;
+        }
+        case FNALGO_QBALL6:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::qBallSharp( ds, 6 );
+            }
+            break;
+        }
+        case FNALGO_QBALL8:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::qBallSharp( ds, 8 );
+            }
+            break;
+        }
+        case FNALGO_TENSORFIT:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::tensorFit( ds );
+            }
+            break;
+        }
+        case FNALGO_FA:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::calcFAFromDWI( ds );
+            }
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            {
+                l = DWIAlgos::calcFAFromTensor( ds );
+            }
+            break;
+        }
+        case FNALGO_EV:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::calcEVFromDWI( ds );
+            }
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            {
+                l = DWIAlgos::calcEVFromTensor( ds );
+            }
+            break;
+        }
+        case FNALGO_BINGHAM:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SH )
+            {
+                l = DWIAlgos::fitBingham( ds );
+            }
+            break;
+        }
+        case FNALGO_TENSOR_TRACK:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            {
+                l = DWIAlgos::tensorTrack( ds );
+            }
+            break;
+        }
+        case FNALGO_ISOSURFACE:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SCALAR )
+            {
+                l = ScalarAlgos::isoSurface( ds );
+            }
+            break;
+        }
+        case FNALGO_FIBER_THINNING:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_FIBERS )
+            {
+                l = FiberAlgos::thinOut( ds );
+            }
+            break;
+        }
+        case FNALGO_BINGHAM_2_TENSOR:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_BINGHAM )
+            {
+                l = DWIAlgos::bingham2Tensor( ds );
+            }
+            break;
+        }
+        case FNALGO_TEST:
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( model()->data( index, Qt::EditRole ) );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_SCALAR )
+            {
+                //DWIAlgos::testAlgo( ds, m_datasetList );
+            }
+            break;
+        }
+    }
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+    }
 }
