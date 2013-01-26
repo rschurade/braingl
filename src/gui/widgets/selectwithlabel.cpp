@@ -12,25 +12,43 @@
 
 #include "selectwithlabel.h"
 
-SelectWithLabel::SelectWithLabel( QString label, int id )
+SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
+    QFrame( parent )
 {
     m_id = id;
 
     m_comboBox = new QComboBox();
+    connect( m_comboBox, SIGNAL( currentIndexChanged( int ) ), this, SLOT( indexChanged( int ) ) );
 
-    QHBoxLayout* hLayout = new QHBoxLayout();
     QVBoxLayout* vLayout = new QVBoxLayout();
 
-    QGroupBox* gb = new QGroupBox( label );
-    hLayout->addWidget( m_comboBox );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    m_label = new QLabel( label );
+    hLayout->addWidget( m_label );
+    hLayout->addStretch();
 
-    gb->setLayout( hLayout );
-    gb->setFlat( true );
-    vLayout->addWidget( gb );
+    QHBoxLayout* hLayout2 = new QHBoxLayout();
+    hLayout2->addWidget( m_comboBox );
+
+    vLayout->addLayout( hLayout );
+    vLayout->addLayout( hLayout2 );
+
+    hLayout->setContentsMargins( 0,0,0,0 );
+    hLayout2->setContentsMargins( 0,0,0,0 );
+    vLayout->setContentsMargins( 1,1,1,1 );
+    vLayout->addStretch();
+
 
     setLayout( vLayout );
 
-    connect( m_comboBox, SIGNAL( currentIndexChanged( int ) ), this, SLOT( indexChanged( int ) ) );
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+    setStyleSheet( "QLabel { font:  bold 12px; margin-bottom: -1px }"
+                     "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; margin-top: -1px } "
+                     "QSlider { max-height: 14px; margin-top: -1px }"
+                     "QLineEdit { font: 12px; max-height: 14px; margin-top: -1px }" );
+
+
 }
 
 SelectWithLabel::~SelectWithLabel()
