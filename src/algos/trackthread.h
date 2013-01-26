@@ -30,7 +30,12 @@ public:
                   float dx,
                   float dy,
                   float dz,
-                  int id );
+                  int id,
+                  int minLength,
+                  float minFA,
+                  float minStartFA,
+                  float stepSize,
+                  float smoothness );
 
     virtual ~TrackThread();
 

@@ -89,12 +89,12 @@ void Track::startTracking()
 void Track::trackWholeBrain()
 {
     QAtomicInt currentId( 0 );
-    int numThreads = QThread::idealThreadCount() - 1;
+    int numThreads = QThread::idealThreadCount();
 
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        TrackThread* t = new TrackThread( m_tensors, m_logTensors, &m_fa, &m_evec1, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, i );
+        TrackThread* t = new TrackThread( m_tensors, m_logTensors, &m_fa, &m_evec1, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, i, m_minLength, m_minFA, m_minStartFA, m_stepSize, m_smoothness );
         m_threads.push_back( t );
         connect( t, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
         connect( t, SIGNAL( finished() ), this, SLOT( slotThreadFinished() ), Qt::QueuedConnection );
@@ -135,4 +135,28 @@ void Track::slotThreadFinished()
     }
 }
 
+void Track::setMinLength( int value, int )
+{
+    m_minLength = value;
+}
+
+void Track::setMinFA( float value, int )
+{
+    m_minFA = value;
+}
+
+void Track::setMinStartFA( float value, int )
+{
+    m_minStartFA = value;
+}
+
+void Track::setStepSize( float value, int )
+{
+    m_stepSize = value;
+}
+
+void Track::setSmoothness( float value, int )
+{
+    m_smoothness = value;
+}
 

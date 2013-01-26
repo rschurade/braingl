@@ -20,7 +20,12 @@ TrackThread::TrackThread( QVector<Matrix>* tensors,
                           float dx,
                           float dy,
                           float dz,
-                          int id ) :
+                          int id,
+                          int minLength,
+                          float minFA,
+                          float minStartFA,
+                          float stepSize,
+                           float smoothness ) :
     m_tensors( tensors ),
     m_logTensors( logTensors ),
     m_fa( fa ),
@@ -33,13 +38,13 @@ TrackThread::TrackThread( QVector<Matrix>* tensors,
     m_dz( dz ),
     m_id( id ),
 
-    m_minLength( 10 ),
-    m_minFA( 0.2 ),
-    m_minStartFA( 0.2 ),
-    m_stepSize( 1.0 ),
+    m_minLength( minLength ),
+    m_minFA( minFA ),
+    m_minStartFA( minStartFA ),
+    m_stepSize( stepSize ),
     m_diag( 1.0 ),
     maxStepsInVoxel( 3 ),
-    m_smoothness( 0.0 )
+    m_smoothness( smoothness )
 {
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );
     maxStepsInVoxel = ( (int) ( m_diag / m_stepSize ) + 1 ) * 2;
@@ -58,7 +63,7 @@ QVector< QVector< float > > TrackThread::getFibs()
 
 void TrackThread::run()
 {
-    int numThreads = QThread::idealThreadCount() - 1;
+    int numThreads = QThread::idealThreadCount();
     int progressCounter = 0;
 
     for ( int i = m_id; i < m_blockSize;  i += numThreads )
@@ -73,7 +78,7 @@ void TrackThread::run()
         fib1 = track( i, false );
         fib2 = track( i, true );
 
-        if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength / m_stepSize )
+        if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
         {
             fib2r.resize( fib2.size() );
             for ( int i = 0; i < fib2.size() / 3; ++i )

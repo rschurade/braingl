@@ -73,6 +73,12 @@ private slots:
     void slotProgress();
     void slotThreadFinished();
 
+    void setMinLength( int value, int );
+    void setMinFA( float value, int );
+    void setMinStartFA( float value, int );
+    void setStepSize( float value, int );
+    void setSmoothness( float value, int );
+
 signals:
     void progress();
     void finished();
