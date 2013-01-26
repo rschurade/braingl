@@ -90,7 +90,6 @@ QString DatasetIsosurface::getValueAsString( int x, int y, int z )
 
 void DatasetIsosurface::generateSurface()
 {
-    qDebug() << "start generate";
     for ( int i = 0; i < m_numThreads; ++i )
     {
         m_threads[i]->setIsoLevel( m_isoLevel );
@@ -111,7 +110,6 @@ void DatasetIsosurface::generateSurface()
 
 void DatasetIsosurface::renameVerticesAndTriangles()
 {
-    qDebug() << "start rename";
     unsigned int nextID = 0;
     QMap<int, POINT3DID>::iterator mapIterator = m_i2pt3idVertices.begin();
     TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
@@ -140,10 +138,8 @@ void DatasetIsosurface::renameVerticesAndTriangles()
         m_mesh->addTriangle( ( *vecIterator ).pointID[ 0 ], ( *vecIterator ).pointID[ 1 ], ( *vecIterator ).pointID[ 2 ] );
         ++vecIterator;
     }
-    qDebug() << "finalize";
     m_mesh->finalize();
 
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
-    qDebug() << "end rename";
 }
