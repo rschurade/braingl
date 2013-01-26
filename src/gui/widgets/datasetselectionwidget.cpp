@@ -27,6 +27,7 @@ DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, FN_DATAS
         }
         m_layout->addWidget( sel );
     }
+    m_layout->addStretch();
     setLayout( m_layout );
 }
 

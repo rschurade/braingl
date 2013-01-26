@@ -8,17 +8,17 @@
 #ifndef SELECTWITHLABEL_H_
 #define SELECTWITHLABEL_H_
 
-#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 
 class QComboBox;
 class QLabel;
 
-class SelectWithLabel  : public QWidget
+class SelectWithLabel  : public QFrame
 {
     Q_OBJECT
 
 public:
-    SelectWithLabel( QString label, int id );
+    SelectWithLabel( QString label, int id, QWidget* parent = 0 );
     virtual ~SelectWithLabel();
 
     void insertItem( int index, QString label );
