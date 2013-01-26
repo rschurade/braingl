@@ -31,15 +31,11 @@ Track::Track( DatasetTensor* ds ) :
     maxStepsInVoxel( 3 ),
     m_smoothness( 0.0 ),
 
-    m_threads( 4 ),
-    m_count ( 0 ),
+    m_threadsRunning( 0 ),
     m_thinOut( false ),
     m_numPoints( 0 ),
     m_numLines( 0 )
 {
-    m_tensors = ds->getData();
-    m_logTensors = ds->getLogData();
-
     m_nx = ds->properties()->get( FNPROP_NX ).toInt();
     m_ny = ds->properties()->get( FNPROP_NY ).toInt();
     m_nz = ds->properties()->get( FNPROP_NZ ).toInt();
@@ -47,14 +43,10 @@ Track::Track( DatasetTensor* ds ) :
     m_dy = ds->properties()->get( FNPROP_DY ).toFloat();
     m_dz = ds->properties()->get( FNPROP_DZ ).toFloat();
 
-    qDebug() << m_dx << m_dy << m_dz;
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );
     maxStepsInVoxel = ( (int) ( m_diag / m_stepSize ) + 1 ) * 2;
 
     blockSize = m_nx * m_ny * m_nz;
-
-    FMath::evec1( *m_tensors, m_evec1 );
-    FMath::fa( *m_tensors, m_fa );
 }
 
 Track::~Track()
@@ -78,49 +70,69 @@ int Track::getNumLines()
 
 void Track::startTracking()
 {
+    m_tensors = m_dataset->getData();
+    m_logTensors = m_dataset->getLogData();
+    FMath::evec1( *m_tensors, m_evec1 );
+    FMath::fa( *m_tensors, m_fa );
+
     srand( time( 0 ) );
 
+    qDebug() << m_dx << m_dy << m_dz;
     qDebug() << "diag: " << m_diag << " msiv: " << maxStepsInVoxel;
     qDebug() << "smoothness: " << m_smoothness;
     qDebug() << "min length: " << m_minLength / m_stepSize;
 
     qDebug() << "start tracking";
     trackWholeBrain();
-    qDebug() << "finished tracking";
 }
 
 void Track::trackWholeBrain()
 {
     QAtomicInt currentId( 0 );
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = QThread::idealThreadCount() - 1;
 
-    QVector<TrackThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new TrackThread( m_tensors, m_logTensors, &m_fa, &m_evec1, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, i ) );
+        TrackThread* t = new TrackThread( m_tensors, m_logTensors, &m_fa, &m_evec1, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, i );
+        m_threads.push_back( t );
+        connect( t, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
+        connect( t, SIGNAL( finished() ), this, SLOT( slotThreadFinished() ), Qt::QueuedConnection );
     }
 
     // run threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads[i]->start();
+        ++m_threadsRunning;
+        m_threads[i]->start();
     }
-
-    // wait for all threads to finish
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        threads[i]->wait();
-    }
-    // combine fibs from all threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        fibs += threads[i]->getFibs();
-    }
-
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        delete threads[i];
-    }
-    qDebug() << "tracked " << fibs.size() << " fibers";
 }
+
+void Track::slotProgress()
+{
+    emit( progress() );
+}
+
+void Track::slotThreadFinished()
+{
+    --m_threadsRunning;
+    if ( !m_threadsRunning )
+    {
+        qDebug() << "all threads finished";
+        // combine fibs from all threads
+        for ( int i = 0; i < m_threads.size(); ++i )
+        {
+            fibs += m_threads[i]->getFibs();
+        }
+
+        for ( int i = 0; i < m_threads.size(); ++i )
+        {
+            delete m_threads[i];
+        }
+        qDebug() << "tracked " << fibs.size() << " fibers";
+        qDebug() << "finished tracking";
+        emit( finished() );
+    }
+}
+
+

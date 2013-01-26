@@ -15,6 +15,7 @@
 #include "fnaction.h"
 
 class ToolBarView;
+class TensorTrackWidget;
 
 class ToolBar : public QToolBar
 {
@@ -45,11 +46,15 @@ private:
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
 
+    TensorTrackWidget* m_ttw;
+
     void createActions();
 
 private slots:
     void slot( FN_ALGO algo );
     void slotSelectionChanged( int type );
+
+    void tensorTrackFinished();
 };
 
 #endif /* TOOLBAR_H_ */

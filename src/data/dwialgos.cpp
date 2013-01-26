@@ -300,11 +300,7 @@ QList<Dataset*> DWIAlgos::bingham2Tensor( Dataset* ds )
 QList<Dataset*> DWIAlgos::testAlgo( Dataset* ds, QList<Dataset*> &dsl )
 {
     QVector< QPair<QString, FN_DATASET_TYPE> >filter;
-
-    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "a scalar dataset", FNDT_NIFTI_SCALAR ) );
-    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "another scalar dataset", FNDT_NIFTI_SCALAR ) );
-    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "a bingham dataset", FNDT_NIFTI_BINGHAM ) );
-    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "any nifti dataset", FNDT_NIFTI_ANY ) );
+    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "optional: mask", FNDT_NIFTI_SCALAR ) );
 
     DatasetSelectionWidget* dsw = new DatasetSelectionWidget( filter, dsl );
     dsw->show();

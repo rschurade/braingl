@@ -17,6 +17,8 @@
 
 class TrackThread : public QThread
 {
+    Q_OBJECT
+
 public:
     TrackThread(  QVector<Matrix>* tensors,
                   QVector<Matrix>* logTensors,
@@ -69,6 +71,10 @@ private:
     int m_blockSize;
 
     QVector< QVector< float > >fibs;
+
+signals:
+    void progress();
+    void finished();
 };
 
 #endif /* TRACKTHREAD_H_ */
