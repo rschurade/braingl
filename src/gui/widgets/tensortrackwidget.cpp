@@ -69,7 +69,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QVector< QPair<QString, FN_DA
     setLayout( m_layout );
 
     m_tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
-    connect( m_tracker, SIGNAL( progress() ), this, SLOT( slotProgress() ) );
+    connect( m_tracker, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
     connect( m_tracker, SIGNAL( finished() ), this, SLOT( slotFinished() ) );
 
 }
@@ -95,7 +95,7 @@ void TensorTrackWidget::start()
 
 void TensorTrackWidget::slotProgress()
 {
-    m_progressBar->setValue( ++m_progress );
+    m_progressBar->setValue( m_progressBar->value() + 100 );
 }
 
 void TensorTrackWidget::slotFinished()
