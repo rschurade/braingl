@@ -26,7 +26,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<Dataset*> &dsl, QWidget
     connect( m_tracker, SIGNAL( finished() ), this, SLOT( slotFinished() ) );
 
     m_layout = new QVBoxLayout();
-
+/*
     SelectWithLabel* sel = new SelectWithLabel( QString( "optional: mask (not yet implemented)" ), 1 );
     sel->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
@@ -48,7 +48,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<Dataset*> &dsl, QWidget
         }
     }
     m_layout->addWidget( sel2 );
-
+*/
     QHBoxLayout* hLayout = new QHBoxLayout();
     m_startButton = new QPushButton( tr("Start") );
     connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
