@@ -18,7 +18,7 @@
 
 #include "tensortrackwidget.h"
 
-TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<Dataset*> &dsl, QWidget* parent ) :
+TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent ) :
     m_progress( 0 )
 {
     m_tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
