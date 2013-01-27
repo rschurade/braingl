@@ -49,12 +49,15 @@ private:
 
     GLuint *vboIds;
 
-    float m_x;
-    float m_y;
-    float m_z;
-    float m_xb;
-    float m_yb;
-    float m_zb;
+    int m_x;
+    int m_y;
+    int m_z;
+    float m_dx;
+    float m_dy;
+    float m_dz;
+    int m_nx;
+    int m_ny;
+    int m_nz;
 
     int m_width;
     int m_height;
