@@ -55,7 +55,7 @@ private:
 
     void updateGlobals();
 
-    QList<Dataset*> m_datasetList;
+    QList<QVariant> m_datasetList;
 
     PropertyGroup m_globalProperties;
 

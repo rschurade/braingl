@@ -22,7 +22,7 @@ class TensorTrackWidget : public QWidget
     Q_OBJECT
 
 public:
-    TensorTrackWidget( Dataset* ds, QList<Dataset*> &dsl, QWidget* parent = 0 );
+    TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent = 0 );
     virtual ~TensorTrackWidget();
 
     QList<Dataset*> getFibs();

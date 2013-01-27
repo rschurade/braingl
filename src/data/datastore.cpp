@@ -48,7 +48,7 @@ DataStore::~DataStore()
 void DataStore::addDataset( Dataset* dataset )
 {
     beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
-    m_datasetList.push_back( dataset );
+    m_datasetList.push_back( VPtr<Dataset>::asQVariant( dataset ) );
     connect( dataset->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     endInsertRows();
 
@@ -61,7 +61,7 @@ void DataStore::updateGlobals()
 {
     if ( m_datasetList.size() > 0 )
     {
-        Dataset* ds = m_datasetList.first();
+        Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
         if ( ds->properties()->get( FNPROP_TYPE ).toInt() < FNDT_MESH_ASCII )
         {
             m_globalProperties.set( FNGLOBAL_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
@@ -96,7 +96,7 @@ bool DataStore::save( int index, QString fileName )
 {
     if ( index >= 0 && index < m_datasetList.size() )
     {
-        Writer writer( m_datasetList[index], fileName );
+        Writer writer( VPtr<Dataset>::asPtr( m_datasetList[index] ), fileName );
         return writer.save();
     }
     return false;
@@ -135,7 +135,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
 QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
 {
-    Dataset* ds = dynamic_cast<Dataset*>( m_datasetList.at( index.row() ) );
+    Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
 
     // handle props with special treatment
     switch ( index.column() )
@@ -144,7 +144,10 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
             return ds->getTextureGLuint();
             break;
         case FNPROP_DATASET_POINTER:
-            return VPtr<Dataset>::asQVariant( ds );
+            return m_datasetList.at( index.row() );
+            break;
+        case FNPROP_DATASET_LIST:
+            return m_datasetList;
             break;
     }
     // everything else
@@ -177,7 +180,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         // everything else
         if ( index.row() >= 0 && index.row() < m_datasetList.size() )
         {
-            m_datasetList.at( index.row() )->properties()->set( (FN_PROPERTY)index.column(), value );
+            VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) )->properties()->set( (FN_PROPERTY)index.column(), value );
         }
         emit( dataChanged( index, index ) );
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -224,7 +227,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
         }
         else
         {
-            return m_datasetList.at( section )->properties()->get( FNPROP_NAME ).toString();
+            return VPtr<Dataset>::asPtr( m_datasetList.at( section ) )->properties()->get( FNPROP_NAME ).toString();
         }
     }
     if ( role == Qt::UserRole )
@@ -248,7 +251,7 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
 {
     if ( row < m_datasetList.size() )
     {
-        return createIndex( row, column, m_datasetList.at( row ) );
+        return createIndex( row, column, VPtr<Dataset>::asPtr( m_datasetList.at( row ) ) );
     }
     else if ( m_datasetList.size() == 0 && column > FNGLOBAL_SAGITTAL )
     {
@@ -294,7 +297,7 @@ void DataStore::deleteItem( int row )
     if ( row >= 0 && row < m_datasetList.size() )
     {
         beginRemoveRows( index( row, 0 ), row, row );
-        Dataset* toDelete = m_datasetList.at( row );
+        Dataset* toDelete = VPtr<Dataset>::asPtr( m_datasetList.at( row ) );
         m_datasetList.removeAt( row );
         endRemoveRows();
         beginResetModel();

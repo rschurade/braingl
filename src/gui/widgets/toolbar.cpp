@@ -126,12 +126,7 @@ void ToolBar::slot( FN_ALGO algo )
             break;
         case FNALGO_TENSOR_TRACK:
         {
-            QList<Dataset*>dsList;
-            int numDS = m_toolBarView->model()->rowCount();
-            for ( int i = 0; i < numDS; ++i )
-            {
-                dsList.push_back( VPtr<Dataset>::asPtr( m_toolBarView->model()->data( m_toolBarView->model()->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) ) );
-            }
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::EditRole ).toList();
 
             m_ttw = new TensorTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ttw, SIGNAL( finished() ), this, SLOT( tensorTrackFinished() ) );
