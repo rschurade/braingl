@@ -25,7 +25,7 @@ CombinedNavRenderer::CombinedNavRenderer( QString name ) :
     ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
-    vboIds( new GLuint[ 2 ] ),
+    vboIds( new GLuint[ 4 ] ),
     m_x( 0. ),
     m_y( 0. ),
     m_z( 0. ),
@@ -58,7 +58,7 @@ void CombinedNavRenderer::initGL()
         //qDebug() << "OpenGL initialized.";
     }
 
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 4, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
@@ -169,94 +169,128 @@ void CombinedNavRenderer::initGeometry()
     m_zb *= dz;
 
     VertexData vertices[12];
+    VertexData verticesCrosshair[12];
+
+    int xOffset = 0;
+    int yOffset = 0;
 
     if ( m_ratio > 1.5 )
     {
-        VertexData vd0 = { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        // axial
+        vertices[0] =  { QVector3D( xOffset,        yOffset,        m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        vertices[1] =  { QVector3D( xOffset + m_xb, yOffset,        m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        vertices[2] =  { QVector3D( xOffset + m_xb, yOffset + m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        vertices[3] =  { QVector3D( xOffset,        yOffset + m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
 
-        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        verticesCrosshair[0] = { QVector3D( xOffset,        yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[1] = { QVector3D( xOffset + m_xb, yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[2] = { QVector3D( xOffset + m_x,  yOffset,        m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[3] = { QVector3D( xOffset + m_x,  yOffset + m_yb, m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
-        VertexData vd4 =  { QVector3D( m_xb,  0.0,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        VertexData vd5 =  { QVector3D( m_xb + m_xb, 0.0,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        VertexData vd6 =  { QVector3D( m_xb + m_xb, m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        VertexData vd7 =  { QVector3D( m_xb,  m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        xOffset = m_xb;
+        //coronal
+        vertices[4] =  { QVector3D( xOffset,        yOffset,        m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        vertices[5] =  { QVector3D( xOffset + m_xb, yOffset,        m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        vertices[6] =  { QVector3D( xOffset + m_xb, yOffset + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        vertices[7] =  { QVector3D( xOffset,        yOffset + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
 
-        VertexData vd8 =  { QVector3D( m_xb + m_xb,  0.0,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_xb + m_xb + m_yb, 0.0,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_xb + m_xb + m_yb, m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( m_xb + m_xb,  m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 0 ] = vd0;
-        vertices[ 1 ] = vd1;
-        vertices[ 2 ] = vd2;
-        vertices[ 3 ] = vd3;
-        vertices[ 4 ] = vd4;
-        vertices[ 5 ] = vd5;
-        vertices[ 6 ] = vd6;
-        vertices[ 7 ] = vd7;
-        vertices[ 8 ] = vd8;
-        vertices[ 9 ] = vd9;
-        vertices[ 10 ] = vd10;
-        vertices[ 11 ] = vd11;
+        verticesCrosshair[4] = { QVector3D( xOffset,        yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[5] = { QVector3D( xOffset + m_xb, yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[6] = { QVector3D( xOffset + m_x,  yOffset,        m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[7] = { QVector3D( xOffset + m_x,  yOffset + m_zb, m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+
+        xOffset += m_xb;
+        //sagittal
+        vertices[8] =  { QVector3D( xOffset,        yOffset,        m_x ),       QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        vertices[9] =  { QVector3D( xOffset + m_yb, yOffset,        m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        vertices[10] = { QVector3D( xOffset + m_yb, yOffset + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[11] = { QVector3D( xOffset,        yOffset + m_zb, m_x ),       QVector3D( m_x/m_xb, 1.0, 1.0 ) };
+
+        verticesCrosshair[8] =  { QVector3D( xOffset,        yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + m_yb, yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + m_y,  yOffset,        m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + m_y,  yOffset + m_zb, m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+
+
+
     }
     else if ( m_ratio < 0.66 )
     {
-        VertexData vd0 =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
-        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        //sagittal
+        vertices[8] =  { QVector3D( xOffset,        yOffset,        m_x ),       QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        vertices[9] =  { QVector3D( xOffset + m_yb, yOffset,        m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        vertices[10] = { QVector3D( xOffset + m_yb, yOffset + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[11] = { QVector3D( xOffset,        yOffset + m_zb, m_x ),       QVector3D( m_x/m_xb, 1.0, 1.0 ) };
 
-        VertexData vd4 =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        VertexData vd5 =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        VertexData vd6 =  { QVector3D( m_xb, m_yb + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        VertexData vd7 =  { QVector3D( 0.0,  m_yb + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        verticesCrosshair[8] =  { QVector3D( xOffset,        yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + m_yb, yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + m_y,  yOffset,        m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + m_y,  yOffset + m_zb, m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
-        VertexData vd8 =  { QVector3D( 0.0,  m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_yb, m_yb + m_zb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_yb, m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( 0.0,  m_yb + m_zb + m_zb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 0 ] = vd0;
-        vertices[ 1 ] = vd1;
-        vertices[ 2 ] = vd2;
-        vertices[ 3 ] = vd3;
-        vertices[ 4 ] = vd4;
-        vertices[ 5 ] = vd5;
-        vertices[ 6 ] = vd6;
-        vertices[ 7 ] = vd7;
-        vertices[ 8 ] = vd8;
-        vertices[ 9 ] = vd9;
-        vertices[ 10 ] = vd10;
-        vertices[ 11 ] = vd11;
+        yOffset = m_zb;
+        //coronal
+        vertices[4] =  { QVector3D( xOffset,        yOffset,        m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        vertices[5] =  { QVector3D( xOffset + m_xb, yOffset,        m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        vertices[6] =  { QVector3D( xOffset + m_xb, yOffset + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        vertices[7] =  { QVector3D( xOffset,        yOffset + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+
+        verticesCrosshair[4] = { QVector3D( xOffset,        yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[5] = { QVector3D( xOffset + m_xb, yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[6] = { QVector3D( xOffset + m_x,  yOffset,        m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[7] = { QVector3D( xOffset + m_x,  yOffset + m_zb, m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+
+        yOffset += m_zb;
+        // axial
+        vertices[0] =  { QVector3D( xOffset,        yOffset,        m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        vertices[1] =  { QVector3D( xOffset + m_xb, yOffset,        m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        vertices[2] =  { QVector3D( xOffset + m_xb, yOffset + m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        vertices[3] =  { QVector3D( xOffset,        yOffset + m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+
+        verticesCrosshair[0] = { QVector3D( xOffset,        yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[1] = { QVector3D( xOffset + m_xb, yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[2] = { QVector3D( xOffset + m_x,  yOffset,        m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[3] = { QVector3D( xOffset + m_x,  yOffset + m_yb, m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
     }
     else
     {
-        VertexData vd0 =  { QVector3D( 0.0,  0.0,  m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
-        VertexData vd1 =  { QVector3D( m_xb, 0.0,  m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
-        VertexData vd2 =  { QVector3D( m_xb, m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
-        VertexData vd3 =  { QVector3D( 0.0,  m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
+        // axial
+        vertices[0] =  { QVector3D( xOffset,        yOffset,        m_z ), QVector3D( 0.0, 0.0, m_z/m_zb ) };
+        vertices[1] =  { QVector3D( xOffset + m_xb, yOffset,        m_z ), QVector3D( 1.0, 0.0, m_z/m_zb ) };
+        vertices[2] =  { QVector3D( xOffset + m_xb, yOffset + m_yb, m_z ), QVector3D( 1.0, 1.0, m_z/m_zb ) };
+        vertices[3] =  { QVector3D( xOffset,        yOffset + m_yb, m_z ), QVector3D( 0.0, 1.0, m_z/m_zb ) };
 
-        VertexData vd4 =  { QVector3D( 0.0,  m_yb,  m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
-        VertexData vd5 =  { QVector3D( m_xb, m_yb,  m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
-        VertexData vd6 =  { QVector3D( m_xb, m_zb + m_yb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
-        VertexData vd7 =  { QVector3D( 0.0,  m_zb + m_yb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+        verticesCrosshair[0] = { QVector3D( xOffset,        yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[1] = { QVector3D( xOffset + m_xb, yOffset + m_y,  m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[2] = { QVector3D( xOffset + m_x,  yOffset,        m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[3] = { QVector3D( xOffset + m_x,  yOffset + m_yb, m_zb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
-        VertexData vd8 =  { QVector3D( m_xb,  m_yb,  m_x ), QVector3D( m_x/m_xb, 1.0, 0.0 ) };
-        VertexData vd9 =  { QVector3D( m_yb + m_xb, m_yb,  m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
-        VertexData vd10 = { QVector3D( m_yb + m_xb, m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
-        VertexData vd11 = { QVector3D( m_xb,  m_zb + m_yb, m_x ), QVector3D( m_x/m_xb, 1.0, 1.0 ) };
-        vertices[ 0 ] = vd0;
-        vertices[ 1 ] = vd1;
-        vertices[ 2 ] = vd2;
-        vertices[ 3 ] = vd3;
-        vertices[ 4 ] = vd4;
-        vertices[ 5 ] = vd5;
-        vertices[ 6 ] = vd6;
-        vertices[ 7 ] = vd7;
-        vertices[ 8 ] = vd8;
-        vertices[ 9 ] = vd9;
-        vertices[ 10 ] = vd10;
-        vertices[ 11 ] = vd11;
+        yOffset = m_yb;
+        //coronal
+        vertices[4] =  { QVector3D( xOffset,        yOffset,        m_y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) };
+        vertices[5] =  { QVector3D( xOffset + m_xb, yOffset,        m_y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) };
+        vertices[6] =  { QVector3D( xOffset + m_xb, yOffset + m_zb, m_y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) };
+        vertices[7] =  { QVector3D( xOffset,        yOffset + m_zb, m_y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) };
+
+        verticesCrosshair[4] = { QVector3D( xOffset,        yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[5] = { QVector3D( xOffset + m_xb, yOffset + m_z,  m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[6] = { QVector3D( xOffset + m_x,  yOffset,        m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[7] = { QVector3D( xOffset + m_x,  yOffset + m_zb, m_yb ), QVector3D( 0.0, 0.0, 0.0 ) };
+
+        xOffset = m_xb;
+        //sagittal
+        vertices[8] =  { QVector3D( xOffset,        yOffset,        m_x ),       QVector3D( m_x/m_xb, 1.0, 0.0 ) };
+        vertices[9] =  { QVector3D( xOffset + m_yb, yOffset,        m_x ), QVector3D( m_x/m_xb, 0.0, 0.0 ) };
+        vertices[10] = { QVector3D( xOffset + m_yb, yOffset + m_zb, m_x ), QVector3D( m_x/m_xb, 0.0, 1.0 ) };
+        vertices[11] = { QVector3D( xOffset,        yOffset + m_zb, m_x ),       QVector3D( m_x/m_xb, 1.0, 1.0 ) };
+
+        verticesCrosshair[8] =  { QVector3D( xOffset,        yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + m_yb, yOffset + m_z,  m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + m_y,  yOffset,        m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + m_y,  yOffset + m_zb, m_xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+
+        xOffset = 0;
+        yOffset = m_yb;
+
     }
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3,
@@ -270,6 +304,15 @@ void CombinedNavRenderer::initGeometry()
     // Transfer vertex data to VBO 1
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
+
+    GLushort crosshairIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    // Transfer index data to VBO 2
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(GLushort), crosshairIndices, GL_STATIC_DRAW );
+
+    // Transfer vertex data to VBO 3
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(VertexData), verticesCrosshair, GL_STATIC_DRAW );
 }
 
 void CombinedNavRenderer::setupTextures()
@@ -304,4 +347,20 @@ void CombinedNavRenderer::draw()
 
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, 0 );
+
+    GLFunctions::getShader( "crosshair" )->bind();
+    GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
+    GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), (const void *) offset );
+
+    glDrawElements( GL_LINES, 12, GL_UNSIGNED_SHORT, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
 }
