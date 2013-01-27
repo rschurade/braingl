@@ -167,16 +167,21 @@ void NavRendererCoronal::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
-    GLFunctions::getShader( "crosshair" )->bind();
-    GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-    // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-    long int offset = 0;
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
-    GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), (const void *) offset );
-    // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_LINES, 4, GL_UNSIGNED_SHORT, 0 );
+    bool renderCrosshirs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ), Qt::UserRole ).toBool();
+
+    if ( renderCrosshirs )
+    {
+        GLFunctions::getShader( "crosshair" )->bind();
+        GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
+        // Tell OpenGL which VBOs to use
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+        long int offset = 0;
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
+        GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
+        glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), (const void *) offset );
+        // Draw cube geometry using indices from VBO 0
+        glDrawElements( GL_LINES, 4, GL_UNSIGNED_SHORT, 0 );
+    }
 }

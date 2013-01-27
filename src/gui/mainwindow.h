@@ -45,7 +45,8 @@ private slots:
     void slotStandardSagittalView();
     void slotToggleShaderEdit();
 
-    void slotToggleDockTitles();
+    void slotToggleDockTitles( bool value );
+    void slotRenderCrosshairs( bool value );
 
 private:
     void createActions();
@@ -57,7 +58,6 @@ private:
     DataStore* m_dataStore;
 
     bool m_debug;
-    bool m_showDockTitles;
 
     GLWidget* mainGLWidget;
     DatasetListWidget* m_datasetWidget;
@@ -65,7 +65,7 @@ private:
     ShaderEditWidget* m_shaderEditWidget;
 
     QMenu* fileMenu;
-    QMenu* editMenu;
+    QMenu* optionMenu;
     QMenu* viewMenu;
     QMenu* tabMenu;
     QMenu* helpMenu;
@@ -78,14 +78,17 @@ private:
     QAction* openAct;
     QAction* saveAct;
     QAction* printAct;
-    QAction* undoAct;
-    QAction* aboutAct;
-    QAction* aboutQtAct;
     QAction* quitAct;
+
+    QAction* lockDockTitlesAct;
+    QAction* renderCrosshairsAct;
+
     QAction* showAxialAct;
     QAction* showCoronalAct;
     QAction* showSagittalAct;
-    QAction* toggleDockTitlesAct;
+
+    QAction* aboutAct;
+    QAction* aboutQtAct;
 
     QAction* toggleShaderEditAct;
 
