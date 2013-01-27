@@ -23,8 +23,7 @@
 MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
-    m_debug( debug ),
-    m_showDockTitles( true )
+    m_debug( debug )
 {
 	m_centralTabWidget = new QTabWidget( this );
 	setCentralWidget( m_centralTabWidget );
@@ -60,11 +59,11 @@ MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
 	}
-	if ( settings.contains( "showDockTitles") )
+	if ( settings.contains( "lockDockTitles") )
 	{
-	    if ( !settings.value( "showDockTitles" ).toBool() )
+	    if ( settings.value( "lockDockTitles" ).toBool() )
 	    {
-	        toggleDockTitlesAct->activate( QAction::Trigger );
+	        lockDockTitlesAct->activate( QAction::Trigger );
 
 	    }
 	}
@@ -77,7 +76,7 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	settings.setValue( "mainWindowState", saveState() );
 	QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
 	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
-	settings.setValue( "showDockTitles", m_showDockTitles );
+	settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
 }
 
 void MainWindow::print()
@@ -171,11 +170,6 @@ void MainWindow::createActions()
     printAct->setStatusTip( tr( "Print the current form letter" ) );
     connect( printAct, SIGNAL(triggered()), this, SLOT(print()) );
 
-    undoAct = new QAction( QIcon( ":/icons/undo.png" ), tr( "&Undo" ), this );
-    undoAct->setShortcuts( QKeySequence::Undo );
-    undoAct->setStatusTip( tr( "Undo the last editing action" ) );
-    connect( undoAct, SIGNAL(triggered()), this, SLOT(undo()) );
-
     quitAct = new QAction( tr( "&Quit" ), this );
     quitAct->setShortcuts( QKeySequence::Quit );
     quitAct->setStatusTip( tr( "Quit the application" ) );
@@ -239,9 +233,18 @@ void MainWindow::createActions()
     toggleShaderEditAct->setStatusTip( tr( "Toggle the shader edit widget." ) );
     connect( toggleShaderEditAct, SIGNAL( triggered() ), this, SLOT( slotToggleShaderEdit() ) );
 
-    toggleDockTitlesAct = new QAction( tr( "Lock Widgets" ), this );
-    toggleDockTitlesAct->setStatusTip( tr( "Lock all dock widgets in place" ) );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), this, SLOT( slotToggleDockTitles() ) );
+    lockDockTitlesAct = new QAction( tr( "Lock Widgets" ), this );
+    lockDockTitlesAct->setStatusTip( tr( "Lock all dock widgets in place" ) );
+    lockDockTitlesAct->setCheckable( true );
+    lockDockTitlesAct->setChecked( false );
+    connect( lockDockTitlesAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleDockTitles( bool ) ) );
+
+    renderCrosshairsAct = new QAction( tr( "Render Crosshairs" ), this );
+    renderCrosshairsAct->setStatusTip( tr( "render crosshairs in navigation widgets." ) );
+    renderCrosshairsAct->setCheckable( true );
+    renderCrosshairsAct->setChecked( true );
+    connect( renderCrosshairsAct, SIGNAL( toggled( bool ) ), this, SLOT( slotRenderCrosshairs( bool ) ) );
+
 }
 
 void MainWindow::createMenus()
@@ -253,11 +256,11 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction( quitAct );
 
-    editMenu = menuBar()->addMenu( tr( "&Edit" ) );
-    editMenu->addAction( undoAct );
+    optionMenu = menuBar()->addMenu( tr( "&Options" ) );
+    optionMenu->addAction( lockDockTitlesAct );
+    optionMenu->addAction( renderCrosshairsAct );
 
     viewMenu = menuBar()->addMenu( tr( "&View" ) );
-    viewMenu->addAction( toggleDockTitlesAct );
 
     tabMenu = menuBar()->addMenu( tr( "&Tabs" ) );
     tabMenu->addAction( addTabCombined );
@@ -312,7 +315,7 @@ void MainWindow::createDockWindows()
 	m_datasetWidget->setModel( m_dataStore );
 	addDockWidget( Qt::LeftDockWidgetArea, m_datasetWidget );
 	viewMenu->addAction( m_datasetWidget->toggleViewAction() );
-	connect( toggleDockTitlesAct, SIGNAL( triggered() ), m_datasetWidget, SLOT( toggleTitleWidget() ) );
+	connect( lockDockTitlesAct, SIGNAL( triggered() ), m_datasetWidget, SLOT( toggleTitleWidget() ) );
 
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
@@ -323,45 +326,45 @@ void MainWindow::createDockWindows()
     dsProperties->setModel( m_dataStore );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dsProperties->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), dsProperties, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dsProperties, SLOT( toggleTitleWidget() ) );
 
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( QString("global properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, globalProperties );
     globalProperties->setModel( m_dataStore );
     viewMenu->addAction( globalProperties->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), globalProperties, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), globalProperties, SLOT( toggleTitleWidget() ) );
 
 	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
 	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
 	dsInfo->setModel( m_dataStore );
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dsInfo->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), dsInfo, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dsInfo, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav1 );
     viewMenu->addAction( nav1->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav1, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav1, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), 0, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav2 );
     viewMenu->addAction( nav2->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav2, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav2, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), 1, this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav3 );
     viewMenu->addAction( nav3->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav3, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav3, SLOT( toggleTitleWidget() ) );
 
     DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, nav4 );
     viewMenu->addAction( nav4->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), nav4, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav4, SLOT( toggleTitleWidget() ) );
 
     DockSingleSHWidget* sshw = new DockSingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
     addDockWidget( Qt::RightDockWidgetArea, sshw );
     viewMenu->addAction( sshw->toggleViewAction() );
-    connect( toggleDockTitlesAct, SIGNAL( triggered() ), sshw, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), sshw, SLOT( toggleTitleWidget() ) );
 }
 
 void MainWindow::closeTab( int index )
@@ -446,7 +449,13 @@ void MainWindow::slotToggleShaderEdit()
     m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
 }
 
-void MainWindow::slotToggleDockTitles()
+void MainWindow::slotToggleDockTitles( bool value )
 {
-    m_showDockTitles = !m_showDockTitles;
 }
+
+void MainWindow::slotRenderCrosshairs( bool value )
+{
+    QModelIndex mi = m_dataStore->index( 0, FNSETTING_RENDER_CROSSHAIRS );
+    m_dataStore->setData( mi, value, Qt::UserRole );
+}
+

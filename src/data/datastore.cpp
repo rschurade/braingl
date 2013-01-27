@@ -39,6 +39,8 @@ DataStore::DataStore()
     m_globalProperties.set( FNGLOBAL_BBX, 0 );
     m_globalProperties.set( FNGLOBAL_BBY, 0 );
     m_globalProperties.set( FNGLOBAL_VIEW, 0 );
+    m_globalProperties.set( FNSETTING_RENDER_CROSSHAIRS, true );
+
 }
 
 DataStore::~DataStore()
@@ -210,10 +212,8 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         {
             emit( dataChanged( index, index ) );
         }
-
         return true;
     }
-
     return false;
 }
 

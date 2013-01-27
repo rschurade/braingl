@@ -104,13 +104,15 @@ enum FN_PROPERTY
     FNGLOBAL_SHOW_SAGITTAL,
     FNGLOBAL_SHOW_CORONAL,
     FNGLOBAL_SHOW_AXIAL,
+    FNSETTING_LOCK_WIDGETS,
+    FNSETTING_RENDER_CROSSHAIRS,
+// settings that need a datastore signal to update widgets need to be inserted above this line
     FNGLOBAL_ZOOM,
     FNGLOBAL_MOVEX,
     FNGLOBAL_MOVEY,
     FNGLOBAL_BBX,
     FNGLOBAL_BBY,
-    FNGLOBAL_VIEW,
-    FNSETTING_LOCK_WIDGETS
+    FNGLOBAL_VIEW
 };
 
 enum FN_ORIENT
