@@ -45,8 +45,8 @@ void DatasetScalar::examineDataset()
     m_properties.set( FNPROP_MIN, min );
     m_properties.set( FNPROP_MAX, max );
 
-    m_properties.set( FNPROP_LOWER_THRESHOLD, min );
-    m_properties.set( FNPROP_UPPER_THRESHOLD, max );
+    m_properties.set( FNPROP_LOWER_THRESHOLD, min, min, max, true );
+    m_properties.set( FNPROP_UPPER_THRESHOLD, max, min, max, true );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
