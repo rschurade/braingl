@@ -13,8 +13,8 @@
 
 #include "../../algos/track.h"
 #include "../../data/datasets/dataset.h"
-#include "../../data/datasets/datasetFibers.h"
-#include "../../data/datasets/datasetTensor.h"
+#include "../../data/datasets/datasetfibers.h"
+#include "../../data/datasets/datasettensor.h"
 
 #include "tensortrackwidget.h"
 
