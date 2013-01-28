@@ -283,7 +283,7 @@ QList<Dataset*> DWIAlgos::tensorTrack( Dataset* ds )
     return l;
 }
 
-QList<Dataset*> DWIAlgos::bingham2Tensor( Dataset* ds )
+QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
 {
     QList<Dataset*> l= Bingham::bingham2Tensor( dynamic_cast<DatasetBingham*>( ds ) );
     for ( int i = 0; i < l.size(); ++i )
@@ -291,7 +291,6 @@ QList<Dataset*> DWIAlgos::bingham2Tensor( Dataset* ds )
         l[i]->properties()->set( FNPROP_FILENAME, "Tensor" );
         l[i]->properties()->set( FNPROP_NAME, "DWI FROM BINGHAM " + QString::number( i ) );
         l[i]->properties()->set( FNPROP_CREATED_BY, FNALGO_BINGHAM_2_TENSOR );
-        l[i]->properties()->set( FNPROP_DIM, 9 );
         l[i]->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
     }
     return l;

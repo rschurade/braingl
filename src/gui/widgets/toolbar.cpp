@@ -141,7 +141,7 @@ void ToolBar::slot( FN_ALGO algo )
             l = FiberAlgos::thinOut( ds );
             break;
         case FNALGO_BINGHAM_2_TENSOR:
-            l = DWIAlgos::bingham2Tensor( ds );
+            l = DWIAlgos::bingham2DWI( ds );
             break;
         case FNALGO_TEST:
             break;
