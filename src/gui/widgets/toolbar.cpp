@@ -116,10 +116,24 @@ void ToolBar::slot( FN_ALGO algo )
             l = DWIAlgos::tensorFit( ds );
             break;
         case FNALGO_FA:
-            l = DWIAlgos::calcFAFromDWI( ds );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::calcFAFromDWI( ds );
+            }
+            else if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            {
+                l = DWIAlgos::calcFAFromTensor( ds );
+            }
             break;
         case FNALGO_EV:
-            l = DWIAlgos::calcEVFromDWI( ds );
+            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            {
+                l = DWIAlgos::calcEVFromDWI( ds );
+            }
+            else if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            {
+                l = DWIAlgos::calcEVFromTensor( ds );
+            }
             break;
         case FNALGO_BINGHAM:
             l = DWIAlgos::fitBingham( ds );
