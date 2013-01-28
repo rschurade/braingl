@@ -39,9 +39,9 @@ bool Writer::save()
         {
             nifti_image* out = createHeader( 1 );
 
-            QVector<float> data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
+            QVector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
 
-            out->data = &( data[0] );
+            out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;

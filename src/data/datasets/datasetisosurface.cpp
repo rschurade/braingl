@@ -21,7 +21,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
         m_renderer( 0 ),
         m_oldIsoValue( -1 )
 {
-    m_scalarField = ds->getData();
+    m_scalarField = *(ds->getData() );
 
     m_properties.set( FNPROP_NX, ds->properties()->get( FNPROP_NX ).toInt() );
     m_properties.set( FNPROP_NY, ds->properties()->get( FNPROP_NY ).toInt() );
