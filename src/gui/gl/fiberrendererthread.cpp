@@ -4,6 +4,8 @@
  *  Created on: 28.12.2012
  *      Author: Ralph
  */
+#include <math.h>
+
 #include <QtGui/QVector3D>
 
 #include "fiberrendererthread.h"

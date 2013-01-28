@@ -5,6 +5,7 @@
  *      Author: schurade
  */
 #include <limits>
+#include <math.h>
 
 #include "../data/datasets/datasetfibers.h"
 
