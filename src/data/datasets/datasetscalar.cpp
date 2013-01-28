@@ -25,6 +25,12 @@ DatasetScalar::~DatasetScalar()
     glDeleteTextures( 1, &m_textureGLuint );
 }
 
+QVector<float>* DatasetScalar::getData()
+{
+    return &m_data;
+}
+
+
 void DatasetScalar::examineDataset()
 {
     int nx = m_properties.get( FNPROP_NX ).toInt();
@@ -84,11 +90,6 @@ void DatasetScalar::createTexture()
     glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
     delete[] tmpData;
 
-}
-
-QVector<float> DatasetScalar::getData()
-{
-    return m_data;
 }
 
 void DatasetScalar::flipX()

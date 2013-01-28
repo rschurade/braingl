@@ -16,7 +16,7 @@ public:
     DatasetScalar( QString filename, QVector<float> data, nifti_image* header );
     virtual ~DatasetScalar();
 
-    QVector<float> getData();
+    QVector<float>* getData();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
     QString getValueAsString( int x, int y, int z );
