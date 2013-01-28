@@ -10,6 +10,8 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
+#include <math.h>
+
 #include <QtCore/QVector>
 #include <QtCore/QString>
 #include <QtCore/QVector>

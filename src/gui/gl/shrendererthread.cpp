@@ -4,6 +4,8 @@
  *  Created on: 27.12.2012
  *      Author: Ralph
  */
+#include <math.h>
+ #include <limits>
 
 #include "../../data/mesh/tesselation.h"
 
