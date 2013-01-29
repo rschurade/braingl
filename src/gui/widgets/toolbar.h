@@ -16,6 +16,7 @@
 
 class ToolBarView;
 class TensorTrackWidget;
+class CrossingTrackWidget;
 
 class ToolBar : public QToolBar
 {
@@ -42,11 +43,13 @@ private:
     FNAction* m_evAct;
     FNAction* m_meshAction1;
     FNAction* m_fiberTrackingAct;
+    FNAction* m_crossingTrackingAct;
     FNAction* m_fiberThinningAct;
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
 
     TensorTrackWidget* m_ttw;
+    CrossingTrackWidget* m_ctw;
 
     void createActions();
 
@@ -55,6 +58,7 @@ private slots:
     void slotSelectionChanged( int type );
 
     void tensorTrackFinished();
+    void crossingTrackFinished();
 };
 
 #endif /* TOOLBAR_H_ */

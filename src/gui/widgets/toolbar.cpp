@@ -14,6 +14,7 @@
 
 #include "../views/toolbarview.h"
 #include "../widgets/tensortrackwidget.h"
+#include "../widgets/crossingtrackwidget.h"
 
 #include "toolbar.h"
 
@@ -85,6 +86,10 @@ void ToolBar::createActions()
     m_fiberTrackingAct->setStatusTip( tr( "tensor tracking" ) );
     connect( m_fiberTrackingAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 
+    m_crossingTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking with fiber crossings" ), this, FNALGO_CROSSING_TRACK );
+    m_crossingTrackingAct->setStatusTip( tr( "tensor tracking with crossings" ) );
+    connect( m_crossingTrackingAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+
     m_fiberThinningAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "fiber thinning" ), this, FNALGO_FIBER_THINNING );
     m_fiberThinningAct->setStatusTip( tr( "fiber thinning" ) );
     connect( m_fiberThinningAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
@@ -148,6 +153,17 @@ void ToolBar::slot( FN_ALGO algo )
             break;
 
         }
+        case FNALGO_CROSSING_TRACK:
+        {
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::EditRole ).toList();
+
+            m_ctw = new CrossingTrackWidget( ds, dsList, this->parentWidget() );
+            connect( m_ctw, SIGNAL( finished() ), this, SLOT( crossingTrackFinished() ) );
+            m_ctw->show();
+            break;
+
+        }
+
         case FNALGO_ISOSURFACE:
             l = ScalarAlgos::isoSurface( ds );
             break;
@@ -191,6 +207,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_faAct );
             this->addAction( m_evAct );
             this->addAction( m_fiberTrackingAct );
+            this->addAction( m_crossingTrackingAct );
             break;
         }
         case FNDT_NIFTI_SH:
@@ -231,10 +248,22 @@ void ToolBar::tensorTrackFinished()
     QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), FNPROP_DATASET_POINTER );
     QList<Dataset*>l = m_ttw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
-   {
-       m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
-   }
+    {
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+    }
     m_ttw->hide();
     destroy( m_ttw );
 }
 
+void ToolBar::crossingTrackFinished()
+{
+    qDebug() << "toolbar crossing track finished";
+    QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), FNPROP_DATASET_POINTER );
+    QList<Dataset*>l = m_ctw->getFibs();
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+    }
+    m_ctw->hide();
+    destroy( m_ctw );
+}

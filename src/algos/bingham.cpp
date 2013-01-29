@@ -203,11 +203,11 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
                 ColumnVector sh_signal = inv_base * tmp;
 
                 //do the convolution
-                for( int order(0), j(0), i(0); order <= max_ord; order+=2, ++i )
+                for( int order(0), j(0), m(0); order <= max_ord; order+=2, ++i )
                 {
                     for( int degree( -order ); degree <= order; ++degree, ++j )
                     {
-                        sh_signal(j+1) = sh_signal( j+1 ) * ( kernel[i] / boost::math::spherical_harmonic_r( order, 0, 0, 0 ) );
+                        sh_signal(j+1) = sh_signal( j+1 ) * ( kernel[m] / boost::math::spherical_harmonic_r( order, 0, 0, 0 ) );
                     }
                 }
 
