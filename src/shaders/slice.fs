@@ -46,7 +46,7 @@ vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, flo
 {
     float value = unpackFloat( v );
     vec3 color = vec3(0.0);
-    if( value > lowerThreshold && value <= upperThreshold )
+    if( value > lowerThreshold )
     {
         value = ( value - lowerThreshold ) / ( upperThreshold - lowerThreshold );
         

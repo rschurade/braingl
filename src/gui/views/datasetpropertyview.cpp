@@ -10,6 +10,7 @@
 #include "../widgets/sliderwitheditint.h"
 #include "../widgets/selectwithlabel.h"
 #include "../widgets/checkboxwithlabel.h"
+#include "../widgets/colormapwidget.h"
 #include "../../data/enums.h"
 
 #include "../../data/datasets/dataset.h"
@@ -119,11 +120,23 @@ void DatasetPropertyView::updateWidgetVisibility()
     m_layout->removeItem( m_layout->itemAt( 0 ) );
     m_visibleWidgets.clear();
     m_widget->repaint();
+
     for ( int i = 0; i < visible.size(); ++i )
     {
         m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
         ds->properties()->getWidget( visible[i] )->show();
         m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
+        if ( visible[i] == FNPROP_COLORMAP )
+        {
+            ColormapWidget* cmapWidget = new ColormapWidget( m_widget->size().width() );
+            m_layout->addWidget( cmapWidget );
+            m_visibleWidgets.push_back( cmapWidget );
+            cmapWidget->setLowerThreshold( ds->properties()->get( FNPROP_LOWER_THRESHOLD ).toFloat() );
+            cmapWidget->setUpperThreshold( ds->properties()->get( FNPROP_UPPER_THRESHOLD ).toFloat() );
+            connect( ds->properties()->getWidget( FNPROP_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+            connect( ds->properties()->getWidget( FNPROP_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+        }
     }
+
     m_layout->addStretch();
 }
