@@ -36,6 +36,11 @@ uniform int u_colormap4;
 
 varying vec3 v_texcoord;
 
+float unpackFloat(const vec4 value) {
+    const vec4 bitSh = vec4(1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0);
+    //const vec4 bitSh = vec4(0.0, 0.0, 1.0, 1.0 / 256.0 );
+    return (dot(value, bitSh));
+}
 
 vec3 colormap( vec3 v, int colormapSelection )
 {
@@ -61,7 +66,7 @@ vec3 colormap( vec3 v, int colormapSelection )
 	}
 	else
 	{
-		return v;
+		return vec3( v.r, v.r, v.r );
 	}
 }
 
@@ -74,9 +79,11 @@ void main()
 	if ( u_texActive0 )
 	{
 		vec4 color0 = texture3D( texture0, v_texcoord );
-		if( color0.r > u_lowerThreshold0 && color0.r <= u_upperThreshold0 )
+		float value0 = unpackFloat( color0 );
+		if( value0 > u_lowerThreshold0 && value0 <= u_upperThreshold0 )
 		{
-		    color0.r = ( color0.r - u_lowerThreshold0 ) / ( u_upperThreshold0 - u_lowerThreshold0 );
+		    value0 = ( value0 - u_lowerThreshold0 ) / ( u_upperThreshold0 - u_lowerThreshold0 );
+		    color0.r = value0;
 			color = vec4( colormap( color0.rgb, u_colormap0 ), 1.0 );
 		}
 	}
@@ -84,9 +91,11 @@ void main()
 	if ( u_texActive1 )
 	{
 		vec4 color1 = texture3D( texture1, v_texcoord );
-		if( color1.r > u_lowerThreshold1 && color1.r <= u_upperThreshold1 )
+		float value1 = unpackFloat( color1 );
+		if( value1 > u_lowerThreshold1 && value1 <= u_upperThreshold1 )
 		{
-		    color1.r = ( color1.r - u_lowerThreshold1 ) / ( u_upperThreshold1 - u_lowerThreshold1 );
+		    value1 = ( value1 - u_lowerThreshold1 ) / ( u_upperThreshold1 - u_lowerThreshold1 );
+            color1.r = value1;
 			color.rgb =  mix( color.rgb, colormap( color1.rgb, u_colormap1 ), u_alpha1 );
 		}
 	}
@@ -94,9 +103,11 @@ void main()
 	if ( u_texActive2 )
 	{
 		vec4 color2 = texture3D( texture2, v_texcoord );
-		if( color2.r > u_lowerThreshold2 && color2.r <= u_upperThreshold2 )
+		float value2 = unpackFloat( color2 );
+		if( value2 > u_lowerThreshold2 && value2 <= u_upperThreshold2 )
 		{
-		    color2.r = ( color2.r - u_lowerThreshold2 ) / ( u_upperThreshold2 - u_lowerThreshold2 );
+		    value2 = ( value2 - u_lowerThreshold2 ) / ( u_upperThreshold2 - u_lowerThreshold2 );
+            color2.r = value2;
 			color.rgb =  mix( color.rgb, colormap( color2.rgb, u_colormap2 ), u_alpha2 );
 		}
 	}
@@ -104,9 +115,11 @@ void main()
 	if ( u_texActive3 )
 	{
 		vec4 color3 = texture3D( texture3, v_texcoord );
-		if( color3.r > u_lowerThreshold3 && color3.r <= u_upperThreshold3 )
+		float value3 = unpackFloat( color3 );
+		if( value3 > u_lowerThreshold3 && value3 <= u_upperThreshold3 )
 		{
-		    color3.r = ( color3.r - u_lowerThreshold3 ) / ( u_upperThreshold3 - u_lowerThreshold3 );
+		    value3 = ( value3 - u_lowerThreshold3 ) / ( u_upperThreshold3 - u_lowerThreshold3 );
+            color3.r = value3;
 			color.rgb =  mix( color.rgb, colormap( color3.rgb, u_colormap3 ), u_alpha3 );
 		}
 	}
@@ -114,9 +127,11 @@ void main()
 	if ( u_texActive4 )
 	{
 		vec4 color4 = texture3D( texture4, v_texcoord );
-		if( color4.r > u_lowerThreshold4 && color4.r <= u_upperThreshold4 )
+		float value4 = unpackFloat( color4 );
+		if( value4 > u_lowerThreshold4 && value4 <= u_upperThreshold4 )
 		{
-		    color4.r = ( color4.r - u_lowerThreshold4 ) / ( u_upperThreshold4 - u_lowerThreshold4 );
+		    value4 = ( value4 - u_lowerThreshold4 ) / ( u_upperThreshold4 - u_lowerThreshold4 );
+            color4.r = value4;
 			color.rgb =  mix( color.rgb, colormap( color4.rgb, u_colormap4 ), u_alpha4 );
 		}
 	}
