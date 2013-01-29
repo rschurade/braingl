@@ -81,13 +81,18 @@ void DatasetScalar::createTexture()
 
     float max = m_properties.get( FNPROP_MAX ).toFloat();
 
-    float* tmpData = new float[nx * ny * nz];
+    unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
     {
-        tmpData[i] = m_data[i] / max;
+        //unsigned int tmp = (double)i / (double)(nx * ny * nz) * 256 * 256 * 256 * 256;
+        unsigned int tmp = ( m_data[i] / max ) * 256 * 256 * 256 * 256;
+        tmpData[4 * i + 3 ] = (tmp / (256 * 256 * 256)) % 256;
+        tmpData[4 * i + 2 ] = (tmp / (256 * 256)) % 256;
+        tmpData[4 * i + 1 ] = (tmp / (256)) % 256;
+        tmpData[4 * i + 0 ] = tmp % 256 ;
     }
 
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
+    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
 
 }
