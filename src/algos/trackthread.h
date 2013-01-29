@@ -9,9 +9,9 @@
 #define TRACKTHREAD_H_
 
 #include <QtCore/QDebug>
+#include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-#include <QThread>
 
 #include "../thirdparty/newmat10/newmat.h"
 

@@ -13,7 +13,8 @@
 #include "selectwithlabel.h"
 
 SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
-    QFrame( parent )
+    QFrame( parent ),
+    m_currentIndex( -1 )
 {
     m_id = id;
 
@@ -60,12 +61,23 @@ void SelectWithLabel::insertItem( int index, QString label )
     m_comboBox->insertItem( index, label );
 }
 
+void SelectWithLabel::addItem ( const QString &text, const QVariant &userData )
+{
+    m_comboBox->addItem( text, userData );
+}
+
 void SelectWithLabel::setCurrentIndex( int index )
 {
     m_comboBox->setCurrentIndex( index );
 }
 
+int SelectWithLabel::getCurrentIndex()
+{
+    return m_currentIndex;
+}
+
 void SelectWithLabel::indexChanged( int index )
 {
+    m_currentIndex = m_comboBox->itemData( index ).toInt();
     emit( currentIndexChanged( index, m_id ) );
 }

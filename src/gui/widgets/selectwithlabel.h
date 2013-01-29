@@ -8,6 +8,7 @@
 #ifndef SELECTWITHLABEL_H_
 #define SELECTWITHLABEL_H_
 
+#include <QtCore/QVariant>
 #include <QtGui/QFrame>
 
 class QComboBox;
@@ -23,12 +24,15 @@ public:
 
     void insertItem( int index, QString label );
     void setCurrentIndex( int index );
+    int getCurrentIndex();
+    void addItem (const QString  &text   , const QVariant  &userData=QVariant() );
 
 private:
     QLabel* m_label;
     QComboBox* m_comboBox;
 
     int m_id;
+    int m_currentIndex;
 
 signals:
     void currentIndexChanged( int, int );
