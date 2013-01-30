@@ -75,7 +75,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
         m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
         if ( visible[i] == FNPROP_COLORMAP )
         {
-            ColormapWidget* cmapWidget = new ColormapWidget( size().width() );
+            ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 6 );
             m_layout->addWidget( cmapWidget );
             m_visibleWidgets.push_back( cmapWidget );
             cmapWidget->setLowerThreshold( ds->properties()->get( FNPROP_LOWER_THRESHOLD ).toFloat() );
