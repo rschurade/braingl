@@ -7,14 +7,14 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QProgressBar>
 
-#include "sliderwithedit.h"
-#include "sliderwitheditint.h"
-#include "selectwithlabel.h"
+#include "../controls/sliderwithedit.h"
+#include "../controls/sliderwitheditint.h"
+#include "../controls/selectwithlabel.h"
 
-#include "../../algos/track.h"
-#include "../../data/datasets/dataset.h"
-#include "../../data/datasets/datasetfibers.h"
-#include "../../data/datasets/datasettensor.h"
+#include "../../../algos/track.h"
+#include "../../../data/datasets/dataset.h"
+#include "../../../data/datasets/datasetfibers.h"
+#include "../../../data/datasets/datasettensor.h"
 
 #include "tensortrackwidget.h"
 

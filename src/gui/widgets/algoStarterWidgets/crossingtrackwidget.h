@@ -8,7 +8,7 @@
 #ifndef CROSSINGTRACKWIDGET_H_
 #define CROSSINGTRACKWIDGET_H_
 
-#include "../../data/enums.h"
+#include "../../../data/enums.h"
 
 #include <QtGui/QtGui>
 

@@ -13,8 +13,8 @@
 #include "../../data/datasets/dataset.h"
 
 #include "../views/toolbarview.h"
-#include "../widgets/tensortrackwidget.h"
-#include "../widgets/crossingtrackwidget.h"
+#include "../widgets/algoStarterWidgets/tensortrackwidget.h"
+#include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
 
 #include "toolbar.h"
 

@@ -6,7 +6,7 @@
  */
 #include <QtGui/QWidget>
 
-#include "../../gui/widgets/sliderwithedit.h"
+#include "../../gui/widgets/controls/sliderwithedit.h"
 
 #include "propertyfloat.h"
 

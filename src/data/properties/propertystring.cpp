@@ -4,7 +4,7 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/editwithlabel.h"
+#include "../../gui/widgets/controls/editwithlabel.h"
 
 #include "propertystring.h"
 

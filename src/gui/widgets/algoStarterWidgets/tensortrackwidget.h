@@ -8,7 +8,7 @@
 #ifndef TENSORTRACKWIDGET_H_
 #define TENSORTRACKWIDGET_H_
 
-#include "../../data/enums.h"
+#include "../../../data/enums.h"
 
 #include <QtGui/QtGui>
 

@@ -4,7 +4,7 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/sliderwitheditint.h"
+#include "../../gui/widgets/controls/sliderwitheditint.h"
 
 #include "propertyint.h"
 
