@@ -6,11 +6,11 @@
  */
 #include <QtGui/QtGui>
 
-#include "../widgets/sliderwithedit.h"
-#include "../widgets/sliderwitheditint.h"
-#include "../widgets/selectwithlabel.h"
-#include "../widgets/checkboxwithlabel.h"
-#include "../widgets/colormapwidget.h"
+#include "../widgets/controls/sliderwithedit.h"
+#include "../widgets/controls/sliderwitheditint.h"
+#include "../widgets/controls/selectwithlabel.h"
+#include "../widgets/controls/checkboxwithlabel.h"
+#include "../widgets/controls/colormapwidget.h"
 #include "../../data/enums.h"
 
 #include "../../data/datasets/dataset.h"

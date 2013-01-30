@@ -8,7 +8,7 @@
 #ifndef DATASETSELECTIONWIDGET_H_
 #define DATASETSELECTIONWIDGET_H_
 
-#include "../../data/enums.h"
+#include "../../../data/enums.h"
 
 #include <QtGui/QtGui>
 

@@ -12,7 +12,7 @@
 
 #include "../../data/enums.h"
 
-#include "fnaction.h"
+#include "controls/fnaction.h"
 
 class ToolBarView;
 class TensorTrackWidget;

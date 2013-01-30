@@ -6,7 +6,7 @@
  */
 #include <QtGui/QtGui>
 
-#include "../widgets/sliderwitheditint.h"
+#include "../widgets/controls/sliderwitheditint.h"
 #include "../../data/enums.h"
 #include "globalpropertyview.h"
 

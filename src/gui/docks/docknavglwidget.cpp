@@ -8,7 +8,7 @@
 
 #include "../../data/enums.h"
 #include "../../data/datastore.h"
-#include "../widgets/sliderwitheditint2.h"
+#include "../widgets/controls/sliderwitheditint2.h"
 
 
 #include "../widgets/navglwidget.h"

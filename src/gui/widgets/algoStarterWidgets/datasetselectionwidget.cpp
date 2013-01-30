@@ -4,9 +4,9 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../data/datasets/dataset.h"
+#include "../../../data/datasets/dataset.h"
 
-#include "selectwithlabel.h"
+#include "../controls/selectwithlabel.h"
 
 #include "datasetselectionwidget.h"
 

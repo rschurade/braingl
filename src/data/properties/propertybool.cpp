@@ -4,7 +4,7 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/checkboxwithlabel.h"
+#include "../../gui/widgets/controls/checkboxwithlabel.h"
 
 #include "propertybool.h"
 

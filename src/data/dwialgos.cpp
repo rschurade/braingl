@@ -15,7 +15,7 @@
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
 
-#include "../gui/widgets/datasetselectionwidget.h"
+#include "../gui/widgets/algoStarterWidgets/datasetselectionwidget.h"
 
 #include "mesh/tesselation.h"
 
