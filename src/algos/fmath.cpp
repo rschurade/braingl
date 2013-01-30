@@ -610,7 +610,7 @@ void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
 
         if ( DD > 0 )
         {
-            faOut[i] = (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) );
+            faOut[i] = qMin( 1.0f, (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) ) );
         }
         else
         {
