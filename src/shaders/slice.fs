@@ -57,9 +57,8 @@ vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, flo
         if ( cmap == 1 )
         {
             value *= 5.0;
-            if( value < 0.0 )
-                color = vec3( 0.0, 0.0, 0.0 );
-            else if( value < 1.0 )
+            color = vec3( 0.0, 0.0, 0.0 );
+            if( value < 1.0 )
                 color = vec3( 0.0, value, 1.0 );
             else if( value < 2.0 )
                 color = vec3( 0.0, 1.0, 2.0-value );
@@ -73,6 +72,22 @@ vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, flo
                 color =  vec3( 1.0, 0.0, 1.0 );
         }  
         if ( cmap == 2 )
+        {
+            value *= 6.0;
+            if( value < 0.0 )
+                color = vec3( 0.0, 0.0, 0.0 );
+            if( value < 2.0 )
+                color = vec3( 0.0, .5 * value, 1.0 );
+            else if( value < 3.0 )
+                color = vec3( 0.0, 1.0, 3.0-value );
+            else if( value < 4.0 )
+                color =  vec3( value-3.0, 1.0, 0.0 );
+            else if( value <= 6.0 )
+                color = vec3( 1.0, .5 * (6.0-value), 0.0 );
+            else
+                color =  vec3( 1.0, 0.0, 0.0 ); 
+        }
+        if ( cmap == 3 )
         {
             color = vec3( v.r, v.g, v.b );            
         }

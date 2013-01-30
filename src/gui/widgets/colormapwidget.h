@@ -23,12 +23,14 @@ public:
 
 private:
     QImage* createImage( int width );
-    QColor colormap( float value );
+    QColor colormap1( float value );
+    QColor colormap2( float value );
 
     QImage* m_image;
     QLabel* m_nlabel;
     QLabel* m_clabel;
 
+    int m_colormap;
     int m_width;
     float m_lowerThreshold;
     float m_upperThreshold;
@@ -36,6 +38,7 @@ private:
 public slots:
     void setLowerThreshold( float value );
     void setUpperThreshold( float value );
+    void setColormap( int value );
 };
 
 #endif /* COLORMAPWIDGET_H_ */
