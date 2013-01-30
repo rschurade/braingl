@@ -7,10 +7,16 @@
 
 #include "fndockwidget.h"
 
-FNDockWidget::FNDockWidget( QString name, QWidget* parent ) :
+FNDockWidget::FNDockWidget( QString name, QWidget* widget, QWidget* parent ) :
     QDockWidget( name, parent )
 {
+    setObjectName( name );
+
     m_titleWidget = new QWidget();
+
+    setWidget( widget );
+    setAllowedAreas( Qt::AllDockWidgetAreas );
+    setFeatures( QDockWidget::AllDockWidgetFeatures );
 }
 
 FNDockWidget::~FNDockWidget()

@@ -32,28 +32,13 @@ public:
     bool isIndexHidden( const QModelIndex &index ) const;
     void setSelection( const QRect &rect, QItemSelectionModel::SelectionFlags flags );
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
-
-    QWidget* getWidget();
-
     void init();
+
+signals:
+    void gotDataChanged();
 
 public slots:
     void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
-
-    void sliderChanged( int value, int id );
-
-
-private slots:
-
-
-private:
-    QWidget* m_widget;
-
-    QVBoxLayout* m_layout;
-
-    SliderWithEditInt* m_sagittalSlider;
-    SliderWithEditInt* m_coronalSlider;
-    SliderWithEditInt* m_axialSlider;
 };
 
 #endif /* GLOBALPROPERTYVIEW_H_ */

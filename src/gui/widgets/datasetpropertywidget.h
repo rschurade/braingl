@@ -8,18 +8,18 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
-#include "fndockwidget.h"
+#include <QtGui/QWidget>
 
 class DatasetPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
 
-class DatasetPropertyWidget : public FNDockWidget
+class DatasetPropertyWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    DatasetPropertyWidget( QString name, QWidget* parent = 0 );
+    DatasetPropertyWidget( QWidget* parent = 0 );
     virtual ~DatasetPropertyWidget();
 
     void setModel( QAbstractItemModel* model );
@@ -27,6 +27,12 @@ public:
 
 private:
     DatasetPropertyView* m_propertyView;
+
+    QVBoxLayout* m_layout;
+    QList<QWidget*>m_visibleWidgets;
+
+public slots:
+    void updateWidgetVisibility();
 };
 
 #endif /* DATASETPROPERTYWIDGET_H_ */

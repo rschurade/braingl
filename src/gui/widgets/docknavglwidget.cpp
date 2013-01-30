@@ -17,7 +17,7 @@
 #include "docknavglwidget.h"
 
 DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
-    FNDockWidget( name, parent ),
+    QWidget( parent ),
     m_dataStore( dataStore ),
     m_name( name )
 {
@@ -25,11 +25,6 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
 
     m_glWidget = new NavFrame( dataStore, name, orient, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
-
-    this->setAllowedAreas( Qt::AllDockWidgetAreas );
-    this->setFeatures( QDockWidget::AllDockWidgetFeatures );
-
-    QWidget* panel = new QWidget( this );
 
     m_layout = new QVBoxLayout();
 
@@ -47,8 +42,7 @@ DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient
     m_layout->setContentsMargins( 1, 1, 1, 1 );
     m_layout->setSpacing( 1 );
 
-    panel->setLayout( m_layout );
-    setWidget( panel );
+    setLayout( m_layout );
 
     m_glWidget->setMinimumSize( 50, 50 );
 

@@ -11,17 +11,13 @@
 #include <QtCore/QVariant>
 #include <QtOpenGL/QGLWidget>
 
-#include "fndockwidget.h"
-
 class DataStore;
 class NavGLWidget;
 class NavFrame;
 class SliderWithEditInt2;
 class QVBoxLayout;
 
-
-
-class DockNavGLWidget : public FNDockWidget
+class DockNavGLWidget : public QWidget
 {
     Q_OBJECT
 

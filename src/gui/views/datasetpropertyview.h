@@ -31,24 +31,16 @@ public:
     void setSelection( const QRect &rect, QItemSelectionModel::SelectionFlags flags );
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
-    QWidget* getWidget();
+    QModelIndex getSelectedIndex( int column );
+
+private:
+    QItemSelection m_selected;
+
+signals:
+    void selectedChanged();
 
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
-
-private slots:
-
-private:
-    QModelIndex getSelectedIndex( int column );
-    void updateWidgetVisibility();
-
-    QItemSelection m_selected;
-
-    QWidget* m_widget;
-
-    QVBoxLayout* m_layout;
-
-    QList<QWidget*>m_visibleWidgets;
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

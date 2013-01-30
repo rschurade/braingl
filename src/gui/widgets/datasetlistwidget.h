@@ -8,7 +8,7 @@
 #ifndef DATASETVIEWWIDGET_H_
 #define DATASETVIEWWIDGET_H_
 
-#include "fndockwidget.h"
+#include <QtGui/QWidget>
 
 class QVBoxLayout;
 class QPushButton;
@@ -17,7 +17,7 @@ class DatasetListView;
 class QItemSelection;
 class QItemSelectionModel;
 
-class DatasetListWidget : public FNDockWidget
+class DatasetListWidget : public QWidget
 {
 	Q_OBJECT
 
