@@ -23,6 +23,7 @@
 	<file>icons/qball4.png</file>
 	<file>icons/qball6.png</file>
 	<file>icons/qball8.png</file>
+	<file>icons/box.png</file>
 	<file>icons/eigenvector.png</file>
 	<file>shaders/slice.vs</file>
 	<file>shaders/slice.fs</file>
