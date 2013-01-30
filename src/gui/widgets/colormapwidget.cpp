@@ -9,6 +9,7 @@
 #include "colormapwidget.h"
 
 ColormapWidget::ColormapWidget( int width ) :
+    m_colormap( 0 ),
     m_width( width ),
     m_lowerThreshold( 0.0 ),
     m_upperThreshold( 1.0 )
@@ -52,7 +53,20 @@ QImage* ColormapWidget::createImage( int width )
 
     for ( int i = 0; i < width; ++i )
     {
-        QColor c = colormap( (float)i / (float)width );
+        QColor c;
+        if ( m_colormap == 1 )
+        {
+            c = colormap1( (float)i / (float)width );
+        }
+        else if ( m_colormap == 2 )
+        {
+            c = colormap2( (float)i / (float)width );
+        }
+        else
+        {
+            int g = (float)i / (float)width * 255;
+            c = QColor( g, g, g );
+        }
         for ( int k = 0; k < 20; ++k )
         {
             image->setPixel( i, k, c.rgba() );
@@ -62,7 +76,7 @@ QImage* ColormapWidget::createImage( int width )
     return image;
 }
 
-QColor ColormapWidget::colormap( float value )
+QColor ColormapWidget::colormap1( float value )
 {
     value = ( value - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold );
 
@@ -99,6 +113,42 @@ QColor ColormapWidget::colormap( float value )
     return QColor( 255 * r, 255 * g, 255 * b );
 }
 
+QColor ColormapWidget::colormap2( float value )
+{
+    value = ( value - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold );
+
+    value = qMax( 0.0f, qMin( 1.0f, value ) );
+    value *= 6.0;
+    float r = 0.0;
+    float g = 0.0;
+    float b = 0.0;
+    if( value < 2.0 )
+    {
+        g = value * 0.5f;
+        b = 1.0f;
+    }
+    else if( value < 3.0 )
+    {
+        g = 1.0;
+        b = 3.0 -value;
+    }
+    else if( value < 4.0 )
+    {
+        r = value-3.0;
+        g = 1.0;
+    }
+    else if( value < 6.0 )
+    {
+        r = 1.0;
+        g = 0.5f * ( 6.0-value );
+    }
+    else
+    {
+        r = 1.0;
+    }
+    return QColor( 255 * r, 255 * g, 255 * b );
+}
+
 void ColormapWidget::setLowerThreshold( float value )
 {
     value = qMax( 0.0f, qMin( 1.0f, value ) );
@@ -113,6 +163,16 @@ void ColormapWidget::setUpperThreshold( float value )
 {
     value = qMax( 0.0f, qMin( 1.0f, value ) );
     m_upperThreshold = value;
+    m_image = createImage( m_width );
+    QPixmap pix( m_width, 20 );
+    pix.convertFromImage( *m_image );
+    m_nlabel->setPixmap( pix );
+}
+
+void ColormapWidget::setColormap( int value )
+{
+    value = qMax( 0, qMin( value, 3 ) );
+    m_colormap = value;
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );

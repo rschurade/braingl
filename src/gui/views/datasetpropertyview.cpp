@@ -133,10 +133,11 @@ void DatasetPropertyView::updateWidgetVisibility()
             m_visibleWidgets.push_back( cmapWidget );
             cmapWidget->setLowerThreshold( ds->properties()->get( FNPROP_LOWER_THRESHOLD ).toFloat() );
             cmapWidget->setUpperThreshold( ds->properties()->get( FNPROP_UPPER_THRESHOLD ).toFloat() );
+            cmapWidget->setColormap( ds->properties()->get( FNPROP_COLORMAP ).toInt() );
             connect( ds->properties()->getWidget( FNPROP_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
             connect( ds->properties()->getWidget( FNPROP_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+            connect( ds->properties()->getWidget( FNPROP_COLORMAP ), SIGNAL( valueChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
         }
     }
-
     m_layout->addStretch();
 }
