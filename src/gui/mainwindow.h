@@ -5,11 +5,13 @@
 
 class QAction;
 class QListView;
-class DatasetListWidget;
+class QMenu;
 class QTabWidget;
 class QTableView;
+
+class DatasetListWidget;
+class DockSelectionBoxWidget;
 class ShaderEditWidget;
-class QMenu;
 
 class DataStore;
 class GLWidget;
@@ -48,6 +50,8 @@ private slots:
     void slotToggleDockTitles( bool value );
     void slotRenderCrosshairs( bool value );
 
+    void slotNewSelectionBox();
+
 private:
     void createActions();
     void createMenus();
@@ -63,6 +67,7 @@ private:
     DatasetListWidget* m_datasetWidget;
     QTabWidget* m_centralTabWidget;
     ShaderEditWidget* m_shaderEditWidget;
+    DockSelectionBoxWidget* m_selectionBoxWidget;
 
     QMenu* fileMenu;
     QMenu* optionMenu;
@@ -100,6 +105,8 @@ private:
     QAction* standardViewAxialAct;
     QAction* standardViewCoronalAct;
     QAction* standardViewSagittalAct;
+
+    QAction* newSelectionBoxAct;
 };
 
 #endif

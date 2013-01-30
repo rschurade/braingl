@@ -10,6 +10,7 @@
 #include "docks/docknavglwidget.h"
 #include "docks/dockcombinednavglwidget.h"
 #include "docks/docksingleshwidget.h"
+#include "docks/dockselectionboxwidget.h"
 
 #include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
@@ -245,6 +246,10 @@ void MainWindow::createActions()
     renderCrosshairsAct->setChecked( true );
     connect( renderCrosshairsAct, SIGNAL( toggled( bool ) ), this, SLOT( slotRenderCrosshairs( bool ) ) );
 
+    newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New selection box" ), this );
+    newSelectionBoxAct->setStatusTip( tr( "Add a new selection box." ) );
+    connect( newSelectionBoxAct, SIGNAL( triggered() ), this, SLOT( slotNewSelectionBox() ) );
+
 }
 
 void MainWindow::createMenus()
@@ -294,6 +299,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction( standardViewAxialAct );
     editToolBar->addAction( standardViewCoronalAct );
     editToolBar->addAction( standardViewSagittalAct );
+    editToolBar->addAction( newSelectionBoxAct );
     editToolBar->setObjectName( "editToolbar");
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
@@ -320,6 +326,12 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
+
+	m_selectionBoxWidget = new DockSelectionBoxWidget( QString("Selection Boxes"), this );
+    addDockWidget( Qt::LeftDockWidgetArea, m_selectionBoxWidget );
+    viewMenu->addAction( m_selectionBoxWidget->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_selectionBoxWidget, SLOT( toggleTitleWidget() ) );
+    connect( newSelectionBoxAct, SIGNAL( triggered() ), m_selectionBoxWidget, SLOT( addBox() ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("dataset properties"), this );
     addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
@@ -459,3 +471,6 @@ void MainWindow::slotRenderCrosshairs( bool value )
     m_dataStore->setData( mi, value, Qt::UserRole );
 }
 
+void MainWindow::slotNewSelectionBox()
+{
+}
