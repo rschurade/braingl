@@ -3,15 +3,16 @@
 #include "../data/datastore.h"
 #include "../data/enums.h"
 
-#include "docks/datasetlistwidget.h"
-#include "docks/datasetinfowidget.h"
-#include "docks/datasetpropertywidget.h"
-#include "docks/globalpropertywidget.h"
-#include "docks/docknavglwidget.h"
-#include "docks/dockcombinednavglwidget.h"
-#include "docks/docksingleshwidget.h"
-#include "docks/dockselectionboxwidget.h"
+#include "views/datasetinfoview.h"
 
+#include "widgets/fndockwidget.h"
+#include "widgets/datasetpropertywidget.h"
+#include "widgets/globalpropertywidget.h"
+#include "widgets/docknavglwidget.h"
+#include "widgets/combinednavglwidget.h"
+#include "widgets/singleshwidget.h"
+#include "widgets/selectionboxwidget.h"
+#include "widgets/datasetlistwidget.h"
 #include "widgets/navglwidget.h"
 #include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
@@ -317,66 +318,76 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-	m_datasetWidget = new DatasetListWidget( this );
+    m_datasetWidget = new DatasetListWidget( this );
 	m_datasetWidget->setModel( m_dataStore );
-	addDockWidget( Qt::LeftDockWidgetArea, m_datasetWidget );
-	viewMenu->addAction( m_datasetWidget->toggleViewAction() );
-	connect( lockDockTitlesAct, SIGNAL( triggered() ), m_datasetWidget, SLOT( toggleTitleWidget() ) );
+	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
+	addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
+	viewMenu->addAction( dockDSW->toggleViewAction() );
+	connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSW, SLOT( toggleTitleWidget() ) );
 
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	m_selectionBoxWidget = new DockSelectionBoxWidget( QString("Selection Boxes"), this );
-    addDockWidget( Qt::LeftDockWidgetArea, m_selectionBoxWidget );
-    viewMenu->addAction( m_selectionBoxWidget->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_selectionBoxWidget, SLOT( toggleTitleWidget() ) );
-    connect( newSelectionBoxAct, SIGNAL( triggered() ), m_selectionBoxWidget, SLOT( addBox() ) );
+	SelectionBoxWidget* selectionBoxWidget = new SelectionBoxWidget( this );
+	FNDockWidget* dockSBW = new FNDockWidget( QString("Selection Boxes"), selectionBoxWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
+    viewMenu->addAction( dockSBW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
+    connect( newSelectionBoxAct, SIGNAL( triggered() ), selectionBoxWidget, SLOT( addBox() ) );
 
-	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( QString("dataset properties"), this );
-    addDockWidget( Qt::LeftDockWidgetArea, dsProperties );
+	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( this );
+	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockDSP );
     dsProperties->setModel( m_dataStore );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
-    viewMenu->addAction( dsProperties->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dsProperties, SLOT( toggleTitleWidget() ) );
+    viewMenu->addAction( dockDSP->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
 
-    GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( QString("global properties"), this );
-    addDockWidget( Qt::LeftDockWidgetArea, globalProperties );
+    GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
+    FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockGP );
     globalProperties->setModel( m_dataStore );
-    viewMenu->addAction( globalProperties->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), globalProperties, SLOT( toggleTitleWidget() ) );
+    viewMenu->addAction( dockGP->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGP, SLOT( toggleTitleWidget() ) );
 
-	DatasetInfoWidget *dsInfo = new DatasetInfoWidget( tr( "Dataset Info Table" ), this );
-	addDockWidget( Qt::BottomDockWidgetArea, dsInfo );
+	DatasetInfoView *dsInfo = new DatasetInfoView( this );
+	FNDockWidget* dockDSI = new FNDockWidget( QString("dataset info"), dsInfo, this );
+	addDockWidget( Qt::BottomDockWidgetArea, dockDSI );
 	dsInfo->setModel( m_dataStore );
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
-    viewMenu->addAction( dsInfo->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dsInfo, SLOT( toggleTitleWidget() ) );
+    viewMenu->addAction( dockDSI->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
-    addDockWidget( Qt::RightDockWidgetArea, nav1 );
-    viewMenu->addAction( nav1->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav1, SLOT( toggleTitleWidget() ) );
+    FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
+    addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
+    viewMenu->addAction( dockNav1->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), 0, this, mainGLWidget );
-    addDockWidget( Qt::RightDockWidgetArea, nav2 );
-    viewMenu->addAction( nav2->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav2, SLOT( toggleTitleWidget() ) );
+    FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
+    addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
+    viewMenu->addAction( dockNav2->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), 1, this, mainGLWidget );
-    addDockWidget( Qt::RightDockWidgetArea, nav3 );
-    viewMenu->addAction( nav3->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav3, SLOT( toggleTitleWidget() ) );
+    FNDockWidget* dockNav3 = new FNDockWidget( QString("axial"), nav3, this );
+    addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
+    viewMenu->addAction( dockNav3->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
 
-    DockCombinedNavGLWidget* nav4 = new DockCombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
-    addDockWidget( Qt::RightDockWidgetArea, nav4 );
-    viewMenu->addAction( nav4->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), nav4, SLOT( toggleTitleWidget() ) );
+    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
+    addDockWidget( Qt::RightDockWidgetArea, dockNav4 );
+    viewMenu->addAction( dockNav4->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
 
-    DockSingleSHWidget* sshw = new DockSingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
-    addDockWidget( Qt::RightDockWidgetArea, sshw );
-    viewMenu->addAction( sshw->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), sshw, SLOT( toggleTitleWidget() ) );
+    SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
+    FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
+    addDockWidget( Qt::RightDockWidgetArea, dockSSHW );
+    viewMenu->addAction( dockSSHW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
 }
 
 void MainWindow::closeTab( int index )

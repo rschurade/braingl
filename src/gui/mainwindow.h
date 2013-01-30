@@ -10,7 +10,6 @@ class QTabWidget;
 class QTableView;
 
 class DatasetListWidget;
-class DockSelectionBoxWidget;
 class ShaderEditWidget;
 
 class DataStore;
@@ -67,7 +66,6 @@ private:
     DatasetListWidget* m_datasetWidget;
     QTabWidget* m_centralTabWidget;
     ShaderEditWidget* m_shaderEditWidget;
-    DockSelectionBoxWidget* m_selectionBoxWidget;
 
     QMenu* fileMenu;
     QMenu* optionMenu;

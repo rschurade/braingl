@@ -8,24 +8,37 @@
 #ifndef GLOBALPROPERTYWIDGET_H_
 #define GLOBALPROPERTYWIDGET_H_
 
-#include "fndockwidget.h"
+#include <QtGui/QWidget>
 
 class GlobalPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
 
-class GlobalPropertyWidget : public FNDockWidget
+class GlobalPropertyWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    GlobalPropertyWidget( QString name, QWidget* parent = 0 );
+    GlobalPropertyWidget( QWidget* parent = 0 );
     virtual ~GlobalPropertyWidget();
 
     void setModel( QAbstractItemModel* model );
 
 private:
     GlobalPropertyView* m_propertyView;
+
+    QVBoxLayout* m_layout;
+
+    SliderWithEditInt* m_sagittalSlider;
+    SliderWithEditInt* m_coronalSlider;
+    SliderWithEditInt* m_axialSlider;
+
+public slots:
+    void dataChanged();
+
+private slots:
+    void sliderChanged( int value, int id );
+
 };
 
 #endif /* DATASETPROPERTYWIDGET_H_ */

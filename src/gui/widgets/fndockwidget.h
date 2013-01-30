@@ -15,7 +15,7 @@ class FNDockWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    FNDockWidget( QString name, QWidget* parent );
+    FNDockWidget( QString name, QWidget* widget, QWidget* parent );
     virtual ~FNDockWidget();
 
 public slots:

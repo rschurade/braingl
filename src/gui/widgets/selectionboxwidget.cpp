@@ -32,9 +32,9 @@ SelectionBoxWidget::SelectionBoxWidget( QWidget* parent ) :
     buttonLayout->addWidget( m_upButton );
     buttonLayout->addWidget( m_deleteButton );
 
-    connect( m_upButton, SIGNAL( clicked() ), this, SLOT( moveItemUp() ) );
-    connect( m_downButton, SIGNAL( clicked() ), this, SLOT( moveItemDown() ) );
-    connect( m_deleteButton, SIGNAL( clicked() ), this, SLOT( deleteItem() ) );
+//    connect( m_upButton, SIGNAL( clicked() ), this, SLOT( moveItemUp() ) );
+//    connect( m_downButton, SIGNAL( clicked() ), this, SLOT( moveItemDown() ) );
+//    connect( m_deleteButton, SIGNAL( clicked() ), this, SLOT( deleteItem() ) );
 
     buttonLayout->setContentsMargins( 0, 0, 0, 0 );
 

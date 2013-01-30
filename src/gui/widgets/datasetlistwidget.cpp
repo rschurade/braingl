@@ -11,11 +11,9 @@
 #include "datasetlistwidget.h"
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
-	FNDockWidget( "Datasets", parent ),
+	QWidget( parent ),
 	m_selected( -1 )
 {
-	setObjectName( "Dataset View Dock" );
-
 	QFrame* frame = new QFrame( this );
 
 	QVBoxLayout* layout = new QVBoxLayout();
@@ -28,11 +26,6 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
     layout->setContentsMargins( 0, 0, 0, 0 );
     frame->setLayout( layout );
     frame->setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
-
-	this->setAllowedAreas( Qt::AllDockWidgetAreas );
-	this->setFeatures( QDockWidget::AllDockWidgetFeatures );
-
-	QWidget* panel = new QWidget( this );
 
 	m_layout = new QVBoxLayout();
 
@@ -60,8 +53,7 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	m_layout->addLayout( buttonLayout );
 	m_layout->setContentsMargins( 1, 1, 1, 1 );
 
-	panel->setLayout( m_layout );
-	setWidget( panel );
+	setLayout( m_layout );
 
 	m_upButton->setEnabled( false );
 	m_downButton->setEnabled( false );
