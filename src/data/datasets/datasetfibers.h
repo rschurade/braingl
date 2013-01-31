@@ -17,7 +17,7 @@ class FiberRenderer;
 class DatasetFibers: public Dataset
 {
 public:
-    DatasetFibers( QVector< QVector< float > > fibs, int numPoints, int numLines );
+    DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
     DatasetFibers( QVector< QVector< float > > fibs );
     virtual ~DatasetFibers();
 

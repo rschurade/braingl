@@ -9,8 +9,8 @@
 
 #include "datasetfibers.h"
 
-DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, int numPoints, int numLines ) :
-    Dataset( QString("fibers"), FNDT_FIBERS ),
+DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
+    Dataset( filename, FNDT_FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {
@@ -19,7 +19,7 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, int numPoints, i
 }
 
 DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
-    Dataset( QString("fibers"), FNDT_FIBERS ),
+    Dataset( QString("new fibers"), FNDT_FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {
