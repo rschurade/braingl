@@ -189,7 +189,7 @@ void ToolBar::slot( FN_ALGO algo )
     }
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
 
 }
