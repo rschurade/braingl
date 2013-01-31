@@ -13,6 +13,7 @@
 class DatasetPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
+class QVBoxLayout;
 
 class DatasetPropertyWidget : public QWidget
 {
