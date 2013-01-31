@@ -67,7 +67,7 @@ QImage* ColormapWidget::createImage( int width )
                 c = colormap3( (float)i / (float)width );
                 break;
             default:
-                g = (float)i / (float)width * 255;
+                g = qMin( 255.0f, qMax( 0.0f, ( (float)i / (float)width - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold ) * 255 ) );
                 c = QColor( g, g, g );
                 break;
         }
