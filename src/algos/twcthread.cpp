@@ -69,8 +69,8 @@ void TWCThread::run()
         QVector<float> fib2r;
         int j = 0;
 
-        fib1 = track( i, false );
-        fib2 = track( i, true );
+        track( i, false, fib1 );
+        track( i, true, fib2 );
 
         if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
         {
@@ -103,19 +103,18 @@ void TWCThread::run()
     emit( finished() );
 }
 
-QVector<float> TWCThread::track( int id, bool negDir )
+void TWCThread::track( int id, bool negDir, QVector<float>& result )
 {
     int xs = 0;
     int ys = 0;
     int zs = 0;
     getXYZ( id, xs, ys, zs );
 
+    double xx, xy, xz, yy, yz, zz;
+    float newDirX, newDirY, newDirZ;
 
-        double xx, xy, xz, yy, yz, zz;
-        float newDirX, newDirY, newDirZ;
-
-        int oldId = 0;
-        Matrix iT; // interpolated tensor
+    int oldId = 0;
+    Matrix iT; // interpolated tensor
 
     // getStart direction
     float dirX, dirY, dirZ;
@@ -142,7 +141,6 @@ QVector<float> TWCThread::track( int id, bool negDir )
     float z = zs * m_dz;
     float curFA = getInterpolatedFA( id, x, y, z );
 
-    QVector<float> result;
     int lc = 0;
     while ( true )
     {
@@ -206,7 +204,6 @@ QVector<float> TWCThread::track( int id, bool negDir )
         dirZ = newDirZ / norm;
         oldId = id;
     }
-    return result;
 }
 
 float TWCThread::getInterpolatedFA( int& id, float& inx, float& iny, float& inz )

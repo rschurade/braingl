@@ -44,7 +44,7 @@ public:
 private:
     void run();
 
-    QVector<float> track( int id, bool negDir );
+    void track( int id, bool negDir, QVector<float>& result );
 
     int getID( float x, float y, float z );
     void getXYZ( int id, int &x, int &y, int &z );

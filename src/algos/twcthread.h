@@ -38,7 +38,7 @@ public:
 private:
     void run();
 
-    QVector<float> track( int id, bool negDir );
+    void track( int id, bool negDir, QVector<float>& result );
 
     float getInterpolatedFA( int &id, float &inx, float &iny, float &inz );
     Matrix getInterpolatedTensor( int &id, float &inx, float &iny, float &inz, float &dirX, float &dirY, float &dirZ );
