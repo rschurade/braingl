@@ -75,8 +75,8 @@ void TrackThread::run()
         QVector<float> fib2r;
         int j = 0;
 
-        fib1 = track( i, false );
-        fib2 = track( i, true );
+        track( i, false, fib1 );
+        track( i, true, fib2 );
 
         if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
         {
@@ -109,7 +109,7 @@ void TrackThread::run()
     emit( finished() );
 }
 
-QVector<float> TrackThread::track( int id, bool negDir )
+void TrackThread::track( int id, bool negDir, QVector<float>& result )
 {
     int xs = 0;
     int ys = 0;
@@ -117,7 +117,6 @@ QVector<float> TrackThread::track( int id, bool negDir )
 
     getXYZ( id, xs, ys, zs );
 
-    QVector<float> result;
     double xx, xy, xz, yy, yz, zz;
     float newDirX, newDirY, newDirZ;
     float dirX, dirY, dirZ, norm;
@@ -135,7 +134,7 @@ QVector<float> TrackThread::track( int id, bool negDir )
 
     if ( curFA < m_minStartFA )
     {
-        return result;
+        return;
     }
 
     if ( negDir )
@@ -218,7 +217,6 @@ QVector<float> TrackThread::track( int id, bool negDir )
         dirZ = newDirZ / norm;
         oldId = id;
     }
-    return result;
 }
 
 int TrackThread::getID( float x, float y, float z )
