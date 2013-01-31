@@ -994,7 +994,7 @@ bool Loader::loadFib()
                 fibs.push_back( fib );
             }
 
-            DatasetFibers* dataset = new DatasetFibers( fibs, numPoints, numLines );
+            DatasetFibers* dataset = new DatasetFibers( fn, fibs, numPoints, numLines );
             m_dataset.push_back( dataset );
 
             return true;
