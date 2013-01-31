@@ -21,8 +21,8 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	m_listView = new DatasetListView( frame );
 	m_listView->setToolTip( QString( "datasets" ) );
 	m_listView->setStyleSheet( "border: none" );
-
     layout->addWidget( m_listView );
+
     layout->setContentsMargins( 0, 0, 0, 0 );
     frame->setLayout( layout );
     frame->setFrameStyle( QFrame::StyledPanel | QFrame::Plain );

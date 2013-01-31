@@ -45,7 +45,6 @@ DatasetPropertyWidget::~DatasetPropertyWidget()
 void DatasetPropertyWidget::setModel( QAbstractItemModel* model )
 {
     m_propertyView->setModel( model );
-
 }
 
 void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionModel )

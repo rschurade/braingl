@@ -121,6 +121,17 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
 
     switch ( role )
     {
+        case Qt::CheckStateRole:
+        {
+            if ( index.column() == 0 )
+            {
+                Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
+                return ds->properties()->get( FNPROP_ACTIVE ).toBool();
+                break;
+            }
+            else
+                return QVariant();
+        }
         case Qt::EditRole:
         case Qt::DisplayRole:
             return getDatasetProperties( index );
@@ -167,6 +178,14 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     if ( !index.isValid() )
     {
         return false;
+    }
+
+    if ( role == Qt::CheckStateRole )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
+        ds->properties()->set( FNPROP_ACTIVE, !ds->properties()->get( FNPROP_ACTIVE ).toBool() );
+        emit( dataChanged( index, index ) );
+        emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
     }
 
     if ( role == Qt::EditRole )
@@ -246,6 +265,25 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
     }
     return QVariant();
 }
+
+Qt::ItemFlags DataStore::flags( const QModelIndex& index ) const
+{
+    if ( !index.isValid() )
+    {
+        qDebug() << "Item can be dropped here";
+        return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled ;
+    }
+
+    Qt::ItemFlags defaultFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+    if ( index.column() == 0 )
+    {
+        defaultFlags |= Qt::ItemIsUserCheckable;
+    }
+
+    return defaultFlags;
+}
+
 
 QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) const
 {
