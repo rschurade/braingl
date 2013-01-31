@@ -23,7 +23,6 @@ void DatasetListView::selectionChanged( const QItemSelection &selected, const QI
 
 void DatasetListView::rowsInserted (const QModelIndex &parent, int start, int end )
 {
-    qDebug() << "inserted" << parent << start << end;
     selectionModel()->clear();
     selectionModel()->select( model()->index( start, 0, parent ), QItemSelectionModel::Select );
 }
