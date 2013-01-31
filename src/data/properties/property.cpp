@@ -226,6 +226,12 @@ QString Property::getNameAsString( FN_PROPERTY name )
         case FNSETTING_LOCK_WIDGETS:
             return "lock widgets";
             break;
+        case FNPROP_FIBER_COLORMODE:
+            return "Fiber color mode";
+            break;
+        case FNPROP_FIBER_RENDERMODE:
+            return "Fiber render mode";
+            break;
         default:
             return "no string set for property";
             break;

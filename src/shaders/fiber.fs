@@ -54,7 +54,7 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
 void main()
 {
-
+/*
     gl_FragColor = blinnPhongIllumination(
         // material properties
         gl_Color.rgb * 0.2,                    // ambient color
@@ -70,7 +70,7 @@ void main()
         normalize( v_normal ),                 // normal
         v_viewDir.xyz,                         // viewdir
         v_lightDir.xyz );                    // light direction
-
+*/
     
-    //gl_FragColor = gl_Color;
+    gl_FragColor = gl_Color;
 }

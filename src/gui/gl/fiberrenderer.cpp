@@ -18,7 +18,8 @@ FiberRenderer::FiberRenderer( QVector< QVector< float > >& data )  :
     ObjectRenderer(),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
-    m_isInitialized( false )
+    m_isInitialized( false ),
+    m_colorMode( 0 )
 {
 }
 
@@ -39,6 +40,7 @@ void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     // Set modelview-projection matrix
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", mvp_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
 
     initGeometry();
 
@@ -120,4 +122,9 @@ void FiberRenderer::initGeometry()
     qDebug() << "create fiber vbo's done";
 
     m_isInitialized = true;
+}
+
+void FiberRenderer::setRenderParams( int colorMode )
+{
+    m_colorMode = colorMode;
 }
