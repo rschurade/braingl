@@ -13,6 +13,8 @@
 class GlobalPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
+class QVBoxLayout;
+class SliderWithEditInt;
 
 class GlobalPropertyWidget : public QWidget
 {
