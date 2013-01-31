@@ -158,9 +158,9 @@ void SceneRenderer::draw()
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = m_dataStore->index( i, FNPROP_ACTIVE );
-        if ( m_dataStore->data( index, Qt::EditRole ).toBool() )
+        if ( m_dataStore->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_dataStore );
         }
     }
@@ -173,9 +173,9 @@ void SceneRenderer::setView( int view )
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = m_dataStore->index( i, FNPROP_ACTIVE );
-        if ( m_dataStore->data( index, Qt::EditRole ).toBool() )
+        if ( m_dataStore->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, FNPROP_DATASET_POINTER ), Qt::EditRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->properties()->set( FNPROP_RENDER_SLICE, view );
         }
     }

@@ -43,7 +43,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 4;
             index = model->index( tl.at( texIndex ), FNPROP_TEXTURE_GLUINT );
-            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -54,7 +54,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 3;
             index = model->index( tl.at( texIndex ), FNPROP_TEXTURE_GLUINT );
-            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -65,7 +65,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 2;
             index = model->index( tl.at( texIndex ), FNPROP_TEXTURE_GLUINT );
-            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -76,7 +76,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 1;
             index = model->index( tl.at( texIndex ), FNPROP_TEXTURE_GLUINT );
-            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -87,7 +87,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
         {
             texIndex = 0;
             index = model->index( tl.at( texIndex ), FNPROP_TEXTURE_GLUINT );
-            GLuint tex = static_cast< GLuint >( model->data( index, Qt::EditRole ).toInt() );
+            GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE0 );
             glBindTexture( GL_TEXTURE_3D, tex );
@@ -102,7 +102,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
 void GLFunctions::setTexInterpolation( QAbstractItemModel* model, int row )
 {
     QModelIndex index = model->index( row, FNPROP_INTERPOLATION );
-    bool interpolation = model->data( index, Qt::EditRole ).toBool();
+    bool interpolation = model->data( index, Qt::DisplayRole ).toBool();
     if ( interpolation )
     {
         glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -422,13 +422,13 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             index = model->index( tl.at( texIndex ), FNPROP_MAX );
             texMax = model->data( index, Qt::DisplayRole ).toFloat();
             index = model->index( tl.at( texIndex ), FNPROP_LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold4", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_lowerThreshold4", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold4", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_upperThreshold4", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_COLORMAP );
-            program->setUniformValue( "u_colormap4", model->data( index, Qt::EditRole ).toInt() );
+            program->setUniformValue( "u_colormap4", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ), FNPROP_ALPHA );
-            program->setUniformValue( "u_alpha4", model->data( index, Qt::EditRole ).toFloat() );
+            program->setUniformValue( "u_alpha4", model->data( index, Qt::DisplayRole ).toFloat() );
             program->setUniformValue( "u_texActive4", true );
         }
             /* no break */
@@ -438,13 +438,13 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             index = model->index( tl.at( texIndex ), FNPROP_MAX );
             texMax = model->data( index, Qt::DisplayRole ).toFloat();
             index = model->index( tl.at( texIndex ), FNPROP_LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold3", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_lowerThreshold3", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold3", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_upperThreshold3", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_COLORMAP );
-            program->setUniformValue( "u_colormap3", model->data( index, Qt::EditRole ).toInt() );
+            program->setUniformValue( "u_colormap3", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ), FNPROP_ALPHA );
-            program->setUniformValue( "u_alpha3", model->data( index, Qt::EditRole ).toFloat() );
+            program->setUniformValue( "u_alpha3", model->data( index, Qt::DisplayRole ).toFloat() );
             program->setUniformValue( "u_texActive3", true );
         }
             /* no break */
@@ -454,13 +454,13 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             index = model->index( tl.at( texIndex ), FNPROP_MAX );
             texMax = model->data( index, Qt::DisplayRole ).toFloat();
             index = model->index( tl.at( texIndex ), FNPROP_LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold2", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_lowerThreshold2", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold2", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_upperThreshold2", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_COLORMAP );
-            program->setUniformValue( "u_colormap2", model->data( index, Qt::EditRole ).toInt() );
+            program->setUniformValue( "u_colormap2", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ), FNPROP_ALPHA );
-            program->setUniformValue( "u_alpha2", model->data( index, Qt::EditRole ).toFloat() );
+            program->setUniformValue( "u_alpha2", model->data( index, Qt::DisplayRole ).toFloat() );
             program->setUniformValue( "u_texActive2", true );
         }
             /* no break */
@@ -470,13 +470,13 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             index = model->index( tl.at( texIndex ), FNPROP_MAX );
             texMax = model->data( index, Qt::DisplayRole ).toFloat();
             index = model->index( tl.at( texIndex ), FNPROP_LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold1", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_lowerThreshold1", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold1", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_upperThreshold1", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_COLORMAP );
-            program->setUniformValue( "u_colormap1", model->data( index, Qt::EditRole ).toInt() );
+            program->setUniformValue( "u_colormap1", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ), FNPROP_ALPHA );
-            program->setUniformValue( "u_alpha1", model->data( index, Qt::EditRole ).toFloat() );
+            program->setUniformValue( "u_alpha1", model->data( index, Qt::DisplayRole ).toFloat() );
             program->setUniformValue( "u_texActive1", true );
         }
             /* no break */
@@ -486,13 +486,13 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             index = model->index( tl.at( texIndex ), FNPROP_MAX );
             texMax = model->data( index, Qt::DisplayRole ).toFloat();
             index = model->index( tl.at( texIndex ), FNPROP_LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold0", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_lowerThreshold0", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold0", model->data( index, Qt::EditRole ).toFloat() / texMax );
+            program->setUniformValue( "u_upperThreshold0", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ), FNPROP_COLORMAP );
-            program->setUniformValue( "u_colormap0", model->data( index, Qt::EditRole ).toInt() );
+            program->setUniformValue( "u_colormap0", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ), FNPROP_ALPHA );
-            program->setUniformValue( "u_alpha0", model->data( index, Qt::EditRole ).toFloat() );
+            program->setUniformValue( "u_alpha0", model->data( index, Qt::DisplayRole ).toFloat() );
             program->setUniformValue( "u_texActive0", true );
 
         }
@@ -541,7 +541,7 @@ QList< int > GLFunctions::getTextureIndexes( QAbstractItemModel* model )
     {
         QModelIndex index = model->index( i, 1 );
 
-        bool active = model->data( model->index( i, FNPROP_ACTIVE ), Qt::EditRole ).toBool();
+        bool active = model->data( model->index( i, FNPROP_ACTIVE ), Qt::DisplayRole ).toBool();
         int dim = model->data( model->index( i, FNPROP_DIM ), Qt::DisplayRole ).toInt();
         bool isTex = ( dim == 1 || dim == 3 );
         if ( active && isTex )

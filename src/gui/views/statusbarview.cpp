@@ -75,7 +75,7 @@ void StatusBarView::selectionChanged( const QItemSelection &selected, const QIte
     if ( selected.indexes().size() > 0 )
     {
         m_selected = selected.indexes().first().row();
-        Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::EditRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
         m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
 
         emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo ) );
@@ -119,7 +119,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += "]";
     }
 
-    Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::EditRole ) );
+    Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
     if ( ds )
     {
         m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
