@@ -19,6 +19,7 @@ public:
     virtual ~FiberAlgos();
 
     static QList<Dataset*> thinOut( Dataset* ds );
+    static QList<Dataset*> tractDensity( Dataset* ds );
 };
 
 #endif /* FIBERALGOS_H_ */
