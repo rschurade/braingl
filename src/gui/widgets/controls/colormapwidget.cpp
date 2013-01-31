@@ -149,6 +149,34 @@ QColor ColormapWidget::colormap2( float value )
     return QColor( 255 * r, 255 * g, 255 * b );
 }
 
+QColor ColormapWidget::colormap3( float value )
+{
+    value = ( value - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold );
+
+    value = qMax( 0.0f, qMin( 1.0f, value ) );
+    value *= 2.0;
+    float r = 0.0;
+    float g = 0.0;
+    float b = 0.0;
+    if( value < 1.0 )
+    {
+        r = value;
+        g = value;
+        b = 1.0;
+    }
+    else if( value <= 2.0 )
+    {
+        r = 1.0;
+        g = 2.0-value;
+        b = 2.0-value;
+    }
+    else
+    {
+        r = 1.0;
+    }
+    return QColor( 255 * r, 255 * g, 255 * b );
+}
+
 void ColormapWidget::setLowerThreshold( float value )
 {
     value = qMax( 0.0f, qMin( 1.0f, value ) );
