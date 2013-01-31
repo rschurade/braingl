@@ -93,7 +93,7 @@ vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, flo
             value *= 2.0;
             if( value < 0.0 )
                 color = vec3( 0.0, 0.0, 1.0 );
-            if( value < 1.0 )
+            else if( value < 1.0 )
                 color = vec3( value, value, 1.0 );
             else if( value <= 2.0 )
                 color = vec3( 1.0, 2.0-value, 2.0-value );
