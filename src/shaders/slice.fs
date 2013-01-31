@@ -52,6 +52,7 @@ vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, flo
         
         if ( cmap == 0 )
         {
+            value = max( value, 0.001 );
             color = vec3( value, value, value );
         }
         if ( cmap == 1 )
