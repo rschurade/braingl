@@ -80,3 +80,11 @@ void DatasetPropertyView::selectionChanged( const QItemSelection &selected, cons
         emit( selectedChanged() );
     }
 }
+
+void DatasetPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
+{
+    if ( m_selected.indexes().size() > 0 )
+    {
+       // emit( selectedChanged() );
+    }
+}

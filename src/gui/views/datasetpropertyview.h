@@ -41,6 +41,7 @@ signals:
 
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
+    void dataChanged( const QModelIndex  &topLeft , const QModelIndex  &bottomRight );
 };
 
 #endif /* DATASETPROPERTYVIEW_H_ */

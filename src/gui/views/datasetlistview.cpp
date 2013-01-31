@@ -4,7 +4,6 @@
  *  Created on: 08.05.2012
  *      Author: Ralph
  */
-
 #include "datasetlistview.h"
 
 DatasetListView::DatasetListView( QWidget *parent ) : QListView( parent )

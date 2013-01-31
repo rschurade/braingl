@@ -34,6 +34,7 @@ QVariant PropertyBool::getValue()
 void PropertyBool::setValue( QVariant value )
 {
     m_value = value.toBool();
+    m_widget->setChecked( m_value );
 }
 
 void PropertyBool::widgetChanged( int value, int id )
