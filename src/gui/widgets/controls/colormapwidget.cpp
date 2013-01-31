@@ -54,18 +54,22 @@ QImage* ColormapWidget::createImage( int width )
     for ( int i = 0; i < width; ++i )
     {
         QColor c;
-        if ( m_colormap == 1 )
+        int g = 0;
+        switch ( m_colormap )
         {
-            c = colormap1( (float)i / (float)width );
-        }
-        else if ( m_colormap == 2 )
-        {
-            c = colormap2( (float)i / (float)width );
-        }
-        else
-        {
-            int g = (float)i / (float)width * 255;
-            c = QColor( g, g, g );
+            case 1:
+                c = colormap1( (float)i / (float)width );
+                break;
+            case 2:
+                c = colormap2( (float)i / (float)width );
+                break;
+            case 3:
+                c = colormap3( (float)i / (float)width );
+                break;
+            default:
+                g = (float)i / (float)width * 255;
+                c = QColor( g, g, g );
+                break;
         }
         for ( int k = 0; k < 20; ++k )
         {
