@@ -37,10 +37,14 @@ private:
     int m_width;
     float m_lowerThreshold;
     float m_upperThreshold;
+    float m_min;
+    float m_max;
 
 public slots:
     void setLowerThreshold( float value );
     void setUpperThreshold( float value );
+    void setMin( float value );
+    void setMax( float value );
     void setColormap( int value );
 };
 
