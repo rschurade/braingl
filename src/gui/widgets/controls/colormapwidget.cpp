@@ -9,7 +9,7 @@
 #include "colormapwidget.h"
 
 ColormapWidget::ColormapWidget( int width ) :
-    m_colormap( 0 ),
+    m_colormap( FNCM_GRAY ),
     m_width( width ),
     m_lowerThreshold( 0.0 ),
     m_upperThreshold( 1.0 )
@@ -57,13 +57,13 @@ QImage* ColormapWidget::createImage( int width )
         int g = 0;
         switch ( m_colormap )
         {
-            case 1:
+            case FNCM_RAINBOW1:
                 c = colormap1( (float)i / (float)width );
                 break;
-            case 2:
+            case FNCM_RAINBOW2:
                 c = colormap2( (float)i / (float)width );
                 break;
-            case 3:
+            case FNCM_BLUEWHITERED:
                 c = colormap3( (float)i / (float)width );
                 break;
             default:
@@ -203,8 +203,7 @@ void ColormapWidget::setUpperThreshold( float value )
 
 void ColormapWidget::setColormap( int value )
 {
-    value = qMax( 0, qMin( value, 3 ) );
-    m_colormap = value;
+    m_colormap = qMin( (FN_COLORMAP)value, FNCM_NOCOLORMAP );
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );

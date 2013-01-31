@@ -8,6 +8,8 @@
 #ifndef COLORMAPWIDGET_H_
 #define COLORMAPWIDGET_H_
 
+#include "../../../data/enums.h"
+
 #include <QtGui/QFrame>
 
 class QImage;
@@ -31,7 +33,7 @@ private:
     QLabel* m_nlabel;
     QLabel* m_clabel;
 
-    int m_colormap;
+    FN_COLORMAP m_colormap;
     int m_width;
     float m_lowerThreshold;
     float m_upperThreshold;

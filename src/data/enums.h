@@ -17,6 +17,16 @@ enum FN_DATASET_TYPE
     FNDT_FIBERS
 };
 
+enum FN_COLORMAP
+{
+    FNCM_GRAY,
+    FNCM_RAINBOW1,
+    FNCM_RAINBOW2,
+    FNCM_BLUEWHITERED,
+    FNCM_NOCOLORMAP // used for RGB datasets, takes values directly from texture
+                    // other colormaps use float packing
+};
+
 enum FN_ALGO
 {
     FNALGO_NONE,
