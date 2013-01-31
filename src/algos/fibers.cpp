@@ -144,7 +144,6 @@ DatasetScalar* Fibers::tractDensity()
         }
     }
 
-
     int dims[8] = { 3, 160, 200, 160, 1, 1, 1 };
     nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
     DatasetScalar* out = new DatasetScalar( "tract density", data, header );
