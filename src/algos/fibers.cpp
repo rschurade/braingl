@@ -8,11 +8,19 @@
 #include <math.h>
 
 #include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetscalar.h"
 
 #include "fibers.h"
 
 Fibers::Fibers( DatasetFibers* ds ) :
-    m_dataset( ds )
+    m_dataset( ds ),
+    m_nx( 1 ),
+    m_ny( 1 ),
+    m_nz( 1 ),
+    m_dx( 1.0 ),
+    m_dy( 1.0 ),
+    m_dz( 1.0 ),
+    m_blockSize( 1 )
 {
 }
 
@@ -111,4 +119,34 @@ float Fibers::getDist( float x1, float y1, float z1, float x2, float y2, float z
     float y = y1 - y2;
     float z = z1 - z2;
     return sqrt( x*x + y*y + z*z );
+}
+
+DatasetScalar* Fibers::tractDensity()
+{
+    m_nx = 160;
+    m_ny = 200;
+    m_nz = 160;
+    m_dx = 1.0;
+    m_dy = 1.0;
+    m_dz = 1.0;
+    m_blockSize = m_nx * m_ny * m_nz;
+    QVector<float> data( m_blockSize, 0 );
+    QVector< QVector< float > > fibs = m_dataset->getFibs();
+    int x, y, z;
+    for ( int i = 0; i < fibs.size(); ++i )
+    {
+        for( int k = 0; k < fibs[i].size() / 3; ++k )
+        {
+            x = fibs[i].at( k * 3     );
+            y = fibs[i].at( k * 3 + 1 );
+            z = fibs[i].at( k * 3 + 2 );
+            ++data[ getID( x, y, z ) ];
+        }
+    }
+
+
+    int dims[8] = { 3, 160, 200, 160, 1, 1, 1 };
+    nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
+    DatasetScalar* out = new DatasetScalar( "tract density", data, header );
+    return out;
 }

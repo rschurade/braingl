@@ -94,6 +94,10 @@ void ToolBar::createActions()
     m_fiberThinningAct->setStatusTip( tr( "fiber thinning" ) );
     connect( m_fiberThinningAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
 
+    m_fiberTractDensityAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tract density" ), this, FNALGO_TRACT_DENSITY );
+    m_fiberTractDensityAct->setStatusTip( tr( "tract density" ) );
+    connect( m_fiberTractDensityAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+
     m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, FNALGO_BINGHAM_2_TENSOR );
     m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
     connect( m_bingham2tensorAction, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
@@ -170,6 +174,9 @@ void ToolBar::slot( FN_ALGO algo )
         case FNALGO_FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
             break;
+        case FNALGO_TRACT_DENSITY:
+            l = FiberAlgos::tractDensity( ds );
+            break;
         case FNALGO_BINGHAM_2_TENSOR:
             l = DWIAlgos::bingham2DWI( ds );
             break;
@@ -233,6 +240,7 @@ void ToolBar::slotSelectionChanged( int type )
         case FNDT_FIBERS:
         {
             this->addAction( m_fiberThinningAct );
+            this->addAction( m_fiberTractDensityAct );
             break;
         }
         default:
