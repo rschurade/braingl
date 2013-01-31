@@ -1,5 +1,6 @@
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrixInvert;
+uniform int u_colorMode;
 
 attribute vec4 a_position;
 attribute vec4 a_normal;
@@ -30,7 +31,14 @@ void main()
     vec4 lightPos = vec4( 0.0, 0.0, 1.0, 0.0 );
     v_lightDir.xyz = normalize( ( mv_matrixInvert * lightPos ).xyz );
 	
-	gl_FrontColor = a_color;
+	if ( u_colorMode == 0 )
+	{
+	   gl_FrontColor = a_color;
+	}
+	else 
+	{
+	   gl_FrontColor = vec4( abs( v_normal ), 1.0 );
+	}
 	
     gl_Position = mvp_matrix * a_position;
 }

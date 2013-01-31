@@ -22,6 +22,8 @@ public:
 
     void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
 
+    void setRenderParams( int colorMode );
+
 protected:
     void setupTextures();
     void setShaderVars();
@@ -38,6 +40,8 @@ private:
     QVector<int>m_startIndexes;
 
     bool m_isInitialized;
+
+    int m_colorMode;
 };
 
 #endif /* FIBERRENDERER_H_ */
