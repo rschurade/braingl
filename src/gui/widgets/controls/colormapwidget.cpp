@@ -12,7 +12,9 @@ ColormapWidget::ColormapWidget( int width ) :
     m_colormap( FNCM_GRAY ),
     m_width( width ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 )
+    m_upperThreshold( 1.0 ),
+    m_min( 0.0 ),
+    m_max( 0.0 )
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
 
@@ -50,7 +52,6 @@ ColormapWidget::~ColormapWidget()
 QImage* ColormapWidget::createImage( int width )
 {
     QImage* image = new QImage( width, 20, QImage::Format_RGB32 );
-
     for ( int i = 0; i < width; ++i )
     {
         QColor c;
@@ -183,8 +184,7 @@ QColor ColormapWidget::colormap3( float value )
 
 void ColormapWidget::setLowerThreshold( float value )
 {
-    value = qMax( 0.0f, qMin( 1.0f, value ) );
-    m_lowerThreshold = value;
+    m_lowerThreshold = qMax( 0.0f, qMin( 1.0f, value / m_max ) );
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );
@@ -193,13 +193,23 @@ void ColormapWidget::setLowerThreshold( float value )
 
 void ColormapWidget::setUpperThreshold( float value )
 {
-    value = qMax( 0.0f, qMin( 1.0f, value ) );
-    m_upperThreshold = value;
+    m_upperThreshold = qMax( 0.0f, qMin( 1.0f, value / m_max ) );
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );
     m_nlabel->setPixmap( pix );
 }
+
+void ColormapWidget::setMin( float value )
+{
+    m_min = value;
+}
+
+void ColormapWidget::setMax( float value )
+{
+    m_max = value;
+}
+
 
 void ColormapWidget::setColormap( int value )
 {
