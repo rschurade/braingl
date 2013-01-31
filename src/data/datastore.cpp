@@ -132,7 +132,6 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
             else
                 return QVariant();
         }
-        case Qt::EditRole:
         case Qt::DisplayRole:
             return getDatasetProperties( index );
             break;
@@ -188,7 +187,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
     }
 
-    if ( role == Qt::EditRole )
+    if ( role == Qt::DisplayRole )
     {
         // handle props with special treatment
         if ( index.column() == FNPROP_DATASET_POINTER )

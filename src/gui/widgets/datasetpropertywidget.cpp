@@ -55,7 +55,7 @@ void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionMod
 void DatasetPropertyWidget::updateWidgetVisibility()
 {
     QModelIndex index = m_propertyView->getSelectedIndex( FNPROP_DATASET_POINTER );
-    Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::EditRole ) );
+    Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
     QList<FN_PROPERTY>visible = ds->properties()->getVisible();
 
     for ( int i = 0; i < m_visibleWidgets.size(); ++i )

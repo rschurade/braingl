@@ -238,7 +238,7 @@ void SingleSHRenderer::draw()
 //    for ( int i = 0; i < countDatasets; ++i )
 //    {
 //        QModelIndex index = model()->index( i, FNPROP_ACTIVE );
-//        if ( model()->data( index, Qt::EditRole ).toBool() )
+//        if ( model()->data( index, Qt::DisplayRole ).toBool() )
 //        {
 //            index = model()->index( i, FNPROP_TYPE );
 //            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNDT_NIFTI_SH )
@@ -251,7 +251,7 @@ void SingleSHRenderer::draw()
 //
 //    if ( rl.size() > 0 )
 //    {
-//        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], FNPROP_DATASET_POINTER ), Qt::EditRole ) );
+//        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
 //
 //        GLFunctions::getShader( "qball" )->bind();
 //        // Set modelview-projection matrix

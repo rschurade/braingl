@@ -109,7 +109,7 @@ void ToolBar::slot( FN_ALGO algo )
 
     QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), FNPROP_DATASET_POINTER );
     QList<Dataset*>l;
-    Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::EditRole ) );
+    Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
     switch ( algo )
     {
         case FNALGO_QBALL4:
@@ -149,7 +149,7 @@ void ToolBar::slot( FN_ALGO algo )
             break;
         case FNALGO_TENSOR_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::EditRole ).toList();
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
 
             m_ttw = new TensorTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ttw, SIGNAL( finished() ), this, SLOT( tensorTrackFinished() ) );
@@ -159,7 +159,7 @@ void ToolBar::slot( FN_ALGO algo )
         }
         case FNALGO_CROSSING_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::EditRole ).toList();
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
 
             m_ctw = new CrossingTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ctw, SIGNAL( finished() ), this, SLOT( crossingTrackFinished() ) );
