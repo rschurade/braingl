@@ -4,24 +4,22 @@
  *  Created on: Nov 23, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
-#include <boost/math/special_functions/spherical_harmonic.hpp>
-
-#include "../data/mesh/tesselation.h"
+#include "bingham.h"
+#include "binghamthread.h"
+#include "fmath.h"
+#include "gradients.h"
+#include "sorts.h"
 
 #include "../data/datasets/dataset.h"
 #include "../data/datasets/datasetdwi.h"
 #include "../data/datasets/datasetsh.h"
 #include "../data/datasets/datasetbingham.h"
 #include "../data/datasets/datasettensor.h"
+#include "../data/mesh/tesselation.h"
 
-#include "fmath.h"
-#include "gradients.h"
-#include "sorts.h"
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 
-#include "binghamthread.h"
-#include "bingham.h"
+#include <QtCore/QDebug>
 
 Bingham::Bingham()
 {

@@ -4,17 +4,16 @@
  *  Created on: 10.07.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
-
-#include <boost/math/special_functions/spherical_harmonic.hpp>
-
-#include "../data/datasets/datasetdwi.h"
+#include "qball.h"
+#include "sharpqballthread.h"
 
 #include "fmath.h"
 
-#include "sharpqballthread.h"
+#include "../data/datasets/datasetdwi.h"
 
-#include "qball.h"
+#include <QtCore/QDebug>
+
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 
 QBall::QBall()
 {

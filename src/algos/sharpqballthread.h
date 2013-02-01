@@ -8,11 +8,11 @@
 #ifndef SHARPQBALLTHREAD_H_
 #define SHARPQBALLTHREAD_H_
 
-#include <QtCore/QDebug>
-#include <QThread>
-#include <QtCore/QVector>
-
 #include "../thirdparty/newmat10/newmat.h"
+
+#include <QtCore/QDebug>
+#include <QtCore/QThread>
+#include <QtCore/QVector>
 
 class DatasetDWI;
 
