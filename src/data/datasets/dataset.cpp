@@ -42,3 +42,19 @@ PropertyGroup* Dataset::properties()
 {
     return &m_properties;
 }
+
+void Dataset::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
+{
+    // do nothing here
+}
+
+QString Dataset::getValueAsString( int x, int y, int z )
+{
+    return QString( "0" );
+}
+
+
+void Dataset::createTexture()
+{
+    // do nothing here
+}

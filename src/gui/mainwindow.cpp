@@ -18,6 +18,8 @@
 #include "widgets/shadereditwidget.h"
 
 #include "../data/datastore.h"
+#include "../data/loader.h"
+#include "../data/vptr.h"
 #include "../data/enums.h"
 
 #include <QtGui/QtGui>
@@ -93,11 +95,19 @@ void MainWindow::open()
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
     {
-    	m_dataStore->load( fileName );
-
-    	QFileInfo fi( fileName );
-    	QDir dir = fi.absoluteDir();
-    	QString lastPath = dir.absolutePath();
+        Loader loader;
+        loader.setFilename( QDir( fileName ) );
+        if ( loader.load() )
+        {
+            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            {
+                m_dataStore->insertRow( 0 );
+                m_dataStore->setData( m_dataStore->index( m_dataStore->rowCount() - 1, FNPROP_DATASET_POINTER ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
+            }
+        }
+        QFileInfo fi( fileName );
+        QDir dir = fi.absoluteDir();
+        QString lastPath = dir.absolutePath();
         m_dataStore->setData( mi, lastPath, Qt::UserRole );
     }
 }

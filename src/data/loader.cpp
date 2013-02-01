@@ -20,13 +20,19 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QtGui>
 
-Loader::Loader( QDir fileName ) :
-        m_fileName( fileName ), m_datasetType( FNDT_UNKNOWN ), m_success( false )
+Loader::Loader() :
+    m_datasetType( FNDT_UNKNOWN ),
+    m_success( false )
 {
 }
 
 Loader::~Loader()
 {
+}
+
+void Loader::setFilename( QDir fn )
+{
+    m_fileName = fn;
 }
 
 bool Loader::succes()

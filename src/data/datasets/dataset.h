@@ -34,12 +34,12 @@ public:
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model ) = 0;
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
 
-    virtual QString getValueAsString( int x, int y, int z ) = 0;
+    virtual QString getValueAsString( int x, int y, int z );
 
 protected:
-    virtual void createTexture() = 0;
+    virtual void createTexture();
 
     PropertyGroup m_properties;
 

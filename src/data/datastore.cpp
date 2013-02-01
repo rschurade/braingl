@@ -6,7 +6,6 @@
  */
 #include "datastore.h"
 
-#include "loader.h"
 #include "writer.h"
 #include "vptr.h"
 #include "enums.h"
@@ -47,16 +46,18 @@ DataStore::~DataStore()
 {
 }
 
-void DataStore::addDataset( Dataset* dataset )
+bool DataStore::insertRow ( int row, const QModelIndex &parent )
 {
+    Dataset* ds = new Dataset( QDir("tmp"), FNDT_UNKNOWN );
     beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
-    m_datasetList.push_back( VPtr<Dataset>::asQVariant( dataset ) );
-    connect( dataset->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+    m_datasetList.push_back( VPtr<Dataset>::asQVariant( ds ) );
     endInsertRows();
+    return true;
+}
 
-    updateGlobals();
-
-    emit ( dataChanged( index( m_datasetList.size() - 1, 0 ), index( m_datasetList.size() - 1, 0 ) ) );
+bool DataStore::insertRows (int row, int count, const QModelIndex &parent )
+{
+    return insertRow( row );
 }
 
 void DataStore::updateGlobals()
@@ -79,19 +80,6 @@ void DataStore::updateGlobals()
             emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
     }
-}
-
-bool DataStore::load( QDir fileName )
-{
-    Loader loader( fileName );
-    if ( loader.load() )
-    {
-        for ( int i = 0; i < loader.getNumDatasets(); ++i )
-        {
-            addDataset( loader.getDataset( i ) );
-        }
-    }
-    return loader.succes();
 }
 
 bool DataStore::save( int index, QString fileName )
@@ -192,7 +180,11 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         // handle props with special treatment
         if ( index.column() == FNPROP_DATASET_POINTER )
         {
-            addDataset( VPtr<Dataset>::asPtr( value ) );
+            //addDataset( VPtr<Dataset>::asPtr( value ) );
+            m_datasetList.replace( index.row(), value );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
+            connect( ds->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+            updateGlobals();
             emit( dataChanged( index, index ) );
             emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
             return true;
