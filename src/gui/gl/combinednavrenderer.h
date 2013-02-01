@@ -8,11 +8,9 @@
 #ifndef COMBINEDNAVRENDERER_H_
 #define COMBINEDNAVRENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "objectrenderer.h"
 
 #include <QtGui/QMatrix4x4>
-
-#include "objectrenderer.h"
 
 class DataStore;
 class QGLShaderProgram;

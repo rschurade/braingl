@@ -8,11 +8,11 @@
 #ifndef TOOLBAR_H_
 #define TOOLBAR_H_
 
-#include <QtGui/QtGui>
+#include "controls/fnaction.h"
 
 #include "../../data/enums.h"
 
-#include "controls/fnaction.h"
+#include <QtGui/QtGui>
 
 class ToolBarView;
 class TensorTrackWidget;

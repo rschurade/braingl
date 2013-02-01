@@ -4,10 +4,10 @@
  *  Created on: Jan 30, 2013
  *      Author: schurade
  */
+#include "selectionboxwidget.h"
+
 #include <QtCore/QDebug>
 #include <QtGui/QtGui>
-
-#include "selectionboxwidget.h"
 
 SelectionBoxWidget::SelectionBoxWidget( QWidget* parent ) :
     QFrame( parent ),

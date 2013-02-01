@@ -4,10 +4,9 @@
  *  Created on: Nov 13, 2012
  *      Author: schurade
  */
+#include "statusbar.h"
 
 #include "../views/statusbarview.h"
-
-#include "statusbar.h"
 
 StatusBar::StatusBar( QWidget* parent ) :
     QStatusBar( parent )

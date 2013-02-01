@@ -8,9 +8,9 @@
 #ifndef TOOLBARVIEW_H_
 #define TOOLBARVIEW_H_
 
-#include <QtGui/QAbstractItemView>
-
 #include "../../data/enums.h"
+
+#include <QtGui/QAbstractItemView>
 
 class ToolBarView  : public QAbstractItemView
 {

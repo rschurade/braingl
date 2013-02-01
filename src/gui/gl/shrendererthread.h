@@ -8,6 +8,8 @@
 #ifndef SHRENDERERTHREAD_H_
 #define SHRENDERERTHREAD_H_
 
+#include "../../thirdparty/newmat10/newmat.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 #include <QtCore/QVector>

@@ -4,14 +4,13 @@
  *  Created on: 13.05.2012
  *      Author: Ralph
  */
-#include <QtGui/QtGui>
+#include "globalpropertywidget.h"
+#include "../views/globalpropertyview.h"
 
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../../data/enums.h"
 
-#include "../views/globalpropertyview.h"
-
-#include "globalpropertywidget.h"
+#include <QtGui/QtGui>
 
 GlobalPropertyWidget::GlobalPropertyWidget( QWidget* parent ) :
     QWidget( parent )

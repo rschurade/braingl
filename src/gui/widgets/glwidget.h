@@ -1,6 +1,8 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include "../../thirdparty/glew/include/glew.h"
+
 #include "../gl/scenerenderer.h"
 
 #include <QtOpenGL/QGLWidget>

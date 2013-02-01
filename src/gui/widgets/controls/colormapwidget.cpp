@@ -4,9 +4,9 @@
  *  Created on: Jan 29, 2013
  *      Author: schurade
  */
-#include <QtGui/QtGui>
-
 #include "colormapwidget.h"
+
+#include <QtGui/QtGui>
 
 ColormapWidget::ColormapWidget( int width ) :
     m_colormap( FNCM_GRAY ),

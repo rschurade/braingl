@@ -5,15 +5,16 @@
  *      Author: Ralph
  */
 #include "navrenderersagittal.h"
+#include "glfunctions.h"
+#include "../../data/enums.h"
 
 #include <QtCore/QDebug>
-
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../data/enums.h"
-#include "../gl/glfunctions.h"
+
+
 
 NavRendererSagittal::NavRendererSagittal( QString name ) :
     NavRenderer( name )

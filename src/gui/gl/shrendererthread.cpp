@@ -4,14 +4,13 @@
  *  Created on: 27.12.2012
  *      Author: Ralph
  */
-#include <math.h>
- #include <limits>
-
-#include "../../data/mesh/tesselation.h"
+#include "shrendererthread.h"
 
 #include "../../algos/fmath.h"
+#include "../../data/mesh/tesselation.h"
 
-#include "shrendererthread.h"
+#include <math.h>
+#include <limits>
 
 SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,

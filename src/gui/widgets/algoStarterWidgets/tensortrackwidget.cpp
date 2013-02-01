@@ -4,8 +4,7 @@
  *  Created on: 26.01.2013
  *      Author: Ralph
  */
-#include <QtGui/QPushButton>
-#include <QtGui/QProgressBar>
+#include "tensortrackwidget.h"
 
 #include "../controls/sliderwithedit.h"
 #include "../controls/sliderwitheditint.h"
@@ -16,7 +15,8 @@
 #include "../../../data/datasets/datasetfibers.h"
 #include "../../../data/datasets/datasettensor.h"
 
-#include "tensortrackwidget.h"
+#include <QtGui/QPushButton>
+#include <QtGui/QProgressBar>
 
 TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent ) :
     m_progress( 0 )

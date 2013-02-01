@@ -4,17 +4,16 @@
  *  Created on: 12.05.2012
  *      Author: Ralph
  */
-#include <QtGui/QtGui>
-
-#include "../../data/enums.h"
-#include "../../data/datastore.h"
-#include "../widgets/controls/sliderwitheditint2.h"
-
+#include "docknavglwidget.h"
 
 #include "../widgets/navglwidget.h"
 #include "../widgets/navframe.h"
+#include "../widgets/controls/sliderwitheditint2.h"
 
-#include "docknavglwidget.h"
+#include "../../data/enums.h"
+#include "../../data/datastore.h"
+
+#include <QtGui/QtGui>
 
 DockNavGLWidget::DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),

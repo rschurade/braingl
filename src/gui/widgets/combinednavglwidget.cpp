@@ -1,9 +1,10 @@
-#include <QtGui/QtGui>
+#include "combinednavglwidget.h"
 
-#include "../../data/datastore.h"
 #include "../gl/combinednavrenderer.h"
 
-#include "combinednavglwidget.h"
+#include "../../data/datastore.h"
+
+#include <QtGui/QtGui>
 
 CombinedNavGLWidget::CombinedNavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )

@@ -4,15 +4,13 @@
  *  Created on: 28.12.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
-
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
+#include "fiberrenderer.h"
+#include "fiberrendererthread.h"
 
 #include "glfunctions.h"
 
-#include "fiberrendererthread.h"
-#include "fiberrenderer.h"
+#include <QtOpenGL/QGLShaderProgram>
+#include <QtCore/QDebug>
 
 FiberRenderer::FiberRenderer( QVector< QVector< float > >& data )  :
     ObjectRenderer(),

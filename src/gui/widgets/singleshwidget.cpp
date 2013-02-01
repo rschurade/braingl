@@ -4,13 +4,12 @@
  *  Created on: 12.07.2012
  *      Author: Ralph
  */
-
-#include <QtGui/QtGui>
+#include "singleshwidget.h"
 
 #include "../../data/datastore.h"
 #include "../gl/singleshrenderer.h"
 
-#include "singleshwidget.h"
+#include <QtGui/QtGui>
 
 SingleSHWidget::SingleSHWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( parent, shareWidget )

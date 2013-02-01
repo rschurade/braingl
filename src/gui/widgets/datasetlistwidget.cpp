@@ -4,11 +4,11 @@
  *  Created on: 08.05.2012
  *      Author: Ralph
  */
-#include <QtGui/QtGui>
+#include "datasetlistwidget.h"
 
 #include "../views/datasetlistview.h"
 
-#include "datasetlistwidget.h"
+#include <QtGui/QtGui>
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QWidget( parent ),

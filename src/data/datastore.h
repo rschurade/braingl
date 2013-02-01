@@ -8,8 +8,6 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include "../thirdparty/glew/include/glew.h"
-
 #include "properties/propertygroup.h"
 
 #include <QtCore/QDir>

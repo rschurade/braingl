@@ -4,7 +4,11 @@
  *  Created on: 14.06.2012
  *      Author: Ralph
  */
-#include <QtCore/QVariant>
+#include "toolbar.h"
+
+#include "../views/toolbarview.h"
+#include "../widgets/algoStarterWidgets/tensortrackwidget.h"
+#include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
 
 #include "../../data/vptr.h"
 #include "../../data/dwialgos.h"
@@ -12,11 +16,7 @@
 #include "../../data/fiberalgos.h"
 #include "../../data/datasets/dataset.h"
 
-#include "../views/toolbarview.h"
-#include "../widgets/algoStarterWidgets/tensortrackwidget.h"
-#include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
-
-#include "toolbar.h"
+#include <QtCore/QVariant>
 
 ToolBar::ToolBar( const QString &title, QWidget* parent ) :
     QToolBar( title, parent )

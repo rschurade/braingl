@@ -8,9 +8,9 @@
 #ifndef FNACTION_H_
 #define FNACTION_H_
 
-#include <QtGui/QtGui>
-
 #include "../../../data/enums.h"
+
+#include <QtGui/QtGui>
 
 class FNAction : public QAction
 {

@@ -5,17 +5,15 @@
  *      Author: Ralph
  */
 #include "combinednavrenderer.h"
-
-#include <QtCore/QDebug>
-
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include "../gl/glfunctions.h"
 
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
 
-#include "../gl/glfunctions.h"
+#include <QtCore/QDebug>
+#include <QtGui/QVector3D>
+#include <QtGui/QMatrix4x4>
+#include <QtOpenGL/QGLShaderProgram>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

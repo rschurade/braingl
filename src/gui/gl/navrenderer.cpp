@@ -6,13 +6,12 @@
  */
 #include "navrenderer.h"
 
-#include <QtCore/QDebug>
+#include "../gl/glfunctions.h"
 
+#include <QtCore/QDebug>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
-
-#include "../gl/glfunctions.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

@@ -9,6 +9,7 @@
 #define GLFUNCTIONS_H_
 
 #include <QtCore/QList>
+#include <QtGui/QVector3D>
 
 class QAbstractItemModel;
 class QGLShaderProgram;

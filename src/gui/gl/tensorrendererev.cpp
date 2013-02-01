@@ -4,23 +4,19 @@
  *  Created on: 03.07.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "tensorrendererev.h"
+#include "glfunctions.h"
 
-#include <limits>
+#include "../../algos/fmath.h"
+#include "../../data/enums.h"
+#include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-#include "../../algos/fmath.h"
-
-#include "../../data/enums.h"
-
-#include "../../thirdparty/newmat10/newmat.h"
-
-#include "glfunctions.h"
-#include "tensorrendererev.h"
+#include <limits>
 
 TensorRendererEV::TensorRendererEV( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),

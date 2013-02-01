@@ -4,9 +4,9 @@
  *  Created on: 08.05.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
-
 #include "datasetlistview.h"
+
+#include <QtCore/QDebug>
 
 DatasetListView::DatasetListView( QWidget *parent ) : QListView( parent )
 {

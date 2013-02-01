@@ -4,6 +4,8 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
+#include "sliderwitheditint.h"
+
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
@@ -12,8 +14,6 @@
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
-
-#include "sliderwitheditint.h"
 
 SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     QFrame( parent )

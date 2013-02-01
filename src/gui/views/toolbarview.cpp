@@ -4,11 +4,11 @@
  *  Created on: 14.06.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
+#include "toolbarview.h"
 
 #include "../../data/enums.h"
 
-#include "toolbarview.h"
+#include <QtCore/QDebug>
 
 ToolBarView::ToolBarView( QWidget* parent ) :
     m_selected( -1 )

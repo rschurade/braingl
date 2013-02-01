@@ -4,23 +4,22 @@
  *  Created on: 13.05.2012
  *      Author: Ralph
  */
-#include <QtGui/QtGui>
+#include "datasetpropertywidget.h"
+
+#include "../views/datasetpropertyview.h"
 
 #include "../widgets/controls/sliderwithedit.h"
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../widgets/controls/selectwithlabel.h"
 #include "../widgets/controls/checkboxwithlabel.h"
 #include "../widgets/controls/colormapwidget.h"
+
 #include "../../data/enums.h"
-
-#include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
-
+#include "../../data/datasets/dataset.h"
 #include "../../data/properties/property.h"
 
-#include "../views/datasetpropertyview.h"
-
-#include "datasetpropertywidget.h"
+#include <QtGui/QtGui>
 
 DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
     QWidget( parent )

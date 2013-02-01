@@ -4,14 +4,13 @@
  *  Created on: Nov 13, 2012
  *      Author: schurade
  */
-
-#include <QtCore/QDebug>
+#include "statusbarview.h"
 
 #include "../../data/enums.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 
-#include "statusbarview.h"
+#include <QtCore/QDebug>
 
 StatusBarView::StatusBarView() :
     m_selected( 0 ),

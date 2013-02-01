@@ -4,11 +4,11 @@
  *  Created on: 28.12.2012
  *      Author: Ralph
  */
-#include <math.h>
+#include "fiberrendererthread.h"
 
 #include <QtGui/QVector3D>
 
-#include "fiberrendererthread.h"
+#include <math.h>
 
 FiberRendererThread::FiberRendererThread( QVector< QVector< float > >& data, int id ) :
     m_data( data ),

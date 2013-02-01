@@ -8,11 +8,9 @@
 #ifndef NAVRENDERER_H_
 #define NAVRENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "objectrenderer.h"
 
 #include <QtGui/QMatrix4x4>
-
-#include "objectrenderer.h"
 
 class QGLShaderProgram;
 

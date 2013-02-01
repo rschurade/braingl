@@ -9,7 +9,7 @@
 #define FIBERRENDERERTHREAD_H_
 
 #include <QtCore/QDebug>
-#include <QThread>
+#include <QtCore/QThread>
 #include <QtCore/QVector>
 
 class FiberRendererThread : public QThread

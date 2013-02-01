@@ -4,14 +4,10 @@
  *  Created on: 12.07.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "singleshrenderer.h"
 
-#include <limits>
-
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include "glfunctions.h"
+#include "arcball.h"
 
 #include "../../data/datasets/datasetdwi.h"
 #include "../../data/enums.h"
@@ -23,10 +19,12 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include "glfunctions.h"
-#include "arcball.h"
+#include <QtOpenGL/QGLShaderProgram>
+#include <QtCore/QDebug>
+#include <QtGui/QVector3D>
+#include <QtGui/QMatrix4x4>
 
-#include "singleshrenderer.h"
+#include <limits>
 
 SingleSHRenderer::SingleSHRenderer( QString name ) :
     ObjectRenderer(),

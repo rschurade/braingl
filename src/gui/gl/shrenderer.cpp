@@ -4,14 +4,9 @@
  *  Created on: 03.07.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
-
-#include <limits>
-
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include "shrenderer.h"
+#include "shrendererthread.h"
+#include "glfunctions.h"
 
 #include "../../data/datasets/datasetsh.h"
 #include "../../data/enums.h"
@@ -23,10 +18,12 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include "glfunctions.h"
+#include <QtOpenGL/QGLShaderProgram>
+#include <QtCore/QDebug>
+#include <QtGui/QVector3D>
+#include <QtGui/QMatrix4x4>
 
-#include "shrendererthread.h"
-#include "shrenderer.h"
+#include <limits>
 
 SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),

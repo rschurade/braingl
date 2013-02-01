@@ -6,16 +6,15 @@
  */
 #include "../../thirdparty/glew/include/glew.h"
 
+#include "glfunctions.h"
+#include "../../data/enums.h"
+
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QHash>
 #include <QtCore/QFile>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
-
-#include "../../data/enums.h"
-
-#include "glfunctions.h"
 
 #define NUM_TEXTURES 5
 

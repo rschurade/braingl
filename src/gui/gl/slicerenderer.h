@@ -8,8 +8,6 @@
 #ifndef SLICERENDERER_H_
 #define SLICERENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
-
 #include "objectrenderer.h"
 
 class QGLShaderProgram;

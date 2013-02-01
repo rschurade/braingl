@@ -1,8 +1,8 @@
-#include <QtGui/QtGui>
+#include "glwidget.h"
 
 #include "../../data/datastore.h"
 
-#include "glwidget.h"
+#include <QtGui/QtGui>
 
 GLWidget::GLWidget( DataStore* dataStore, QWidget *parent ) :
 	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),

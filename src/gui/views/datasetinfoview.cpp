@@ -4,9 +4,10 @@
  *  Created on: 12.05.2012
  *      Author: Ralph
  */
+#include "datasetinfoview.h"
+
 #include "intformatdelegate.h"
 #include "niftiformatdelegate.h"
-#include "datasetinfoview.h"
 
 DatasetInfoView::DatasetInfoView(  QWidget * parent ) :
     QTableView( parent )

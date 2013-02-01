@@ -8,10 +8,10 @@
 #ifndef OBJECTRENDERER_H_
 #define OBJECTRENDERER_H_
 
+#include "../../thirdparty/glew/include/glew.h"
+
 #include <QtGui/QVector3D>
 #include <QtGui/QAbstractItemView>
-
-#include "../../thirdparty/glew/include/glew.h"
 
 class ObjectRenderer : public QAbstractItemView
 {

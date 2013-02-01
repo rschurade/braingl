@@ -4,14 +4,14 @@
  *  Created on: 15.05.2012
  *      Author: Ralph
  */
+#include "sliderwithedit.h"
+
 #include <QtGui/QSlider>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 #include <QtCore/QDebug>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
-
-#include "sliderwithedit.h"
 
 SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     QFrame( parent )
