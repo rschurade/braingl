@@ -13,11 +13,12 @@
 class ArcBall;
 class DataStore;
 class SliceRenderer;
+class QAbstractItemModel;
 
 class SceneRenderer
 {
 public:
-	SceneRenderer( DataStore* dataStore );
+	SceneRenderer( QAbstractItemModel* model );
 	virtual ~SceneRenderer();
 
 	void resizeGL( int width, int height );
@@ -36,14 +37,13 @@ public:
 
 private:
 	ArcBall* m_arcBall;
-	DataStore* m_dataStore;
 	SliceRenderer* m_sliceRenderer;
 
 	int m_boundingbox;
 
-	float m_datasetSizeX;
-	float m_datasetSizeY;
-	float m_datasetSizeZ;
+	float m_nx;
+	float m_ny;
+	float m_nz;
 
 	int m_width;
 	int m_height;
