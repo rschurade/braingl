@@ -6,7 +6,6 @@
  */
 #include "datasettensor.h"
 
-#include "../datastore.h"
 #include "../../algos/fmath.h"
 #include "../../gui/gl/tensorrenderer.h"
 #include "../../gui/gl/tensorrendererev.h"

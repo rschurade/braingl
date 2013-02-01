@@ -9,7 +9,6 @@
 #include "datasetscalar.h"
 #include "isosurfacethread.h"
 
-#include "../datastore.h"
 #include "../mesh/trianglemesh2.h"
 
 #include "../../gui/gl/meshrenderer.h"
