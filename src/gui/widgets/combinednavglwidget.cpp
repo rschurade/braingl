@@ -2,16 +2,14 @@
 
 #include "../gl/combinednavrenderer.h"
 
-#include "../../data/datastore.h"
-
 #include <QtGui/QtGui>
 
-CombinedNavGLWidget::CombinedNavGLWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+CombinedNavGLWidget::CombinedNavGLWidget( QAbstractItemModel* model, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
     m_renderer = new CombinedNavRenderer( name );
-    m_renderer->setModel( dataStore );
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer->setModel( model );
+    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 CombinedNavGLWidget::~CombinedNavGLWidget()

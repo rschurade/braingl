@@ -13,7 +13,7 @@
 #include <QtCore/QVariant>
 #include <QtOpenGL/QGLWidget>
 
-class DataStore;
+class QAbstractItemModel;
 class NavGLWidget;
 class NavFrame;
 class SliderWithEditInt2;
@@ -24,16 +24,15 @@ class DockNavGLWidget : public QWidget
     Q_OBJECT
 
 public:
-    DockNavGLWidget( DataStore* dataStore, QString name, int orient, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
+    DockNavGLWidget( QAbstractItemModel* model, QString name, int orient, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
     virtual ~DockNavGLWidget();
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
 private:
-    DataStore* m_dataStore;
     QString m_name;
-
+    QAbstractItemModel* m_model;
     NavFrame* m_glWidget;
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
