@@ -89,8 +89,7 @@ int main( int argc, char *argv[] )
         {
             for ( int k = 0; k < loader.getNumDatasets(); ++k )
             {
-                dataStore->insertRow( 0 );
-                dataStore->setData( dataStore->index( dataStore->rowCount() - 1, FNPROP_DATASET_POINTER ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
+                dataStore->setData( dataStore->index( dataStore->rowCount(), FNPROP_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
             }
         }
     }
