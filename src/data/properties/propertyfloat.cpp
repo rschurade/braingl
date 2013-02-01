@@ -4,11 +4,9 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include <QtGui/QWidget>
+#include "propertyfloat.h"
 
 #include "../../gui/widgets/controls/sliderwithedit.h"
-
-#include "propertyfloat.h"
 
 PropertyFloat::PropertyFloat( FN_PROPERTY name, float value, float min, float max ) :
     Property( name ),

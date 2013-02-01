@@ -4,9 +4,9 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
 #include "propertygroup.h"
+
+#include <QtCore/QDebug>
 
 PropertyGroup::PropertyGroup()
 {

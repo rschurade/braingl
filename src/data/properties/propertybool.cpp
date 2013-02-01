@@ -4,9 +4,9 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/controls/checkboxwithlabel.h"
-
 #include "propertybool.h"
+
+#include "../../gui/widgets/controls/checkboxwithlabel.h"
 
 PropertyBool::PropertyBool( FN_PROPERTY name, bool value ) :
     Property( name ),

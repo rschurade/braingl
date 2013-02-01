@@ -8,15 +8,15 @@
 #ifndef PROPERTYGROUP_H_
 #define PROPERTYGROUP_H_
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-
 #include "property.h"
 #include "propertybool.h"
 #include "propertyint.h"
 #include "propertyfloat.h"
 #include "propertystring.h"
+
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 class PropertyGroup : public QObject
 {

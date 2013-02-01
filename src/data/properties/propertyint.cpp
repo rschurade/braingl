@@ -4,9 +4,9 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../gui/widgets/controls/sliderwitheditint.h"
-
 #include "propertyint.h"
+
+#include "../../gui/widgets/controls/sliderwitheditint.h"
 
 PropertyInt::PropertyInt( FN_PROPERTY name, int value, int min, int max ) :
     Property( name ),
