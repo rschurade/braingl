@@ -4,6 +4,8 @@
 #include <QtCore/QDateTime>
 
 #include "data/datastore.h"
+#include "data/loader.h"
+#include "data/vptr.h"
 #include "gui/mainwindow.h"
 
 
@@ -81,7 +83,16 @@ int main( int argc, char *argv[] )
 
     for ( int i = 1; i < args.size(); ++i )
     {
-        dataStore->load( QDir( args.at( i ) ) );
+        Loader loader;
+        loader.setFilename( QDir( args.at( i ) ) );
+        if ( loader.load() )
+        {
+            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            {
+                dataStore->insertRow( 0 );
+                dataStore->setData( dataStore->index( dataStore->rowCount() - 1, FNPROP_DATASET_POINTER ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
+            }
+        }
     }
 
     return app.exec();

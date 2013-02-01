@@ -18,7 +18,7 @@
 class Loader
 {
 public:
-    Loader( QDir fileName );
+    Loader();
     virtual ~Loader();
 
     bool load();
@@ -26,6 +26,7 @@ public:
     Dataset* getDataset( int id = 0 );
     int getNumDatasets();
 
+    void setFilename( QDir fn );
     bool succes();
 private:
     FN_DATASET_TYPE determineType();
