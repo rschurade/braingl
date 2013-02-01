@@ -4,20 +4,19 @@
  *  Created on: Jul 17, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
-#include <math.h>
-#include <float.h>
-
-#include <boost/math/special_functions/spherical_harmonic.hpp>
+#include "fmath.h"
 
 #include "../thirdparty/newmat10/newmatap.h"
 #include "../thirdparty/newmat10/newmatio.h"
 #include "../thirdparty/newmat10/newmatrm.h"
 #include "../thirdparty/newmat10/precisio.h"
 
+#include <QtCore/QDebug>
 
-#include "fmath.h"
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+
+#include <math.h>
+#include <float.h>
 
 FMath::FMath() {}
 FMath::~FMath() {}

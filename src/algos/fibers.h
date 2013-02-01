@@ -42,7 +42,7 @@ private:
     {
         int id = (int) ( x / m_dx ) + (int) ( y / m_dy ) * m_nx + (int) ( z / m_dz ) * m_ny * m_nx;
 
-        id = max( (int) 0, min( m_blockSize - 1, id ) );
+        id = std::max( (int) 0, std::min( m_blockSize - 1, id ) );
         return id;
     }
 

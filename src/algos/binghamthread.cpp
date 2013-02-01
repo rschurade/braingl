@@ -4,14 +4,13 @@
  *  Created on: 27.12.2012
  *      Author: Ralph
  */
-
-#include "../data/datasets/datasetsh.h"
-#include "../data/mesh/tesselation.h"
+#include "binghamthread.h"
 
 #include "fmath.h"
 #include "sorts.h"
 
-#include "binghamthread.h"
+#include "../data/datasets/datasetsh.h"
+#include "../data/mesh/tesselation.h"
 
 BinghamThread::BinghamThread( DatasetSH* ds, int lod, int id ) :
     m_ds( ds ),

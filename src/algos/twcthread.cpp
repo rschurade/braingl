@@ -4,10 +4,11 @@
  *  Created on: Jan 28, 2013
  *      Author: schurade
  */
-#include "fmath.h"
-#include "time.h"
-
 #include "twcthread.h"
+
+#include "fmath.h"
+
+#include "time.h"
 
 TWCThread::TWCThread( int id,
                         QVector<float>* mask,

@@ -4,9 +4,9 @@
  *  Created on: Nov 26, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
 #include "sorts.h"
+
+#include <QtCore/QDebug>
 
 Sorts::Sorts()
 {

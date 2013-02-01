@@ -4,16 +4,16 @@
  *  Created on: Jan 28, 2013
  *      Author: schurade
  */
-#include <QtCore/QThread>
+#include "trackwithcrossings.h"
+#include "twcthread.h"
 
+#include "fmath.h"
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasettensor.h"
 
-#include "fmath.h"
-#include "time.h"
+#include <QtCore/QThread>
 
-#include "twcthread.h"
-#include "trackwithcrossings.h"
+#include "time.h"
 
 TrackWithCrossings::TrackWithCrossings() :
     m_nx( 0 ),

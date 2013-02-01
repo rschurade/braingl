@@ -9,6 +9,7 @@
 #define QBALL_H_
 
 #include "../thirdparty/newmat10/newmat.h"
+
 #include <QtCore/QVector>
 
 class DatasetDWI;

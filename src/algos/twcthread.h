@@ -8,12 +8,12 @@
 #ifndef TWCTHREAD_H_
 #define TWCTHREAD_H_
 
+#include "../thirdparty/newmat10/newmat.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-
-#include "../thirdparty/newmat10/newmat.h"
 
 class DatasetTensor;
 

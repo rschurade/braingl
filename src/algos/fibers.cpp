@@ -4,13 +4,13 @@
  *  Created on: Jan 24, 2013
  *      Author: schurade
  */
-#include <limits>
-#include <math.h>
+#include "fibers.h"
 
 #include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/datasetscalar.h"
 
-#include "fibers.h"
+#include <limits>
+#include <math.h>
 
 Fibers::Fibers( DatasetFibers* ds ) :
     m_dataset( ds ),

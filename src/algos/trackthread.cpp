@@ -4,11 +4,10 @@
  *  Created on: 25.12.2012
  *      Author: Ralph
  */
-
-#include "fmath.h"
-#include "time.h"
-
 #include "trackthread.h"
+#include "fmath.h"
+
+#include "time.h"
 
 TrackThread::TrackThread( QVector<Matrix>* tensors,
                           QVector<Matrix>* logTensors,

@@ -8,12 +8,12 @@
 #ifndef BINGHAMTHREAD_H_
 #define BINGHAMTHREAD_H_
 
+#include "../thirdparty/newmat10/newmat.h"
+#include "../thirdparty/newmat10/newmatap.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
-
-#include "../thirdparty/newmat10/newmat.h"
-#include "../thirdparty/newmat10/newmatap.h"
 
 class DatasetSH;
 

@@ -8,11 +8,11 @@
 #ifndef TRACKWITHCROSSINGS_H_
 #define TRACKWITHCROSSINGS_H_
 
+#include "fmath.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-
-#include "fmath.h"
 
 class DatasetScalar;
 class DatasetTensor;

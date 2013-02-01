@@ -5,13 +5,12 @@
  *      Author: Ralph
  */
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
-
-#include "../data/datasets/datasetdwi.h"
+#include "sharpqballthread.h"
 
 #include "fmath.h"
+#include "../data/datasets/datasetdwi.h"
 
-#include "sharpqballthread.h"
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 
 SharpQBallThread::SharpQBallThread( DatasetDWI* ds, int order, int id ) :
     m_ds( ds ),

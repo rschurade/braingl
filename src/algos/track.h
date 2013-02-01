@@ -8,11 +8,11 @@
 #ifndef TRACK_H_
 #define TRACK_H_
 
+#include "fmath.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-
-#include "fmath.h"
 
 class DatasetTensor;
 class TrackThread;

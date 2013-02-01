@@ -4,15 +4,15 @@
  *  Created on: Dec 11, 2012
  *      Author: schurade
  */
-#include <QtCore/QThread>
-
-#include "../data/datasets/datasettensor.h"
+#include "track.h"
+#include "trackthread.h"
 
 #include "fmath.h"
 #include "time.h"
 
-#include "trackthread.h"
-#include "track.h"
+#include "../data/datasets/datasettensor.h"
+
+#include <QtCore/QThread>
 
 Track::Track( DatasetTensor* ds ) :
     m_dataset( ds ),
