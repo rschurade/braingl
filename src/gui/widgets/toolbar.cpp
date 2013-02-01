@@ -257,7 +257,7 @@ void ToolBar::tensorTrackFinished()
     QList<Dataset*>l = m_ttw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ttw->hide();
     destroy( m_ttw );
@@ -270,7 +270,7 @@ void ToolBar::crossingTrackFinished()
     QList<Dataset*>l = m_ctw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ) );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ctw->hide();
     destroy( m_ctw );
