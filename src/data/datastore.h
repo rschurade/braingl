@@ -37,8 +37,6 @@ public:
     QModelIndex parent( const QModelIndex & index ) const;
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
     Qt::ItemFlags flags( const QModelIndex& index ) const;
-    bool insertRow ( int row, const QModelIndex &parent=QModelIndex() );
-    bool insertRows (int row, int count, const QModelIndex &parent );
 
 public slots:
     void moveItemUp( int row );

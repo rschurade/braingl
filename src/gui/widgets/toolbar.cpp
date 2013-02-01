@@ -189,8 +189,7 @@ void ToolBar::slot( FN_ALGO algo )
     }
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->insertRows( 0, 0 );
-        index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount() - 1, FNPROP_DATASET_POINTER );
+        index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
 
@@ -258,8 +257,7 @@ void ToolBar::tensorTrackFinished()
     QList<Dataset*>l = m_ttw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->insertRows( 0, 1 );
-        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount() - 1, FNPROP_DATASET_POINTER );
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ttw->hide();
@@ -272,8 +270,7 @@ void ToolBar::crossingTrackFinished()
     QList<Dataset*>l = m_ctw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        m_toolBarView->model()->insertRows( 0, 1 );
-        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount() - 1, FNPROP_DATASET_POINTER );
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ctw->hide();

@@ -101,8 +101,7 @@ void MainWindow::open()
         {
             for ( int k = 0; k < loader.getNumDatasets(); ++k )
             {
-                m_dataStore->insertRow( 0 );
-                m_dataStore->setData( m_dataStore->index( m_dataStore->rowCount() - 1, FNPROP_DATASET_POINTER ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
+                m_dataStore->setData( m_dataStore->index( m_dataStore->rowCount(), FNPROP_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
             }
         }
         QFileInfo fi( fileName );

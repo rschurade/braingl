@@ -46,20 +46,6 @@ DataStore::~DataStore()
 {
 }
 
-bool DataStore::insertRow ( int row, const QModelIndex &parent )
-{
-    Dataset* ds = new Dataset( QDir("tmp"), FNDT_UNKNOWN );
-    beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
-    m_datasetList.push_back( VPtr<Dataset>::asQVariant( ds ) );
-    endInsertRows();
-    return true;
-}
-
-bool DataStore::insertRows (int row, int count, const QModelIndex &parent )
-{
-    return insertRow( row );
-}
-
 void DataStore::updateGlobals()
 {
     if ( m_datasetList.size() > 0 )
@@ -162,7 +148,7 @@ QVariant DataStore::getGlobal( const QModelIndex &index ) const
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
 {
     //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
-    if ( !index.isValid() )
+    if ( index.column() == !FNPROP_NEW_DATASET && !index.isValid() )
     {
         return false;
     }
@@ -178,12 +164,12 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     if ( role == Qt::DisplayRole )
     {
         // handle props with special treatment
-        if ( index.column() == FNPROP_DATASET_POINTER )
+        if ( index.column() == FNPROP_NEW_DATASET )
         {
-            //addDataset( VPtr<Dataset>::asPtr( value ) );
-            m_datasetList.replace( index.row(), value );
-            Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
-            connect( ds->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+            beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
+            m_datasetList.push_back( value );
+            endInsertRows();
+            connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
             updateGlobals();
             emit( dataChanged( index, index ) );
             emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -285,6 +271,10 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     else if ( m_datasetList.size() == 0 && column > FNGLOBAL_GLOBALS )
     {
         return createIndex( row, column, 0 );
+    }
+    else if ( row == m_datasetList.size() && column == FNPROP_NEW_DATASET )
+    {
+        return createIndex( 0, column, 0 );
     }
     else
     {
