@@ -12,6 +12,7 @@
 
 #include "dataset.h"
 
+class QAbstractItemModel;
 class FiberRenderer;
 
 class DatasetFibers: public Dataset
@@ -21,7 +22,7 @@ public:
     DatasetFibers( QVector< QVector< float > > fibs );
     virtual ~DatasetFibers();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();

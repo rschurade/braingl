@@ -13,6 +13,7 @@
 
 #include "datasetnifti.h"
 
+class QAbstractItemModel;
 class BinghamRenderer;
 
 class DatasetBingham : public DatasetNifti
@@ -23,7 +24,7 @@ public:
 
     QVector<QVector<float> >* getData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
 private:

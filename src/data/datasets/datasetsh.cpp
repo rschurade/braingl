@@ -108,13 +108,13 @@ void DatasetSH::flipX()
     m_data = newData;
 }
 
-void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
+void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
 {
     if ( m_renderer == 0 )
     {
         m_renderer = new SHRenderer( &m_data, m_properties.get( FNPROP_NX ).toInt(), m_properties.get( FNPROP_NY ).toInt(), m_properties.get( FNPROP_NZ ).toInt(),
                 m_properties.get( FNPROP_DX ).toFloat(), m_properties.get( FNPROP_DY ).toFloat(), m_properties.get( FNPROP_DZ ).toFloat() );
-        m_renderer->setModel( dataStore );
+        m_renderer->setModel( model );
         m_renderer->init();
     }
 

@@ -4,8 +4,6 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
-
-#include "../datastore.h"
 #include "../../gui/gl/evrenderer.h"
 
 #include "dataset3d.h"
@@ -143,7 +141,7 @@ QVector<QVector3D>* Dataset3D::getData()
     return &m_data;
 }
 
-void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
 {
     if ( m_renderer == 0 )
     {
@@ -153,7 +151,7 @@ void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStor
                                               m_properties.get( FNPROP_DX ).toFloat(),
                                               m_properties.get( FNPROP_DY ).toFloat(),
                                               m_properties.get( FNPROP_DZ ).toFloat() );
-        m_renderer->setModel( datastore );
+        m_renderer->setModel( model );
         m_renderer->init();
     }
 

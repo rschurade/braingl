@@ -13,6 +13,7 @@
 
 #include "datasetnifti.h"
 
+class QAbstractItemModel;
 class EVRenderer;
 
 class Dataset3D: public DatasetNifti
@@ -21,7 +22,7 @@ public:
     Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
     QVector<QVector3D>* getData();
