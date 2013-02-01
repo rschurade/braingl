@@ -8,9 +8,9 @@
 #ifndef PROPERTYSTRING_H_
 #define PROPERTYSTRING_H_
 
-#include <QtCore/QString>
-
 #include "property.h"
+
+#include <QtCore/QString>
 
 class EditWithLabel;
 class QWidget;

@@ -4,17 +4,16 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-
-#include "../enums.h"
-
 #ifndef PROPERTY_H_
 #define PROPERTY_H_
 
-#include <limits>
+#include "../enums.h"
 
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 #include <QtCore/QObject>
+
+#include <limits>
 
 class QWidget;
 

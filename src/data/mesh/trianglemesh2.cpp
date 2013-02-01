@@ -4,10 +4,10 @@
  *  Created on: Dec 4, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
-#include "meshthread.h"
 #include "trianglemesh2.h"
+#include "meshthread.h"
+
+#include <QtCore/QDebug>
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     m_numVerts( numVerts ),

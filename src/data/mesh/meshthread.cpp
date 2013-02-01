@@ -4,7 +4,6 @@
  *  Created on: 29.12.2012
  *      Author: Ralph
  */
-
 #include "meshthread.h"
 
 MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int id ) :

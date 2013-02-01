@@ -8,7 +8,7 @@
 #ifndef MESHTHREAD_H_
 #define MESHTHREAD_H_
 
-#include <QThread>
+#include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
 

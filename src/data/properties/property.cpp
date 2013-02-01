@@ -4,7 +4,6 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-
 #include "property.h"
 
 Property::Property( FN_PROPERTY name ) :
