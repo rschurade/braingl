@@ -4,10 +4,9 @@
  *  Created on: Jul 19, 2012
  *      Author: schurade
  */
+#include "datasetmesh.h"
 
 #include "../mesh/trianglemesh2.h"
-
-#include "datasetmesh.h"
 
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
         Dataset( fileName, FNDT_MESH_BINARY ), m_mesh( mesh )

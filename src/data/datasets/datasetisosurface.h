@@ -10,9 +10,9 @@
 
 #include "../../thirdparty/glew/include/glew.h"
 
-#include "../mesh/isosurfaceincludes.h"
-
 #include "dataset.h"
+
+#include "../mesh/isosurfaceincludes.h"
 
 class QAbstractItemModel;
 class DatasetScalar;

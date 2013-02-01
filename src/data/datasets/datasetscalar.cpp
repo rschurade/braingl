@@ -4,9 +4,9 @@
  *  Created on: May 4, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
 #include "datasetscalar.h"
+
+#include <QtCore/QDebug>
 
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SCALAR, header ), m_data( data )

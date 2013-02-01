@@ -27,8 +27,6 @@ public:
 
     static QList<Dataset*> tensorTrack( Dataset* ds );
 
-    static QList<Dataset*> testAlgo( Dataset* ds, QList<Dataset*> &dsl );
-
 private:
     DWIAlgos();
     virtual ~DWIAlgos();

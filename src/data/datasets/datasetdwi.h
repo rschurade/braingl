@@ -8,12 +8,12 @@
 #ifndef DATASETDWI_H_
 #define DATASETDWI_H_
 
-#include <QtGui/QVector3D>
-#include <QtCore/QVector>
+#include "datasetnifti.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include "datasetnifti.h"
+#include <QtGui/QVector3D>
+#include <QtCore/QVector>
 
 class QAbstractItemModel;
 

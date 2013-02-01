@@ -8,10 +8,10 @@
 #ifndef ISOSURFACETHREAD_H_
 #define ISOSURFACETHREAD_H_
 
-#include <QMutex>
-#include <QThread>
-
 #include "../mesh/isosurfaceincludes.h"
+
+#include <QtCore/QMutex>
+#include <QtCore/QThread>
 
 class IsoSurfaceThread : public QThread
 {

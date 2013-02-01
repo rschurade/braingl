@@ -8,11 +8,11 @@
 #ifndef DATASETNIFTI_H_
 #define DATASETNIFTI_H_
 
+#include "dataset.h"
+
 #include "../../thirdparty/nifti/nifti1_io.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
-
-#include "dataset.h"
 
 class QAbstractItemModel;
 

@@ -8,10 +8,10 @@
 #ifndef DATASETBINGHAM_H_
 #define DATASETBINGHAM_H_
 
+#include "datasetnifti.h"
+
 #include <QtGui/QVector3D>
 #include <QtCore/QVector>
-
-#include "datasetnifti.h"
 
 class QAbstractItemModel;
 class BinghamRenderer;

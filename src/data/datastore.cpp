@@ -4,15 +4,15 @@
  *  Created on: May 4, 2012
  *      Author: schurade
  */
-#include <QtCore/QLocale>
-#include <QtCore/QDebug>
+#include "datastore.h"
 
 #include "loader.h"
 #include "writer.h"
 #include "vptr.h"
 #include "enums.h"
 
-#include "datastore.h"
+#include <QtCore/QLocale>
+#include <QtCore/QDebug>
 
 DataStore::DataStore()
 {

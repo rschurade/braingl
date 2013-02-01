@@ -8,9 +8,9 @@
 #ifndef DATASETMESH_H_
 #define DATASETMESH_H_
 
-#include <QtCore/QString>
-
 #include "dataset.h"
+
+#include <QtCore/QString>
 
 class QAbstractItemModel;
 class TriangleMesh2;

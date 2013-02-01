@@ -4,10 +4,11 @@
  *  Created on: Dec 12, 2012
  *      Author: schurade
  */
-#include "../datastore.h"
-#include "../../gui/gl/fiberrenderer.h"
-
 #include "datasetfibers.h"
+
+#include "../datastore.h"
+
+#include "../../gui/gl/fiberrenderer.h"
 
 DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
     Dataset( filename, FNDT_FIBERS ),

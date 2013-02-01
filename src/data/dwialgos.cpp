@@ -4,21 +4,10 @@
  *  Created on: Jun 18, 2012
  *      Author: schurade
  */
+#include "dwialgos.h"
 #include "enums.h"
-#include "../algos/fmath.h"
-#include "../algos/track.h"
-
-#include <QtCore/QDebug>
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
-
-#include "../thirdparty/newmat10/newmat.h"
-#include "../thirdparty/newmat10/newmatap.h"
-
-#include "../gui/widgets/algoStarterWidgets/datasetselectionwidget.h"
 
 #include "mesh/tesselation.h"
-
 #include "datasets/dataset3d.h"
 #include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
@@ -27,9 +16,17 @@
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 
+#include "../algos/fmath.h"
+#include "../algos/track.h"
 #include "../algos/qball.h"
 #include "../algos/bingham.h"
-#include "dwialgos.h"
+
+#include "../thirdparty/newmat10/newmat.h"
+#include "../thirdparty/newmat10/newmatap.h"
+
+#include <QtCore/QDebug>
+#include <QtCore/QVector>
+#include <QtGui/QVector3D>
 
 
 DWIAlgos::DWIAlgos()
@@ -283,16 +280,5 @@ QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
         l[i]->properties()->set( FNPROP_CREATED_BY, FNALGO_BINGHAM_2_TENSOR );
         l[i]->properties()->set( FNPROP_DATATYPE, DT_FLOAT );
     }
-    return l;
-}
-
-QList<Dataset*> DWIAlgos::testAlgo( Dataset* ds, QList<Dataset*> &dsl )
-{
-    QVector< QPair<QString, FN_DATASET_TYPE> >filter;
-    filter.push_back( QPair<QString, FN_DATASET_TYPE>( "optional: mask", FNDT_NIFTI_SCALAR ) );
-
-    DatasetSelectionWidget* dsw = new DatasetSelectionWidget( filter, dsl );
-    dsw->show();
-    QList<Dataset*>l;
     return l;
 }

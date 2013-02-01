@@ -4,13 +4,14 @@
  *  Created on: 09.07.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
-#include "datasets/datasetfibers.h"
-#include "datasets/datasetscalar.h"
+#include "fiberalgos.h"
 
 #include "../algos/fibers.h"
 
-#include "fiberalgos.h"
+#include "datasets/datasetfibers.h"
+#include "datasets/datasetscalar.h"
+
+#include <QtCore/QDebug>
 
 FiberAlgos::FiberAlgos()
 {

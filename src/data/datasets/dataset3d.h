@@ -8,10 +8,10 @@
 #ifndef DATASET3D_H_
 #define DATASET3D_H_
 
+#include "datasetnifti.h"
+
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-
-#include "datasetnifti.h"
 
 class QAbstractItemModel;
 class EVRenderer;

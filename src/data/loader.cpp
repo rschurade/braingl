@@ -4,10 +4,7 @@
  *  Created on: May 3, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-#include <QtCore/QDataStream>
-#include <QtGui/QVector3D>
-#include <QtGui/QtGui>
+#include "loader.h"
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
@@ -18,7 +15,10 @@
 #include "datasets/datasetsh.h"
 #include "mesh/trianglemesh2.h"
 
-#include "loader.h"
+#include <QtCore/QDebug>
+#include <QtCore/QDataStream>
+#include <QtGui/QVector3D>
+#include <QtGui/QtGui>
 
 Loader::Loader( QDir fileName ) :
         m_fileName( fileName ), m_datasetType( FNDT_UNKNOWN ), m_success( false )

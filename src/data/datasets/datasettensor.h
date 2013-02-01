@@ -8,12 +8,12 @@
 #ifndef DATASETTENSOR_H_
 #define DATASETTENSOR_H_
 
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include "datasetnifti.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include "datasetnifti.h"
+#include <QtCore/QVector>
+#include <QtGui/QVector3D>
 
 class QAbstractItemModel;
 class TensorRenderer;

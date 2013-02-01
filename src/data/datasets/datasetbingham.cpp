@@ -4,11 +4,11 @@
  *  Created on: Nov 23, 2012
  *      Author: schurade
  */
+#include "datasetbingham.h"
+
 #include "../datastore.h"
 
 #include "../../gui/gl/binghamrenderer.h"
-
-#include "datasetbingham.h"
 
 DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_BINGHAM, header ),

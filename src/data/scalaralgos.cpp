@@ -4,11 +4,10 @@
  *  Created on: 09.07.2012
  *      Author: Ralph
  */
+#include "scalaralgos.h"
 
 #include "datasets/datasetscalar.h"
 #include "datasets/datasetisosurface.h"
-
-#include "scalaralgos.h"
 
 ScalarAlgos::ScalarAlgos()
 {

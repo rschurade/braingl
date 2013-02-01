@@ -10,7 +10,8 @@
 
 #include "../../thirdparty/glew/include/glew.h"
 
-#include <limits>
+#include "../enums.h"
+#include "../properties/propertygroup.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
@@ -19,9 +20,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QMatrix4x4>
 
-#include "../properties/propertygroup.h"
-
-#include "../enums.h"
+#include <limits>
 
 class QAbstractItemModel;
 

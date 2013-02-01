@@ -8,12 +8,12 @@
 #ifndef LOADER_H_
 #define LOADER_H_
 
-#include <QtCore/QDir>
-#include <QtCore/QVector>
+#include "datasets/dataset.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
-#include "datasets/dataset.h"
+#include <QtCore/QDir>
+#include <QtCore/QVector>
 
 class Loader
 {

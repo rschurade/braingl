@@ -4,9 +4,9 @@
  *  Created on: 28.12.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
-
 #include "isosurfacethread.h"
+
+#include <QtCore/QDebug>
 
 IsoSurfaceThread::IsoSurfaceThread( QVector<float>* scalarField, QMutex* mutex, ID2POINT3DID* i2pt3idVertices, TRIANGLEVECTOR* trivecTriangles,
                                     int nx, int ny, int nz, float dx, float dy, float dz, int id ) :
