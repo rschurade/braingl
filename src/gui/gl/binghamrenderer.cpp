@@ -4,7 +4,7 @@
  *  Created on: 03.07.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "binghamrenderer.h"
 
 #include <limits>
 
@@ -25,7 +25,6 @@
 
 #include "glfunctions.h"
 #include "binghamrendererthread.h"
-#include "binghamrenderer.h"
 
 BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),

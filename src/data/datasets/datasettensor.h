@@ -15,6 +15,7 @@
 
 #include "datasetnifti.h"
 
+class QAbstractItemModel;
 class TensorRenderer;
 class TensorRendererEV;
 
@@ -28,7 +29,7 @@ public:
     QVector<Matrix>* getData();
     QVector<Matrix>* getLogData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
 private:

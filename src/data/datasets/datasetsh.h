@@ -15,6 +15,7 @@
 
 #include "datasetnifti.h"
 
+class QAbstractItemModel;
 class SHRenderer;
 
 class DatasetSH: public DatasetNifti
@@ -25,7 +26,7 @@ public:
 
     QVector<ColumnVector>* getData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
 private:

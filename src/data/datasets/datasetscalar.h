@@ -10,6 +10,8 @@
 
 #include "datasetnifti.h"
 
+class QAbstractItemModel;
+
 class DatasetScalar: public DatasetNifti
 {
 public:
@@ -18,7 +20,7 @@ public:
 
     QVector<float>* getData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
 private:

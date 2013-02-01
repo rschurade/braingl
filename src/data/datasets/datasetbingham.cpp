@@ -67,7 +67,7 @@ void DatasetBingham::flipX()
 {
 }
 
-void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* dataStore )
+void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
 {
     if ( m_renderer == 0 )
     {
@@ -78,7 +78,7 @@ void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, Dat
                                                   m_properties.get( FNPROP_DX ).toFloat(),
                                                   m_properties.get( FNPROP_DY ).toFloat(),
                                                   m_properties.get( FNPROP_DZ ).toFloat() );
-        m_renderer->setModel( dataStore );
+        m_renderer->setModel( model );
         m_renderer->init();
         qDebug() << "ds bingham init renderer done";
     }

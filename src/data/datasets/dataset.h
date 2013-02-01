@@ -23,7 +23,7 @@
 
 #include "../enums.h"
 
-class DataStore;
+class QAbstractItemModel;
 
 class Dataset
 {
@@ -35,7 +35,7 @@ public:
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model ) = 0;
 
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 

@@ -127,7 +127,7 @@ void DatasetScalar::flipX()
     m_data = newData;
 }
 
-void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore )
+void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
 {
 }
 

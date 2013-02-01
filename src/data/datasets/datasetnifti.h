@@ -14,6 +14,8 @@
 
 #include "dataset.h"
 
+class QAbstractItemModel;
+
 class DatasetNifti: public Dataset
 {
 public:
@@ -25,7 +27,7 @@ public:
     Matrix getQForm();
     Matrix getSForm();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore ) = 0;
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
     static QString getNiftiDataType( const int type );

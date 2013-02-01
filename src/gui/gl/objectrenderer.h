@@ -11,6 +11,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QAbstractItemView>
 
+#include "../../thirdparty/glew/include/glew.h"
+
 class ObjectRenderer : public QAbstractItemView
 {
 public:

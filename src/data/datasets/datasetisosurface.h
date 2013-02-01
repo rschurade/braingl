@@ -14,6 +14,7 @@
 
 #include "dataset.h"
 
+class QAbstractItemModel;
 class DatasetScalar;
 class MeshRenderer;
 class TriangleMesh2;
@@ -25,7 +26,7 @@ public:
     DatasetIsosurface( DatasetScalar* ds );
     virtual ~DatasetIsosurface();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, DataStore* datastore );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
     QString getValueAsString( int x, int y, int z );
 
 protected:
