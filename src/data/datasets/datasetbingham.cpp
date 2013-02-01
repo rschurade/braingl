@@ -6,8 +6,6 @@
  */
 #include "datasetbingham.h"
 
-#include "../datastore.h"
-
 #include "../../gui/gl/binghamrenderer.h"
 
 DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data, nifti_image* header ) :

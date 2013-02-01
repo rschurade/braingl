@@ -4,11 +4,9 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
-
-#include "../datastore.h"
-#include "../../gui/gl/shrenderer.h"
-
 #include "datasetsh.h"
+
+#include "../../gui/gl/shrenderer.h"
 
 DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_SH, header ), m_data( data ), m_renderer( 0 )

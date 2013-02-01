@@ -6,8 +6,6 @@
  */
 #include "datasetfibers.h"
 
-#include "../datastore.h"
-
 #include "../../gui/gl/fiberrenderer.h"
 
 DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
