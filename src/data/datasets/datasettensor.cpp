@@ -4,14 +4,12 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
+#include "datasettensor.h"
 
 #include "../datastore.h"
+#include "../../algos/fmath.h"
 #include "../../gui/gl/tensorrenderer.h"
 #include "../../gui/gl/tensorrendererev.h"
-
-#include "../../algos/fmath.h"
-
-#include "datasettensor.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_image* header ) :
     DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),

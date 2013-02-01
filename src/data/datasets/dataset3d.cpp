@@ -4,9 +4,9 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
-#include "../../gui/gl/evrenderer.h"
-
 #include "dataset3d.h"
+
+#include "../../gui/gl/evrenderer.h"
 
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
         DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )

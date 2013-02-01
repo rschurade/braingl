@@ -4,16 +4,17 @@
  *  Created on: Dec 4, 2012
  *      Author: schurade
  */
-#include <QtCore/QString>
-
-#include "../datastore.h"
-#include "../../gui/gl/meshrenderer.h"
-
-#include "../mesh/trianglemesh2.h"
+#include "datasetisosurface.h"
 
 #include "datasetscalar.h"
 #include "isosurfacethread.h"
-#include "datasetisosurface.h"
+
+#include "../datastore.h"
+#include "../mesh/trianglemesh2.h"
+
+#include "../../gui/gl/meshrenderer.h"
+
+#include <QtCore/QString>
 
 DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
         Dataset( QString( "isosurface" ), FNDT_MESH_ISOSURFACE ),

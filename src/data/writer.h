@@ -8,11 +8,11 @@
 #ifndef WRITER_H_
 #define WRITER_H_
 
-#include <QtCore/QString>
+#include "datasets/dataset.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
-#include "datasets/dataset.h"
+#include <QtCore/QString>
 
 class Writer
 {

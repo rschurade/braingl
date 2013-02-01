@@ -4,10 +4,9 @@
  *  Created on: May 9, 2012
  *      Author: schurade
  */
+#include "datasetnifti.h"
 
 #include <QtCore/QDebug>
-
-#include "datasetnifti.h"
 
 DatasetNifti::DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header ) :
         Dataset( filename, type ), m_header( header ), m_qform( 3, 3 ), m_sform( 3, 3 )

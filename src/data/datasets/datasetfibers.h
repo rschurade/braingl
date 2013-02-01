@@ -8,9 +8,9 @@
 #ifndef DATASETFIBERS_H_
 #define DATASETFIBERS_H_
 
-#include <QtCore/QString>
-
 #include "dataset.h"
+
+#include <QtCore/QString>
 
 class QAbstractItemModel;
 class FiberRenderer;

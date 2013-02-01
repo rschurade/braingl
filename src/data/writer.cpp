@@ -4,12 +4,7 @@
  *  Created on: Jun 1, 2012
  *      Author: schurade
  */
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-
-
-#include <QtCore/QDebug>
+#include "writer.h"
 
 #include "datasets/dataset3d.h"
 #include "datasets/datasetbingham.h"
@@ -20,7 +15,11 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetfibers.h"
 
-#include "writer.h"
+#include <QtCore/QDebug>
+
+#include <fstream>
+#include <iostream>
+#include <stdio.h>
 
 Writer::Writer( Dataset* dataset, QString fileName ) :
         m_dataset( dataset ), m_fileName( fileName )

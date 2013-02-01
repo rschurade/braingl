@@ -10,13 +10,13 @@
 
 #include "../thirdparty/glew/include/glew.h"
 
+#include "properties/propertygroup.h"
+
 #include <QtCore/QDir>
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QVector3D>
-
-#include "properties/propertygroup.h"
 
 class Dataset;
 
