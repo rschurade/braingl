@@ -7,14 +7,12 @@
 #include "navframe.h"
 #include "navglwidget.h"
 
-#include "../../data/datastore.h"
-
 #include <QtGui/QtGui>
 
-NavFrame::NavFrame( DataStore* dataStore, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
+NavFrame::NavFrame( QAbstractItemModel* model, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
     QFrame( parent )
 {
-    m_widget = new NavGLWidget( dataStore, name, orient, parent, shareWidget );
+    m_widget = new NavGLWidget( model, name, orient, parent, shareWidget );
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget( m_widget );
 
@@ -28,6 +26,5 @@ NavFrame::NavFrame( DataStore* dataStore, QString name, int orient, QWidget *par
 
 NavFrame::~NavFrame()
 {
-    // TODO Auto-generated destructor stub
 }
 

@@ -6,17 +6,16 @@
  */
 #include "singleshwidget.h"
 
-#include "../../data/datastore.h"
 #include "../gl/singleshrenderer.h"
 
 #include <QtGui/QtGui>
 
-SingleSHWidget::SingleSHWidget( DataStore* dataStore, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+SingleSHWidget::SingleSHWidget( QAbstractItemModel* model, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( parent, shareWidget )
 {
     m_renderer = new SingleSHRenderer( name );
-    m_renderer->setModel( dataStore );
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer->setModel( model );
+    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 SingleSHWidget::~SingleSHWidget()

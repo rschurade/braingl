@@ -1,16 +1,13 @@
 #include "glwidget.h"
 
-#include "../../data/datastore.h"
-
 #include <QtGui/QtGui>
 
-GLWidget::GLWidget( DataStore* dataStore, QWidget *parent ) :
-	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
-	m_dataStore( dataStore )
+GLWidget::GLWidget( QAbstractItemModel* model, QWidget *parent ) :
+	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-	m_sceneRenderer = new SceneRenderer( m_dataStore );
+	m_sceneRenderer = new SceneRenderer( model );
 
-	connect( m_dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+	connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 GLWidget::~GLWidget()

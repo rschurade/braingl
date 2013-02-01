@@ -12,14 +12,14 @@
 #include <QtOpenGL/QGLWidget>
 
 class SingleSHRenderer;
-class DataStore;
+class QAbstractItemModel;
 
 class SingleSHWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    SingleSHWidget( DataStore* dataStore, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
+    SingleSHWidget( QAbstractItemModel* model, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
     virtual ~SingleSHWidget();
 
     QSize minimumSizeHint() const;

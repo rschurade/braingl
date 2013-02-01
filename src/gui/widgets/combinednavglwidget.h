@@ -5,14 +5,14 @@
 #include <QtOpenGL/QGLWidget>
 
 class CombinedNavRenderer;
-class DataStore;
+class QAbstractItemModel;
 
 class CombinedNavGLWidget: public QGLWidget
 {
     Q_OBJECT
 
 public:
-    CombinedNavGLWidget( DataStore* dataStore, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
+    CombinedNavGLWidget( QAbstractItemModel* model, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
     ~CombinedNavGLWidget();
 
     QSize minimumSizeHint() const;

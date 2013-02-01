@@ -7,7 +7,6 @@
 
 #include <QtOpenGL/QGLWidget>
 
-class DataStore;
 class SceneRenderer;
 
 class GLWidget: public QGLWidget
@@ -15,7 +14,7 @@ class GLWidget: public QGLWidget
     Q_OBJECT
 
 public:
-    GLWidget( DataStore* dataStore, QWidget *parent = 0 );
+    GLWidget( QAbstractItemModel* model, QWidget *parent = 0 );
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -38,7 +37,6 @@ protected:
     void wheelEvent( QWheelEvent *event );
 
 private:
-    DataStore* m_dataStore;
     SceneRenderer* m_sceneRenderer;
 };
 

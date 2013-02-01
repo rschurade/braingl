@@ -4,13 +4,10 @@
 #include "../gl/navrenderercoronal.h"
 #include "../gl/navrenderersagittal.h"
 
-#include "../../data/datastore.h"
-
 #include <QtGui/QtGui>
 #include <QtCore/QDebug>
 
-
-NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
+NavGLWidget::NavGLWidget( QAbstractItemModel* model, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
     switch( orient )
@@ -32,8 +29,8 @@ NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, int orient, QWidge
         }
     }
 
-    m_navRenderer->setModel( dataStore );
-    connect( dataStore, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_navRenderer->setModel( model );
+    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 NavGLWidget::~NavGLWidget()
