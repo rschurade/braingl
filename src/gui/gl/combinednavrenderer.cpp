@@ -181,7 +181,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
         else
         {
             xout = xout - ( 2 * m_nx );
-            xout = qMax( 0, qMin( xout, static_cast<int>( m_ny - 1.0 ) ) );
+            xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = out.y() / m_dz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
             mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
@@ -193,7 +193,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
         if ( ( (float)out.y() / m_dz ) < m_nz )
         {
             xout = out.x() / m_dy;
-            xout = qMax( 0, qMin( xout, static_cast<int>( m_ny - 1.0 ) ) );
+            xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
             mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
         }
@@ -237,7 +237,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
         else
         {
             xout = xout - m_nx;
-            xout = qMax( 0, qMin( xout, static_cast<int>( m_ny - 1.0 ) ) );
+            xout = qMax( 0, qMin( m_ny - xout- 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = yout - m_ny;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
             mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
@@ -314,10 +314,10 @@ void CombinedNavRenderer::initGeometry()
         vertices[10] = { QVector3D( xOffset + yb, yOffset + zb, x ), QVector3D( x/xb, 0.0, 1.0 ) };
         vertices[11] = { QVector3D( xOffset,      yOffset + zb, x ), QVector3D( x/xb, 1.0, 1.0 ) };
 
-        verticesCrosshair[8] =  { QVector3D( xOffset,      yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[9] =  { QVector3D( xOffset + yb, yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[10] = { QVector3D( xOffset + y,  yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[11] = { QVector3D( xOffset + y,  yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[8] =  { QVector3D( xOffset,          yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + yb,     yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + yb - y, yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + yb - y, yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
 
 
@@ -330,10 +330,10 @@ void CombinedNavRenderer::initGeometry()
         vertices[10] = { QVector3D( xOffset + yb, yOffset + zb, x ), QVector3D( x/xb, 0.0, 1.0 ) };
         vertices[11] = { QVector3D( xOffset,      yOffset + zb, x ), QVector3D( x/xb, 1.0, 1.0 ) };
 
-        verticesCrosshair[8] =  { QVector3D( xOffset,      yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[9] =  { QVector3D( xOffset + yb, yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[10] = { QVector3D( xOffset + y,  yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[11] = { QVector3D( xOffset + y,  yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[8] =  { QVector3D( xOffset,          yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + yb,     yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + yb - y, yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + yb - y, yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
         yOffset = zb;
         //coronal
@@ -391,10 +391,10 @@ void CombinedNavRenderer::initGeometry()
         vertices[10] = { QVector3D( xOffset + yb, yOffset + zb, x ), QVector3D( x/xb, 0.0, 1.0 ) };
         vertices[11] = { QVector3D( xOffset,      yOffset + zb, x ), QVector3D( x/xb, 1.0, 1.0 ) };
 
-        verticesCrosshair[8] =  { QVector3D( xOffset,      yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[9] =  { QVector3D( xOffset + yb, yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[10] = { QVector3D( xOffset + y,  yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
-        verticesCrosshair[11] = { QVector3D( xOffset + y,  yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[8] =  { QVector3D( xOffset,          yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[9] =  { QVector3D( xOffset + yb,     yOffset + z,  xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[10] = { QVector3D( xOffset + yb - y, yOffset,      xb ), QVector3D( 0.0, 0.0, 0.0 ) };
+        verticesCrosshair[11] = { QVector3D( xOffset + yb - y, yOffset + zb, xb ), QVector3D( 0.0, 0.0, 0.0 ) };
 
         xOffset = 0;
         yOffset = yb;

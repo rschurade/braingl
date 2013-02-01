@@ -290,7 +290,7 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     {
         return createIndex( row, column, VPtr<Dataset>::asPtr( m_datasetList.at( row ) ) );
     }
-    else if ( m_datasetList.size() == 0 && column > FNGLOBAL_SAGITTAL )
+    else if ( m_datasetList.size() == 0 && column > FNGLOBAL_GLOBALS )
     {
         return createIndex( row, column, 0 );
     }
