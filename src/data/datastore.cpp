@@ -6,9 +6,10 @@
  */
 #include "datastore.h"
 
-#include "writer.h"
 #include "vptr.h"
 #include "enums.h"
+
+#include "datasets/dataset.h"
 
 #include <QtCore/QLocale>
 #include <QtCore/QDebug>
@@ -66,16 +67,6 @@ void DataStore::updateGlobals()
             emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
     }
-}
-
-bool DataStore::save( int index, QString fileName )
-{
-    if ( index >= 0 && index < m_datasetList.size() )
-    {
-        Writer writer( VPtr<Dataset>::asPtr( m_datasetList[index] ), fileName );
-        return writer.save();
-    }
-    return false;
 }
 
 int DataStore::rowCount( const QModelIndex &parent ) const

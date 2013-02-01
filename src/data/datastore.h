@@ -26,8 +26,6 @@ public:
     DataStore();
     virtual ~DataStore();
 
-    bool save( int index, QString fileName );
-
     // reimplemented from QAbstractItemModel
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;

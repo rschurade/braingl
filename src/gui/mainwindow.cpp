@@ -19,6 +19,7 @@
 
 #include "../data/datastore.h"
 #include "../data/loader.h"
+#include "../data/writer.h"
 #include "../data/vptr.h"
 #include "../data/enums.h"
 
@@ -131,15 +132,21 @@ void MainWindow::save()
             switch ( ret )
             {
                 case QMessageBox::Save :
-                    m_dataStore->save( m_datasetWidget->getSelected(), fileName );
+                {
+                    Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( m_datasetWidget->getSelected(), FNPROP_DATASET_POINTER) ) );
+                    Writer writer( ds, fileName );
+                    writer.save();
                     break;
+                }
                 case QMessageBox::Cancel :
                     break;
             }
         }
         else
         {
-            m_dataStore->save( m_datasetWidget->getSelected(), fileName );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( m_datasetWidget->getSelected(), FNPROP_DATASET_POINTER) ) );
+            Writer writer( ds, fileName );
+            writer.save();
         }
 
         QFileInfo fi( fileName );
