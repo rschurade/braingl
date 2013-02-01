@@ -4,13 +4,12 @@
  *  Created on: Jan 23, 2013
  *      Author: schurade
  */
-#include <QtGui/QtGui>
+#include "navframe.h"
+#include "navglwidget.h"
 
 #include "../../data/datastore.h"
-#include "navglwidget.h"
-#include "navframe.h"
 
-
+#include <QtGui/QtGui>
 
 NavFrame::NavFrame( DataStore* dataStore, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
     QFrame( parent )

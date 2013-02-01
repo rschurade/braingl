@@ -1,11 +1,14 @@
-#include <QtGui/QtGui>
-#include <QtCore/QDebug>
-#include "../../data/datastore.h"
+#include "navglwidget.h"
+
 #include "../gl/navrendereraxial.h"
 #include "../gl/navrenderercoronal.h"
 #include "../gl/navrenderersagittal.h"
 
-#include "navglwidget.h"
+#include "../../data/datastore.h"
+
+#include <QtGui/QtGui>
+#include <QtCore/QDebug>
+
 
 NavGLWidget::NavGLWidget( DataStore* dataStore, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )

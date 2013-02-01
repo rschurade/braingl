@@ -4,11 +4,11 @@
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-
-#include <QtCore/QDebug>
 #include "objectrenderer.h"
 
 #include "../../data/enums.h"
+
+#include <QtCore/QDebug>
 
 ObjectRenderer::ObjectRenderer() :
 	QAbstractItemView(),

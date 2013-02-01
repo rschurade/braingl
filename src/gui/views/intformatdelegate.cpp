@@ -4,7 +4,6 @@
  *  Created on: Jan 22, 2013
  *      Author: schurade
  */
-
 #include "intformatdelegate.h"
 
 IntFormatDelegate::IntFormatDelegate( QObject *parent ) :

@@ -8,12 +8,11 @@
 #ifndef SINGLESHRENDERER_H_
 #define SINGLESHRENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "objectrenderer.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtGui/QMatrix4x4>
-
-#include "objectrenderer.h"
 
 class ArcBall;
 class DatasetDWI;

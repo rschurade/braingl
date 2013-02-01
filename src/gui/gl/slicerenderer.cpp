@@ -4,16 +4,14 @@
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "slicerenderer.h"
+
+#include "glfunctions.h"
+#include "../../data/enums.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
-
-#include "../../data/enums.h"
-#include "glfunctions.h"
-
-#include "slicerenderer.h"
 
 SliceRenderer::SliceRenderer() :
     ObjectRenderer(),

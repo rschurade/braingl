@@ -4,13 +4,12 @@
  *  Created on: 14.07.2012
  *      Author: Ralph
  */
+#include "checkboxwithlabel.h"
 
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QCheckBox>
 #include <QtGui/QLabel>
-
-#include "checkboxwithlabel.h"
 
 CheckboxWithLabel::CheckboxWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent )

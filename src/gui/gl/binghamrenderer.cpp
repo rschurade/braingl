@@ -5,13 +5,9 @@
  *      Author: Ralph
  */
 #include "binghamrenderer.h"
+#include "binghamrendererthread.h"
 
-#include <limits>
-
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include "glfunctions.h"
 
 #include "../../data/datasets/datasetsh.h"
 #include "../../data/enums.h"
@@ -23,8 +19,12 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include "glfunctions.h"
-#include "binghamrendererthread.h"
+#include <QtOpenGL/QGLShaderProgram>
+#include <QtCore/QDebug>
+#include <QtGui/QVector3D>
+#include <QtGui/QMatrix4x4>
+
+#include <limits>
 
 BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),

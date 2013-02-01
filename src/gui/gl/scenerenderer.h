@@ -8,8 +8,6 @@
 #ifndef SCENERENDERER_H_
 #define SCENERENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
-
 #include <QtGui/QMatrix4x4>
 
 class ArcBall;

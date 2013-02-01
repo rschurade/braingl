@@ -4,14 +4,13 @@
  *  Created on: 14.07.2012
  *      Author: Ralph
  */
+#include "editwithlabel.h"
 
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QGroupBox>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
-
-#include "editwithlabel.h"
 
 EditWithLabel::EditWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent )

@@ -4,7 +4,11 @@
  *  Created on: Dec 4, 2012
  *      Author: schurade
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "meshrenderer.h"
+
+#include "glfunctions.h"
+
+#include "../../data/mesh/trianglemesh2.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
@@ -12,12 +16,6 @@
 #include <QtGui/QMatrix4x4>
 
 #include <limits>
-
-#include "../../data/mesh/trianglemesh2.h"
-
-#include "glfunctions.h"
-
-#include "meshrenderer.h"
 
 MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     ObjectRenderer(),

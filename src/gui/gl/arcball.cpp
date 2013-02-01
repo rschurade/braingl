@@ -4,11 +4,11 @@
  *  Created on: 10.05.2012
  *      Author: Ralph
  */
+#include "arcball.h"
+
 #include <QtCore/QtDebug>
 
 #include <math.h>
-
-#include "arcball.h"
 
 ArcBall::ArcBall( int width, int height ) :
     Epsilon( 0.00001 ),

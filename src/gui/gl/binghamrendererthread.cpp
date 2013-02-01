@@ -4,12 +4,11 @@
  *  Created on: 27.12.2012
  *      Author: Ralph
  */
-
-#include "../../data/mesh/tesselation.h"
+#include "binghamrendererthread.h"
 
 #include "../../algos/fmath.h"
 
-#include "binghamrendererthread.h"
+#include "../../data/mesh/tesselation.h"
 
 BinghamRendererThread::BinghamRendererThread( QVector<QVector<float> >* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,

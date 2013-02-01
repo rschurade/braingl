@@ -8,8 +8,6 @@
 #ifndef DATASETISOSURFACE_H_
 #define DATASETISOSURFACE_H_
 
-#include "../../thirdparty/glew/include/glew.h"
-
 #include "dataset.h"
 
 #include "../mesh/isosurfaceincludes.h"

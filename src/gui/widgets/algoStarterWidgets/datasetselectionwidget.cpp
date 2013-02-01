@@ -4,11 +4,11 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "../../../data/datasets/dataset.h"
+#include "datasetselectionwidget.h"
 
 #include "../controls/selectwithlabel.h"
 
-#include "datasetselectionwidget.h"
+#include "../../../data/datasets/dataset.h"
 
 DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, FN_DATASET_TYPE> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
     QWidget( parent )

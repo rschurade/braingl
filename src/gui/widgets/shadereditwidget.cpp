@@ -4,11 +4,11 @@
  *  Created on: Nov 20, 2012
  *      Author: schurade
  */
-#include <QtCore/QDebug>
-
 #include "shadereditwidget.h"
 
 #include "../gl/glfunctions.h"
+
+#include <QtCore/QDebug>
 
 ShaderEditWidget::ShaderEditWidget( QWidget* parent ) :
     QWidget( parent )

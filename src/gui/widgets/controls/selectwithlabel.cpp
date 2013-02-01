@@ -4,13 +4,13 @@
  *  Created on: 12.07.2012
  *      Author: Ralph
  */
+#include "selectwithlabel.h"
+
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QGroupBox>
 #include <QtGui/QComboBox>
 #include <QtGui/QLabel>
-
-#include "selectwithlabel.h"
 
 SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent ),

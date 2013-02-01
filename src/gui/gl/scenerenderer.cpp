@@ -4,20 +4,20 @@
  *  Created on: 09.05.2012
  *      Author: Ralph
  */
-#include <QtCore/QDebug>
+#include "../../thirdparty/glew/include/glew.h"
 
-#include <math.h>
+#include "scenerenderer.h"
+#include "arcball.h"
+#include "slicerenderer.h"
 
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
 #include "../../data/datasets/dataset.h"
-
-#include "arcball.h"
-#include "slicerenderer.h"
-
 #include "../../data/vptr.h"
 
-#include "scenerenderer.h"
+#include <QtCore/QDebug>
+
+#include <math.h>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

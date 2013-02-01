@@ -4,8 +4,7 @@
  *  Created on: 26.01.2013
  *      Author: Ralph
  */
-#include <QtGui/QPushButton>
-#include <QtGui/QProgressBar>
+#include "crossingtrackwidget.h"
 
 #include "../controls/sliderwithedit.h"
 #include "../controls/sliderwitheditint.h"
@@ -18,7 +17,8 @@
 #include "../../../data/datasets/datasetscalar.h"
 #include "../../../data/datasets/datasettensor.h"
 
-#include "crossingtrackwidget.h"
+#include <QtGui/QPushButton>
+#include <QtGui/QProgressBar>
 
 CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent ) :
     m_ds( ds ),

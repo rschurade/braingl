@@ -8,12 +8,9 @@
 #ifndef NAVRENDERERAXIAL_H_
 #define NAVRENDERERAXIAL_H_
 
-#include "../../thirdparty/glew/include/glew.h"
-
+#include "navrenderer.h"
 
 #include <QtGui/QMatrix4x4>
-
-#include "navrenderer.h"
 
 class QGLShaderProgram;
 

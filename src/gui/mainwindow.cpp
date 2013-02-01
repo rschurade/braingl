@@ -1,10 +1,8 @@
-#include <QtGui/QtGui>
-
-#include "../data/datastore.h"
-#include "../data/enums.h"
+#include "mainwindow.h"
 
 #include "views/datasetinfoview.h"
 
+#include "widgets/glwidget.h"
 #include "widgets/fndockwidget.h"
 #include "widgets/datasetpropertywidget.h"
 #include "widgets/globalpropertywidget.h"
@@ -14,13 +12,15 @@
 #include "widgets/selectionboxwidget.h"
 #include "widgets/datasetlistwidget.h"
 #include "widgets/navglwidget.h"
-#include "widgets/glwidget.h"
 #include "widgets/combinednavglwidget.h"
 #include "widgets/toolbar.h"
 #include "widgets/statusbar.h"
 #include "widgets/shadereditwidget.h"
 
-#include "mainwindow.h"
+#include "../data/datastore.h"
+#include "../data/enums.h"
+
+#include <QtGui/QtGui>
 
 MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
 	QMainWindow(),
