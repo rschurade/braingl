@@ -12,6 +12,7 @@
 #include "../data/datasets/datasetdwi.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/qmath.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 

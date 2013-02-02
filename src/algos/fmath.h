@@ -10,16 +10,10 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
-#include <math.h>
-
 #include <QtCore/QVector>
 #include <QtCore/QString>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
-
-#ifdef __WINDOWS__
-    #define M_PI 3.14159265359
-#endif
 
 class FMath
 {
