@@ -20,9 +20,9 @@ DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, Fn::Data
         SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
         for ( int k = 0; k < dsl.size(); ++k )
         {
-            if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == (int)filter[i].second || (int)filter[i].second == (int)Fn::DatasetType::NIFTI_ANY )
+            if ( dsl[k]->properties()->get( Fn::Property::TYPE ).toInt() == (int)filter[i].second || (int)filter[i].second == (int)Fn::DatasetType::NIFTI_ANY )
             {
-                sel->insertItem( k, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
+                sel->insertItem( k, dsl[k]->properties()->get( Fn::Property::NAME ).toString() );
             }
         }
         m_layout->addWidget( sel );

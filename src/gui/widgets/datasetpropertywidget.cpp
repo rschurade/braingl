@@ -53,9 +53,9 @@ void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionMod
 
 void DatasetPropertyWidget::updateWidgetVisibility()
 {
-    QModelIndex index = m_propertyView->getSelectedIndex( FNPROP_DATASET_POINTER );
+    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    QList<FN_PROPERTY>visible = ds->properties()->getVisible();
+    QList<Fn::Property>visible = ds->properties()->getVisible();
 
     for ( int i = 0; i < m_visibleWidgets.size(); ++i )
     {
@@ -71,21 +71,21 @@ void DatasetPropertyWidget::updateWidgetVisibility()
         m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
         ds->properties()->getWidget( visible[i] )->show();
         m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
-        if ( visible[i] == FNPROP_COLORMAP )
+        if ( visible[i] == Fn::Property::COLORMAP )
         {
             ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 6 );
             m_layout->addWidget( cmapWidget );
             m_visibleWidgets.push_back( cmapWidget );
-            cmapWidget->setMin( ds->properties()->get( FNPROP_MIN ).toFloat() );
-            cmapWidget->setMax( ds->properties()->get( FNPROP_MAX ).toFloat() );
-            cmapWidget->setLowerThreshold( ds->properties()->get( FNPROP_LOWER_THRESHOLD ).toFloat() );
-            cmapWidget->setUpperThreshold( ds->properties()->get( FNPROP_UPPER_THRESHOLD ).toFloat() );
-            cmapWidget->setColormap( ds->properties()->get( FNPROP_COLORMAP ).toInt() );
-            connect( ds->properties()->getWidget( FNPROP_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
-            connect( ds->properties()->getWidget( FNPROP_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
-            connect( ds->properties()->getWidget( FNPROP_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
-            connect( ds->properties()->getWidget( FNPROP_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
-            connect( ds->properties()->getWidget( FNPROP_COLORMAP ), SIGNAL( valueChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
+            cmapWidget->setMin( ds->properties()->get( Fn::Property::MIN ).toFloat() );
+            cmapWidget->setMax( ds->properties()->get( Fn::Property::MAX ).toFloat() );
+            cmapWidget->setLowerThreshold( ds->properties()->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
+            cmapWidget->setUpperThreshold( ds->properties()->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
+            cmapWidget->setColormap( ds->properties()->get( Fn::Property::COLORMAP ).toInt() );
+            connect( ds->properties()->getWidget( Fn::Property::MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::COLORMAP ), SIGNAL( valueChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
         }
     }
     m_layout->addStretch();

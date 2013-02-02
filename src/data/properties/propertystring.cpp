@@ -8,7 +8,7 @@
 
 #include "../../gui/widgets/controls/editwithlabel.h"
 
-PropertyString::PropertyString( FN_PROPERTY name, QString value ) :
+PropertyString::PropertyString( Fn::Property name, QString value ) :
     Property( name ),
     m_value( value )
 {

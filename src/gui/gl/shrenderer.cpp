@@ -92,9 +92,9 @@ void SHRenderer::setShaderVars()
 
 void SHRenderer::initGeometry()
 {
-    int xi = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toInt();
-    int yi = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toInt();
-    int zi = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toInt();
+    int xi = model()->data( model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 ) ).toInt();
+    int yi = model()->data( model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 ) ).toInt();
+    int zi = model()->data( model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 ) ).toInt();
 
 
     calcBounds( m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_orient );

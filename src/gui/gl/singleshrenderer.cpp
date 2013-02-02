@@ -132,15 +132,15 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toFloat();
+    m_x = model()->data( model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
-    int xbi = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toInt();
-    int ybi = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toInt();
-    //int zbi = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toInt();
+    int xbi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 ) ).toInt();
+    int ybi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 ) ).toInt();
+    //int zbi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 ) ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 
@@ -149,7 +149,7 @@ void SingleSHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int order = m_dataset->properties()->get( FNPROP_ORDER ).toInt();
+    int order = m_dataset->properties()->get( Fn::Property::ORDER ).toInt();
 
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
@@ -235,10 +235,10 @@ void SingleSHRenderer::draw()
 //    int countDatasets = model()->rowCount();
 //    for ( int i = 0; i < countDatasets; ++i )
 //    {
-//        QModelIndex index = model()->index( i, FNPROP_ACTIVE );
+//        QModelIndex index = model()->index( i, Fn::Property::ACTIVE );
 //        if ( model()->data( index, Qt::DisplayRole ).toBool() )
 //        {
-//            index = model()->index( i, FNPROP_TYPE );
+//            index = model()->index( i, Fn::Property::TYPE );
 //            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNDT_NIFTI_SH )
 //            {
 //                rl.push_back( i );
@@ -249,14 +249,14 @@ void SingleSHRenderer::draw()
 //
 //    if ( rl.size() > 0 )
 //    {
-//        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
+//        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
 //
 //        GLFunctions::getShader( "qball" )->bind();
 //        // Set modelview-projection matrix
 //        GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
 //        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
 //
-//        bool minMaxScaling = m_dataset->getProperty( FNPROP_MINMAX_SCALING ).toBool();
+//        bool minMaxScaling = m_dataset->getProperty( Fn::Property::MINMAX_SCALING ).toBool();
 //        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", minMaxScaling );
 //
 //        initGeometry();

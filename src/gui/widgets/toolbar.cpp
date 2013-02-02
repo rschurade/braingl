@@ -107,7 +107,7 @@ void ToolBar::slot( Fn::Algo algo )
 {
     //m_toolBarView->activateAlgo( algo );
 
-    QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), FNPROP_DATASET_POINTER );
+    QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), (int)Fn::Property::DATASET_POINTER );
     QList<Dataset*>l;
     Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
     switch ( algo )
@@ -125,21 +125,21 @@ void ToolBar::slot( Fn::Algo algo )
             l = DWIAlgos::tensorFit( ds );
             break;
         case Fn::Algo::FA:
-            if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
+            if ( ds->properties()->get( Fn::Property::TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcFAFromDWI( ds );
             }
-            else if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
+            else if ( ds->properties()->get( Fn::Property::TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcFAFromTensor( ds );
             }
             break;
         case Fn::Algo::EV:
-            if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
+            if ( ds->properties()->get( Fn::Property::TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcEVFromDWI( ds );
             }
-            else if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
+            else if ( ds->properties()->get( Fn::Property::TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcEVFromTensor( ds );
             }
@@ -149,7 +149,7 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::TENSOR_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::DATASET_LIST ), Qt::DisplayRole ).toList();
 
             m_ttw = new TensorTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ttw, SIGNAL( finished() ), this, SLOT( tensorTrackFinished() ) );
@@ -159,7 +159,7 @@ void ToolBar::slot( Fn::Algo algo )
         }
         case Fn::Algo::CROSSING_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::DATASET_LIST ), Qt::DisplayRole ).toList();
 
             m_ctw = new CrossingTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ctw, SIGNAL( finished() ), this, SLOT( crossingTrackFinished() ) );
@@ -189,7 +189,7 @@ void ToolBar::slot( Fn::Algo algo )
     }
     for ( int i = 0; i < l.size(); ++i )
     {
-        index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
+        index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
 
@@ -257,7 +257,7 @@ void ToolBar::tensorTrackFinished()
     QList<Dataset*>l = m_ttw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ttw->hide();
@@ -270,7 +270,7 @@ void ToolBar::crossingTrackFinished()
     QList<Dataset*>l = m_ctw->getFibs();
     for ( int i = 0; i < l.size(); ++i )
     {
-        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), FNPROP_NEW_DATASET );
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
     m_ctw->hide();

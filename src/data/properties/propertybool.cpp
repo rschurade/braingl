@@ -8,7 +8,7 @@
 
 #include "../../gui/widgets/controls/checkboxwithlabel.h"
 
-PropertyBool::PropertyBool( FN_PROPERTY name, bool value ) :
+PropertyBool::PropertyBool( Fn::Property name, bool value ) :
     Property( name ),
     m_value( value )
 {
