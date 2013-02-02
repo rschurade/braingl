@@ -7,7 +7,7 @@
 
 #include "fnaction.h"
 
-FNAction::FNAction( const QIcon &icon, const QString &text, QObject *parent, FN_ALGO algo ) :
+FNAction::FNAction( const QIcon &icon, const QString &text, QObject *parent, Fn::Algo algo ) :
     QAction( icon, text, parent ),
     m_algo( algo )
 {

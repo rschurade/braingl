@@ -15,7 +15,7 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_properties.set( FNPROP_TYPE, (int)type );
     m_properties.set( FNPROP_NAME, fileName.path().split( "/" ).last(), true );
     m_properties.set( FNPROP_SIZE, -1 );
-    m_properties.set( FNPROP_CREATED_BY, FNALGO_NONE );
+    m_properties.set( FNPROP_CREATED_BY, (int)Fn::Algo::NONE );
 
     m_properties.set( FNPROP_RENDER_LOWER_X, 0 );
     m_properties.set( FNPROP_RENDER_LOWER_Y, 0 );

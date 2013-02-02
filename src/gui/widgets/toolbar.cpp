@@ -46,64 +46,64 @@ void ToolBar::setSelectionModel( QItemSelectionModel* selectionModel )
 
 void ToolBar::createActions()
 {
-    m_isosurfaceAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "Scalar 1" ), this, FNALGO_ISOSURFACE );
+    m_isosurfaceAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "Scalar 1" ), this, Fn::Algo::ISOSURFACE );
     m_isosurfaceAct->setStatusTip( tr( "Scalar Action 1" ) );
-    connect( m_isosurfaceAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, FNALGO_TEST );
+    m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, Fn::Algo::TEST );
     m_testAct->setStatusTip( tr( "Test Action 1" ) );
-    connect( m_testAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_testAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_qball4Act = new FNAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this, FNALGO_QBALL4 );
+    m_qball4Act = new FNAction( QIcon( ":/icons/qball4.png" ), tr( "QBall 4th order" ), this, Fn::Algo::QBALL4 );
     m_qball4Act->setStatusTip( tr( "QBall 4th order" ) );
-    connect( m_qball4Act, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_qball4Act, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_qball6Act = new FNAction( QIcon( ":/icons/qball6.png" ), tr( "QBall 6th order" ), this, FNALGO_QBALL6 );
+    m_qball6Act = new FNAction( QIcon( ":/icons/qball6.png" ), tr( "QBall 6th order" ), this, Fn::Algo::QBALL6 );
     m_qball6Act->setStatusTip( tr( "QBall 6th order" ) );
-    connect( m_qball6Act, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_qball6Act, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_qball8Act = new FNAction( QIcon( ":/icons/qball8.png" ), tr( "QBall 8th order" ), this, FNALGO_QBALL8 );
+    m_qball8Act = new FNAction( QIcon( ":/icons/qball8.png" ), tr( "QBall 8th order" ), this, Fn::Algo::QBALL8 );
     m_qball8Act->setStatusTip( tr( "QBall 8th order" ) );
-    connect( m_qball8Act, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_qball8Act, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_tensorAct = new FNAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this, FNALGO_TENSORFIT );
+    m_tensorAct = new FNAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this, Fn::Algo::TENSORFIT );
     m_tensorAct->setStatusTip( tr( "tensor fit" ) );
-    connect( m_tensorAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_tensorAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_faAct = new FNAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this, FNALGO_FA );
+    m_faAct = new FNAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this, Fn::Algo::FA );
     m_faAct->setStatusTip( tr( "calc FA" ) );
-    connect( m_faAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_faAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_evAct = new FNAction( QIcon( ":/icons/eigenvector.png" ), tr( "Calc Eigen Vector" ), this, FNALGO_EV );
+    m_evAct = new FNAction( QIcon( ":/icons/eigenvector.png" ), tr( "Calc Eigen Vector" ), this, Fn::Algo::EV );
     m_evAct->setStatusTip( tr( "calc Eigen Vector" ) );
-    connect( m_evAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_evAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_binghamAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Fit Bingham" ), this, FNALGO_BINGHAM );
+    m_binghamAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Fit Bingham" ), this, Fn::Algo::BINGHAM );
     m_binghamAction->setStatusTip( tr( "fit bingham distribution" ) );
-    connect( m_binghamAction, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_binghamAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_fiberTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking" ), this, FNALGO_TENSOR_TRACK );
+    m_fiberTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking" ), this, Fn::Algo::TENSOR_TRACK );
     m_fiberTrackingAct->setStatusTip( tr( "tensor tracking" ) );
-    connect( m_fiberTrackingAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_fiberTrackingAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_crossingTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking with fiber crossings" ), this, FNALGO_CROSSING_TRACK );
+    m_crossingTrackingAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tensor tracking with fiber crossings" ), this, Fn::Algo::CROSSING_TRACK );
     m_crossingTrackingAct->setStatusTip( tr( "tensor tracking with crossings" ) );
-    connect( m_crossingTrackingAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_crossingTrackingAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_fiberThinningAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "fiber thinning" ), this, FNALGO_FIBER_THINNING );
+    m_fiberThinningAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "fiber thinning" ), this, Fn::Algo::FIBER_THINNING );
     m_fiberThinningAct->setStatusTip( tr( "fiber thinning" ) );
-    connect( m_fiberThinningAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_fiberThinningAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_fiberTractDensityAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tract density" ), this, FNALGO_TRACT_DENSITY );
+    m_fiberTractDensityAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tract density" ), this, Fn::Algo::TRACT_DENSITY );
     m_fiberTractDensityAct->setStatusTip( tr( "tract density" ) );
-    connect( m_fiberTractDensityAct, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_fiberTractDensityAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, FNALGO_BINGHAM_2_TENSOR );
+    m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, Fn::Algo::BINGHAM_2_TENSOR );
     m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
-    connect( m_bingham2tensorAction, SIGNAL( sigTriggered( FN_ALGO ) ), this, SLOT( slot( FN_ALGO ) ) );
+    connect( m_bingham2tensorAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
-void ToolBar::slot( FN_ALGO algo )
+void ToolBar::slot( Fn::Algo algo )
 {
     //m_toolBarView->activateAlgo( algo );
 
@@ -112,19 +112,19 @@ void ToolBar::slot( FN_ALGO algo )
     Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
     switch ( algo )
     {
-        case FNALGO_QBALL4:
+        case Fn::Algo::QBALL4:
             l = DWIAlgos::qBallSharp( ds, 4 );
             break;
-        case FNALGO_QBALL6:
+        case Fn::Algo::QBALL6:
             l = DWIAlgos::qBallSharp( ds, 6 );
             break;
-        case FNALGO_QBALL8:
+        case Fn::Algo::QBALL8:
             l = DWIAlgos::qBallSharp( ds, 8 );
             break;
-        case FNALGO_TENSORFIT:
+        case Fn::Algo::TENSORFIT:
             l = DWIAlgos::tensorFit( ds );
             break;
-        case FNALGO_FA:
+        case Fn::Algo::FA:
             if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcFAFromDWI( ds );
@@ -134,7 +134,7 @@ void ToolBar::slot( FN_ALGO algo )
                 l = DWIAlgos::calcFAFromTensor( ds );
             }
             break;
-        case FNALGO_EV:
+        case Fn::Algo::EV:
             if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcEVFromDWI( ds );
@@ -144,10 +144,10 @@ void ToolBar::slot( FN_ALGO algo )
                 l = DWIAlgos::calcEVFromTensor( ds );
             }
             break;
-        case FNALGO_BINGHAM:
+        case Fn::Algo::BINGHAM:
             l = DWIAlgos::fitBingham( ds );
             break;
-        case FNALGO_TENSOR_TRACK:
+        case Fn::Algo::TENSOR_TRACK:
         {
             QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
 
@@ -157,7 +157,7 @@ void ToolBar::slot( FN_ALGO algo )
             break;
 
         }
-        case FNALGO_CROSSING_TRACK:
+        case Fn::Algo::CROSSING_TRACK:
         {
             QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, FNPROP_DATASET_LIST ), Qt::DisplayRole ).toList();
 
@@ -168,23 +168,23 @@ void ToolBar::slot( FN_ALGO algo )
 
         }
 
-        case FNALGO_ISOSURFACE:
+        case Fn::Algo::ISOSURFACE:
             l = ScalarAlgos::isoSurface( ds );
             break;
-        case FNALGO_FIBER_THINNING:
+        case Fn::Algo::FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
             break;
-        case FNALGO_TRACT_DENSITY:
+        case Fn::Algo::TRACT_DENSITY:
             l = FiberAlgos::tractDensity( ds );
             break;
-        case FNALGO_BINGHAM_2_TENSOR:
+        case Fn::Algo::BINGHAM_2_TENSOR:
             l = DWIAlgos::bingham2DWI( ds );
             break;
-        case FNALGO_TEST:
+        case Fn::Algo::TEST:
             break;
-        case FNALGO_NONE:
+        case Fn::Algo::NONE:
             break;
-        case FNALGO_QBALL:
+        case Fn::Algo::QBALL:
             break;
     }
     for ( int i = 0; i < l.size(); ++i )

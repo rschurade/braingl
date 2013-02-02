@@ -31,7 +31,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties.set( FNPROP_DZ, ds->properties()->get( FNPROP_DZ ).toFloat() );
 
     m_properties.set( FNPROP_DIM, 0 );
-    m_properties.set( FNPROP_CREATED_BY, FNALGO_ISOSURFACE );
+    m_properties.set( FNPROP_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties.set( FNPROP_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
     m_properties.set( FNPROP_NAME, QString( "isosurface" ) );
     m_properties.set( FNPROP_ISO_VALUE, 80.0f, ds->properties()->get( FNPROP_MIN ).toFloat(), ds->properties()->get( FNPROP_MAX ).toFloat(), true );
