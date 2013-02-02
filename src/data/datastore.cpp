@@ -40,7 +40,6 @@ DataStore::DataStore()
     m_globalProperties.set( FNGLOBAL_BBY, 0 );
     m_globalProperties.set( FNGLOBAL_VIEW, 0 );
     m_globalProperties.set( FNSETTING_RENDER_CROSSHAIRS, true );
-
 }
 
 DataStore::~DataStore()
@@ -49,14 +48,12 @@ DataStore::~DataStore()
 
 void DataStore::updateGlobals()
 {
-    if ( m_datasetList.size() > 0 )
+    Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
+
+    if ( ds->properties()->get( FNPROP_TYPE ).toInt() < FNDT_NIFTI_ANY )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
-        if ( ds->properties()->get( FNPROP_TYPE ).toInt() < FNDT_MESH_ASCII )
+        if ( m_datasetList.size() > 0 )
         {
-            m_globalProperties.set( FNGLOBAL_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
-            m_globalProperties.set( FNGLOBAL_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() / 2 );
-            m_globalProperties.set( FNGLOBAL_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() / 2 );
             m_globalProperties.set( FNGLOBAL_MAX_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() );
             m_globalProperties.set( FNGLOBAL_MAX_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() );
             m_globalProperties.set( FNGLOBAL_MAX_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() );
@@ -66,6 +63,13 @@ void DataStore::updateGlobals()
 
             emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
+        if ( m_datasetList.size() == 1 )
+        {
+            m_globalProperties.set( FNGLOBAL_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
+            m_globalProperties.set( FNGLOBAL_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() / 2 );
+            m_globalProperties.set( FNGLOBAL_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() / 2 );
+        }
+
     }
 }
 

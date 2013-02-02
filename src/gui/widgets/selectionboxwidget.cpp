@@ -9,16 +9,13 @@
 #include <QtCore/QDebug>
 #include <QtGui/QtGui>
 
-SelectionBoxWidget::SelectionBoxWidget( QWidget* parent ) :
+SelectionBoxWidget::SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget* parent ) :
     QFrame( parent ),
     m_count( 0 )
 {
-    m_treeWidget = new QTreeWidget();
-    m_treeWidget->setColumnCount( 1 );
-    m_treeWidget->headerItem()->setText( 0, tr( "Selection Boxes" ) );
-    m_treeWidget->header()->close();
-    m_treeWidget->setRootIsDecorated( false );
-    connect( m_treeWidget, SIGNAL( clicked( QModelIndex ) ), this, SLOT( treeClicked() ) );
+    m_treeView = new QTreeView();
+    m_treeView->setModel( selBoxModel );
+    connect( m_treeView, SIGNAL( clicked( QModelIndex ) ), this, SLOT( treeClicked() ) );
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     m_downButton = new QPushButton( this );
@@ -39,7 +36,7 @@ SelectionBoxWidget::SelectionBoxWidget( QWidget* parent ) :
     buttonLayout->setContentsMargins( 0, 0, 0, 0 );
 
     QVBoxLayout* vLayout = new QVBoxLayout();
-    vLayout->addWidget( m_treeWidget );
+    vLayout->addWidget( m_treeView );
     vLayout->addLayout( buttonLayout );
     vLayout->setContentsMargins( 1, 1, 1, 1 );
 
@@ -62,28 +59,7 @@ SelectionBoxWidget::~SelectionBoxWidget()
 
 void SelectionBoxWidget::addBox()
 {
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText( 0, QString( "new box " ) + QString::number( ++m_count ) );
-    item->setCheckState( 0, Qt::CheckState::Checked );
 
-    QList<QTreeWidgetItem*> sel = m_treeWidget->selectedItems();
-    if( sel.size() > 0 )
-    {
-        if ( sel[0]->parent() )
-        {
-            sel[0]->parent()->addChild( item );
-            sel[0]->parent()->setExpanded( true );
-        }
-        else
-        {
-            sel[0]->addChild( item );
-            sel[0]->setExpanded( true );
-        }
-    }
-    else
-    {
-        m_treeWidget->addTopLevelItem( item );
-    }
 }
 
 void SelectionBoxWidget::treeClicked()

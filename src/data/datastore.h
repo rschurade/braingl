@@ -16,8 +16,6 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QVector3D>
 
-class Dataset;
-
 class DataStore: public QAbstractItemModel
 {
 Q_OBJECT
