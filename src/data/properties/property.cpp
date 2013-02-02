@@ -141,24 +141,6 @@ QString Property::getNameAsString( FN_PROPERTY name )
         case FNPROP_BVALUE:
             return "bvalue";
             break;
-        case FNPROP_CALC_LOWER_X:
-            return "calc lower x";
-            break;
-        case FNPROP_CALC_UPPER_X:
-            return "calc upper x";
-            break;
-        case FNPROP_CALC_LOWER_Y:
-            return "calc lower y";
-            break;
-        case FNPROP_CALC_UPPER_Y:
-            return "calc upper y";
-            break;
-        case FNPROP_CALC_LOWER_Z:
-            return "calc lower z";
-            break;
-        case FNPROP_CALC_UPPER_Z:
-            return "calc upper z";
-            break;
         case FNPROP_TENSOR_RENDERMODE:
             return "tensor render moder";
             break;

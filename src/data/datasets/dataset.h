@@ -27,7 +27,7 @@ class QAbstractItemModel;
 class Dataset
 {
 public:
-    Dataset( QDir fileName, FN_DATASET_TYPE type );
+    Dataset( QDir fileName, Fn::DatasetType type );
     virtual ~Dataset();
 
     PropertyGroup* properties();

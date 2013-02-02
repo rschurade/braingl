@@ -29,7 +29,7 @@ public:
     void setFilename( QDir fn );
     bool succes();
 private:
-    FN_DATASET_TYPE determineType();
+    Fn::DatasetType determineType();
 
     bool loadNifti();
     bool loadNiftiHeader( QString hdrPath );
@@ -54,7 +54,7 @@ private:
     nifti_image* m_header;
     QDir m_fileName;
 
-    FN_DATASET_TYPE m_datasetType;
+    Fn::DatasetType m_datasetType;
     QVector<Dataset*> m_dataset;
 
     bool m_success;

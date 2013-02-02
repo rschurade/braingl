@@ -59,11 +59,10 @@ SelectionBoxWidget::~SelectionBoxWidget()
 
 void SelectionBoxWidget::addBox()
 {
-
+    qDebug() << "add box";
 }
 
 void SelectionBoxWidget::treeClicked()
 {
     qDebug() << "tree clicked";
-    //m_treeWidget->clearSelection();
 }

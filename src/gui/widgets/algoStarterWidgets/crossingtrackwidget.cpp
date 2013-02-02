@@ -35,7 +35,7 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_maskSelect->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
         {
             m_maskSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_NAME ).toString(), k+1 );
         }
@@ -47,7 +47,7 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_tensor2Select->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == FNDT_NIFTI_TENSOR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
         {
             m_tensor2Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_NAME ).toString(), k+1 );
         }
@@ -58,7 +58,7 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_tensor3Select->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == FNDT_NIFTI_TENSOR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
         {
             m_tensor3Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( FNPROP_NAME ).toString(), k+1 );
         }

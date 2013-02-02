@@ -10,7 +10,7 @@
 
 #include "../../../data/datasets/dataset.h"
 
-DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, FN_DATASET_TYPE> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
+DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, Fn::DatasetType> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
     QWidget( parent )
 {
     m_layout = new QVBoxLayout();
@@ -20,7 +20,7 @@ DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, FN_DATAS
         SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
         for ( int k = 0; k < dsl.size(); ++k )
         {
-            if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == filter[i].second || filter[i].second == FNDT_NIFTI_ANY )
+            if ( dsl[k]->properties()->get( FNPROP_TYPE ).toInt() == (int)filter[i].second || (int)filter[i].second == (int)Fn::DatasetType::NIFTI_ANY )
             {
                 sel->insertItem( k, dsl[k]->properties()->get( FNPROP_NAME ).toString() );
             }

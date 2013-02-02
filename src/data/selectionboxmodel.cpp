@@ -55,3 +55,9 @@ Qt::ItemFlags SelectionBoxModel::flags( const QModelIndex& index ) const
 {
     return 0;
 }
+
+bool SelectionBoxModel::insertRows( int row, int count, const QModelIndex &parent )
+{
+
+    return true;
+}

@@ -16,7 +16,7 @@
 #include <QtCore/QString>
 
 DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
-        Dataset( QString( "isosurface" ), FNDT_MESH_ISOSURFACE ),
+        Dataset( QString( "isosurface" ), Fn::DatasetType::MESH_ISOSURFACE ),
         m_mesh( 0 ),
         m_renderer( 0 ),
         m_oldIsoValue( -1 )
@@ -32,7 +32,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 
     m_properties.set( FNPROP_DIM, 0 );
     m_properties.set( FNPROP_CREATED_BY, FNALGO_ISOSURFACE );
-    m_properties.set( FNPROP_TYPE, FNDT_MESH_ISOSURFACE );
+    m_properties.set( FNPROP_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
     m_properties.set( FNPROP_NAME, QString( "isosurface" ) );
     m_properties.set( FNPROP_ISO_VALUE, 80.0f, ds->properties()->get( FNPROP_MIN ).toFloat(), ds->properties()->get( FNPROP_MAX ).toFloat(), true );
 

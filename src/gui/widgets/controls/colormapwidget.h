@@ -33,7 +33,7 @@ private:
     QLabel* m_nlabel;
     QLabel* m_clabel;
 
-    FN_COLORMAP m_colormap;
+    Fn::Colormap m_colormap;
     int m_width;
     float m_lowerThreshold;
     float m_upperThreshold;

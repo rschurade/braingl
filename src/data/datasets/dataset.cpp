@@ -6,13 +6,13 @@
  */
 #include "dataset.h"
 
-Dataset::Dataset( QDir fileName, FN_DATASET_TYPE type ) :
+Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_textureGLuint( 0 )
 {
     // add standard properties
     m_properties.set( FNPROP_ACTIVE, true, true );
     m_properties.set( FNPROP_FILENAME, fileName.path() );
-    m_properties.set( FNPROP_TYPE, type );
+    m_properties.set( FNPROP_TYPE, (int)type );
     m_properties.set( FNPROP_NAME, fileName.path().split( "/" ).last(), true );
     m_properties.set( FNPROP_SIZE, -1 );
     m_properties.set( FNPROP_CREATED_BY, FNALGO_NONE );

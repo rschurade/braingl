@@ -9,9 +9,9 @@
 #include "../../gui/gl/evrenderer.h"
 
 Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
+        DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties.set( FNPROP_COLORMAP, 4, 0, FNCM_NOCOLORMAP );
+    m_properties.set( FNPROP_COLORMAP, (int)Fn::Colormap::NONE );
     m_properties.set( FNPROP_INTERPOLATION, false, true );
     m_properties.set( FNPROP_ALPHA, 1.0f, 0.0, 1.0, true );
     m_properties.set( FNPROP_DIM, 3 );
