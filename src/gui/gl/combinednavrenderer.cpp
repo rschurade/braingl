@@ -18,8 +18,9 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-CombinedNavRenderer::CombinedNavRenderer( QString name ) :
+CombinedNavRenderer::CombinedNavRenderer( QAbstractItemModel* dataModel, QString name ) :
     ObjectRenderer(),
+    m_dataModel( dataModel ),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),
@@ -165,7 +166,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = out.y() / m_dy;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_SAGITTAL_CORONAL );
+            mi = model()->index( FNGLOBAL_SAGITTAL_CORONAL, 0 );
         }
         else if ( ( (float)out.x() / m_dx ) < m_nx * 2  )
         {
@@ -173,7 +174,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = out.y() / m_dz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_SAGITTAL_AXIAL );
+            mi = model()->index( FNGLOBAL_SAGITTAL_AXIAL, 0 );
         }
         else
         {
@@ -181,7 +182,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = out.y() / m_dz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
+            mi = model()->index( FNGLOBAL_CORONAL_AXIAL, 0 );
         }
     }
     else if ( m_ratio < 0.66 )
@@ -192,7 +193,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = out.x() / m_dy;
             xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
+            mi = model()->index( FNGLOBAL_CORONAL_AXIAL, 0 );
         }
         else if ( ( (float)out.y() / m_dz ) < m_nz * 2  )
         {
@@ -200,7 +201,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = yout - m_nz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_SAGITTAL_AXIAL );
+            mi = model()->index( FNGLOBAL_SAGITTAL_AXIAL, 0 );
         }
         else
         {
@@ -208,7 +209,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = yout - ( 2 * m_nz );
             yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_SAGITTAL_CORONAL );
+            mi = model()->index( FNGLOBAL_SAGITTAL_CORONAL, 0 );
         }
     }
     else
@@ -221,14 +222,14 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             {
                 xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
                 yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-                mi = model()->index( 0, FNGLOBAL_SAGITTAL_CORONAL );
+                mi = model()->index( FNGLOBAL_SAGITTAL_CORONAL, 0 );
             }
             else
             {
                 xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
                 yout = yout - m_ny;
                 yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-                mi = model()->index( 0, FNGLOBAL_SAGITTAL_AXIAL );
+                mi = model()->index( FNGLOBAL_SAGITTAL_AXIAL, 0 );
             }
         }
         else
@@ -237,14 +238,14 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( m_ny - xout- 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = yout - m_ny;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( 0, FNGLOBAL_CORONAL_AXIAL );
+            mi = model()->index( FNGLOBAL_CORONAL_AXIAL, 0 );
         }
     }
     QPoint p( xout, yout );
 
     if ( mi.isValid() )
     {
-        model()->setData( mi, p, Qt::UserRole );
+        model()->setData( mi, p );
     }
 }
 
@@ -255,16 +256,16 @@ void CombinedNavRenderer::leftMouseDrag( int x, int y )
 
 void CombinedNavRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
-    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
-    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
-    m_nx = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toInt();
-    m_ny = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toInt();
-    m_nz = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toInt();
+    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toInt();
+    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toInt();
+    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toInt();
+    m_nx = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toInt();
+    m_ny = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toInt();
+    m_nz = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toInt();
 
-    m_dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-    m_dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-    m_dz = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
+    m_dx = model()->data( model()->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
+    m_dy = model()->data( model()->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
+    m_dz = model()->data( model()->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
 
     float x = m_x * m_dx + m_dx / 2.0;
     float y = m_y * m_dy + m_dy / 2.0;
@@ -422,12 +423,12 @@ void CombinedNavRenderer::initGeometry()
 
 void CombinedNavRenderer::setupTextures()
 {
-    GLFunctions::setupTextures( model() );
+    GLFunctions::setupTextures( m_dataModel );
 }
 
 void CombinedNavRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "slice", model() );
+    GLFunctions::setShaderVars( "slice", m_dataModel );
 }
 
 void CombinedNavRenderer::draw()
@@ -453,7 +454,7 @@ void CombinedNavRenderer::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshairs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ), Qt::UserRole ).toBool();
+    bool renderCrosshairs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ) ).toBool();
 
     if ( renderCrosshairs )
     {

@@ -13,8 +13,9 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-SliceRenderer::SliceRenderer() :
+SliceRenderer::SliceRenderer( QAbstractItemModel* dataModel ) :
     ObjectRenderer(),
+    m_dataModel( dataModel ),
     vboIds( new GLuint[ 4 ] ),
     m_x( 0. ),
     m_y( 0. ),
@@ -52,23 +53,23 @@ void SliceRenderer::init()
 
 void SliceRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
+    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
 
-    m_xb = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_yb = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
-    m_zb = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
+    m_xb = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
+    m_yb = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toFloat();
+    m_zb = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toFloat();
     int xbi = m_xb;
     int ybi = m_yb;
     int zbi = m_zb;
 
-    float dx = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-    float dy = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-    float dz = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
+    float dx = model()->data( model()->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
 
     float x = m_x * dx + dx / 2.;
     float y = m_y * dy + dy / 2.;
@@ -130,12 +131,12 @@ void SliceRenderer::initGeometry()
 
 void SliceRenderer::setupTextures()
 {
-    GLFunctions::setupTextures( model() );
+    GLFunctions::setupTextures( m_dataModel );
 }
 
 void SliceRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "slice", model() );
+    GLFunctions::setShaderVars( "slice", m_dataModel );
 }
 
 void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
@@ -151,15 +152,15 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 
     initGeometry();
 
-    if ( model()->data( model()->index( 0, FNGLOBAL_SHOW_AXIAL ), Qt::UserRole ).toBool() )
+    if ( model()->data( model()->index( FNGLOBAL_SHOW_AXIAL, 0 ) ).toBool() )
     {
         drawAxial();
     }
-    if ( model()->data( model()->index( 0, FNGLOBAL_SHOW_CORONAL ), Qt::UserRole ).toBool() )
+    if ( model()->data( model()->index( FNGLOBAL_SHOW_CORONAL, 0 ) ).toBool() )
     {
         drawCoronal();
     }
-    if ( model()->data( model()->index( 0, FNGLOBAL_SHOW_SAGITTAL ), Qt::UserRole ).toBool() )
+    if ( model()->data( model()->index( FNGLOBAL_SHOW_SAGITTAL, 0 ) ).toBool() )
     {
         drawSagittal();
     }

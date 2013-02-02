@@ -12,7 +12,7 @@ class CombinedNavGLWidget: public QGLWidget
     Q_OBJECT
 
 public:
-    CombinedNavGLWidget( QAbstractItemModel* model, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
+    CombinedNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
     ~CombinedNavGLWidget();
 
     QSize minimumSizeHint() const;

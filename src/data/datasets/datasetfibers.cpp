@@ -33,7 +33,6 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
     m_properties.set( FNPROP_FIBER_COLORMODE, 0, 0, 1, true );
 }
 
-
 DatasetFibers::~DatasetFibers()
 {
     m_fibs.clear();
@@ -60,5 +59,3 @@ QString DatasetFibers::getValueAsString( int x, int y, int z )
 {
     return QString( "" );
 }
-
-

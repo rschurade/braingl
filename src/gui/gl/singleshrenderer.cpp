@@ -132,15 +132,15 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
+    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
-    int xbi = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL), Qt::UserRole ).toInt();
-    int ybi = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toInt();
-    //int zbi = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL), Qt::UserRole ).toInt();
+    int xbi = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toInt();
+    int ybi = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toInt();
+    //int zbi = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 

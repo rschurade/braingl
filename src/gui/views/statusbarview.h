@@ -15,7 +15,7 @@ class StatusBarView  : public QAbstractItemView
     Q_OBJECT
 
 public:
-    StatusBarView();
+    StatusBarView( QAbstractItemModel* globalModel );
     virtual ~StatusBarView();
 
     QRect visualRect( const QModelIndex &index ) const;
@@ -33,6 +33,7 @@ public slots:
     void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 
 private:
+    QAbstractItemModel* m_globalModel;
     int m_selected;
     QString m_globalInfo;
     QString m_datasetInfo;

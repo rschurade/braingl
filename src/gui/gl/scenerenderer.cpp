@@ -23,8 +23,9 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* selectionBoxModel ) :
+SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* selectionBoxModel ) :
     m_dataModel( dataModel ),
+    m_globalModel( globalModel ),
     m_selectionBoxModelModel( selectionBoxModel ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
@@ -34,8 +35,8 @@ SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel*
     m_height( 1 ),
     m_ratio( 1.0 )
 {
-    m_sliceRenderer = new SliceRenderer();
-    m_sliceRenderer->setModel( dataModel );
+    m_sliceRenderer = new SliceRenderer( dataModel );
+    m_sliceRenderer->setModel( globalModel );
 
     m_arcBall = new ArcBall( 400, 400 );
 
@@ -103,12 +104,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::calcMVPMatrix()
 {
-    m_nx = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_ny = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
-    m_nz = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
-    float dx = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-    float dy = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-    float dz = m_dataModel->data( m_dataModel->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
+    m_nx = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toFloat();
+    float dx = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
+    float dy = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
+    float dz = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
@@ -141,11 +142,11 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
-    m_dataModel->setData( m_dataModel->index( 0, FNGLOBAL_ZOOM ), m_arcBall->getZoom(), Qt::UserRole );
-    m_dataModel->setData( m_dataModel->index( 0, FNGLOBAL_MOVEX ), m_arcBall->getMoveX(), Qt::UserRole );
-    m_dataModel->setData( m_dataModel->index( 0, FNGLOBAL_MOVEY ), m_arcBall->getMoveY(), Qt::UserRole );
-    m_dataModel->setData( m_dataModel->index( 0, FNGLOBAL_BBX ), bbx, Qt::UserRole );
-    m_dataModel->setData( m_dataModel->index( 0, FNGLOBAL_BBY ), bby, Qt::UserRole );
+    m_globalModel->setData( m_globalModel->index( FNGLOBAL_ZOOM, 0 ), m_arcBall->getZoom() );
+    m_globalModel->setData( m_globalModel->index( FNGLOBAL_MOVEX, 0 ), m_arcBall->getMoveX() );
+    m_globalModel->setData( m_globalModel->index( FNGLOBAL_MOVEY, 0 ), m_arcBall->getMoveY() );
+    m_globalModel->setData( m_globalModel->index( FNGLOBAL_BBX, 0 ), bbx );
+    m_globalModel->setData( m_globalModel->index( FNGLOBAL_BBY, 0 ), bby );
 
     //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
@@ -162,7 +163,7 @@ void SceneRenderer::draw()
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_dataModel );
+            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel );
         }
     }
 }

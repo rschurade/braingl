@@ -17,7 +17,7 @@ class QGLShaderProgram;
 class NavRendererCoronal : public NavRenderer
 {
 public:
-	NavRendererCoronal( QString name );
+	NavRendererCoronal(  QAbstractItemModel* dataModel, QString name );
 	virtual ~NavRendererCoronal();
 
 	void draw();

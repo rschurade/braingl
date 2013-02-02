@@ -18,7 +18,7 @@ class QGLShaderProgram;
 class CombinedNavRenderer : public ObjectRenderer
 {
 public:
-	CombinedNavRenderer( QString name );
+	CombinedNavRenderer( QAbstractItemModel* dataModel, QString name );
 	virtual ~CombinedNavRenderer();
 
 	void resizeGL( int width, int height );
@@ -39,6 +39,7 @@ private:
 
     void initGeometry();
 
+    QAbstractItemModel* m_dataModel;
 	QString m_name;
 
 	float m_ratio;

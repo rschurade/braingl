@@ -18,6 +18,7 @@
 #include "widgets/shadereditwidget.h"
 
 #include "../data/datastore.h"
+#include "../data/globalpropertymodel.h"
 #include "../data/selectionboxmodel.h"
 #include "../data/loader.h"
 #include "../data/writer.h"
@@ -26,9 +27,10 @@
 
 #include <QtGui/QtGui>
 
-MainWindow::MainWindow( DataStore* dataStore, SelectionBoxModel* selBoxModel, bool debug ) :
+MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, SelectionBoxModel* selBoxModel, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
+    m_globalProps( globalProps ),
     m_selBoxModel( selBoxModel ),
     m_debug( debug )
 {
@@ -37,7 +39,7 @@ MainWindow::MainWindow( DataStore* dataStore, SelectionBoxModel* selBoxModel, bo
 	m_centralTabWidget->setTabsClosable( true );
 	connect( m_centralTabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab( int ) ) );
 
-    mainGLWidget = new GLWidget( m_dataStore );
+    mainGLWidget = new GLWidget( m_dataStore, m_globalProps );
     m_centralTabWidget->addTab( mainGLWidget, "main gl" );
 
     createActions();
@@ -63,15 +65,13 @@ MainWindow::MainWindow( DataStore* dataStore, SelectionBoxModel* selBoxModel, bo
 	{
 	    QString lastPath = settings.value( "lastPath" ).toString();
 	    qDebug() << "last path" << lastPath;
-	    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
-	    m_dataStore->setData( mi, lastPath, Qt::UserRole );
+	    m_globalProps->setData( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ), lastPath );
 	}
 	if ( settings.contains( "lockDockTitles") )
 	{
 	    if ( settings.value( "lockDockTitles" ).toBool() )
 	    {
 	        lockDockTitlesAct->activate( QAction::Trigger );
-
 	    }
 	}
 }
@@ -81,8 +81,8 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	QSettings settings;
 	settings.setValue( "mainWindowGeometry", saveGeometry() );
 	settings.setValue( "mainWindowState", saveState() );
-	QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
-	settings.setValue( "lastPath", m_dataStore->data( mi, Qt::UserRole ).toString() );
+
+	settings.setValue( "lastPath", m_globalProps->data( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ) ).toString() );
 	settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
 }
 
@@ -92,9 +92,7 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
-    QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
-
+    QString fn = m_globalProps->data( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
     {
@@ -110,14 +108,13 @@ void MainWindow::open()
         QFileInfo fi( fileName );
         QDir dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        m_dataStore->setData( mi, lastPath, Qt::UserRole );
+        m_globalProps->setData( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ), lastPath );
     }
 }
 
 void MainWindow::save()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_LAST_PATH );
-    QString fn = m_dataStore->data( mi, Qt::UserRole ).toString();
+    QString fn = m_globalProps->data( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
     if ( !fileName.isEmpty() )
@@ -154,7 +151,7 @@ void MainWindow::save()
         QFileInfo fi( fileName );
         dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        m_dataStore->setData( mi, lastPath, Qt::UserRole );
+        m_globalProps->setData( m_globalProps->index( FNGLOBAL_LAST_PATH, 0 ), lastPath );
     }
 }
 
@@ -328,8 +325,7 @@ void MainWindow::createToolBars()
 
 void MainWindow::createStatusBar()
 {
-    StatusBar* sbar = new StatusBar( this );
-    sbar->setModel( m_dataStore );
+    StatusBar* sbar = new StatusBar( m_dataStore, m_globalProps, this );
     sbar->setSelectionModel( m_datasetWidget->selectionModel() );
     this->setStatusBar( sbar );
 }
@@ -365,7 +361,7 @@ void MainWindow::createDockWindows()
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
     FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockGP );
-    globalProperties->setModel( m_dataStore );
+    globalProperties->setModel( m_globalProps );
     viewMenu->addAction( dockGP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGP, SLOT( toggleTitleWidget() ) );
 
@@ -377,25 +373,25 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
 
-    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, QString("axial"), 2, this, mainGLWidget );
+    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, m_globalProps, QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
     addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
 
-    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, QString( "sagittal" ), 0, this, mainGLWidget );
+    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
     addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
 
-    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, QString( "coronal" ), 1, this, mainGLWidget );
+    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("axial"), nav3, this );
     addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
 
-    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
     addDockWidget( Qt::RightDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
@@ -418,68 +414,62 @@ void MainWindow::closeTab( int index )
 
 void MainWindow::slotAddTabCombined()
 {
-    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, QString( "combined" ), this, mainGLWidget );
+    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
     m_centralTabWidget->addTab( combNav, "slices" );
     m_centralTabWidget->setCurrentWidget( combNav );
 }
 
 void MainWindow::slotAddTabSagittal()
 {
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("sagittal"), 0, this, mainGLWidget );
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("sagittal"), 0, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "sagittal" );
     m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotAddTabCoronal()
 {
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("coronal"), 1, this, mainGLWidget );
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("coronal"), 1, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "coronal" );
     m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotAddTabAxial()
 {
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, tr("axial"), 2, this, mainGLWidget );
+    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("axial"), 2, this, mainGLWidget );
     m_centralTabWidget->addTab( glWidget, "axial" );
     m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotToggleAxialSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_AXIAL );
-    m_dataStore->setData( mi, showAxialAct->isChecked(), Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_CORONAL );
-    m_dataStore->setData( mi, showCoronalAct->isChecked(), Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_SHOW_SAGITTAL );
-    m_dataStore->setData( mi, showSagittalAct->isChecked(), Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
 }
 
 void  MainWindow::slotStandardAxialView()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_AXIAL, Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_AXIAL );
     mainGLWidget->setView( FN_AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_CORONAL, Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_CORONAL );
     mainGLWidget->setView( FN_CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    QModelIndex mi = m_dataStore->index( 0, FNGLOBAL_VIEW );
-    m_dataStore->setData( mi, FN_SAGITTAL, Qt::UserRole );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_SAGITTAL );
     mainGLWidget->setView( FN_SAGITTAL );
 }
 
@@ -497,7 +487,7 @@ void MainWindow::slotToggleDockTitles( bool value )
 void MainWindow::slotRenderCrosshairs( bool value )
 {
     QModelIndex mi = m_dataStore->index( 0, FNSETTING_RENDER_CROSSHAIRS );
-    m_dataStore->setData( mi, value, Qt::UserRole );
+    m_dataStore->setData( mi, value );
 }
 
 void MainWindow::slotNewSelectionBox()

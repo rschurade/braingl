@@ -16,7 +16,7 @@ PropertyGroup::~PropertyGroup()
 {
 }
 
-bool PropertyGroup::contains( FN_PROPERTY name )
+bool PropertyGroup::contains( FN_PROPERTY name ) const
 {
     return m_properties.contains( name );
 }
@@ -35,20 +35,22 @@ QVariant PropertyGroup::get( FN_PROPERTY name ) const
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, QVariant value )
+bool PropertyGroup::set( FN_PROPERTY name, QVariant value )
 {
     if ( m_properties.contains( name ) )
     {
         m_properties[name]->setValue( value );
+        return true;
     }
     else
     {
         qDebug() << "*** ERROR *** SET" << m_properties[FNPROP_NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
         exit( 0 );
+        return false;
     }
 }
 
-void PropertyGroup::set( FN_PROPERTY name, bool value, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, bool value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -64,9 +66,10 @@ void PropertyGroup::set( FN_PROPERTY name, bool value, bool visible )
             m_visible.append( name );
         }
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, int value, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, int value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -82,13 +85,14 @@ void PropertyGroup::set( FN_PROPERTY name, int value, bool visible )
             m_visible.append( name );
         }
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, int value, int min, int max, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, int value, int min, int max, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
-        return;
+        return false;
     }
     else
     {
@@ -100,9 +104,10 @@ void PropertyGroup::set( FN_PROPERTY name, int value, int min, int max, bool vis
             m_visible.append( name );
         }
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, float value, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, float value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -118,13 +123,14 @@ void PropertyGroup::set( FN_PROPERTY name, float value, bool visible )
             m_visible.append( name );
         }
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, float value, float min, float max, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, float value, float min, float max, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
-        return;
+        return false;
     }
     PropertyFloat* prop = new PropertyFloat( name, value, min, max );
     m_properties[name] = prop;
@@ -133,9 +139,10 @@ void PropertyGroup::set( FN_PROPERTY name, float value, float min, float max, bo
     {
         m_visible.append( name );
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, QString value, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, QString value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -151,9 +158,10 @@ void PropertyGroup::set( FN_PROPERTY name, QString value, bool visible )
             m_visible.append( name );
         }
     }
+    return true;
 }
 
-void PropertyGroup::set( FN_PROPERTY name, const char* value, bool visible )
+bool PropertyGroup::set( FN_PROPERTY name, const char* value, bool visible )
 {
     if ( m_properties.contains( name ) )
     {
@@ -169,6 +177,7 @@ void PropertyGroup::set( FN_PROPERTY name, const char* value, bool visible )
             m_visible.append( name );
         }
     }
+    return true;
 }
 
 QList<FN_PROPERTY> PropertyGroup::getVisible()
@@ -184,4 +193,9 @@ QWidget* PropertyGroup::getWidget( FN_PROPERTY name )
 void PropertyGroup::slotPropChanged()
 {
     signalPropChanged();
+}
+
+int PropertyGroup::size() const
+{
+    return m_properties.size();
 }

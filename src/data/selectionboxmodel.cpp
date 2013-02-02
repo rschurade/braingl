@@ -7,7 +7,7 @@
 
 #include "selectionboxmodel.h"
 
-SelectionBoxModel::SelectionBoxModel()
+SelectionBoxModel::SelectionBoxModel( QAbstractItemModel* globalProps )
 {
 
 }

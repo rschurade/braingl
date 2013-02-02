@@ -4,12 +4,13 @@
 
 #include <QtGui/QtGui>
 
-CombinedNavGLWidget::CombinedNavGLWidget( QAbstractItemModel* model, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+CombinedNavGLWidget::CombinedNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_renderer = new CombinedNavRenderer( name );
-    m_renderer->setModel( model );
-    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer = new CombinedNavRenderer( dataModel, name );
+    m_renderer->setModel( globalModel );
+    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 CombinedNavGLWidget::~CombinedNavGLWidget()
