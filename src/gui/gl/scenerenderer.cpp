@@ -104,12 +104,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::calcMVPMatrix()
 {
-    m_nx = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = m_globalModel->data( m_globalModel->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toFloat();
-    float dx = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
-    float dy = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
-    float dz = m_globalModel->data( m_globalModel->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
+    m_nx = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 ) ).toFloat();
+    float dx = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DX, 0 ) ).toFloat();
+    float dy = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DY, 0 ) ).toFloat();
+    float dz = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
@@ -142,11 +142,11 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
-    m_globalModel->setData( m_globalModel->index( FNGLOBAL_ZOOM, 0 ), m_arcBall->getZoom() );
-    m_globalModel->setData( m_globalModel->index( FNGLOBAL_MOVEX, 0 ), m_arcBall->getMoveX() );
-    m_globalModel->setData( m_globalModel->index( FNGLOBAL_MOVEY, 0 ), m_arcBall->getMoveY() );
-    m_globalModel->setData( m_globalModel->index( FNGLOBAL_BBX, 0 ), bbx );
-    m_globalModel->setData( m_globalModel->index( FNGLOBAL_BBY, 0 ), bby );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_ZOOM, 0 ), m_arcBall->getZoom() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_MOVEX, 0 ), m_arcBall->getMoveX() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_MOVEY, 0 ), m_arcBall->getMoveY() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_BBX, 0 ), bbx );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_BBY, 0 ), bby );
 
     //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
@@ -159,10 +159,10 @@ void SceneRenderer::draw()
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = m_dataModel->index( i, FNPROP_ACTIVE );
+        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::ACTIVE );
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
             ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel );
         }
     }
@@ -174,11 +174,11 @@ void SceneRenderer::setView( Fn::Orient view )
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = m_dataModel->index( i, FNPROP_ACTIVE );
+        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::ACTIVE );
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->properties()->set( FNPROP_RENDER_SLICE, (int)view );
+            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            ds->properties()->set( Fn::Property::RENDER_SLICE, (int)view );
         }
     }
 }

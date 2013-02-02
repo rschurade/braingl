@@ -83,7 +83,7 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
 
     QModelIndex mi;
     QPoint p( xout, yout );
-    mi = model()->index( FNGLOBAL_CORONAL_AXIAL, 0 );
+    mi = model()->index( (int)Fn::Property::GLOBAL_CORONAL_AXIAL, 0 );
     if ( mi.isValid() )
     {
         model()->setData( mi, p );
@@ -92,22 +92,22 @@ void NavRendererSagittal::leftMouseDown( int x, int y )
 
 void NavRendererSagittal::initGeometry()
 {
-    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toFloat();
+    m_x = model()->data( model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
 
     if ( m_xOld != xi || m_yOld != yi || m_zOld != zi )
     {
-        m_xb = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
-        m_yb = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toFloat();
-        m_zb = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toFloat();
+        m_xb = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
+        m_yb = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 ) ).toFloat();
+        m_zb = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 ) ).toFloat();
 
-        m_xd = model()->data( model()->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
-        m_yd = model()->data( model()->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
-        m_zd = model()->data( model()->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
+        m_xd = model()->data( model()->index( (int)Fn::Property::GLOBAL_SLICE_DX, 0 ) ).toFloat();
+        m_yd = model()->data( model()->index( (int)Fn::Property::GLOBAL_SLICE_DY, 0 ) ).toFloat();
+        m_zd = model()->data( model()->index( (int)Fn::Property::GLOBAL_SLICE_DZ, 0 ) ).toFloat();
 
         float x = m_x * m_xd;
         float y = m_y * m_yd;
@@ -168,7 +168,7 @@ void NavRendererSagittal::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshirs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ) ).toBool();
+    bool renderCrosshirs = model()->data( model()->index( (int)Fn::Property::SETTING_RENDER_CROSSHAIRS, 0 ) ).toBool();
 
     if ( renderCrosshirs )
     {

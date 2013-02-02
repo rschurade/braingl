@@ -90,9 +90,9 @@ void TensorRenderer::setShaderVars()
 
 void TensorRenderer::initGeometry()
 {
-    int xi = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toInt();
-    int yi = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toInt();
-    int zi = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toInt();
+    int xi = model()->data( model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 ) ).toInt();
+    int yi = model()->data( model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 ) ).toInt();
+    int zi = model()->data( model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 ) ).toInt();
 
     QString s = createSettingsString( xi, yi, zi, m_orient, 0, 0, 0, 0, 0, 0, false, 0, 0, m_offset);
 

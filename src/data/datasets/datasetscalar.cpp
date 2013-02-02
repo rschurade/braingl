@@ -11,10 +11,10 @@
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data )
 {
-    m_properties.set( FNPROP_COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
-    m_properties.set( FNPROP_INTERPOLATION, false, true );
-    m_properties.set( FNPROP_ALPHA, 1.0f, 0.0, 1.0, true );
-    m_properties.set( FNPROP_DIM, 1 );
+    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
+    m_properties.set( Fn::Property::INTERPOLATION, false, true );
+    m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
+    m_properties.set( Fn::Property::DIM, 1 );
 
     examineDataset();
 }
@@ -33,9 +33,9 @@ QVector<float>* DatasetScalar::getData()
 
 void DatasetScalar::examineDataset()
 {
-    int nx = m_properties.get( FNPROP_NX ).toInt();
-    int ny = m_properties.get( FNPROP_NY ).toInt();
-    int nz = m_properties.get( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
+    int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
     float min = std::numeric_limits<float>::max();
     float max = 0;
@@ -47,16 +47,16 @@ void DatasetScalar::examineDataset()
         max = qMax( max, m_data[i] );
     }
 
-    m_properties.set( FNPROP_SIZE, static_cast<int>( size * sizeof(float) ) );
-    m_properties.set( FNPROP_MIN, min );
-    m_properties.set( FNPROP_MAX, max );
+    m_properties.set( Fn::Property::SIZE, static_cast<int>( size * sizeof(float) ) );
+    m_properties.set( Fn::Property::MIN, min );
+    m_properties.set( Fn::Property::MAX, max );
 
-    m_properties.set( FNPROP_LOWER_THRESHOLD, min, min, max, true );
-    m_properties.set( FNPROP_UPPER_THRESHOLD, max, min, max, true );
+    m_properties.set( Fn::Property::LOWER_THRESHOLD, min, min, max, true );
+    m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
-        qDebug() << m_properties.get( FNPROP_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
 }
@@ -75,11 +75,11 @@ void DatasetScalar::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
 
-    int nx = m_properties.get( FNPROP_NX ).toInt();
-    int ny = m_properties.get( FNPROP_NY ).toInt();
-    int nz = m_properties.get( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
+    int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
-    float max = m_properties.get( FNPROP_MAX ).toFloat();
+    float max = m_properties.get( Fn::Property::MAX ).toFloat();
 
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
@@ -99,9 +99,9 @@ void DatasetScalar::createTexture()
 
 void DatasetScalar::flipX()
 {
-    int nx = m_properties.get( FNPROP_NX ).toInt();
-    int ny = m_properties.get( FNPROP_NY ).toInt();
-    int nz = m_properties.get( FNPROP_NZ ).toInt();
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
+    int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
     QVector<float> newData;
 
@@ -133,8 +133,8 @@ void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
 
 QString DatasetScalar::getValueAsString( int x, int y, int z )
 {
-    int nx = m_properties.get( FNPROP_NX ).toInt();
-    int ny = m_properties.get( FNPROP_NY ).toInt();
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
     float data = m_data[x + y * nx + z * nx * ny];
     return QString::number( data );
 }

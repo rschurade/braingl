@@ -13,9 +13,9 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_fibs( fibs ),
     m_renderer( 0 )
 {
-    m_properties.set( FNPROP_NUM_POINTS, numPoints );
-    m_properties.set( FNPROP_NUM_LINES, numLines );
-    m_properties.set( FNPROP_FIBER_COLORMODE, 0, 0, 1, true );
+    m_properties.set( Fn::Property::NUM_POINTS, numPoints );
+    m_properties.set( Fn::Property::NUM_LINES, numLines );
+    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 1, true );
 }
 
 DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
@@ -28,9 +28,9 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
     {
         numPoints += fibs[i].size();
     }
-    m_properties.set( FNPROP_NUM_POINTS, numPoints );
-    m_properties.set( FNPROP_NUM_LINES, fibs.size() );
-    m_properties.set( FNPROP_FIBER_COLORMODE, 0, 0, 1, true );
+    m_properties.set( Fn::Property::NUM_POINTS, numPoints );
+    m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
+    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 1, true );
 }
 
 DatasetFibers::~DatasetFibers()
@@ -51,7 +51,7 @@ void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
         m_renderer->setModel( model );
         m_renderer->init();
     }
-    m_renderer->setRenderParams( m_properties.get( FNPROP_FIBER_COLORMODE ).toInt() );
+    m_renderer->setRenderParams( m_properties.get( Fn::Property::FIBER_COLORMODE ).toInt() );
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
 

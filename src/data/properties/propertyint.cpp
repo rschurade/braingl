@@ -8,7 +8,7 @@
 
 #include "../../gui/widgets/controls/sliderwitheditint.h"
 
-PropertyInt::PropertyInt( FN_PROPERTY name, int value, int min, int max ) :
+PropertyInt::PropertyInt( Fn::Property name, int value, int min, int max ) :
     Property( name ),
     m_value( value ),
     m_min( min ),

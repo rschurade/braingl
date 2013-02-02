@@ -26,26 +26,26 @@ public:
     PropertyGroup();
     virtual ~PropertyGroup();
 
-    bool contains( FN_PROPERTY name ) const;
-    QVariant get( FN_PROPERTY name ) const;
+    bool contains( int name ) const;
+    QVariant get( Fn::Property name ) const;
 
-    bool set( FN_PROPERTY name, bool value, bool visible = false );
-    bool set( FN_PROPERTY name, int value, bool visible = false );
-    bool set( FN_PROPERTY name, int value, int min, int max, bool visible = false );
-    bool set( FN_PROPERTY name, float value, bool visible = false );
-    bool set( FN_PROPERTY name, float value, float min, float max, bool visible = false );
-    bool set( FN_PROPERTY name, QString value, bool visible = false );
-    bool set( FN_PROPERTY name, const char* value, bool visible = false );
-    bool set( FN_PROPERTY name, QVariant value );
+    bool set( Fn::Property name, bool value, bool visible = false );
+    bool set( Fn::Property name, int value, bool visible = false );
+    bool set( Fn::Property name, int value, int min, int max, bool visible = false );
+    bool set( Fn::Property name, float value, bool visible = false );
+    bool set( Fn::Property name, float value, float min, float max, bool visible = false );
+    bool set( Fn::Property name, QString value, bool visible = false );
+    bool set( Fn::Property name, const char* value, bool visible = false );
+    bool set( Fn::Property name, QVariant value );
 
     int size() const;
 
-    QList<FN_PROPERTY> getVisible();
-    QWidget* getWidget( FN_PROPERTY name );
+    QList<Fn::Property> getVisible();
+    QWidget* getWidget( Fn::Property name );
 
 private:
-    QHash<FN_PROPERTY, Property*> m_properties;
-    QList<FN_PROPERTY>m_visible;
+    QHash<int, Property*> m_properties;
+    QList<Fn::Property>m_visible;
 
 private slots:
     void slotPropChanged();

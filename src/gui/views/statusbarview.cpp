@@ -76,7 +76,7 @@ void StatusBarView::selectionChanged( const QItemSelection &selected, const QIte
     if ( selected.indexes().size() > 0 )
     {
         m_selected = selected.indexes().first().row();
-        Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
         m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
 
         emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo ) );
@@ -96,7 +96,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     m_globalInfo = "[";
 
     QModelIndex mi;
-    mi = m_globalModel->index( FNGLOBAL_SAGITTAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 );
     if ( mi.isValid() )
     {
         m_x = m_globalModel->data( mi ).toInt();
@@ -104,7 +104,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( FNGLOBAL_CORONAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_CORONAL, 0 );
     if ( mi.isValid() )
     {
         m_y = m_globalModel->data( mi ).toInt();
@@ -112,7 +112,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( FNGLOBAL_AXIAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_AXIAL, 0 );
     if ( mi.isValid() )
     {
         m_z = m_globalModel->data( mi ).toInt();
@@ -120,7 +120,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += "]";
     }
 
-    Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
+    Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
     if ( ds )
     {
         m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );

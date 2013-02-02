@@ -8,7 +8,7 @@
 
 #include "../../gui/widgets/controls/sliderwithedit.h"
 
-PropertyFloat::PropertyFloat( FN_PROPERTY name, float value, float min, float max ) :
+PropertyFloat::PropertyFloat( Fn::Property name, float value, float min, float max ) :
     Property( name ),
     m_value( value ),
     m_min( min ),

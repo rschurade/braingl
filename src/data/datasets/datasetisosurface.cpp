@@ -23,26 +23,26 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 {
     m_scalarField = *(ds->getData() );
 
-    m_properties.set( FNPROP_NX, ds->properties()->get( FNPROP_NX ).toInt() );
-    m_properties.set( FNPROP_NY, ds->properties()->get( FNPROP_NY ).toInt() );
-    m_properties.set( FNPROP_NZ, ds->properties()->get( FNPROP_NZ ).toInt() );
-    m_properties.set( FNPROP_DX, ds->properties()->get( FNPROP_DX ).toFloat() );
-    m_properties.set( FNPROP_DY, ds->properties()->get( FNPROP_DY ).toFloat() );
-    m_properties.set( FNPROP_DZ, ds->properties()->get( FNPROP_DZ ).toFloat() );
+    m_properties.set( Fn::Property::NX, ds->properties()->get( Fn::Property::NX ).toInt() );
+    m_properties.set( Fn::Property::NY, ds->properties()->get( Fn::Property::NY ).toInt() );
+    m_properties.set( Fn::Property::NZ, ds->properties()->get( Fn::Property::NZ ).toInt() );
+    m_properties.set( Fn::Property::DX, ds->properties()->get( Fn::Property::DX ).toFloat() );
+    m_properties.set( Fn::Property::DY, ds->properties()->get( Fn::Property::DY ).toFloat() );
+    m_properties.set( Fn::Property::DZ, ds->properties()->get( Fn::Property::DZ ).toFloat() );
 
-    m_properties.set( FNPROP_DIM, 0 );
-    m_properties.set( FNPROP_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
-    m_properties.set( FNPROP_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
-    m_properties.set( FNPROP_NAME, QString( "isosurface" ) );
-    m_properties.set( FNPROP_ISO_VALUE, 80.0f, ds->properties()->get( FNPROP_MIN ).toFloat(), ds->properties()->get( FNPROP_MAX ).toFloat(), true );
+    m_properties.set( Fn::Property::DIM, 0 );
+    m_properties.set( Fn::Property::CREATED_BY, (int)Fn::Algo::ISOSURFACE );
+    m_properties.set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
+    m_properties.set( Fn::Property::NAME, QString( "isosurface" ) );
+    m_properties.set( Fn::Property::ISO_VALUE, 80.0f, ds->properties()->get( Fn::Property::MIN ).toFloat(), ds->properties()->get( Fn::Property::MAX ).toFloat(), true );
 
-    m_nX = m_properties.get( FNPROP_NX ).toInt() - 1;
-    m_nY = m_properties.get( FNPROP_NY ).toInt() - 1;
-    m_nZ = m_properties.get( FNPROP_NZ ).toInt() - 1;
+    m_nX = m_properties.get( Fn::Property::NX ).toInt() - 1;
+    m_nY = m_properties.get( Fn::Property::NY ).toInt() - 1;
+    m_nZ = m_properties.get( Fn::Property::NZ ).toInt() - 1;
 
-    m_dX = m_properties.get( FNPROP_DX ).toFloat();
-    m_dY = m_properties.get( FNPROP_DY ).toFloat();
-    m_dZ = m_properties.get( FNPROP_DZ ).toFloat();
+    m_dX = m_properties.get( Fn::Property::DX ).toFloat();
+    m_dY = m_properties.get( Fn::Property::DY ).toFloat();
+    m_dZ = m_properties.get( Fn::Property::DZ ).toFloat();
 
     m_nPointsInXDirection = ( m_nX + 1 );
     m_nPointsInSlice = m_nPointsInXDirection * ( m_nY + 1 );
@@ -71,7 +71,7 @@ void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, 
         m_renderer->init();
     }
 
-    m_isoLevel = m_properties.get( FNPROP_ISO_VALUE ).toFloat();
+    m_isoLevel = m_properties.get( Fn::Property::ISO_VALUE ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh;
