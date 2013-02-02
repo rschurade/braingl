@@ -9,9 +9,9 @@
 #include <QtCore/QDebug>
 
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_SCALAR, header ), m_data( data )
+        DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data )
 {
-    m_properties.set( FNPROP_COLORMAP, 0, 0, FNCM_NOCOLORMAP - 1, true );
+    m_properties.set( FNPROP_COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
     m_properties.set( FNPROP_INTERPOLATION, false, true );
     m_properties.set( FNPROP_ALPHA, 1.0f, 0.0, 1.0, true );
     m_properties.set( FNPROP_DIM, 1 );

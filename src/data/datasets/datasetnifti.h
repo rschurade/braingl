@@ -19,7 +19,7 @@ class QAbstractItemModel;
 class DatasetNifti: public Dataset
 {
 public:
-    DatasetNifti( QString filename, FN_DATASET_TYPE type, nifti_image* header );
+    DatasetNifti( QString filename, Fn::DatasetType type, nifti_image* header );
     virtual ~DatasetNifti();
 
     nifti_image* getHeader();

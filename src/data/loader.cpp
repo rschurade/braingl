@@ -21,7 +21,7 @@
 #include <QtGui/QtGui>
 
 Loader::Loader() :
-    m_datasetType( FNDT_UNKNOWN ),
+    m_datasetType( Fn::DatasetType::UNKNOWN ),
     m_success( false )
 {
 }
@@ -89,27 +89,27 @@ bool Loader::loadNifti()
 
     if ( m_header->dim[4] == 1 || m_header->dim[4] == 0 )
     {
-        m_datasetType = FNDT_NIFTI_SCALAR;
+        m_datasetType = Fn::DatasetType::NIFTI_SCALAR;
         return loadNiftiScalar( fn );
     }
     else if ( m_header->dim[4] == 3 )
     {
-        m_datasetType = FNDT_NIFTI_VECTOR;
+        m_datasetType = Fn::DatasetType::NIFTI_VECTOR;
         return loadNiftiVector3D( fn );
     }
     else if ( m_header->dim[4] == 6 )
     {
-        m_datasetType = FNDT_NIFTI_TENSOR;
+        m_datasetType = Fn::DatasetType::NIFTI_TENSOR;
         return loadNiftiTensor( fn );
     }
     else if ( m_header->dim[4] == 27 )
     {
-        m_datasetType = FNDT_NIFTI_BINGHAM;
+        m_datasetType = Fn::DatasetType::NIFTI_BINGHAM;
         return loadNiftiBingham( fn );
     }
     else if ( m_header->dim[4] == 15 || m_header->dim[4] == 28 || m_header->dim[4] == 45 )
     {
-        m_datasetType = FNDT_NIFTI_SH;
+        m_datasetType = Fn::DatasetType::NIFTI_SH;
         return loadNiftiQBall( fn );
     }
     else if ( m_header->dim[4] > 3 )
@@ -117,12 +117,12 @@ bool Loader::loadNifti()
         if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) )
         {
             qDebug() << "fnav2 dwi dataset found";
-            m_datasetType = FNDT_NIFTI_DWI;
+            m_datasetType = Fn::DatasetType::NIFTI_DWI;
             return loadNiftiDWI_FNAV2( fn );
         }
         else
         {
-            m_datasetType = FNDT_NIFTI_DWI;
+            m_datasetType = Fn::DatasetType::NIFTI_DWI;
             return loadNiftiDWI( fn );
         }
     }

@@ -9,7 +9,7 @@
 #include "../../gui/gl/binghamrenderer.h"
 
 DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data, nifti_image* header ) :
-    DatasetNifti( filename, FNDT_NIFTI_BINGHAM, header ),
+    DatasetNifti( filename, Fn::DatasetType::NIFTI_BINGHAM, header ),
     m_data( data ),
     m_renderer( 0 )
 {

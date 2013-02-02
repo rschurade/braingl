@@ -9,7 +9,7 @@
 #include "../../gui/gl/fiberrenderer.h"
 
 DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
-    Dataset( filename, FNDT_FIBERS ),
+    Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {
@@ -19,7 +19,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
 }
 
 DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
-    Dataset( QString("new fibers"), FNDT_FIBERS ),
+    Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {

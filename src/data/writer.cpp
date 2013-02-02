@@ -32,9 +32,9 @@ Writer::~Writer()
 
 bool Writer::save()
 {
-    switch ( m_dataset->properties()->get( FNPROP_TYPE ).toInt() )
+    switch ( (Fn::DatasetType)( m_dataset->properties()->get( FNPROP_TYPE ).toInt() ) )
     {
-        case FNDT_NIFTI_SCALAR:
+        case Fn::DatasetType::NIFTI_SCALAR:
         {
             nifti_image* out = createHeader( 1 );
 
@@ -52,7 +52,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_VECTOR:
+        case Fn::DatasetType::NIFTI_VECTOR:
         {
             QVector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
 
@@ -92,7 +92,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_TENSOR:
+        case Fn::DatasetType::NIFTI_TENSOR:
         {
             nifti_image* out = createHeader( 6 );
 
@@ -133,7 +133,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_SH:
+        case Fn::DatasetType::NIFTI_SH:
         {
             QVector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
 
@@ -174,7 +174,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_BINGHAM:
+        case Fn::DatasetType::NIFTI_BINGHAM:
         {
             QVector<QVector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
 
@@ -215,7 +215,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_NIFTI_DWI:
+        case Fn::DatasetType::NIFTI_DWI:
         {
             QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
             QVector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
@@ -277,7 +277,7 @@ bool Writer::save()
             nifti_image_free( out );
         }
             break;
-        case FNDT_FIBERS:
+        case Fn::DatasetType::FIBERS:
         {
             saveFibs( m_fileName );
             break;

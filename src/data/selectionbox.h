@@ -8,11 +8,19 @@
 #ifndef SELECTIONBOX_H_
 #define SELECTIONBOX_H_
 
+#include "enums.h"
+#include "properties/propertygroup.h"
+
 class SelectionBox
 {
 public:
     SelectionBox();
     virtual ~SelectionBox();
+
+    PropertyGroup* properties();
+
+private:
+    PropertyGroup m_properties;
 };
 
 #endif /* SELECTIONBOX_H_ */

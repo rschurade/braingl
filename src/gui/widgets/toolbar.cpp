@@ -125,21 +125,21 @@ void ToolBar::slot( FN_ALGO algo )
             l = DWIAlgos::tensorFit( ds );
             break;
         case FNALGO_FA:
-            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcFAFromDWI( ds );
             }
-            else if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            else if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcFAFromTensor( ds );
             }
             break;
         case FNALGO_EV:
-            if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_DWI )
+            if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcEVFromDWI( ds );
             }
-            else if ( ds->properties()->get( FNPROP_TYPE ) == FNDT_NIFTI_TENSOR )
+            else if ( ds->properties()->get( FNPROP_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcEVFromTensor( ds );
             }
@@ -198,19 +198,19 @@ void ToolBar::slot( FN_ALGO algo )
 void ToolBar::slotSelectionChanged( int type )
 {
     this->clear();
-    switch ( type )
+    switch ( (Fn::DatasetType)type )
     {
-        case FNDT_NIFTI_SCALAR:
+        case Fn::DatasetType::NIFTI_SCALAR:
         {
             this->addAction( m_isosurfaceAct );
             break;
         }
-        case FNDT_NIFTI_VECTOR:
+        case Fn::DatasetType::NIFTI_VECTOR:
         {
             //this->addAction( m_vectorAction1 );
             break;
         }
-        case FNDT_NIFTI_TENSOR:
+        case Fn::DatasetType::NIFTI_TENSOR:
         {
             this->addAction( m_faAct );
             this->addAction( m_evAct );
@@ -218,12 +218,12 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_crossingTrackingAct );
             break;
         }
-        case FNDT_NIFTI_SH:
+        case Fn::DatasetType::NIFTI_SH:
         {
             this->addAction( m_binghamAction );
             break;
         }
-        case FNDT_NIFTI_DWI:
+        case Fn::DatasetType::NIFTI_DWI:
         {
             this->addAction( m_qball4Act );
             this->addAction( m_qball6Act );
@@ -233,12 +233,12 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_evAct );
             break;
         }
-        case FNDT_NIFTI_BINGHAM:
+        case Fn::DatasetType::NIFTI_BINGHAM:
         {
             this->addAction( m_bingham2tensorAction );
             break;
         }
-        case FNDT_FIBERS:
+        case Fn::DatasetType::FIBERS:
         {
             this->addAction( m_fiberThinningAct );
             this->addAction( m_fiberTractDensityAct );

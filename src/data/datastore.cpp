@@ -27,7 +27,7 @@ void DataStore::updateGlobals()
 {
     Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
 
-    if ( ds->properties()->get( FNPROP_TYPE ).toInt() < FNDT_NIFTI_ANY )
+    if ( ds->properties()->get( FNPROP_TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
     {
         if ( m_datasetList.size() > 0 )
         {

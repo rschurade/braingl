@@ -15,3 +15,7 @@ SelectionBox::~SelectionBox()
 {
 }
 
+PropertyGroup* SelectionBox::properties()
+{
+    return &m_properties;
+}

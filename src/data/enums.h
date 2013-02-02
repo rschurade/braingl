@@ -1,32 +1,35 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
-enum FN_DATASET_TYPE
+namespace Fn
 {
-    FNDT_UNKNOWN,
-    FNDT_NIFTI_SCALAR,
-    FNDT_NIFTI_VECTOR,
-    FNDT_NIFTI_TENSOR,
-    FNDT_NIFTI_SH,
-    FNDT_NIFTI_DWI,
-    FNDT_NIFTI_BINGHAM,
-    FNDT_NIFTI_ANY,
-    FNDT_MESH_ASCII,
-    FNDT_MESH_BINARY,
-    FNDT_MESH_ISOSURFACE,
-    FNDT_FIBERS
-};
+    enum class DatasetType : int
+    {
+        UNKNOWN,
+        NIFTI_SCALAR,
+        NIFTI_VECTOR,
+        NIFTI_TENSOR,
+        NIFTI_SH,
+        NIFTI_DWI,
+        NIFTI_BINGHAM,
+        NIFTI_ANY,
+        MESH_ASCII,
+        MESH_BINARY,
+        MESH_ISOSURFACE,
+        FIBERS
+    };
 
-enum FN_COLORMAP
-{
-    FNCM_GRAY,
-    FNCM_RAINBOW1,
-    FNCM_RAINBOW2,
-    FNCM_BLUEWHITERED,
-    FNCM_NOCOLORMAP // used for RGB datasets, takes values directly from texture
-                    // other colormaps use float packing
-};
+    enum class Colormap : int
+    {
+        GRAY,
+        RAINBOW1,
+        RAINBOW2,
+        BLUEWHITERED,
+        NONE // used for RGB datasets, takes values directly from texture
+             // other colormaps use float packing
+    };
 
+}
 enum FN_ALGO
 {
     FNALGO_NONE,
@@ -87,12 +90,6 @@ enum FN_PROPERTY
     FNPROP_RENDER_UPPER_Z,
     FNPROP_MINMAX_SCALING,
     FNPROP_BVALUE,
-    FNPROP_CALC_LOWER_X,
-    FNPROP_CALC_UPPER_X,
-    FNPROP_CALC_LOWER_Y,
-    FNPROP_CALC_UPPER_Y,
-    FNPROP_CALC_LOWER_Z,
-    FNPROP_CALC_UPPER_Z,
     FNPROP_TENSOR_RENDERMODE,
     FNPROP_ISO_VALUE,
     FNPROP_NUM_POINTS,

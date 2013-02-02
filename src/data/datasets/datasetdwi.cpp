@@ -9,7 +9,7 @@
 #include <QtCore/QDebug>
 
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
-    DatasetNifti( filename, FNDT_NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
+    DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
     examineDataset();
 }

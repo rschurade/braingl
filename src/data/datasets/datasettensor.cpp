@@ -11,7 +11,7 @@
 #include "../../gui/gl/tensorrendererev.h"
 
 DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_image* header ) :
-    DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ),
+    DatasetNifti( filename, Fn::DatasetType::NIFTI_TENSOR, header ),
     m_data( data ),
     m_logData( 0 ),
     m_renderer( 0 ),
@@ -29,7 +29,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_imag
 }
 
 DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> > data, nifti_image* header ) :
-        DatasetNifti( filename, FNDT_NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
+        DatasetNifti( filename, Fn::DatasetType::NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
 {
     for ( int i = 0; i < data.size(); ++i )
     {
