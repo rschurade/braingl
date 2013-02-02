@@ -18,6 +18,7 @@
 #include "widgets/shadereditwidget.h"
 
 #include "../data/datastore.h"
+#include "../data/selectionboxmodel.h"
 #include "../data/loader.h"
 #include "../data/writer.h"
 #include "../data/vptr.h"
@@ -25,9 +26,10 @@
 
 #include <QtGui/QtGui>
 
-MainWindow::MainWindow( DataStore* dataStore, bool debug ) :
+MainWindow::MainWindow( DataStore* dataStore, SelectionBoxModel* selBoxModel, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
+    m_selBoxModel( selBoxModel ),
     m_debug( debug )
 {
 	m_centralTabWidget = new QTabWidget( this );
@@ -345,7 +347,7 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	SelectionBoxWidget* selectionBoxWidget = new SelectionBoxWidget( this );
+	SelectionBoxWidget* selectionBoxWidget = new SelectionBoxWidget( m_selBoxModel, this );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("Selection Boxes"), selectionBoxWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );

@@ -7,7 +7,6 @@
 #include "combinednavrenderer.h"
 #include "../gl/glfunctions.h"
 
-#include "../../data/datastore.h"
 #include "../../data/enums.h"
 
 #include <QtCore/QDebug>
@@ -454,9 +453,9 @@ void CombinedNavRenderer::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshirs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ), Qt::UserRole ).toBool();
+    bool renderCrosshairs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ), Qt::UserRole ).toBool();
 
-    if ( renderCrosshirs )
+    if ( renderCrosshairs )
     {
         GLFunctions::getShader( "crosshair" )->bind();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );

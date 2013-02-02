@@ -10,7 +10,8 @@
 
 #include <QtGui/QFrame>
 
-class QTreeWidget;
+class QAbstractItemModel;
+class QTreeView;
 class QVBoxLayout;
 class QPushButton;
 
@@ -19,11 +20,11 @@ class SelectionBoxWidget : public QFrame
     Q_OBJECT
 
 public:
-    SelectionBoxWidget( QWidget* parent );
+    SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget* parent = 0 );
     virtual ~SelectionBoxWidget();
 
 private:
-    QTreeWidget* m_treeWidget;
+    QTreeView* m_treeView;
 
     QPushButton* m_downButton;
     QPushButton* m_upButton;

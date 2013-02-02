@@ -4,6 +4,7 @@
 #include <QtCore/QDateTime>
 
 #include "data/datastore.h"
+#include "data/selectionboxmodel.h"
 #include "data/loader.h"
 #include "data/vptr.h"
 #include "gui/mainwindow.h"
@@ -55,8 +56,6 @@ int main( int argc, char *argv[] )
 
     QStringList args = app.arguments();
 
-    DataStore* dataStore = new DataStore();
-
     qInstallMsgHandler( noOutput );
     bool debug = false;
     for ( int i = 1; i < args.size(); ++i )
@@ -78,7 +77,10 @@ int main( int argc, char *argv[] )
     debug = true;
 #endif
 
-    MainWindow mainWin( dataStore, debug );
+    DataStore* dataStore = new DataStore();
+    SelectionBoxModel* selBoxModel = new SelectionBoxModel();
+
+    MainWindow mainWin( dataStore, selBoxModel, debug );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )

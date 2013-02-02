@@ -13,6 +13,7 @@ class DatasetListWidget;
 class ShaderEditWidget;
 
 class DataStore;
+class SelectionBoxModel;
 class GLWidget;
 class ToolBar;
 
@@ -21,7 +22,7 @@ class MainWindow: public QMainWindow
 Q_OBJECT
 
 public:
-    MainWindow( DataStore* dataStore, bool debug = false );
+    MainWindow( DataStore* dataStore, SelectionBoxModel* selBoxModel,  bool debug = false );
 
     void closeEvent( QCloseEvent *event );
 
@@ -59,6 +60,7 @@ private:
     void createDockWindows();
 
     DataStore* m_dataStore;
+    SelectionBoxModel* m_selBoxModel;
 
     bool m_debug;
 
