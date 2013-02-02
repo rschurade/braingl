@@ -18,7 +18,7 @@ class QAbstractItemModel;
 class SceneRenderer
 {
 public:
-	SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* selectionBoxModel = 0 );
+	SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* selectionBoxModel = 0 );
 	virtual ~SceneRenderer();
 
 	void resizeGL( int width, int height );
@@ -40,6 +40,7 @@ private:
 	SliceRenderer* m_sliceRenderer;
 
 	QAbstractItemModel* m_dataModel;
+	QAbstractItemModel* m_globalModel;
 	QAbstractItemModel* m_selectionBoxModelModel;
 
 	int m_boundingbox;

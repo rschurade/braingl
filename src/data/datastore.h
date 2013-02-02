@@ -8,8 +8,6 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include "properties/propertygroup.h"
-
 #include <QtCore/QDir>
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -18,10 +16,10 @@
 
 class DataStore: public QAbstractItemModel
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-    DataStore();
+    DataStore( QAbstractItemModel* globalProps );
     virtual ~DataStore();
 
     // reimplemented from QAbstractItemModel
@@ -43,13 +41,12 @@ public slots:
 
 private:
     QVariant getDatasetProperties( const QModelIndex &index ) const;
-    QVariant getGlobal( const QModelIndex &index ) const;
 
     void updateGlobals();
 
     QList<QVariant> m_datasetList;
 
-    PropertyGroup m_globalProperties;
+    QAbstractItemModel* m_globalProperties;
 
 signals:
 };

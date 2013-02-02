@@ -14,7 +14,7 @@ class GLWidget: public QGLWidget
     Q_OBJECT
 
 public:
-    GLWidget( QAbstractItemModel* model, QWidget *parent = 0 );
+    GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QWidget *parent = 0 );
     ~GLWidget();
 
     QSize minimumSizeHint() const;

@@ -15,7 +15,7 @@ class QGLShaderProgram;
 class SliceRenderer : public ObjectRenderer
 {
 public:
-	SliceRenderer();
+	SliceRenderer( QAbstractItemModel* dataModel );
 	virtual ~SliceRenderer();
 
 	void init();
@@ -32,6 +32,8 @@ private:
 	void drawAxial();
 	void drawCoronal();
 	void drawSagittal();
+
+	QAbstractItemModel* m_dataModel;
 
 	GLuint *vboIds;
 

@@ -12,7 +12,8 @@
 
 #include <QtCore/QDebug>
 
-StatusBarView::StatusBarView() :
+StatusBarView::StatusBarView( QAbstractItemModel* globalModel ) :
+    m_globalModel( globalModel ),
     m_selected( 0 ),
     m_globalInfo( "" ),
     m_datasetInfo( "" ),
@@ -20,6 +21,7 @@ StatusBarView::StatusBarView() :
     m_y( 0 ),
     m_z( 0 )
 {
+    connect( m_globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( dataChanged( QModelIndex, QModelIndex ) ) );
 }
 
 StatusBarView::~StatusBarView()
@@ -94,26 +96,26 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     m_globalInfo = "[";
 
     QModelIndex mi;
-    mi = model()->index( 0, FNGLOBAL_SAGITTAL );
+    mi = m_globalModel->index( FNGLOBAL_SAGITTAL, 0 );
     if ( mi.isValid() )
     {
-        m_x = model()->data( mi, Qt::UserRole ).toInt();
+        m_x = m_globalModel->data( mi ).toInt();
         m_globalInfo +=  QString::number( m_x );
         m_globalInfo += ",";
     }
 
-    mi = model()->index( 0, FNGLOBAL_CORONAL );
+    mi = m_globalModel->index( FNGLOBAL_CORONAL, 0 );
     if ( mi.isValid() )
     {
-        m_y = model()->data( mi, Qt::UserRole ).toInt();
+        m_y = m_globalModel->data( mi ).toInt();
         m_globalInfo += QString::number( m_y );
         m_globalInfo += ",";
     }
 
-    mi = model()->index( 0, FNGLOBAL_AXIAL );
+    mi = m_globalModel->index( FNGLOBAL_AXIAL, 0 );
     if ( mi.isValid() )
     {
-        m_z = model()->data( mi, Qt::UserRole ).toInt();
+        m_z = m_globalModel->data( mi ).toInt();
         m_globalInfo += QString::number( m_z );
         m_globalInfo += "]";
     }

@@ -24,7 +24,7 @@ class DockNavGLWidget : public QWidget
     Q_OBJECT
 
 public:
-    DockNavGLWidget( QAbstractItemModel* model, QString name, int orient, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
+    DockNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget* parent = 0, const QGLWidget *shareWidget = 0 );
     virtual ~DockNavGLWidget();
 
     QSize minimumSizeHint() const;
@@ -32,7 +32,7 @@ public:
 
 private:
     QString m_name;
-    QAbstractItemModel* m_model;
+    QAbstractItemModel* m_globalModel;
     NavFrame* m_glWidget;
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;

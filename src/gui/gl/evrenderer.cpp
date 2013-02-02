@@ -82,9 +82,9 @@ void EVRenderer::setShaderVars()
 
 void EVRenderer::initGeometry()
 {
-    int xi = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toInt();
-    int yi = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toInt();
-    int zi = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toInt();
+    int xi = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toInt();
+    int yi = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toInt();
+    int zi = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toInt();
 
     QString s = createSettingsString( xi, yi, zi, m_orient, 0, 0, 0, 0, 0, 0, false, 0, 0, m_offset);
 

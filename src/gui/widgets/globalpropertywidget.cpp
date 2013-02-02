@@ -49,43 +49,43 @@ void GlobalPropertyWidget::setModel( QAbstractItemModel* model )
 
 void GlobalPropertyWidget::sliderChanged( int value, int id )
 {
-    m_propertyView->model()->setData( m_propertyView->model()->index( 0, id ), value, Qt::UserRole );
+    m_propertyView->model()->setData( m_propertyView->model()->index( id, 0 ), value );
 }
 
 void GlobalPropertyWidget::dataChanged()
 {
     QModelIndex mi;
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_SAGITTAL );
+    mi = m_propertyView->model()->index( FNGLOBAL_SAGITTAL, 0 );
     if ( mi.isValid() )
     {
-        m_sagittalSlider->setValue( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() );
+        m_sagittalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
     }
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_MAX_SAGITTAL );
+    mi = m_propertyView->model()->index( FNGLOBAL_MAX_SAGITTAL, 0 );
     if ( mi.isValid() )
     {
-        m_sagittalSlider->setMax( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() - 1 );
-    }
-
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_CORONAL );
-    if ( mi.isValid() )
-    {
-        m_coronalSlider->setValue( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() );
-    }
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_MAX_CORONAL );
-    if ( mi.isValid() )
-    {
-        m_coronalSlider->setMax( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() - 1 );
+        m_sagittalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
     }
 
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_AXIAL );
+    mi = m_propertyView->model()->index( FNGLOBAL_CORONAL, 0 );
     if ( mi.isValid() )
     {
-        m_axialSlider->setValue( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() );
+        m_coronalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
     }
-    mi = m_propertyView->model()->index( 0, FNGLOBAL_MAX_AXIAL );
+    mi = m_propertyView->model()->index( FNGLOBAL_MAX_CORONAL, 0 );
     if ( mi.isValid() )
     {
-        m_axialSlider->setMax( m_propertyView->model()->data( mi, Qt::UserRole ).toInt() - 1 );
+        m_coronalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
+    }
+
+    mi = m_propertyView->model()->index( FNGLOBAL_AXIAL, 0 );
+    if ( mi.isValid() )
+    {
+        m_axialSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
+    }
+    mi = m_propertyView->model()->index( FNGLOBAL_MAX_AXIAL, 0 );
+    if ( mi.isValid() )
+    {
+        m_axialSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
     }
 }
 

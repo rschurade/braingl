@@ -14,32 +14,9 @@
 #include <QtCore/QLocale>
 #include <QtCore/QDebug>
 
-DataStore::DataStore()
+DataStore::DataStore( QAbstractItemModel* globalProps ) :
+    m_globalProperties( globalProps )
 {
-    m_globalProperties.set( FNPROP_NAME, QString("datastore") );
-    m_globalProperties.set( FNGLOBAL_AXIAL, 0 );
-    m_globalProperties.set( FNGLOBAL_CORONAL, 0 );
-    m_globalProperties.set( FNGLOBAL_SAGITTAL, 0 );
-    m_globalProperties.set( FNGLOBAL_MAX_AXIAL, 1 );
-    m_globalProperties.set( FNGLOBAL_MAX_CORONAL, 1 );
-    m_globalProperties.set( FNGLOBAL_MAX_SAGITTAL, 1 );
-    m_globalProperties.set( FNGLOBAL_SLICE_DX, 1.0f );
-    m_globalProperties.set( FNGLOBAL_SLICE_DY, 1.0f );
-    m_globalProperties.set( FNGLOBAL_SLICE_DZ, 1.0f );
-    m_globalProperties.set( FNGLOBAL_LAST_PATH, QString("") );
-    m_globalProperties.set( FNGLOBAL_SHOW_AXIAL, true );
-    m_globalProperties.set( FNGLOBAL_SHOW_CORONAL, true );
-    m_globalProperties.set( FNGLOBAL_SHOW_SAGITTAL, true );
-    m_globalProperties.set( FNGLOBAL_CORONAL_AXIAL, 0 );
-    m_globalProperties.set( FNGLOBAL_SAGITTAL_AXIAL, 0 );
-    m_globalProperties.set( FNGLOBAL_SAGITTAL_CORONAL, 0 );
-    m_globalProperties.set( FNGLOBAL_ZOOM, 1.0f );
-    m_globalProperties.set( FNGLOBAL_MOVEX, 0 );
-    m_globalProperties.set( FNGLOBAL_MOVEY, 0 );
-    m_globalProperties.set( FNGLOBAL_BBX, 0 );
-    m_globalProperties.set( FNGLOBAL_BBY, 0 );
-    m_globalProperties.set( FNGLOBAL_VIEW, 0 );
-    m_globalProperties.set( FNSETTING_RENDER_CROSSHAIRS, true );
 }
 
 DataStore::~DataStore()
@@ -54,20 +31,20 @@ void DataStore::updateGlobals()
     {
         if ( m_datasetList.size() > 0 )
         {
-            m_globalProperties.set( FNGLOBAL_MAX_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() );
-            m_globalProperties.set( FNGLOBAL_MAX_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() );
-            m_globalProperties.set( FNGLOBAL_MAX_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() );
-            m_globalProperties.set( FNGLOBAL_SLICE_DX, ds->properties()->get( FNPROP_DX ).toFloat() );
-            m_globalProperties.set( FNGLOBAL_SLICE_DY, ds->properties()->get( FNPROP_DY ).toFloat() );
-            m_globalProperties.set( FNGLOBAL_SLICE_DZ, ds->properties()->get( FNPROP_DZ ).toFloat() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_MAX_AXIAL,    0 ), ds->properties()->get( FNPROP_NZ ).toInt() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_MAX_CORONAL,  0 ), ds->properties()->get( FNPROP_NY ).toInt() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_MAX_SAGITTAL, 0 ), ds->properties()->get( FNPROP_NX ).toInt() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_SLICE_DX,     0 ), ds->properties()->get( FNPROP_DX ).toFloat() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_SLICE_DY,     0 ), ds->properties()->get( FNPROP_DY ).toFloat() );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_SLICE_DZ,     0 ), ds->properties()->get( FNPROP_DZ ).toFloat() );
 
             emit dataChanged( index( 0, FNGLOBAL_SAGITTAL ), index( 0, FNGLOBAL_SLICE_DZ ) );
         }
         if ( m_datasetList.size() == 1 )
         {
-            m_globalProperties.set( FNGLOBAL_AXIAL, ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
-            m_globalProperties.set( FNGLOBAL_CORONAL, ds->properties()->get( FNPROP_NY ).toInt() / 2 );
-            m_globalProperties.set( FNGLOBAL_SAGITTAL, ds->properties()->get( FNPROP_NX ).toInt() / 2 );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_AXIAL, 0 ), ds->properties()->get( FNPROP_NZ ).toInt() / 2 );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_CORONAL, 0 ), ds->properties()->get( FNPROP_NY ).toInt() / 2 );
+            m_globalProperties->setData( m_globalProperties->index( FNGLOBAL_SAGITTAL, 0 ), ds->properties()->get( FNPROP_NX ).toInt() / 2 );
         }
 
     }
@@ -104,9 +81,6 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
         case Qt::DisplayRole:
             return getDatasetProperties( index );
             break;
-        case Qt::UserRole:
-            return getGlobal( index );
-            break;
         default:
             break;
     }
@@ -133,11 +107,6 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
     }
     // everything else
     return ds->properties()->get( (FN_PROPERTY)index.column() );
-}
-
-QVariant DataStore::getGlobal( const QModelIndex &index ) const
-{
-    return m_globalProperties.get( (FN_PROPERTY)index.column() );
 }
 
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
@@ -179,32 +148,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
         return true;
     }
-
-    if ( role == Qt::UserRole )
-    {
-        switch( index.column() )
-        {
-            case FNGLOBAL_CORONAL_AXIAL:
-                m_globalProperties.set( FNGLOBAL_CORONAL, value.toPoint().x() );
-                m_globalProperties.set( FNGLOBAL_AXIAL, value.toPoint().y() );
-                break;
-            case FNGLOBAL_SAGITTAL_AXIAL:
-                m_globalProperties.set( FNGLOBAL_SAGITTAL, value.toPoint().x() );
-                m_globalProperties.set( FNGLOBAL_AXIAL, value.toPoint().y() );
-                break;
-            case FNGLOBAL_SAGITTAL_CORONAL:
-                m_globalProperties.set( FNGLOBAL_SAGITTAL, value.toPoint().x() );
-                m_globalProperties.set( FNGLOBAL_CORONAL, value.toPoint().y() );
-                break;
-        }
-        m_globalProperties.set( (FN_PROPERTY)index.column(), value );
-        // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
-        if ( index.column() < FNGLOBAL_ZOOM )
-        {
-            emit( dataChanged( index, index ) );
-        }
-        return true;
-    }
     return false;
 }
 
@@ -219,20 +162,6 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
         else
         {
             return VPtr<Dataset>::asPtr( m_datasetList.at( section ) )->properties()->get( FNPROP_NAME ).toString();
-        }
-    }
-    if ( role == Qt::UserRole )
-    {
-        if ( orientation == Qt::Horizontal )
-        {
-            switch ( section )
-            {
-                case 1:
-                    return QString( "GLuint" );
-                    break;
-                default:
-                    break;
-            }
         }
     }
     return QVariant();
@@ -262,10 +191,6 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     if ( row < m_datasetList.size() )
     {
         return createIndex( row, column, VPtr<Dataset>::asPtr( m_datasetList.at( row ) ) );
-    }
-    else if ( m_datasetList.size() == 0 && column > FNGLOBAL_GLOBALS )
-    {
-        return createIndex( row, column, 0 );
     }
     else if ( row == m_datasetList.size() && column == FNPROP_NEW_DATASET )
     {

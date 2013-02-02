@@ -17,8 +17,9 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-NavRenderer::NavRenderer( QString name ) :
+NavRenderer::NavRenderer( QAbstractItemModel* dataModel, QString name ) :
     ObjectRenderer(),
+    m_dataModel( dataModel ),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),
@@ -115,12 +116,12 @@ void NavRenderer::leftMouseDrag( int x, int y )
 
 void NavRenderer::setupTextures()
 {
-    GLFunctions::setupTextures( model() );
+    GLFunctions::setupTextures( m_dataModel );
 }
 
 void NavRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "slice", model() );
+    GLFunctions::setShaderVars( "slice", m_dataModel );
 }
 
 void NavRenderer::mouseWheel( int step )

@@ -1,33 +1,36 @@
 /*
- * selectionboxmodel.h
+ * globalpropertymodel.h
  *
  *  Created on: 02.02.2013
  *      Author: Ralph
  */
 
-#ifndef SELECTIONBOXMODEL_H_
-#define SELECTIONBOXMODEL_H_
+#ifndef GLOBALPROPERTYMODEL_H_
+#define GLOBALPROPERTYMODEL_H_
+
+#include "properties/propertygroup.h"
 
 #include <QtCore/QAbstractItemModel>
 
-class SelectionBoxModel : public QAbstractItemModel
+class GlobalPropertyModel : public QAbstractItemModel
 {
+    Q_OBJECT
+
 public:
-    SelectionBoxModel( QAbstractItemModel* globalProps );
-    virtual ~SelectionBoxModel();
+    GlobalPropertyModel();
+    virtual ~GlobalPropertyModel();
 
     // reimplemented from QAbstractItemModel
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
     QModelIndex index( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
     QModelIndex parent( const QModelIndex & index ) const;
-    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
-    Qt::ItemFlags flags( const QModelIndex& index ) const;
-    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
 
 private:
-
+    PropertyGroup m_properties;
 };
 
-#endif /* SELECTIONBOXMODEL_H_ */
+#endif /* GLOBALPROPERTYMODEL_H_ */

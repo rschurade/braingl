@@ -13,8 +13,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
-NavRendererAxial::NavRendererAxial( QString name ) :
-    NavRenderer( name )
+NavRendererAxial::NavRendererAxial(  QAbstractItemModel* dataModel, QString name ) :
+    NavRenderer( dataModel, name )
 {
 }
 
@@ -79,31 +79,31 @@ void NavRendererAxial::leftMouseDown( int x, int y )
 
     QModelIndex mi;
     QPoint p( xout, yout );
-    mi = model()->index( 0, FNGLOBAL_SAGITTAL_CORONAL );
+    mi = model()->index( FNGLOBAL_SAGITTAL_CORONAL, 0 );
     if ( mi.isValid() )
     {
-        model()->setData( mi, p, Qt::UserRole );
+        model()->setData( mi, p );
     }
 }
 
 void NavRendererAxial::initGeometry()
 {
-    m_x = model()->data( model()->index( 0, FNGLOBAL_SAGITTAL ), Qt::UserRole ).toFloat();
-    m_y = model()->data( model()->index( 0, FNGLOBAL_CORONAL ), Qt::UserRole ).toFloat();
-    m_z = model()->data( model()->index( 0, FNGLOBAL_AXIAL ), Qt::UserRole ).toFloat();
+    m_x = model()->data( model()->index( FNGLOBAL_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( FNGLOBAL_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( FNGLOBAL_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
 
     if ( m_xOld != xi || m_yOld != yi || m_zOld != zi )
     {
-        m_xb = model()->data( model()->index( 0, FNGLOBAL_MAX_SAGITTAL ), Qt::UserRole ).toFloat();
-        m_yb = model()->data( model()->index( 0, FNGLOBAL_MAX_CORONAL ), Qt::UserRole ).toFloat();
-        m_zb = model()->data( model()->index( 0, FNGLOBAL_MAX_AXIAL ), Qt::UserRole ).toFloat();
+        m_xb = model()->data( model()->index( FNGLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
+        m_yb = model()->data( model()->index( FNGLOBAL_MAX_CORONAL, 0 ) ).toFloat();
+        m_zb = model()->data( model()->index( FNGLOBAL_MAX_AXIAL, 0 ) ).toFloat();
 
-        m_xd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DX ), Qt::UserRole ).toFloat();
-        m_yd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DY ), Qt::UserRole ).toFloat();
-        m_zd = model()->data( model()->index( 0, FNGLOBAL_SLICE_DZ ), Qt::UserRole ).toFloat();
+        m_xd = model()->data( model()->index( FNGLOBAL_SLICE_DX, 0 ) ).toFloat();
+        m_yd = model()->data( model()->index( FNGLOBAL_SLICE_DY, 0 ) ).toFloat();
+        m_zd = model()->data( model()->index( FNGLOBAL_SLICE_DZ, 0 ) ).toFloat();
 
         float x = m_x * m_xd;
         float y = m_y * m_yd;
@@ -164,7 +164,7 @@ void NavRendererAxial::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshirs = model()->data( model()->index( 0, FNSETTING_RENDER_CROSSHAIRS ), Qt::UserRole ).toBool();
+    bool renderCrosshirs = model()->data( model()->index( FNSETTING_RENDER_CROSSHAIRS, 0 ) ).toBool();
 
     if ( renderCrosshirs )
     {

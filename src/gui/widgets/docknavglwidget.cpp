@@ -14,15 +14,15 @@
 
 #include <QtGui/QtGui>
 
-DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* model, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
+DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),
     m_name( name ),
-    m_model( model )
+    m_globalModel( globalModel )
 {
 
     setObjectName( QString("nav gl ") + name );
 
-    m_glWidget = new NavFrame( model, name, orient, this, shareWidget );
+    m_glWidget = new NavFrame( dataModel, globalModel, name, orient, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     m_layout = new QVBoxLayout();
@@ -48,7 +48,7 @@ DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* model, QString name, int o
     settingChanged();
     setContentsMargins( 1, 1, 1, 1 );
 
-    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
+    connect( m_globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -70,15 +70,15 @@ void DockNavGLWidget::sliderChanged( int value )
 {
     if  ( m_name == "sagittal")
     {
-        m_model->setData( m_model->index( 0, FNGLOBAL_SAGITTAL ), value, Qt::UserRole );
+        m_globalModel->setData( m_globalModel->index( FNGLOBAL_SAGITTAL, 0 ), value );
     }
     else if ( m_name == "coronal" )
     {
-        m_model->setData( m_model->index( 0, FNGLOBAL_CORONAL ), value, Qt::UserRole );
+        m_globalModel->setData( m_globalModel->index( FNGLOBAL_CORONAL, 0 ), value );
     }
     else if ( m_name == "axial" )
     {
-        m_model->setData( m_model->index( 0, FNGLOBAL_AXIAL ), value, Qt::UserRole );
+        m_globalModel->setData( m_globalModel->index( FNGLOBAL_AXIAL, 0 ), value );
     }
 }
 
@@ -87,41 +87,41 @@ void DockNavGLWidget::settingChanged()
     QModelIndex mi;
     if  ( m_name == "sagittal")
     {
-        mi = m_model->index( 0, FNGLOBAL_SAGITTAL );
+        mi = m_globalModel->index( FNGLOBAL_SAGITTAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_model->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setValue( m_globalModel->data( mi ).toInt() );
         }
-        mi = m_model->index( 0, FNGLOBAL_MAX_SAGITTAL );
+        mi = m_globalModel->index( FNGLOBAL_MAX_SAGITTAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_model->data( mi, Qt::UserRole ).toInt() - 1 );
+            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
         }
     }
     else if ( m_name == "coronal" )
     {
-        mi = m_model->index( 0, FNGLOBAL_CORONAL );
+        mi = m_globalModel->index( FNGLOBAL_CORONAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_model->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setValue( m_globalModel->data( mi ).toInt() );
         }
-        mi = m_model->index( 0, FNGLOBAL_MAX_CORONAL );
+        mi = m_globalModel->index( FNGLOBAL_MAX_CORONAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_model->data( mi, Qt::UserRole ).toInt() - 1 );
+            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
         }
     }
     else if ( m_name == "axial" )
     {
-        mi = m_model->index( 0, FNGLOBAL_AXIAL );
+        mi = m_globalModel->index( FNGLOBAL_AXIAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_model->data( mi, Qt::UserRole ).toInt() );
+            m_slider->setValue( m_globalModel->data( mi ).toInt() );
         }
-        mi = m_model->index( 0, FNGLOBAL_MAX_AXIAL );
+        mi = m_globalModel->index( FNGLOBAL_MAX_AXIAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_model->data( mi, Qt::UserRole ).toInt() - 1 );
+            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
         }
     }
 }

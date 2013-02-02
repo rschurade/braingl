@@ -126,11 +126,11 @@ int ObjectRenderer::getMaxLod( int orient, int lx, int ux, int ly, int uy, int l
 
 void ObjectRenderer::calcBounds( int nx, int ny, int nz, float dx, float dy, float dz, int orient )
 {
-    m_zoom = model()->data( model()->index( 0, FNGLOBAL_ZOOM ), Qt::UserRole ).toFloat();
-    m_moveX = model()->data( model()->index( 0, FNGLOBAL_MOVEX ), Qt::UserRole ).toFloat();
-    m_moveY = model()->data( model()->index( 0, FNGLOBAL_MOVEY ), Qt::UserRole ).toFloat();
-    m_bbX = model()->data( model()->index( 0, FNGLOBAL_BBX ), Qt::UserRole ).toFloat();
-    m_bbY = model()->data( model()->index( 0, FNGLOBAL_BBY ), Qt::UserRole ).toFloat();
+    m_zoom = model()->data( model()->index( FNGLOBAL_ZOOM, 0 ) ).toFloat();
+    m_moveX = model()->data( model()->index( FNGLOBAL_MOVEX, 0 ) ).toFloat();
+    m_moveY = model()->data( model()->index( FNGLOBAL_MOVEY, 0 ) ).toFloat();
+    m_bbX = model()->data( model()->index( FNGLOBAL_BBX, 0 ) ).toFloat();
+    m_bbY = model()->data( model()->index( FNGLOBAL_BBY, 0 ) ).toFloat();
 
 
     switch( orient )

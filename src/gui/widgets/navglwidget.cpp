@@ -7,30 +7,31 @@
 #include <QtGui/QtGui>
 #include <QtCore/QDebug>
 
-NavGLWidget::NavGLWidget( QAbstractItemModel* model, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
+NavGLWidget::NavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
     switch( orient )
     {
         case 0:
         {
-            m_navRenderer = new NavRendererSagittal( name );
+            m_navRenderer = new NavRendererSagittal( dataModel, name );
             break;
         }
         case 1:
         {
-            m_navRenderer = new NavRendererCoronal( name );
+            m_navRenderer = new NavRendererCoronal( dataModel, name );
             break;
         }
         case 2:
         {
-            m_navRenderer = new NavRendererAxial( name );
+            m_navRenderer = new NavRendererAxial( dataModel, name );
             break;
         }
     }
 
-    m_navRenderer->setModel( model );
-    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_navRenderer->setModel( globalModel );
+    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 NavGLWidget::~NavGLWidget()

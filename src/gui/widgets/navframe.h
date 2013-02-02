@@ -18,7 +18,7 @@ class QGLWidget;
 class NavFrame : public QFrame
 {
 public:
-    NavFrame( QAbstractItemModel* model, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget );
+    NavFrame( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget );
     virtual ~NavFrame();
 
 private:

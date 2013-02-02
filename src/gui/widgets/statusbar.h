@@ -17,10 +17,9 @@ class StatusBar : public QStatusBar
     Q_OBJECT
 
 public:
-    StatusBar( QWidget* parent );
+    StatusBar( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QWidget* parent = 0 );
     virtual ~StatusBar();
 
-    void setModel( QAbstractItemModel* model );
     void setSelectionModel( QItemSelectionModel* selectionModel );
 
 private:

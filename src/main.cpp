@@ -4,6 +4,7 @@
 #include <QtCore/QDateTime>
 
 #include "data/datastore.h"
+#include "data/globalpropertymodel.h"
 #include "data/selectionboxmodel.h"
 #include "data/loader.h"
 #include "data/vptr.h"
@@ -77,10 +78,11 @@ int main( int argc, char *argv[] )
     debug = true;
 #endif
 
-    DataStore* dataStore = new DataStore();
-    SelectionBoxModel* selBoxModel = new SelectionBoxModel();
+    GlobalPropertyModel* globalProps = new GlobalPropertyModel();
+    DataStore* dataStore = new DataStore( globalProps );
+    SelectionBoxModel* selBoxModel = new SelectionBoxModel( globalProps );
 
-    MainWindow mainWin( dataStore, selBoxModel, debug );
+    MainWindow mainWin( dataStore, globalProps, selBoxModel, debug );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )
