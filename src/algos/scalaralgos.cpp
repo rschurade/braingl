@@ -6,8 +6,8 @@
  */
 #include "scalaralgos.h"
 
-#include "datasets/datasetscalar.h"
-#include "datasets/datasetisosurface.h"
+#include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasetisosurface.h"
 
 ScalarAlgos::ScalarAlgos()
 {

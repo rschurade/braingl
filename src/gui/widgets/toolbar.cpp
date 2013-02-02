@@ -10,10 +10,10 @@
 #include "../widgets/algoStarterWidgets/tensortrackwidget.h"
 #include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
 
+#include "../../algos/dwialgos.h"
+#include "../../algos/scalaralgos.h"
+#include "../../algos/fiberalgos.h"
 #include "../../data/vptr.h"
-#include "../../data/dwialgos.h"
-#include "../../data/scalaralgos.h"
-#include "../../data/fiberalgos.h"
 #include "../../data/datasets/dataset.h"
 
 #include <QtCore/QVariant>

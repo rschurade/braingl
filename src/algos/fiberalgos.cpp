@@ -6,10 +6,10 @@
  */
 #include "fiberalgos.h"
 
-#include "../algos/fibers.h"
+#include "fibers.h"
 
-#include "datasets/datasetfibers.h"
-#include "datasets/datasetscalar.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetscalar.h"
 
 #include <QtCore/QDebug>
 
