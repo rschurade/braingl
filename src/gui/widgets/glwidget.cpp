@@ -86,7 +86,7 @@ void GLWidget::update()
     updateGL();
 }
 
-void GLWidget::setView( int view )
+void GLWidget::setView( Fn::Orient view )
 {
     m_sceneRenderer->setView( view );
     update();

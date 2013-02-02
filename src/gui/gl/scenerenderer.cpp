@@ -168,9 +168,9 @@ void SceneRenderer::draw()
     }
 }
 
-void SceneRenderer::setView( int view )
+void SceneRenderer::setView( Fn::Orient view )
 {
-    m_arcBall->setView( view );
+    m_arcBall->setView( (int)view );
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
@@ -178,7 +178,7 @@ void SceneRenderer::setView( int view )
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, FNPROP_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->properties()->set( FNPROP_RENDER_SLICE, view );
+            ds->properties()->set( FNPROP_RENDER_SLICE, (int)view );
         }
     }
 }

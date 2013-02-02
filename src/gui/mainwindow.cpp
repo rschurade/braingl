@@ -457,20 +457,20 @@ void MainWindow::slotToggleSagittalSlice()
 
 void  MainWindow::slotStandardAxialView()
 {
-    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_AXIAL );
-    mainGLWidget->setView( FN_AXIAL );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), (int)Fn::Orient::AXIAL );
+    mainGLWidget->setView( Fn::Orient::AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_CORONAL );
-    mainGLWidget->setView( FN_CORONAL );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), (int)Fn::Orient::CORONAL );
+    mainGLWidget->setView( Fn::Orient::CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), FN_SAGITTAL );
-    mainGLWidget->setView( FN_SAGITTAL );
+    m_globalProps->setData( m_globalProps->index( FNGLOBAL_VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
+    mainGLWidget->setView( Fn::Orient::SAGITTAL );
 }
 
 void MainWindow::slotToggleShaderEdit()
