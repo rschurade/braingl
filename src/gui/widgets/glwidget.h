@@ -5,6 +5,8 @@
 
 #include "../gl/scenerenderer.h"
 
+#include "../../data/enums.h"
+
 #include <QtOpenGL/QGLWidget>
 
 class SceneRenderer;
@@ -20,7 +22,7 @@ public:
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
-    void setView( int view );
+    void setView( Fn::Orient view );
 
 public slots:
     void update();

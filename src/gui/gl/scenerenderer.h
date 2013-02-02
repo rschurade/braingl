@@ -8,6 +8,8 @@
 #ifndef SCENERENDERER_H_
 #define SCENERENDERER_H_
 
+#include "../../data/enums.h"
+
 #include <QtGui/QMatrix4x4>
 
 class ArcBall;
@@ -31,7 +33,7 @@ public:
 	void middleMouseDown( int x, int y );
 	void middleMouseDrag( int x, int y );
 	void mouseWheel( int step );
-	void setView( int view );
+	void setView( Fn::Orient view );
 
 	void calcMVPMatrix();
 

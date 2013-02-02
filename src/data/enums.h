@@ -50,11 +50,20 @@ namespace Fn
         FIBER_THINNING,
         TRACT_DENSITY
     };
+
+    enum class Orient : int
+    {
+        NONE,
+        AXIAL,
+        CORONAL,
+        SAGITTAL
+    };
 }
 
 Q_DECLARE_METATYPE( Fn::DatasetType )
 Q_DECLARE_METATYPE( Fn::Colormap )
 Q_DECLARE_METATYPE( Fn::Algo )
+Q_DECLARE_METATYPE( Fn::Orient )
 
 // dataset properties
 enum FN_PROPERTY
@@ -132,14 +141,6 @@ enum FN_PROPERTY
     FNGLOBAL_BBX,
     FNGLOBAL_BBY,
     FNGLOBAL_VIEW
-};
-
-enum FN_ORIENT
-{
-    FN_NONE,
-    FN_AXIAL,
-    FN_CORONAL,
-    FN_SAGITTAL
 };
 
 #endif /* ENUMS_H_ */
