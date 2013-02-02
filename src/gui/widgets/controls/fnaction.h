@@ -17,17 +17,17 @@ class FNAction : public QAction
     Q_OBJECT
 
 public:
-    FNAction( const QIcon &icon, const QString &text, QObject *parent, FN_ALGO algo );
+    FNAction( const QIcon &icon, const QString &text, QObject *parent, Fn::Algo algo );
     virtual ~FNAction();
 
 private:
-    FN_ALGO m_algo;
+    Fn::Algo m_algo;
 
 private slots:
     void slotTriggered();
 
 signals:
-    void sigTriggered( FN_ALGO algo );
+    void sigTriggered( Fn::Algo algo );
 };
 
 #endif /* FNACTION_H_ */

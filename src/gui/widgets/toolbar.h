@@ -55,7 +55,7 @@ private:
     void createActions();
 
 private slots:
-    void slot( FN_ALGO algo );
+    void slot( Fn::Algo algo );
     void slotSelectionChanged( int type );
 
     void tensorTrackFinished();

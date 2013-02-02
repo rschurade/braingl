@@ -47,7 +47,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> > data, n
         m_data.push_back( m );
     }
 
-    m_properties.set( FNPROP_CREATED_BY, FNALGO_TENSORFIT );
+    m_properties.set( FNPROP_CREATED_BY, (int)Fn::Algo::TENSORFIT );
     m_properties.set( FNPROP_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
     m_properties.set( FNPROP_EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
     m_properties.set( FNPROP_GAMMA, 0.1f, 0.0f, 10.0f, true );
@@ -246,6 +246,6 @@ QString DatasetTensor::getValueAsString( int x, int y, int z )
     int ny = m_properties.get( FNPROP_NY ).toInt();
     Matrix data = m_data.at( x + y * nx + z * nx * ny );
     return QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
-            + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );;
+            + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );
 }
 

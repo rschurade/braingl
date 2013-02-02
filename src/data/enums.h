@@ -1,6 +1,8 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+#include <QtCore/QMetaType>
+
 namespace Fn
 {
     enum class DatasetType : int
@@ -29,26 +31,30 @@ namespace Fn
              // other colormaps use float packing
     };
 
+    enum class Algo : int
+    {
+        NONE,
+        TEST,
+        QBALL,
+        QBALL4,
+        QBALL6,
+        QBALL8,
+        TENSORFIT,
+        FA,
+        EV,
+        BINGHAM,
+        ISOSURFACE,
+        TENSOR_TRACK,
+        CROSSING_TRACK,
+        BINGHAM_2_TENSOR,
+        FIBER_THINNING,
+        TRACT_DENSITY
+    };
 }
-enum FN_ALGO
-{
-    FNALGO_NONE,
-    FNALGO_TEST,
-    FNALGO_QBALL,
-    FNALGO_QBALL4,
-    FNALGO_QBALL6,
-    FNALGO_QBALL8,
-    FNALGO_TENSORFIT,
-    FNALGO_FA,
-    FNALGO_EV,
-    FNALGO_BINGHAM,
-    FNALGO_ISOSURFACE,
-    FNALGO_TENSOR_TRACK,
-    FNALGO_CROSSING_TRACK,
-    FNALGO_BINGHAM_2_TENSOR,
-    FNALGO_FIBER_THINNING,
-    FNALGO_TRACT_DENSITY
-};
+
+Q_DECLARE_METATYPE( Fn::DatasetType )
+Q_DECLARE_METATYPE( Fn::Colormap )
+Q_DECLARE_METATYPE( Fn::Algo )
 
 // dataset properties
 enum FN_PROPERTY
