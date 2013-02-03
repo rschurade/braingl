@@ -17,6 +17,7 @@ SelectionBoxWidget::SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget
 {
     m_treeView = new SelectionBoxTreeView( this );
     m_treeView->setModel( selBoxModel );
+    m_treeView->hideColumn( 1 );
     connect( m_treeView, SIGNAL( clicked( QModelIndex ) ), this, SLOT( treeClicked() ) );
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
