@@ -202,7 +202,7 @@ namespace Fn
     };
 
     struct Global2String {
-        static QString s( Property p )
+        static QString s( Global p )
         {
             switch( p )
             {

@@ -20,9 +20,9 @@ GlobalPropertyWidget::GlobalPropertyWidget( QWidget* parent ) :
     m_layout->setContentsMargins( 1, 0, 1, 0 );
     m_layout->setSpacing( 1 );
 
-    m_sagittalSlider = new SliderWithEditInt( "sagittal", (int)Fn::Property::GLOBAL_SAGITTAL );
-    m_coronalSlider = new SliderWithEditInt( "coronal", (int)Fn::Property::GLOBAL_CORONAL );
-    m_axialSlider = new SliderWithEditInt( "axial", (int)Fn::Property::GLOBAL_AXIAL );
+    m_sagittalSlider = new SliderWithEditInt( "sagittal", (int)Fn::Global::SAGITTAL );
+    m_coronalSlider = new SliderWithEditInt( "coronal", (int)Fn::Global::CORONAL );
+    m_axialSlider = new SliderWithEditInt( "axial", (int)Fn::Global::AXIAL );
 
     m_layout->addWidget( m_sagittalSlider );
     m_layout->addWidget( m_coronalSlider );
@@ -55,34 +55,34 @@ void GlobalPropertyWidget::sliderChanged( int value, int id )
 void GlobalPropertyWidget::dataChanged()
 {
     QModelIndex mi;
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::SAGITTAL, 0 );
     if ( mi.isValid() )
     {
         m_sagittalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
     }
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 );
     if ( mi.isValid() )
     {
         m_sagittalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
     }
 
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::CORONAL, 0 );
     if ( mi.isValid() )
     {
         m_coronalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
     }
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_CORONAL, 0 );
     if ( mi.isValid() )
     {
         m_coronalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
     }
 
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::AXIAL, 0 );
     if ( mi.isValid() )
     {
         m_axialSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
     }
-    mi = m_propertyView->model()->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 );
+    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_AXIAL, 0 );
     if ( mi.isValid() )
     {
         m_axialSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );

@@ -65,7 +65,7 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 	{
 	    QString lastPath = settings.value( "lastPath" ).toString();
 	    qDebug() << "last path" << lastPath;
-	    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ), lastPath );
+	    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
 	}
 	if ( settings.contains( "lockDockTitles") )
 	{
@@ -82,7 +82,7 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	settings.setValue( "mainWindowGeometry", saveGeometry() );
 	settings.setValue( "mainWindowState", saveState() );
 
-	settings.setValue( "lastPath", m_globalProps->data( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ) ).toString() );
+	settings.setValue( "lastPath", m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString() );
 	settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
 }
 
@@ -92,7 +92,7 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ) ).toString();
+    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
     {
@@ -108,13 +108,13 @@ void MainWindow::open()
         QFileInfo fi( fileName );
         QDir dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ), lastPath );
+        m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
     }
 }
 
 void MainWindow::save()
 {
-    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ) ).toString();
+    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
     if ( !fileName.isEmpty() )
@@ -151,7 +151,7 @@ void MainWindow::save()
         QFileInfo fi( fileName );
         dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_LAST_PATH, 0 ), lastPath );
+        m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
     }
 }
 
@@ -442,34 +442,34 @@ void MainWindow::slotAddTabAxial()
 
 void MainWindow::slotToggleAxialSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
 }
 
 void  MainWindow::slotStandardAxialView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_VIEW, 0 ), (int)Fn::Orient::AXIAL );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::AXIAL );
     mainGLWidget->setView( Fn::Orient::AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_VIEW, 0 ), (int)Fn::Orient::CORONAL );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::CORONAL );
     mainGLWidget->setView( Fn::Orient::CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::GLOBAL_VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
     mainGLWidget->setView( Fn::Orient::SAGITTAL );
 }
 
@@ -486,7 +486,7 @@ void MainWindow::slotToggleDockTitles( bool value )
 
 void MainWindow::slotRenderCrosshairs( bool value )
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Property::SETTING_RENDER_CROSSHAIRS, 0 ), value );
+    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::RENDER_CROSSHAIRS, 0 ), value );
 }
 
 void MainWindow::slotNewSelectionBox()

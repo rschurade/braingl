@@ -96,7 +96,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     m_globalInfo = "[";
 
     QModelIndex mi;
-    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 );
     if ( mi.isValid() )
     {
         m_x = m_globalModel->data( mi ).toInt();
@@ -104,7 +104,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_CORONAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Global::CORONAL, 0 );
     if ( mi.isValid() )
     {
         m_y = m_globalModel->data( mi ).toInt();
@@ -112,7 +112,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( (int)Fn::Property::GLOBAL_AXIAL, 0 );
+    mi = m_globalModel->index( (int)Fn::Global::AXIAL, 0 );
     if ( mi.isValid() )
     {
         m_z = m_globalModel->data( mi ).toInt();
