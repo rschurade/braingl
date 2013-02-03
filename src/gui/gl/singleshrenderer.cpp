@@ -132,15 +132,15 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Property::GLOBAL_SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( (int)Fn::Property::GLOBAL_CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( (int)Fn::Property::GLOBAL_AXIAL, 0 ) ).toFloat();
+    m_x = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
-    int xbi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 ) ).toInt();
-    int ybi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 ) ).toInt();
-    //int zbi = model()->data( model()->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 ) ).toInt();
+    int xbi = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
+    int ybi = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
+    //int zbi = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 

@@ -8,7 +8,7 @@
 #ifndef GLOBALPROPERTYMODEL_H_
 #define GLOBALPROPERTYMODEL_H_
 
-#include "properties/propertygroup.h"
+#include "properties/globalpropertygroup.h"
 
 #include <QtCore/QAbstractItemModel>
 
@@ -30,7 +30,7 @@ public:
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
 
 private:
-    PropertyGroup m_properties;
+    GlobalPropertyGroup m_properties;
 };
 
 #endif /* GLOBALPROPERTYMODEL_H_ */

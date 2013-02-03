@@ -12,30 +12,29 @@
 
 GlobalPropertyModel::GlobalPropertyModel()
 {
-    m_properties.set( Fn::Property::NAME, QString("global properties") );
-    m_properties.set( Fn::Property::GLOBAL_AXIAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_CORONAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_SAGITTAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_MAX_AXIAL, 1 );
-    m_properties.set( Fn::Property::GLOBAL_MAX_CORONAL, 1 );
-    m_properties.set( Fn::Property::GLOBAL_MAX_SAGITTAL, 1 );
-    m_properties.set( Fn::Property::GLOBAL_SLICE_DX, 1.0f );
-    m_properties.set( Fn::Property::GLOBAL_SLICE_DY, 1.0f );
-    m_properties.set( Fn::Property::GLOBAL_SLICE_DZ, 1.0f );
-    m_properties.set( Fn::Property::GLOBAL_LAST_PATH, QString("") );
-    m_properties.set( Fn::Property::GLOBAL_SHOW_AXIAL, true );
-    m_properties.set( Fn::Property::GLOBAL_SHOW_CORONAL, true );
-    m_properties.set( Fn::Property::GLOBAL_SHOW_SAGITTAL, true );
-    m_properties.set( Fn::Property::GLOBAL_CORONAL_AXIAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_SAGITTAL_AXIAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_SAGITTAL_CORONAL, 0 );
-    m_properties.set( Fn::Property::GLOBAL_ZOOM, 1.0f );
-    m_properties.set( Fn::Property::GLOBAL_MOVEX, 0 );
-    m_properties.set( Fn::Property::GLOBAL_MOVEY, 0 );
-    m_properties.set( Fn::Property::GLOBAL_BBX, 0 );
-    m_properties.set( Fn::Property::GLOBAL_BBY, 0 );
-    m_properties.set( Fn::Property::GLOBAL_VIEW, 0 );
-    m_properties.set( Fn::Property::SETTING_RENDER_CROSSHAIRS, true );
+    m_properties.set( Fn::Global::AXIAL, 0 );
+    m_properties.set( Fn::Global::CORONAL, 0 );
+    m_properties.set( Fn::Global::SAGITTAL, 0 );
+    m_properties.set( Fn::Global::MAX_AXIAL, 1 );
+    m_properties.set( Fn::Global::MAX_CORONAL, 1 );
+    m_properties.set( Fn::Global::MAX_SAGITTAL, 1 );
+    m_properties.set( Fn::Global::SLICE_DX, 1.0f );
+    m_properties.set( Fn::Global::SLICE_DY, 1.0f );
+    m_properties.set( Fn::Global::SLICE_DZ, 1.0f );
+    m_properties.set( Fn::Global::LAST_PATH, QString("") );
+    m_properties.set( Fn::Global::SHOW_AXIAL, true );
+    m_properties.set( Fn::Global::SHOW_CORONAL, true );
+    m_properties.set( Fn::Global::SHOW_SAGITTAL, true );
+    m_properties.set( Fn::Global::CORONAL_AXIAL, 0 );
+    m_properties.set( Fn::Global::SAGITTAL_AXIAL, 0 );
+    m_properties.set( Fn::Global::SAGITTAL_CORONAL, 0 );
+    m_properties.set( Fn::Global::ZOOM, 1.0f );
+    m_properties.set( Fn::Global::MOVEX, 0 );
+    m_properties.set( Fn::Global::MOVEY, 0 );
+    m_properties.set( Fn::Global::BBX, 0 );
+    m_properties.set( Fn::Global::BBY, 0 );
+    m_properties.set( Fn::Global::VIEW, 0 );
+    m_properties.set( Fn::Global::RENDER_CROSSHAIRS, true );
 }
 
 GlobalPropertyModel::~GlobalPropertyModel()
@@ -54,7 +53,7 @@ int GlobalPropertyModel::columnCount( const QModelIndex &parent ) const
 
 QVariant GlobalPropertyModel::data( const QModelIndex &index, int role ) const
 {
-    return m_properties.get( (Fn::Property)index.row() );
+    return m_properties.get( (Fn::Global)index.row() );
 }
 
 QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientation, int role ) const
@@ -63,7 +62,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
     {
         if ( orientation == Qt::Vertical )
         {
-            return QString( Fn::Prop2String::s( (Fn::Property)section ) );
+            return QString( Fn::Global2String::s( (Fn::Global)section ) );
         }
 
     }
@@ -72,7 +71,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
 
 QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    if ( m_properties.contains( (Fn::Property)row ) )
+    if ( m_properties.contains( (Fn::Global)row ) )
     {
         return createIndex( row, 0, 0 );
     }
@@ -86,26 +85,26 @@ QModelIndex GlobalPropertyModel::parent( const QModelIndex & index ) const
 
 bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
-    switch( (Fn::Property)index.row() )
+    switch( (Fn::Global)index.row() )
     {
-        case Fn::Property::GLOBAL_CORONAL_AXIAL:
-            m_properties.set( Fn::Property::GLOBAL_CORONAL, value.toPoint().x() );
-            m_properties.set( Fn::Property::GLOBAL_AXIAL, value.toPoint().y() );
+        case Fn::Global::CORONAL_AXIAL:
+            m_properties.set( Fn::Global::CORONAL, value.toPoint().x() );
+            m_properties.set( Fn::Global::AXIAL, value.toPoint().y() );
             break;
-        case Fn::Property::GLOBAL_SAGITTAL_AXIAL:
-            m_properties.set( Fn::Property::GLOBAL_SAGITTAL, value.toPoint().x() );
-            m_properties.set( Fn::Property::GLOBAL_AXIAL, value.toPoint().y() );
+        case Fn::Global::SAGITTAL_AXIAL:
+            m_properties.set( Fn::Global::SAGITTAL, value.toPoint().x() );
+            m_properties.set( Fn::Global::AXIAL, value.toPoint().y() );
             break;
-        case Fn::Property::GLOBAL_SAGITTAL_CORONAL:
-            m_properties.set( Fn::Property::GLOBAL_SAGITTAL, value.toPoint().x() );
-            m_properties.set( Fn::Property::GLOBAL_CORONAL, value.toPoint().y() );
+        case Fn::Global::SAGITTAL_CORONAL:
+            m_properties.set( Fn::Global::SAGITTAL, value.toPoint().x() );
+            m_properties.set( Fn::Global::CORONAL, value.toPoint().y() );
             break;
         default:
-            m_properties.set( (Fn::Property)index.row(), value );
+            m_properties.set( (Fn::Global)index.row(), value );
             break;
     }
     // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
-    if ( index.row() < (int)Fn::Property::GLOBAL_ZOOM )
+    if ( index.row() < (int)Fn::Global::ZOOM )
     {
         emit dataChanged( index, index );
     }

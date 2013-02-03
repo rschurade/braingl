@@ -104,12 +104,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::calcMVPMatrix()
 {
-    m_nx = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_MAX_AXIAL, 0 ) ).toFloat();
-    float dx = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DX, 0 ) ).toFloat();
-    float dy = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DY, 0 ) ).toFloat();
-    float dz = m_globalModel->data( m_globalModel->index( (int)Fn::Property::GLOBAL_SLICE_DZ, 0 ) ).toFloat();
+    m_nx = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
+    float dx = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
@@ -142,11 +142,11 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = pMatrix * m_mvMatrix;
 
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_ZOOM, 0 ), m_arcBall->getZoom() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_MOVEX, 0 ), m_arcBall->getMoveX() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_MOVEY, 0 ), m_arcBall->getMoveY() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_BBX, 0 ), bbx );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Property::GLOBAL_BBY, 0 ), bby );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::MOVEY, 0 ), m_arcBall->getMoveY() );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::BBX, 0 ), bbx );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::BBY, 0 ), bby );
 
     //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
