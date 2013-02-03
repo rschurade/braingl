@@ -138,6 +138,91 @@ namespace Fn
         GLOBAL_BBY,
         GLOBAL_VIEW
     };
+
+    struct Property2String {
+        static QString s( Property p )
+        {
+            switch( p )
+            {
+            case Property::NAME: return QString( "name" ); break;
+            case Property::DIM: return QString( "dim" ); break;
+            case Property::DATATYPE: return QString( "data type" ); break;
+            case Property::SIZE: return QString( "size" ); break;
+            case Property::NX: return QString( "nx" ); break;
+            case Property::NY: return QString( "ny" ); break;
+            case Property::NZ: return QString( "nz" ); break;
+            case Property::DX: return QString( "dx" ); break;
+            case Property::DY: return QString( "dy" ); break;
+            case Property::DZ: return QString( "dz" ); break;
+            case Property::MIN: return QString( "min" ); break;
+            case Property::MAX: return QString( "max" ); break;
+            case Property::TYPE: return QString( "type" ); break;
+            case Property::CREATED_BY: return QString( "created by" ); break;
+            case Property::FILENAME: return QString( "filename" ); break;
+            case Property::LOWER_THRESHOLD: return QString( "lower threshold" ); break;
+            case Property::UPPER_THRESHOLD: return QString( "upper threshold" ); break;
+            case Property::COLORMAP: return QString( "colormap" ); break;
+            case Property::INTERPOLATION: return QString( "interpolation" ); break;
+            case Property::ALPHA: return QString( "alpha" ); break;
+            case Property::ACTIVE: return QString( "active" ); break;
+            case Property::ORDER: return QString( "order" ); break;
+            case Property::LOD: return QString( "lod" ); break;
+            case Property::SCALING: return QString( "scaling" ); break;
+            case Property::FA_THRESHOLD: return QString( "fa threshold" ); break;
+            case Property::EV_THRESHOLD: return QString( "ev threshold" ); break;
+            case Property::GAMMA: return QString( "gamma" ); break;
+            case Property::OFFSET: return QString( "offset" ); break;
+            case Property::RENDER_SLICE: return QString( "render slice" ); break;
+            case Property::RENDER_LOWER_X: return QString( "render lower x" ); break;
+            case Property::RENDER_UPPER_X: return QString( "render upper x" ); break;
+            case Property::RENDER_LOWER_Y: return QString( "render lower y" ); break;
+            case Property::RENDER_UPPER_Y: return QString( "render upper y" ); break;
+            case Property::RENDER_LOWER_Z: return QString( "render lower z" ); break;
+            case Property::RENDER_UPPER_Z: return QString( "render upper z" ); break;
+            case Property::MINMAX_SCALING: return QString( "min max scaling" ); break;
+            case Property::BVALUE: return QString( "bvalue" ); break;
+            case Property::TENSOR_RENDERMODE: return QString( "tensor render mode" ); break;
+            case Property::ISO_VALUE: return QString( "iso value" ); break;
+            case Property::NUM_POINTS: return QString( "num points" ); break;
+            case Property::NUM_LINES: return QString( "num lines" ); break;
+            case Property::FIBER_COLORMODE: return QString( "fiber color mode" ); break;
+            case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
+            case Property::TEXTURE_GLUINT: return QString( "texture gluint" ); break;
+            case Property::DATASET_POINTER: return QString( "dataset pointer" ); break;
+            case Property::NEW_DATASET: return QString( "new dataset" ); break;
+            case Property::DATASET_LIST: return QString( "dataset list" ); break;
+            // Settings
+            case Property::SETTING_LOCK_WIDGETS: return QString( "lock widgets" ); break;
+            case Property::SETTING_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break;
+            // Global Settings for rendering
+            case Property::GLOBALS: return QString( "globals" ); break;
+            case Property::GLOBAL_SAGITTAL: return QString( "global sagittal" ); break;
+            case Property::GLOBAL_CORONAL: return QString( "global coronal" ); break;
+            case Property::GLOBAL_AXIAL: return QString( "" ); break;
+            case Property::GLOBAL_MAX_SAGITTAL: return QString( "" ); break;
+            case Property::GLOBAL_MAX_CORONAL: return QString( "" ); break;
+            case Property::GLOBAL_MAX_AXIAL: return QString( "" ); break;
+            case Property::GLOBAL_SLICE_DX: return QString( "" ); break;
+            case Property::GLOBAL_SLICE_DY: return QString( "" ); break;
+            case Property::GLOBAL_SLICE_DZ: return QString( "" ); break;
+            case Property::GLOBAL_CORONAL_AXIAL: return QString( "" ); break;
+            case Property::GLOBAL_SAGITTAL_AXIAL: return QString( "" ); break;
+            case Property::GLOBAL_SAGITTAL_CORONAL: return QString( "" ); break;
+            case Property::GLOBAL_LAST_PATH: return QString( "" ); break;
+            case Property::GLOBAL_SHOW_SAGITTAL: return QString( "" ); break;
+            case Property::GLOBAL_SHOW_CORONAL: return QString( "" ); break;
+            case Property::GLOBAL_SHOW_AXIAL: return QString( "" ); break;
+            // settings that need a datastore signal to update widgets need to be inserted above this line
+            case Property::GLOBAL_ZOOM: return QString( "" ); break;
+            case Property::GLOBAL_MOVEX: return QString( "" ); break;
+            case Property::GLOBAL_MOVEY: return QString( "" ); break;
+            case Property::GLOBAL_BBX: return QString( "" ); break;
+            case Property::GLOBAL_BBY: return QString( "" ); break;
+            case Property::GLOBAL_VIEW: return QString( "" ); break;
+            }
+            return QString( "property not defined" );
+        }
+    };
 }
 
 Q_DECLARE_METATYPE( Fn::DatasetType )
