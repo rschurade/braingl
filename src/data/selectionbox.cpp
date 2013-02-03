@@ -7,8 +7,10 @@
 
 #include "selectionbox.h"
 
-SelectionBox::SelectionBox()
+SelectionBox::SelectionBox( QString name )
 {
+    m_properties.set( Fn::Property::NAME, name );
+    m_properties.set( Fn::Property::ACTIVE, true );
 }
 
 SelectionBox::~SelectionBox()

@@ -10,6 +10,8 @@
 
 #include <QtCore/QAbstractItemModel>
 
+class SelectionBox;
+
 class SelectionBoxModel : public QAbstractItemModel
 {
 public:
@@ -29,6 +31,8 @@ public:
     bool insertRows( int row, int count, const QModelIndex &parent=QModelIndex() );
 
 private:
+    QList< QList<SelectionBox*> >m_boxes;
+    int m_count;
 
 };
 
