@@ -8,13 +8,13 @@
 
 #include "../../gui/widgets/controls/sliderwithedit.h"
 
-PropertyFloat::PropertyFloat( Fn::Property name, float value, float min, float max ) :
+PropertyFloat::PropertyFloat( QString name, float value, float min, float max ) :
     Property( name ),
     m_value( value ),
     m_min( min ),
     m_max( max )
 {
-    m_widget = new SliderWithEdit( m_label );
+    m_widget = new SliderWithEdit( m_name );
     m_widget->setMin( min );
     m_widget->setMax( max );
     m_widget->setValue( value );

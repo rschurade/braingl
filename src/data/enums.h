@@ -139,7 +139,7 @@ namespace Fn
         GLOBAL_VIEW
     };
 
-    struct Property2String {
+    struct Prop2String {
         static QString s( Property p )
         {
             switch( p )

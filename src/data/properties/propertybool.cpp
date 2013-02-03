@@ -8,11 +8,11 @@
 
 #include "../../gui/widgets/controls/checkboxwithlabel.h"
 
-PropertyBool::PropertyBool( Fn::Property name, bool value ) :
+PropertyBool::PropertyBool( QString name, bool value ) :
     Property( name ),
     m_value( value )
 {
-    m_widget = new CheckboxWithLabel( m_label );
+    m_widget = new CheckboxWithLabel( m_name );
     m_widget->setChecked( value );
     connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
 }

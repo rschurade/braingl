@@ -8,11 +8,11 @@
 
 #include "../../gui/widgets/controls/editwithlabel.h"
 
-PropertyString::PropertyString( Fn::Property name, QString value ) :
+PropertyString::PropertyString( QString name, QString value ) :
     Property( name ),
     m_value( value )
 {
-    m_widget = new EditWithLabel( m_label );
+    m_widget = new EditWithLabel( m_name );
     m_widget->setText( value );
     connect( m_widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );
 }

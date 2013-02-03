@@ -8,13 +8,13 @@
 
 #include "../../gui/widgets/controls/sliderwitheditint.h"
 
-PropertyInt::PropertyInt( Fn::Property name, int value, int min, int max ) :
+PropertyInt::PropertyInt( QString name, int value, int min, int max ) :
     Property( name ),
     m_value( value ),
     m_min( min ),
     m_max( max )
 {
-    m_widget = new SliderWithEditInt( m_label );
+    m_widget = new SliderWithEditInt( m_name );
     m_widget->setMin( min );
     m_widget->setMax( max );
     m_widget->setValue( value );

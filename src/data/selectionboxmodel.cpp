@@ -114,7 +114,7 @@ QVariant SelectionBoxModel::headerData( int section, Qt::Orientation orientation
         {
             if ( orientation == Qt::Horizontal )
             {
-                return QString( Fn::Property2String::s( (Fn::Property)section ) );
+                return QString( Fn::Prop2String::s( (Fn::Property)section ) );
             }
             break;
         }

@@ -4,28 +4,28 @@
  *  Created on: Jan 17, 2013
  *      Author: schurade
  */
-#include "propertygroup.h"
+#include "globalpropertygroup.h"
 
 #include <QtCore/QDebug>
 
-PropertyGroup::PropertyGroup()
+GlobalPropertyGroup::GlobalPropertyGroup()
 {
 }
 
-PropertyGroup::~PropertyGroup()
+GlobalPropertyGroup::~GlobalPropertyGroup()
 {
 }
 
-bool PropertyGroup::contains( Fn::Property name ) const
+bool GlobalPropertyGroup::contains( int name ) const
 {
-    return m_properties.contains( (int)name );
+    return m_properties.contains( name );
 }
 
-QVariant PropertyGroup::get( Fn::Property name ) const
+QVariant GlobalPropertyGroup::get( int name ) const
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        return m_properties[(int)name]->getValue();
+        return m_properties[name]->getValue();
     }
     else
     {
@@ -35,11 +35,11 @@ QVariant PropertyGroup::get( Fn::Property name ) const
     }
 }
 
-bool PropertyGroup::set( Fn::Property name, QVariant value )
+bool GlobalPropertyGroup::set( int name, QVariant value )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        m_properties[name]->setValue( value );
         return true;
     }
     else
@@ -50,16 +50,16 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
     }
 }
 
-bool PropertyGroup::set( Fn::Property name, bool value, bool visible )
+bool GlobalPropertyGroup::set( int name, bool value, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        m_properties[name]->setValue( value );
     }
     else
     {
         PropertyBool* prop = new PropertyBool( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -69,16 +69,16 @@ bool PropertyGroup::set( Fn::Property name, bool value, bool visible )
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, int value, bool visible )
+bool GlobalPropertyGroup::set( int name, int value, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        m_properties[name]->setValue( value );
     }
     else
     {
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -88,16 +88,16 @@ bool PropertyGroup::set( Fn::Property name, int value, bool visible )
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, int value, int min, int max, bool visible )
+bool GlobalPropertyGroup::set( int name, int value, int min, int max, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
         return false;
     }
     else
     {
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -107,16 +107,16 @@ bool PropertyGroup::set( Fn::Property name, int value, int min, int max, bool vi
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, float value, bool visible )
+bool GlobalPropertyGroup::set( int name, float value, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        m_properties[name]->setValue( value );
     }
     else
     {
         PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -126,14 +126,14 @@ bool PropertyGroup::set( Fn::Property name, float value, bool visible )
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, float value, float min, float max, bool visible )
+bool GlobalPropertyGroup::set( int name, float value, float min, float max, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
         return false;
     }
     PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
-    m_properties[(int)name] = prop;
+    m_properties[name] = prop;
     connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
     if ( visible )
     {
@@ -142,16 +142,16 @@ bool PropertyGroup::set( Fn::Property name, float value, float min, float max, b
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, QString value, bool visible )
+bool GlobalPropertyGroup::set( int name, QString value, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        m_properties[name]->setValue( value );
     }
     else
     {
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -161,16 +161,16 @@ bool PropertyGroup::set( Fn::Property name, QString value, bool visible )
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, const char* value, bool visible )
+bool GlobalPropertyGroup::set( int name, const char* value, bool visible )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( m_properties.contains( name ) )
     {
-        m_properties[(int)name]->setValue( QString( value ) );
+        m_properties[name]->setValue( QString( value ) );
     }
     else
     {
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), QString( value ) );
-        m_properties[(int)name] = prop;
+        m_properties[name] = prop;
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
         if ( visible )
         {
@@ -180,14 +180,14 @@ bool PropertyGroup::set( Fn::Property name, const char* value, bool visible )
     return true;
 }
 
-QList<Fn::Property> PropertyGroup::getVisible()
+QList<int> GlobalPropertyGroup::getVisible()
 {
     return m_visible;
 }
 
-QWidget* PropertyGroup::getWidget( Fn::Property name )
+QWidget* GlobalPropertyGroup::getWidget( int name )
 {
-    return m_properties[(int)name]->getWidget();
+    return m_properties[name]->getWidget();
 }
 
 void PropertyGroup::slotPropChanged()
@@ -195,7 +195,7 @@ void PropertyGroup::slotPropChanged()
     signalPropChanged();
 }
 
-int PropertyGroup::size() const
+int GlobalPropertyGroup::size() const
 {
     return m_properties.size();
 }

@@ -6,9 +6,8 @@
  */
 #include "property.h"
 
-Property::Property( Fn::Property name ) :
-    m_name( name ),
-    m_label( Fn::Property2String::s( name ) )
+Property::Property( QString name ) :
+    m_name( name )
 {
 }
 
@@ -16,13 +15,8 @@ Property::~Property()
 {
 }
 
-Fn::Property Property::getName()
+QString Property::getName()
 {
     return m_name;
-}
-
-QString Property::getLabel()
-{
-    return m_label;
 }
 

@@ -20,7 +20,7 @@ class PropertyString : public Property
     Q_OBJECT
 
 public:
-    PropertyString( Fn::Property name, QString value = ""  );
+    PropertyString( QString name, QString value = ""  );
     virtual ~PropertyString();
 
     QWidget* getWidget();
