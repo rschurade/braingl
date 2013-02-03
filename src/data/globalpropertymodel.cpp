@@ -63,7 +63,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
     {
         if ( orientation == Qt::Vertical )
         {
-            return QString( Property::getNameAsString( (Fn::Property)section ) );
+            return QString( Fn::Property2String::s( (Fn::Property)section ) );
         }
 
     }

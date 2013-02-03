@@ -30,8 +30,6 @@ public:
     virtual QVariant getValue() = 0;
     virtual void setValue( QVariant value ) = 0;
 
-    static QString getNameAsString( Fn::Property name );
-
 protected:
     Fn::Property m_name; // used for access
     QString m_label; // used for label in the dataset property view
