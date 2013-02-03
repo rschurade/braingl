@@ -42,7 +42,7 @@ int ROIModel::rowCount( const QModelIndex &parent ) const
 
 int ROIModel::columnCount( const QModelIndex &parent ) const
 {
-    return 2;
+    return 1;
 }
 
 QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) const
@@ -193,6 +193,5 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         }
         endInsertRows();
     }
-
     return true;
 }
