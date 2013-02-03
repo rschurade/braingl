@@ -65,7 +65,7 @@ QModelIndex ROIPropertyView::getSelectedIndex( int column )
     {
         int sel = -1;
         sel = m_selected.indexes().first().row();
-        QModelIndex index = model()->index( sel, column );
+        QModelIndex index = model()->index( sel, column, model()->parent( m_selected.indexes().first() ) );
         return index;
     }
     return QModelIndex();
