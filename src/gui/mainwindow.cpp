@@ -9,7 +9,7 @@
 #include "widgets/docknavglwidget.h"
 #include "widgets/combinednavglwidget.h"
 #include "widgets/singleshwidget.h"
-#include "widgets/selectionboxwidget.h"
+#include "widgets/roiwidget.h"
 #include "widgets/datasetlistwidget.h"
 #include "widgets/navglwidget.h"
 #include "widgets/combinednavglwidget.h"
@@ -19,7 +19,7 @@
 
 #include "../data/datastore.h"
 #include "../data/globalpropertymodel.h"
-#include "../data/selectionboxmodel.h"
+#include "../data/roimodel.h"
 #include "../data/loader.h"
 #include "../data/writer.h"
 #include "../data/vptr.h"
@@ -27,11 +27,11 @@
 
 #include <QtGui/QtGui>
 
-MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, SelectionBoxModel* selBoxModel, bool debug ) :
+MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
     m_globalProps( globalProps ),
-    m_selBoxModel( selBoxModel ),
+    m_roiModel( roiModel ),
     m_debug( debug )
 {
 	m_centralTabWidget = new QTabWidget( this );
@@ -343,12 +343,12 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	SelectionBoxWidget* selectionBoxWidget = new SelectionBoxWidget( m_selBoxModel, this );
-	FNDockWidget* dockSBW = new FNDockWidget( QString("Selection Boxes"), selectionBoxWidget, this );
+	ROIWidget* roiWidget = new ROIWidget( m_roiModel, this );
+	FNDockWidget* dockSBW = new FNDockWidget( QString("Selection Boxes"), roiWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
-    connect( newSelectionBoxAct, SIGNAL( triggered() ), selectionBoxWidget, SLOT( addBox() ) );
+    connect( newSelectionBoxAct, SIGNAL( triggered() ), roiWidget, SLOT( addBox() ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( this );
 	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );

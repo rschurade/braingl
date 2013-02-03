@@ -1,22 +1,22 @@
 /*
- * selectionboxtreeview.cpp
+ * sroitreeview.cpp
  *
  *  Created on: 03.02.2013
  *      Author: Ralph
  */
 
-#include "selectionboxtreeview.h"
+#include "roitreeview.h"
 
-SelectionBoxTreeView::SelectionBoxTreeView( QWidget* parent ) :
+ROITreeView::ROITreeView( QWidget* parent ) :
     QTreeView( parent )
 {
 }
 
-SelectionBoxTreeView::~SelectionBoxTreeView()
+ROITreeView::~ROITreeView()
 {
 }
 
-void SelectionBoxTreeView::addBox()
+void ROITreeView::addBox()
 {
     if ( selectionModel()->selectedRows().size() > 0 )
     {
@@ -29,7 +29,7 @@ void SelectionBoxTreeView::addBox()
     }
 }
 
-void SelectionBoxTreeView::mousePressEvent(QMouseEvent *event)
+void ROITreeView::mousePressEvent(QMouseEvent *event)
 {
     QModelIndex item = indexAt( event->pos() );
     bool selected = selectionModel()->isSelected( indexAt( event->pos() ) );
