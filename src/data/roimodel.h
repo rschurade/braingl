@@ -14,6 +14,8 @@ class ROI;
 
 class ROIModel : public QAbstractItemModel
 {
+    Q_OBJECT
+
 public:
     ROIModel( QAbstractItemModel* globalProps );
     virtual ~ROIModel();
@@ -31,8 +33,13 @@ public:
     bool insertRows( int row, int count, const QModelIndex &parent=QModelIndex() );
 
 private:
-    QList< QList<ROI*> >m_boxes;
+    QAbstractItemModel* m_globalProps;
+
+    QList< QList<QVariant> >m_boxes;
     int m_count;
+
+public slots:
+    void propChanged();
 
 };
 

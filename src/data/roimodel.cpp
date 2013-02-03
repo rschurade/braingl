@@ -7,10 +7,12 @@
 #include "roimodel.h"
 
 #include "selectionbox.h"
+#include "vptr.h"
 
 #include <QtCore/QDebug>
 
 ROIModel::ROIModel( QAbstractItemModel* globalProps ) :
+    m_globalProps( globalProps ),
     m_count( 0 )
 {
 
@@ -73,30 +75,42 @@ QModelIndex ROIModel::parent( const QModelIndex & index ) const
 
 QVariant ROIModel::data( const QModelIndex &index, int role ) const
 {
-    //qDebug() << "data";
+    QVariant roi;
     switch ( role )
     {
         case Qt::CheckStateRole:
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->get( Fn::ROI::ACTIVE );
+                roi = m_boxes[index.row()][0];
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::ACTIVE );
+                roi = m_boxes[index.internalId()][index.row()+1];
             }
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::ACTIVE );
             break;
         }
         case Qt::DisplayRole:
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->get( Fn::ROI::NAME );
+                roi = m_boxes[index.row()][0];
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::NAME );
+                roi = m_boxes[index.internalId()][index.row()+1];
+            }
+            switch ( (Fn::ROI)index.column() )
+            {
+                case Fn::ROI::POINTER:
+                {
+                    return roi;
+                    break;
+                }
+                default:
+                    return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::NAME );
+                    break;
             }
             break;
         }
@@ -130,11 +144,11 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->set( Fn::ROI::ACTIVE, !m_boxes[index.row()][0]->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                return VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->set( Fn::ROI::ACTIVE, !m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                return VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             break;
         }
@@ -168,30 +182,43 @@ Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
 
 bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
 {
+    int x = m_globalProps->data( m_globalProps->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+    int y = m_globalProps->data( m_globalProps->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+    int z = m_globalProps->data( m_globalProps->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    float dx = 5;
+    float dy = 5;
+    float dz = 5;
+    QString name = QString("new box") + QString::number( m_count++ );
+    SelectionBox* newBox = new SelectionBox( name, x, y, z, dx, dy, dz, false );
+    connect( newBox->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     //qDebug() << parent << parent.isValid();
     if ( !parent.isValid() )
     {
-        QList<ROI*>l;
-        SelectionBox* newBox = new SelectionBox( QString("new top box") + QString::number( m_count++ ) );
-        l.push_back( newBox );
-
+        QList<QVariant>l;
+        l.push_back( VPtr<ROI>::asQVariant( newBox ) );
         beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
         m_boxes.push_back( l );
         endInsertRows();
     }
     else
     {
-        SelectionBox* newBox = new SelectionBox( QString("new child box") + QString::number( m_count++ ) );
         beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
         if ( parent.internalId() == -1 )
         {
-            m_boxes[parent.row()].push_back( newBox );
+            m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }
         else
         {
-            m_boxes[parent.internalId()].push_back( newBox );
+            m_boxes[parent.internalId()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }
         endInsertRows();
     }
     return true;
 }
+
+void ROIModel::propChanged()
+{
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
+
+}
+

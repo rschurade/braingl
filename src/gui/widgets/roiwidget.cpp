@@ -68,3 +68,8 @@ void ROIWidget::addBox()
 void ROIWidget::treeClicked()
 {
 }
+
+QItemSelectionModel* ROIWidget::selectionModel()
+{
+    return m_treeView->selectionModel();
+}

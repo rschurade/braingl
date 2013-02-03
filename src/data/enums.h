@@ -250,6 +250,7 @@ namespace Fn
         NEG,
         TYPE,
         ACTIVE,
+        POINTER
     };
 
     struct ROI2String {
@@ -267,9 +268,16 @@ namespace Fn
                 case ROI::NEG: return QString( "neg" ); break;
                 case ROI::TYPE: return QString( "type" ); break;
                 case ROI::ACTIVE: return QString( "active" ); break;
+                case ROI::POINTER: return QString( "pointer" ); break;
             }
         return QString( "property not defined" );
         }
+    };
+
+    enum class ROIType : int
+    {
+        Box,
+        Potato
     };
 }
 

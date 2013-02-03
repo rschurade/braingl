@@ -10,6 +10,7 @@ class QTabWidget;
 class QTableView;
 
 class DatasetListWidget;
+class ROIWidget;
 class ShaderEditWidget;
 
 class DataStore;
@@ -68,6 +69,7 @@ private:
 
     GLWidget* mainGLWidget;
     DatasetListWidget* m_datasetWidget;
+    ROIWidget* m_roiWidget;
     QTabWidget* m_centralTabWidget;
     ShaderEditWidget* m_shaderEditWidget;
 

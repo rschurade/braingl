@@ -19,7 +19,7 @@ public:
 
     ROIPropertyGroup* properties();
 
-private:
+protected:
     ROIPropertyGroup m_properties;
 };
 
