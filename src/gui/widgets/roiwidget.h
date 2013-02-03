@@ -13,7 +13,7 @@
 class QAbstractItemModel;
 class QVBoxLayout;
 class QPushButton;
-
+class QItemSelectionModel;
 class ROITreeView;
 
 class ROIWidget : public QFrame
@@ -23,6 +23,8 @@ class ROIWidget : public QFrame
 public:
     ROIWidget( QAbstractItemModel* ROIModel, QWidget* parent = 0 );
     virtual ~ROIWidget();
+
+    QItemSelectionModel* selectionModel();
 
 private:
     ROITreeView* m_treeView;

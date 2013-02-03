@@ -5,6 +5,7 @@
 #include "widgets/glwidget.h"
 #include "widgets/fndockwidget.h"
 #include "widgets/datasetpropertywidget.h"
+#include "widgets/roipropertywidget.h"
 #include "widgets/globalpropertywidget.h"
 #include "widgets/docknavglwidget.h"
 #include "widgets/combinednavglwidget.h"
@@ -343,12 +344,12 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
-	ROIWidget* roiWidget = new ROIWidget( m_roiModel, this );
-	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), roiWidget, this );
+	ROIWidget* m_roiWidget = new ROIWidget( m_roiModel, this );
+	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
-    connect( newSelectionBoxAct, SIGNAL( triggered() ), roiWidget, SLOT( addBox() ) );
+    connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( this );
 	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
@@ -357,6 +358,15 @@ void MainWindow::createDockWindows()
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
+
+    ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
+    FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockRP );
+    roiProperties->setModel( m_roiModel );
+    roiProperties->setSelectionModel( m_roiWidget->selectionModel() );
+    viewMenu->addAction( dockRP->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockRP, SLOT( toggleTitleWidget() ) );
+
 
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
     FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );

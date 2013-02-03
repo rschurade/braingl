@@ -9,8 +9,8 @@
 
 ROI::ROI( QString name )
 {
-    m_properties.set( Fn::ROI::NAME, name );
-    m_properties.set( Fn::ROI::ACTIVE, true );
+    m_properties.set( Fn::ROI::NAME, name, true );
+    m_properties.set( Fn::ROI::ACTIVE, true, true );
 }
 
 ROI::~ROI()
