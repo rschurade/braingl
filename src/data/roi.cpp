@@ -9,15 +9,15 @@
 
 ROI::ROI( QString name )
 {
-    m_properties.set( Fn::Property::NAME, name );
-    m_properties.set( Fn::Property::ACTIVE, true );
+    m_properties.set( Fn::ROI::NAME, name );
+    m_properties.set( Fn::ROI::ACTIVE, true );
 }
 
 ROI::~ROI()
 {
 }
 
-PropertyGroup* ROI::properties()
+ROIPropertyGroup* ROI::properties()
 {
     return &m_properties;
 }

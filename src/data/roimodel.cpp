@@ -80,11 +80,11 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->get( Fn::Property::ACTIVE );
+                return m_boxes[index.row()][0]->properties()->get( Fn::ROI::ACTIVE );
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::Property::ACTIVE );
+                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::ACTIVE );
             }
             break;
         }
@@ -92,11 +92,11 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->get( Fn::Property::NAME );
+                return m_boxes[index.row()][0]->properties()->get( Fn::ROI::NAME );
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::Property::NAME );
+                return m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::NAME );
             }
             break;
         }
@@ -114,7 +114,7 @@ QVariant ROIModel::headerData( int section, Qt::Orientation orientation, int rol
         {
             if ( orientation == Qt::Horizontal )
             {
-                return QString( Fn::Prop2String::s( (Fn::Property)section ) );
+                return QString( Fn::ROI2String::s( (Fn::ROI)section ) );
             }
             break;
         }
@@ -130,11 +130,11 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                return m_boxes[index.row()][0]->properties()->set( Fn::Property::ACTIVE, !m_boxes[index.row()][0]->properties()->get( Fn::Property::ACTIVE ).toBool() );
+                return m_boxes[index.row()][0]->properties()->set( Fn::ROI::ACTIVE, !m_boxes[index.row()][0]->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             else
             {
-                return m_boxes[index.internalId()][index.row()+1]->properties()->set( Fn::Property::ACTIVE, !m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::Property::ACTIVE ).toBool() );
+                return m_boxes[index.internalId()][index.row()+1]->properties()->set( Fn::ROI::ACTIVE, !m_boxes[index.internalId()][index.row()+1]->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             break;
         }

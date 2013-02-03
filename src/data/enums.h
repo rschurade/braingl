@@ -237,6 +237,40 @@ namespace Fn
             return QString( "property not defined" );
         }
     };
+
+    enum class ROI : int
+    {
+        NAME,
+        X,
+        Y,
+        Z,
+        DX,
+        DY,
+        DZ,
+        NEG,
+        TYPE,
+        ACTIVE,
+    };
+
+    struct ROI2String {
+        static QString s( ROI p )
+        {
+            switch( p )
+            {
+                case ROI::NAME: return QString( "name" ); break;
+                case ROI::X: return QString( "x" ); break;
+                case ROI::Y: return QString( "y" ); break;
+                case ROI::Z: return QString( "z" ); break;
+                case ROI::DX: return QString( "dx" ); break;
+                case ROI::DY: return QString( "dy" ); break;
+                case ROI::DZ: return QString( "dz" ); break;
+                case ROI::NEG: return QString( "neg" ); break;
+                case ROI::TYPE: return QString( "type" ); break;
+                case ROI::ACTIVE: return QString( "active" ); break;
+            }
+        return QString( "property not defined" );
+        }
+    };
 }
 
 Q_DECLARE_METATYPE( Fn::DatasetType )
@@ -244,6 +278,7 @@ Q_DECLARE_METATYPE( Fn::Colormap )
 Q_DECLARE_METATYPE( Fn::Algo )
 Q_DECLARE_METATYPE( Fn::Orient )
 Q_DECLARE_METATYPE( Fn::Property )
+Q_DECLARE_METATYPE( Fn::Global )
 
 
 #endif /* ENUMS_H_ */
