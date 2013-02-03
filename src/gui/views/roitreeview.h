@@ -20,7 +20,7 @@ public:
     void addBox();
 
 private:
-    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mousePressEvent( QMouseEvent *event );
 
 };
 

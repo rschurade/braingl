@@ -7,6 +7,8 @@
 
 #include "roitreeview.h"
 
+#include <QtCore/QDebug>
+
 ROITreeView::ROITreeView( QWidget* parent ) :
     QTreeView( parent )
 {
@@ -33,6 +35,7 @@ void ROITreeView::mousePressEvent(QMouseEvent *event)
 {
     QModelIndex item = indexAt( event->pos() );
     bool selected = selectionModel()->isSelected( indexAt( event->pos() ) );
+    qDebug() << indexAt( event->pos() );
     QTreeView::mousePressEvent( event );
     if ( ( item.row() == -1 && item.column() == -1 ) || selected )
     {

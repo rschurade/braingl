@@ -80,9 +80,9 @@ int main( int argc, char *argv[] )
 
     GlobalPropertyModel* globalProps = new GlobalPropertyModel();
     DataStore* dataStore = new DataStore( globalProps );
-    ROIModel* selBoxModel = new ROIModel( globalProps );
+    ROIModel* roiModel = new ROIModel( globalProps );
 
-    MainWindow mainWin( dataStore, globalProps, selBoxModel, debug );
+    MainWindow mainWin( dataStore, globalProps, roiModel, debug );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )

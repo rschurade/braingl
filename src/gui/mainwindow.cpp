@@ -262,8 +262,8 @@ void MainWindow::createActions()
     renderCrosshairsAct->setChecked( true );
     connect( renderCrosshairsAct, SIGNAL( toggled( bool ) ), this, SLOT( slotRenderCrosshairs( bool ) ) );
 
-    newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New selection box" ), this );
-    newSelectionBoxAct->setStatusTip( tr( "Add a new selection box." ) );
+    newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
+    newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), this, SLOT( slotNewSelectionBox() ) );
 
 }
@@ -344,7 +344,7 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
 	ROIWidget* roiWidget = new ROIWidget( m_roiModel, this );
-	FNDockWidget* dockSBW = new FNDockWidget( QString("Selection Boxes"), roiWidget, this );
+	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), roiWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
