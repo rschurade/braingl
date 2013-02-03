@@ -6,8 +6,7 @@
  */
 #include "datasetinfoview.h"
 
-#include "intformatdelegate.h"
-#include "niftiformatdelegate.h"
+#include "delegates.h"
 
 DatasetInfoView::DatasetInfoView(  QWidget * parent ) :
     QTableView( parent )
