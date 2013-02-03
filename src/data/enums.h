@@ -109,34 +109,38 @@ namespace Fn
         DATASET_POINTER,
         NEW_DATASET,
         DATASET_LIST,
+
+    };
+
+    enum class Global : int
+    {
         // Settings
-        SETTING_LOCK_WIDGETS,
-        SETTING_RENDER_CROSSHAIRS,
+        LOCK_WIDGETS,
+        RENDER_CROSSHAIRS,
         // Global Settings for rendering
-        GLOBALS,
-        GLOBAL_SAGITTAL,
-        GLOBAL_CORONAL,
-        GLOBAL_AXIAL,
-        GLOBAL_MAX_SAGITTAL,
-        GLOBAL_MAX_CORONAL,
-        GLOBAL_MAX_AXIAL,
-        GLOBAL_SLICE_DX,
-        GLOBAL_SLICE_DY,
-        GLOBAL_SLICE_DZ,
-        GLOBAL_CORONAL_AXIAL,
-        GLOBAL_SAGITTAL_AXIAL,
-        GLOBAL_SAGITTAL_CORONAL,
-        GLOBAL_LAST_PATH,
-        GLOBAL_SHOW_SAGITTAL,
-        GLOBAL_SHOW_CORONAL,
-        GLOBAL_SHOW_AXIAL,
+        SAGITTAL,
+        CORONAL,
+        AXIAL,
+        MAX_SAGITTAL,
+        MAX_CORONAL,
+        MAX_AXIAL,
+        SLICE_DX,
+        SLICE_DY,
+        SLICE_DZ,
+        CORONAL_AXIAL,
+        SAGITTAL_AXIAL,
+        SAGITTAL_CORONAL,
+        LAST_PATH,
+        SHOW_SAGITTAL,
+        SHOW_CORONAL,
+        SHOW_AXIAL,
     // settings that need a datastore signal to update widgets need to be inserted above this line
-        GLOBAL_ZOOM,
-        GLOBAL_MOVEX,
-        GLOBAL_MOVEY,
-        GLOBAL_BBX,
-        GLOBAL_BBY,
-        GLOBAL_VIEW
+        ZOOM,
+        MOVEX,
+        MOVEY,
+        BBX,
+        BBY,
+        VIEW
     };
 
     struct Prop2String {
@@ -191,34 +195,44 @@ namespace Fn
             case Property::DATASET_POINTER: return QString( "dataset pointer" ); break;
             case Property::NEW_DATASET: return QString( "new dataset" ); break;
             case Property::DATASET_LIST: return QString( "dataset list" ); break;
-            // Settings
-            case Property::SETTING_LOCK_WIDGETS: return QString( "lock widgets" ); break;
-            case Property::SETTING_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break;
-            // Global Settings for rendering
-            case Property::GLOBALS: return QString( "globals" ); break;
-            case Property::GLOBAL_SAGITTAL: return QString( "global sagittal" ); break;
-            case Property::GLOBAL_CORONAL: return QString( "global coronal" ); break;
-            case Property::GLOBAL_AXIAL: return QString( "" ); break;
-            case Property::GLOBAL_MAX_SAGITTAL: return QString( "" ); break;
-            case Property::GLOBAL_MAX_CORONAL: return QString( "" ); break;
-            case Property::GLOBAL_MAX_AXIAL: return QString( "" ); break;
-            case Property::GLOBAL_SLICE_DX: return QString( "" ); break;
-            case Property::GLOBAL_SLICE_DY: return QString( "" ); break;
-            case Property::GLOBAL_SLICE_DZ: return QString( "" ); break;
-            case Property::GLOBAL_CORONAL_AXIAL: return QString( "" ); break;
-            case Property::GLOBAL_SAGITTAL_AXIAL: return QString( "" ); break;
-            case Property::GLOBAL_SAGITTAL_CORONAL: return QString( "" ); break;
-            case Property::GLOBAL_LAST_PATH: return QString( "" ); break;
-            case Property::GLOBAL_SHOW_SAGITTAL: return QString( "" ); break;
-            case Property::GLOBAL_SHOW_CORONAL: return QString( "" ); break;
-            case Property::GLOBAL_SHOW_AXIAL: return QString( "" ); break;
-            // settings that need a datastore signal to update widgets need to be inserted above this line
-            case Property::GLOBAL_ZOOM: return QString( "" ); break;
-            case Property::GLOBAL_MOVEX: return QString( "" ); break;
-            case Property::GLOBAL_MOVEY: return QString( "" ); break;
-            case Property::GLOBAL_BBX: return QString( "" ); break;
-            case Property::GLOBAL_BBY: return QString( "" ); break;
-            case Property::GLOBAL_VIEW: return QString( "" ); break;
+
+            }
+            return QString( "property not defined" );
+        }
+    };
+
+    struct Global2String {
+        static QString s( Property p )
+        {
+            switch( p )
+            {
+                // Settings
+                case Global::LOCK_WIDGETS: return QString( "lock widgets" ); break;
+                case Global::RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break;
+                // Global Settings for rendering
+                case Global::SAGITTAL: return QString( "global sagittal" ); break;
+                case Global::CORONAL: return QString( "global coronal" ); break;
+                case Global::AXIAL: return QString( "" ); break;
+                case Global::MAX_SAGITTAL: return QString( "" ); break;
+                case Global::MAX_CORONAL: return QString( "" ); break;
+                case Global::MAX_AXIAL: return QString( "" ); break;
+                case Global::SLICE_DX: return QString( "" ); break;
+                case Global::SLICE_DY: return QString( "" ); break;
+                case Global::SLICE_DZ: return QString( "" ); break;
+                case Global::CORONAL_AXIAL: return QString( "" ); break;
+                case Global::SAGITTAL_AXIAL: return QString( "" ); break;
+                case Global::SAGITTAL_CORONAL: return QString( "" ); break;
+                case Global::LAST_PATH: return QString( "" ); break;
+                case Global::SHOW_SAGITTAL: return QString( "" ); break;
+                case Global::SHOW_CORONAL: return QString( "" ); break;
+                case Global::SHOW_AXIAL: return QString( "" ); break;
+                // settings that need a datastore signal to update widgets need to be inserted above this line
+                case Global::ZOOM: return QString( "" ); break;
+                case Global::MOVEX: return QString( "" ); break;
+                case Global::MOVEY: return QString( "" ); break;
+                case Global::BBX: return QString( "" ); break;
+                case Global::BBY: return QString( "" ); break;
+                case Global::VIEW: return QString( "" ); break;
             }
             return QString( "property not defined" );
         }
