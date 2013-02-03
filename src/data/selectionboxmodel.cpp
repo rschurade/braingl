@@ -42,7 +42,7 @@ int SelectionBoxModel::rowCount( const QModelIndex &parent ) const
 
 int SelectionBoxModel::columnCount( const QModelIndex &parent ) const
 {
-    return 1;
+    return 2;
 }
 
 QModelIndex SelectionBoxModel::index( int row, int column, const QModelIndex & parent ) const
@@ -108,7 +108,18 @@ QVariant SelectionBoxModel::data( const QModelIndex &index, int role ) const
 
 QVariant SelectionBoxModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
-    return 0;
+    switch ( role )
+    {
+        case Qt::DisplayRole:
+        {
+            if ( orientation == Qt::Horizontal )
+            {
+                return QString( Property::getNameAsString( (Fn::Property)section ) );
+            }
+            break;
+        }
+    }
+    return QVariant();
 }
 
 bool SelectionBoxModel::setData( const QModelIndex &index, const QVariant &value, int role )
