@@ -1,12 +1,12 @@
 /*
- * selectionboxwidget.h
+ * roiwidget.h
  *
  *  Created on: Jan 30, 2013
  *      Author: schurade
  */
 
-#ifndef SELECTIONBOXWIDGET_H_
-#define SELECTIONBOXWIDGET_H_
+#ifndef ROIWIDGET_H_
+#define ROIWIDGET_H_
 
 #include <QtGui/QFrame>
 
@@ -14,18 +14,18 @@ class QAbstractItemModel;
 class QVBoxLayout;
 class QPushButton;
 
-class SelectionBoxTreeView;
+class ROITreeView;
 
-class SelectionBoxWidget : public QFrame
+class ROIWidget : public QFrame
 {
     Q_OBJECT
 
 public:
-    SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget* parent = 0 );
-    virtual ~SelectionBoxWidget();
+    ROIWidget( QAbstractItemModel* ROIModel, QWidget* parent = 0 );
+    virtual ~ROIWidget();
 
 private:
-    SelectionBoxTreeView* m_treeView;
+    ROITreeView* m_treeView;
 
     QPushButton* m_newTopButton;
     QPushButton* m_newChildButton;
@@ -38,4 +38,4 @@ public slots:
     void treeClicked();
 };
 
-#endif /* SELECTIONBOXWIDGET_H_ */
+#endif /* ROIWIDGET_H_ */

@@ -5,7 +5,7 @@
 
 #include "data/datastore.h"
 #include "data/globalpropertymodel.h"
-#include "data/selectionboxmodel.h"
+#include "data/roimodel.h"
 #include "data/loader.h"
 #include "data/vptr.h"
 #include "gui/mainwindow.h"
@@ -80,7 +80,7 @@ int main( int argc, char *argv[] )
 
     GlobalPropertyModel* globalProps = new GlobalPropertyModel();
     DataStore* dataStore = new DataStore( globalProps );
-    SelectionBoxModel* selBoxModel = new SelectionBoxModel( globalProps );
+    ROIModel* selBoxModel = new ROIModel( globalProps );
 
     MainWindow mainWin( dataStore, globalProps, selBoxModel, debug );
     mainWin.show();

@@ -112,37 +112,6 @@ namespace Fn
 
     };
 
-    enum class Global : int
-    {
-        // Settings
-        LOCK_WIDGETS,
-        RENDER_CROSSHAIRS,
-        // Global Settings for rendering
-        SAGITTAL,
-        CORONAL,
-        AXIAL,
-        MAX_SAGITTAL,
-        MAX_CORONAL,
-        MAX_AXIAL,
-        SLICE_DX,
-        SLICE_DY,
-        SLICE_DZ,
-        CORONAL_AXIAL,
-        SAGITTAL_AXIAL,
-        SAGITTAL_CORONAL,
-        LAST_PATH,
-        SHOW_SAGITTAL,
-        SHOW_CORONAL,
-        SHOW_AXIAL,
-    // settings that need a datastore signal to update widgets need to be inserted above this line
-        ZOOM,
-        MOVEX,
-        MOVEY,
-        BBX,
-        BBY,
-        VIEW
-    };
-
     struct Prop2String {
         static QString s( Property p )
         {
@@ -200,6 +169,37 @@ namespace Fn
             return QString( "property not defined" );
         }
     };
+
+    enum class Global : int
+   {
+       // Settings
+       LOCK_WIDGETS,
+       RENDER_CROSSHAIRS,
+       // Global Settings for rendering
+       SAGITTAL,
+       CORONAL,
+       AXIAL,
+       MAX_SAGITTAL,
+       MAX_CORONAL,
+       MAX_AXIAL,
+       SLICE_DX,
+       SLICE_DY,
+       SLICE_DZ,
+       CORONAL_AXIAL,
+       SAGITTAL_AXIAL,
+       SAGITTAL_CORONAL,
+       LAST_PATH,
+       SHOW_SAGITTAL,
+       SHOW_CORONAL,
+       SHOW_AXIAL,
+   // settings that need a datastore signal to update widgets need to be inserted above this line
+       ZOOM,
+       MOVEX,
+       MOVEY,
+       BBX,
+       BBY,
+       VIEW
+   };
 
     struct Global2String {
         static QString s( Global p )

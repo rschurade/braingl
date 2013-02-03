@@ -1,22 +1,22 @@
 /*
- * selectionboxwidget.cpp
+ * roiwidget.cpp
  *
  *  Created on: Jan 30, 2013
  *      Author: schurade
  */
-#include "selectionboxwidget.h"
+#include "roiwidget.h"
 
-#include "../views/selectionboxtreeview.h"
+#include "../views/roitreeview.h"
 
 #include <QtCore/QDebug>
 #include <QtGui/QtGui>
 
-SelectionBoxWidget::SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget* parent ) :
+ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
     QFrame( parent ),
     m_count( 0 )
 {
-    m_treeView = new SelectionBoxTreeView( this );
-    m_treeView->setModel( selBoxModel );
+    m_treeView = new ROITreeView( this );
+    m_treeView->setModel( roiModel );
     m_treeView->hideColumn( 1 );
     connect( m_treeView, SIGNAL( clicked( QModelIndex ) ), this, SLOT( treeClicked() ) );
 
@@ -56,15 +56,15 @@ SelectionBoxWidget::SelectionBoxWidget( QAbstractItemModel* selBoxModel, QWidget
 
 }
 
-SelectionBoxWidget::~SelectionBoxWidget()
+ROIWidget::~ROIWidget()
 {
 }
 
-void SelectionBoxWidget::addBox()
+void ROIWidget::addBox()
 {
     m_treeView->addBox();
 }
 
-void SelectionBoxWidget::treeClicked()
+void ROIWidget::treeClicked()
 {
 }

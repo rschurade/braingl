@@ -1,26 +1,26 @@
 /*
- * selectionboxmodel.cpp
+ * roimodel.cpp
  *
  *  Created on: 02.02.2013
  *      Author: Ralph
  */
-#include "selectionboxmodel.h"
+#include "roimodel.h"
 
 #include "selectionbox.h"
 
 #include <QtCore/QDebug>
 
-SelectionBoxModel::SelectionBoxModel( QAbstractItemModel* globalProps ) :
+ROIModel::ROIModel( QAbstractItemModel* globalProps ) :
     m_count( 0 )
 {
 
 }
 
-SelectionBoxModel::~SelectionBoxModel()
+ROIModel::~ROIModel()
 {
 }
 
-int SelectionBoxModel::rowCount( const QModelIndex &parent ) const
+int ROIModel::rowCount( const QModelIndex &parent ) const
 {
     //qDebug() << "rowCount():" << parent;
     if ( parent.isValid() )
@@ -40,12 +40,12 @@ int SelectionBoxModel::rowCount( const QModelIndex &parent ) const
     }
 }
 
-int SelectionBoxModel::columnCount( const QModelIndex &parent ) const
+int ROIModel::columnCount( const QModelIndex &parent ) const
 {
     return 2;
 }
 
-QModelIndex SelectionBoxModel::index( int row, int column, const QModelIndex & parent ) const
+QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) const
 {
     //qDebug() << "index():" << row << column << parent;
     if ( parent.isValid() )
@@ -58,7 +58,7 @@ QModelIndex SelectionBoxModel::index( int row, int column, const QModelIndex & p
     }
 }
 
-QModelIndex SelectionBoxModel::parent( const QModelIndex & index ) const
+QModelIndex ROIModel::parent( const QModelIndex & index ) const
 {
     //qDebug() << "parent():" << index;
     if ( index.internalId() == -1 )
@@ -71,7 +71,7 @@ QModelIndex SelectionBoxModel::parent( const QModelIndex & index ) const
     }
 }
 
-QVariant SelectionBoxModel::data( const QModelIndex &index, int role ) const
+QVariant ROIModel::data( const QModelIndex &index, int role ) const
 {
     //qDebug() << "data";
     switch ( role )
@@ -106,7 +106,7 @@ QVariant SelectionBoxModel::data( const QModelIndex &index, int role ) const
     return QVariant();
 }
 
-QVariant SelectionBoxModel::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant ROIModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     switch ( role )
     {
@@ -122,7 +122,7 @@ QVariant SelectionBoxModel::headerData( int section, Qt::Orientation orientation
     return QVariant();
 }
 
-bool SelectionBoxModel::setData( const QModelIndex &index, const QVariant &value, int role )
+bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
     switch ( role )
     {
@@ -149,7 +149,7 @@ bool SelectionBoxModel::setData( const QModelIndex &index, const QVariant &value
     return true;
 }
 
-Qt::ItemFlags SelectionBoxModel::flags( const QModelIndex& index ) const
+Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
 {
     if ( !index.isValid() )
     {
@@ -166,12 +166,12 @@ Qt::ItemFlags SelectionBoxModel::flags( const QModelIndex& index ) const
     return defaultFlags;
 }
 
-bool SelectionBoxModel::insertRows( int row, int count, const QModelIndex &parent )
+bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
 {
     //qDebug() << parent << parent.isValid();
     if ( !parent.isValid() )
     {
-        QList<SelectionBox*>l;
+        QList<ROI*>l;
         SelectionBox* newBox = new SelectionBox( QString("new top box") + QString::number( m_count++ ) );
         l.push_back( newBox );
 

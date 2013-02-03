@@ -14,7 +14,7 @@ class ShaderEditWidget;
 
 class DataStore;
 class GlobalPropertyModel;
-class SelectionBoxModel;
+class ROIModel;
 class GLWidget;
 class ToolBar;
 
@@ -23,7 +23,7 @@ class MainWindow: public QMainWindow
 Q_OBJECT
 
 public:
-    MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, SelectionBoxModel* selBoxModel,  bool debug = false );
+    MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel,  bool debug = false );
 
     void closeEvent( QCloseEvent *event );
 
@@ -62,7 +62,7 @@ private:
 
     DataStore* m_dataStore;
     GlobalPropertyModel* m_globalProps;
-    SelectionBoxModel* m_selBoxModel;
+    ROIModel* m_roiModel;
 
     bool m_debug;
 

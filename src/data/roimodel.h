@@ -1,22 +1,22 @@
 /*
- * selectionboxmodel.h
+ * roimodel.h
  *
  *  Created on: 02.02.2013
  *      Author: Ralph
  */
 
-#ifndef SELECTIONBOXMODEL_H_
-#define SELECTIONBOXMODEL_H_
+#ifndef ROIMODEL_H_
+#define ROIMODEL_H_
 
 #include <QtCore/QAbstractItemModel>
 
-class SelectionBox;
+class ROI;
 
-class SelectionBoxModel : public QAbstractItemModel
+class ROIModel : public QAbstractItemModel
 {
 public:
-    SelectionBoxModel( QAbstractItemModel* globalProps );
-    virtual ~SelectionBoxModel();
+    ROIModel( QAbstractItemModel* globalProps );
+    virtual ~ROIModel();
 
     // reimplemented from QAbstractItemModel
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -31,9 +31,9 @@ public:
     bool insertRows( int row, int count, const QModelIndex &parent=QModelIndex() );
 
 private:
-    QList< QList<SelectionBox*> >m_boxes;
+    QList< QList<ROI*> >m_boxes;
     int m_count;
 
 };
 
-#endif /* SELECTIONBOXMODEL_H_ */
+#endif /* ROIMODEL_H_ */
