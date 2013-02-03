@@ -11,9 +11,10 @@
 #include <QtGui/QFrame>
 
 class QAbstractItemModel;
-class QTreeView;
 class QVBoxLayout;
 class QPushButton;
+
+class SelectionBoxTreeView;
 
 class SelectionBoxWidget : public QFrame
 {
@@ -24,10 +25,10 @@ public:
     virtual ~SelectionBoxWidget();
 
 private:
-    QTreeView* m_treeView;
+    SelectionBoxTreeView* m_treeView;
 
-    QPushButton* m_downButton;
-    QPushButton* m_upButton;
+    QPushButton* m_newTopButton;
+    QPushButton* m_newChildButton;
     QPushButton* m_deleteButton;
 
     int m_count;

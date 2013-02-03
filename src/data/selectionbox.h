@@ -14,7 +14,7 @@
 class SelectionBox
 {
 public:
-    SelectionBox();
+    SelectionBox( QString name );
     virtual ~SelectionBox();
 
     PropertyGroup* properties();
