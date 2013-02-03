@@ -13,7 +13,7 @@
 class SelectionBox : public ROI
 {
 public:
-    SelectionBox( QString name, int x, int y, int z, float dx, float dy, float dz, bool neg );
+    SelectionBox( QString name, QAbstractItemModel* globals );
     virtual ~SelectionBox();
 
 };

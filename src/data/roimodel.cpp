@@ -189,7 +189,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     float dy = 5;
     float dz = 5;
     QString name = QString("new box") + QString::number( m_count++ );
-    SelectionBox* newBox = new SelectionBox( name, x, y, z, dx, dy, dz, false );
+    SelectionBox* newBox = new SelectionBox( name, m_globalProps );
     connect( newBox->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     //qDebug() << parent << parent.isValid();
     if ( !parent.isValid() )

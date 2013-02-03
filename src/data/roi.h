@@ -11,16 +11,19 @@
 #include "enums.h"
 #include "properties/roipropertygroup.h"
 
+class QAbstractItemModel;
+
 class ROI
 {
 public:
-    ROI( QString name );
+    ROI( QString name, QAbstractItemModel* globals );
     virtual ~ROI();
 
     ROIPropertyGroup* properties();
 
 protected:
     ROIPropertyGroup m_properties;
+    QAbstractItemModel* m_globals;
 };
 
 #endif /* ROI_H_ */
