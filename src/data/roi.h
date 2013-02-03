@@ -9,7 +9,7 @@
 #define ROI_H_
 
 #include "enums.h"
-#include "properties/propertygroup.h"
+#include "properties/roipropertygroup.h"
 
 class ROI
 {
@@ -17,10 +17,10 @@ public:
     ROI( QString name );
     virtual ~ROI();
 
-    PropertyGroup* properties();
+    ROIPropertyGroup* properties();
 
 private:
-    PropertyGroup m_properties;
+    ROIPropertyGroup m_properties;
 };
 
 #endif /* ROI_H_ */
