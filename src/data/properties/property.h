@@ -20,19 +20,17 @@ class QWidget;
 class Property : public QObject
 {
 public:
-    Property( Fn::Property name );
+    Property( QString name );
     virtual ~Property();
 
-    Fn::Property getName();
-    QString getLabel();
+    QString getName();
 
     virtual QWidget* getWidget() = 0;
     virtual QVariant getValue() = 0;
     virtual void setValue( QVariant value ) = 0;
 
 protected:
-    Fn::Property m_name; // used for access
-    QString m_label; // used for label in the dataset property view
+    QString m_name; // used for access
 
 private:
 

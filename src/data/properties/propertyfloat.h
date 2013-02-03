@@ -18,7 +18,7 @@ class PropertyFloat :public Property
     Q_OBJECT
 
 public:
-    PropertyFloat( Fn::Property name,
+    PropertyFloat( QString name,
                      float value = 0.0,
                      float min = std::numeric_limits<float>::min(),
                      float max = std::numeric_limits<float>::max() );

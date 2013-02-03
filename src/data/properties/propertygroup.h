@@ -26,7 +26,7 @@ public:
     PropertyGroup();
     virtual ~PropertyGroup();
 
-    bool contains( int name ) const;
+    bool contains( Fn::Property name ) const;
     QVariant get( Fn::Property name ) const;
 
     bool set( Fn::Property name, bool value, bool visible = false );

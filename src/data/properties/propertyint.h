@@ -18,7 +18,7 @@ class PropertyInt : public Property
     Q_OBJECT
 
 public:
-    PropertyInt( Fn::Property name, int value = 0, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() );
+    PropertyInt( QString name, int value = 0, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() );
     virtual ~PropertyInt();
 
     QWidget* getWidget();

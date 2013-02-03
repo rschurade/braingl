@@ -63,7 +63,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
     {
         if ( orientation == Qt::Vertical )
         {
-            return QString( Fn::Property2String::s( (Fn::Property)section ) );
+            return QString( Fn::Prop2String::s( (Fn::Property)section ) );
         }
 
     }
@@ -72,7 +72,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
 
 QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    if ( m_properties.contains( row ) )
+    if ( m_properties.contains( (Fn::Property)row ) )
     {
         return createIndex( row, 0, 0 );
     }

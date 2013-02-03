@@ -159,7 +159,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
     {
         if ( orientation == Qt::Horizontal )
         {
-            return QString( Fn::Property2String::s( (Fn::Property)section ) );
+            return QString( Fn::Prop2String::s( (Fn::Property)section ) );
         }
         else
         {
