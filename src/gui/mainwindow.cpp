@@ -314,7 +314,7 @@ void MainWindow::createDockWindows()
 {
     mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockMainGL );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
 
@@ -388,15 +388,18 @@ void MainWindow::createDockWindows()
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav4 );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
 
     SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockSSHW );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
+
+    m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
+    m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
 }
 
 void MainWindow::slotToggleAxialSlice()
