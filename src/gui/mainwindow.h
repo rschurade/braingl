@@ -34,11 +34,6 @@ private slots:
     void print();
     void undo();
     void about();
-    void closeTab( int index );
-    void slotAddTabCombined();
-    void slotAddTabSagittal();
-    void slotAddTabCoronal();
-    void slotAddTabAxial();
 
     void slotToggleAxialSlice();
     void slotToggleCoronalSlice();
@@ -67,10 +62,11 @@ private:
 
     bool m_debug;
 
+    QMainWindow* m_centralWidget;
+
     GLWidget* mainGLWidget;
     DatasetListWidget* m_datasetWidget;
     ROIWidget* m_roiWidget;
-    QTabWidget* m_centralTabWidget;
     ShaderEditWidget* m_shaderEditWidget;
 
     QMenu* fileMenu;
@@ -100,11 +96,6 @@ private:
     QAction* aboutQtAct;
 
     QAction* toggleShaderEditAct;
-
-    QAction* addTabCombined;
-    QAction* addTabSagittal;
-    QAction* addTabCoronal;
-    QAction* addTabAxial;
 
     QAction* standardViewAxialAct;
     QAction* standardViewCoronalAct;

@@ -35,18 +35,17 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
     m_roiModel( roiModel ),
     m_debug( debug )
 {
-	m_centralTabWidget = new QTabWidget( this );
-	setCentralWidget( m_centralTabWidget );
-	m_centralTabWidget->setTabsClosable( true );
-	connect( m_centralTabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab( int ) ) );
-
-    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, roiModel );
-    m_centralTabWidget->addTab( mainGLWidget, "main gl" );
+	m_centralWidget = new QMainWindow();
+	m_centralWidget->setObjectName( "central widget" );
+	m_centralWidget->setDockOptions( QMainWindow::AnimatedDocks |  QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks );
+	m_centralWidget->setDocumentMode( true );
+	setCentralWidget( m_centralWidget );
 
     createActions();
     createMenus();
     createToolBars();
     createDockWindows();
+
 
     // this needs to be done after the view is created
     m_toolsToolBar->setSelectionModel( m_datasetWidget->selectionModel() );
@@ -59,8 +58,10 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 
     QSettings settings;
     restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
-
 	restoreState( settings.value( "mainWindowState" ).toByteArray() );
+
+	m_centralWidget->restoreGeometry( settings.value( "centralWidgetGeometry" ).toByteArray() );
+	m_centralWidget->restoreState( settings.value( "centralWidgetState" ).toByteArray() );
 
 	if ( settings.contains( "lastPath" ) )
 	{
@@ -82,6 +83,9 @@ void MainWindow::closeEvent( QCloseEvent *event )
 	QSettings settings;
 	settings.setValue( "mainWindowGeometry", saveGeometry() );
 	settings.setValue( "mainWindowState", saveState() );
+
+	settings.setValue( "centralWidgetGeometry", m_centralWidget->saveGeometry() );
+	settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
 
 	settings.setValue( "lastPath", m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString() );
 	settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
@@ -170,20 +174,17 @@ void MainWindow::about()
 
 void MainWindow::createActions()
 {
-    openAct = new QAction( QIcon( ":/icons/open.png" ), tr( "&Open..." ),
-            this );
+    openAct = new QAction( QIcon( ":/icons/open.png" ), tr( "&Open..." ), this );
     openAct->setShortcuts( QKeySequence::Open );
     openAct->setStatusTip( tr( "Load Dataset" ) );
     connect( openAct, SIGNAL(triggered()), this, SLOT(open()) );
 
-    saveAct = new QAction( QIcon( ":/icons/save.png" ), tr( "&Save..." ),
-            this );
+    saveAct = new QAction( QIcon( ":/icons/save.png" ), tr( "&Save..." ), this );
     saveAct->setShortcuts( QKeySequence::Save );
     saveAct->setStatusTip( tr( "Save the current form letter" ) );
     connect( saveAct, SIGNAL(triggered()), this, SLOT(save()) );
 
-    printAct = new QAction( QIcon( ":/icons/print.png" ), tr( "&Print..." ),
-            this );
+    printAct = new QAction( QIcon( ":/icons/print.png" ), tr( "&Print..." ), this );
     printAct->setShortcuts( QKeySequence::Print );
     printAct->setStatusTip( tr( "Print the current form letter" ) );
     connect( printAct, SIGNAL(triggered()), this, SLOT(print()) );
@@ -200,22 +201,6 @@ void MainWindow::createActions()
     aboutQtAct = new QAction( tr( "About &Qt" ), this );
     aboutQtAct->setStatusTip( tr( "Show the Qt library's About box" ) );
     connect( aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()) );
-
-    addTabCombined = new QAction( tr( "Add Combined Slice Tab" ), this );
-    addTabCombined->setStatusTip( tr( "Add a new tab to the central tab widget with all 3 slices." ) );
-    connect( addTabCombined, SIGNAL(triggered()), this, SLOT( slotAddTabCombined() ) );
-
-    addTabSagittal = new QAction( tr( "Add Sagittal Slice Tab" ), this );
-    addTabSagittal->setStatusTip( tr( "Add a new tab to the central tab widget showing the sagittal slice." ) );
-    connect( addTabSagittal, SIGNAL(triggered()), this, SLOT( slotAddTabSagittal() ) );
-
-    addTabCoronal = new QAction( tr( "Add Coronal Slice Tab" ), this );
-    addTabCoronal->setStatusTip( tr( "Add a new tab to the central tab widget showing the coronal slice." ) );
-    connect( addTabCoronal, SIGNAL(triggered()), this, SLOT( slotAddTabCoronal() ) );
-
-    addTabAxial = new QAction( tr( "Add Axial Slice Tab" ), this );
-    addTabAxial->setStatusTip( tr( "Add a new tab to the central tab widget showing the axial slice." ) );
-    connect( addTabAxial, SIGNAL(triggered()), this, SLOT( slotAddTabAxial() ) );
 
     showAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Show Axial Slice" ), this );
     showAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
@@ -284,12 +269,6 @@ void MainWindow::createMenus()
 
     viewMenu = menuBar()->addMenu( tr( "&View" ) );
 
-    tabMenu = menuBar()->addMenu( tr( "&Tabs" ) );
-    tabMenu->addAction( addTabCombined );
-    tabMenu->addAction( addTabSagittal );
-    tabMenu->addAction( addTabCoronal );
-    tabMenu->addAction( addTabAxial );
-
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
@@ -333,7 +312,13 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-    m_datasetWidget = new DatasetListWidget( this );
+    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel );
+    FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockMainGL );
+    viewMenu->addAction( dockMainGL->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
+
+    m_datasetWidget = new DatasetListWidget();
 	m_datasetWidget->setModel( m_dataStore );
 	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
 	addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
@@ -385,69 +370,33 @@ void MainWindow::createDockWindows()
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, m_globalProps, QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
-    addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
-    addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("axial"), nav3, this );
-    addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
-    addDockWidget( Qt::RightDockWidgetArea, dockNav4 );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
 
     SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
-    addDockWidget( Qt::RightDockWidgetArea, dockSSHW );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
-}
-
-void MainWindow::closeTab( int index )
-{
-    if ( index > 0 )
-    {
-        m_centralTabWidget->removeTab( index );
-    }
-}
-
-void MainWindow::slotAddTabCombined()
-{
-    CombinedNavGLWidget* combNav = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
-    m_centralTabWidget->addTab( combNav, "slices" );
-    m_centralTabWidget->setCurrentWidget( combNav );
-}
-
-void MainWindow::slotAddTabSagittal()
-{
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("sagittal"), 0, this, mainGLWidget );
-    m_centralTabWidget->addTab( glWidget, "sagittal" );
-    m_centralTabWidget->setCurrentWidget( glWidget );
-}
-
-void MainWindow::slotAddTabCoronal()
-{
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("coronal"), 1, this, mainGLWidget );
-    m_centralTabWidget->addTab( glWidget, "coronal" );
-    m_centralTabWidget->setCurrentWidget( glWidget );
-}
-
-void MainWindow::slotAddTabAxial()
-{
-    NavGLWidget* glWidget = new NavGLWidget( m_dataStore, m_globalProps, tr("axial"), 2, this, mainGLWidget );
-    m_centralTabWidget->addTab( glWidget, "axial" );
-    m_centralTabWidget->setCurrentWidget( glWidget );
 }
 
 void MainWindow::slotToggleAxialSlice()
@@ -485,9 +434,9 @@ void  MainWindow::slotStandardSagittalView()
 
 void MainWindow::slotToggleShaderEdit()
 {
-    m_shaderEditWidget = new ShaderEditWidget( this );
-    m_centralTabWidget->addTab( m_shaderEditWidget, "shader edit" );
-    m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
+//    m_shaderEditWidget = new ShaderEditWidget( this );
+//    m_centralTabWidget->addTab( m_shaderEditWidget, "shader edit" );
+//    m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
 }
 
 void MainWindow::slotToggleDockTitles( bool value )
