@@ -182,12 +182,6 @@ Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
 
 bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
 {
-    int x = m_globalProps->data( m_globalProps->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    int y = m_globalProps->data( m_globalProps->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    int z = m_globalProps->data( m_globalProps->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
-    float dx = 5;
-    float dy = 5;
-    float dz = 5;
     QString name = QString("new box") + QString::number( m_count++ );
     SelectionBox* newBox = new SelectionBox( name, m_globalProps );
     connect( newBox->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );

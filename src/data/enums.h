@@ -108,8 +108,7 @@ namespace Fn
         TEXTURE_GLUINT,
         DATASET_POINTER,
         NEW_DATASET,
-        DATASET_LIST,
-
+        DATASET_LIST
     };
 
     struct Prop2String {
