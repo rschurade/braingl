@@ -63,7 +63,8 @@ void SceneRenderer::initGL()
         qDebug() << "OpenGL initialized.";
     }
 
-    glClearColor( 1.0, 1.0, 1.0, 1.0 );
+    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glEnable( GL_DEPTH_TEST );
 
@@ -154,6 +155,9 @@ void SceneRenderer::calcMVPMatrix()
 
 void SceneRenderer::draw()
 {
+    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_sliceRenderer->draw( m_mvpMatrix );
 

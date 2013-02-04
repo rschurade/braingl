@@ -40,6 +40,11 @@ public:
     bool set( Fn::Global name, QVariant value );
     bool set( Fn::Global name, QColor value, bool visible = false );
 
+    bool setMin( Fn::Global name,  float value );
+    bool setMax( Fn::Global name,  float value );
+    bool setMin( Fn::Global name,  int value );
+    bool setMax( Fn::Global name,  int value );
+
     int size() const;
 
     QList<Fn::Global> getVisible();

@@ -5,6 +5,7 @@
  *      Author: schurade
  */
 #include "globalpropertygroup.h"
+#include "propertyfloat.h"
 
 #include <QtCore/QDebug>
 
@@ -199,6 +200,47 @@ bool GlobalPropertyGroup::set( Fn::Global name, QColor value, bool visible )
     return true;
 }
 
+bool GlobalPropertyGroup::setMin( Fn::Global name, float value )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        ( (PropertyFloat*)( m_properties[(int)name] ) )->setMin( value );
+        return true;
+    }
+    return false;
+}
+
+bool GlobalPropertyGroup::setMax( Fn::Global name, float value )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        ( (PropertyFloat*)( m_properties[(int)name] ) )->setMax( value );
+        return true;
+    }
+    return false;
+}
+
+bool GlobalPropertyGroup::setMin( Fn::Global name, int value )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        ( (PropertyInt*)( m_properties[(int)name] ) )->setMin( value );
+        return true;
+    }
+    return false;
+}
+
+bool GlobalPropertyGroup::setMax( Fn::Global name, int value )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        ( (PropertyInt*)( m_properties[(int)name] ) )->setMax( value );
+        return true;
+    }
+    return false;
+}
+
+
 QList<Fn::Global> GlobalPropertyGroup::getVisible()
 {
     return m_visible;
@@ -211,7 +253,7 @@ QWidget* GlobalPropertyGroup::getWidget( Fn::Global name )
 
 void GlobalPropertyGroup::slotPropChanged()
 {
-    signalPropChanged();
+    emit( signalPropChanged() );
 }
 
 int GlobalPropertyGroup::size() const
