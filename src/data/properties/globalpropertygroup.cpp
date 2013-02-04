@@ -180,6 +180,25 @@ bool GlobalPropertyGroup::set( Fn::Global name, const char* value, bool visible 
     return true;
 }
 
+bool GlobalPropertyGroup::set( Fn::Global name, QColor value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value );
+    }
+    else
+    {
+        PropertyColor* prop = new PropertyColor( Fn::Global2String::s( name ), value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
 QList<Fn::Global> GlobalPropertyGroup::getVisible()
 {
     return m_visible;

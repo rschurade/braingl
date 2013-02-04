@@ -191,6 +191,12 @@ namespace Fn
        SHOW_SAGITTAL,
        SHOW_CORONAL,
        SHOW_AXIAL,
+       BACKGROUND_COLOR_MAIN,
+       BACKGROUND_COLOR_COMBINED,
+       BACKGROUND_COLOR_NAV1,
+       BACKGROUND_COLOR_NAV2,
+       BACKGROUND_COLOR_NAV3,
+       OBJECT,
    // settings that need a datastore signal to update widgets need to be inserted above this line
        ZOOM,
        MOVEX,
@@ -211,7 +217,7 @@ namespace Fn
                 // Global Settings for rendering
                 case Global::SAGITTAL: return QString( "global sagittal" ); break;
                 case Global::CORONAL: return QString( "global coronal" ); break;
-                case Global::AXIAL: return QString( "" ); break;
+                case Global::AXIAL: return QString( "global axial" ); break;
                 case Global::MAX_SAGITTAL: return QString( "" ); break;
                 case Global::MAX_CORONAL: return QString( "" ); break;
                 case Global::MAX_AXIAL: return QString( "" ); break;
@@ -225,6 +231,12 @@ namespace Fn
                 case Global::SHOW_SAGITTAL: return QString( "" ); break;
                 case Global::SHOW_CORONAL: return QString( "" ); break;
                 case Global::SHOW_AXIAL: return QString( "" ); break;
+                case Global::BACKGROUND_COLOR_MAIN: return QString( "background color main" ); break;
+                case Global::BACKGROUND_COLOR_COMBINED: return QString( "background color combined" ); break;
+                case Global::BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
+                case Global::BACKGROUND_COLOR_NAV2: return QString( "background color nav 2" ); break;
+                case Global::BACKGROUND_COLOR_NAV3: return QString( "background color nav 3" ); break;
+                case Global::OBJECT: return QString( "" ); break;
                 // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Global::ZOOM: return QString( "" ); break;
                 case Global::MOVEX: return QString( "" ); break;

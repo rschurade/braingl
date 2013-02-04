@@ -9,6 +9,8 @@
 
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../../data/enums.h"
+#include "../../data/vptr.h"
+#include "../../data/properties/globalpropertygroup.h"
 
 #include <QtGui/QtGui>
 
@@ -17,24 +19,11 @@ GlobalPropertyWidget::GlobalPropertyWidget( QWidget* parent ) :
 {
     m_propertyView = new GlobalPropertyView( this );
     m_layout = new QVBoxLayout();
-    m_layout->setContentsMargins( 1, 0, 1, 0 );
+    m_layout->setContentsMargins( 1, 1, 1, 1 );
     m_layout->setSpacing( 1 );
-
-    m_sagittalSlider = new SliderWithEditInt( "sagittal", (int)Fn::Global::SAGITTAL );
-    m_coronalSlider = new SliderWithEditInt( "coronal", (int)Fn::Global::CORONAL );
-    m_axialSlider = new SliderWithEditInt( "axial", (int)Fn::Global::AXIAL );
-
-    m_layout->addWidget( m_sagittalSlider );
-    m_layout->addWidget( m_coronalSlider );
-    m_layout->addWidget( m_axialSlider );
-
-    m_layout->addStretch( 0 );
     setLayout( m_layout );
 
-    connect( m_sagittalSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
-    connect( m_coronalSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
-    connect( m_axialSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( sliderChanged( int, int ) ) );
-    connect( m_propertyView, SIGNAL( gotDataChanged() ), this, SLOT( dataChanged() ) );
+    setContentsMargins( 0, 0, 0, 0 );
 }
 
 GlobalPropertyWidget::~GlobalPropertyWidget()
@@ -45,6 +34,16 @@ void GlobalPropertyWidget::setModel( QAbstractItemModel* model )
 {
     m_propertyView->setModel( model );
     m_propertyView->init();
+
+    GlobalPropertyGroup* props = VPtr<GlobalPropertyGroup>::asPtr( model->data( model->index( (int)Fn::Global::OBJECT, 0 ) ) );
+    QList<Fn::Global>visible = props->getVisible();
+
+    for ( int i = 0; i < visible.size(); ++i )
+    {
+        m_layout->addWidget( props->getWidget( visible[i] ) );
+        props->getWidget( visible[i] )->show();
+    }
+    m_layout->addStretch();
 }
 
 void GlobalPropertyWidget::sliderChanged( int value, int id )
@@ -54,38 +53,5 @@ void GlobalPropertyWidget::sliderChanged( int value, int id )
 
 void GlobalPropertyWidget::dataChanged()
 {
-    QModelIndex mi;
-    mi = m_propertyView->model()->index( (int)Fn::Global::SAGITTAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_sagittalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
-    }
-    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_sagittalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
-    }
-
-    mi = m_propertyView->model()->index( (int)Fn::Global::CORONAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_coronalSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
-    }
-    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_CORONAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_coronalSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
-    }
-
-    mi = m_propertyView->model()->index( (int)Fn::Global::AXIAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_axialSlider->setValue( m_propertyView->model()->data( mi ).toInt() );
-    }
-    mi = m_propertyView->model()->index( (int)Fn::Global::MAX_AXIAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_axialSlider->setMax( m_propertyView->model()->data( mi ).toInt() - 1 );
-    }
 }
 

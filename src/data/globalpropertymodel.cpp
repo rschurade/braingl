@@ -7,34 +7,42 @@
 #include "globalpropertymodel.h"
 
 #include "enums.h"
+#include "vptr.h"
 
 #include <QtCore/QPoint>
+#include <QtGui/QColor>
 
 GlobalPropertyModel::GlobalPropertyModel()
 {
-    m_properties.set( Fn::Global::AXIAL, 0 );
-    m_properties.set( Fn::Global::CORONAL, 0 );
-    m_properties.set( Fn::Global::SAGITTAL, 0 );
-    m_properties.set( Fn::Global::MAX_AXIAL, 1 );
-    m_properties.set( Fn::Global::MAX_CORONAL, 1 );
-    m_properties.set( Fn::Global::MAX_SAGITTAL, 1 );
-    m_properties.set( Fn::Global::SLICE_DX, 1.0f );
-    m_properties.set( Fn::Global::SLICE_DY, 1.0f );
-    m_properties.set( Fn::Global::SLICE_DZ, 1.0f );
-    m_properties.set( Fn::Global::LAST_PATH, QString("") );
-    m_properties.set( Fn::Global::SHOW_AXIAL, true );
-    m_properties.set( Fn::Global::SHOW_CORONAL, true );
-    m_properties.set( Fn::Global::SHOW_SAGITTAL, true );
-    m_properties.set( Fn::Global::CORONAL_AXIAL, 0 );
-    m_properties.set( Fn::Global::SAGITTAL_AXIAL, 0 );
-    m_properties.set( Fn::Global::SAGITTAL_CORONAL, 0 );
-    m_properties.set( Fn::Global::ZOOM, 1.0f );
-    m_properties.set( Fn::Global::MOVEX, 0 );
-    m_properties.set( Fn::Global::MOVEY, 0 );
-    m_properties.set( Fn::Global::BBX, 0 );
-    m_properties.set( Fn::Global::BBY, 0 );
-    m_properties.set( Fn::Global::VIEW, 0 );
-    m_properties.set( Fn::Global::RENDER_CROSSHAIRS, true );
+    m_properties = new GlobalPropertyGroup();
+    m_properties->set( Fn::Global::AXIAL, 0, true );
+    m_properties->set( Fn::Global::CORONAL, 0, true );
+    m_properties->set( Fn::Global::SAGITTAL, 0, true );
+    m_properties->set( Fn::Global::MAX_AXIAL, 1 );
+    m_properties->set( Fn::Global::MAX_CORONAL, 1 );
+    m_properties->set( Fn::Global::MAX_SAGITTAL, 1 );
+    m_properties->set( Fn::Global::SLICE_DX, 1.0f );
+    m_properties->set( Fn::Global::SLICE_DY, 1.0f );
+    m_properties->set( Fn::Global::SLICE_DZ, 1.0f );
+    m_properties->set( Fn::Global::LAST_PATH, QString("") );
+    m_properties->set( Fn::Global::SHOW_AXIAL, true );
+    m_properties->set( Fn::Global::SHOW_CORONAL, true );
+    m_properties->set( Fn::Global::SHOW_SAGITTAL, true );
+    m_properties->set( Fn::Global::CORONAL_AXIAL, 0 );
+    m_properties->set( Fn::Global::SAGITTAL_AXIAL, 0 );
+    m_properties->set( Fn::Global::SAGITTAL_CORONAL, 0 );
+    m_properties->set( Fn::Global::ZOOM, 1.0f );
+    m_properties->set( Fn::Global::MOVEX, 0 );
+    m_properties->set( Fn::Global::MOVEY, 0 );
+    m_properties->set( Fn::Global::BBX, 0 );
+    m_properties->set( Fn::Global::BBY, 0 );
+    m_properties->set( Fn::Global::VIEW, 0 );
+    m_properties->set( Fn::Global::RENDER_CROSSHAIRS, true );
+    m_properties->set( Fn::Global::BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), true );
+    m_properties->set( Fn::Global::BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), true );
+    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), true );
+    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), true );
+    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), true );
 }
 
 GlobalPropertyModel::~GlobalPropertyModel()
@@ -43,7 +51,7 @@ GlobalPropertyModel::~GlobalPropertyModel()
 
 int GlobalPropertyModel::rowCount( const QModelIndex &parent ) const
 {
-    return m_properties.size();
+    return m_properties->size();
 }
 
 int GlobalPropertyModel::columnCount( const QModelIndex &parent ) const
@@ -53,7 +61,14 @@ int GlobalPropertyModel::columnCount( const QModelIndex &parent ) const
 
 QVariant GlobalPropertyModel::data( const QModelIndex &index, int role ) const
 {
-    return m_properties.get( (Fn::Global)index.row() );
+    if ( index.row() == (int)Fn::Global::OBJECT )
+    {
+        return VPtr<GlobalPropertyGroup>::asQVariant( m_properties );
+    }
+    else
+    {
+        return m_properties->get( (Fn::Global)index.row() );
+    }
 }
 
 QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientation, int role ) const
@@ -71,7 +86,11 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
 
 QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    if ( m_properties.contains( (Fn::Global)row ) )
+    if ( m_properties->contains( (Fn::Global)row ) )
+    {
+        return createIndex( row, 0, 0 );
+    }
+    else if ( row == (int)Fn::Global::OBJECT )
     {
         return createIndex( row, 0, 0 );
     }
@@ -88,19 +107,19 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
     switch( (Fn::Global)index.row() )
     {
         case Fn::Global::CORONAL_AXIAL:
-            m_properties.set( Fn::Global::CORONAL, value.toPoint().x() );
-            m_properties.set( Fn::Global::AXIAL, value.toPoint().y() );
+            m_properties->set( Fn::Global::CORONAL, value.toPoint().x() );
+            m_properties->set( Fn::Global::AXIAL, value.toPoint().y() );
             break;
         case Fn::Global::SAGITTAL_AXIAL:
-            m_properties.set( Fn::Global::SAGITTAL, value.toPoint().x() );
-            m_properties.set( Fn::Global::AXIAL, value.toPoint().y() );
+            m_properties->set( Fn::Global::SAGITTAL, value.toPoint().x() );
+            m_properties->set( Fn::Global::AXIAL, value.toPoint().y() );
             break;
         case Fn::Global::SAGITTAL_CORONAL:
-            m_properties.set( Fn::Global::SAGITTAL, value.toPoint().x() );
-            m_properties.set( Fn::Global::CORONAL, value.toPoint().y() );
+            m_properties->set( Fn::Global::SAGITTAL, value.toPoint().x() );
+            m_properties->set( Fn::Global::CORONAL, value.toPoint().y() );
             break;
         default:
-            m_properties.set( (Fn::Global)index.row(), value );
+            m_properties->set( (Fn::Global)index.row(), value );
             break;
     }
     // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
