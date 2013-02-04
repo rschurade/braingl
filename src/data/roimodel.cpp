@@ -76,31 +76,28 @@ QModelIndex ROIModel::parent( const QModelIndex & index ) const
 QVariant ROIModel::data( const QModelIndex &index, int role ) const
 {
     QVariant roi;
+    if ( index.internalId() == -1 )
+    {
+        roi = m_boxes[index.row()][0];
+    }
+    else
+    {
+        roi = m_boxes[index.internalId()][index.row()+1];
+    }
     switch ( role )
     {
         case Qt::CheckStateRole:
         {
-            if ( index.internalId() == -1 )
-            {
-                roi = m_boxes[index.row()][0];
-            }
-            else
-            {
-                roi = m_boxes[index.internalId()][index.row()+1];
-            }
             return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::ACTIVE );
+            break;
+        }
+        case Qt::BackgroundColorRole:
+        {
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::COLOR );
             break;
         }
         case Qt::DisplayRole:
         {
-            if ( index.internalId() == -1 )
-            {
-                roi = m_boxes[index.row()][0];
-            }
-            else
-            {
-                roi = m_boxes[index.internalId()][index.row()+1];
-            }
             switch ( (Fn::ROI)index.column() )
             {
                 case Fn::ROI::POINTER:
