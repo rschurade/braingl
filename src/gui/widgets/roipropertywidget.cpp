@@ -26,7 +26,7 @@ ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
     m_propertyView = new ROIPropertyView( this );
 
     m_layout = new QVBoxLayout();
-    m_layout->setContentsMargins( 1, 0, 1, 0 );
+    m_layout->setContentsMargins( 1, 1, 1, 1 );
     m_layout->setSpacing( 1 );
     m_layout->addStretch();
     setLayout( m_layout );
