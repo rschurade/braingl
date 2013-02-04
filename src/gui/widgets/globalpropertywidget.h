@@ -31,9 +31,6 @@ private:
 
     QVBoxLayout* m_layout;
 
-    SliderWithEditInt* m_sagittalSlider;
-    SliderWithEditInt* m_coronalSlider;
-    SliderWithEditInt* m_axialSlider;
 
 public slots:
     void dataChanged();

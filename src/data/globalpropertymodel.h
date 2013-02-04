@@ -30,7 +30,7 @@ public:
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
 
 private:
-    GlobalPropertyGroup m_properties;
+    GlobalPropertyGroup* m_properties;
 };
 
 #endif /* GLOBALPROPERTYMODEL_H_ */
