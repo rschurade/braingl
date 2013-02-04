@@ -180,6 +180,25 @@ bool ROIPropertyGroup::set( Fn::ROI name, const char* value, bool visible )
     return true;
 }
 
+bool ROIPropertyGroup::set( Fn::ROI name, QColor value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value );
+    }
+    else
+    {
+        PropertyColor* prop = new PropertyColor( Fn::ROI2String::s( name ), value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
 QList<Fn::ROI> ROIPropertyGroup::getVisible()
 {
     return m_visible;

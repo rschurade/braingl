@@ -249,6 +249,7 @@ namespace Fn
         NEG,
         TYPE,
         ACTIVE,
+        COLOR,
         POINTER
     };
 
@@ -267,6 +268,7 @@ namespace Fn
                 case ROI::NEG: return QString( "neg" ); break;
                 case ROI::TYPE: return QString( "type" ); break;
                 case ROI::ACTIVE: return QString( "active" ); break;
+                case ROI::COLOR: return QString( "color" ); break;
                 case ROI::POINTER: return QString( "pointer" ); break;
             }
         return QString( "property not defined" );

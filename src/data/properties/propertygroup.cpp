@@ -180,6 +180,25 @@ bool PropertyGroup::set( Fn::Property name, const char* value, bool visible )
     return true;
 }
 
+bool PropertyGroup::set( Fn::Property name, QColor value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value );
+    }
+    else
+    {
+        PropertyColor* prop = new PropertyColor( Fn::Prop2String::s( (Fn::Property)name ), value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
 QList<Fn::Property> PropertyGroup::getVisible()
 {
     return m_visible;

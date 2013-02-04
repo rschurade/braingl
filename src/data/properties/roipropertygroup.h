@@ -10,6 +10,7 @@
 
 #include "property.h"
 #include "propertybool.h"
+#include "propertycolor.h"
 #include "propertyint.h"
 #include "propertyfloat.h"
 #include "propertystring.h"
@@ -37,6 +38,7 @@ public:
     bool set( Fn::ROI name, QString value, bool visible = false );
     bool set( Fn::ROI name, const char* value, bool visible = false );
     bool set( Fn::ROI name, QVariant value );
+    bool set( Fn::ROI name, QColor value, bool visible = false );
 
     int size() const;
 

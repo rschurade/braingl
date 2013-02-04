@@ -10,6 +10,8 @@
 
 #include "objectrenderer.h"
 
+#include <QtGui/QColor>
+
 class QGLShaderProgram;
 
 class BoxRenderer : public ObjectRenderer
@@ -22,7 +24,7 @@ public:
 
 	void draw( QMatrix4x4 mvp_matrix );
 
-	void updateGeometry( float x, float y, float z, float dx, float dy, float dz );
+	void updateGeometry( float x, float y, float z, float dx, float dy, float dz, QColor color );
 
 protected:
     void setShaderVars();
