@@ -42,7 +42,7 @@ void BoxRenderer::init()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 24 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 
-    updateGeometry( 0, 0, 0, 0, 0, 0 );
+    updateGeometry( 0, 0, 0, 0, 0, 0, QColor( 0,0,0 ) );
 }
 
 void BoxRenderer::initGeometry()
@@ -50,7 +50,7 @@ void BoxRenderer::initGeometry()
 
 }
 
-void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy, float dz )
+void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy, float dz, QColor color )
 {
     float x1 = x - dx / 2.0;
     float y1 = y - dy / 2.0;
@@ -59,16 +59,20 @@ void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy,
     float y2 = y + dy / 2.0;
     float z2 = z + dz / 2.0;
 
+    float r = color.redF();
+    float g = color.greenF();
+    float b = color.blueF();
+
     VertexData vertices[] =
     {
-        { QVector3D( x1, y1, z1 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x2, y1, z1 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x2, y2, z1 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x1, y2, z1 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x1, y1, z2 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x2, y1, z2 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x2, y2, z2 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( x1, y2, z2 ), QVector3D( 1.0, 0.0, 0.0 ) }
+        { QVector3D( x1, y1, z1 ), QVector3D( r, g, b ) },
+        { QVector3D( x2, y1, z1 ), QVector3D( r, g, b ) },
+        { QVector3D( x2, y2, z1 ), QVector3D( r, g, b ) },
+        { QVector3D( x1, y2, z1 ), QVector3D( r, g, b ) },
+        { QVector3D( x1, y1, z2 ), QVector3D( r, g, b ) },
+        { QVector3D( x2, y1, z2 ), QVector3D( r, g, b ) },
+        { QVector3D( x2, y2, z2 ), QVector3D( r, g, b ) },
+        { QVector3D( x1, y2, z2 ), QVector3D( r, g, b ) }
     };
 
     // Transfer vertex data to VBO 1

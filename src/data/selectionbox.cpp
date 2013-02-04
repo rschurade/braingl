@@ -35,6 +35,7 @@ SelectionBox::SelectionBox( QString name, QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::DZ, 5., 0., zMax/2, true );
     m_properties.set( Fn::ROI::NEG, false, true );
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
+    m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
 }
@@ -52,7 +53,8 @@ void SelectionBox::propChanged()
                                     m_properties.get( Fn::ROI::Z ).toFloat(),
                                     m_properties.get( Fn::ROI::DX ).toFloat(),
                                     m_properties.get( Fn::ROI::DY ).toFloat(),
-                                    m_properties.get( Fn::ROI::DZ ).toFloat() );
+                                    m_properties.get( Fn::ROI::DZ ).toFloat(),
+                                    m_properties.get( Fn::ROI::COLOR ).value<QColor>() );
     }
 }
 
@@ -67,7 +69,8 @@ void SelectionBox::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse )
                                     m_properties.get( Fn::ROI::Z ).toFloat(),
                                     m_properties.get( Fn::ROI::DX ).toFloat(),
                                     m_properties.get( Fn::ROI::DY ).toFloat(),
-                                    m_properties.get( Fn::ROI::DZ ).toFloat() );
+                                    m_properties.get( Fn::ROI::DZ ).toFloat(),
+                                    m_properties.get( Fn::ROI::COLOR ).value<QColor>() );
     }
     m_renderer->draw( mvpMatrix );
 }
