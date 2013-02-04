@@ -34,13 +34,13 @@ QVariant PropertyColor::getValue()
 
 void PropertyColor::setValue( QVariant value )
 {
-    //m_value = value;
+    m_value = value.value<QColor>();
     m_widget->setValue( m_value );
 }
 
 void PropertyColor::setValue( QColor value )
 {
-    //m_value = value;
+    m_value = value;
     m_widget->setValue( m_value );
 }
 

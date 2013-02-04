@@ -185,6 +185,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     //qDebug() << parent << parent.isValid();
     if ( !parent.isValid() )
     {
+        // top box
         QList<QVariant>l;
         l.push_back( VPtr<ROI>::asQVariant( newBox ) );
         beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
@@ -193,13 +194,16 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     }
     else
     {
+        // child box
         beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
         if ( parent.internalId() == -1 )
         {
+            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
             m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }
         else
         {
+            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.internalId()][0] )->properties()->get( Fn::ROI::COLOR ) );
             m_boxes[parent.internalId()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }
         endInsertRows();
