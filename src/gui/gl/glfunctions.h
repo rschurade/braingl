@@ -31,7 +31,7 @@ public:
     static void loadShaders();
     static void reloadShaders();
 
-    static void setShaderVars( QString name, QAbstractItemModel* model );
+    static void setShaderVars( QString name, QAbstractItemModel* model = 0 );
     static void setShaderVarsTensor( QGLShaderProgram* program, QAbstractItemModel* model );
     static void setShaderVarsTensorEV( QGLShaderProgram* program, QAbstractItemModel* model );
     static void setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel* model );
@@ -39,6 +39,7 @@ public:
     static void setShaderVarsQBall( QGLShaderProgram* program, QAbstractItemModel* model );
     static void setShaderVarsMesh( QGLShaderProgram* program, QAbstractItemModel* model );
     static void setShaderVarsFiber( QGLShaderProgram* program, QAbstractItemModel* model );
+    static void setShaderVarsBox( QGLShaderProgram* program );
 
     static QList<int> getTextureIndexes( QAbstractItemModel* model );
 

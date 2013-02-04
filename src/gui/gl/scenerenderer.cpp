@@ -14,6 +14,7 @@
 #include "../../data/enums.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
+#include "../../data/roi.h"
 
 #include <QtCore/QDebug>
 
@@ -23,10 +24,10 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* selectionBoxModel ) :
+SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel ) :
     m_dataModel( dataModel ),
     m_globalModel( globalModel ),
-    m_selectionBoxModelModel( selectionBoxModel ),
+    m_roiModel( roiModel ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
     m_ny( 200 ),
@@ -164,6 +165,22 @@ void SceneRenderer::draw()
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
             ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel );
+        }
+    }
+
+    int countTopBoxes = m_roiModel->rowCount();
+    for ( int i = 0; i < countTopBoxes; ++i )
+    {
+        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
+        roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+
+        QModelIndex mi = m_roiModel->index( i, 0 );
+        int countBoxes = m_roiModel->rowCount(  mi );
+
+        for ( int k = 0; k < countBoxes; ++k )
+        {
+            roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
+            roi->draw( m_mvpMatrix, m_mvMatrixInverse );
         }
     }
 }

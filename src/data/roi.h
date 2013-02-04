@@ -11,15 +11,20 @@
 #include "enums.h"
 #include "properties/roipropertygroup.h"
 
+#include <QtGui/QMatrix4x4>
+#include <QtCore/QObject>
+
 class QAbstractItemModel;
 
-class ROI
+class ROI : public QObject
 {
 public:
     ROI( QString name, QAbstractItemModel* globals );
     virtual ~ROI();
 
     ROIPropertyGroup* properties();
+
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse ) = 0;
 
 protected:
     ROIPropertyGroup m_properties;

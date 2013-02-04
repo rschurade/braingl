@@ -37,6 +37,8 @@
     <file>shaders/tensorev.fs</file>
     <file>shaders/ev.vs</file>
     <file>shaders/ev.fs</file>
+    <file>shaders/box.vs</file>
+    <file>shaders/box.fs</file>
     <file>shaders/fiber.vs</file>
     <file>shaders/fiber.fs</file>
     <file>shaders/mesh.vs</file>

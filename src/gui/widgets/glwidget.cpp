@@ -2,12 +2,13 @@
 
 #include <QtGui/QtGui>
 
-GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QWidget *parent ) :
+GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QWidget *parent ) :
 	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-	m_sceneRenderer = new SceneRenderer( dataModel, globalModel );
+	m_sceneRenderer = new SceneRenderer( dataModel, globalModel, roiModel );
 
 	connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+	connect( roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 	connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
