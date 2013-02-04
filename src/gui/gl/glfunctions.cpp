@@ -155,6 +155,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "ev" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "fiber" );
+        GLFunctions::m_shaderNames.push_back( "box" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
@@ -260,6 +261,10 @@ void GLFunctions::setShaderVars( QString name, QAbstractItemModel* model )
     if ( name == "fiber" )
     {
         setShaderVarsFiber( m_shaders[ name ], model );
+    }
+    if ( name == "box" )
+    {
+        setShaderVarsBox( m_shaders[ name ] );
     }
 }
 
@@ -376,6 +381,26 @@ void GLFunctions::setShaderVarsEV( QGLShaderProgram* program, QAbstractItemModel
     int offsetLocation = program->attributeLocation( "a_vec" );
     program->enableAttributeArray( offsetLocation );
     glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+}
+
+void GLFunctions::setShaderVarsBox( QGLShaderProgram* program )
+{
+    program->bind();
+    // Offset for position
+    long int offset = 0;
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+
+    // Offset for texture coordinate
+    offset += sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex color data
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 }
 
 void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model )

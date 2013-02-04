@@ -207,6 +207,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         }
         endInsertRows();
     }
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }
 

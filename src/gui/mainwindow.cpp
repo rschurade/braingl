@@ -40,7 +40,7 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 	m_centralTabWidget->setTabsClosable( true );
 	connect( m_centralTabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab( int ) ) );
 
-    mainGLWidget = new GLWidget( m_dataStore, m_globalProps );
+    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, roiModel );
     m_centralTabWidget->addTab( mainGLWidget, "main gl" );
 
     createActions();

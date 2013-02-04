@@ -10,12 +10,23 @@
 
 #include "roi.h"
 
+class BoxRenderer;
+
 class SelectionBox : public ROI
 {
+    Q_OBJECT
+
 public:
     SelectionBox( QString name, QAbstractItemModel* globals );
     virtual ~SelectionBox();
 
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse );
+
+private:
+    BoxRenderer* m_renderer;
+
+private slots:
+    void propChanged();
 };
 
 #endif /* SELECTIONBOX_H_ */

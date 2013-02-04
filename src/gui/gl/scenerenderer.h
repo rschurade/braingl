@@ -20,7 +20,7 @@ class QAbstractItemModel;
 class SceneRenderer
 {
 public:
-	SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* selectionBoxModel = 0 );
+	SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel );
 	virtual ~SceneRenderer();
 
 	void resizeGL( int width, int height );
@@ -43,7 +43,7 @@ private:
 
 	QAbstractItemModel* m_dataModel;
 	QAbstractItemModel* m_globalModel;
-	QAbstractItemModel* m_selectionBoxModelModel;
+	QAbstractItemModel* m_roiModel;
 
 	int m_boundingbox;
 
