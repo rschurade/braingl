@@ -41,7 +41,7 @@ ColorWidgetWithLabel::ColorWidgetWithLabel( QString label, int id, QWidget* pare
 
     setStyleSheet( "QFrame { background-color : " + m_value.name() + " }"
                      "QLabel { font:  bold 12px } "
-                     "QPushButton { font:  bold 12px; max-height: 14px; } ");
+                     "QPushButton { font:  bold 12px; max-height: 16px; } ");
 }
 
 ColorWidgetWithLabel::~ColorWidgetWithLabel()
@@ -53,7 +53,7 @@ void ColorWidgetWithLabel::setValue( QColor value )
     m_value = value;
     setStyleSheet( "QFrame { background-color : " + m_value.name() + " }"
                      "QLabel { font:  bold 12px } "
-                     "QPushButton { font:  bold 12px; max-height: 14px; } ");
+                     "QPushButton { font:  bold 12px; max-height: 16px; } ");
 }
 
 void ColorWidgetWithLabel::slotButton()
@@ -62,6 +62,6 @@ void ColorWidgetWithLabel::slotButton()
 
     setStyleSheet( "QFrame { background-color : " + m_value.name() + " }"
                      "QLabel { font:  bold 12px } "
-                     "QPushButton { font:  bold 12px; max-height: 14px; } ");
+                     "QPushButton { font:  bold 12px; max-height: 16px; } ");
     emit( colorChanged( m_value, m_id ) );
 }
