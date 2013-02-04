@@ -31,6 +31,9 @@ public:
 
 private:
     GlobalPropertyGroup* m_properties;
+
+public slots:
+    void propChanged();
 };
 
 #endif /* GLOBALPROPERTYMODEL_H_ */

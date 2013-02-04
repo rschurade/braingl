@@ -9,15 +9,16 @@
 #include "enums.h"
 #include "vptr.h"
 
+#include <QtCore/QDebug>
 #include <QtCore/QPoint>
 #include <QtGui/QColor>
 
 GlobalPropertyModel::GlobalPropertyModel()
 {
     m_properties = new GlobalPropertyGroup();
-    m_properties->set( Fn::Global::AXIAL, 0, true );
-    m_properties->set( Fn::Global::CORONAL, 0, true );
-    m_properties->set( Fn::Global::SAGITTAL, 0, true );
+    m_properties->set( Fn::Global::AXIAL, 0, 0, 0, true );
+    m_properties->set( Fn::Global::CORONAL, 0, 0, 0, true );
+    m_properties->set( Fn::Global::SAGITTAL, 0, 0, 0, true );
     m_properties->set( Fn::Global::MAX_AXIAL, 1 );
     m_properties->set( Fn::Global::MAX_CORONAL, 1 );
     m_properties->set( Fn::Global::MAX_SAGITTAL, 1 );
@@ -43,6 +44,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), true );
+    connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
 }
 
 GlobalPropertyModel::~GlobalPropertyModel()
@@ -125,8 +127,17 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
     // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
     if ( index.row() < (int)Fn::Global::ZOOM )
     {
+        propChanged();
         emit dataChanged( index, index );
     }
 
     return true;
+}
+
+void GlobalPropertyModel::propChanged()
+{
+    m_properties->setMax( Fn::Global::AXIAL, m_properties->get( Fn::Global::MAX_AXIAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Global::CORONAL, m_properties->get( Fn::Global::MAX_CORONAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Global::SAGITTAL, m_properties->get( Fn::Global::MAX_SAGITTAL ).toInt() - 1 );
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
 }

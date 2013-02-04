@@ -148,6 +148,9 @@ void NavRendererSagittal::initGeometry()
 
 void NavRendererSagittal::draw()
 {
+    QColor color = model()->data( model()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ).value<QColor>();
+    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+
     //qDebug() << "nav draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 

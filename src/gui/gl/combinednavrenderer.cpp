@@ -433,6 +433,9 @@ void CombinedNavRenderer::setShaderVars()
 
 void CombinedNavRenderer::draw()
 {
+    QColor color = model()->data( model()->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ).value<QColor>();
+    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+
     //qDebug() << "combined draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 

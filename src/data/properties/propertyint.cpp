@@ -8,6 +8,8 @@
 
 #include "../../gui/widgets/controls/sliderwitheditint.h"
 
+#include <QtCore/QDebug>
+
 PropertyInt::PropertyInt( QString name, int value, int min, int max ) :
     Property( name ),
     m_value( value ),
@@ -38,6 +40,7 @@ QVariant PropertyInt::getValue()
 void PropertyInt::setValue( QVariant value )
 {
     m_value = value.toInt();
+    m_widget->setValue( m_value );
 }
 
 void PropertyInt::setMin( int min )
@@ -47,6 +50,8 @@ void PropertyInt::setMin( int min )
     {
         m_value = m_min;
     }
+    m_widget->setMin( min );
+    m_widget->setValue( m_value );
 }
 
 void PropertyInt::setMax( int max )
@@ -56,6 +61,8 @@ void PropertyInt::setMax( int max )
     {
         m_value = m_max;
     }
+    m_widget->setMax( max );
+    m_widget->setValue( m_value );
 }
 
 void PropertyInt::widgetChanged( int value, int id )
