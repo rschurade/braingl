@@ -10,12 +10,14 @@
 
 #include <QtGui/QtGui>
 
-SingleSHWidget::SingleSHWidget( QAbstractItemModel* model, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget )
+SingleSHWidget::SingleSHWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+    QGLWidget( parent, shareWidget ),
+    m_globalModel( globalModel)
 {
-    m_renderer = new SingleSHRenderer( name );
-    m_renderer->setModel( model );
-    connect( model, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer = new SingleSHRenderer( m_globalModel );
+    m_renderer->setModel( dataModel );
+    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 SingleSHWidget::~SingleSHWidget()
