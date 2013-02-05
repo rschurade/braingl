@@ -282,6 +282,8 @@ bool Writer::save()
             saveFibs( m_fileName );
             break;
         }
+        default:
+            break;
     }
     return true;
 }
