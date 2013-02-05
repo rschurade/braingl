@@ -81,6 +81,7 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV2 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::CROSSHAIR_COLOR ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::SHOW_NAV_SLIDERS ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 ) ) );
 }
 
 void MainWindow::loadSettings()
@@ -106,6 +107,7 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV2 );
     loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV3 );
     loadSetting( settings, Fn::Global::CROSSHAIR_COLOR );
+    loadSetting( settings, Fn::Global::SHOW_NAV_SLIDERS );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Global setting )

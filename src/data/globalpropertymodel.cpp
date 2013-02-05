@@ -45,6 +45,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::RENDER_CROSSHAIRS, true, true );
     m_properties->set( Fn::Global::CROSSHAIR_COLOR, QColor( 255, 0, 0 ), true );
+    m_properties->set( Fn::Global::SHOW_NAV_SLIDERS, true, true );
     connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
 }
 

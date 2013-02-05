@@ -85,6 +85,16 @@ void DockNavGLWidget::sliderChanged( int value )
 void DockNavGLWidget::settingChanged()
 {
     QModelIndex mi;
+    mi = m_globalModel->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 );
+    if ( m_globalModel->data( mi ).toBool() )
+    {
+        m_slider->show();
+    }
+    else
+    {
+        m_slider->hide();
+    }
+
     if  ( m_name == "sagittal")
     {
         mi = m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 );
