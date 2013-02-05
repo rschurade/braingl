@@ -76,7 +76,7 @@ DatasetFibers* Fibers::thinOut()
         mergedFibs.clear();
         qDebug() << fibs.size() + unmergedFibs.size() << "fibers after merging";
     }
-    return new DatasetFibers( fibs + unmergedFibs );
+    return new DatasetFibers( m_dataset->getRoiModel(), fibs + unmergedFibs );
 }
 
 QVector<float> Fibers::mergeFibs( QVector< float >& lhs, QVector< float >& rhs )

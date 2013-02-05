@@ -18,8 +18,8 @@ class FiberRenderer;
 class DatasetFibers: public Dataset
 {
 public:
-    DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
-    DatasetFibers( QVector< QVector< float > > fibs );
+    DatasetFibers( QAbstractItemModel* roiModel, QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
+    DatasetFibers( QAbstractItemModel* roiModel, QVector< QVector< float > > fibs );
     virtual ~DatasetFibers();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );

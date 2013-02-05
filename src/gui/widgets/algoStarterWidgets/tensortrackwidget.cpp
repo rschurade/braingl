@@ -115,10 +115,10 @@ TensorTrackWidget::~TensorTrackWidget()
 {
 }
 
-QList<Dataset*> TensorTrackWidget::getFibs()
+QList<Dataset*> TensorTrackWidget::getFibs( QAbstractItemModel* roiModel )
 {
     QList<Dataset*> l;
-    DatasetFibers* fibs = new DatasetFibers( m_tracker->getFibs() );
+    DatasetFibers* fibs = new DatasetFibers( roiModel, m_tracker->getFibs() );
     l.push_back( fibs );
     return l;
 }

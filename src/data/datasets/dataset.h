@@ -27,7 +27,7 @@ class QAbstractItemModel;
 class Dataset
 {
 public:
-    Dataset( QDir fileName, Fn::DatasetType type );
+    Dataset( QDir fileName, Fn::DatasetType type, QAbstractItemModel* roiModel = 0 );
     virtual ~Dataset();
 
     PropertyGroup* properties();
@@ -38,8 +38,13 @@ public:
 
     virtual QString getValueAsString( int x, int y, int z );
 
+    void setRoiModel( QAbstractItemModel* roiModel );
+    QAbstractItemModel* getRoiModel();
+
 protected:
     virtual void createTexture();
+
+    QAbstractItemModel* m_roiModel;
 
     PropertyGroup m_properties;
 

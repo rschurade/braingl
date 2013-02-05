@@ -18,8 +18,9 @@
 
 #include <QtCore/QVariant>
 
-ToolBar::ToolBar( const QString &title, QWidget* parent ) :
-    QToolBar( title, parent )
+ToolBar::ToolBar( const QString &title, QAbstractItemModel* roiModel, QWidget* parent ) :
+    QToolBar( title, parent ),
+    m_roiModel( roiModel )
 {
     setObjectName( title );
     m_toolBarView = new ToolBarView( this );
@@ -254,7 +255,7 @@ void ToolBar::slotSelectionChanged( int type )
 void ToolBar::tensorTrackFinished()
 {
     qDebug() << "toolbar track finished";
-    QList<Dataset*>l = m_ttw->getFibs();
+    QList<Dataset*>l = m_ttw->getFibs( m_roiModel );
     for ( int i = 0; i < l.size(); ++i )
     {
         QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::NEW_DATASET );
@@ -267,7 +268,7 @@ void ToolBar::tensorTrackFinished()
 void ToolBar::crossingTrackFinished()
 {
     qDebug() << "toolbar crossing track finished";
-    QList<Dataset*>l = m_ctw->getFibs();
+    QList<Dataset*>l = m_ctw->getFibs( m_roiModel );
     for ( int i = 0; i < l.size(); ++i )
     {
         QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::NEW_DATASET );

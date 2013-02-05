@@ -26,7 +26,7 @@ public:
     CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent = 0 );
     virtual ~CrossingTrackWidget();
 
-    QList<Dataset*> getFibs();
+    QList<Dataset*> getFibs( QAbstractItemModel* roiModel );
 
 private:
     Dataset* m_ds;

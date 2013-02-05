@@ -87,7 +87,7 @@ int main( int argc, char *argv[] )
 
     for ( int i = 1; i < args.size(); ++i )
     {
-        Loader loader;
+        Loader loader( dataStore, roiModel, globalProps );
         loader.setFilename( QDir( args.at( i ) ) );
         if ( loader.load() )
         {
