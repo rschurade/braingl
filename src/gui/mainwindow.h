@@ -1,7 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../data/enums.h"
+
 #include <QtGui/QMainWindow>
+#include <QtCore/QSettings>
 
 class QAction;
 class QListView;
@@ -55,6 +58,10 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
+
+    void saveSettings();
+    void loadSettings();
+    void loadSetting( QSettings &settings, Fn::Global setting );
 
     DataStore* m_dataStore;
     GlobalPropertyModel* m_globalProps;

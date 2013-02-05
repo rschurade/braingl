@@ -56,39 +56,63 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 
     setUnifiedTitleAndToolBarOnMac( true );
 
-    QSettings settings;
-    restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
-	restoreState( settings.value( "mainWindowState" ).toByteArray() );
-
-	m_centralWidget->restoreGeometry( settings.value( "centralWidgetGeometry" ).toByteArray() );
-	m_centralWidget->restoreState( settings.value( "centralWidgetState" ).toByteArray() );
-
-	if ( settings.contains( "lastPath" ) )
-	{
-	    QString lastPath = settings.value( "lastPath" ).toString();
-	    qDebug() << "last path" << lastPath;
-	    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
-	}
-	if ( settings.contains( "lockDockTitles") )
-	{
-	    if ( settings.value( "lockDockTitles" ).toBool() )
-	    {
-	        lockDockTitlesAct->activate( QAction::Trigger );
-	    }
-	}
+	loadSettings();
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
 {
-	QSettings settings;
-	settings.setValue( "mainWindowGeometry", saveGeometry() );
-	settings.setValue( "mainWindowState", saveState() );
+    saveSettings();
+}
 
-	settings.setValue( "centralWidgetGeometry", m_centralWidget->saveGeometry() );
-	settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
+void MainWindow::saveSettings()
+{
+    QSettings settings;
+    settings.setValue( "mainWindowGeometry", saveGeometry() );
+    settings.setValue( "mainWindowState", saveState() );
 
-	settings.setValue( "lastPath", m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString() );
-	settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
+    settings.setValue( "centralWidgetGeometry", m_centralWidget->saveGeometry() );
+    settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
+
+    settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
+    settings.setValue( Fn::Global2String::s( Fn::Global::LAST_PATH ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_MAIN ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_COMBINED ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV1 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV1, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV2 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+    restoreGeometry( settings.value( "mainWindowGeometry" ).toByteArray() );
+    restoreState( settings.value( "mainWindowState" ).toByteArray() );
+
+    m_centralWidget->restoreGeometry( settings.value( "centralWidgetGeometry" ).toByteArray() );
+    m_centralWidget->restoreState( settings.value( "centralWidgetState" ).toByteArray() );
+
+    if ( settings.contains( "lockDockTitles") )
+    {
+        if ( settings.value( "lockDockTitles" ).toBool() )
+        {
+            lockDockTitlesAct->activate( QAction::Trigger );
+        }
+    }
+    loadSetting( settings, Fn::Global::LAST_PATH );
+    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_MAIN );
+    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_COMBINED );
+    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV1 );
+    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV2 );
+    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV3 );
+}
+
+void MainWindow::loadSetting( QSettings &settings, Fn::Global setting )
+{
+    if ( settings.contains( Fn::Global2String::s( setting) ) )
+    {
+        QVariant s = settings.value( Fn::Global2String::s( setting ) );
+        m_globalProps->setData( m_globalProps->index( (int)setting, 0 ), s );
+    }
 }
 
 void MainWindow::print()
