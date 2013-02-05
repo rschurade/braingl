@@ -195,15 +195,14 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     else
     {
         // child box
+        beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
         if ( parent.internalId() == -1 )
         {
-            beginInsertRows( parent, m_boxes.size(), m_boxes.size() );
             newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
             m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }
         else
         {
-            beginInsertRows( parent.parent(), m_boxes.size(), m_boxes.size() );
             newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.internalId()][0] )->properties()->get( Fn::ROI::COLOR ) );
             m_boxes[parent.internalId()].push_back( VPtr<ROI>::asQVariant( newBox ) );
         }

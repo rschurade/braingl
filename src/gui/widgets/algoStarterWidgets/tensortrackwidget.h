@@ -25,7 +25,7 @@ public:
     TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent = 0 );
     virtual ~TensorTrackWidget();
 
-    QList<Dataset*> getFibs( QAbstractItemModel* roiModel );
+    QList<Dataset*> getFibs();
 
 private:
     QVBoxLayout* m_layout;

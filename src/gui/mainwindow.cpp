@@ -129,7 +129,7 @@ void MainWindow::open()
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     if ( !fileName.isEmpty() )
     {
-        Loader loader( m_dataStore, m_roiModel, m_globalProps );
+        Loader loader;
         loader.setFilename( QDir( fileName ) );
         if ( loader.load() )
         {
@@ -326,7 +326,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction( newSelectionBoxAct );
     editToolBar->setObjectName( "editToolbar");
 
-    m_toolsToolBar = new ToolBar( tr( "Tools" ), m_roiModel, this );
+    m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
     m_toolsToolBar->setModel( m_dataStore );
     addToolBar( m_toolsToolBar );
 }
