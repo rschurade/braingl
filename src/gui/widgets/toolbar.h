@@ -23,15 +23,13 @@ class ToolBar : public QToolBar
     Q_OBJECT
 
 public:
-    ToolBar( const QString &title, QAbstractItemModel* roiModel, QWidget* parent=0 );
+    ToolBar( const QString &title, QWidget* parent=0 );
     virtual ~ToolBar();
 
     void setModel( QAbstractItemModel* model );
     void setSelectionModel( QItemSelectionModel* selectionModel );
 
 private:
-    QAbstractItemModel* m_roiModel;
-
     ToolBarView* m_toolBarView;
 
     FNAction* m_isosurfaceAct;

@@ -258,17 +258,17 @@ QList<Dataset*> DWIAlgos::fitBingham( Dataset* ds )
     return l;
 }
 
-//QList<Dataset*> DWIAlgos::tensorTrack( Dataset* ds )
-//{
-//    Track* tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
-//    tracker->startTracking();
-//
-//    QList<Dataset*> l;
-//    DatasetFibers* fibs = new DatasetFibers( tracker->getFibs() );
-//    l.push_back( fibs );
-//
-//    return l;
-//}
+QList<Dataset*> DWIAlgos::tensorTrack( Dataset* ds )
+{
+    Track* tracker = new Track( dynamic_cast<DatasetTensor*>( ds ) );
+    tracker->startTracking();
+
+    QList<Dataset*> l;
+    DatasetFibers* fibs = new DatasetFibers( tracker->getFibs() );
+    l.push_back( fibs );
+
+    return l;
+}
 
 QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
 {

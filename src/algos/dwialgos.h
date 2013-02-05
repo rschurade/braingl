@@ -25,7 +25,7 @@ public:
     static QList<Dataset*> fitBingham( Dataset* ds );
     static QList<Dataset*> bingham2DWI( Dataset* ds );
 
-    //static QList<Dataset*> tensorTrack( Dataset* ds );
+    static QList<Dataset*> tensorTrack( Dataset* ds );
 
 private:
     DWIAlgos();

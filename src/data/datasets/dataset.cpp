@@ -6,8 +6,7 @@
  */
 #include "dataset.h"
 
-Dataset::Dataset( QDir fileName, Fn::DatasetType type, QAbstractItemModel* roiModel ) :
-    m_roiModel( roiModel ),
+Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_textureGLuint( 0 )
 {
     // add standard properties
@@ -58,14 +57,4 @@ QString Dataset::getValueAsString( int x, int y, int z )
 void Dataset::createTexture()
 {
     // do nothing here
-}
-
-void Dataset::setRoiModel( QAbstractItemModel* roiModel )
-{
-    m_roiModel = roiModel;
-}
-
-QAbstractItemModel* Dataset::getRoiModel()
-{
-    return m_roiModel;
 }
