@@ -10,8 +10,10 @@
 
 #include <QtCore/QAbstractItemModel>
 
-SelectionBox::SelectionBox( QString name, QAbstractItemModel* globals ) :
-    ROI( name, globals ),
+int SelectionBox::m_count = 0;
+
+SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
+    ROI( QString("new box") + QString::number( m_count++ ), globals ),
     m_renderer( 0 )
 {
     float dx = globals->data( globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
@@ -36,8 +38,9 @@ SelectionBox::SelectionBox( QString name, QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::NEG, false, true );
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::ROI::ID, m_count );
 
-    connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+    connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
 }
 
 SelectionBox::~SelectionBox()

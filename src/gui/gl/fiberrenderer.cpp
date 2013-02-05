@@ -12,13 +12,17 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 
-FiberRenderer::FiberRenderer( QVector< QVector< float > >& data )  :
+FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data )  :
     ObjectRenderer(),
+    m_roiModel( roiModel ),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
     m_isInitialized( false ),
     m_colorMode( 0 )
 {
+    connect( m_roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
+    connect( m_roiModel, SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );
+    connect( m_roiModel, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), this, SLOT( roiDeleted( QModelIndex, int, int ) ) );
 }
 
 FiberRenderer::~FiberRenderer()
@@ -125,4 +129,19 @@ void FiberRenderer::initGeometry()
 void FiberRenderer::setRenderParams( int colorMode )
 {
     m_colorMode = colorMode;
+}
+
+void FiberRenderer::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
+{
+    qDebug() << "roi changed" << topLeft.row() << topLeft.column() << topLeft.internalId();
+}
+
+void FiberRenderer::roiInserted( const QModelIndex &parent, int start, int end )
+{
+    qDebug() << "roi inserted" << parent.row() << start << end;
+}
+
+void FiberRenderer::roiDeleted( const QModelIndex &parent, int start, int end )
+{
+    qDebug() << "roi deleted" << parent.row() << start << end;
 }

@@ -179,36 +179,39 @@ Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
 
 bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
 {
-    QString name = QString("new box") + QString::number( m_count++ );
-    SelectionBox* newBox = new SelectionBox( name, m_globalProps );
-    connect( newBox->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
-    //qDebug() << parent << parent.isValid();
-    if ( !parent.isValid() )
+    SelectionBox* newBox = new SelectionBox( m_globalProps );
+    connect( newBox->properties(), SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
+
+    if ( parent.isValid() )
     {
-        // top box
+        // child box
+        if ( parent.parent().isValid() )
+        {
+            // child box selected
+            beginInsertRows( parent.parent(), m_boxes[parent.parent().row()].size(), m_boxes[parent.parent().row()].size() );
+            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.parent().row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            m_boxes[parent.parent().row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
+            endInsertRows();
+        }
+        else
+        {
+            // top box selected
+            beginInsertRows( parent, m_boxes[parent.row()].size(), m_boxes[parent.row()].size() );
+            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
+            endInsertRows();
+        }
+    }
+    else
+    {
+        // nothing selected, insert top box
         QList<QVariant>l;
         l.push_back( VPtr<ROI>::asQVariant( newBox ) );
         beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
         m_boxes.push_back( l );
         endInsertRows();
+
     }
-    else
-    {
-        // child box
-        beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
-        if ( parent.internalId() == -1 )
-        {
-            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
-            m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
-        }
-        else
-        {
-            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.internalId()][0] )->properties()->get( Fn::ROI::COLOR ) );
-            m_boxes[parent.internalId()].push_back( VPtr<ROI>::asQVariant( newBox ) );
-        }
-        endInsertRows();
-    }
-    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }
 
@@ -223,16 +226,45 @@ bool ROIModel::removeRows( int row, int count, const QModelIndex &parent )
     else
     {
         beginRemoveRows( parent, row, row );
-        QList<QVariant>l = m_boxes[parent.row()];
-        l.removeAt( row );
-        endMoveRows();
+        m_boxes[parent.row()].removeAt( row + 1 );
+        endRemoveRows();
     }
     return true;
 }
 
-void ROIModel::propChanged()
+void ROIModel::propChanged( int value )
 {
-    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
-
+    bool found = false;
+    int ii = -1;
+    int kk = -1;
+    for ( int i = 0; i < m_boxes.size(); ++i )
+    {
+        for ( int k = 0; k < m_boxes[i].size(); ++k )
+        {
+            if ( value == VPtr<ROI>::asPtr( m_boxes[i][k] )->properties()->get( Fn::ROI::ID ).toInt() )
+            {
+                found = true;
+                kk = k;
+                break;
+            }
+        }
+        if ( found )
+        {
+            ii = i;
+            break;
+        }
+    }
+    if ( kk == 0 )
+    {
+        QModelIndex parent;
+        QModelIndex index = this->index( ii, 0, parent );
+        emit ( dataChanged( index, index ) );
+    }
+    else
+    {
+        QModelIndex parent = this->index( ii, 0, QModelIndex() );
+        QModelIndex index = this->index( kk - 1, 0, parent );
+        emit ( dataChanged( index, index ) );
+    }
 }
 

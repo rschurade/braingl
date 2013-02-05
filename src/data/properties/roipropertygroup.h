@@ -53,7 +53,7 @@ private slots:
     void slotPropChanged();
 
 signals:
-    void signalPropChanged();
+    void signalPropChanged( int );
 };
 
 #endif /* ROIPROPERTYGROUP_H_ */

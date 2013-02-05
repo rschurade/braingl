@@ -266,6 +266,7 @@ namespace Fn
         TYPE,
         ACTIVE,
         COLOR,
+        ID,
         POINTER
     };
 
@@ -285,6 +286,7 @@ namespace Fn
                 case ROI::TYPE: return QString( "type" ); break;
                 case ROI::ACTIVE: return QString( "active" ); break;
                 case ROI::COLOR: return QString( "color" ); break;
+                case ROI::ID: return QString( "id" ); break;
                 case ROI::POINTER: return QString( "pointer" ); break;
             }
         return QString( "property not defined" );
