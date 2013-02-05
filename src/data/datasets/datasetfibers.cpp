@@ -43,12 +43,12 @@ QVector< QVector< float > > DatasetFibers::getFibs()
     return m_fibs;
 }
 
-void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
+void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
     if ( m_renderer == 0 )
     {
         m_renderer = new FiberRenderer( m_fibs );
-        m_renderer->setModel( model );
+        m_renderer->setModel( globalModel );
         m_renderer->init();
     }
     m_renderer->setRenderParams( m_properties.get( Fn::Property::FIBER_COLORMODE ).toInt() );
