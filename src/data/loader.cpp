@@ -20,7 +20,10 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QtGui>
 
-Loader::Loader() :
+Loader::Loader( QAbstractItemModel* dataModel, QAbstractItemModel* roiModel, QAbstractItemModel* globalModel ) :
+    m_dataModel( dataModel ),
+    m_roiModel( roiModel ),
+    m_globalModel( globalModel ),
     m_datasetType( Fn::DatasetType::UNKNOWN ),
     m_success( false )
 {
@@ -1000,7 +1003,7 @@ bool Loader::loadFib()
                 fibs.push_back( fib );
             }
 
-            DatasetFibers* dataset = new DatasetFibers( fn, fibs, numPoints, numLines );
+            DatasetFibers* dataset = new DatasetFibers( m_roiModel, fn, fibs, numPoints, numLines );
             m_dataset.push_back( dataset );
 
             return true;

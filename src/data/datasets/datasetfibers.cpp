@@ -8,8 +8,8 @@
 
 #include "../../gui/gl/fiberrenderer.h"
 
-DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
-    Dataset( filename, Fn::DatasetType::FIBERS ),
+DatasetFibers::DatasetFibers( QAbstractItemModel* roiModel, QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
+    Dataset( filename, Fn::DatasetType::FIBERS, roiModel ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {
@@ -18,8 +18,8 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 1, true );
 }
 
-DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
-    Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
+DatasetFibers::DatasetFibers( QAbstractItemModel* roiModel, QVector< QVector< float > > fibs ) :
+    Dataset( QString("new fibers"), Fn::DatasetType::FIBERS, roiModel ),
     m_fibs( fibs ),
     m_renderer( 0 )
 {

@@ -18,7 +18,7 @@
 class Loader
 {
 public:
-    Loader();
+    Loader( QAbstractItemModel* dataModel, QAbstractItemModel* roiModel, QAbstractItemModel* globalModel );
     virtual ~Loader();
 
     bool load();
@@ -50,6 +50,10 @@ private:
     bool loadMeshBinary();
 
     QString readLine( QDataStream& in );
+
+    QAbstractItemModel* m_dataModel;
+    QAbstractItemModel* m_roiModel;
+    QAbstractItemModel* m_globalModel;
 
     nifti_image* m_header;
     QDir m_fileName;
