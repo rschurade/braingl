@@ -26,10 +26,10 @@
 
 #include <limits>
 
-SingleSHRenderer::SingleSHRenderer( QString name ) :
+SingleSHRenderer::SingleSHRenderer( QAbstractItemModel* globalModel ) :
     ObjectRenderer(),
+    m_globalModel( globalModel ),
     vboIds( new GLuint[ 2 ] ),
-    m_name( name ),
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
@@ -53,7 +53,7 @@ void SingleSHRenderer::init()
 
 void SingleSHRenderer::initGL()
 {
-    qDebug() << "gl init " << m_name << " widget";
+    qDebug() << "gl init single sh widget";
     GLenum errorCode = glewInit();
     if ( GLEW_OK != errorCode )
     {
@@ -132,15 +132,15 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+    m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+    m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
-    int xbi = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
-    int ybi = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
-    //int zbi = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+    int xbi = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
+    int ybi = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
+    //int zbi = model()->data( m_globalModel->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 
@@ -230,44 +230,44 @@ void SingleSHRenderer::setShaderVars()
 
 void SingleSHRenderer::draw()
 {
-//    QList<int>rl;
-//
-//    int countDatasets = model()->rowCount();
-//    for ( int i = 0; i < countDatasets; ++i )
-//    {
-//        QModelIndex index = model()->index( i, Fn::Property::ACTIVE );
-//        if ( model()->data( index, Qt::DisplayRole ).toBool() )
-//        {
-//            index = model()->index( i, Fn::Property::TYPE );
-//            if ( model()->data( index, Qt::DisplayRole ).toInt() == FNDT_NIFTI_SH )
-//            {
-//                rl.push_back( i );
-//                //qDebug() << "found QBall to render";
-//            }
-//        }
-//    }
-//
-//    if ( rl.size() > 0 )
-//    {
-//        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-//
-//        GLFunctions::getShader( "qball" )->bind();
-//        // Set modelview-projection matrix
-//        GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-//        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
-//
-//        bool minMaxScaling = m_dataset->getProperty( Fn::Property::MINMAX_SCALING ).toBool();
-//        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", minMaxScaling );
-//
-//        initGeometry();
-//
-//        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-//
-//        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-//        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-//        setShaderVars();
-//        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
-//        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-//        glBindBuffer( GL_ARRAY_BUFFER, 0 );
-//    }
+    QList<int>rl;
+
+    int countDatasets = model()->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = model()->index( i, (int)Fn::Property::ACTIVE );
+        if ( model()->data( index, Qt::DisplayRole ).toBool() )
+        {
+            index = model()->index( i, (int)Fn::Property::TYPE );
+            if ( model()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
+            {
+                rl.push_back( i );
+                //qDebug() << "found QBall to render";
+            }
+        }
+    }
+
+    if ( rl.size() > 0 )
+    {
+        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+
+        GLFunctions::getShader( "qball" )->bind();
+        // Set modelview-projection matrix
+        GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
+        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
+
+        bool minMaxScaling = m_dataset->properties()->get( Fn::Property::MINMAX_SCALING ).toBool();
+        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", minMaxScaling );
+
+        initGeometry();
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+        setShaderVars();
+        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
 }

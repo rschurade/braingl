@@ -20,7 +20,7 @@ class DatasetDWI;
 class SingleSHRenderer : public ObjectRenderer
 {
 public:
-    SingleSHRenderer( QString name );
+    SingleSHRenderer( QAbstractItemModel* globalModel );
     virtual ~SingleSHRenderer();
 
     void resizeGL( int width, int height );
@@ -41,9 +41,9 @@ private:
 
     void calcMVPMatrix();
 
-    GLuint *vboIds;
+    QAbstractItemModel* m_globalModel;
 
-    QString m_name;
+    GLuint *vboIds;
 
     int m_width;
     int m_height;
