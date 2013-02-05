@@ -107,8 +107,8 @@ void BinghamRenderer::initGeometry()
     int upperY = m_visibleArea[3];
     int upperZ = m_visibleArea[5];
 
-    int _lod = m_lodAdjust - 2;
-    int lod = qMin( 5, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) + _lod ) );
+
+    int lod = qMin( m_lodAdjust, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
 
     QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod);
     if ( s == m_previousSettings || m_orient == 0 )

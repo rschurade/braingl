@@ -47,7 +47,7 @@ private:
     float m_scaling;
     int m_orient;
     float m_offset;
-    float m_lodAdjust;
+    int m_lodAdjust;
     bool m_minMaxScaling;
     int m_order;
 
