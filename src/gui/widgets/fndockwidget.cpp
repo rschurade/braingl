@@ -7,6 +7,8 @@
 
 #include "fndockwidget.h"
 
+#include <QtCore/QDebug>
+
 FNDockWidget::FNDockWidget( QString name, QWidget* widget, QWidget* parent ) :
     QDockWidget( name, parent )
 {

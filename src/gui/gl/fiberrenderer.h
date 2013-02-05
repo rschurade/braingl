@@ -14,8 +14,10 @@
 
 class FiberRenderer : public ObjectRenderer
 {
+    Q_OBJECT
+
 public:
-    FiberRenderer( QVector< QVector< float > >& data );
+    FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data );
     virtual ~FiberRenderer();
 
     void init();
@@ -33,6 +35,7 @@ protected:
     void initIndexBuffer( int lod );
 
 private:
+    QAbstractItemModel* m_roiModel;
     GLuint *vboIds;
 
     QVector< QVector< float > > m_data;
@@ -42,6 +45,11 @@ private:
     bool m_isInitialized;
 
     int m_colorMode;
+
+private slots:
+    void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
+    void roiInserted( const QModelIndex &parent, int start, int end );
+    void roiDeleted( const QModelIndex &parent, int start, int end );
 };
 
 #endif /* FIBERRENDERER_H_ */

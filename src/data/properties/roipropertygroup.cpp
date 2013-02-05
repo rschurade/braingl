@@ -211,7 +211,7 @@ QWidget* ROIPropertyGroup::getWidget( Fn::ROI name )
 
 void ROIPropertyGroup::slotPropChanged()
 {
-    signalPropChanged();
+    emit( signalPropChanged( m_properties[(int)Fn::ROI::ID]->getValue().toInt() ) );
 }
 
 int ROIPropertyGroup::size() const

@@ -27,6 +27,7 @@ void ROITreeView::addBox()
     }
     else
     {
+        // nothing selected, inserting top box
         model()->insertRows( 0, 1, QModelIndex() );
     }
 }

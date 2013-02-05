@@ -40,7 +40,7 @@ private:
     int m_count;
 
 public slots:
-    void propChanged();
+    void propChanged( int );
 
 };
 

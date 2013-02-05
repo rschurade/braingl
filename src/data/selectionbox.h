@@ -17,11 +17,12 @@ class SelectionBox : public ROI
     Q_OBJECT
 
 public:
-    SelectionBox( QString name, QAbstractItemModel* globals );
+    SelectionBox( QAbstractItemModel* globals );
     virtual ~SelectionBox();
 
     virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse );
 
+    static int m_count;
 private:
     BoxRenderer* m_renderer;
 
