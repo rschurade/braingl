@@ -46,6 +46,10 @@ private:
 
     int m_colorMode;
 
+    QVector<bool>m_bitfield;
+    QList<QVector<bool> >m_branchfields;
+    QList<QList<QVector<bool> > >m_bitfields;
+
 private slots:
     void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
     void roiInserted( const QModelIndex &parent, int start, int end );

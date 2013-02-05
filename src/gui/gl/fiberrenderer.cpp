@@ -23,6 +23,8 @@ FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< fl
     connect( m_roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
     connect( m_roiModel, SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );
     connect( m_roiModel, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), this, SLOT( roiDeleted( QModelIndex, int, int ) ) );
+
+    m_bitfield.resize( data.size() );
 }
 
 FiberRenderer::~FiberRenderer()
@@ -134,14 +136,52 @@ void FiberRenderer::setRenderParams( int colorMode )
 void FiberRenderer::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
     qDebug() << "roi changed" << topLeft.row() << topLeft.column() << topLeft.internalId();
+    int branch = 0;
+    int pos = 0;
+    if ( topLeft.internalId() == -1 )
+    {
+        // top level box
+        branch = topLeft.row();
+    }
+    else
+    {
+        // child box
+        branch = topLeft.internalId();
+        pos = topLeft.row() + 1;
+    }
+
 }
 
 void FiberRenderer::roiInserted( const QModelIndex &parent, int start, int end )
 {
     qDebug() << "roi inserted" << parent.row() << start << end;
+    if ( parent.row() == -1 )
+    {
+        // inserted top level roi
+        QList<QVector<bool> >newBranch;
+        QVector<bool>newLeaf( m_data.size() );
+        newBranch.push_back( newLeaf );
+        m_branchfields.push_back( newLeaf );
+        m_bitfields.push_back( newBranch );
+    }
+    else
+    {
+        // inserted child roi
+        QVector<bool>newLeaf( m_data.size() );
+        m_bitfields[parent.row()].push_back( newLeaf );
+    }
 }
 
 void FiberRenderer::roiDeleted( const QModelIndex &parent, int start, int end )
 {
     qDebug() << "roi deleted" << parent.row() << start << end;
+    if ( parent.row() == -1 )
+    {
+        m_bitfields.removeAt( start );
+        m_branchfields.removeAt( start );
+    }
+    else
+    {
+        m_bitfields[parent.row()].removeAt( start + 1 );
+    }
 }
