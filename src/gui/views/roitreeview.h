@@ -13,6 +13,8 @@
 
 class ROITreeView : public QTreeView
 {
+    Q_OBJECT
+
 public:
     ROITreeView( QWidget* parent = 0 );
     virtual ~ROITreeView();
@@ -21,6 +23,12 @@ public:
 
 private:
     virtual void mousePressEvent( QMouseEvent *event );
+
+private slots:
+    void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
+
+signals:
+    void itemSelectionChanged( const QItemSelection &selected );
 
 };
 

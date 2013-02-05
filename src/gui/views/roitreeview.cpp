@@ -43,3 +43,8 @@ void ROITreeView::mousePressEvent(QMouseEvent *event)
         selectionModel()->setCurrentIndex( index, QItemSelectionModel::Select );
     }
 }
+
+void ROITreeView::selectionChanged( const QItemSelection &selected, const QItemSelection &deselected )
+{
+    emit itemSelectionChanged( selected );
+}

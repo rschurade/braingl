@@ -31,6 +31,7 @@ public:
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
 
     bool insertRows( int row, int count, const QModelIndex &parent=QModelIndex() );
+    bool removeRows( int row, int count, const QModelIndex &parent=QModelIndex() );
 
 private:
     QAbstractItemModel* m_globalProps;

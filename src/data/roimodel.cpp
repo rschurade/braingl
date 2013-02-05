@@ -212,6 +212,23 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     return true;
 }
 
+bool ROIModel::removeRows( int row, int count, const QModelIndex &parent )
+{
+    if ( !parent.isValid() )
+    {
+        beginRemoveRows( QModelIndex(), row, row );
+        m_boxes.removeAt( row );
+        endRemoveRows();
+    }
+    else
+    {
+        beginRemoveRows( parent, row, row );
+        QList<QVariant>l = m_boxes[parent.row()];
+        l.removeAt( row );
+        endMoveRows();
+    }
+}
+
 void ROIModel::propChanged()
 {
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
