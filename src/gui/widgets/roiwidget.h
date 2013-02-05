@@ -13,6 +13,7 @@
 class QAbstractItemModel;
 class QVBoxLayout;
 class QPushButton;
+class QItemSelection;
 class QItemSelectionModel;
 class ROITreeView;
 
@@ -37,7 +38,9 @@ private:
 
 public slots:
     void addBox();
+    void deleteItem();
     void treeClicked();
+    void itemSelectionChanged( const QItemSelection &selected );
 };
 
 #endif /* ROIWIDGET_H_ */

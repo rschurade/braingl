@@ -34,7 +34,7 @@ ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
 
 //    connect( m_upButton, SIGNAL( clicked() ), this, SLOT( moveItemUp() ) );
 //    connect( m_downButton, SIGNAL( clicked() ), this, SLOT( moveItemDown() ) );
-//    connect( m_deleteButton, SIGNAL( clicked() ), this, SLOT( deleteItem() ) );
+    connect( m_deleteButton, SIGNAL( clicked() ), this, SLOT( deleteItem() ) );
 
     buttonLayout->setContentsMargins( 0, 0, 0, 0 );
 
@@ -54,6 +54,8 @@ ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
 
     setStyleSheet( "QPushButton { font:  bold 12px; max-height: 14px; margin-top: -1px } " );
 
+    connect( m_treeView, SIGNAL(itemSelectionChanged( const QItemSelection ) ), this, SLOT( itemSelectionChanged( const QItemSelection ) ) );
+
 }
 
 ROIWidget::~ROIWidget()
@@ -72,4 +74,20 @@ void ROIWidget::treeClicked()
 QItemSelectionModel* ROIWidget::selectionModel()
 {
     return m_treeView->selectionModel();
+}
+
+void ROIWidget::itemSelectionChanged( const QItemSelection &selected )
+{
+    m_deleteButton->setEnabled( false );
+
+    if ( selected.indexes().size() > 0 )
+    {
+        m_deleteButton->setEnabled( true );
+    }
+}
+
+void ROIWidget::deleteItem()
+{
+    QModelIndex id = m_treeView->selectionModel()->selectedIndexes().first();
+    m_treeView->model()->removeRows( id.row(), 0, id.parent() );
 }
