@@ -38,12 +38,12 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Global::BBX, 0 );
     m_properties->set( Fn::Global::BBY, 0 );
     m_properties->set( Fn::Global::VIEW, 0 );
-    m_properties->set( Fn::Global::RENDER_CROSSHAIRS, true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), true );
     m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), true );
+    m_properties->set( Fn::Global::RENDER_CROSSHAIRS, true, true );
     m_properties->set( Fn::Global::CROSSHAIR_COLOR, QColor( 255, 0, 0 ), true );
     connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
 }
