@@ -43,7 +43,7 @@ PropertyGroup* Dataset::properties()
     return &m_properties;
 }
 
-void Dataset::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
+void Dataset::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
     // do nothing here
 }

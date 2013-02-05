@@ -34,7 +34,7 @@ public:
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel );
 
     virtual QString getValueAsString( int x, int y, int z );
 

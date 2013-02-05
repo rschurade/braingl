@@ -20,7 +20,7 @@ public:
 
     QVector<float>* getData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model );
+    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel );
     QString getValueAsString( int x, int y, int z );
 
 private:

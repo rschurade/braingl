@@ -205,7 +205,7 @@ void DatasetTensor::flipX()
     m_data = newData;
 }
 
-void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
+void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
     if ( m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() == 0 )
     {
@@ -213,7 +213,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
         {
             m_renderer = new TensorRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
                     m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
-            m_renderer->setModel( model );
+            m_renderer->setModel( globalModel );
             m_renderer->init();
         }
 
@@ -228,7 +228,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
         {
             m_rendererEV = new TensorRendererEV( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
                     m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
-            m_rendererEV->setModel( model );
+            m_rendererEV->setModel( globalModel );
             m_rendererEV->init();
         }
 

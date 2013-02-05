@@ -62,12 +62,12 @@ DatasetIsosurface::~DatasetIsosurface()
 {
 }
 
-void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* model )
+void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( m_mesh );
-        m_renderer->setModel( model );
+        m_renderer->setModel( globalModel );
         m_renderer->init();
     }
 

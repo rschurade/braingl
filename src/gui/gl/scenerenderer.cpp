@@ -168,7 +168,7 @@ void SceneRenderer::draw()
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel );
+            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel, m_roiModel );
         }
     }
 
