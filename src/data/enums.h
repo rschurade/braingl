@@ -196,6 +196,7 @@ namespace Fn
        BACKGROUND_COLOR_NAV1,
        BACKGROUND_COLOR_NAV2,
        BACKGROUND_COLOR_NAV3,
+       CROSSHAIR_COLOR,
        OBJECT,
    // settings that need a datastore signal to update widgets need to be inserted above this line
        ZOOM,
@@ -236,6 +237,7 @@ namespace Fn
                 case Global::BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
                 case Global::BACKGROUND_COLOR_NAV2: return QString( "background color nav 2" ); break;
                 case Global::BACKGROUND_COLOR_NAV3: return QString( "background color nav 3" ); break;
+                case Global::CROSSHAIR_COLOR: return QString( "crosshair color" ); break;
                 case Global::OBJECT: return QString( "" ); break;
                 // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Global::ZOOM: return QString( "" ); break;
