@@ -169,7 +169,7 @@ void FiberRenderer::setRenderParams( int colorMode )
 void FiberRenderer::updatePresentRois()
 {
     int numBranches = m_roiModel->rowCount( QModelIndex() );
-    qDebug() << "num branches" << numBranches;
+
     for ( int i = 0; i < numBranches; ++i )
     {
         QList<QVector<bool> >newBranch;
@@ -180,7 +180,7 @@ void FiberRenderer::updatePresentRois()
         updateBox( m_bitfields.size() - 1, 0 );
 
         int leafCount = m_roiModel->rowCount( createIndex( i, 0, 0 ) );
-        qDebug() << "leaf count" << leafCount;
+
         for ( int k = 0; k < leafCount; ++k )
         {
             // inserted child roi
