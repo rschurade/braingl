@@ -39,6 +39,8 @@ protected:
 private:
     QModelIndex createIndex( int branch, int pos, int column );
 
+    void updatePresentRois();
+
     QAbstractItemModel* m_roiModel;
     GLuint *vboIds;
 
