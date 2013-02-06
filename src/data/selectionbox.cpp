@@ -32,9 +32,9 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::X, x, 0., xMax, true );
     m_properties.set( Fn::ROI::Y, y, 0., yMax, true );
     m_properties.set( Fn::ROI::Z, z, 0., zMax, true );
-    m_properties.set( Fn::ROI::DX, 5., 0., xMax/2, true );
-    m_properties.set( Fn::ROI::DY, 5., 0., yMax/2, true );
-    m_properties.set( Fn::ROI::DZ, 5., 0., zMax/2, true );
+    m_properties.set( Fn::ROI::DX, 20., 0., xMax/2, true );
+    m_properties.set( Fn::ROI::DY, 20., 0., yMax/2, true );
+    m_properties.set( Fn::ROI::DZ, 20., 0., zMax/2, true );
     m_properties.set( Fn::ROI::NEG, false, true );
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );

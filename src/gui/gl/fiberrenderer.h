@@ -37,10 +37,17 @@ protected:
     void initIndexBuffer( int lod );
 
 private:
+    QModelIndex createIndex( int branch, int pos, int column );
+
     QAbstractItemModel* m_roiModel;
     GLuint *vboIds;
 
     QVector< QVector< float > > m_data;
+
+    int m_numLines;
+    int m_numPoints;
+
+
     QVector<int>m_pointsPerLine;
     QVector<int>m_startIndexes;
 
@@ -49,17 +56,26 @@ private:
     int m_colorMode;
 
     KdTree* m_kdTree;
+    QVector<float>m_kdVerts;
     QVector<int>m_reverseIndexes;
 
-
-    QVector<bool>m_bitfield;
+    QVector<bool>m_rootfield;
     QList<QVector<bool> >m_branchfields;
     QList<QList<QVector<bool> > >m_bitfields;
+
+    QVector<float> m_boxMin;
+    QVector<float> m_boxMax;
 
 private slots:
     void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
     void roiInserted( const QModelIndex &parent, int start, int end );
     void roiDeleted( const QModelIndex &parent, int start, int end );
+
+    void updateBox( int branch, int pos );
+    void boxTest( QVector<bool>& workfield, int left, int right, int axis );
+
+    void updateBranch( int branch );
+    void updateRoot();
 };
 
 #endif /* FIBERRENDERER_H_ */

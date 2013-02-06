@@ -106,8 +106,10 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
                     break;
                 }
                 default:
-                    return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::NAME );
+                {
+                    return VPtr<ROI>::asPtr( roi )->properties()->get( (Fn::ROI)index.column() );
                     break;
+                }
             }
             break;
         }
@@ -141,16 +143,29 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                return VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             else
             {
-                return VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             break;
         }
         case Qt::DisplayRole:
         {
+            if ( index.column() == (int)Fn::ROI::UPDATED )
+            {
+                emit( dataChanged( QModelIndex(), QModelIndex() ) );
+                return true;
+            }
+            if ( index.internalId() == -1 )
+            {
+                VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( (Fn::ROI)index.column(), value );
+            }
+            else
+            {
+                VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( (Fn::ROI)index.column(), value );
+            }
             break;
         }
     }
@@ -212,6 +227,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         endInsertRows();
 
     }
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }
 
@@ -229,6 +245,8 @@ bool ROIModel::removeRows( int row, int count, const QModelIndex &parent )
         m_boxes[parent.row()].removeAt( row + 1 );
         endRemoveRows();
     }
+
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }
 
