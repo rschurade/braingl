@@ -34,6 +34,7 @@ private:
 
 public slots:
     void updateWidgetVisibility();
+    void clearWidget();
 };
 
 #endif /* ROIPROPERTYWIDGET_H_ */

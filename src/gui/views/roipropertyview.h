@@ -38,6 +38,7 @@ private:
 
 signals:
     void selectedChanged();
+    void nothingSelected();
 
 public slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );

@@ -42,10 +42,32 @@ void ROITreeView::mousePressEvent(QMouseEvent *event)
         clearSelection();
         const QModelIndex index;
         selectionModel()->setCurrentIndex( index, QItemSelectionModel::Select );
+        emit nothingSelected();
     }
+
+    repaint();
 }
 
 void ROITreeView::selectionChanged( const QItemSelection &selected, const QItemSelection &deselected )
 {
     emit itemSelectionChanged( selected );
+}
+
+void ROITreeView::rowsInserted (const QModelIndex &parent, int start, int end )
+{
+    if ( selectionModel()->hasSelection() )
+    {
+        expand( selectionModel()->selectedRows().at( 0 ) );
+    }
+    selectionModel()->clear();
+    if ( parent.row() == -1 )
+    {
+        selectionModel()->select( model()->index( start, 0, parent ), QItemSelectionModel::Select );
+    }
+    else
+    {
+        selectionModel()->select( model()->index( start-1, 0, parent ), QItemSelectionModel::Select );
+    }
+    QTreeView::rowsInserted( parent, start, end );
+
 }

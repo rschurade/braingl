@@ -26,9 +26,11 @@ private:
 
 private slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
+    void rowsInserted (const QModelIndex &parent, int start, int end );
 
 signals:
     void itemSelectionChanged( const QItemSelection &selected );
+    void nothingSelected();
 
 };
 

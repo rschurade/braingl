@@ -34,6 +34,7 @@ ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
     setContentsMargins( 0, 0, 0, 0 );
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
+    connect( m_propertyView, SIGNAL( nothingSelected() ), this, SLOT( clearWidget() ) );
 }
 
 ROIPropertyWidget::~ROIPropertyWidget()
@@ -53,6 +54,7 @@ void ROIPropertyWidget::setSelectionModel( QItemSelectionModel* selectionModel )
 void ROIPropertyWidget::updateWidgetVisibility()
 {
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::ROI::POINTER );
+
     ROI* roi = VPtr<ROI>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
     QList<Fn::ROI>visible = roi->properties()->getVisible();
 
@@ -71,5 +73,19 @@ void ROIPropertyWidget::updateWidgetVisibility()
         roi->properties()->getWidget( visible[i] )->show();
         m_visibleWidgets.push_back( roi->properties()->getWidget( visible[i] ) );
     }
+    m_layout->addStretch();
+}
+
+void ROIPropertyWidget::clearWidget()
+{
+    for ( int i = 0; i < m_visibleWidgets.size(); ++i )
+    {
+        m_visibleWidgets[i]->hide();
+        m_layout->removeWidget( m_visibleWidgets[i] );
+    }
+    m_layout->removeItem( m_layout->itemAt( 0 ) );
+    m_visibleWidgets.clear();
+    repaint();
+
     m_layout->addStretch();
 }
