@@ -246,7 +246,7 @@ bool ROIModel::removeRows( int row, int count, const QModelIndex &parent )
         endRemoveRows();
     }
 
-    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
+    emit ( dataChanged( QModelIndex(), QModelIndex() ) );
     return true;
 }
 
