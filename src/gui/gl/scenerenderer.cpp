@@ -179,17 +179,17 @@ void SceneRenderer::draw()
         if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
         {
             roi->draw( m_mvpMatrix, m_mvMatrixInverse );
-        }
 
-        QModelIndex mi = m_roiModel->index( i, 0 );
-        int countBoxes = m_roiModel->rowCount(  mi );
+            QModelIndex mi = m_roiModel->index( i, 0 );
+            int countBoxes = m_roiModel->rowCount(  mi );
 
-        for ( int k = 0; k < countBoxes; ++k )
-        {
-            roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
-            if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+            for ( int k = 0; k < countBoxes; ++k )
             {
-                roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+                roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
+                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+                {
+                    roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+                }
             }
         }
     }
