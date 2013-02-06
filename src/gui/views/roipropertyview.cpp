@@ -79,6 +79,10 @@ void ROIPropertyView::selectionChanged( const QItemSelection &selected, const QI
     {
         emit( selectedChanged() );
     }
+    else
+    {
+        emit( nothingSelected() );
+    }
 }
 
 void ROIPropertyView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )

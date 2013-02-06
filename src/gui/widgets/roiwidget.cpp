@@ -55,7 +55,6 @@ ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
     setStyleSheet( "QPushButton { font:  bold 12px; max-height: 14px; margin-top: -1px } " );
 
     connect( m_treeView, SIGNAL(itemSelectionChanged( const QItemSelection ) ), this, SLOT( itemSelectionChanged( const QItemSelection ) ) );
-
 }
 
 ROIWidget::~ROIWidget()
