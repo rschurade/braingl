@@ -125,6 +125,23 @@ void FiberRenderer::initGeometry()
     }
     qDebug() << "create fiber vbo's done";
 
+    QVector<float>kdVerts;
+    kdVerts.reserve( verts.size() / 9 * 3 );
+    m_reverseIndexes.reserve( verts.size() / 9 );
+    for ( int i = 0; i < m_data.size(); ++i )
+    {
+        for( int k = 0; k < m_data[i].size() / 3; ++k )
+        {
+            kdVerts.push_back( m_data[i][k * 3    ] );
+            kdVerts.push_back( m_data[i][k * 3 + 1] );
+            kdVerts.push_back( m_data[i][k * 3 + 2] );
+            m_reverseIndexes.push_back( i );
+        }
+    }
+    qDebug() << "start creating kdtree";
+    m_kdTree = new KdTree( kdVerts.size() / 3, kdVerts.data() );
+    qDebug() << "end creating kdtree";
+
     m_isInitialized = true;
 }
 

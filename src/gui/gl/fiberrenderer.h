@@ -10,6 +10,8 @@
 
 #include "objectrenderer.h"
 
+#include "../../algos/kdtree.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 class FiberRenderer : public ObjectRenderer
@@ -45,6 +47,10 @@ private:
     bool m_isInitialized;
 
     int m_colorMode;
+
+    KdTree* m_kdTree;
+    QVector<int>m_reverseIndexes;
+
 
     QVector<bool>m_bitfield;
     QList<QVector<bool> >m_branchfields;
