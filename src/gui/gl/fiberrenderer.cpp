@@ -156,12 +156,39 @@ void FiberRenderer::initGeometry()
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
     qDebug() << "end creating kdtree";
 
+    updatePresentRois();
+
     m_isInitialized = true;
 }
 
 void FiberRenderer::setRenderParams( int colorMode )
 {
     m_colorMode = colorMode;
+}
+
+void FiberRenderer::updatePresentRois()
+{
+    int numBranches = m_roiModel->rowCount( QModelIndex() );
+    qDebug() << "num branches" << numBranches;
+    for ( int i = 0; i < numBranches; ++i )
+    {
+        QList<QVector<bool> >newBranch;
+        QVector<bool>newLeaf( m_numLines );
+        newBranch.push_back( newLeaf );
+        m_branchfields.push_back( newLeaf );
+        m_bitfields.push_back( newBranch );
+        updateBox( m_bitfields.size() - 1, 0 );
+
+        int leafCount = m_roiModel->rowCount( createIndex( i, 0, 0 ) );
+        qDebug() << "leaf count" << leafCount;
+        for ( int k = 0; k < leafCount; ++k )
+        {
+            // inserted child roi
+            QVector<bool>newLeaf( m_numLines );
+            m_bitfields[i].push_back( newLeaf );
+            updateBox( i, k + 1 );
+        }
+    }
 }
 
 void FiberRenderer::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
@@ -274,7 +301,10 @@ void FiberRenderer::updateBox( int branch, int pos )
     }
 
     updateBranch( branch );
-    m_roiModel->setData( createIndex( branch, pos, (int)Fn::ROI::UPDATED ), true, Qt::DisplayRole );
+    if ( m_isInitialized )
+    {
+        m_roiModel->setData( createIndex( branch, pos, (int)Fn::ROI::UPDATED ), true, Qt::DisplayRole );
+    }
 }
 
 void FiberRenderer::boxTest( QVector<bool>& workfield, int left, int right, int axis )
