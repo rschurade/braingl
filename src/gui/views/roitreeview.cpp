@@ -55,9 +55,10 @@ void ROITreeView::selectionChanged( const QItemSelection &selected, const QItemS
 
 void ROITreeView::rowsInserted (const QModelIndex &parent, int start, int end )
 {
+    qDebug() << parent << start << end;
     if ( selectionModel()->hasSelection() )
     {
-        expand( selectionModel()->selectedRows().at( 0 ) );
+        expand( selectionModel()->selectedIndexes().first() );
     }
     selectionModel()->clear();
     if ( parent.row() == -1 )
@@ -69,5 +70,4 @@ void ROITreeView::rowsInserted (const QModelIndex &parent, int start, int end )
         selectionModel()->select( model()->index( start-1, 0, parent ), QItemSelectionModel::Select );
     }
     QTreeView::rowsInserted( parent, start, end );
-
 }
