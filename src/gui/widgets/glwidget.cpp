@@ -51,6 +51,10 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
     {
         m_sceneRenderer->middleMouseDown( event->x(), event->y() );
     }
+    if ( event->buttons() & Qt::RightButton )
+    {
+        m_sceneRenderer->rightMouseDown( event->x(), event->y() );
+    }
     updateGL();
 }
 

@@ -6,6 +6,8 @@
  */
 #include "../../thirdparty/glew/include/glew.h"
 
+#include "glfunctions.h"
+
 #include "scenerenderer.h"
 #include "arcball.h"
 #include "slicerenderer.h"
@@ -161,6 +163,21 @@ void SceneRenderer::draw()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     m_sliceRenderer->draw( m_mvpMatrix );
 
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable( GL_BLEND );
+
+    glShadeModel( GL_SMOOTH );
+    //glEnable( GL_LIGHTING );
+    //glEnable( GL_LIGHT0 );
+    glEnable( GL_MULTISAMPLE );
+
+    renderDatasets();
+
+    renderRois();
+}
+
+void SceneRenderer::renderDatasets()
+{
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
@@ -171,28 +188,31 @@ void SceneRenderer::draw()
             ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel, m_roiModel );
         }
     }
+}
 
+void SceneRenderer::renderRois()
+{
     int countTopBoxes = m_roiModel->rowCount();
-    for ( int i = 0; i < countTopBoxes; ++i )
-    {
-        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
-        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
-        {
-            roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+   for ( int i = 0; i < countTopBoxes; ++i )
+   {
+       ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
+       if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+       {
+           roi->draw( m_mvpMatrix, m_mvMatrixInverse );
 
-            QModelIndex mi = m_roiModel->index( i, 0 );
-            int countBoxes = m_roiModel->rowCount(  mi );
+           QModelIndex mi = m_roiModel->index( i, 0 );
+           int countBoxes = m_roiModel->rowCount(  mi );
 
-            for ( int k = 0; k < countBoxes; ++k )
-            {
-                roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
-                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
-                {
-                    roi->draw( m_mvpMatrix, m_mvMatrixInverse );
-                }
-            }
-        }
-    }
+           for ( int k = 0; k < countBoxes; ++k )
+           {
+               roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
+               if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+               {
+                   roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+               }
+           }
+       }
+   }
 }
 
 void SceneRenderer::setView( Fn::Orient view )
@@ -237,4 +257,26 @@ void SceneRenderer::mouseWheel( int step )
 {
     m_arcBall->mouseWheel( step );
     calcMVPMatrix();
+}
+
+void SceneRenderer::rightMouseDown( int x, int y )
+{
+    // create offscreen texture
+    GLFunctions::generate_frame_buffer_texture( m_width, m_height );
+    // render
+    GLFunctions::beginPicking();
+
+    glEnable( GL_DEPTH_TEST );
+    /* clear the frame buffer */
+    glClearColor( 0, 0, 0, 0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    //render_picking_scene();
+    renderRois();
+
+    // get id
+    qDebug() << "picked object id: " << GLFunctions::get_object_id( x, y );
+
+    /* return to the default frame buffer */
+    GLFunctions::endPicking();
 }

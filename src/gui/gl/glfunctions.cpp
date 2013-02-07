@@ -19,7 +19,8 @@
 #define NUM_TEXTURES 5
 
 bool GLFunctions::shadersLoaded = false;
-int GLFunctions::pickIndex = 1;
+unsigned int GLFunctions::pickIndex = 1;
+bool GLFunctions::picking = false;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderSources;
@@ -399,15 +400,7 @@ void GLFunctions::setShaderVarsBox( QGLShaderProgram* program )
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
-
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-
-    // Tell OpenGL programmable pipeline how to locate vertex color data
-    int colorLocation = program->attributeLocation( "a_color" );
-    program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (const void *) offset );
 }
 
 void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model )
@@ -587,4 +580,136 @@ QList< int > GLFunctions::getTextureIndexes( QAbstractItemModel* model )
     }
 
     return tl;
+}
+
+GLuint GLFunctions::tex = 0;
+GLuint GLFunctions::rbo = 0;
+GLuint GLFunctions::fbo = 0;
+GLuint GLFunctions::pbo_a = 0;
+GLuint GLFunctions::pbo_b = 0;
+int GLFunctions::screenWidth = 0;
+int GLFunctions::screenHeight = 0;
+
+void GLFunctions::generate_frame_buffer_texture( const int screen_width, const int screen_height )
+{
+    GLFunctions::screenWidth = screen_width;
+    GLFunctions::screenHeight = screen_height;
+
+    /* generate a texture id */
+    glGenTextures( 1, &GLFunctions::tex );
+    /* bind the texture */
+    glBindTexture( GL_TEXTURE_2D, GLFunctions::tex );
+    /* set texture parameters */
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    /* create the texture in the GPU */
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL );
+    /* unbind the texture */
+    glBindTexture( GL_TEXTURE_2D, 0 );
+    /* create a renderbuffer object for the depth buffer */
+    glGenRenderbuffers( 1, &GLFunctions::rbo );
+    /* bind the texture */
+    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::rbo );
+    /* create the render buffer in the GPU */
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screen_width, screen_height );
+    /* unbind the render buffer */
+    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+    /* create a framebuffer object */
+    glGenFramebuffers( 1, &GLFunctions::fbo );
+    /* attach the texture and the render buffer to the frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::tex, 0 );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::rbo );
+    /* check the frame buffer */
+    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+    {
+        /* handle an error : frame buffer incomplete */
+    }
+
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+void GLFunctions::generate_pixel_buffer_objects()
+{
+    /* generate the first pixel buffer objects */
+    glGenBuffers( 1, &GLFunctions::pbo_a );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_a );
+    glBufferData( GL_PIXEL_PACK_BUFFER, GLFunctions::screenWidth * GLFunctions::screenHeight * 4, NULL, GL_STREAM_READ );
+    /* to avoid weird behaviour the first frame the data is loaded */
+    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* generate the second pixel buffer objects */
+    glGenBuffers( 1, &GLFunctions::pbo_b );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_b );
+    glBufferData( GL_PIXEL_PACK_BUFFER, GLFunctions::screenWidth * GLFunctions::screenHeight * 4, NULL, GL_STREAM_READ );
+    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* unbind */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+}
+
+uint GLFunctions::get_object_id( int x, int y )
+{
+    static int frame_event = 0;
+    int read_pbo, map_pbo;
+    uint object_id;
+
+    uint red, green, blue, alpha, pixel_index;
+    GLubyte* ptr;
+
+    GLFunctions::generate_pixel_buffer_objects();
+    /* switch between pixel buffer objects */
+    if (frame_event == 0)
+    {
+        frame_event = 1;
+        read_pbo = GLFunctions::pbo_b;
+        map_pbo = GLFunctions::pbo_a;
+    }
+    else {
+        frame_event = 0;
+        map_pbo = GLFunctions::pbo_a;
+        read_pbo = GLFunctions::pbo_b;
+    }
+    /* read one pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* map the other pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* get the mouse coordinates */
+    /* OpenGL has the {0,0} at the down-left corner of the screen */
+    y = GLFunctions::screenHeight - y;
+    object_id = -1;
+
+    if ( x >= 0 && x < GLFunctions::screenWidth && y >= 0 && y < GLFunctions::screenHeight )
+    {
+        pixel_index = ( x + y * GLFunctions::screenWidth ) * 4;
+        blue = ptr[pixel_index];
+        green = ptr[pixel_index + 1];
+        red = ptr[pixel_index + 2];
+        alpha = ptr[pixel_index + 3];
+        //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
+        object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
+        //qDebug() << "output" << red << green << blue << alpha;
+    }
+    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+    return object_id;
+}
+
+void GLFunctions::beginPicking()
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
+    GLFunctions::picking = true;
+}
+
+void GLFunctions::endPicking()
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::picking = false;
+}
+
+bool GLFunctions::isPicking()
+{
+    return GLFunctions::picking;
 }
