@@ -26,6 +26,8 @@ public:
 
 	void updateGeometry( float x, float y, float z, float dx, float dy, float dz, QColor color );
 
+	unsigned int getPickId();
+
 protected:
     void setShaderVars();
     void initGeometry();

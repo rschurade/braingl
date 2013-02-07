@@ -20,9 +20,9 @@ ROITreeView::~ROITreeView()
 
 void ROITreeView::addBox()
 {
-    if ( selectionModel()->selectedRows().size() > 0 )
+    if ( selectionModel()->hasSelection() )
     {
-        model()->insertRows( 0, 1, selectionModel()->selectedRows().at( 0 ) );
+        model()->insertRows( 0, 1, selectionModel()->selectedIndexes().first() );
         expand( selectionModel()->selectedRows().at( 0 ) );
     }
     else

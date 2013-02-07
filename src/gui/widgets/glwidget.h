@@ -10,13 +10,14 @@
 #include <QtOpenGL/QGLWidget>
 
 class SceneRenderer;
+class QItemSelectionModel;
 
 class GLWidget: public QGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QWidget *parent = 0 );
+    GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel, QWidget *parent = 0 );
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -24,10 +25,8 @@ public:
 
     void setView( Fn::Orient view );
 
-public slots:
-    void update();
-
-signals:
+private:
+    SceneRenderer* m_sceneRenderer;
 
 protected:
     void initializeGL();
@@ -38,8 +37,11 @@ protected:
     void mouseMoveEvent( QMouseEvent *event );
     void wheelEvent( QWheelEvent *event );
 
-private:
-    SceneRenderer* m_sceneRenderer;
+public slots:
+    void update();
+
+signals:
+
 };
 
 #endif
