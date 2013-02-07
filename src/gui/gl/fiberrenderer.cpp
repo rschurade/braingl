@@ -194,7 +194,7 @@ void FiberRenderer::updatePresentRois()
 void FiberRenderer::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
     if ( topLeft.row() == -1 ) return;
-    qDebug() << "roi changed" << topLeft.row() << topLeft.column() << topLeft.internalId();
+    //qDebug() << "roi changed" << topLeft.row() << topLeft.column() << topLeft.internalId();
     int branch = 0;
     int pos = 0;
     if ( topLeft.internalId() == -1 )
@@ -236,7 +236,7 @@ void FiberRenderer::roiInserted( const QModelIndex &parent, int start, int end )
 
 void FiberRenderer::roiDeleted( const QModelIndex &parent, int start, int end )
 {
-    qDebug() << "roi deleted" << parent.row() << start << end;
+    //qDebug() << "roi deleted" << parent.row() << start << end;
     if ( parent.row() == -1 )
     {
         m_bitfields.removeAt( start );
@@ -393,7 +393,7 @@ void FiberRenderer::updateBranch( int branch )
 
 void FiberRenderer::updateRoot()
 {
-    qDebug() << "update root";
+    //qDebug() << "update root";
     if ( m_branchfields.size() > 0 )
     {
         for ( int i = 0; i < m_numLines; ++i )
