@@ -15,8 +15,10 @@
 
 BoxRenderer::BoxRenderer() :
     ObjectRenderer(),
-    vboIds( new GLuint[ 2 ] )
+    vboIds( new GLuint[ 2 ] ),
+    m_pickId( GLFunctions::getPickIndex() )
 {
+
 }
 
 BoxRenderer::~BoxRenderer()
@@ -52,6 +54,8 @@ void BoxRenderer::initGeometry()
 
 void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy, float dz, QColor color )
 {
+    m_color = color;
+
     float x1 = x - dx / 2.0;
     float y1 = y - dy / 2.0;
     float z1 = z - dz / 2.0;
@@ -59,25 +63,21 @@ void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy,
     float y2 = y + dy / 2.0;
     float z2 = z + dz / 2.0;
 
-    float r = color.redF();
-    float g = color.greenF();
-    float b = color.blueF();
-
-    VertexData vertices[] =
+    float vertices[] =
     {
-        { QVector3D( x1, y1, z1 ), QVector3D( r, g, b ) },
-        { QVector3D( x2, y1, z1 ), QVector3D( r, g, b ) },
-        { QVector3D( x2, y2, z1 ), QVector3D( r, g, b ) },
-        { QVector3D( x1, y2, z1 ), QVector3D( r, g, b ) },
-        { QVector3D( x1, y1, z2 ), QVector3D( r, g, b ) },
-        { QVector3D( x2, y1, z2 ), QVector3D( r, g, b ) },
-        { QVector3D( x2, y2, z2 ), QVector3D( r, g, b ) },
-        { QVector3D( x1, y2, z2 ), QVector3D( r, g, b ) }
+        x1, y1, z1,
+        x2, y1, z1,
+        x2, y2, z1,
+        x1, y2, z1,
+        x1, y1, z2,
+        x2, y1, z2,
+        x2, y2, z2,
+        x1, y2, z2
     };
 
     // Transfer vertex data to VBO 1
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ARRAY_BUFFER, 8 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, 24 * sizeof(float), &vertices, GL_STATIC_DRAW );
 
 }
 
@@ -91,6 +91,26 @@ void BoxRenderer::draw( QMatrix4x4 mvp_matrix )
     GLFunctions::getShader( "box" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "box" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    if( GLFunctions::isPicking() )
+    {
+//        GLubyte alpha =   m_pickId         & 0xFF;
+//        GLubyte blue =  ( m_pickId >> 8  ) & 0xFF;
+//        GLubyte green = ( m_pickId >> 16 ) & 0xFF;
+//        GLubyte red =   ( m_pickId >> 24 ) & 0xFF;
+
+        float alpha =  1.0;
+        float blue =  (float)(( m_pickId ) & 0xFF) / 255.f;
+        float green = (float)(( m_pickId >> 8 ) & 0xFF) / 255.f;
+        float red =   (float)(( m_pickId >> 16 ) & 0xFF) / 255.f;
+
+
+        //qDebug() << " input" << red << green << blue << (float)alpha / 255.0f;
+        GLFunctions::getShader( "box" )->setUniformValue( "u_color", red, green , blue, alpha );
+    }
+    else
+    {
+        GLFunctions::getShader( "box" )->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 0.4 );
+    }
 
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );

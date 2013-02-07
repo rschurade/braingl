@@ -32,12 +32,16 @@ public:
 	void leftMouseDrag( int x, int y );
 	void middleMouseDown( int x, int y );
 	void middleMouseDrag( int x, int y );
+	void rightMouseDown( int x, int y );
 	void mouseWheel( int step );
 	void setView( Fn::Orient view );
 
 	void calcMVPMatrix();
 
 private:
+	void renderDatasets();
+	void renderRois();
+
 	ArcBall* m_arcBall;
 	SliceRenderer* m_sliceRenderer;
 

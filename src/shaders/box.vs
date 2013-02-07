@@ -1,7 +1,6 @@
 #version 120
 
 attribute vec4 a_position;
-attribute vec4 a_color;
 
 uniform mat4 mvp_matrix;
 
@@ -16,7 +15,5 @@ uniform mat4 mvp_matrix;
 /////////////////////////////////////////////////////////////////////////////////////////////
 void main()
 {
-    gl_FrontColor = vec4( a_color.rgb, 0.4 );
-    
     gl_Position = mvp_matrix * a_position;
 }

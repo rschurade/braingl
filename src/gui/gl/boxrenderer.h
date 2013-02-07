@@ -32,6 +32,10 @@ protected:
 
 private:
 	GLuint *vboIds;
+
+	QColor m_color;
+
+	unsigned int m_pickId;
 };
 
 #endif /* SLICERENDERER_H_ */
