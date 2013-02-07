@@ -19,6 +19,8 @@
 #define NUM_TEXTURES 5
 
 bool GLFunctions::shadersLoaded = false;
+int GLFunctions::pickIndex = 1;
+
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
@@ -29,6 +31,11 @@ GLFunctions::GLFunctions()
 
 GLFunctions::~GLFunctions()
 {
+}
+
+int GLFunctions::getPickIndex()
+{
+    return GLFunctions::pickIndex++;
 }
 
 void GLFunctions::setupTextures( QAbstractItemModel* model )

@@ -49,6 +49,8 @@ public:
     static QString getShaderCode( QString name );
     static void setShaderCode( QString name,  QString source );
 
+    static int getPickIndex();
+
 private:
     GLFunctions();
     virtual ~GLFunctions();
@@ -60,6 +62,7 @@ private:
     static QVector<QString>m_shaderNames;
 
     static bool shadersLoaded;
+    static int pickIndex;
 };
 
 #endif /* GLFUNCTIONS_H_ */
