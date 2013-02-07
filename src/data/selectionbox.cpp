@@ -39,6 +39,7 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::ROI::ID, m_count );
+    m_properties.set( Fn::ROI::PICK_ID, 0 );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
 }
@@ -66,6 +67,7 @@ void SelectionBox::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse )
     if ( !m_renderer )
     {
         m_renderer = new BoxRenderer();
+        m_properties.set( Fn::ROI::PICK_ID, (int)m_renderer->getPickId() );
         m_renderer->init();
         m_renderer->updateGeometry( m_properties.get( Fn::ROI::X ).toFloat(),
                                     m_properties.get( Fn::ROI::Y ).toFloat(),

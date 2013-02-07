@@ -38,6 +38,7 @@ QVariant PropertyFloat::getValue()
 void PropertyFloat::setValue( QVariant value )
 {
     m_value = value.toFloat();
+    m_widget->setValue( m_value );
 }
 
 void PropertyFloat::setMin( float min )

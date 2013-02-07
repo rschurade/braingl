@@ -27,6 +27,11 @@ BoxRenderer::~BoxRenderer()
     delete[] vboIds;
 }
 
+unsigned int BoxRenderer::getPickId()
+{
+    return m_pickId;
+}
+
 void BoxRenderer::init()
 {
     GLFunctions::loadShaders();
@@ -93,18 +98,12 @@ void BoxRenderer::draw( QMatrix4x4 mvp_matrix )
     GLFunctions::getShader( "box" )->setUniformValue( "mvp_matrix", mvp_matrix );
     if( GLFunctions::isPicking() )
     {
-//        GLubyte alpha =   m_pickId         & 0xFF;
-//        GLubyte blue =  ( m_pickId >> 8  ) & 0xFF;
-//        GLubyte green = ( m_pickId >> 16 ) & 0xFF;
-//        GLubyte red =   ( m_pickId >> 24 ) & 0xFF;
-
         float alpha =  1.0;
         float blue =  (float)(( m_pickId ) & 0xFF) / 255.f;
         float green = (float)(( m_pickId >> 8 ) & 0xFF) / 255.f;
         float red =   (float)(( m_pickId >> 16 ) & 0xFF) / 255.f;
 
-
-        //qDebug() << " input" << red << green << blue << (float)alpha / 255.0f;
+        //qDebug() << " input" << red << green << blue << alpha ;
         GLFunctions::getShader( "box" )->setUniformValue( "u_color", red, green , blue, alpha );
     }
     else

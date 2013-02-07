@@ -33,6 +33,8 @@ public:
     bool insertRows( int row, int count, const QModelIndex &parent=QModelIndex() );
     bool removeRows( int row, int count, const QModelIndex &parent=QModelIndex() );
 
+    QModelIndexList match( const QModelIndex &start, int role, const QVariant &value, int hits=1, Qt::MatchFlags flags=Qt::MatchFlags( Qt::MatchStartsWith | Qt::MatchWrap ) ) const;
+
 private:
     QAbstractItemModel* m_globalProps;
 

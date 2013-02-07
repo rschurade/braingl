@@ -286,3 +286,30 @@ void ROIModel::propChanged( int value )
     }
 }
 
+QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVariant &value, int hits, Qt::MatchFlags flags ) const
+{
+    QModelIndexList l;
+
+    if ( role == Qt::DisplayRole )
+    {
+        for ( int i = 0; i < m_boxes.size(); ++i )
+        {
+            for ( int k = 0; k < m_boxes[i].size(); ++k )
+            {
+                if ( value.toInt() == VPtr<ROI>::asPtr( m_boxes[i][k] )->properties()->get( Fn::ROI::PICK_ID ).toInt() )
+                {
+                    if ( k == 0 )
+                    {
+                        l.push_back( createIndex( i, (int)Fn::ROI::PICK_ID, -1 ) );
+                    }
+                    else
+                    {
+                        l.push_back( createIndex( k-1, (int)Fn::ROI::PICK_ID, i ) );
+                    }
+                }
+            }
+        }
+    }
+
+    return l;
+}

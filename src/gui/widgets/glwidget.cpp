@@ -2,10 +2,10 @@
 
 #include <QtGui/QtGui>
 
-GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QWidget *parent ) :
+GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
 	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-	m_sceneRenderer = new SceneRenderer( dataModel, globalModel, roiModel );
+	m_sceneRenderer = new SceneRenderer( dataModel, globalModel, roiModel, roiSelectionModel );
 
 	connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 	connect( roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
@@ -67,6 +67,10 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
     if ( event->buttons() & Qt::MiddleButton )
     {
         m_sceneRenderer->middleMouseDrag( event->x(), event->y() );
+    }
+    if ( event->buttons() & Qt::RightButton )
+    {
+        m_sceneRenderer->rightMouseDrag( event->x(), event->y() );
     }
     updateGL();
 }

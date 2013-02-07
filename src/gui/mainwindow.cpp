@@ -340,12 +340,6 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel );
-    FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
-    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
-    viewMenu->addAction( dockMainGL->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
-
     m_datasetWidget = new DatasetListWidget();
 	m_datasetWidget->setModel( m_dataStore );
 	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
@@ -395,6 +389,14 @@ void MainWindow::createDockWindows()
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
+
+    // GL Widgets
+
+    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel, m_roiWidget->selectionModel() );
+    FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
+    viewMenu->addAction( dockMainGL->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, m_globalProps, QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );

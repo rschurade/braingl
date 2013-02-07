@@ -26,10 +26,11 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel ) :
+SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel ) :
     m_dataModel( dataModel ),
     m_globalModel( globalModel ),
     m_roiModel( roiModel ),
+    m_roiSelectionModel( roiSelectionModel ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
     m_ny( 200 ),
@@ -123,8 +124,7 @@ void SceneRenderer::calcMVPMatrix()
     m_boundingbox = qMax ( m_nx, qMax( m_ny, m_nz ) );
 
     // Reset projection
-    QMatrix4x4 pMatrix;
-    pMatrix.setToIdentity();
+    m_pMatrix.setToIdentity();
 
     float halfBB = m_boundingbox / 2.0;
 
@@ -133,18 +133,18 @@ void SceneRenderer::calcMVPMatrix()
 
     if ( m_ratio >= 1.0 )
     {
-        pMatrix.ortho( -halfBB * m_ratio, halfBB * m_ratio, -halfBB, halfBB, -3000, 3000 );
+        m_pMatrix.ortho( -halfBB * m_ratio, halfBB * m_ratio, -halfBB, halfBB, -3000, 3000 );
         bbx = m_boundingbox * m_ratio;
     }
     else
     {
-        pMatrix.ortho( -halfBB, halfBB, -halfBB / m_ratio, halfBB / m_ratio, -3000, 3000 );
+        m_pMatrix.ortho( -halfBB, halfBB, -halfBB / m_ratio, halfBB / m_ratio, -3000, 3000 );
         bby = m_boundingbox / m_ratio;
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
     m_mvMatrixInverse = m_mvMatrix.inverted();
-    m_mvpMatrix = pMatrix * m_mvMatrix;
+    m_mvpMatrix = m_pMatrix * m_mvMatrix;
 
     m_globalModel->setData( m_globalModel->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
     m_globalModel->setData( m_globalModel->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
@@ -192,7 +192,7 @@ void SceneRenderer::renderDatasets()
 
 void SceneRenderer::renderRois()
 {
-    int countTopBoxes = m_roiModel->rowCount();
+   int countTopBoxes = m_roiModel->rowCount();
    for ( int i = 0; i < countTopBoxes; ++i )
    {
        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
@@ -275,8 +275,69 @@ void SceneRenderer::rightMouseDown( int x, int y )
     renderRois();
 
     // get id
-    qDebug() << "picked object id: " << GLFunctions::get_object_id( x, y );
+    int pick = GLFunctions::get_object_id( x, y );
+    //qDebug() << "picked object id: " << pick;
+
+    if ( m_roiModel->rowCount() > 0 )
+    {
+        QModelIndex mi = m_roiModel->index( 0, (int)Fn::ROI::PICK_ID );
+        QModelIndexList l = ( m_roiModel->match( mi, Qt::DisplayRole, pick ) );
+        if ( l.size() > 0 )
+        {
+            m_roiSelectionModel->clear();
+            m_roiSelectionModel->select( l.first(), QItemSelectionModel::Select );
+        }
+    }
 
     /* return to the default frame buffer */
     GLFunctions::endPicking();
+
+    m_pickXold = x;
+    m_pickYold = y;
+}
+
+void SceneRenderer::rightMouseDrag( int x, int y )
+{
+    QVector3D vs = mapMouse2World( x, y, 0 );
+    QVector3D vs2 = mapMouse2World( m_pickXold, m_pickYold, 0 );
+    QVector3D dir = vs - vs2;
+
+    m_pickXold = x;
+    m_pickYold = y;
+
+    if ( m_roiSelectionModel->hasSelection() )
+    {
+        QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
+        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
+        float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
+        float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
+        float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
+
+        roi->properties()->set( Fn::ROI::X, newx );
+        roi->properties()->set( Fn::ROI::Y, newy );
+        roi->properties()->set( Fn::ROI::Z, newz );
+        roi->properties()->slotPropChanged();
+    }
+}
+
+QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
+{
+    GLint viewport[4];
+    //GLdouble modelview[16];
+    //GLdouble projection[16];
+    GLfloat winX, winY;
+
+
+
+//  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+//  glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+    winX = (float) x;
+    winY = (float) viewport[3] - (float) y;
+    GLdouble posX, posY, posZ;
+    gluUnProject( winX, winY, dir, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+
+    QVector3D v( posX, posY, posZ );
+    return v;
 }
