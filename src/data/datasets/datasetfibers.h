@@ -26,6 +26,7 @@ public:
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();
+    QVector< QVector< float > > getSelectedFibs();
 
 protected:
     void createTexture() {};

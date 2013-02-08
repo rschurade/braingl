@@ -43,6 +43,27 @@ QVector< QVector< float > > DatasetFibers::getFibs()
     return m_fibs;
 }
 
+QVector< QVector< float > > DatasetFibers::getSelectedFibs()
+{
+    if ( m_renderer == 0 )
+    {
+        return m_fibs;
+    }
+    else
+    {
+        QVector<bool>selected = m_renderer->getSelection();
+        QVector<QVector<float> >out;
+        for ( int i = 0; i < selected.size(); ++i )
+        {
+            if ( selected[i] )
+            {
+                out.push_back( m_fibs[i] );
+            }
+        }
+        return out;
+    }
+}
+
 void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
     if ( m_renderer == 0 )

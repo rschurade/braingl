@@ -38,3 +38,13 @@ QList<Dataset*> FiberAlgos::tractDensity( Dataset* ds )
     l.push_back( out );
     return l;
 }
+
+QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
+{
+    DatasetFibers* f = dynamic_cast<DatasetFibers*>( ds );
+    QVector<QVector<float> >selected = f->getSelectedFibs();
+    DatasetFibers* out = new DatasetFibers( selected );
+    QList<Dataset*> l;
+    l.push_back( out );
+    return l;
+}

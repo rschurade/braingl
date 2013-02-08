@@ -101,6 +101,10 @@ void ToolBar::createActions()
     m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, Fn::Algo::BINGHAM_2_TENSOR );
     m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
     connect( m_bingham2tensorAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_cutSelectedFibersAction = new FNAction( QIcon( ":/icons/cut.png" ), tr( "Cut selected fibers" ), this, Fn::Algo::CUT_SELECTED_FIBERS );
+    m_cutSelectedFibersAction->setStatusTip( tr( "create new fiber dataset from selected fibers" ) );
+    connect( m_cutSelectedFibersAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -186,6 +190,12 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::QBALL:
             break;
+        case Fn::Algo::CUT_SELECTED_FIBERS:
+            if ( ds->properties()->get( Fn::Property::TYPE ) == (int)Fn::DatasetType::FIBERS )
+            {
+                l = FiberAlgos::cutSelecteded( ds );
+            }
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -240,6 +250,7 @@ void ToolBar::slotSelectionChanged( int type )
         }
         case Fn::DatasetType::FIBERS:
         {
+            this->addAction( m_cutSelectedFibersAction );
             this->addAction( m_fiberThinningAct );
             this->addAction( m_fiberTractDensityAct );
             break;
