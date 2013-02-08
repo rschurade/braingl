@@ -2,7 +2,7 @@
  * singleshwidget.cpp
  *
  *  Created on: 12.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "singleshwidget.h"
 

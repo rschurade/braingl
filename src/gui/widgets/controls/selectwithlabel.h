@@ -2,7 +2,7 @@
  * selectwithlabel.h
  *
  *  Created on: 12.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SELECTWITHLABEL_H_

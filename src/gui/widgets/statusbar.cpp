@@ -2,7 +2,7 @@
  * statusbar.cpp
  *
  *  Created on: Nov 13, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "statusbar.h"
 

@@ -2,7 +2,7 @@
  * writer.cpp
  *
  *  Created on: Jun 1, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "writer.h"
 

@@ -2,7 +2,7 @@
  * sharpqballthread.h
  *
  *  Created on: 27.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SHARPQBALLTHREAD_H_

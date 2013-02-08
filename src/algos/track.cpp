@@ -2,7 +2,7 @@
  * track.cpp
  *
  *  Created on: Dec 11, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "track.h"
 #include "trackthread.h"

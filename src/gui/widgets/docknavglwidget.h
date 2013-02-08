@@ -2,7 +2,7 @@
  * navglwidget.h
  *
  *  Created on: 12.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef NAVGLWIDGET_H_

@@ -2,7 +2,7 @@
  * roiwidget.cpp
  *
  *  Created on: Jan 30, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "roiwidget.h"
 

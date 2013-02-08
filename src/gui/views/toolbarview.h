@@ -2,7 +2,7 @@
  * toolbarview.h
  *
  *  Created on: 14.06.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef TOOLBARVIEW_H_

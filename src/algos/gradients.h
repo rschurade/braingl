@@ -1,3 +1,10 @@
+/*
+ * gradients.h
+ *
+ *  Created on: Jul 17, 2012
+ *      Author: Ralph Schurade
+ */
+
 #ifndef INC_GRADIENTS_H
 #define INC_GRADIENTS_H
 

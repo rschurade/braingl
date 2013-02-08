@@ -2,7 +2,7 @@
  * shrendererthread.h
  *
  *  Created on: 27.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SHRENDERERTHREAD_H_

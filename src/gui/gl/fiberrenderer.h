@@ -2,7 +2,7 @@
  * fiberrenderer.h
  *
  *  Created on: 28.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef FIBERRENDERER_H_

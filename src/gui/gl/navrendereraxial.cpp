@@ -2,7 +2,7 @@
  * NavRendererAxial.cpp
  *
  *  Created on: 09.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "navrendereraxial.h"
 #include "glfunctions.h"

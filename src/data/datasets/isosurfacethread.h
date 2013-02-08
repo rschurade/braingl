@@ -2,7 +2,7 @@
  * isosurfacethread.h
  *
  *  Created on: 28.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef ISOSURFACETHREAD_H_

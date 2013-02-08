@@ -2,7 +2,7 @@
  * fmath.cpp
  *
  *  Created on: Jul 17, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "fmath.h"
 

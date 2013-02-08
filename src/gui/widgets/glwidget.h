@@ -1,3 +1,10 @@
+/*
+ * glwidget.h
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 

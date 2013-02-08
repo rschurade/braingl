@@ -2,7 +2,7 @@
  * dataset.h
  *
  *  Created on: May 3, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASET_H_

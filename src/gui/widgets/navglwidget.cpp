@@ -1,3 +1,10 @@
+/*
+ * navglwidget.cpp
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #include "navglwidget.h"
 
 #include "../gl/navrendereraxial.h"

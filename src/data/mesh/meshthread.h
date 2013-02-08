@@ -2,7 +2,7 @@
  * meshthread.h
  *
  *  Created on: 29.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef MESHTHREAD_H_

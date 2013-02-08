@@ -2,7 +2,7 @@
  * sorts.cpp
  *
  *  Created on: Nov 26, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "sorts.h"
 

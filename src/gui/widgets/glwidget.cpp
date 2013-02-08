@@ -1,3 +1,10 @@
+/*
+ * glwidget.h
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #include "glwidget.h"
 
 #include <QtGui/QtGui>

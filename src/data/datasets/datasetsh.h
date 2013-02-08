@@ -2,7 +2,7 @@
  * dataset3d.h
  *
  *  Created on: May 9, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETSH_H_

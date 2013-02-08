@@ -2,7 +2,7 @@
  * track.h
  *
  *  Created on: Dec 11, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef TRACK_H_

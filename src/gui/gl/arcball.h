@@ -2,7 +2,7 @@
  * arcball.h
  *
  *  Created on: 10.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef ARCBALL_H_

@@ -2,7 +2,7 @@
  * shrenderer.h
  *
  *  Created on: 03.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef EVRENDERER_H_

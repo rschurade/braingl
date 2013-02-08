@@ -2,7 +2,7 @@
  * roi.h
  *
  *  Created on: 03.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef ROI_H_

@@ -2,7 +2,7 @@
  * crossingtrackwidget.h
  *
  *  Created on: 26.01.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef CROSSINGTRACKWIDGET_H_

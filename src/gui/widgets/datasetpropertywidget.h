@@ -2,7 +2,7 @@
  * datasetpropertywidget.h
  *
  *  Created on: 13.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETPROPERTYWIDGET_H_

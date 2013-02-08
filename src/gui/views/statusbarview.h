@@ -2,7 +2,7 @@
  * statusbarview.h
  *
  *  Created on: Nov 13, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef STATUSBARVIEW_H_

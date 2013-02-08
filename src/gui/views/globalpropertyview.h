@@ -2,7 +2,7 @@
  * globalpropertyview.h
  *
  *  Created on: 13.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef GLOBALPROPERTYVIEW_H_

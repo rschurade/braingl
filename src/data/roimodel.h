@@ -2,7 +2,7 @@
  * roimodel.h
  *
  *  Created on: 02.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef ROIMODEL_H_

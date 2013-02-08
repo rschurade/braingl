@@ -2,7 +2,7 @@
  * roipropertygroup.cpp
  *
  *  Created on: Feb 02, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "roipropertygroup.h"
 

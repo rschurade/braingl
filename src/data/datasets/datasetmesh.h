@@ -2,7 +2,7 @@
  * datasetmesh.h
  *
  *  Created on: Jul 19, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETMESH_H_

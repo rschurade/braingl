@@ -2,7 +2,7 @@
  * datasetbingham.h
  *
  *  Created on: Nov 23, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETBINGHAM_H_

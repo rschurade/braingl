@@ -2,7 +2,7 @@
  * qball.h
  *
  *  Created on: 10.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef QBALL_H_

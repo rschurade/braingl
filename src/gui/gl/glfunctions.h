@@ -2,7 +2,7 @@
  * glfunctions.h
  *
  *  Created on: 15.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef GLFUNCTIONS_H_

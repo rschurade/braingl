@@ -2,7 +2,7 @@
  * fnaction.h
  *
  *  Created on: Jan 4, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef FNACTION_H_

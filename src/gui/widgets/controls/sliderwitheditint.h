@@ -2,7 +2,7 @@
  * sliderwithedit.h
  *
  *  Created on: 15.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SLIDERWITHEDITINT_H_

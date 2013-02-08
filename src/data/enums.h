@@ -1,3 +1,10 @@
+/*
+ * enums.h
+ *
+ *  Created on: May 04, 2012
+ *      Author: Ralph Schurade
+ */
+
 #ifndef ENUMS_H_
 #define ENUMS_H_
 

@@ -2,7 +2,7 @@
  * propertycolor.h
  *
  *  Created on: Feb 4, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef PROPERTYCOLOR_H_

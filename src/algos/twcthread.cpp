@@ -2,7 +2,7 @@
  * twcthread.cpp
  *
  *  Created on: Jan 28, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "twcthread.h"
 

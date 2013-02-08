@@ -2,7 +2,7 @@
  * roipropertygroup.h
  *
  *  Created on: Feb 02, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef ROIPROPERTYGROUP_H_

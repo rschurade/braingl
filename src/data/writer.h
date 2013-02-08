@@ -2,7 +2,7 @@
  * writer.h
  *
  *  Created on: Jun 1, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef WRITER_H_
