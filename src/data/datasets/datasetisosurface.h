@@ -2,7 +2,7 @@
  * datasetisosurface.h
  *
  *  Created on: Dec 4, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETISOSURFACE_H_

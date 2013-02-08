@@ -2,7 +2,7 @@
  * isosurfacethread.cpp
  *
  *  Created on: 28.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "isosurfacethread.h"
 

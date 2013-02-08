@@ -2,7 +2,7 @@
  * fnaction.cpp
  *
  *  Created on: Jan 4, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #include "fnaction.h"

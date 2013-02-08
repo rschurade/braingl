@@ -2,7 +2,7 @@
  * shadereditwidget.h
  *
  *  Created on: Nov 20, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef SHADEREDITWIDGET_H_

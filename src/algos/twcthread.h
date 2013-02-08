@@ -2,7 +2,7 @@
  * twcthread.h
  *
  *  Created on: Jan 28, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef TWCTHREAD_H_

@@ -2,7 +2,7 @@
  * vptr.h
  *
  *  Created on: 17.06.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef VPTR_H_

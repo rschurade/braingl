@@ -2,7 +2,7 @@
  * meshrenderer.h
  *
  *  Created on: Dec 4, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef MESHRENDERER_H_

@@ -2,7 +2,7 @@
  * kdtree.h
  *
  *  Created on: 05.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef KDTREE_H_

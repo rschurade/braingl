@@ -2,7 +2,7 @@
  * propertybool.h
  *
  *  Created on: Jan 17, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef PROPERTYBOOL_H_

@@ -2,7 +2,7 @@
  * shadereditwidget.cpp
  *
  *  Created on: Nov 20, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "shadereditwidget.h"
 

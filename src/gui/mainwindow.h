@@ -1,3 +1,10 @@
+/*
+ * mainwindow.h
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

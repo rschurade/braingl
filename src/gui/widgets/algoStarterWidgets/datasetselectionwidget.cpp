@@ -2,7 +2,7 @@
  * datasetselectionwidget.cpp
  *
  *  Created on: Jan 17, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "datasetselectionwidget.h"
 

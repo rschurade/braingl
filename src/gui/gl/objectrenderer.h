@@ -2,7 +2,7 @@
  * objectrenderer.h
  *
  *  Created on: 09.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef OBJECTRENDERER_H_

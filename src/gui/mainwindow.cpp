@@ -1,3 +1,10 @@
+/*
+ * mainwindow.cpp
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #include "mainwindow.h"
 
 #include "views/datasetinfoview.h"

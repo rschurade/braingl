@@ -2,7 +2,7 @@
  * datasetlistview.cpp
  *
  *  Created on: 08.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "datasetlistview.h"
 

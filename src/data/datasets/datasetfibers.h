@@ -2,7 +2,7 @@
  * datasetfibers.h
  *
  *  Created on: Dec 12, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DATASETFIBERS_H_

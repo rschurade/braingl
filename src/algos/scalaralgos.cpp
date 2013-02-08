@@ -2,7 +2,7 @@
  * scalaralgos.cpp
  *
  *  Created on: 09.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "scalaralgos.h"
 

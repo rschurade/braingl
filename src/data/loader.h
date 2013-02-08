@@ -2,7 +2,7 @@
  * Loader.h
  *
  *  Created on: May 3, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef LOADER_H_

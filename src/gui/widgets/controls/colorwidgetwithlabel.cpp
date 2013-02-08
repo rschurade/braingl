@@ -2,7 +2,7 @@
  * colorwidgetwithlabel.cpp
  *
  *  Created on: Feb 4, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "colorwidgetwithlabel.h"
 

@@ -1,3 +1,10 @@
+/*
+ * combinednavglwidget.h
+ *
+ *  Created on: May 03, 2012
+ *      Author: Ralph Schurade
+ */
+
 #ifndef COMBINEDNAVGLWIDGET_H
 #define COMBINEDNAVGLWIDGET_H
 

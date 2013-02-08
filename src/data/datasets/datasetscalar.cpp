@@ -2,7 +2,7 @@
  * datasetscalar.cpp
  *
  *  Created on: May 4, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "datasetscalar.h"
 

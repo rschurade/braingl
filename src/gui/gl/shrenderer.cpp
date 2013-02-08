@@ -2,7 +2,7 @@
  * shrenderer.cpp
  *
  *  Created on: 03.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "shrenderer.h"
 #include "shrendererthread.h"

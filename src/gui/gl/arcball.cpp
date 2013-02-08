@@ -2,7 +2,7 @@
  * arcball.cpp
  *
  *  Created on: 10.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "arcball.h"
 

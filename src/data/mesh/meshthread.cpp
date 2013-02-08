@@ -2,7 +2,7 @@
  * meshthread.cpp
  *
  *  Created on: 29.12.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "meshthread.h"
 

@@ -2,7 +2,7 @@
  * checkboxwithlabel.h
  *
  *  Created on: 14.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef CHECKBOXWITHLABEL_H_

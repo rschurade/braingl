@@ -2,7 +2,7 @@
  * globalpropertygroup.h
  *
  *  Created on: Jan 17, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef GLOBALPROPERTYGROUP_H_

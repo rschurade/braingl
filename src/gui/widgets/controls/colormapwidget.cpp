@@ -2,7 +2,7 @@
  * colormapwidget.cpp
  *
  *  Created on: Jan 29, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "colormapwidget.h"
 

@@ -2,7 +2,7 @@
  * slicerenderer.h
  *
  *  Created on: 09.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SLICERENDERER_H_

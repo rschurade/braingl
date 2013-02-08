@@ -2,7 +2,7 @@
  * kdtree.cpp
  *
  *  Created on: 05.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #include "kdtree.h"

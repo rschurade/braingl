@@ -2,7 +2,7 @@
  * boxrenderer.cpp
  *
  *  Created on: 04.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "boxrenderer.h"
 

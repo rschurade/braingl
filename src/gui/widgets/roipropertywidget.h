@@ -2,7 +2,7 @@
  * roipropertywidget.h
  *
  *  Created on: 03.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef ROIPROPERTYWIDGET_H_

@@ -2,7 +2,7 @@
  * sliderwithedit.cpp
  *
  *  Created on: 15.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "sliderwithedit.h"
 

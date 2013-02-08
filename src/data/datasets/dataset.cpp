@@ -2,7 +2,7 @@
  * dataset.cpp
  *
  *  Created on: May 3, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "dataset.h"
 

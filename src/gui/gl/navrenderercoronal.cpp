@@ -2,7 +2,7 @@
  * NavRendererCoronal.cpp
  *
  *  Created on: 09.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "navrenderercoronal.h"
 #include "glfunctions.h"

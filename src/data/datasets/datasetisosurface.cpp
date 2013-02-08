@@ -2,7 +2,7 @@
  * datasetisosurface.cpp
  *
  *  Created on: Dec 4, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "datasetisosurface.h"
 

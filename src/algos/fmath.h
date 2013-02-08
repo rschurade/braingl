@@ -2,7 +2,7 @@
  * fmath.h
  *
  *  Created on: Jul 17, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef FMATH_H_

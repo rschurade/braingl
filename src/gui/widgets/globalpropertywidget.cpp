@@ -2,7 +2,7 @@
  * globalpropertywidget.cpp
  *
  *  Created on: 13.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "globalpropertywidget.h"
 #include "../views/globalpropertyview.h"

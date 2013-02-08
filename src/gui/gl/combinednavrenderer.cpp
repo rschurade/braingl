@@ -2,7 +2,7 @@
  * NavRenderer.cpp
  *
  *  Created on: 09.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "combinednavrenderer.h"
 #include "../gl/glfunctions.h"

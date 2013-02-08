@@ -2,7 +2,7 @@
  * sorts.h
  *
  *  Created on: Nov 26, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef SORTS_H_

@@ -2,7 +2,7 @@
  * datasetfibers.cpp
  *
  *  Created on: Dec 12, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 #include "datasetfibers.h"
 

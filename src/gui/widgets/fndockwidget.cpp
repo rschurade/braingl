@@ -2,7 +2,7 @@
  * fndockwidget.cpp
  *
  *  Created on: Jan 23, 2013
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #include "fndockwidget.h"

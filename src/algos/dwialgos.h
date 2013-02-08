@@ -2,7 +2,7 @@
  * dwialgos.h
  *
  *  Created on: Jun 18, 2012
- *      Author: schurade
+ *      Author: Ralph Schurade
  */
 
 #ifndef DWIALGOS_H_

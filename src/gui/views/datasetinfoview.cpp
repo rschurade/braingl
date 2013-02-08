@@ -2,7 +2,7 @@
  * datasetinfoview.cpp
  *
  *  Created on: 12.05.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "datasetinfoview.h"
 

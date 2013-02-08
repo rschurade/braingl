@@ -2,7 +2,7 @@
  * scalaralgos.h
  *
  *  Created on: 09.07.2012
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 
 #ifndef SCALARALGOS_H_

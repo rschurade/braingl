@@ -2,7 +2,7 @@
  * globalpropertymodel.cpp
  *
  *  Created on: 02.02.2013
- *      Author: Ralph
+ *      Author: Ralph Schurade
  */
 #include "globalpropertymodel.h"
 
