@@ -28,6 +28,8 @@ public:
 
     void setRenderParams( int colorMode );
 
+    QVector<bool> getSelection();
+
 protected:
     void setupTextures();
     void setShaderVars();

@@ -55,7 +55,8 @@ namespace Fn
         CROSSING_TRACK,
         BINGHAM_2_TENSOR,
         FIBER_THINNING,
-        TRACT_DENSITY
+        TRACT_DENSITY,
+        CUT_SELECTED_FIBERS
     };
 
     enum class Orient : int

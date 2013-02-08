@@ -48,6 +48,7 @@ private:
     FNAction* m_fiberTractDensityAct;
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
+    FNAction* m_cutSelectedFibersAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

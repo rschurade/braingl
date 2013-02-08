@@ -49,6 +49,11 @@ void FiberRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
+QVector<bool> FiberRenderer::getSelection()
+{
+    return m_rootfield;
+}
+
 void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 {
     GLFunctions::getShader( "fiber" )->bind();

@@ -20,6 +20,7 @@ public:
 
     static QList<Dataset*> thinOut( Dataset* ds );
     static QList<Dataset*> tractDensity( Dataset* ds );
+    static QList<Dataset*> cutSelecteded( Dataset* ds );
 };
 
 #endif /* FIBERALGOS_H_ */
