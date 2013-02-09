@@ -39,6 +39,7 @@ private slots:
 
 signals:
     void valueChanged();
+    void colorChanged( QColor color );
 };
 
 #endif /* PROPERTYCOLOR_H_ */

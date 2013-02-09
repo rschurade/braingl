@@ -22,7 +22,8 @@ FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< fl
     m_numLines( data.size() ),
     m_numPoints( 0 ),
     m_isInitialized( false ),
-    m_colorMode( 0 )
+    m_colorMode( 0 ),
+    m_kdTree( 0 )
 {
     m_boxMin.resize( 3 );
     m_boxMax.resize( 3 );
@@ -61,6 +62,7 @@ void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", mvp_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
 
     initGeometry();
 
@@ -68,11 +70,25 @@ void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
 
-    for ( int i = 0; i < m_data.size(); ++i )
+    if ( m_colorMode != 2 )
     {
-        if ( m_rootfield[i] )
+        for ( int i = 0; i < m_data.size(); ++i )
         {
-            glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+            if ( m_rootfield[i] )
+            {
+                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+            }
+        }
+    }
+    else
+    {
+        for ( int i = 0; i < m_data.size(); ++i )
+        {
+            if ( m_rootfield[i] )
+            {
+                GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", m_colorField[i].redF(), m_colorField[i].greenF(), m_colorField[i].blueF() );
+                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+            }
         }
     }
 
@@ -148,6 +164,9 @@ void FiberRenderer::initGeometry()
     m_numPoints = verts.size() / 9;
     m_kdVerts.reserve( m_numPoints * 3 );
     m_reverseIndexes.reserve( m_numPoints );
+
+    m_colorField.reserve( m_numLines );
+    QColor color( 255, 0, 0 );
     for ( int i = 0; i < m_numLines; ++i )
     {
         for( int k = 0; k < m_data[i].size() / 3; ++k )
@@ -157,6 +176,7 @@ void FiberRenderer::initGeometry()
             m_kdVerts.push_back( m_data[i][k * 3 + 2] );
             m_reverseIndexes.push_back( i );
         }
+        m_colorField.push_back( color );
     }
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
     qDebug() << "end creating kdtree";
@@ -425,4 +445,17 @@ void FiberRenderer::updateRoot()
         }
     }
 }
+
+void FiberRenderer::colorChanged( QColor color )
+{
+    qDebug() << color;
+    for ( int i = 0; i < m_numLines; ++i )
+    {
+        if ( m_rootfield[i] )
+        {
+            m_colorField.replace( i, color );
+        }
+    }
+}
+
 

@@ -24,7 +24,7 @@
 
 class QAbstractItemModel;
 
-class Dataset
+class Dataset : public QObject
 {
 public:
     Dataset( QDir fileName, Fn::DatasetType type );

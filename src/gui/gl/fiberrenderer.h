@@ -14,6 +14,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QtGui/QColor>
+
 class FiberRenderer : public ObjectRenderer
 {
     Q_OBJECT
@@ -58,6 +60,7 @@ private:
     bool m_isInitialized;
 
     int m_colorMode;
+    QVector<QColor>m_colorField;
 
     KdTree* m_kdTree;
     QVector<float>m_kdVerts;
@@ -69,6 +72,9 @@ private:
 
     QVector<float> m_boxMin;
     QVector<float> m_boxMax;
+
+public slots:
+    void colorChanged( QColor color );
 
 private slots:
     void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
