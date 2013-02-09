@@ -11,7 +11,13 @@
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
+    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
+    m_properties.set( Fn::Property::INTERPOLATION, false, true );
+    m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
+
     examineDataset();
+
+    m_properties.set( Fn::Property::HAS_TEXTURE, true );
 }
 
 DatasetDWI::~DatasetDWI()
@@ -54,23 +60,31 @@ void DatasetDWI::examineDataset()
     m_properties.set( Fn::Property::DIM, dim );
     int size = nx * ny * nz * dim;
 
+    float min = 0;
+    float max = 0;
+
     if ( datatype == DT_UNSIGNED_CHAR )
     {
         m_properties.set( Fn::Property::SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
         m_properties.set( Fn::Property::MIN, 0 );
         m_properties.set( Fn::Property::MAX, 255 );    }
+        min = 0;
+        max = 255;
 
     if ( datatype == DT_SIGNED_SHORT )
     {
         m_properties.set( Fn::Property::SIZE, static_cast<int>( size * sizeof(signed short) ) );
 
-        float max = -32767;
-        float min = 32768;
+        max = -32767;
+        min = 32768;
 
-        for ( int i = 0; i < m_b0Data.size(); ++i )
+        for ( int i = 0; i < m_data.size(); ++i )
         {
-            min = qMin( min, m_b0Data[i] );
-            max = qMax( max, m_b0Data[i] );
+            for ( int k = 1; k < dim + 1; ++k )
+            {
+                min = qMin( min, (float)( m_data[i]( k ) ) );
+                max = qMax( max, (float)( m_data[i]( k ) ) );
+            }
         }
         m_properties.set( Fn::Property::MIN, min );
         m_properties.set( Fn::Property::MAX, max );
@@ -80,11 +94,26 @@ void DatasetDWI::examineDataset()
     {
         m_properties.set( Fn::Property::SIZE, static_cast<int>( size * sizeof(float) ) );
 
-        m_properties.set( Fn::Property::MIN, -1.0f );
-        m_properties.set( Fn::Property::MAX, 1.0f );
+        max = -32767;
+        min = 32768;
+
+        for ( int i = 0; i < m_data.size(); ++i )
+        {
+            for ( int k = 1; k < dim + 1; ++k )
+            {
+                min = qMin( min, (float)( m_data[i]( k ) ) );
+                max = qMax( max, (float)( m_data[i]( k ) ) );
+            }
+        }
+        m_properties.set( Fn::Property::MIN, min );
+        m_properties.set( Fn::Property::MAX, max );
     }
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, m_properties.get( Fn::Property::MIN ).toFloat() );
-    m_properties.set( Fn::Property::UPPER_THRESHOLD, m_properties.get( Fn::Property::MAX ).toFloat() );
+
+    m_properties.set( Fn::Property::LOWER_THRESHOLD, min, min, max, true );
+    m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
+
+    m_properties.set( Fn::Property::SELECTED_TEXTURE, 0, 0, dim - 1, true );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_TEXTURE ), SIGNAL( valueChanged() ), this, SLOT( selectTexture() ) );
 }
 
 void DatasetDWI::createTexture()
@@ -105,17 +134,23 @@ void DatasetDWI::createTexture()
     int ny = m_properties.get( Fn::Property::NY ).toInt();
     int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
+    int frame = m_properties.get( Fn::Property::SELECTED_TEXTURE ).toInt() + 1;
 
-    float* tmpData = new float[nx * ny * nz];
     float max = m_properties.get( Fn::Property::MAX ).toFloat();
+
+    unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
     {
-        tmpData[i] = m_b0Data[i] / max;
+        //unsigned int tmp = (double)i / (double)(nx * ny * nz) * 256 * 256 * 256 * 256;
+        unsigned int tmp = ( m_data[i]( frame) / max ) * 256 * 256 * 256 * 256;
+        tmpData[4 * i + 3 ] = (tmp / (256 * 256 * 256)) % 256;
+        tmpData[4 * i + 2 ] = (tmp / (256 * 256)) % 256;
+        tmpData[4 * i + 1 ] = (tmp / (256)) % 256;
+        tmpData[4 * i + 0 ] = tmp % 256 ;
     }
 
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE_ALPHA, nx, ny, nz, 0, GL_LUMINANCE, GL_FLOAT, tmpData );
+    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
-
 }
 
 void DatasetDWI::flipX()
@@ -128,5 +163,14 @@ void DatasetDWI::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstra
 
 QString DatasetDWI::getValueAsString( int x, int y, int z )
 {
-    return QString( "" );
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
+    float data = m_data[x + y * nx + z * nx * ny]( m_properties.get( Fn::Property::SELECTED_TEXTURE ).toInt() + 1 );
+    return QString::number( data );
+}
+
+void DatasetDWI::selectTexture()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
 }
