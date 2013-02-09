@@ -28,6 +28,7 @@ private:
 
 private slots:
     void propChanged();
+    void globalChanged();
 };
 
 #endif /* SELECTIONBOX_H_ */

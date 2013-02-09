@@ -40,12 +40,33 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::ROI::ID, m_count );
     m_properties.set( Fn::ROI::PICK_ID, 0 );
+    m_properties.set( Fn::ROI::STICK_TO_CROSSHAIR, false, true );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
+    connect( globals, SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
 SelectionBox::~SelectionBox()
 {
+}
+
+void SelectionBox::globalChanged()
+{
+    if (  m_properties.get( Fn::ROI::STICK_TO_CROSSHAIR ).toBool() )
+    {
+        float dx = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+        float dy = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+        float dz = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+        float x = m_globals->data( m_globals->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
+        float y = m_globals->data( m_globals->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
+        float z = m_globals->data( m_globals->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
+
+        m_properties.set( Fn::ROI::X, x );
+        m_properties.set( Fn::ROI::Y, y );
+        m_properties.set( Fn::ROI::Z, z );
+        m_properties.slotPropChanged();
+    }
 }
 
 void SelectionBox::propChanged()
