@@ -109,8 +109,10 @@ void DatasetDWI::examineDataset()
         m_properties.set( Fn::Property::MAX, max );
     }
 
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, min, min, max, true );
+    m_properties.set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
+    m_properties.set( Fn::Property::CUT_LOWER_THRESHOLD, true, true );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
+    m_properties.set( Fn::Property::CUT_UPPER_THRESHOLD, true, true );
 
     m_properties.set( Fn::Property::SELECTED_TEXTURE, 0, 0, dim - 1, true );
     connect( m_properties.getProperty( Fn::Property::SELECTED_TEXTURE ), SIGNAL( valueChanged() ), this, SLOT( selectTexture() ) );
