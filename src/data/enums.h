@@ -284,6 +284,7 @@ namespace Fn
         TYPE,
         ACTIVE,
         COLOR,
+        STICK_TO_CROSSHAIR,
         ID,
         PICK_ID,
         UPDATED,
@@ -306,6 +307,7 @@ namespace Fn
                 case ROI::TYPE: return QString( "type" ); break;
                 case ROI::ACTIVE: return QString( "active" ); break;
                 case ROI::COLOR: return QString( "color" ); break;
+                case ROI::STICK_TO_CROSSHAIR: return QString( "stick to crosshair" ); break;
                 case ROI::ID: return QString( "id" ); break;
                 case ROI::PICK_ID: return QString( "pick id" ); break;
                 case ROI::UPDATED: return QString( "updated" ); break;
