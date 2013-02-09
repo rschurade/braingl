@@ -114,6 +114,8 @@ namespace Fn
         FIBER_COLOR,
         FIBER_COLORMODE,
         FIBER_RENDERMODE,
+        HAS_TEXTURE,
+        SELECTED_TEXTURE,
         TEXTURE_GLUINT,
         DATASET_POINTER,
         NEW_DATASET,
@@ -169,6 +171,8 @@ namespace Fn
             case Property::FIBER_COLOR: return QString( "fiber color" ); break;
             case Property::FIBER_COLORMODE: return QString( "fiber color mode" ); break;
             case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
+            case Property::HAS_TEXTURE: return QString( "has frame" ); break;
+            case Property::SELECTED_TEXTURE: return QString( "selected frame" ); break;
             case Property::TEXTURE_GLUINT: return QString( "texture gluint" ); break;
             case Property::DATASET_POINTER: return QString( "dataset pointer" ); break;
             case Property::NEW_DATASET: return QString( "new dataset" ); break;

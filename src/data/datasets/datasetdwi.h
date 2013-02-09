@@ -19,6 +19,8 @@ class QAbstractItemModel;
 
 class DatasetDWI: public DatasetNifti
 {
+    Q_OBJECT
+
 public:
     DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
@@ -44,6 +46,9 @@ private:
     QVector<float> m_b0Data;
     QVector<float> m_bvals;
     QVector<QVector3D> m_bvecs;
+
+private slots:
+    void selectTexture();
 
 };
 

@@ -20,6 +20,8 @@ Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* he
     m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5, 0.5, true );
 
+    m_properties.set( Fn::Property::HAS_TEXTURE, true );
+
     examineDataset();
 }
 

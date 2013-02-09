@@ -15,6 +15,7 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image
     m_properties.set( Fn::Property::INTERPOLATION, false, true );
     m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
     m_properties.set( Fn::Property::DIM, 1 );
+    m_properties.set( Fn::Property::HAS_TEXTURE, true );
 
     examineDataset();
 }
@@ -94,7 +95,6 @@ void DatasetScalar::createTexture()
 
     glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
-
 }
 
 void DatasetScalar::flipX()
