@@ -52,10 +52,10 @@ void DatasetScalar::examineDataset()
     m_properties.set( Fn::Property::MIN, min );
     m_properties.set( Fn::Property::MAX, max );
 
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, min, min, max, true );
-    m_properties.set( Fn::Property::CUT_LOWER_THRESHOLD, false, true );
+    m_properties.set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
+    m_properties.set( Fn::Property::CUT_LOWER_THRESHOLD, true, true );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
-    m_properties.set( Fn::Property::CUT_UPPER_THRESHOLD, false, true );
+    m_properties.set( Fn::Property::CUT_UPPER_THRESHOLD, true, true );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
