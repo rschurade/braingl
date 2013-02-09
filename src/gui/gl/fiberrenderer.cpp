@@ -448,7 +448,6 @@ void FiberRenderer::updateRoot()
 
 void FiberRenderer::colorChanged( QColor color )
 {
-    qDebug() << color;
     for ( int i = 0; i < m_numLines; ++i )
     {
         if ( m_rootfield[i] )
