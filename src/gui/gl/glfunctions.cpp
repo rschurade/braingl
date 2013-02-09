@@ -449,6 +449,10 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold4", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
             program->setUniformValue( "u_upperThreshold4", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_LOWER_THRESHOLD );
+            program->setUniformValue( "u_cutLowerThreshold4", model->data( index, Qt::DisplayRole ).toBool() );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_UPPER_THRESHOLD );
+            program->setUniformValue( "u_cutUpperThreshold4", model->data( index, Qt::DisplayRole ).toBool() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap4", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
@@ -465,6 +469,10 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold3", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
             program->setUniformValue( "u_upperThreshold3", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_LOWER_THRESHOLD );
+            program->setUniformValue( "u_cutLowerThreshold3", model->data( index, Qt::DisplayRole ).toBool() );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_UPPER_THRESHOLD );
+            program->setUniformValue( "u_cutUpperThreshold3", model->data( index, Qt::DisplayRole ).toBool() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap3", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
@@ -481,6 +489,10 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold2", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
             program->setUniformValue( "u_upperThreshold2", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_LOWER_THRESHOLD );
+            program->setUniformValue( "u_cutLowerThreshold2", model->data( index, Qt::DisplayRole ).toBool() );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_UPPER_THRESHOLD );
+            program->setUniformValue( "u_cutUpperThreshold2", model->data( index, Qt::DisplayRole ).toBool() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap2", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
@@ -497,6 +509,10 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold1", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
             program->setUniformValue( "u_upperThreshold1", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_LOWER_THRESHOLD );
+            program->setUniformValue( "u_cutLowerThreshold1", model->data( index, Qt::DisplayRole ).toBool() );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_UPPER_THRESHOLD );
+            program->setUniformValue( "u_cutUpperThreshold1", model->data( index, Qt::DisplayRole ).toBool() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap1", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
@@ -513,6 +529,10 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
             program->setUniformValue( "u_lowerThreshold0", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
             program->setUniformValue( "u_upperThreshold0", model->data( index, Qt::DisplayRole ).toFloat() / texMax );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_LOWER_THRESHOLD );
+            program->setUniformValue( "u_cutLowerThreshold0", model->data( index, Qt::DisplayRole ).toBool() );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::CUT_UPPER_THRESHOLD );
+            program->setUniformValue( "u_cutUpperThreshold0", model->data( index, Qt::DisplayRole ).toBool() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap0", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );

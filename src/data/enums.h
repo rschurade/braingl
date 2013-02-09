@@ -87,6 +87,8 @@ namespace Fn
         FILENAME,
         LOWER_THRESHOLD,
         UPPER_THRESHOLD,
+        CUT_LOWER_THRESHOLD,
+        CUT_UPPER_THRESHOLD,
         COLORMAP,
         INTERPOLATION,
         ALPHA,
@@ -144,6 +146,8 @@ namespace Fn
             case Property::FILENAME: return QString( "filename" ); break;
             case Property::LOWER_THRESHOLD: return QString( "lower threshold" ); break;
             case Property::UPPER_THRESHOLD: return QString( "upper threshold" ); break;
+            case Property::CUT_LOWER_THRESHOLD: return QString( "cut at lower threshold" ); break;
+            case Property::CUT_UPPER_THRESHOLD: return QString( "cut at upper threshold" ); break;
             case Property::COLORMAP: return QString( "colormap" ); break;
             case Property::INTERPOLATION: return QString( "interpolation" ); break;
             case Property::ALPHA: return QString( "alpha" ); break;
