@@ -46,6 +46,8 @@ public:
     QList<Fn::Property> getVisible();
     QWidget* getWidget( Fn::Property name );
 
+    Property* getProperty( Fn::Property name );
+
 private:
     QHash<int, Property*> m_properties;
     QList<Fn::Property>m_visible;

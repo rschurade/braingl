@@ -218,3 +218,15 @@ int PropertyGroup::size() const
 {
     return m_properties.size();
 }
+
+Property* PropertyGroup::getProperty( Fn::Property name )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        return m_properties[(int)name];
+    }
+    else
+    {
+        return 0;
+    }
+}

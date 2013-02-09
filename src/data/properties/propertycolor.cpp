@@ -48,4 +48,5 @@ void PropertyColor::widgetChanged( QColor value, int id )
 {
     m_value = value;
     emit( valueChanged() );
+    emit( colorChanged( m_value ) );
 }
