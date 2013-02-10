@@ -134,6 +134,20 @@ void MainWindow::open()
 {
     QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
+    load( fileName );
+}
+
+void MainWindow::openRecentFile()
+{
+    QAction *action = qobject_cast< QAction * >( sender() );
+    if ( action )
+    {
+        load( action->data().toString() );
+    }
+}
+
+void MainWindow::load( QString fileName )
+{
     if ( !fileName.isEmpty() )
     {
         Loader loader;
@@ -149,7 +163,56 @@ void MainWindow::open()
         QDir dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
         m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+
+        setCurrentFile(fileName);
     }
+}
+
+void MainWindow::setCurrentFile( const QString &fileName )
+{
+    curFile = fileName;
+    setWindowFilePath( curFile );
+
+    QSettings settings;
+    QStringList files = settings.value( "recentFileList" ).toStringList();
+    files.removeAll( fileName );
+    files.prepend( fileName );
+    while ( files.size() > MaxRecentFiles )
+        files.removeLast();
+
+    settings.setValue( "recentFileList", files );
+
+    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    {
+        MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
+        if ( mainWin )
+            mainWin->updateRecentFileActions();
+    }
+}
+
+void MainWindow::updateRecentFileActions()
+{
+    QSettings settings;
+    QStringList files = settings.value( "recentFileList" ).toStringList();
+
+    int numRecentFiles = qMin( files.size(), (int) MaxRecentFiles );
+
+    for ( int i = 0; i < numRecentFiles; ++i )
+    {
+        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[ i ] ) );
+        recentFileActs[ i ]->setText( text );
+        recentFileActs[ i ]->setData( files[ i ] );
+        recentFileActs[ i ]->setVisible( true );
+    }
+    for ( int j = numRecentFiles; j < MaxRecentFiles; ++j )
+        recentFileActs[ j ]->setVisible( false );
+
+    separatorAct->setVisible( numRecentFiles > 0 );
+}
+
+QString MainWindow::strippedName( const QString &fullFileName )
+{
+    return QFileInfo( fullFileName ).fileName();
 }
 
 void MainWindow::save()
@@ -287,6 +350,12 @@ void MainWindow::createActions()
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), this, SLOT( slotNewSelectionBox() ) );
 
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        recentFileActs[ i ] = new QAction( this );
+        recentFileActs[ i ]->setVisible( false );
+        connect( recentFileActs[ i ], SIGNAL(triggered()), this, SLOT(openRecentFile()) );
+    }
 }
 
 void MainWindow::createMenus()
@@ -295,8 +364,15 @@ void MainWindow::createMenus()
     fileMenu->addAction( openAct );
     fileMenu->addAction( saveAct );
     fileMenu->addAction( printAct );
+    separatorAct = fileMenu->addSeparator();
+
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        fileMenu->addAction( recentFileActs[ i ] );
+    }
     fileMenu->addSeparator();
     fileMenu->addAction( quitAct );
+    updateRecentFileActions();
 
     optionMenu = menuBar()->addMenu( tr( "&Options" ) );
     optionMenu->addAction( lockDockTitlesAct );
