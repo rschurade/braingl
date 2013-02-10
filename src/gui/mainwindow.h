@@ -37,6 +37,7 @@ public:
     MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel,  bool debug = false );
 
     void closeEvent( QCloseEvent *event );
+    void load( QString fileName );
 
 private:
     void createActions();
@@ -48,7 +49,7 @@ private:
     void saveSettings();
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Global setting );
-    void load( QString fileName );
+
 
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();

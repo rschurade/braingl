@@ -87,15 +87,7 @@ int main( int argc, char *argv[] )
 
     for ( int i = 1; i < args.size(); ++i )
     {
-        Loader loader;
-        loader.setFilename( QDir( args.at( i ) ) );
-        if ( loader.load() )
-        {
-            for ( int k = 0; k < loader.getNumDatasets(); ++k )
-            {
-                dataStore->setData( dataStore->index( dataStore->rowCount(), (int)Fn::Property::NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ) );
-            }
-        }
+        mainWin.load( args.at( i ) );
     }
 
     return app.exec();
