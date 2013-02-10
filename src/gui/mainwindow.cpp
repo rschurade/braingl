@@ -158,13 +158,13 @@ void MainWindow::load( QString fileName )
             {
                 m_dataStore->setData( m_dataStore->index( m_dataStore->rowCount(), (int)Fn::Property::NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
             }
-        }
-        QFileInfo fi( fileName );
-        QDir dir = fi.absoluteDir();
-        QString lastPath = dir.absolutePath();
-        m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+            QFileInfo fi( fileName );
+            QDir dir = fi.absoluteDir();
+            QString lastPath = dir.absolutePath();
+            m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
 
-        setCurrentFile(fileName);
+            setCurrentFile(fileName);
+        }
     }
 }
 
