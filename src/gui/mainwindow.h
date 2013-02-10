@@ -38,27 +38,6 @@ public:
 
     void closeEvent( QCloseEvent *event );
 
-private slots:
-    void open();
-    void save();
-    void print();
-    void undo();
-    void about();
-
-    void slotToggleAxialSlice();
-    void slotToggleCoronalSlice();
-    void slotToggleSagittalSlice();
-
-    void slotStandardAxialView();
-    void slotStandardCoronalView();
-    void slotStandardSagittalView();
-    void slotToggleShaderEdit();
-
-    void slotToggleDockTitles( bool value );
-    void slotRenderCrosshairs( bool value );
-
-    void slotNewSelectionBox();
-
 private:
     void createActions();
     void createMenus();
@@ -69,6 +48,11 @@ private:
     void saveSettings();
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Global setting );
+    void load( QString fileName );
+
+    void setCurrentFile( const QString &fileName );
+    void updateRecentFileActions();
+    QString strippedName( const QString &fullFileName );
 
     DataStore* m_dataStore;
     GlobalPropertyModel* m_globalProps;
@@ -88,10 +72,16 @@ private:
     QMenu* viewMenu;
     QMenu* tabMenu;
     QMenu* helpMenu;
+    QMenu *recentFilesMenu;
 
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
     ToolBar* m_toolsToolBar;
+
+    enum { MaxRecentFiles = 5 };
+    QAction *recentFileActs[MaxRecentFiles];
+    QAction *separatorAct;
+    QString curFile;
 
     QAction* newLetterAct;
     QAction* openAct;
@@ -116,6 +106,28 @@ private:
     QAction* standardViewSagittalAct;
 
     QAction* newSelectionBoxAct;
+
+private slots:
+    void open();
+    void openRecentFile();
+    void save();
+    void print();
+    void undo();
+    void about();
+
+    void slotToggleAxialSlice();
+    void slotToggleCoronalSlice();
+    void slotToggleSagittalSlice();
+
+    void slotStandardAxialView();
+    void slotStandardCoronalView();
+    void slotStandardSagittalView();
+    void slotToggleShaderEdit();
+
+    void slotToggleDockTitles( bool value );
+    void slotRenderCrosshairs( bool value );
+
+    void slotNewSelectionBox();
 };
 
 #endif
