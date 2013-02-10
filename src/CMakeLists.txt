@@ -119,6 +119,9 @@ ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
     ADD_DEFINITIONS( -D__WINDOWS__ )
+    
+     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows") 
+    
     # Collect the compile-files for this target
     COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
 
