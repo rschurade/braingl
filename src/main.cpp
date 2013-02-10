@@ -13,11 +13,14 @@
 
 
 QTextStream *out = 0;
+bool logToFile = false;
+bool verbose = false;
 
 void logOutput(QtMsgType type, const char *msg)
 {
-    //QString debugdate = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss:zzz");
+    QString filedate = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss:zzz");
     QString debugdate = QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
+
     switch (type)
     {
     case QtDebugMsg:
@@ -33,7 +36,17 @@ void logOutput(QtMsgType type, const char *msg)
         debugdate += " [F]";
         break;
     }
-    (*out) << debugdate << " " << msg << endl;
+    if ( verbose )
+    {
+        (*out) << debugdate << " " << msg << endl;
+    }
+    if ( logToFile )
+    {
+        QFile outFile("log.txt");
+        outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QTextStream ts(&outFile);
+        ts << filedate << " " << msg << endl;
+    }
 
     if (QtFatalMsg == type)
     {
@@ -63,12 +76,15 @@ int main( int argc, char *argv[] )
     {
         if ( args.at( i ) == "-v" )
         {
-            out = new QTextStream( stdout );
-            qInstallMsgHandler( logOutput );
+            verbose = true;
         }
         if ( args.at( i ) == "-d" )
         {
             debug = true;
+        }
+        if ( args.at( i ) == "-l" )
+        {
+            logToFile = true;
         }
     }
     out = new QTextStream( stdout );
