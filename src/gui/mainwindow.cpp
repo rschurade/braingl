@@ -292,6 +292,10 @@ void MainWindow::createActions()
     quitAct->setStatusTip( tr( "Quit the application" ) );
     connect( quitAct, SIGNAL(triggered()), this, SLOT(close()) );
 
+    screenshotAct = new QAction( tr( "Screenshot" ), this );
+    screenshotAct->setStatusTip( tr( "Sreenshot" ) );
+    connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
+
     aboutAct = new QAction( tr( "&About" ), this );
     aboutAct->setStatusTip( tr( "Show the application's About box" ) );
     connect( aboutAct, SIGNAL(triggered()), this, SLOT(about()) );
@@ -383,6 +387,7 @@ void MainWindow::createMenus()
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
+    helpMenu->addAction( screenshotAct );
     helpMenu->addAction( aboutAct );
     helpMenu->addAction( aboutQtAct );
 }
@@ -566,4 +571,9 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::slotNewSelectionBox()
 {
+}
+
+void MainWindow::screenshot()
+{
+    mainGLWidget->screenshot();
 }

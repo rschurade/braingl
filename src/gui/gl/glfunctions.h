@@ -12,6 +12,7 @@
 
 #include <QtCore/QList>
 #include <QtGui/QVector3D>
+#include <QtGui/QImage>
 
 class QAbstractItemModel;
 class QGLShaderProgram;
@@ -60,6 +61,11 @@ public:
     static void beginPicking();
     static void endPicking();
     static bool isPicking();
+
+    static void beginOffscreen();
+    static void endOffscreen();
+
+    static QImage* getOffscreenTexture();
 
 private:
     GLFunctions();

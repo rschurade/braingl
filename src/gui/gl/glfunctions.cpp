@@ -732,3 +732,66 @@ bool GLFunctions::isPicking()
 {
     return GLFunctions::picking;
 }
+
+void GLFunctions::beginOffscreen()
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
+}
+
+void GLFunctions::endOffscreen()
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+QImage* GLFunctions::getOffscreenTexture()
+{
+    static int frame_event = 0;
+    int read_pbo, map_pbo;
+
+    uint red, green, blue, alpha, pixel_index;
+    GLubyte* ptr;
+
+    GLFunctions::generate_pixel_buffer_objects();
+    /* switch between pixel buffer objects */
+    if (frame_event == 0)
+    {
+        frame_event = 1;
+        read_pbo = GLFunctions::pbo_b;
+        map_pbo = GLFunctions::pbo_a;
+    }
+    else {
+        frame_event = 0;
+        map_pbo = GLFunctions::pbo_a;
+        read_pbo = GLFunctions::pbo_b;
+    }
+    /* read one pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* map the other pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* get the mouse coordinates */
+    /* OpenGL has the {0,0} at the down-left corner of the screen */
+
+    QImage* image = new QImage( GLFunctions::screenWidth, GLFunctions::screenHeight, QImage::Format_RGB32 );
+    QColor c;
+    for ( int x = 0; x < GLFunctions::screenWidth; ++x )
+    {
+        for ( int y = 0; y < GLFunctions::screenHeight; ++y )
+        {
+            pixel_index = ( x + y * GLFunctions::screenWidth ) * 4;
+            blue = ptr[pixel_index];
+            green = ptr[pixel_index + 1];
+            red = ptr[pixel_index + 2];
+            alpha = ptr[pixel_index + 3];
+
+            c = QColor( red, green, blue, alpha );
+            image->setPixel( x, ( GLFunctions::screenHeight - y )-1, c.rgba() );
+        }
+    }
+
+    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+
+    return image;
+}

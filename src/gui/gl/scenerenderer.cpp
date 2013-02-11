@@ -176,6 +176,42 @@ void SceneRenderer::draw()
     renderRois();
 }
 
+void SceneRenderer::screenshot()
+{
+    qDebug() << "rendering screenshot";
+
+    int size = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+
+    // create offscreen texture
+    GLFunctions::generate_frame_buffer_texture( m_width * size , m_height * size );
+    GLFunctions::beginOffscreen();
+
+    glViewport( 0, 0, m_width * size, m_height * size );
+
+    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    m_sliceRenderer->draw( m_mvpMatrix );
+
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable( GL_BLEND );
+
+    glShadeModel( GL_SMOOTH );
+    //glEnable( GL_LIGHTING );
+    //glEnable( GL_LIGHT0 );
+    glEnable( GL_MULTISAMPLE );
+
+    renderDatasets();
+
+    renderRois();
+
+    QImage* image = GLFunctions::getOffscreenTexture();
+    GLFunctions::endOffscreen();
+
+    image->save( QString("screenshot.png"), "PNG" );
+}
+
 void SceneRenderer::renderDatasets()
 {
     int countDatasets = m_dataModel->rowCount();

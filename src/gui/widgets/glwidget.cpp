@@ -107,3 +107,8 @@ void GLWidget::setView( Fn::Orient view )
     m_sceneRenderer->setView( view );
     update();
 }
+
+void GLWidget::screenshot()
+{
+    m_sceneRenderer->screenshot();
+}
