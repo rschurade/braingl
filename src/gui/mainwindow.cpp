@@ -35,6 +35,8 @@
 
 #include <QtGui/QtGui>
 
+int MainWindow::screenshotNumber = 0;
+
 MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel, bool debug ) :
 	QMainWindow(),
     m_dataStore( dataStore ),
@@ -575,5 +577,9 @@ void MainWindow::slotNewSelectionBox()
 
 void MainWindow::screenshot()
 {
-    mainGLWidget->screenshot();
+    QImage* image = mainGLWidget->screenshot();
+    image->save( m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString() +
+                  QString("/screenshot_") +
+                  QString::number( screenshotNumber++ ) +
+                  QString( ".png" ), "PNG" );
 }

@@ -109,6 +109,8 @@ private:
 
     QAction* newSelectionBoxAct;
 
+    static int screenshotNumber;
+
 private slots:
     void open();
     void openRecentFile();

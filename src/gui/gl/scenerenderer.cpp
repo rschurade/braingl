@@ -176,7 +176,7 @@ void SceneRenderer::draw()
     renderRois();
 }
 
-void SceneRenderer::screenshot()
+QImage* SceneRenderer::screenshot()
 {
     qDebug() << "rendering screenshot";
 
@@ -209,7 +209,7 @@ void SceneRenderer::screenshot()
     QImage* image = GLFunctions::getOffscreenTexture();
     GLFunctions::endOffscreen();
 
-    image->save( QString("screenshot.png"), "PNG" );
+    return image;
 }
 
 void SceneRenderer::renderDatasets()

@@ -108,7 +108,7 @@ void GLWidget::setView( Fn::Orient view )
     update();
 }
 
-void GLWidget::screenshot()
+QImage* GLWidget::screenshot()
 {
-    m_sceneRenderer->screenshot();
+    return m_sceneRenderer->screenshot();
 }
