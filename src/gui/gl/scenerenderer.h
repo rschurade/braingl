@@ -29,6 +29,7 @@ public:
 
 	void initGL();
 	void draw();
+	void screenshot();
 
 	void leftMouseDown( int x, int y );
 	void leftMouseDrag( int x, int y );

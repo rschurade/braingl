@@ -97,6 +97,7 @@ private:
     QAction* showCoronalAct;
     QAction* showSagittalAct;
 
+    QAction* screenshotAct;
     QAction* aboutAct;
     QAction* aboutQtAct;
 
@@ -115,6 +116,7 @@ private slots:
     void print();
     void undo();
     void about();
+    void screenshot();
 
     void slotToggleAxialSlice();
     void slotToggleCoronalSlice();
