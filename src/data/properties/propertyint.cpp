@@ -40,6 +40,11 @@ QVariant PropertyInt::getValue()
 void PropertyInt::setValue( QVariant value )
 {
     m_value = value.toInt();
+    if ( m_value > m_max )
+    {
+        m_max = m_value;
+        m_widget->setMax( m_max );
+    }
     m_widget->setValue( m_value );
 }
 

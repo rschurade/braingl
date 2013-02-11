@@ -216,7 +216,6 @@ namespace Fn
        BACKGROUND_COLOR_NAV3,
        CROSSHAIR_COLOR,
        SHOW_NAV_SLIDERS,
-       SCREENSHOT_QUALITY,
        OBJECT,
    // settings that need a datastore signal to update widgets need to be inserted above this line
        ZOOM,
@@ -224,7 +223,8 @@ namespace Fn
        MOVEY,
        BBX,
        BBY,
-       VIEW
+       VIEW,
+       SCREENSHOT_QUALITY
    };
 
     struct Global2String {

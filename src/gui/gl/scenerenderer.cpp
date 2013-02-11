@@ -93,6 +93,10 @@ void SceneRenderer::initGL()
 
     calcMVPMatrix();
     m_sliceRenderer->init();
+
+    int textureSizeMax;
+    glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -181,12 +185,24 @@ QImage* SceneRenderer::screenshot()
     qDebug() << "rendering screenshot";
 
     int size = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int texX;
+    int texY;
+    if ( m_width >= m_height )
+    {
+        texX = size;
+        texY = texX * m_height / m_width;
+    }
+    else
+    {
+        texY = size;
+        texX = m_width * texY / m_height;
+    }
 
     // create offscreen texture
-    GLFunctions::generate_frame_buffer_texture( m_width * size , m_height * size );
+    GLFunctions::generate_frame_buffer_texture( texX , texY );
     GLFunctions::beginOffscreen();
 
-    glViewport( 0, 0, m_width * size, m_height * size );
+    glViewport( 0, 0, texX, texY );
 
     QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
@@ -208,7 +224,7 @@ QImage* SceneRenderer::screenshot()
 
     QImage* image = GLFunctions::getOffscreenTexture();
     GLFunctions::endOffscreen();
-
+    glViewport( 0, 0, m_width, m_height );
     return image;
 }
 
