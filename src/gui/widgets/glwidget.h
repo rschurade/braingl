@@ -31,7 +31,7 @@ public:
     QSize sizeHint() const;
 
     void setView( Fn::Orient view );
-    void screenshot();
+    QImage* screenshot();
 
 private:
     SceneRenderer* m_sceneRenderer;
