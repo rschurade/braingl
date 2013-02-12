@@ -10,6 +10,8 @@
 
 #include "../../data/mesh/tesselation.h"
 
+#include "math.h"
+
 BinghamRendererThread::BinghamRendererThread( QVector<QVector<float> >* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
