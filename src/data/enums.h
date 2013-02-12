@@ -85,6 +85,8 @@ namespace Fn
         TYPE,
         CREATED_BY,
         FILENAME,
+        SELECTED_MIN,
+        SELECTED_MAX,
         LOWER_THRESHOLD,
         UPPER_THRESHOLD,
         CUT_LOWER_THRESHOLD,
@@ -144,6 +146,8 @@ namespace Fn
             case Property::TYPE: return QString( "type" ); break;
             case Property::CREATED_BY: return QString( "created by" ); break;
             case Property::FILENAME: return QString( "filename" ); break;
+            case Property::SELECTED_MIN: return QString( "min" ); break;
+            case Property::SELECTED_MAX: return QString( "max" ); break;
             case Property::LOWER_THRESHOLD: return QString( "lower threshold" ); break;
             case Property::UPPER_THRESHOLD: return QString( "upper threshold" ); break;
             case Property::CUT_LOWER_THRESHOLD: return QString( "cut at lower threshold" ); break;
