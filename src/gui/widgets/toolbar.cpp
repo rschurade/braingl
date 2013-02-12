@@ -46,8 +46,8 @@ void ToolBar::setSelectionModel( QItemSelectionModel* selectionModel )
 
 void ToolBar::createActions()
 {
-    m_isosurfaceAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "Scalar 1" ), this, Fn::Algo::ISOSURFACE );
-    m_isosurfaceAct->setStatusTip( tr( "Scalar Action 1" ) );
+    m_isosurfaceAct = new FNAction( QIcon( ":/icons/iso_surface.png" ), tr( "iso surface" ), this, Fn::Algo::ISOSURFACE );
+    m_isosurfaceAct->setStatusTip( tr( "iso surface" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, Fn::Algo::TEST );
