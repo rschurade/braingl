@@ -28,7 +28,7 @@ namespace Fn
         FIBERS
     };
 
-    enum class Colormap : int
+    enum class ColormapEnum : int
     {
         GRAY,
         RAINBOW1,
@@ -331,7 +331,7 @@ namespace Fn
 }
 
 Q_DECLARE_METATYPE( Fn::DatasetType )
-Q_DECLARE_METATYPE( Fn::Colormap )
+Q_DECLARE_METATYPE( Fn::ColormapEnum )
 Q_DECLARE_METATYPE( Fn::Algo )
 Q_DECLARE_METATYPE( Fn::Orient )
 Q_DECLARE_METATYPE( Fn::Property )

@@ -11,7 +11,7 @@
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data )
 {
-    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
+    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, true );
     m_properties.set( Fn::Property::INTERPOLATION, false, true );
     m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
     m_properties.set( Fn::Property::DIM, 1 );
