@@ -135,8 +135,12 @@ void MainWindow::print()
 void MainWindow::open()
 {
     QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
-    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
-    load( fileName );
+    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn );
+    for ( int i = 0; i < fileNames.size(); ++i )
+    {
+        load( fileNames[i] );
+    }
+
 }
 
 void MainWindow::openRecentFile()
