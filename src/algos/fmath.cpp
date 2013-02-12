@@ -6,6 +6,8 @@
  */
 #include "fmath.h"
 
+#include "math.h"
+
 #include "../thirdparty/newmat10/newmatap.h"
 #include "../thirdparty/newmat10/newmatio.h"
 #include "../thirdparty/newmat10/newmatrm.h"
