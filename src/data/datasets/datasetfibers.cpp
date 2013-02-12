@@ -31,7 +31,7 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
     }
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 1, true );
+    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 2, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
 }
 
