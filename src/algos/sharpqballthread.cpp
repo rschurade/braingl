@@ -14,6 +14,8 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include "math.h"
+
 SharpQBallThread::SharpQBallThread( DatasetDWI* ds, int order, int id ) :
     m_ds( ds ),
     m_order( order ),

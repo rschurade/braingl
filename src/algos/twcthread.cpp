@@ -9,6 +9,7 @@
 #include "fmath.h"
 
 #include "time.h"
+#include "math.h"
 
 TWCThread::TWCThread( int id,
                         QVector<float>* mask,
