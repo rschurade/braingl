@@ -93,7 +93,6 @@ set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-SET ( CMAKE_AUTOMOC TRUE )
 SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-int-to-pointer-cast -Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
@@ -108,7 +107,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 
     QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
     
-    #QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
+    QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
 
@@ -118,6 +117,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
+    SET ( CMAKE_AUTOMOC TRUE )
     ADD_DEFINITIONS( -D__WINDOWS__ )
     
      SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows") 
