@@ -8,6 +8,7 @@
 #include "fmath.h"
 
 #include "time.h"
+#include "math.h"
 
 TrackThread::TrackThread( QVector<Matrix>* tensors,
                           QVector<Matrix>* logTensors,
