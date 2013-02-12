@@ -14,6 +14,7 @@
 #include <QtCore/QThread>
 
 #include "time.h"
+#include "math.h"
 
 TrackWithCrossings::TrackWithCrossings() :
     m_nx( 0 ),
