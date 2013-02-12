@@ -11,7 +11,7 @@
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ), m_data( data ), m_b0Data( b0Data ), m_bvals( bvals ), m_bvecs( bvecs )
 {
-    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::Colormap::NONE - 1, true );
+    m_properties.set( Fn::Property::COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, true );
     m_properties.set( Fn::Property::INTERPOLATION, false, true );
     m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
 
