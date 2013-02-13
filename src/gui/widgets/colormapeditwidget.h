@@ -36,7 +36,6 @@ private:
     ColormapBase m_colormap;
 
     QLabel* m_cLabel;
-    QPushButton* m_newButton;
 
     QVector< SliderWithEdit*>m_sliders;
 
@@ -44,7 +43,7 @@ private:
 private slots:
     void sliderChanged( float value, int id );
     void colorChanged( QColor color, int id );
-    void newEntry();
+    void newEntry( int id );
     void removeEntry( int id );
     void save();
 };
