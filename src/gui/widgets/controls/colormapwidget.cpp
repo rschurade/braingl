@@ -20,22 +20,18 @@ ColormapWidget::ColormapWidget( int width ) :
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
 
-//    QHBoxLayout* hLayout = new QHBoxLayout();
-//    m_nlabel = new QLabel( QString("colormap"), this );
-//    hLayout->addWidget( m_nlabel );
-//    hLayout->addStretch();
-
-    QHBoxLayout* hLayout2 = new QHBoxLayout();
-    m_nlabel = new QLabel( this );
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    m_clabel = new QLabel( this );
 
     m_image = createImage( width );
     QPixmap pix( width, 20 );
     pix.convertFromImage( *m_image );
-    m_nlabel->setPixmap( pix );
-    hLayout2->addWidget( m_nlabel );
+    m_clabel->setPixmap( pix );
+    hLayout->addStretch();
+    hLayout->addWidget( m_clabel );
+    hLayout->addStretch();
 
-    //vLayout->addLayout( hLayout );
-    vLayout->addLayout( hLayout2 );
+    vLayout->addLayout( hLayout );
     vLayout->setContentsMargins( 1,1,1,1 );
 
     setLayout( vLayout );
@@ -49,6 +45,16 @@ ColormapWidget::ColormapWidget( int width ) :
 
 ColormapWidget::~ColormapWidget()
 {
+}
+
+void ColormapWidget::resizeEvent( QResizeEvent* event )
+{
+    m_width = this->width() - 6;
+    QImage* image;
+    image = createImage( m_width );
+    QPixmap pix( m_width, 20 );
+    pix.convertFromImage( *image );
+    m_clabel->setPixmap( pix );
 }
 
 QImage* ColormapWidget::createImage( int width )
@@ -79,7 +85,7 @@ void ColormapWidget::setLowerThreshold( float value )
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );
-    m_nlabel->setPixmap( pix );
+    m_clabel->setPixmap( pix );
 }
 
 void ColormapWidget::setUpperThreshold( float value )
@@ -88,7 +94,7 @@ void ColormapWidget::setUpperThreshold( float value )
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );
-    m_nlabel->setPixmap( pix );
+    m_clabel->setPixmap( pix );
 }
 
 void ColormapWidget::setMin( float value )
@@ -108,5 +114,5 @@ void ColormapWidget::setColormap( int value )
     m_image = createImage( m_width );
     QPixmap pix( m_width, 20 );
     pix.convertFromImage( *m_image );
-    m_nlabel->setPixmap( pix );
+    m_clabel->setPixmap( pix );
 }
