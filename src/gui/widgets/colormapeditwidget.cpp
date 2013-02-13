@@ -78,6 +78,14 @@ void ColormapEditWidget::redrawWidget()
     m_sliders.clear();
     for ( int i = 1; i < m_colormap.size() - 1; ++i )
     {
+        QHBoxLayout* hLayout4 = new QHBoxLayout();
+        hLayout4->addStretch();
+        PushButtonWithId* newButton= new PushButtonWithId( tr("new entry"), i );
+        connect( newButton, SIGNAL( signalClicked(int ) ), this, SLOT( newEntry( int ) ) );
+        hLayout4->addWidget( newButton );
+        hLayout4->addStretch();
+        vLayout->addLayout( hLayout4 );
+
         QHBoxLayout* hLayout2 = new QHBoxLayout();
         SliderWithEdit* slider = new SliderWithEdit( tr(""), i );
         m_sliders.push_back( slider );
@@ -99,9 +107,9 @@ void ColormapEditWidget::redrawWidget()
 
     QHBoxLayout* hLayout4 = new QHBoxLayout();
     hLayout4->addStretch();
-    m_newButton = new QPushButton( tr("new entry") );
-    connect( m_newButton, SIGNAL( clicked() ), this, SLOT( newEntry() ) );
-    hLayout4->addWidget( m_newButton );
+    PushButtonWithId* newButton= new PushButtonWithId( tr("new entry"), m_colormap.size() - 1 );
+    connect( newButton, SIGNAL( signalClicked(int ) ), this, SLOT( newEntry( int ) ) );
+    hLayout4->addWidget( newButton );
     hLayout4->addStretch();
     vLayout->addLayout( hLayout4 );
 
@@ -173,10 +181,10 @@ void ColormapEditWidget::colorChanged( QColor color, int id )
     m_cLabel->setPixmap( pix );
 }
 
-void ColormapEditWidget::newEntry()
+void ColormapEditWidget::newEntry( int id )
 {
-    float v1 = m_colormap.get( m_colormap.size() - 2 ).value;
-    float v2 = m_colormap.get( m_colormap.size() - 1 ).value;
+    float v1 = m_colormap.get( id - 1 ).value;
+    float v2 = m_colormap.get( id ).value;
     float value = v1 + ( ( v2 - v1 ) / 2.0 );
     m_colormap.insertValue( value, QColor( 255, 255, 255 ) );
     redrawWidget();
