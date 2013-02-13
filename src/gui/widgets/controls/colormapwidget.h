@@ -23,11 +23,12 @@ public:
     ColormapWidget( int width );
     virtual ~ColormapWidget();
 
+    void resizeEvent( QResizeEvent* event );
+
 private:
     QImage* createImage( int width );
 
     QImage* m_image;
-    QLabel* m_nlabel;
     QLabel* m_clabel;
 
     int m_colormap;
