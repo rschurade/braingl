@@ -24,6 +24,9 @@
 #include "widgets/toolbar.h"
 #include "widgets/statusbar.h"
 #include "widgets/shadereditwidget.h"
+#include "widgets/colormapeditwidget.h"
+
+#include "gl/glfunctions.h"
 
 #include "../data/datastore.h"
 #include "../data/globalpropertymodel.h"
@@ -49,6 +52,26 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 	m_centralWidget->setDockOptions( QMainWindow::AnimatedDocks |  QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks );
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
+
+	ColormapBase colormap;
+	GLFunctions::addColormap2( colormap );
+
+	ColormapBase cmap( QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+    cmap.insertValue( 0.25, QColor( 0, 255, 255 ) );
+    cmap.insertValue( 0.5, QColor( 0, 255, 0 ) );
+    cmap.insertValue( 0.75, QColor( 255, 255, 0 ) );
+    GLFunctions::addColormap2( cmap );
+
+    ColormapBase cmap2( QColor( 0, 0, 255 ), QColor( 255, 0, 255 ) );
+    cmap2.insertValue( 0.2, QColor( 0, 255, 255 ) );
+    cmap2.insertValue( 0.4, QColor( 0, 255, 0 ) );
+    cmap2.insertValue( 0.6, QColor( 255, 255, 0 ) );
+    cmap2.insertValue( 0.8, QColor( 255, 0, 0 ) );
+    GLFunctions::addColormap2( cmap2 );
+
+    ColormapBase cmap3( QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+    cmap3.insertValue( 0.5, QColor( 255, 255, 255 ) );
+    GLFunctions::addColormap2( cmap3 );
 
     createActions();
     createMenus();
@@ -521,6 +544,13 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
+
+    ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
+    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockCE );
+    viewMenu->addAction( dockCE->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+
 
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
