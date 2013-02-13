@@ -119,6 +119,11 @@ QString ColormapBase::getCode()
         code += " } ";
     }
 
+    c0 = m_values.last().color;
+    code += " if ( value > 1.0 ) color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
+                                                   QString::number( c0.greenF(), 'f', 2 ) + ", " +
+                                                   QString::number( c0.blueF(), 'f', 2 ) + " ); ";
+
     return code;
 }
 
