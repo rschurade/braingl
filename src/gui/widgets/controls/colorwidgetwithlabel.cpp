@@ -25,8 +25,11 @@ ColorWidgetWithLabel::ColorWidgetWithLabel( QString label, int id, QWidget* pare
     QVBoxLayout* vLayout = new QVBoxLayout();
 
     QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addWidget( m_label );
-    hLayout->addStretch();
+    if ( label != "" )
+    {
+        hLayout->addWidget( m_label );
+        hLayout->addStretch();
+    }
     hLayout->addWidget( m_button );
     vLayout->addLayout( hLayout );
 

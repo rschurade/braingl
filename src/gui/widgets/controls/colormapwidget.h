@@ -25,15 +25,12 @@ public:
 
 private:
     QImage* createImage( int width );
-    QColor colormap1( float value );
-    QColor colormap2( float value );
-    QColor colormap3( float value );
 
     QImage* m_image;
     QLabel* m_nlabel;
     QLabel* m_clabel;
 
-    Fn::ColormapEnum m_colormap;
+    int m_colormap;
     int m_width;
     float m_lowerThreshold;
     float m_upperThreshold;

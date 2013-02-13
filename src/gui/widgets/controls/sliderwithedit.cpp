@@ -41,7 +41,10 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     hLayout2->addWidget( m_slider, 70 );
     hLayout2->addWidget( m_edit, 30 );
 
-    vLayout->addLayout( hLayout );
+    if ( name != "" )
+    {
+        vLayout->addLayout( hLayout );
+    }
     vLayout->addLayout( hLayout2 );
 
     hLayout->setContentsMargins( 0,0,0,0 );

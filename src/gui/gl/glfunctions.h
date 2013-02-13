@@ -10,6 +10,8 @@
 
 #include "../../thirdparty/glew/include/glew.h"
 
+#include "../../algos/colormapbase.h"
+
 #include <QtCore/QList>
 #include <QtGui/QVector3D>
 #include <QtGui/QImage>
@@ -67,15 +69,22 @@ public:
 
     static QImage* getOffscreenTexture();
 
+    static void updateColormapShader();
+
+    static void addColormap( ColormapBase colormap );
+    static void addColormap2( ColormapBase colormap );
+    static ColormapBase getColormap( int id );
+
 private:
     GLFunctions();
     virtual ~GLFunctions();
 
-    static void copyShaderToString( QString name );
+    static void copyShaderToString( QString name, QString ext );
 
     static QHash< QString, QString >m_shaderSources;
     static QHash< QString, QGLShaderProgram* >m_shaders;
     static QVector<QString>m_shaderNames;
+    static QVector<ColormapBase>m_colormaps;
 
     static bool shadersLoaded;
     static unsigned int pickIndex;

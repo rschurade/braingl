@@ -25,6 +25,7 @@ bool GLFunctions::picking = false;
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
+QVector<ColormapBase>GLFunctions::m_colormaps;
 
 GLFunctions::GLFunctions()
 {
@@ -155,6 +156,7 @@ void GLFunctions::loadShaders()
 {
     if ( !GLFunctions::shadersLoaded )
     {
+        GLFunctions::m_shaderNames.push_back( "uniforms" );
         GLFunctions::m_shaderNames.push_back( "slice" );
         GLFunctions::m_shaderNames.push_back( "qball" );
         GLFunctions::m_shaderNames.push_back( "crosshair" );
@@ -165,19 +167,79 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "box" );
 
-        for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+        copyShaderToString( GLFunctions::m_shaderNames[ 0 ], QString("fs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 1 ], QString("vs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 1 ], QString("fs") );
+        updateColormapShader();
+
+        for ( int i = 2; i < GLFunctions::m_shaderNames.size(); ++i )
         {
-            copyShaderToString( GLFunctions::m_shaderNames[ i ] );
+            copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
+            copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
             GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
         }
+
 
         GLFunctions::shadersLoaded = true;
     }
 }
 
-void GLFunctions::copyShaderToString( QString name )
+void GLFunctions::addColormap( ColormapBase colormap )
 {
-    QFile fileVS( ":/shaders/" + name + ".vs" );
+    GLFunctions::m_colormaps.push_back( colormap );
+    updateColormapShader();
+}
+
+void GLFunctions::addColormap2( ColormapBase colormap )
+{
+    GLFunctions::m_colormaps.push_back( colormap );
+}
+
+ColormapBase GLFunctions::getColormap( int id )
+{
+    return GLFunctions::m_colormaps[ qMax( 0, qMin( id, GLFunctions::m_colormaps.size() - 1 ) ) ];
+}
+
+void GLFunctions::updateColormapShader()
+{
+    int numColormaps = GLFunctions::m_colormaps.size();
+    QString code("" );
+    code += " vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) ";
+    code += " { ";
+    code += " vec3 color = vec3(0.0); ";
+    code += " if ( cmap == " + QString::number( numColormaps ) + " ) ";
+    code += " { ";
+    code += " color = vec3( v.r, v.g, v.b ); ";
+    code += " return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); ";
+    code += " } ";
+    code += " float value = unpackFloat( v ); ";
+    code += " if ( value < lowerThreshold ) ";
+    code += " { ";
+    code += " return fragColor; ";
+    code += " } ";
+    code += " if ( value > upperThreshold ) ";
+    code += " { ";
+    code += " return fragColor; ";
+    code += " } ";
+    code += " value = ( value - selectedMin ) / ( selectedMax - selectedMin ); ";
+    for ( int i = 0; i < numColormaps; ++i )
+    {
+        code += "if ( cmap == " + QString::number( i ) + " ) ";
+        code += " { ";
+        code += GLFunctions::m_colormaps[i].getCode();
+        code += " } ";
+    }
+    code += " return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); ";
+    code += " } ";
+    //qDebug() << code;
+    copyShaderToString( "slice", "fs" );
+    GLFunctions::m_shaderSources[ "slice_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "slice_fs" ];
+    GLFunctions::m_shaders[ "slice" ] = initShader( "slice" );
+}
+
+void GLFunctions::copyShaderToString( QString name, QString ext )
+{
+    QFile fileVS( ":/shaders/" + name + "." + ext );
     fileVS.open( QIODevice::ReadOnly );
     QTextStream inVS( &fileVS );
     QString codeVS( "" );
@@ -186,17 +248,7 @@ void GLFunctions::copyShaderToString( QString name )
         codeVS += inVS.readLine();
         codeVS += "\n";
     }
-    GLFunctions::m_shaderSources[ name + "_vs" ] = codeVS;
-    QFile fileFS( ":/shaders/" + name + ".fs" );
-    fileFS.open( QIODevice::ReadOnly );
-    QTextStream inFS( &fileFS );
-    QString codeFS( "" );
-    while ( !inFS.atEnd() )
-    {
-        codeFS += inFS.readLine();
-        codeFS += "\n";
-    }
-    GLFunctions::m_shaderSources[ name + "_fs" ] = codeFS;
+    GLFunctions::m_shaderSources[ name + "_" + ext ] = codeVS;
 }
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
