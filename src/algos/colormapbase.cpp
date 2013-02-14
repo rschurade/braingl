@@ -11,7 +11,8 @@
 
 #include <QtCore/QDebug>
 
-ColormapBase::ColormapBase()
+ColormapBase::ColormapBase() :
+    m_name( "new colormap" )
 {
     ColormapPair p0;
     p0.value = 0.0f;
@@ -26,7 +27,8 @@ ColormapBase::ColormapBase()
 }
 
 
-ColormapBase::ColormapBase( QColor c0, QColor c1 )
+ColormapBase::ColormapBase( QString name, QColor c0, QColor c1 ) :
+    m_name( name )
 {
     ColormapPair p0;
     p0.value = 0.0f;
@@ -42,6 +44,16 @@ ColormapBase::ColormapBase( QColor c0, QColor c1 )
 
 ColormapBase::~ColormapBase()
 {
+}
+
+void ColormapBase::setName( QString name )
+{
+    m_name = name;
+}
+
+QString ColormapBase::getName()
+{
+    return m_name;
 }
 
 void ColormapBase::insertValue( ColormapPair pair )

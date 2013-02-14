@@ -10,6 +10,7 @@
 
 #include <QtGui/QColor>
 #include <QtCore/QVector>
+#include <QtCore/QString>
 
 struct ColormapPair
 {
@@ -21,7 +22,7 @@ class ColormapBase
 {
 public:
     ColormapBase();
-    ColormapBase( QColor c0, QColor c1 );
+    ColormapBase( QString name, QColor c0, QColor c1 );
     virtual ~ColormapBase();
 
     void insertValue( ColormapPair value );
@@ -31,6 +32,9 @@ public:
     void setValue( int id, float value );
     void setColor( int id, QColor color );
 
+    void setName( QString name );
+    QString getName();
+
     int size();
     ColormapPair get( int id );
 
@@ -38,6 +42,7 @@ public:
     QString getCode();
 
 private:
+    QString m_name;
     QVector< ColormapPair >m_values;
 
 };

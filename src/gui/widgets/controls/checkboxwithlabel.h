@@ -23,6 +23,7 @@ public:
     virtual ~CheckboxWithLabel();
 
     void setChecked( bool state );
+    bool checked();
 
 private:
     QLabel* m_label;

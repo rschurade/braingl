@@ -6,11 +6,16 @@
  */
 #include "colormapeditwidget.h"
 
-#include "../widgets/controls/sliderwithedit.h"
+#include "../widgets/controls/checkboxwithlabel.h"
 #include "../widgets/controls/colorwidgetwithlabel.h"
+#include "../widgets/controls/editwithlabel.h"
 #include "../widgets/controls/pushbuttonwithid.h"
+#include "../widgets/controls/selectwithlabel.h"
+#include "../widgets/controls/sliderwithedit.h"
+#include "../widgets/controls/sliderwitheditint.h"
 
 #include "../gl/glfunctions.h"
+#include "../gl/colormapfunctions.h"
 
 #include "../../data/enums.h"
 #include "../../data/properties/property.h"
@@ -19,13 +24,17 @@
 
 ColormapEditWidget::ColormapEditWidget( QWidget* parent ) :
     QWidget( parent ),
-    m_colormap( QColor( 0, 0, 255), QColor( 255, 0, 0 ) )
+    m_selected( 0 ),
+    m_contUpdating( false )
 {
+    m_colormap = ColormapFunctions::get( 0 );
     redrawWidget();
 
     setContentsMargins( 0, 0, 0, 0 );
 
     this->setMaximumWidth( 500 );
+    setStyleSheet( "QLabel { font:  bold 12px } "
+                     "QPushButton { font:  bold 12px; max-height: 16px; } ");
 }
 
 ColormapEditWidget::~ColormapEditWidget()
@@ -48,11 +57,65 @@ void ColormapEditWidget::redrawWidget()
         QWidget().setLayout(layout());
     }
 
-
     QVBoxLayout* vLayout = new QVBoxLayout();
     vLayout->setContentsMargins( 1, 1, 1, 1 );
     vLayout->setSpacing( 1 );
     setLayout( vLayout );
+
+    QHBoxLayout* hLayoutTop = new QHBoxLayout();
+    m_nameEdit = new EditWithLabel( "name" );
+    m_nameEdit->setText( ColormapFunctions::get( m_selected).getName() );
+
+    m_sel = new SelectWithLabel( "colormap", 0 );
+    for ( int k = 0; k < ColormapFunctions::size(); ++k )
+    {
+         m_sel->insertItem( k, ColormapFunctions::get( k ).getName() );
+
+    }
+    m_sel->setCurrentIndex( m_selected );
+    connect( m_sel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( selectionChanged( int) ) );
+
+    hLayoutTop->addWidget( m_nameEdit );
+    hLayoutTop->addWidget( m_sel );
+    vLayout->addLayout( hLayoutTop );
+
+    m_buttonPanel = new QWidget();
+    m_buttonPanel->setLayout( createButtonPanel() );
+    vLayout->addWidget( m_buttonPanel );
+
+    vLayout->addStretch();
+    QHBoxLayout* hLayout5 = new QHBoxLayout();
+    hLayout5->addStretch();
+    CheckboxWithLabel* contUpdating = new CheckboxWithLabel( tr("continuous updating"), false );
+    contUpdating->setChecked( m_contUpdating );
+    connect( contUpdating, SIGNAL( stateChanged( int, int ) ), this, SLOT( contUpdatingChanged( int ) ) );
+    hLayout5->addWidget( contUpdating );
+    QPushButton* updateButton = new QPushButton( tr("update") );
+    connect( updateButton, SIGNAL( clicked() ), this, SLOT( update() ) );
+    hLayout5->addWidget( updateButton );
+    QPushButton* saveButton = new QPushButton( tr("save new") );
+    connect( saveButton, SIGNAL( clicked() ), this, SLOT( save() ) );
+    hLayout5->addWidget( saveButton );
+    vLayout->addLayout( hLayout5 );
+
+    layout()->setContentsMargins( 1, 1, 1, 1 );
+    layout()->setSpacing( 1 );
+
+    repaint();
+}
+
+void ColormapEditWidget::updateWidget()
+{
+    if( m_buttonPanel->layout() )
+    {
+        QWidget().setLayout( m_buttonPanel->layout() );
+    }
+    m_buttonPanel->setLayout( createButtonPanel() );
+}
+
+QVBoxLayout* ColormapEditWidget::createButtonPanel()
+{
+    QVBoxLayout* vLayout = new QVBoxLayout();
 
     QHBoxLayout* hLayout = new QHBoxLayout();
     m_cLabel = new QLabel( this );
@@ -121,18 +184,7 @@ void ColormapEditWidget::redrawWidget()
     hLayout3->addWidget( colorWidget2 );
     vLayout->addLayout( hLayout3 );
 
-    QHBoxLayout* hLayout5 = new QHBoxLayout();
-    hLayout5->addStretch();
-    QPushButton* saveButton = new QPushButton( tr("save") );
-    connect( saveButton, SIGNAL( clicked() ), this, SLOT( save() ) );
-    hLayout5->addWidget( saveButton );
-    vLayout->addLayout( hLayout5 );
-
-    layout()->setContentsMargins( 1, 1, 1, 1 );
-    layout()->setSpacing( 1 );
-
-    vLayout->addStretch();
-    repaint();
+    return vLayout;
 }
 
 QImage* ColormapEditWidget::createImage( int width )
@@ -168,6 +220,11 @@ void ColormapEditWidget::sliderChanged( float value, int id )
         m_sliders[i]->setMax( m_colormap.get( i + 2 ).value - 0.01 );
     }
     repaint();
+
+    if ( m_contUpdating )
+    {
+        update();
+    }
 }
 
 void ColormapEditWidget::colorChanged( QColor color, int id )
@@ -179,6 +236,11 @@ void ColormapEditWidget::colorChanged( QColor color, int id )
     QPixmap pix( this->width() - 6, 20 );
     pix.convertFromImage( *image );
     m_cLabel->setPixmap( pix );
+
+    if ( m_contUpdating )
+    {
+        update();
+    }
 }
 
 void ColormapEditWidget::newEntry( int id )
@@ -188,15 +250,50 @@ void ColormapEditWidget::newEntry( int id )
     float value = v1 + ( ( v2 - v1 ) / 2.0 );
     m_colormap.insertValue( value, QColor( 255, 255, 255 ) );
     redrawWidget();
+    if ( m_contUpdating )
+    {
+        update();
+    }
 }
 
 void ColormapEditWidget::removeEntry( int id )
 {
     m_colormap.removeValue( id );
     redrawWidget();
+    if ( m_contUpdating )
+    {
+        update();
+    }
 }
 
 void ColormapEditWidget::save()
 {
-    GLFunctions::addColormap( m_colormap );
+    m_colormap.setName( m_nameEdit->text() );
+    ColormapFunctions::addColormap( m_colormap );
+    GLFunctions::updateColormapShader();
+    m_selected = ColormapFunctions::size() - 1;
+    redrawWidget();
+}
+
+void ColormapEditWidget::update()
+{
+    m_colormap.setName( m_nameEdit->text() );
+    ColormapFunctions::updateColormap( m_selected, m_colormap );
+    GLFunctions::updateColormapShader();
+
+    emit( signalUpdate() );
+}
+
+void ColormapEditWidget::selectionChanged( int id )
+{
+    m_colormap = ColormapFunctions::get( id );
+    m_nameEdit->setText( m_colormap.getName() );
+    m_selected = id;
+
+    updateWidget();
+}
+
+void ColormapEditWidget::contUpdatingChanged( int value )
+{
+    m_contUpdating = value;
 }

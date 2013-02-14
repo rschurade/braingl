@@ -28,3 +28,7 @@ NavFrame::~NavFrame()
 {
 }
 
+void NavFrame::update()
+{
+    m_widget->update();
+}

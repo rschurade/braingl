@@ -54,3 +54,8 @@ void CheckboxWithLabel::setChecked( bool state )
 {
     m_checkBox->setChecked( state );
 }
+
+bool CheckboxWithLabel::checked()
+{
+    return m_checkBox->checkState();
+}

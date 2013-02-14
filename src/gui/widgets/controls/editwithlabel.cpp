@@ -58,3 +58,8 @@ void EditWithLabel::setText( QString text )
 {
     m_lineEdit->setText( text );
 }
+
+QString EditWithLabel::text()
+{
+    return m_lineEdit->text();
+}

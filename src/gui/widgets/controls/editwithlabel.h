@@ -22,6 +22,7 @@ public:
     EditWithLabel(  QString label, int id = 0, QWidget* parent = 0 );
     virtual ~EditWithLabel();
 
+    QString text();
     void setText( QString text );
 
 private:

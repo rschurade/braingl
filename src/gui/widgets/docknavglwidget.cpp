@@ -135,3 +135,8 @@ void DockNavGLWidget::settingChanged()
         }
     }
 }
+
+void DockNavGLWidget::update()
+{
+    m_glWidget->update();
+}
