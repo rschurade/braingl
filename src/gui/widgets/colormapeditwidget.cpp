@@ -209,8 +209,8 @@ void ColormapEditWidget::sliderChanged( float value, int id )
     m_colormap.setValue( id, value );
 
     QImage* image;
-    image = createImage( this->width() - 6 );
-    QPixmap pix( this->width() - 6, 20 );
+    image = createImage( this->width() - 20 );
+    QPixmap pix( this->width() - 20, 20 );
     pix.convertFromImage( *image );
     m_cLabel->setPixmap( pix );
 
@@ -232,8 +232,8 @@ void ColormapEditWidget::colorChanged( QColor color, int id )
     m_colormap.setColor( id, color );
 
     QImage* image;
-    image = createImage( this->width() - 6 );
-    QPixmap pix( this->width() - 6, 20 );
+    image = createImage( this->width() - 20 );
+    QPixmap pix( this->width() - 20, 20 );
     pix.convertFromImage( *image );
     m_cLabel->setPixmap( pix );
 

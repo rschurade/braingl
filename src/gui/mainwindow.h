@@ -49,6 +49,7 @@ private:
     void saveSettings();
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Global setting );
+    void loadColormaps();
 
 
     void setCurrentFile( const QString &fileName );

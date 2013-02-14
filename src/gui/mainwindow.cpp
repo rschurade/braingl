@@ -54,25 +54,7 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	ColormapBase colormap( "grey", QColor( 0, 0, 0 ), QColor( 255, 255, 255 ) );
-	ColormapFunctions::addColormap( colormap );
-
-	ColormapBase cmap( "rainbow", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
-    cmap.insertValue( 0.25, QColor( 0, 255, 255 ) );
-    cmap.insertValue( 0.5, QColor( 0, 255, 0 ) );
-    cmap.insertValue( 0.75, QColor( 255, 255, 0 ) );
-    ColormapFunctions::addColormap( cmap );
-
-    ColormapBase cmap2( "rainbow 2", QColor( 0, 0, 255 ), QColor( 255, 0, 255 ) );
-    cmap2.insertValue( 0.2, QColor( 0, 255, 255 ) );
-    cmap2.insertValue( 0.4, QColor( 0, 255, 0 ) );
-    cmap2.insertValue( 0.6, QColor( 255, 255, 0 ) );
-    cmap2.insertValue( 0.8, QColor( 255, 0, 0 ) );
-    ColormapFunctions::addColormap( cmap2 );
-
-    ColormapBase cmap3( "blue white red", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
-    cmap3.insertValue( 0.5, QColor( 255, 255, 255 ) );
-    ColormapFunctions::addColormap( cmap3 );
+	loadColormaps();
 
     createActions();
     createMenus();
@@ -115,6 +97,25 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::CROSSHAIR_COLOR ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::SHOW_NAV_SLIDERS ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 ) ) );
+
+    QByteArray ar;
+    QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
+
+    out << ColormapFunctions::size();
+
+    for ( int i = 0; i < ColormapFunctions::size(); ++i )
+    {
+        ColormapBase c = ColormapFunctions::get( i );
+        out << c.getName();
+        out << c.size();
+        for ( int k = 0; k < c.size(); ++k )
+        {
+            out << c.get( k ).value;
+            out << c.get( k ).color;
+        }
+    }
+    settings.setValue( "colormaps", ar );
+
 }
 
 void MainWindow::loadSettings()
@@ -149,6 +150,59 @@ void MainWindow::loadSetting( QSettings &settings, Fn::Global setting )
     {
         QVariant s = settings.value( Fn::Global2String::s( setting ) );
         m_globalProps->setData( m_globalProps->index( (int)setting, 0 ), s );
+    }
+}
+
+void MainWindow::loadColormaps()
+{
+    QSettings settings;
+    if ( settings.contains( "colormaps" ) )
+    {
+        qDebug() << "restore colormaps";
+        QByteArray ar = settings.value( "colormaps" ).toByteArray();
+        QDataStream in( &ar,QIODevice::ReadOnly );
+        int countColormaps;
+        in >> countColormaps;
+        for ( int i = 0; i < countColormaps; ++i )
+        {
+            QString name;
+            QVector< ColormapPair >values;
+            in >> name;
+            int cmapSize;
+            in >> cmapSize;
+            for ( int k = 0; k < cmapSize; ++k)
+            {
+                ColormapPair pair;
+                in >> pair.value;
+                in >> pair.color;
+                values.push_back( pair );
+            }
+            ColormapBase cmap( name, values );
+            ColormapFunctions::addColormap( cmap );
+        }
+    }
+    else
+    {
+        qDebug() << "create colormaps";
+        ColormapBase colormap( "grey", QColor( 0, 0, 0 ), QColor( 255, 255, 255 ) );
+        ColormapFunctions::addColormap( colormap );
+
+        ColormapBase cmap( "rainbow", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+        cmap.insertValue( 0.25, QColor( 0, 255, 255 ) );
+        cmap.insertValue( 0.5, QColor( 0, 255, 0 ) );
+        cmap.insertValue( 0.75, QColor( 255, 255, 0 ) );
+        ColormapFunctions::addColormap( cmap );
+
+        ColormapBase cmap2( "rainbow 2", QColor( 0, 0, 255 ), QColor( 255, 0, 255 ) );
+        cmap2.insertValue( 0.2, QColor( 0, 255, 255 ) );
+        cmap2.insertValue( 0.4, QColor( 0, 255, 0 ) );
+        cmap2.insertValue( 0.6, QColor( 255, 255, 0 ) );
+        cmap2.insertValue( 0.8, QColor( 255, 0, 0 ) );
+        ColormapFunctions::addColormap( cmap2 );
+
+        ColormapBase cmap3( "blue white red", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+        cmap3.insertValue( 0.5, QColor( 255, 255, 255 ) );
+        ColormapFunctions::addColormap( cmap3 );
     }
 }
 
