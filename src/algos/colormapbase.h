@@ -23,6 +23,7 @@ class ColormapBase
 public:
     ColormapBase();
     ColormapBase( QString name, QColor c0, QColor c1 );
+    ColormapBase( QString name, QVector< ColormapPair >values );
     virtual ~ColormapBase();
 
     void insertValue( ColormapPair value );

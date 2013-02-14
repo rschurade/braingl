@@ -42,6 +42,13 @@ ColormapBase::ColormapBase( QString name, QColor c0, QColor c1 ) :
     m_values.push_back( p1 );
 }
 
+ColormapBase::ColormapBase( QString name, QVector< ColormapPair > values ) :
+    m_name( name ),
+    m_values( values )
+{
+
+}
+
 ColormapBase::~ColormapBase()
 {
 }
