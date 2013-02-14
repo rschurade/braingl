@@ -469,6 +469,12 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
 
+	ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
+    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockCE );
+    viewMenu->addAction( dockCE->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+
 	ROIWidget* m_roiWidget = new ROIWidget( m_roiModel, this );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
@@ -483,6 +489,7 @@ void MainWindow::createDockWindows()
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
 
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
     FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
@@ -508,11 +515,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
 
-    ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
-    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockCE );
-    viewMenu->addAction( dockCE->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+
 
     // GL Widgets
 

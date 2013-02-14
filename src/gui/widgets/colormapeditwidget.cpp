@@ -273,6 +273,8 @@ void ColormapEditWidget::save()
     GLFunctions::updateColormapShader();
     m_selected = ColormapFunctions::size() - 1;
     redrawWidget();
+
+    emit( signalUpdate() );
 }
 
 void ColormapEditWidget::update()

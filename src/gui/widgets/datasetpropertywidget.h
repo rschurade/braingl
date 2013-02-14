@@ -34,6 +34,8 @@ private:
 
 public slots:
     void updateWidgetVisibility();
+    void colormapSelectionChanged( int id );
+    void update();
 };
 
 #endif /* DATASETPROPERTYWIDGET_H_ */

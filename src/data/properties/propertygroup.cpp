@@ -211,7 +211,7 @@ QWidget* PropertyGroup::getWidget( Fn::Property name )
 
 void PropertyGroup::slotPropChanged()
 {
-    signalPropChanged();
+    emit( signalPropChanged() );
 }
 
 int PropertyGroup::size() const
