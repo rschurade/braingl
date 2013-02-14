@@ -21,6 +21,8 @@ public:
     NavFrame( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget );
     virtual ~NavFrame();
 
+    void update();
+
 private:
     NavGLWidget* m_widget;
 };

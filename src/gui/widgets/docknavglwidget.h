@@ -37,6 +37,9 @@ private:
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
 
+public slots:
+    void update();
+
 private slots:
     void sliderChanged( int value );
     void settingChanged();

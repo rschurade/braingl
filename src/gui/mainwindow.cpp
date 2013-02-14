@@ -27,6 +27,7 @@
 #include "widgets/colormapeditwidget.h"
 
 #include "gl/glfunctions.h"
+#include "gl/colormapfunctions.h"
 
 #include "../data/datastore.h"
 #include "../data/globalpropertymodel.h"
@@ -53,25 +54,26 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	ColormapBase colormap;
-	GLFunctions::addColormap2( colormap );
+	ColormapBase colormap( "grey", QColor( 0, 0, 0 ), QColor( 255, 255, 255 ) );
+	ColormapFunctions::addColormap( colormap );
 
-	ColormapBase cmap( QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+	ColormapBase cmap( "rainbow", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
     cmap.insertValue( 0.25, QColor( 0, 255, 255 ) );
     cmap.insertValue( 0.5, QColor( 0, 255, 0 ) );
     cmap.insertValue( 0.75, QColor( 255, 255, 0 ) );
-    GLFunctions::addColormap2( cmap );
+    ColormapFunctions::addColormap( cmap );
 
-    ColormapBase cmap2( QColor( 0, 0, 255 ), QColor( 255, 0, 255 ) );
+    ColormapBase cmap2( "rainbow 2", QColor( 0, 0, 255 ), QColor( 255, 0, 255 ) );
     cmap2.insertValue( 0.2, QColor( 0, 255, 255 ) );
     cmap2.insertValue( 0.4, QColor( 0, 255, 0 ) );
     cmap2.insertValue( 0.6, QColor( 255, 255, 0 ) );
     cmap2.insertValue( 0.8, QColor( 255, 0, 0 ) );
-    GLFunctions::addColormap2( cmap2 );
+    ColormapFunctions::addColormap( cmap2 );
 
-    ColormapBase cmap3( QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
+    ColormapBase cmap3( "blue white red", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
     cmap3.insertValue( 0.5, QColor( 255, 255, 255 ) );
-    GLFunctions::addColormap2( cmap3 );
+    ColormapFunctions::addColormap( cmap3 );
+    GLFunctions::updateColormapShader();
 
     createActions();
     createMenus();
@@ -507,6 +509,12 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
 
+    ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
+    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockCE );
+    viewMenu->addAction( dockCE->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+
     // GL Widgets
 
     mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel, m_roiWidget->selectionModel() );
@@ -514,30 +522,35 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget, SLOT( update() ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, m_globalProps, QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav1, SLOT( update() ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("axial"), nav3, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav3, SLOT( update() ) );
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav4, SLOT( update() ) );
 
     SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, m_globalProps, QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
@@ -545,11 +558,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
 
-    ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
-    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockCE );
-    viewMenu->addAction( dockCE->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+
 
 
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );

@@ -18,6 +18,9 @@ class QVBoxLayout;
 class QImage;
 class QLabel;
 class QPushButton;
+class SelectWithLabel;
+class EditWithLabel;
+class CheckboxWithLabel;
 
 class ColormapEditWidget : public QWidget
 {
@@ -32,13 +35,23 @@ public:
 private:
     QImage* createImage( int width );
     void redrawWidget();
+    void updateWidget();
+    QVBoxLayout* createButtonPanel();
 
     ColormapBase m_colormap;
+    int m_selected;
 
     QLabel* m_cLabel;
+    EditWithLabel* m_nameEdit;
+    bool m_contUpdating;
+    SelectWithLabel* m_sel;
+
+    QWidget* m_buttonPanel;
 
     QVector< SliderWithEdit*>m_sliders;
 
+signals:
+    void signalUpdate();
 
 private slots:
     void sliderChanged( float value, int id );
@@ -46,6 +59,9 @@ private slots:
     void newEntry( int id );
     void removeEntry( int id );
     void save();
+    void update();
+    void selectionChanged( int id );
+    void contUpdatingChanged( int value );
 };
 
 #endif /* COLORMAPEDITWIDGET_H_ */

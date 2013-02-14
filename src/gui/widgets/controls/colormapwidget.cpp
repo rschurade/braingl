@@ -6,6 +6,7 @@
  */
 #include "colormapwidget.h"
 #include "../../gl/glfunctions.h"
+#include "../../gl/colormapfunctions.h"
 #include "../../../algos/colormapbase.h"
 
 #include <QtGui/QtGui>
@@ -63,9 +64,7 @@ QImage* ColormapWidget::createImage( int width )
     for ( int i = 0; i < width; ++i )
     {
         QColor c;
-        int g = 0;
-
-        ColormapBase cmap = GLFunctions::getColormap( m_colormap );
+        ColormapBase cmap = ColormapFunctions::getColormap( m_colormap );
 
         float value = ( ( (float)i / (float)width ) - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold );
         c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );

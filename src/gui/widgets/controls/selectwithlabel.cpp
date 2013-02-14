@@ -37,8 +37,6 @@ SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
     hLayout->setContentsMargins( 0,0,0,0 );
     hLayout2->setContentsMargins( 0,0,0,0 );
     vLayout->setContentsMargins( 1,1,1,1 );
-    vLayout->addStretch();
-
 
     setLayout( vLayout );
 

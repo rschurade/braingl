@@ -7,6 +7,7 @@
 #include "../../thirdparty/glew/include/glew.h"
 
 #include "glfunctions.h"
+#include "colormapfunctions.h"
 #include "../../data/enums.h"
 
 #include <QtCore/QAbstractItemModel>
@@ -25,7 +26,6 @@ bool GLFunctions::picking = false;
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
-QVector<ColormapBase>GLFunctions::m_colormaps;
 
 GLFunctions::GLFunctions()
 {
@@ -179,30 +179,13 @@ void GLFunctions::loadShaders()
             GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
         }
 
-
         GLFunctions::shadersLoaded = true;
     }
 }
 
-void GLFunctions::addColormap( ColormapBase colormap )
-{
-    GLFunctions::m_colormaps.push_back( colormap );
-    updateColormapShader();
-}
-
-void GLFunctions::addColormap2( ColormapBase colormap )
-{
-    GLFunctions::m_colormaps.push_back( colormap );
-}
-
-ColormapBase GLFunctions::getColormap( int id )
-{
-    return GLFunctions::m_colormaps[ qMax( 0, qMin( id, GLFunctions::m_colormaps.size() - 1 ) ) ];
-}
-
 void GLFunctions::updateColormapShader()
 {
-    int numColormaps = GLFunctions::m_colormaps.size();
+    int numColormaps = ColormapFunctions::size();
     QString code("" );
     code += " vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) ";
     code += " { ";
@@ -226,7 +209,7 @@ void GLFunctions::updateColormapShader()
     {
         code += "if ( cmap == " + QString::number( i ) + " ) ";
         code += " { ";
-        code += GLFunctions::m_colormaps[i].getCode();
+        code += ColormapFunctions::get( i ).getCode();
         code += " } ";
     }
     code += " return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); ";
