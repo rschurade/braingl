@@ -52,7 +52,7 @@ private:
     QHash<int, Property*> m_properties;
     QList<Fn::Property>m_visible;
 
-private slots:
+public slots:
     void slotPropChanged();
 
 signals:
