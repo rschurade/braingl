@@ -73,7 +73,6 @@ MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, 
     ColormapBase cmap3( "blue white red", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
     cmap3.insertValue( 0.5, QColor( 255, 255, 255 ) );
     ColormapFunctions::addColormap( cmap3 );
-    GLFunctions::updateColormapShader();
 
     createActions();
     createMenus();

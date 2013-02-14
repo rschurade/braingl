@@ -186,35 +186,35 @@ void GLFunctions::loadShaders()
 void GLFunctions::updateColormapShader()
 {
     int numColormaps = ColormapFunctions::size();
-    QString code("" );
-    code += " vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) ";
-    code += " { ";
-    code += " vec3 color = vec3(0.0); ";
-    code += " if ( cmap == " + QString::number( numColormaps ) + " ) ";
-    code += " { ";
-    code += " color = vec3( v.r, v.g, v.b ); ";
-    code += " return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); ";
-    code += " } ";
-    code += " float value = unpackFloat( v ); ";
-    code += " if ( value < lowerThreshold ) ";
-    code += " { ";
-    code += " return fragColor; ";
-    code += " } ";
-    code += " if ( value > upperThreshold ) ";
-    code += " { ";
-    code += " return fragColor; ";
-    code += " } ";
-    code += " value = ( value - selectedMin ) / ( selectedMax - selectedMin ); ";
+    QString code( "" );
+    code += "vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) \n";
+    code += "{ \n";
+    code += "    vec3 color = vec3(0.0); \n";
+    code += "    if ( cmap == " + QString::number( numColormaps ) + " ) \n";
+    code += "    { \n";
+    code += "        color = vec3( v.r, v.g, v.b ); \n";
+    code += "        return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); \n";
+    code += "    } \n";
+    code += "    float value = unpackFloat( v ); \n";
+    code += "    if ( value < lowerThreshold ) \n";
+    code += "        { \n";
+    code += "            return fragColor; \n";
+    code += "        } \n";
+    code += "    if ( value > upperThreshold ) \n";
+    code += "    { \n";
+    code += "        return fragColor; \n";
+    code += "    } \n";
+    code += "    value = ( value - selectedMin ) / ( selectedMax - selectedMin ); \n";
     for ( int i = 0; i < numColormaps; ++i )
     {
-        code += "if ( cmap == " + QString::number( i ) + " ) ";
-        code += " { ";
+        code += "    if ( cmap == " + QString::number( i ) + " ) \n";
+        code += "    { \n";
         code += ColormapFunctions::get( i ).getCode();
-        code += " } ";
+        code += "    } \n";
     }
-    code += " return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); ";
-    code += " } ";
-    //qDebug() << code;
+    code += "    return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); \n";
+    code += "} \n";
+
     copyShaderToString( "slice", "fs" );
     GLFunctions::m_shaderSources[ "slice_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "slice_fs" ];
     GLFunctions::m_shaders[ "slice" ] = initShader( "slice" );
