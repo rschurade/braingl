@@ -153,8 +153,8 @@ QVBoxLayout* ColormapEditWidget::createButtonPanel()
         SliderWithEdit* slider = new SliderWithEdit( tr(""), i );
         m_sliders.push_back( slider );
         slider->setValue( m_colormap.get( i ).value );
-        slider->setMin( m_colormap.get( i - 1 ).value + 0.01 );
-        slider->setMax( m_colormap.get( i + 1 ).value - 0.01 );
+        slider->setMin( m_colormap.get( i - 1 ).value );
+        slider->setMax( m_colormap.get( i + 1 ).value );
         connect( slider, SIGNAL( valueChanged( float, int ) ), this, SLOT( sliderChanged( float, int ) ) );
         ColorWidgetWithLabel* colorWidget = new ColorWidgetWithLabel( QString::number( i ), i );
         colorWidget->setValue( m_colormap.get( i ).color );
@@ -216,8 +216,8 @@ void ColormapEditWidget::sliderChanged( float value, int id )
 
     for ( int i = 0; i < m_sliders.size(); ++i )
     {
-        m_sliders[i]->setMin( m_colormap.get( i ).value + 0.01 );
-        m_sliders[i]->setMax( m_colormap.get( i + 2 ).value - 0.01 );
+        m_sliders[i]->setMin( m_colormap.get( i ).value);
+        m_sliders[i]->setMax( m_colormap.get( i + 2 ).value );
     }
     repaint();
 

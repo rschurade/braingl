@@ -129,7 +129,7 @@ QString ColormapBase::getCode()
         float v1 = m_values[i-1].value;
         QColor c2 = m_values[i].color;
         float v2 = m_values[i].value;
-        code += "if ( value >= " + QString::number( v1, 'f', 2 ) + " && value <= " + QString::number( v2, 'f', 2 ) + " ) \n";
+        code += "if ( value >= " + QString::number( v1, 'f', 2 ) + " && value < " + QString::number( v2, 'f', 2 ) + " ) \n";
         code += "{ \n";
         code += "    float _v = ( value - " + QString::number( v1, 'f', 2 ) + " ) / " + QString::number( v2 - v1, 'f', 2 ) + "; \n";
         code += "    color.r = ( 1.0 - _v ) * " + QString::number( c1.redF(), 'f', 2 ) + " + _v * " + QString::number( c2.redF(), 'f', 2 ) + " ; \n";
@@ -139,7 +139,7 @@ QString ColormapBase::getCode()
     }
 
     c0 = m_values.last().color;
-    code += "if ( value > 1.0 ) \n    color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
+    code += "if ( value >= 1.0 ) \n    color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
                                                    QString::number( c0.greenF(), 'f', 2 ) + ", " +
                                                    QString::number( c0.blueF(), 'f', 2 ) + " ); \n";
 
