@@ -20,23 +20,28 @@ class ColormapWidget : public QFrame
     Q_OBJECT
 
 public:
-    ColormapWidget( int width );
+    ColormapWidget( int width, float min, float max );
     virtual ~ColormapWidget();
 
     void resizeEvent( QResizeEvent* event );
 
 private:
     QImage* createImage( int width );
+    QColor getInverseColor( QColor color );
 
     QImage* m_image;
     QLabel* m_clabel;
 
     int m_colormap;
     int m_width;
-    float m_lowerThreshold;
-    float m_upperThreshold;
     float m_min;
     float m_max;
+    float m_selectedMin;
+    float m_selectedMax;
+    float m_lowerThreshold;
+    float m_upperThreshold;
+
+
 
 public slots:
     void setLowerThreshold( float value );
