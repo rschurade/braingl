@@ -34,7 +34,7 @@ void NavRendererCoronal::adjustRatios()
     QMatrix4x4 pMatrix;
     pMatrix.setToIdentity();
 
-    int boundingbox = qMax ( m_xb * m_xd, qMax( m_yb * m_yd, m_zb * m_zd ) );
+    int boundingbox = qMax ( m_nx * m_dx, qMax( m_ny * m_dy, m_nz * m_dz ) );
 
     pMatrix.ortho( 0, boundingbox, 0, boundingbox, -3000, 3000 );
 
@@ -54,7 +54,7 @@ void NavRendererCoronal::adjustRatios()
         pMatrix.scale( 1.0, m_ratio, 1.0 );
     }
 
-    pMatrix.translate( m_xb * m_xd / -2, m_zb * m_zd / -2, 0 );
+    pMatrix.translate( m_nx * m_dx / -2, m_nz * m_dz / -2, 0 );
     m_mvpMatrix = pMatrix;
 }
 
@@ -71,11 +71,11 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
 
     QVector4D out = m_mvpMatrix.inverted() * test;
 
-    int xout = out.x() / m_xd;
-    int yout = out.y() / m_zd;
+    int xout = out.x() / m_dx;
+    int yout = out.y() / m_dz;
 
-    xout = qMax( 0, qMin( xout, static_cast<int>( m_xb - 1.0 ) ) );
-    yout = qMax( 0, qMin( yout, static_cast<int>( m_zb - 1.0 ) ) );
+    xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
+    yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
 
     QModelIndex mi;
     QPoint p( xout, yout );
@@ -88,44 +88,41 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
 
 void NavRendererCoronal::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
-    int xi = m_x;
-    int yi = m_y;
-    int zi = m_z;
+    m_x = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+    m_y = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+    m_z = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
-    if ( m_xOld != xi || m_yOld != yi || m_zOld != zi )
+    if ( m_xOld != m_x || m_yOld != m_y || m_zOld != m_z )
     {
-        m_xb = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
-        m_yb = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
-        m_zb = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
+        m_nx = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
+        m_ny = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
+        m_nz = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
 
-        m_xd = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-        m_yd = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-        m_zd = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+        m_dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+        m_dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+        m_dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-        float x = m_x * m_xd;
-        float y = m_y * m_yd;
-        float z = m_z * m_zd;
-        float xb = m_xb * m_xd;
-        //float yb = m_yb * m_yd;
-        float zb = m_zb * m_zd;
+        float x = m_x * m_dx + m_dx / 2.0;
+        float y = m_y * m_dy + m_dy / 2.0;
+        float z = m_z * m_dz + m_dz / 2.0;
+        float xb = m_nx * m_dx;
+        //float yb = m_ny * m_dy;
+        float zb = m_nz * m_dz;
 
         VertexData vertices[] =
         {
-            { QVector3D( 0.0, 0.0, y ), QVector3D( 0.0, m_y/m_yb, 0.0 ) },
-            { QVector3D( xb,  0.0, y ), QVector3D( 1.0, m_y/m_yb, 0.0 ) },
-            { QVector3D( xb,  zb,  y ), QVector3D( 1.0, m_y/m_yb, 1.0 ) },
-            { QVector3D( 0.0, zb,  y ), QVector3D( 0.0, m_y/m_yb, 1.0 ) }
+            { QVector3D( 0.0, 0.0, y ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
+            { QVector3D( xb,  0.0, y ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
+            { QVector3D( xb,  zb,  y ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
+            { QVector3D( 0.0, zb,  y ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
         };
 
         VertexData verticesCrosshair[] =
         {
-            { QVector3D( 0.0,  z + m_zd / 2., y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( xb, z + m_zd / 2., y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( x + m_xd / 2.,  0.0, y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( x + m_xd / 2., zb, y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) }
+            { QVector3D( 0.0, z,   y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( xb,  z,   y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( x,   0.0, y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
+            { QVector3D( x,   zb,  y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) }
         };
 
         // Transfer vertex data to VBO 2
@@ -136,9 +133,9 @@ void NavRendererCoronal::initGeometry()
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCrosshair, GL_STATIC_DRAW );
 
-        m_xOld = xi;
-        m_yOld = yi;
-        m_zOld = zi;
+        m_xOld = m_x;
+        m_yOld = m_y;
+        m_zOld = m_z;
     }
 }
 

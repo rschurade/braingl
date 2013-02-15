@@ -595,7 +595,7 @@ void MainWindow::createDockWindows()
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "coronal" ), 1, this, mainGLWidget );
-    FNDockWidget* dockNav3 = new FNDockWidget( QString("axial"), nav3, this );
+    FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
