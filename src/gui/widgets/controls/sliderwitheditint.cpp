@@ -24,7 +24,7 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     m_slider->setOrientation( Qt::Horizontal );
 
     m_edit = new QLineEdit( this );
-    m_edit->setMaxLength( 5 );
+    m_edit->setMaxLength( 10 );
     m_edit->setMaximumWidth( 45 );
     m_edit->setAlignment( Qt::AlignCenter );
 
