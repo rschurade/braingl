@@ -52,12 +52,12 @@ protected:
     float m_x;
     float m_y;
     float m_z;
-    float m_xb;
-    float m_yb;
-    float m_zb;
-    float m_xd;
-    float m_yd;
-    float m_zd;
+    float m_nx;
+    float m_ny;
+    float m_nz;
+    float m_dx;
+    float m_dy;
+    float m_dz;
     int m_xOld;
     int m_yOld;
     int m_zOld;
