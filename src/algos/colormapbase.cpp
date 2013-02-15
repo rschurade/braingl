@@ -100,7 +100,7 @@ QColor ColormapBase::getColor( float value )
 
     for ( int i = 1; i < m_values.size(); ++i )
     {
-        if ( m_values[i-1].value <= value &&  m_values[i].value >= value )
+        if ( value >=m_values[i-1].value &&  value <= m_values[i].value )
         {
             color1 = m_values[i-1].color;
             value1 = m_values[i-1].value;

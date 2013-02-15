@@ -85,18 +85,20 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             m_layout->addWidget( cmapSel );
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( colormapSelectionChanged( int) ) );
 
-            ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 6 );
+            float min = ds->properties()->get( Fn::Property::MIN ).toFloat();
+            float max = ds->properties()->get( Fn::Property::MAX ).toFloat();
+            ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 6, min, max );
             m_layout->addWidget( cmapWidget );
             m_visibleWidgets.push_back( cmapWidget );
-            cmapWidget->setMin( ds->properties()->get( Fn::Property::MIN ).toFloat() );
-            cmapWidget->setMax( ds->properties()->get( Fn::Property::MAX ).toFloat() );
+            cmapWidget->setMin( ds->properties()->get( Fn::Property::SELECTED_MIN ).toFloat() );
+            cmapWidget->setMax( ds->properties()->get( Fn::Property::SELECTED_MAX ).toFloat() );
             cmapWidget->setLowerThreshold( ds->properties()->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
             cmapWidget->setUpperThreshold( ds->properties()->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
             cmapWidget->setColormap( selectedCmap );
-            connect( ds->properties()->getWidget( Fn::Property::MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
-            connect( ds->properties()->getWidget( Fn::Property::MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
-            connect( ds->properties()->getWidget( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
-            connect( ds->properties()->getWidget( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+            connect( ds->properties()->getWidget( Fn::Property::UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
         }
         else

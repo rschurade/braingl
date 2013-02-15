@@ -11,13 +11,15 @@
 
 #include <QtGui/QtGui>
 
-ColormapWidget::ColormapWidget( int width ) :
+ColormapWidget::ColormapWidget( int width, float min, float max ) :
     m_colormap( 0 ),
     m_width( width ),
+    m_min( min ),
+    m_max( max ),
+    m_selectedMin( 0.0 ),
+    m_selectedMax( 0.0 ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 ),
-    m_min( 0.0 ),
-    m_max( 0.0 )
+    m_upperThreshold( 1.0 )
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
 
@@ -66,8 +68,20 @@ QImage* ColormapWidget::createImage( int width )
         QColor c;
         ColormapBase cmap = ColormapFunctions::getColormap( m_colormap );
 
-        float value = ( ( (float)i / (float)width ) - m_lowerThreshold ) / ( m_upperThreshold - m_lowerThreshold );
+        float value = ( ( (float)i / (float)width ) - m_selectedMin ) / ( m_selectedMax - m_selectedMin );
         c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
+
+        float compare = ( (float)i / (float)width );
+        if ( ( compare > m_selectedMin - 0.005 && compare < m_selectedMin ) ||
+             ( compare > m_selectedMax && compare < m_selectedMax + 0.005 ) )
+        {
+            c = getInverseColor( c );
+        }
+
+        if ( compare < m_lowerThreshold || compare > m_upperThreshold )
+        {
+            c = Qt::gray;
+        }
 
         for ( int k = 0; k < 20; ++k )
         {
@@ -76,6 +90,14 @@ QImage* ColormapWidget::createImage( int width )
     }
 
     return image;
+}
+
+QColor ColormapWidget::getInverseColor( QColor color )
+{
+    int red = 255 - color.red();
+    int green = 255 - color.green();
+    int blue = 255 - color.blue();
+    return QColor( red, green, blue );
 }
 
 void ColormapWidget::setLowerThreshold( float value )
@@ -98,12 +120,20 @@ void ColormapWidget::setUpperThreshold( float value )
 
 void ColormapWidget::setMin( float value )
 {
-    m_min = value;
+    m_selectedMin = qMax( 0.0f, qMin( 1.0f, value / m_max ) );
+    m_image = createImage( m_width );
+    QPixmap pix( m_width, 20 );
+    pix.convertFromImage( *m_image );
+    m_clabel->setPixmap( pix );
 }
 
 void ColormapWidget::setMax( float value )
 {
-    m_max = value;
+    m_selectedMax = qMax( 0.0f, qMin( 1.0f, value / m_max ) );
+    m_image = createImage( m_width );
+    QPixmap pix( m_width, 20 );
+    pix.convertFromImage( *m_image );
+    m_clabel->setPixmap( pix );
 }
 
 

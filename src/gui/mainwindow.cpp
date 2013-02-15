@@ -184,7 +184,7 @@ void MainWindow::loadColormaps()
     else
     {
         qDebug() << "create colormaps";
-        ColormapBase colormap( "grey", QColor( 0, 0, 0 ), QColor( 255, 255, 255 ) );
+        ColormapBase colormap( "grey", QColor( 3, 3, 3 ), QColor( 255, 255, 255 ) );
         ColormapFunctions::addColormap( colormap );
 
         ColormapBase cmap( "rainbow", QColor( 0, 0, 255 ), QColor( 255, 0, 0 ) );
