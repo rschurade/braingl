@@ -82,13 +82,14 @@ void DatasetScalar::createTexture()
     int ny = m_properties.get( Fn::Property::NY ).toInt();
     int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
+    float min = m_properties.get( Fn::Property::MIN ).toFloat();
     float max = m_properties.get( Fn::Property::MAX ).toFloat();
 
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
     {
         //unsigned int tmp = (double)i / (double)(nx * ny * nz) * 256 * 256 * 256 * 256;
-        unsigned int tmp = ( m_data[i] / max ) * 256 * 256 * 256 * 256;
+        unsigned int tmp = ( ( m_data[i] - min ) / ( max - min ) ) * 256 * 256 * 256 * 256;
         tmpData[4 * i + 3 ] = (tmp / (256 * 256 * 256)) % 256;
         tmpData[4 * i + 2 ] = (tmp / (256 * 256)) % 256;
         tmpData[4 * i + 1 ] = (tmp / (256)) % 256;
