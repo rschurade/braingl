@@ -362,20 +362,6 @@ void SceneRenderer::rightMouseDrag( int x, int y )
 
     m_pickOld = QVector2D( x, y );
 
-    if ( m_roiSelectionModel->hasSelection() )
-    {
-        QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
-        float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
-        float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
-        float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
-
-        roi->properties()->set( Fn::ROI::X, newx );
-        roi->properties()->set( Fn::ROI::Y, newy );
-        roi->properties()->set( Fn::ROI::Z, newz );
-        roi->properties()->slotPropChanged();
-    }
-
     int m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
     int m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
     int m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
@@ -419,7 +405,22 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             break;
         }
         default:
+        {
+            if ( m_roiSelectionModel->hasSelection() )
+            {
+                QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
+                ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
+                float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
+                float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
+                float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
+
+                roi->properties()->set( Fn::ROI::X, newx );
+                roi->properties()->set( Fn::ROI::Y, newy );
+                roi->properties()->set( Fn::ROI::Z, newz );
+                roi->properties()->slotPropChanged();
+            }
             break;
+        }
     }
 }
 
