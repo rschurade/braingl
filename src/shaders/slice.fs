@@ -33,7 +33,16 @@ void main()
 		vec4 color4 = texture3D( texture4, v_texcoord );
 		colormap( color4, u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4, u_alpha4, color );
 	}
-
+	
 	if ( !( color.r + color.g + color.b > 0.0 ) ) discard; 
-	gl_FragColor = color;
+	
+	if ( u_picking )
+	{
+        gl_FragColor = u_pickColor;
+    }
+	else
+	{
+	   gl_FragColor = color;
+	}   
+	
 }

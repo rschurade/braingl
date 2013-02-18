@@ -37,7 +37,8 @@ SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel*
     m_nz( 160 ),
     m_width( 1 ),
     m_height( 1 ),
-    m_ratio( 1.0 )
+    m_ratio( 1.0 ),
+    m_picked( 0 )
 {
     m_sliceRenderer = new SliceRenderer( dataModel );
     m_sliceRenderer->setModel( globalModel );
@@ -324,16 +325,17 @@ void SceneRenderer::rightMouseDown( int x, int y )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     //render_picking_scene();
+    m_sliceRenderer->drawPick( m_mvpMatrix );
     renderRois();
 
     // get id
-    int pick = GLFunctions::get_object_id( x, y );
-    //qDebug() << "picked object id: " << pick;
+    m_picked = GLFunctions::get_object_id( x, y );
+    //qDebug() << "picked object id: " << m_picked;
 
     if ( m_roiModel->rowCount() > 0 )
     {
         QModelIndex mi = m_roiModel->index( 0, (int)Fn::ROI::PICK_ID );
-        QModelIndexList l = ( m_roiModel->match( mi, Qt::DisplayRole, pick ) );
+        QModelIndexList l = ( m_roiModel->match( mi, Qt::DisplayRole, m_picked ) );
         if ( l.size() > 0 )
         {
             m_roiSelectionModel->clear();
@@ -344,18 +346,21 @@ void SceneRenderer::rightMouseDown( int x, int y )
     /* return to the default frame buffer */
     GLFunctions::endPicking();
 
-    m_pickXold = x;
-    m_pickYold = y;
+    m_sliceXPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+    m_sliceYPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+    m_sliceZPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+
+    m_pickOld = QVector2D( x, y );
+    m_rightMouseDown = QVector2D( x, y );
 }
 
 void SceneRenderer::rightMouseDrag( int x, int y )
 {
     QVector3D vs = mapMouse2World( x, y, 0 );
-    QVector3D vs2 = mapMouse2World( m_pickXold, m_pickYold, 0 );
+    QVector3D vs2 = mapMouse2World( m_pickOld.x(), m_pickOld.y(), 0 );
     QVector3D dir = vs - vs2;
 
-    m_pickXold = x;
-    m_pickYold = y;
+    m_pickOld = QVector2D( x, y );
 
     if ( m_roiSelectionModel->hasSelection() )
     {
@@ -370,6 +375,52 @@ void SceneRenderer::rightMouseDrag( int x, int y )
         roi->properties()->set( Fn::ROI::Z, newz );
         roi->properties()->slotPropChanged();
     }
+
+    int m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+    int m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+    int m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    float slowDown = 3.0f * m_arcBall->getZoom();
+
+    switch ( m_picked )
+    {
+        case 1:
+        {
+            QVector2D v1 = mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z );
+            QVector2D v2 = mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z + 1.0 );
+            QVector2D v3 = v1 - v2;
+            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+            int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
+            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+            break;
+        }
+        case 2:
+        {
+            QVector2D v1 = mapWorld2Mouse( m_nx / 2, m_y, m_nz / 2 );
+            QVector2D v2 = mapWorld2Mouse( m_nx / 2, m_y + 1.0, m_nz / 2 );
+            QVector2D v3 = v1 - v2;
+            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+            int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
+            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+
+            break;
+        }
+        case 3:
+        {
+            QVector2D v1 = mapWorld2Mouse( m_x, m_ny / 2, m_nz / 2 );
+            QVector2D v2 = mapWorld2Mouse( m_x + 1.0, m_ny / 2, m_nz / 2 );
+            QVector2D v3 = v1 - v2;
+            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+            int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
+            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
+
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
@@ -378,8 +429,6 @@ QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
     //GLdouble modelview[16];
     //GLdouble projection[16];
     GLfloat winX, winY;
-
-
 
 //  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
 //  glGetDoublev( GL_PROJECTION_MATRIX, projection );
@@ -392,4 +441,13 @@ QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
 
     QVector3D v( posX, posY, posZ );
     return v;
+}
+
+QVector2D SceneRenderer::mapWorld2Mouse( float x, float y, float z )
+{
+    GLint viewport[4];
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    GLdouble winX, winY, winZ;
+    gluProject( x, y, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &winX, &winY, &winZ );
+    return QVector2D( winX, winY );
 }

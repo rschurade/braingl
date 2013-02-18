@@ -20,7 +20,7 @@
 #define NUM_TEXTURES 5
 
 bool GLFunctions::shadersLoaded = false;
-unsigned int GLFunctions::pickIndex = 1;
+unsigned int GLFunctions::pickIndex = 4;
 bool GLFunctions::picking = false;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;

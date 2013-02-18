@@ -10,6 +10,7 @@
 
 #include "../../data/enums.h"
 
+#include <QtGui/QVector2D>
 #include <QtGui/QMatrix4x4>
 #include <QtCore/QModelIndex>
 
@@ -47,6 +48,7 @@ private:
 	void renderRois();
 
 	QVector3D mapMouse2World( int x, int y, int dir );
+	QVector2D mapWorld2Mouse( float x, float y, float z );
 
 	ArcBall* m_arcBall;
 	SliceRenderer* m_sliceRenderer;
@@ -71,8 +73,12 @@ private:
 	QMatrix4x4 m_mvpMatrix;
 	QMatrix4x4 m_mvMatrixInverse;
 
-	int m_pickXold;
-	int m_pickYold;
+	int m_picked;
+	QVector2D m_rightMouseDown;
+	QVector2D m_pickOld;
+	int m_sliceXPosAtPick;
+	int m_sliceYPosAtPick;
+	int m_sliceZPosAtPick;
 };
 
 #endif /* SCENERENDERER_H_ */
