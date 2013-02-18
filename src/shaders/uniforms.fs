@@ -44,6 +44,9 @@ uniform float u_selectedMin4;
 uniform float u_selectedMax4;
 uniform int u_colormap4;
 
+uniform bool u_picking;
+uniform vec4 u_pickColor;
+
 varying vec3 v_texcoord;
 
 float unpackFloat(const vec4 value) {

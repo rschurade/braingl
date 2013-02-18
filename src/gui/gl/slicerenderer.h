@@ -21,6 +21,7 @@ public:
 	void init();
 
 	void draw( QMatrix4x4 mvp_matrix );
+	void drawPick( QMatrix4x4 mvp_matrix );
 
 protected:
     void setupTextures();

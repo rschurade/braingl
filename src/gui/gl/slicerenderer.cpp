@@ -152,6 +152,7 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
     GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "u_picking", false );
 
     initGeometry();
 
@@ -165,6 +166,44 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
     }
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
     {
+        drawSagittal();
+    }
+}
+
+void SliceRenderer::drawPick( QMatrix4x4 mvp_matrix )
+{
+    //qDebug() << "main gl draw";
+    setupTextures();
+
+    glColor4f( 0.0, 0.0, 0.0, 1.0 );
+
+    GLFunctions::getShader( "slice" )->bind();
+    // Set modelview-projection matrix
+    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "u_picking", true );
+
+    initGeometry();
+
+    float alpha =  1.0;
+    float green = 0.0f;
+    float red =   0.0f;
+
+    if ( model()->data( model()->index( (int)Fn::Global::SHOW_AXIAL, 0 ) ).toBool() )
+    {
+        float blue =  (float)(( 1 ) & 0xFF) / 255.f;
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
+        drawAxial();
+    }
+    if ( model()->data( model()->index( (int)Fn::Global::SHOW_CORONAL, 0 ) ).toBool() )
+    {
+        float blue =  (float)(( 2 ) & 0xFF) / 255.f;
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
+        drawCoronal();
+    }
+    if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
+    {
+        float blue =  (float)(( 3 ) & 0xFF) / 255.f;
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
         drawSagittal();
     }
 }
