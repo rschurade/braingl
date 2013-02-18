@@ -369,6 +369,8 @@ void SceneRenderer::rightMouseDrag( int x, int y )
 
     switch ( m_picked )
     {
+        case 0:
+            break;
         case 1:
         {
             QVector2D v1 = mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z );
