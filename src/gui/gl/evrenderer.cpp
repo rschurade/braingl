@@ -77,7 +77,26 @@ void EVRenderer::setupTextures()
 
 void EVRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "ev", model() );
+    QGLShaderProgram* program = GLFunctions::getShader( "ev" );
+
+    program->bind();
+
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int dirLocation = program->attributeLocation( "a_dir" );
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+
+    offset += sizeof(float) * 1;
+    int offsetLocation = program->attributeLocation( "a_vec" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 }
 
 void EVRenderer::initGeometry()

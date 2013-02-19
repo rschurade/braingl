@@ -71,7 +71,22 @@ void MeshRenderer::setupTextures()
 
 void MeshRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "mesh", model() );
+    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
+
+    program->bind();
+
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int normalLocation = program->attributeLocation( "a_normal" );
+    program->enableAttributeArray( normalLocation );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+
 }
 
 void MeshRenderer::initGeometry()

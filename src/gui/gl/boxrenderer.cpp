@@ -88,7 +88,16 @@ void BoxRenderer::updateGeometry( float x, float y, float z, float dx, float dy,
 
 void BoxRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "box" );
+    QGLShaderProgram* program = GLFunctions::getShader( "box" );
+
+    program->bind();
+    // Offset for position
+    long int offset = 0;
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (const void *) offset );
 }
 
 void BoxRenderer::draw( QMatrix4x4 mvp_matrix )
