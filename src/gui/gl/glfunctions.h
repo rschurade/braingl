@@ -10,6 +10,7 @@
 
 #include "../../thirdparty/glew/include/glew.h"
 
+#include <QtCore/QPoint>
 #include <QtCore/QList>
 #include <QtGui/QVector3D>
 #include <QtGui/QImage>
@@ -60,6 +61,9 @@ public:
     static QImage* getOffscreenTexture();
 
     static void updateColormapShader();
+
+    static void setScreenSize( int width, int height );
+    static QPoint getScreenSize();
 
 private:
     GLFunctions();

@@ -6,6 +6,7 @@
  */
 
 #include "glwidget.h"
+#include "../gl/glfunctions.h"
 
 #include <QtGui/QtGui>
 
@@ -46,6 +47,7 @@ void GLWidget::paintGL()
 void GLWidget::resizeGL( int width, int height )
 {
 	m_sceneRenderer->resizeGL( width, height );
+	GLFunctions::setScreenSize( width, height );
 }
 
 void GLWidget::mousePressEvent( QMouseEvent *event )

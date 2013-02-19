@@ -44,6 +44,7 @@ private slots:
 
 signals:
     void valueChanged();
+    void valueChanged( float value );
 };
 
 #endif /* PROPERTYFLOAT_H_ */

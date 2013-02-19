@@ -42,6 +42,7 @@ private slots:
 
 signals:
     void valueChanged();
+    void valueChanged( int );
 
 };
 

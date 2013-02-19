@@ -45,5 +45,9 @@
     <file>shaders/fiber.fs</file>
     <file>shaders/mesh.vs</file>
     <file>shaders/mesh.fs</file>
+    <file>shaders/colormapbar.vs</file>
+    <file>shaders/colormapbar.fs</file>
+    <file>shaders/colormapscale.vs</file>
+    <file>shaders/colormapscale.fs</file>
  </qresource>
  </RCC>
