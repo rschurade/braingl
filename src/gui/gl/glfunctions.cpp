@@ -23,6 +23,9 @@ bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
 bool GLFunctions::picking = false;
 
+int GLFunctions::screenWidth = 0;
+int GLFunctions::screenHeight = 0;
+
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
@@ -38,6 +41,17 @@ GLFunctions::~GLFunctions()
 int GLFunctions::getPickIndex()
 {
     return GLFunctions::pickIndex++;
+}
+
+void GLFunctions::setScreenSize( int width, int height )
+{
+    GLFunctions::screenWidth = width;
+    GLFunctions::screenHeight = height;
+}
+
+QPoint GLFunctions::getScreenSize()
+{
+    return QPoint( GLFunctions::screenWidth, GLFunctions::screenHeight );
 }
 
 void GLFunctions::setupTextures( QAbstractItemModel* model )
@@ -158,6 +172,8 @@ void GLFunctions::loadShaders()
     {
         GLFunctions::m_shaderNames.push_back( "uniforms" );
         GLFunctions::m_shaderNames.push_back( "slice" );
+        GLFunctions::m_shaderNames.push_back( "colormapbar" );
+        GLFunctions::m_shaderNames.push_back( "colormapscale" );
         GLFunctions::m_shaderNames.push_back( "qball" );
         GLFunctions::m_shaderNames.push_back( "crosshair" );
         GLFunctions::m_shaderNames.push_back( "superquadric" );
@@ -166,14 +182,16 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "box" );
-        GLFunctions::m_shaderNames.push_back( "colormapbar" );
+
 
         copyShaderToString( GLFunctions::m_shaderNames[ 0 ], QString("fs") );
         copyShaderToString( GLFunctions::m_shaderNames[ 1 ], QString("vs") );
         copyShaderToString( GLFunctions::m_shaderNames[ 1 ], QString("fs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 2 ], QString("vs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 2 ], QString("fs") );
         updateColormapShader();
 
-        for ( int i = 2; i < GLFunctions::m_shaderNames.size(); ++i )
+        for ( int i = 3; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
@@ -188,19 +206,13 @@ void GLFunctions::updateColormapShader()
 {
     int numColormaps = ColormapFunctions::size();
     QString code( "" );
-    code += "vec4 colormap( vec4 v, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) \n";
+    code += "vec4 colormap( float value, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) \n";
     code += "{ \n";
     code += "    vec3 color = vec3(0.0); \n";
-    code += "    if ( cmap == " + QString::number( numColormaps ) + " ) \n";
-    code += "    { \n";
-    code += "        color = vec3( v.r, v.g, v.b ); \n";
-    code += "        return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); \n";
-    code += "    } \n";
-    code += "    float value = unpackFloat( v ); \n";
     code += "    if ( value < lowerThreshold ) \n";
-    code += "        { \n";
-    code += "            return fragColor; \n";
-    code += "        } \n";
+    code += "    { \n";
+    code += "        return fragColor; \n";
+    code += "    } \n";
     code += "    if ( value > upperThreshold ) \n";
     code += "    { \n";
     code += "        return fragColor; \n";
@@ -217,8 +229,11 @@ void GLFunctions::updateColormapShader()
     code += "} \n";
 
     copyShaderToString( "slice", "fs" );
+    copyShaderToString( "colormapbar", "fs" );
     GLFunctions::m_shaderSources[ "slice_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "slice_fs" ];
+    GLFunctions::m_shaderSources[ "colormapbar_fs" ] = code + GLFunctions::m_shaderSources[ "colormapbar_fs" ];
     GLFunctions::m_shaders[ "slice" ] = initShader( "slice" );
+    GLFunctions::m_shaders[ "colormapbar" ] = initShader( "colormapbar" );
 }
 
 void GLFunctions::copyShaderToString( QString name, QString ext )
@@ -461,8 +476,6 @@ GLuint GLFunctions::rbo = 0;
 GLuint GLFunctions::fbo = 0;
 GLuint GLFunctions::pbo_a = 0;
 GLuint GLFunctions::pbo_b = 0;
-int GLFunctions::screenWidth = 0;
-int GLFunctions::screenHeight = 0;
 
 void GLFunctions::generate_frame_buffer_texture( const int screen_width, const int screen_height )
 {

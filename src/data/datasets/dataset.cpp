@@ -10,7 +10,7 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_textureGLuint( 0 )
 {
     // add standard properties
-    m_properties.set( Fn::Property::ACTIVE, true, true );
+    m_properties.set( Fn::Property::ACTIVE, true );
     m_properties.set( Fn::Property::FILENAME, fileName.path() );
     m_properties.set( Fn::Property::TYPE, (int)type );
     m_properties.set( Fn::Property::NAME, fileName.path().split( "/" ).last(), true );

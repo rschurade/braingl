@@ -6,18 +6,27 @@
  */
 #include "datasetscalar.h"
 
+#include "../../gui/gl/colormaprenderer.h"
+
 #include <QtCore/QDebug>
 
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
-        DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data )
+        DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
+        m_colormapRenderer( 0 )
 {
     m_properties.set( Fn::Property::INTERPOLATION, false, true );
     m_properties.set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
-    m_properties.set( Fn::Property::COLORMAP, 0, 0, 10, true );
+    m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::DIM, 1 );
     m_properties.set( Fn::Property::HAS_TEXTURE, true );
 
     examineDataset();
+
+    m_properties.set( Fn::Property::RENDER_COLORMAP, true, true );
+    m_properties.set( Fn::Property::COLORMAP_X, 0.48f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_Y, 0.93f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_DX, 0.5f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_DY, 0.05f, 0.0f, 1.0f, true );
 }
 
 DatasetScalar::~DatasetScalar()
@@ -132,6 +141,28 @@ void DatasetScalar::flipX()
 
 void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
 {
+    if ( m_properties.get( Fn::Property::RENDER_COLORMAP ).toBool() )
+    {
+        if ( !m_colormapRenderer )
+        {
+            m_colormapRenderer = new ColormapRenderer();
+            m_colormapRenderer->init();
+        }
+        m_colormapRenderer->setColormap( m_properties.get( Fn::Property::COLORMAP ).toInt() );
+        m_colormapRenderer->setX( m_properties.get( Fn::Property::COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( m_properties.get( Fn::Property::COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( m_properties.get( Fn::Property::COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( m_properties.get( Fn::Property::COLORMAP_DY ).toFloat() );
+
+        m_colormapRenderer->setMin( m_properties.get( Fn::Property::MIN).toFloat() );
+        m_colormapRenderer->setMax( m_properties.get( Fn::Property::MAX).toFloat() );
+        m_colormapRenderer->setSelectedMin( m_properties.get( Fn::Property::SELECTED_MIN).toFloat() );
+        m_colormapRenderer->setSelectedMax( m_properties.get( Fn::Property::SELECTED_MAX).toFloat() );
+        m_colormapRenderer->setLowerThreshold( m_properties.get( Fn::Property::LOWER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setUpperThreshold( m_properties.get( Fn::Property::UPPER_THRESHOLD).toFloat() );
+
+        m_colormapRenderer->draw();
+    }
 }
 
 QString DatasetScalar::getValueAsString( int x, int y, int z )

@@ -92,6 +92,12 @@ namespace Fn
         CUT_LOWER_THRESHOLD,
         CUT_UPPER_THRESHOLD,
         COLORMAP,
+        RENDER_COLORMAP,
+        COLORMAP_ORIENT,
+        COLORMAP_X,
+        COLORMAP_Y,
+        COLORMAP_DX,
+        COLORMAP_DY,
         INTERPOLATION,
         ALPHA,
         ACTIVE,
@@ -153,6 +159,12 @@ namespace Fn
             case Property::CUT_LOWER_THRESHOLD: return QString( "cut at lower threshold" ); break;
             case Property::CUT_UPPER_THRESHOLD: return QString( "cut at upper threshold" ); break;
             case Property::COLORMAP: return QString( "colormap" ); break;
+            case Property::RENDER_COLORMAP: return QString( "render colormap" ); break;
+            case Property::COLORMAP_ORIENT: return QString( "colormap orient" ); break;
+            case Property::COLORMAP_X: return QString( "colormap x position" ); break;
+            case Property::COLORMAP_Y: return QString( "colormap y position" ); break;
+            case Property::COLORMAP_DX: return QString( "colormap x size" ); break;
+            case Property::COLORMAP_DY: return QString( "colormap y size" ); break;
             case Property::INTERPOLATION: return QString( "interpolation" ); break;
             case Property::ALPHA: return QString( "alpha" ); break;
             case Property::ACTIVE: return QString( "active" ); break;

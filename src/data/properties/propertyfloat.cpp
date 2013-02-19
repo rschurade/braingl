@@ -67,4 +67,5 @@ void PropertyFloat::widgetChanged( float value, int id )
 {
     m_value = value;
     emit( valueChanged() );
+    emit( valueChanged( value ) );
 }
