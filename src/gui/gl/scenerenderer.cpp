@@ -11,6 +11,7 @@
 #include "scenerenderer.h"
 #include "arcball.h"
 #include "slicerenderer.h"
+#include "colormaprenderer.h"
 
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
@@ -365,7 +366,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
     int m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
     int m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
     int m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
-    float slowDown = 3.0f * m_arcBall->getZoom();
+    float slowDown = 4.0f * m_arcBall->getZoom();
 
     switch ( m_picked )
     {

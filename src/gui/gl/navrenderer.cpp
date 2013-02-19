@@ -121,7 +121,8 @@ void NavRenderer::setupTextures()
 
 void NavRenderer::setShaderVars()
 {
-    GLFunctions::setShaderVars( "slice", m_dataModel );
+    QGLShaderProgram* program = GLFunctions::getShader( "slice" );
+    GLFunctions::setShaderVarsSlice( program, m_dataModel );
 }
 
 void NavRenderer::mouseWheel( int step )

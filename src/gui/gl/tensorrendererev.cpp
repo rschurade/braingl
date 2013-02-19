@@ -84,7 +84,31 @@ void TensorRendererEV::setupTextures()
 
 void TensorRendererEV::setShaderVars()
 {
-    GLFunctions::setShaderVars( "tensorev", model() );
+    QGLShaderProgram* program = GLFunctions::getShader( "tensorev" );
+
+    program->bind();
+
+    long int offset = 0;
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int dirLocation = program->attributeLocation( "a_dir" );
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    offset += sizeof(float) * 1;
+    int offsetLocation = program->attributeLocation( "a_diag" );
+    program->enableAttributeArray( offsetLocation );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int radiusLocation = program->attributeLocation( "a_offdiag" );
+    program->enableAttributeArray( radiusLocation );
+    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
 void TensorRendererEV::initGeometry()
