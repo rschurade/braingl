@@ -37,6 +37,7 @@ QSize GLWidget::sizeHint() const
 void GLWidget::initializeGL()
 {
 	m_sceneRenderer->initGL();
+	GLFunctions::initTextRenderer();
 }
 
 void GLWidget::paintGL()

@@ -26,6 +26,7 @@
 	<file>icons/box.png</file>
 	<file>icons/eigenvector.png</file>
 	<file>icons/iso_surface.png</file>
+	<file>icons/droidsansmono256.png</file>
 	<file>shaders/uniforms.fs</file>
 	<file>shaders/slice.vs</file>
 	<file>shaders/slice.fs</file>
@@ -45,6 +46,8 @@
     <file>shaders/fiber.fs</file>
     <file>shaders/mesh.vs</file>
     <file>shaders/mesh.fs</file>
+    <file>shaders/text.vs</file>
+    <file>shaders/text.fs</file>
     <file>shaders/colormapbar.vs</file>
     <file>shaders/colormapbar.fs</file>
     <file>shaders/colormapscale.vs</file>

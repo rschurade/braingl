@@ -10,6 +10,8 @@
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
 
+#include "../text/textrenderer.h"
+
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QHash>
 #include <QtCore/QFile>
@@ -18,6 +20,8 @@
 #include <QtGui/QMatrix4x4>
 
 #define NUM_TEXTURES 5
+
+TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
@@ -182,7 +186,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "box" );
-
+        GLFunctions::m_shaderNames.push_back( "text" );
 
         copyShaderToString( GLFunctions::m_shaderNames[ 0 ], QString("fs") );
         copyShaderToString( GLFunctions::m_shaderNames[ 1 ], QString("vs") );
@@ -662,4 +666,16 @@ QImage* GLFunctions::getOffscreenTexture()
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
 
     return image;
+}
+
+void GLFunctions::initTextRenderer()
+{
+    GLFunctions::m_textRenderer->init();
+}
+
+void GLFunctions::renderText( QString text, int x, int y, int size, QColor color )
+{
+    GLFunctions::m_textRenderer->setSize( size );
+    GLFunctions::m_textRenderer->setColor( color );
+    GLFunctions::m_textRenderer->renderText( text, x, y );
 }

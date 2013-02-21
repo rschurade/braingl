@@ -61,25 +61,32 @@ void ColormapRenderer::initGeometry()
     z = -0.51f;
     float lineWidth = 0.005;
 
+    m_labels.clear();
+
     float value = m_selectedMin / m_max;
     value = ( value - m_lowerThreshold/m_max )  / ( m_upperThreshold/m_max - m_lowerThreshold/m_max  );
     value = qMax( 0.0f, qMin( 1.0f, value ) );
+    m_labels.push_back( QVector3D( m_x + value * m_dx, m_y, value ) );
 
     float value1 = 0.25 * (  m_selectedMax / m_max - m_selectedMin / m_max ) + m_selectedMin / m_max;
     value1 = ( value1 - m_lowerThreshold/m_max )  / ( m_upperThreshold/m_max - m_lowerThreshold/m_max  );
     value1 = qMax( 0.0f, qMin( 1.0f, value1 ) );
+    m_labels.push_back( QVector3D( m_x + value1 * m_dx, m_y, value1 ) );
 
     float value2 = 0.5 * (  m_selectedMax / m_max - m_selectedMin / m_max ) + m_selectedMin / m_max;
     value2 = ( value2 - m_lowerThreshold/m_max )  / ( m_upperThreshold/m_max - m_lowerThreshold/m_max  );
     value2 = qMax( 0.0f, qMin( 1.0f, value2 ) );
+    m_labels.push_back( QVector3D( m_x + value2 * m_dx, m_y, value2 ) );
 
     float value3 = 0.75 * (  m_selectedMax / m_max - m_selectedMin / m_max ) + m_selectedMin / m_max;
     value3 = ( value3 - m_lowerThreshold/m_max )  / ( m_upperThreshold/m_max - m_lowerThreshold/m_max  );
     value3 = qMax( 0.0f, qMin( 1.0f, value3 ) );
+    m_labels.push_back( QVector3D( m_x + value3 * m_dx, m_y, value3 ) );
 
     float value4 = 1.0 * (  m_selectedMax / m_max - m_selectedMin / m_max ) + m_selectedMin / m_max;
     value4 = ( value4 - m_lowerThreshold/m_max )  / ( m_upperThreshold/m_max - m_lowerThreshold/m_max  );
     value4 = qMax( 0.0f, qMin( 1.0f, value4 ) );
+    m_labels.push_back( QVector3D( m_x + value4 * m_dx, m_y, value4 ) );
 
     float scaleVertices[] =
     {
@@ -176,6 +183,15 @@ void ColormapRenderer::draw()
     glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    for ( int i = 0; i < m_labels.size(); ++i )
+    {
+        int x = ( ( m_labels[i].x() + 1.0 ) / 2.0 ) * (float)GLFunctions::getScreenSize().x();
+        int y = ( ( m_labels[i].y() + 1.0 ) / 2.0 ) * (float)GLFunctions::getScreenSize().y();
+
+        GLFunctions::renderText( QString::number( m_labels[i].z(), 'f', 2 ), x, y, 30 );
+    }
+
 }
 
 void ColormapRenderer::setX( float x )
