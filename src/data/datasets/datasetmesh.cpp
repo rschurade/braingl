@@ -17,7 +17,7 @@ DatasetMesh::~DatasetMesh()
 {
 }
 
-void DatasetMesh::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
+void DatasetMesh::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
 }
 

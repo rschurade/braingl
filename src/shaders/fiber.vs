@@ -23,6 +23,8 @@ varying vec4 v_viewDir;
 // (4 varying floats)
 varying vec4 v_lightDir;
 
+varying vec3 v_texcoord;
+
 void main()
 {
 	v_normal = normalize( a_normal.xyz );
@@ -45,6 +47,8 @@ void main()
     {
        gl_FrontColor =  vec4( u_color, 1.0 );
     }
+    
+    v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
 	
     gl_Position = mvp_matrix * a_position;
 }
