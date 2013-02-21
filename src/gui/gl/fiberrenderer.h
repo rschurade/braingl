@@ -26,7 +26,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
+    void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert, QAbstractItemModel* dataModel );
 
     void setRenderParams( int colorMode );
 

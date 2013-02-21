@@ -42,6 +42,7 @@ public:
     static QGLShaderProgram* getShader( QString name );
 
     static void setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model );
+    static void setTextureUniforms( QGLShaderProgram* program, QAbstractItemModel* model );
 
     static QVector<QString> getShaderNames();
     static QString getShaderCode( QString name );

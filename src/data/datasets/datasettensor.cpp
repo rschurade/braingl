@@ -205,7 +205,7 @@ void DatasetTensor::flipX()
     m_data = newData;
 }
 
-void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
+void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() == 0 )
     {

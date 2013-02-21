@@ -139,7 +139,7 @@ void DatasetScalar::flipX()
     m_data = newData;
 }
 
-void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel )
+void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_properties.get( Fn::Property::RENDER_COLORMAP ).toBool() )
     {

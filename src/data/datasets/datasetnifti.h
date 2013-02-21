@@ -27,7 +27,7 @@ public:
     Matrix getQForm();
     Matrix getSForm();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel ) = 0;
+    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
     static QString getNiftiDataType( const int type );

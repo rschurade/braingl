@@ -55,9 +55,13 @@ QVector<bool> FiberRenderer::getSelection()
     return m_rootfield;
 }
 
-void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert, QAbstractItemModel* dataModel )
 {
     GLFunctions::getShader( "fiber" )->bind();
+
+    GLFunctions::setupTextures( dataModel );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) , dataModel );
+
     // Set modelview-projection matrix
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", mvp_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
