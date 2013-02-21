@@ -43,6 +43,7 @@ private:
     float m_selectedMax;
     float m_lowerThreshold;
     float m_upperThreshold;
+    QVector<QVector3D>m_labels;
 
 public slots:
     void setX( float x );

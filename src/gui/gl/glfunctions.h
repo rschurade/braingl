@@ -14,9 +14,11 @@
 #include <QtCore/QList>
 #include <QtGui/QVector3D>
 #include <QtGui/QImage>
+#include <QtGui/QColor>
 
 class QAbstractItemModel;
 class QGLShaderProgram;
+class TextRenderer;
 
 struct VertexData
 {
@@ -65,11 +67,16 @@ public:
     static void setScreenSize( int width, int height );
     static QPoint getScreenSize();
 
+    static void initTextRenderer();
+    static void renderText( QString text, int x, int y, int size = 10, QColor color = QColor( 0, 0, 0 ) );
+
 private:
     GLFunctions();
     virtual ~GLFunctions();
 
     static void copyShaderToString( QString name, QString ext );
+
+    static TextRenderer* m_textRenderer;
 
     static QHash< QString, QString >m_shaderSources;
     static QHash< QString, QGLShaderProgram* >m_shaders;
