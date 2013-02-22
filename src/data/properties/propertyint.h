@@ -25,17 +25,17 @@ public:
 
     QVariant getValue();
 
-    void setValue( QVariant value );
-    void setMin( int min );
-    void setMax( int max );
-
-
 private:
     int m_value;
     int m_min;
     int m_max;
 
     SliderWithEditInt* m_widget;
+
+public slots:
+void setValue( QVariant value );
+    void setMin( int min );
+    void setMax( int max );
 
 private slots:
     void widgetChanged( int value, int id );

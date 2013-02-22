@@ -23,10 +23,10 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image
     examineDataset();
 
     m_properties.set( Fn::Property::RENDER_COLORMAP, true, true );
-    m_properties.set( Fn::Property::COLORMAP_X, 0.48f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_X, 0.40f, 0.0f, 1.0f, true );
     m_properties.set( Fn::Property::COLORMAP_Y, 0.93f, 0.0f, 1.0f, true );
     m_properties.set( Fn::Property::COLORMAP_DX, 0.5f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::COLORMAP_DY, 0.05f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_DY, 0.03f, 0.0f, 1.0f, true );
 }
 
 DatasetScalar::~DatasetScalar()
@@ -65,6 +65,13 @@ void DatasetScalar::examineDataset()
     m_properties.set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
 
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ), m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ), m_properties.getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
