@@ -4,7 +4,8 @@ uniform float u_width;
 uniform float u_height;
 uniform float u_x;
 uniform float u_y;
-uniform float u_size;
+uniform float u_sizeX;
+uniform float u_sizeY;
 uniform float u_pos;
 uniform float u_char;
 
@@ -12,13 +13,13 @@ varying vec2 v_texCoord;
 
 void main()
 {
-    float fontRatio = 0.6;
+    float fontRatio = 0.5;
 
     float originX = ( ( u_x / u_width ) * 2.0 ) - 1.0;
     float originY = ( ( u_y / u_height ) * 2.0 ) - 1.0;
 
-    float x = ( a_position.x * u_size * fontRatio ) + ( u_pos * u_size * fontRatio ) + originX;
-    float y = ( a_position.y * u_size ) + originY;
+    float x = ( a_position.x * u_sizeX * fontRatio ) + ( u_pos * u_sizeX * fontRatio ) + originX;
+    float y = ( a_position.y * u_sizeY ) + originY;
 
     gl_Position = vec4( x, y, a_position.z, 1.0 );
         

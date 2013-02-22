@@ -15,7 +15,8 @@
 
 TextRenderer::TextRenderer() :
     vboIds( new GLuint[ 1 ] ),
-    m_textSize( 0.1 )
+    m_textSizeX( 0.1 ),
+    m_textSizeY( 0.1 )
 {
     int pos = 0;
     for ( int i = 33; i < 127; ++i )
@@ -73,7 +74,8 @@ void TextRenderer::renderText( QString text, int x, int y )
     program->setUniformValue( "u_y", (float)y );
     program->setUniformValue( "u_width", (float)GLFunctions::getScreenSize().x() );
     program->setUniformValue( "u_height", (float)GLFunctions::getScreenSize().y() );
-    program->setUniformValue( "u_size", m_textSize );
+    program->setUniformValue( "u_sizeX", m_textSizeX );
+    program->setUniformValue( "u_sizeY", m_textSizeY );
 
     for ( int i = 0; i < text.size(); ++i )
     {
@@ -106,7 +108,8 @@ void TextRenderer::initGeometry()
 
 void TextRenderer::setSize( int size )
 {
-    m_textSize = (float)size / (float)GLFunctions::getScreenSize().y();
+    m_textSizeX = (float)size / (float)GLFunctions::getScreenSize().x();
+    m_textSizeY = (float)size / (float)GLFunctions::getScreenSize().y();
 }
 
 void TextRenderer::setColor( QColor color )
