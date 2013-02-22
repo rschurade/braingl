@@ -2,6 +2,9 @@ attribute vec4 a_position;
 
 uniform float u_width;
 uniform float u_height;
+uniform float u_scaleX;
+uniform float u_scaleY;
+
 uniform float u_x;
 uniform float u_y;
 uniform float u_sizeX;
@@ -15,11 +18,11 @@ void main()
 {
     float fontRatio = 0.5;
 
-    float originX = ( ( u_x / u_width ) * 2.0 ) - 1.0;
-    float originY = ( ( u_y / u_height ) * 2.0 ) - 1.0;
+    float originX = ( ( u_x * u_scaleX / u_width ) * 2.0 ) - 1.0;
+    float originY = ( ( u_y * u_scaleY / u_height ) * 2.0 ) - 1.0;
 
-    float x = ( a_position.x * u_sizeX * fontRatio ) + ( u_pos * u_sizeX * fontRatio ) + originX;
-    float y = ( a_position.y * u_sizeY ) + originY;
+    float x = ( a_position.x * u_scaleX * u_sizeX * fontRatio ) + ( u_pos * u_scaleX * u_sizeX * fontRatio ) + originX;
+    float y = ( a_position.y * u_scaleY * u_sizeY ) + originY;
 
     gl_Position = vec4( x, y, a_position.z, 1.0 );
         

@@ -26,6 +26,9 @@ TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
 bool GLFunctions::picking = false;
+bool GLFunctions::offscreen = false;
+float GLFunctions::scaleX = 1.0;
+float GLFunctions::scaleY = 1.0;
 
 int GLFunctions::screenWidth = 0;
 int GLFunctions::screenHeight = 0;
@@ -492,6 +495,9 @@ GLuint GLFunctions::pbo_b = 0;
 
 void GLFunctions::generate_frame_buffer_texture( const int screen_width, const int screen_height )
 {
+    GLFunctions::scaleX = (float)screen_width / (float)GLFunctions::screenWidth;
+    GLFunctions::scaleY = (float)screen_height /(float)GLFunctions::screenHeight;
+
     GLFunctions::screenWidth = screen_width;
     GLFunctions::screenHeight = screen_height;
 
@@ -614,14 +620,22 @@ bool GLFunctions::isPicking()
     return GLFunctions::picking;
 }
 
-void GLFunctions::beginOffscreen()
+void GLFunctions::beginOffscreen( const int screen_width, const int screen_height )
 {
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
+    GLFunctions::offscreen = true;
+    GLFunctions::screenWidth = screen_width;
+    GLFunctions::screenHeight = screen_height;
 }
 
-void GLFunctions::endOffscreen()
+void GLFunctions::endOffscreen( const int screen_width, const int screen_height )
 {
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::offscreen = false;
+    GLFunctions::screenWidth = screen_width;
+    GLFunctions::screenHeight = screen_height;
+    GLFunctions::scaleX = 1.0;
+    GLFunctions::scaleY = 1.0;
 }
 
 QImage* GLFunctions::getOffscreenTexture()
