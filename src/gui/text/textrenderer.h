@@ -32,7 +32,8 @@ private:
     GLuint m_fontTextureGLuint;
     QHash<QChar, int >m_characterPositions;
 
-    float m_textSize;
+    float m_textSizeX;
+    float m_textSizeY;
     QColor m_textColor;
 
     void createFontTexture();
