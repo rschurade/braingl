@@ -41,6 +41,9 @@ void ColormapRenderer::init()
 
 void ColormapRenderer::initGeometry()
 {
+    float dx = m_dx / (float)GLFunctions::getScreenSize().x();
+    float dy = m_dy / (float)GLFunctions::getScreenSize().y();
+
     GLushort indices[] = { 0, 1, 2, 3 };
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -48,9 +51,9 @@ void ColormapRenderer::initGeometry()
     float z = -0.5f;
     VertexData vertices[] =
     {
-        { QVector3D( m_x,        m_y - m_dy, z ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( m_x + m_dx, m_y - m_dy, z ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( m_x + m_dx, m_y,        z ), QVector3D( 1.0, 1.0, 0.0 ) },
+        { QVector3D( m_x,        m_y - dy, z ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( m_x + dx, m_y - dy, z ), QVector3D( 1.0, 0.0, 0.0 ) },
+        { QVector3D( m_x + dx, m_y,        z ), QVector3D( 1.0, 1.0, 0.0 ) },
         { QVector3D( m_x,        m_y,        z ), QVector3D( 0.0, 1.0, 0.0 ) }
     };
 
@@ -67,48 +70,50 @@ void ColormapRenderer::initGeometry()
     m_labels.push_back( QVector3D( m_x, m_y, value ) );
 
     float value1 = 0.25 * (  m_selectedMax - m_selectedMin ) + m_selectedMin;
-    m_labels.push_back( QVector3D( m_x + 0.25 * m_dx, m_y, value1 ) );
+    m_labels.push_back( QVector3D( m_x + 0.25 * dx, m_y, value1 ) );
 
     float value2 = 0.5 * (  m_selectedMax - m_selectedMin ) + m_selectedMin;
-    m_labels.push_back( QVector3D( m_x + 0.5 * m_dx, m_y, value2 ) );
+    m_labels.push_back( QVector3D( m_x + 0.5 * dx, m_y, value2 ) );
 
     float value3 = 0.75 * (  m_selectedMax - m_selectedMin ) + m_selectedMin;
-    m_labels.push_back( QVector3D( m_x + 0.75 * m_dx, m_y, value3 ) );
+    m_labels.push_back( QVector3D( m_x + 0.75 * dx, m_y, value3 ) );
 
     float value4 = 1.0 * (  m_selectedMax - m_selectedMin ) + m_selectedMin;
-    m_labels.push_back( QVector3D( m_x + 1.0 * m_dx, m_y, value4 ) );
+    m_labels.push_back( QVector3D( m_x + 1.0 * dx, m_y, value4 ) );
+
+
 
     float scaleVertices[] =
     {
-        m_x,        m_y - m_dy + lineWidth, z,
-        m_x + m_dx, m_y - m_dy + lineWidth, z,
-        m_x + m_dx, m_y - m_dy,             z,
-        m_x,        m_y - m_dy,             z,
+        m_x,        m_y - dy + lineWidth, z,
+        m_x + dx, m_y - dy + lineWidth, z,
+        m_x + dx, m_y - dy,             z,
+        m_x,        m_y - dy,             z,
 
-        m_x,             m_y - m_dy + lineWidth*3, z,
-        m_x + lineWidth, m_y - m_dy + lineWidth*3, z,
-        m_x + lineWidth, m_y - m_dy,               z,
-        m_x,             m_y - m_dy,               z,
+        m_x,             m_y - dy + lineWidth*3, z,
+        m_x + lineWidth, m_y - dy + lineWidth*3, z,
+        m_x + lineWidth, m_y - dy,               z,
+        m_x,             m_y - dy,               z,
 
-        m_x + 0.25f * m_dx,             m_y - m_dy + lineWidth*3, z,
-        m_x + 0.25f * m_dx - lineWidth, m_y - m_dy + lineWidth*3, z,
-        m_x + 0.25f * m_dx - lineWidth, m_y - m_dy,               z,
-        m_x + 0.25f * m_dx,             m_y - m_dy,               z,
+        m_x + 0.25f * dx,             m_y - dy + lineWidth*3, z,
+        m_x + 0.25f * dx - lineWidth, m_y - dy + lineWidth*3, z,
+        m_x + 0.25f * dx - lineWidth, m_y - dy,               z,
+        m_x + 0.25f * dx,             m_y - dy,               z,
 
-        m_x + 0.5f * m_dx,             m_y - m_dy + lineWidth*3, z,
-        m_x + 0.5f * m_dx - lineWidth, m_y - m_dy + lineWidth*3, z,
-        m_x + 0.5f * m_dx - lineWidth, m_y - m_dy,               z,
-        m_x + 0.5f * m_dx,             m_y - m_dy,               z,
+        m_x + 0.5f * dx,             m_y - dy + lineWidth*3, z,
+        m_x + 0.5f * dx - lineWidth, m_y - dy + lineWidth*3, z,
+        m_x + 0.5f * dx - lineWidth, m_y - dy,               z,
+        m_x + 0.5f * dx,             m_y - dy,               z,
 
-        m_x + 0.75f * m_dx,             m_y - m_dy + lineWidth*3, z,
-        m_x + 0.75f * m_dx - lineWidth, m_y - m_dy + lineWidth*3, z,
-        m_x + 0.75f * m_dx - lineWidth, m_y - m_dy,               z,
-        m_x + 0.75f * m_dx,             m_y - m_dy,               z,
+        m_x + 0.75f * dx,             m_y - dy + lineWidth*3, z,
+        m_x + 0.75f * dx - lineWidth, m_y - dy + lineWidth*3, z,
+        m_x + 0.75f * dx - lineWidth, m_y - dy,               z,
+        m_x + 0.75f * dx,             m_y - dy,               z,
 
-        m_x + m_dx,             m_y - m_dy + lineWidth*3, z,
-        m_x + m_dx - lineWidth, m_y - m_dy + lineWidth*3, z,
-        m_x + m_dx - lineWidth, m_y - m_dy,               z,
-        m_x + m_dx,             m_y - m_dy,               z
+        m_x + dx,             m_y - dy + lineWidth*3, z,
+        m_x + dx - lineWidth, m_y - dy + lineWidth*3, z,
+        m_x + dx - lineWidth, m_y - dy,               z,
+        m_x + dx,             m_y - dy,               z
     };
     // Transfer vertex data to VBO 1
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
@@ -182,7 +187,7 @@ void ColormapRenderer::draw()
         QString label = QString::number( m_labels[i].z(), 'f', 2 );
         float xOffset = ( ( label.size() - 3 )  * ( 7.5f / (float)GLFunctions::getScreenSize().x() ) ) * (float)GLFunctions::getScreenSize().x() +
                         ( 0.5f  * ( 7.5f / (float)GLFunctions::getScreenSize().x() ) ) * (float)GLFunctions::getScreenSize().x();
-        float yOffset = m_dy * (float)GLFunctions::getScreenSize().y();
+        float yOffset = m_dy;
         GLFunctions::renderText( label, x - xOffset, y - yOffset, 30 );
     }
 
@@ -200,12 +205,12 @@ void ColormapRenderer::setY( float y )
 }
 void ColormapRenderer::setDX( float dx )
 {
-    m_dx = 2* dx;
+    m_dx = dx;
     initGeometry();
 }
 void ColormapRenderer::setDY( float dy )
 {
-    m_dy = 2 * dy;
+    m_dy = dy;
     initGeometry();
 }
 
