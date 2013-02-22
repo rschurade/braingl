@@ -23,10 +23,11 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image
     examineDataset();
 
     m_properties.set( Fn::Property::RENDER_COLORMAP, true, true );
-    m_properties.set( Fn::Property::COLORMAP_X, 0.40f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::COLORMAP_Y, 0.93f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::COLORMAP_DX, 500, 1, 2000, true );
-    m_properties.set( Fn::Property::COLORMAP_DY, 30, 1, 1000, true );
+    m_properties.set( Fn::Property::COLORMAP_X, 50, 1, 2000, true );
+    m_properties.set( Fn::Property::COLORMAP_Y, 50, 1, 2000, true );
+    m_properties.set( Fn::Property::COLORMAP_DX, 400, 1, 2000, true );
+    m_properties.set( Fn::Property::COLORMAP_DY, 20, 1, 100, true );
+    m_properties.set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, true );
 }
 
 DatasetScalar::~DatasetScalar()
@@ -65,8 +66,10 @@ void DatasetScalar::examineDataset()
     m_properties.set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
 
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ), m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ), m_properties.getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
 
     connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
@@ -160,6 +163,7 @@ void DatasetScalar::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
         m_colormapRenderer->setY( m_properties.get( Fn::Property::COLORMAP_Y ).toFloat() );
         m_colormapRenderer->setDX( m_properties.get( Fn::Property::COLORMAP_DX ).toFloat() );
         m_colormapRenderer->setDY( m_properties.get( Fn::Property::COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( m_properties.get( Fn::Property::COLORMAP_TEXT_SIZE ).toFloat() );
 
         m_colormapRenderer->setMin( m_properties.get( Fn::Property::MIN).toFloat() );
         m_colormapRenderer->setMax( m_properties.get( Fn::Property::MAX).toFloat() );

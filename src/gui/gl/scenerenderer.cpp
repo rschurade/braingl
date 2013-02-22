@@ -99,6 +99,7 @@ void SceneRenderer::initGL()
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
     m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
+    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -202,7 +203,7 @@ QImage* SceneRenderer::screenshot()
 
     // create offscreen texture
     GLFunctions::generate_frame_buffer_texture( texX , texY );
-    GLFunctions::beginOffscreen();
+    GLFunctions::beginOffscreen( texX, texY );
 
     glViewport( 0, 0, texX, texY );
 
@@ -225,7 +226,7 @@ QImage* SceneRenderer::screenshot()
     renderRois();
 
     QImage* image = GLFunctions::getOffscreenTexture();
-    GLFunctions::endOffscreen();
+    GLFunctions::endOffscreen( m_width, m_height );
     glViewport( 0, 0, m_width, m_height );
     return image;
 }

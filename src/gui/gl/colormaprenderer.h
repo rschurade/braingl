@@ -35,6 +35,7 @@ private:
     float m_y;
     float m_dx;
     float m_dy;
+    int m_textSize;
 
     int m_colormap;
     float m_min;
@@ -50,6 +51,7 @@ public slots:
     void setY( float y );
     void setDX( float dx );
     void setDY( float dy );
+    void setTextSize( int size );
 
     void setColormap( int value );
     void setMin( float value );

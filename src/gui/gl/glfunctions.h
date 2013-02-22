@@ -58,8 +58,8 @@ public:
     static void endPicking();
     static bool isPicking();
 
-    static void beginOffscreen();
-    static void endOffscreen();
+    static void beginOffscreen( const int screen_width, const int screen_height );
+    static void endOffscreen( const int screen_width, const int screen_height );
 
     static QImage* getOffscreenTexture();
 
@@ -71,6 +71,9 @@ public:
     static void initTextRenderer();
     static void renderText( QString text, int x, int y, int size = 10, QColor color = QColor( 0, 0, 0 ) );
 
+    static bool offscreen;
+    static float scaleX;
+    static float scaleY;
 private:
     GLFunctions();
     virtual ~GLFunctions();

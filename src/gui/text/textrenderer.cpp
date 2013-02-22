@@ -74,6 +74,8 @@ void TextRenderer::renderText( QString text, int x, int y )
     program->setUniformValue( "u_y", (float)y );
     program->setUniformValue( "u_width", (float)GLFunctions::getScreenSize().x() );
     program->setUniformValue( "u_height", (float)GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "u_scaleX", GLFunctions::scaleX );
+    program->setUniformValue( "u_scaleY", GLFunctions::scaleY );
     program->setUniformValue( "u_sizeX", m_textSizeX );
     program->setUniformValue( "u_sizeY", m_textSizeY );
 
@@ -88,8 +90,6 @@ void TextRenderer::renderText( QString text, int x, int y )
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
-
-
 
 void TextRenderer::initGeometry()
 {
