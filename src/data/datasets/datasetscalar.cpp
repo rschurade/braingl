@@ -25,8 +25,8 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image
     m_properties.set( Fn::Property::RENDER_COLORMAP, true, true );
     m_properties.set( Fn::Property::COLORMAP_X, 0.40f, 0.0f, 1.0f, true );
     m_properties.set( Fn::Property::COLORMAP_Y, 0.93f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::COLORMAP_DX, 0.5f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::COLORMAP_DY, 0.03f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::COLORMAP_DX, 500, 1, 2000, true );
+    m_properties.set( Fn::Property::COLORMAP_DY, 30, 1, 1000, true );
 }
 
 DatasetScalar::~DatasetScalar()
