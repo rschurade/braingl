@@ -118,7 +118,7 @@ TensorTrackWidget::~TensorTrackWidget()
 QList<Dataset*> TensorTrackWidget::getFibs()
 {
     QList<Dataset*> l;
-    DatasetFibers* fibs = new DatasetFibers( m_tracker->getFibs() );
+    DatasetFibers* fibs = new DatasetFibers( m_tracker->getFibs(), m_tracker->getExtras() );
     l.push_back( fibs );
     return l;
 }

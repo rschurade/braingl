@@ -53,6 +53,11 @@ QVector< QVector< float > > TWCThread::getFibs()
     return fibs;
 }
 
+QVector< QVector< float > > TWCThread::getExtras()
+{
+    return extras;
+}
+
 void TWCThread::run()
 {
     int numThreads = QThread::idealThreadCount();
@@ -67,22 +72,30 @@ void TWCThread::run()
 
         QVector<float> fib1;
         QVector<float> fib2;
-        QVector<float> fib3;
         QVector<float> fib2r;
+
+        QVector<float> extra1;
+        QVector<float> extra2;
+        QVector<float> extra2r;
+
+        track( i, false, fib1, extra1 );
+        track( i, true, fib2, extra2 );
+
         int j = 0;
 
-        track( i, false, fib1 );
-        track( i, true, fib2 );
 
         if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
         {
             fib2r.resize( fib2.size() );
+            extra2r.resize( extra2.size() );
             for ( int i = 0; i < fib2.size() / 3; ++i )
             {
                 j = i * 3;
                 fib2r[j] = fib2[( fib2.size() - 1 ) - ( j + 2 )];
                 fib2r[j + 1] = fib2[( fib2.size() - 1 ) - ( j + 1 )];
                 fib2r[j + 2] = fib2[( fib2.size() - 1 ) - j];
+
+                extra2r[ j / 3 ] = extra2[( extra2.size() - 1 ) - j/3];
             }
 
             if ( fib1.size() > 3 )
@@ -90,10 +103,13 @@ void TWCThread::run()
                 fib1.remove( 0 );
                 fib1.remove( 0 );
                 fib1.remove( 0 );
+                extra1.remove( 0 );
                 fib2r += fib1;
+                extra2r += extra1;
             }
 
             fibs.push_back( fib2r );
+            extras.push_back( extra2r );
         }
         ++progressCounter;
         if ( progressCounter == 100 )
@@ -105,7 +121,7 @@ void TWCThread::run()
     emit( finished() );
 }
 
-void TWCThread::track( int id, bool negDir, QVector<float>& result )
+void TWCThread::track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult )
 {
     int xs = 0;
     int ys = 0;
@@ -153,6 +169,8 @@ void TWCThread::track( int id, bool negDir, QVector<float>& result )
             result.push_back( x );
             result.push_back( y );
             result.push_back( z );
+
+            extraResult.push_back( FMath::fa( getInterpolatedTensor( id, x, y, z, dirX, dirY, dirZ ) ) );
         }
         else
         {

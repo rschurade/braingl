@@ -30,6 +30,7 @@ public:
     void startTracking();
 
     QVector< QVector< float > >getFibs();
+    QVector< QVector< float > >getExtras();
     int getNumPoints();
     int getNumLines();
 
@@ -44,6 +45,7 @@ private:
     QVector<TWCThread*> m_threads;
 
     QVector< QVector< float > >fibs;
+    QVector< QVector< float > >extras;
 
     int m_nx;
     int m_ny;

@@ -620,6 +620,41 @@ void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
     }
 }
 
+float FMath::fa( Matrix tensor )
+{
+    float trace;
+    float value = 0;
+    value = tensor( 1, 1 );
+    value += tensor( 2, 2 );
+    value += tensor( 3, 3 );
+    trace = value / 3.0;
+
+    float fa;
+
+    double xx, xy, xz, yy, yz, zz, tr, AA, DD;
+
+    xx = tensor( 1, 1 );
+    xy = tensor( 1, 2 );
+    xz = tensor( 1, 3 );
+    yy = tensor( 2, 2 );
+    yz = tensor( 2, 3 );
+    zz = tensor( 3, 3 );
+    tr = trace;
+
+    AA = pow2( xx - tr ) + pow2( yy - tr ) + pow2( zz - tr ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
+    DD = pow2( xx ) + pow2( yy ) + pow2( zz ) + 2 * pow2( xy ) + 2 * pow2( xz ) + 2 * pow2( yz );
+
+    if ( DD > 0 )
+    {
+        fa = qMin( 1.0f, (float) ( sqrt( AA ) / sqrt( DD ) * sqrt( 1.5 ) ) );
+    }
+    else
+    {
+        fa = 0.0;
+    }
+    return fa;
+}
+
 void FMath::evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 )
 {
     int blockSize = tensors.size();

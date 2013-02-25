@@ -40,11 +40,12 @@ public:
     virtual ~TrackThread();
 
     QVector< QVector< float > >getFibs();
+    QVector< QVector< float > >getExtras();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result );
+    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
 
     int getID( float x, float y, float z );
     void getXYZ( int id, int &x, int &y, int &z );
@@ -76,6 +77,7 @@ private:
     int m_blockSize;
 
     QVector< QVector< float > >fibs;
+    QVector< QVector< float > >extras;
 
 signals:
     void progress();

@@ -10,8 +10,9 @@
 
 #include <math.h>
 
-FiberRendererThread::FiberRendererThread( QVector< QVector< float > >& data, int id ) :
+FiberRendererThread::FiberRendererThread( QVector< QVector< float > >& data, QVector< QVector< float > >& extraData, int id ) :
     m_data( data ),
+    m_extraData( extraData ),
     m_id( id )
 {
     m_verts = new QVector<float>();
@@ -46,6 +47,7 @@ void FiberRendererThread::run()
     for ( int i = begin; i < end; ++i )
     {
         QVector<float> fib = m_data[i];
+        QVector<float> extra = m_extraData[i];
 
         if ( fib.size() < 9 )
         {
@@ -75,6 +77,8 @@ void FiberRendererThread::run()
         m_verts->push_back( globalColor.y() );
         m_verts->push_back( globalColor.z() );
 
+        m_verts->push_back( extra.first() );
+
         for ( int k = 1; k < fib.size() / 3 - 1; ++k )
         {
             m_verts->push_back( fib[k*3] );
@@ -91,6 +95,8 @@ void FiberRendererThread::run()
             m_verts->push_back( globalColor.x() );
             m_verts->push_back( globalColor.y() );
             m_verts->push_back( globalColor.z() );
+
+            m_verts->push_back( extra[k] );
         }
 
         // push back the last vertex, done seperately because of nomal calculation
@@ -107,5 +113,7 @@ void FiberRendererThread::run()
         m_verts->push_back( globalColor.x() );
         m_verts->push_back( globalColor.y() );
         m_verts->push_back( globalColor.z() );
+
+        m_verts->push_back( extra.last() );
     }
 }

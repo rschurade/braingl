@@ -34,11 +34,12 @@ public:
     virtual ~TWCThread();
 
     QVector< QVector< float > >getFibs();
+    QVector< QVector< float > >getExtras();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result );
+    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
 
     float getInterpolatedFA( int &id, float &inx, float &iny, float &inz );
     Matrix getInterpolatedTensor( int &id, float &inx, float &iny, float &inz, float &dirX, float &dirY, float &dirZ );
@@ -66,6 +67,7 @@ private:
     float m_smoothness;
 
     QVector< QVector< float > >fibs;
+    QVector< QVector< float > >extras;
 
 signals:
     void progress();

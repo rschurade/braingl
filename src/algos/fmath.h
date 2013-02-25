@@ -50,6 +50,7 @@ public:
     static void fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals, QVector<Matrix>& out );
 
     static void fa( QVector<Matrix>& tensors, QVector<float>& faOut );
+    static float fa( Matrix tensor );
 
     static void evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 );
     static void evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,

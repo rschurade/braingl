@@ -14,8 +14,14 @@ varying vec4 v_lightDir;
 varying vec4 v_viewDir;
 
 varying vec3 v_texcoord;
+varying float v_extra;
 
 uniform int u_colorMode;
+uniform int u_colormap;
+uniform float u_selectedMin;
+uniform float u_selectedMax;
+uniform float u_lowerThreshold;
+uniform float u_upperThreshold;
 /**
  * Function to calculate lighting based on "Real-Time Volume Graphics, p 119, chapter 5.4, Listing 5.1".
  *
@@ -134,6 +140,11 @@ void main()
 	    if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
 	    
 	    gl_FragColor = color;
+    }
+    else if ( u_colorMode == 4 )
+    {
+        vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 );
+        gl_FragColor = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
     }
     else
     {
