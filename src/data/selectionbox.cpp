@@ -28,7 +28,7 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     float yMax = globals->data( globals->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat() * dy;
     float zMax = globals->data( globals->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat() * dz;
 
-
+    m_properties.set( Fn::ROI::RENDER, true, true );
     m_properties.set( Fn::ROI::X, x, 0., xMax, true );
     m_properties.set( Fn::ROI::Y, y, 0., yMax, true );
     m_properties.set( Fn::ROI::Z, z, 0., zMax, true );
@@ -98,6 +98,9 @@ void SelectionBox::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse )
                                     m_properties.get( Fn::ROI::DZ ).toFloat(),
                                     m_properties.get( Fn::ROI::COLOR ).value<QColor>() );
     }
-    m_renderer->draw( mvpMatrix );
+    if ( m_properties.get( Fn::ROI::RENDER).toBool() )
+    {
+        m_renderer->draw( mvpMatrix );
+    }
 }
 
