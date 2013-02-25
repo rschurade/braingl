@@ -6,9 +6,10 @@ uniform vec3 u_color;
 attribute vec4 a_position;
 attribute vec4 a_normal;
 attribute vec4 a_color;
-attribute vec4 a_color2;
+attribute float a_extra;
 
 varying vec3 v_normal;
+varying float v_extra;
 
 // point on projection plane of current pixel
 // USAGE:
@@ -28,6 +29,7 @@ varying vec3 v_texcoord;
 void main()
 {
 	v_normal = normalize( a_normal.xyz );
+	v_extra = a_extra;
    
     v_viewDir = mv_matrixInvert * vec4( 0.0, 0.0, 1.0, 0.0);
     v_viewDir.w = 1.0;

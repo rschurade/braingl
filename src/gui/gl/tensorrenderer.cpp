@@ -72,7 +72,7 @@ void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
     GLenum error;
     int i = 0;
     while ((error = glGetError()) != GL_NO_ERROR) {
-        qDebug() << error;
+        qDebug() << "tensor renderer gl error" << error;
         i++;
     }
     glBindBuffer( GL_ARRAY_BUFFER, 0 );

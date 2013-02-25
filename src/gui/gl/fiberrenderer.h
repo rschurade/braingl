@@ -21,14 +21,14 @@ class FiberRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data );
+    FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
     virtual ~FiberRenderer();
 
     void init();
 
     void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert, QAbstractItemModel* dataModel );
 
-    void setRenderParams( int colorMode );
+    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );
 
     QVector<bool> getSelection();
 
@@ -49,6 +49,7 @@ private:
     GLuint *vboIds;
 
     QVector< QVector< float > > m_data;
+    QVector< QVector< float > > m_extraData;
 
     int m_numLines;
     int m_numPoints;
@@ -60,6 +61,11 @@ private:
     bool m_isInitialized;
 
     int m_colorMode;
+    int m_colormap;
+    float m_selectedMin;
+    float m_selectedMax;
+    float m_lowerThreshold;
+    float m_upperThreshold;
     QVector<QColor>m_colorField;
 
     KdTree* m_kdTree;

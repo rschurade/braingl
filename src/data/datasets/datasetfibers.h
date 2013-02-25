@@ -20,6 +20,7 @@ class DatasetFibers: public Dataset
 public:
     DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
     DatasetFibers( QVector< QVector< float > > fibs );
+    DatasetFibers( QVector< QVector< float > > fibs, QVector< QVector< float > > extraData );
     virtual ~DatasetFibers();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
@@ -33,6 +34,7 @@ protected:
 
 private:
     QVector< QVector< float > > m_fibs;
+    QVector< QVector< float > > m_extraData;
 
     FiberRenderer* m_renderer;
 };

@@ -14,15 +14,21 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 
-FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data )  :
+FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),
     m_roiModel( roiModel ),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
+    m_extraData( extraData ),
     m_numLines( data.size() ),
     m_numPoints( 0 ),
     m_isInitialized( false ),
     m_colorMode( 0 ),
+    m_colormap( 1 ),
+    m_selectedMin( 0.0 ),
+    m_selectedMax( 1.0 ),
+    m_lowerThreshold( 0.0 ),
+    m_upperThreshold( 1.0 ),
     m_kdTree( 0 )
 {
     m_boxMin.resize( 3 );
@@ -66,7 +72,12 @@ void FiberRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert, QAb
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", mvp_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
 
     initGeometry();
 
@@ -115,17 +126,22 @@ void FiberRenderer::setShaderVars()
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int extraLocation = program->attributeLocation( "a_extra" );
+    program->enableAttributeArray( extraLocation );
+    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
 void FiberRenderer::initGeometry()
@@ -141,7 +157,7 @@ void FiberRenderer::initGeometry()
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new FiberRendererThread( m_data, i ) );
+        threads.push_back( new FiberRendererThread( m_data, m_extraData, i ) );
     }
 
     // run threads
@@ -184,7 +200,7 @@ void FiberRenderer::initGeometry()
     qDebug() << "create fiber vbo's done";
 
     qDebug() << "start creating kdtree";
-    m_numPoints = verts.size() / 9;
+    m_numPoints = verts.size() / 10;
     m_kdVerts.reserve( m_numPoints * 3 );
     m_reverseIndexes.reserve( m_numPoints );
 
@@ -209,9 +225,14 @@ void FiberRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void FiberRenderer::setRenderParams( int colorMode )
+void FiberRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold )
 {
     m_colorMode = colorMode;
+    m_colormap = colormap;
+    m_selectedMin = selectedMin;
+    m_selectedMax = selectedMax;
+    m_lowerThreshold = lowerThreshold;
+    m_upperThreshold = upperThreshold;
 }
 
 void FiberRenderer::updatePresentRois()

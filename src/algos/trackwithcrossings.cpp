@@ -66,6 +66,11 @@ QVector< QVector< float > > TrackWithCrossings::getFibs()
     return fibs;
 }
 
+QVector< QVector< float > > TrackWithCrossings::getExtras()
+{
+    return extras;
+}
+
 int TrackWithCrossings::getNumPoints()
 {
     return m_numPoints;
@@ -142,6 +147,7 @@ void TrackWithCrossings::slotThreadFinished()
         for ( int i = 0; i < m_threads.size(); ++i )
         {
             fibs += m_threads[i]->getFibs();
+            extras += m_threads[i]->getExtras();
         }
 
         for ( int i = 0; i < m_threads.size(); ++i )
