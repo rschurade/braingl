@@ -32,6 +32,42 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     }
 }
 
+DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras ) :
+    Dataset( filename, Fn::DatasetType::FIBERS ),
+    m_fibs( fibs ),
+    m_extraData( extras ),
+    m_renderer( 0 )
+{
+    int numPoints = 0;
+    for ( int i = 0; i < fibs.size(); ++i )
+    {
+        numPoints += fibs[i].size() / 3;
+    }
+
+    m_properties.set( Fn::Property::NUM_POINTS, numPoints );
+    m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
+    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 4, true );
+    m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::Property::COLORMAP, 1, true );
+    m_properties.set( Fn::Property::MIN, 0.0f );
+    m_properties.set( Fn::Property::MAX, 1.0f );
+    m_properties.set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, true );
+    m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, true );
+
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
+}
+
+
 DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
     Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
@@ -104,6 +140,11 @@ DatasetFibers::~DatasetFibers()
 QVector< QVector< float > > DatasetFibers::getFibs()
 {
     return m_fibs;
+}
+
+QVector< QVector< float > > DatasetFibers::getExtra()
+{
+    return m_extraData;
 }
 
 QVector< QVector< float > > DatasetFibers::getSelectedFibs()

@@ -19,6 +19,7 @@ class DatasetFibers: public Dataset
 {
 public:
     DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
+    DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras );
     DatasetFibers( QVector< QVector< float > > fibs );
     DatasetFibers( QVector< QVector< float > > fibs, QVector< QVector< float > > extraData );
     virtual ~DatasetFibers();
@@ -27,6 +28,7 @@ public:
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();
+    QVector< QVector< float > > getExtra();
     QVector< QVector< float > > getSelectedFibs();
 
 protected:

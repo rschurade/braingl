@@ -361,6 +361,7 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
 void Writer::saveFibs( QString filename )
 {
     QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
+    QVector< QVector<float> >extra = dynamic_cast<DatasetFibers*>( m_dataset )->getExtra();
 
     using std::fstream;
     fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
@@ -385,8 +386,10 @@ void Writer::saveFibs( QString filename )
     out << "POINTS " << numPoints << " float" << lineDelimiter;
     unsigned int *rawLineData = new unsigned int[numPoints + numLines];
     float *rawPointData = new float[numPoints * 3];
+    float *rawFAData = new float[numPoints];
 
     unsigned int pntPosOffset = 0;
+    unsigned int faPosOffset = 0;
     unsigned int lnsPosOffset = 0;
 
     for( int i = 0; i < fibs.size(); ++i )
@@ -399,15 +402,20 @@ void Writer::saveFibs( QString filename )
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3] );
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+1] );
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+2] );
+            rawFAData[faPosOffset++] = static_cast< float >( extra[i][j] );
         }
     }
 
+    switchByteOrderOfArray< float >( rawFAData, numPoints );
     switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
     switchByteOrderOfArray< unsigned int >( rawLineData, numLines + numPoints );
     out.write( reinterpret_cast< char* >( rawPointData ), sizeof( float ) * numPoints * 3 );
     out << lineDelimiter;
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
     out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
+    out << lineDelimiter;
+    out << "FA " << numPoints << " float" << lineDelimiter;
+    out.write( reinterpret_cast< char* >( rawFAData ), sizeof( float ) * numPoints );
     out << lineDelimiter;
     out.close();
 }
