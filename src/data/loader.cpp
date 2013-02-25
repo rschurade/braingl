@@ -1000,8 +1000,46 @@ bool Loader::loadFib()
                 fibs.push_back( fib );
             }
 
-            DatasetFibers* dataset = new DatasetFibers( fn, fibs, numPoints, numLines );
-            m_dataset.push_back( dataset );
+            readLine( in );
+            QVector< QVector< float > > extras;
+            if ( !in.atEnd() )
+            {
+                QString l6 = readLine( in );
+
+                if ( ( l6.startsWith( "FA") && l4.endsWith( "float") ) )
+                {
+                    QStringList fsl = l6.split( ' ' );
+                    int numPoints = fsl[1].toInt();
+                    qDebug() << numPoints << "fa entries";
+                    char* faField = new char[numPoints * sizeof( float )];
+                    in.readRawData( faField, numPoints * sizeof( float ) );
+
+                    float* rawFAData = reinterpret_cast<float*>( faField );
+                    switchByteOrderOfArray< float >( rawFAData, numPoints );
+
+                    int pc = 0;
+                    for ( int i = 0; i < fibs.size(); ++i )
+                    {
+                        QVector<float>extra;
+                        for ( int k = 0; k < fibs[i].size()/3; ++k )
+                        {
+                            extra.push_back( rawFAData[pc++] );
+                        }
+                        extras.push_back( extra );
+                    }
+                }
+            }
+            if ( extras.size() == 0 )
+            {
+
+                DatasetFibers* dataset = new DatasetFibers( fn, fibs, numPoints, numLines );
+                m_dataset.push_back( dataset );
+            }
+            else
+            {
+                DatasetFibers* dataset = new DatasetFibers( fn, fibs, extras );
+                m_dataset.push_back( dataset );
+            }
 
             return true;
         }
