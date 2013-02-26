@@ -10,18 +10,18 @@
 
 #include "objectrenderer.h"
 
-#include "../../algos/kdtree.h"
-
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtGui/QColor>
+
+class FiberSelector;
 
 class FiberRenderer : public ObjectRenderer
 {
     Q_OBJECT
 
 public:
-    FiberRenderer( QAbstractItemModel* roiModel, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
+    FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
     virtual ~FiberRenderer();
 
     void init();
@@ -30,7 +30,6 @@ public:
 
     void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );
 
-    QVector<bool> getSelection();
 
 protected:
     void setupTextures();
@@ -43,9 +42,8 @@ protected:
 private:
     QModelIndex createIndex( int branch, int pos, int column );
 
-    void updatePresentRois();
-
     QAbstractItemModel* m_roiModel;
+    FiberSelector* m_selector;
     GLuint *vboIds;
 
     QVector< QVector< float > > m_data;
@@ -68,30 +66,10 @@ private:
     float m_upperThreshold;
     QVector<QColor>m_colorField;
 
-    KdTree* m_kdTree;
-    QVector<float>m_kdVerts;
-    QVector<int>m_reverseIndexes;
-
-    QVector<bool>m_rootfield;
-    QList<QVector<bool> >m_branchfields;
-    QList<QList<QVector<bool> > >m_bitfields;
-
-    QVector<float> m_boxMin;
-    QVector<float> m_boxMax;
-
 public slots:
     void colorChanged( QColor color );
 
 private slots:
-    void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
-    void roiInserted( const QModelIndex &parent, int start, int end );
-    void roiDeleted( const QModelIndex &parent, int start, int end );
-
-    void updateBox( int branch, int pos );
-    void boxTest( QVector<bool>& workfield, int left, int right, int axis );
-
-    void updateBranch( int branch );
-    void updateRoot();
 };
 
 #endif /* FIBERRENDERER_H_ */
