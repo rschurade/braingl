@@ -5,13 +5,15 @@
  *      Author: Ralph Schurade
  */
 #include "datasetfibers.h"
-
+#include "fiberselector.h"
 #include "../../gui/gl/fiberrenderer.h"
+
 
 DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_selector( 0 )
 {
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, numLines );
@@ -155,11 +157,11 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
     else
     {
-        QVector<bool>selected = m_renderer->getSelection();
+        QVector<bool>*selected = m_selector->getSelection();
         QVector<QVector<float> >out;
-        for ( int i = 0; i < selected.size(); ++i )
+        for ( int i = 0; i < selected->size(); ++i )
         {
-            if ( selected[i] )
+            if ( selected->at( i ) )
             {
                 out.push_back( m_fibs[i] );
             }
@@ -168,11 +170,18 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse,
+                             QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
+    if ( m_selector == 0 )
+    {
+        m_selector = new FiberSelector( roiModel );
+        m_selector->init( m_fibs );
+    }
+
     if ( m_renderer == 0 )
     {
-        m_renderer = new FiberRenderer( roiModel, m_fibs, m_extraData );
+        m_renderer = new FiberRenderer( roiModel, m_selector, m_fibs, m_extraData );
         m_renderer->setModel( globalModel );
         m_renderer->init();
         connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
