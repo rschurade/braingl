@@ -70,6 +70,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIt
     setShaderVars();
 
     QVector<bool>*selected = m_selector->getSelection();
+
     if ( m_colorMode != 2 )
     {
         for ( int i = 0; i < m_data.size(); ++i )

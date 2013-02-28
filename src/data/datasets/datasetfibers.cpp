@@ -42,7 +42,9 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_extraData( extras ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_tubeRenderer( 0 ),
+    m_selector( 0 )
 {
     int numPoints = 0;
     for ( int i = 0; i < fibs.size(); ++i )
@@ -79,7 +81,9 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
 DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
     Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_tubeRenderer( 0 ),
+    m_selector( 0 )
 {
     int numPoints = 0;
     for ( int i = 0; i < fibs.size(); ++i )
@@ -111,7 +115,9 @@ DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, QVector< QVector
     Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_extraData( extraData ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_tubeRenderer( 0 ),
+    m_selector( 0 )
 {
     int numPoints = 0;
     for ( int i = 0; i < fibs.size(); ++i )
