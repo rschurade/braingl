@@ -10,15 +10,21 @@
 #include "../../gui/gl/tuberenderer.h"
 
 
-DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines ) :
+DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
     m_selector( 0 )
 {
+    int numPoints = 0;
+    for ( int i = 0; i < fibs.size(); ++i )
+    {
+        numPoints += fibs[i].size() / 3;
+    }
+
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
-    m_properties.set( Fn::Property::NUM_LINES, numLines );
+    m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
     m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
     m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 3, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
@@ -76,79 +82,6 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
 }
-
-
-DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs ) :
-    Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
-    m_fibs( fibs ),
-    m_renderer( 0 ),
-    m_tubeRenderer( 0 ),
-    m_selector( 0 )
-{
-    int numPoints = 0;
-    for ( int i = 0; i < fibs.size(); ++i )
-    {
-        numPoints += fibs[i].size() / 3;
-    }
-    m_properties.set( Fn::Property::NUM_POINTS, numPoints );
-    m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
-    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 3, true );
-    m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.01f, 0.2f, true );
-    m_properties.set( Fn::Property::COLORMAP, 1 );
-    m_properties.set( Fn::Property::MIN, 0.0f );
-    m_properties.set( Fn::Property::MAX, 1.0f );
-    m_properties.set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-
-    m_extraData.reserve( fibs.size() );
-    for ( int i = 0; i < fibs.size(); ++i )
-    {
-        m_extraData.push_back( QVector<float>( fibs[i].size() / 3 ) );
-    }
-}
-
-DatasetFibers::DatasetFibers( QVector< QVector< float > > fibs, QVector< QVector< float > > extraData ) :
-    Dataset( QString("new fibers"), Fn::DatasetType::FIBERS ),
-    m_fibs( fibs ),
-    m_extraData( extraData ),
-    m_renderer( 0 ),
-    m_tubeRenderer( 0 ),
-    m_selector( 0 )
-{
-    int numPoints = 0;
-    for ( int i = 0; i < fibs.size(); ++i )
-    {
-        numPoints += fibs[i].size() / 3;
-    }
-    m_properties.set( Fn::Property::NUM_POINTS, numPoints );
-    m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
-    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 4, true );
-    m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.01f, 0.2f, true );
-    m_properties.set( Fn::Property::COLORMAP, 1, true );
-    m_properties.set( Fn::Property::MIN, 0.0f );
-    m_properties.set( Fn::Property::MAX, 1.0f );
-    m_properties.set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
-              m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
-              m_properties.getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
-
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
-              m_properties.getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
-    connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
-              m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
-}
-
 
 DatasetFibers::~DatasetFibers()
 {
