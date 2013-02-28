@@ -20,7 +20,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
     void setRenderParams( float scaling, float faThreshold, float evThreshold, float gamma, int orient, float offset );
 

@@ -57,7 +57,7 @@ void SHRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     if ( m_orient == 0 )
     {
@@ -66,8 +66,8 @@ void SHRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
 
     GLFunctions::getShader( "qball" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", mvp_matrix );
-    GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
+    GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_minMaxScaling );
 
     initGeometry();

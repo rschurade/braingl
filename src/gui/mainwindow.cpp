@@ -569,8 +569,6 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
 
-
-
     // GL Widgets
 
     mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel, m_roiWidget->selectionModel() );
@@ -656,9 +654,11 @@ void  MainWindow::slotStandardSagittalView()
 
 void MainWindow::slotToggleShaderEdit()
 {
-//    m_shaderEditWidget = new ShaderEditWidget( this );
-//    m_centralTabWidget->addTab( m_shaderEditWidget, "shader edit" );
-//    m_centralTabWidget->setCurrentWidget( m_shaderEditWidget );
+    m_shaderEditWidget = new ShaderEditWidget( this );
+    FNDockWidget* dockSEW = new FNDockWidget( QString("shader edit" ), m_shaderEditWidget, this );
+    viewMenu->addAction( dockSEW->toggleViewAction() );
+    addDockWidget( Qt::RightDockWidgetArea, dockSEW );
+
 }
 
 void MainWindow::slotToggleDockTitles( bool value )

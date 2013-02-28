@@ -4,8 +4,8 @@
  *  Created on: 28.12.2012
  *      Author: Ralph Schurade
  */
-#include "fiberrenderer.h"
-#include "fiberrendererthread.h"
+#include "tuberenderer.h"
+#include "tuberendererthread.h"
 
 #include "glfunctions.h"
 
@@ -15,7 +15,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtCore/QDebug>
 
-FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
+TubeRenderer::TubeRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),
     m_roiModel( roiModel ),
     m_selector( selector ),
@@ -30,38 +30,46 @@ FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selec
     m_selectedMin( 0.0 ),
     m_selectedMax( 1.0 ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 )
+    m_upperThreshold( 1.0 ),
+    m_tubeThickness( 0.05 )
 {
 }
 
-FiberRenderer::~FiberRenderer()
+TubeRenderer::~TubeRenderer()
 {
     glDeleteBuffers(1, &( vboIds[ 0 ] ) );
     glDeleteBuffers(1, &( vboIds[ 1 ] ) );
 }
 
-void FiberRenderer::init()
+void TubeRenderer::init()
 {
     glGenBuffers( 2, vboIds );
 }
 
-void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
+void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
 {
-    GLFunctions::getShader( "fiber" )->bind();
+    GLFunctions::getShader( "tube" )->bind();
 
     GLFunctions::setupTextures( dataModel );
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) , dataModel );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ) , dataModel );
 
     // Set modelview-projection matrix
-    GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
+    GLFunctions::getShader( "tube" )->setUniformValue( "p_matrix", p_matrix );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrix", mv_matrix );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixI", mv_matrix.inverted() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixT", mv_matrix.transposed() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixIT", mv_matrix.inverted().transposed() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_colorMode", m_colorMode );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_colormap", m_colormap );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMin", m_selectedMin );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMax", m_selectedMax );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_thickness", m_tubeThickness );
+
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     initGeometry();
 
@@ -76,7 +84,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIt
         {
             if ( selected->at( i ) )
             {
-                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+                glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
             }
         }
     }
@@ -86,23 +94,25 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIt
         {
             if ( selected->at( i ) )
             {
-                GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", m_colorField[i].redF(), m_colorField[i].greenF(), m_colorField[i].blueF() );
-                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+                GLFunctions::getShader( "tube" )->setUniformValue( "u_color", m_colorField[i].redF(), m_colorField[i].greenF(), m_colorField[i].blueF() );
+                glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
             }
         }
     }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
-void FiberRenderer::setupTextures()
+void TubeRenderer::setupTextures()
 {
 }
 
-void FiberRenderer::setShaderVars()
+void TubeRenderer::setShaderVars()
 {
-    QGLShaderProgram* program = GLFunctions::getShader( "fiber" );
+    QGLShaderProgram* program = GLFunctions::getShader( "tube" );
 
     program->bind();
 
@@ -111,25 +121,30 @@ void FiberRenderer::setShaderVars()
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int extraLocation = program->attributeLocation( "a_extra" );
     program->enableAttributeArray( extraLocation );
-    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+
+    offset += sizeof(float);
+    int dirLocation = program->attributeLocation( "a_direction" );
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 }
 
-void FiberRenderer::initGeometry()
+void TubeRenderer::initGeometry()
 {
     if ( m_isInitialized )
     {
@@ -138,11 +153,11 @@ void FiberRenderer::initGeometry()
     qDebug() << "create fiber vbo's...";
     int numThreads = QThread::idealThreadCount();
 
-    QVector<FiberRendererThread*> threads;
+    QVector<TubeRendererThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new FiberRendererThread( m_data, m_extraData, i ) );
+        threads.push_back( new TubeRendererThread( m_data, m_extraData, i ) );
     }
 
     // run threads
@@ -196,7 +211,8 @@ void FiberRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void FiberRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold )
+void TubeRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold,
+                                        float upperThreshold, float tubeThickness )
 {
     m_colorMode = colorMode;
     m_colormap = colormap;
@@ -204,9 +220,10 @@ void FiberRenderer::setRenderParams( int colorMode, int colormap, float selected
     m_selectedMax = selectedMax;
     m_lowerThreshold = lowerThreshold;
     m_upperThreshold = upperThreshold;
+    m_tubeThickness = tubeThickness;
 }
 
-void FiberRenderer::colorChanged( QColor color )
+void TubeRenderer::colorChanged( QColor color )
 {
     QVector<bool>*selected = m_selector->getSelection();
     for ( int i = 0; i < m_numLines; ++i )

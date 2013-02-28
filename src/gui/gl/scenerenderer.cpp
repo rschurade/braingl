@@ -168,7 +168,7 @@ void SceneRenderer::draw()
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    m_sliceRenderer->draw( m_mvpMatrix );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
 
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable( GL_BLEND );
@@ -211,7 +211,7 @@ QImage* SceneRenderer::screenshot()
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    m_sliceRenderer->draw( m_mvpMatrix );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
 
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable( GL_BLEND );
@@ -240,7 +240,7 @@ void SceneRenderer::renderDatasets()
         if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_mvpMatrix, m_mvMatrixInverse, m_globalModel, m_roiModel, m_dataModel );
+            ds->draw( m_pMatrix, m_mvMatrix, m_globalModel, m_roiModel, m_dataModel );
         }
     }
 }
