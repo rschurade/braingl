@@ -74,11 +74,9 @@ float unpackFloat(const vec4 value) {
 
 void main()
 {
+    vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 ); 
     if ( u_colorMode == 3 )
     {
-	    vec4 color;
-	    color = vec4( 0.0, 0.0, 0.0, 1.0 );
-	
 	    if ( u_texActive0 )
 	    {
 	        vec4 color0 = texture3D( texture0, v_texcoord );
@@ -140,30 +138,23 @@ void main()
 	        }
 	        else
 	        { 
-	            colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4, u_alpha4, color );
+	            color = colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4, u_alpha4, color );
 	        }
 	    }
 	    if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
-	    
-	    vec3 view = vec3(0., 0., -1.);
-        float view_dot_normal = sqrt(1. - v_sparam * v_sparam) + .1;    
-        color = clamp(view_dot_normal * (color + 0.15 * pow( view_dot_normal, 10.) * pow(v_tangent_dot_view, 10.) ), 0., 1.);
-	    
-	    color.a = 1.0;
-	    gl_FragColor = color;
     }
     else if ( u_colorMode == 4 )
     {
-        vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 );
-        gl_FragColor = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
+        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
+ 
     }
     else
     {
-        vec4 color = gl_Color;
-        vec3 view = vec3( 0., 0., -1. );
-        float view_dot_normal = sqrt( 1. - v_sparam * v_sparam ) + .1;    
-        color = clamp( view_dot_normal * ( color + 0.15 * pow( view_dot_normal, 10. ) * pow( v_tangent_dot_view, 10. ) ), 0., 1. );
-        color.a = 1.0;
-        gl_FragColor = color;
+        color = gl_Color;
     }
+    float view_dot_normal = sqrt( 1. - v_sparam * v_sparam ) + .1;    
+    color = clamp( view_dot_normal * ( color + 0.15 * pow( view_dot_normal, 10. ) * pow( v_tangent_dot_view, 10. ) ), 0., 1. );
+    color.a = 1.0;
+    gl_FragColor = color;
+    
 }
