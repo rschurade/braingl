@@ -44,12 +44,12 @@ void MeshRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void MeshRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "mesh" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "mesh" )->setUniformValue( "mvp_matrix", mvp_matrix );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
     if ( m_dirty )
     {

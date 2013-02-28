@@ -14,6 +14,7 @@
 
 class QAbstractItemModel;
 class FiberRenderer;
+class TubeRenderer;
 class FiberSelector;
 
 class DatasetFibers: public Dataset
@@ -40,6 +41,7 @@ private:
     QVector< QVector< float > > m_extraData;
 
     FiberRenderer* m_renderer;
+    TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
 };
 

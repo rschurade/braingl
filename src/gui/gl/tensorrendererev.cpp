@@ -48,11 +48,11 @@ void TensorRendererEV::init()
     glGenBuffers( 1, vboIds );
 }
 
-void TensorRendererEV::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "tensorev" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "tensorev" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
 
     GLFunctions::getShader( "tensorev" )->setUniformValue( "u_scaling", m_scaling );
     GLFunctions::getShader( "tensorev" )->setUniformValue( "u_faThreshold", m_faThreshold );

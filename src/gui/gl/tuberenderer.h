@@ -1,12 +1,12 @@
 /*
- * fiberrenderer.h
+ * tuberenderer.h
  *
- *  Created on: 28.12.2012
+ *  Created on: 26.02.2013
  *      Author: Ralph Schurade
  */
 
-#ifndef FIBERRENDERER_H_
-#define FIBERRENDERER_H_
+#ifndef TUBERENDERER_H_
+#define TUBERENDERER_H_
 
 #include "objectrenderer.h"
 
@@ -16,19 +16,20 @@
 
 class FiberSelector;
 
-class FiberRenderer : public ObjectRenderer
+class TubeRenderer : public ObjectRenderer
 {
     Q_OBJECT
 
 public:
-    FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
-    virtual ~FiberRenderer();
+    TubeRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
+    virtual ~TubeRenderer();
 
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel );
 
-    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );
+    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax,
+                            float lowerThreshold, float upperThreshold, float tubeThickness );
 
 
 protected:
@@ -64,6 +65,7 @@ private:
     float m_selectedMax;
     float m_lowerThreshold;
     float m_upperThreshold;
+    float m_tubeThickness;
     QVector<QColor>m_colorField;
 
 public slots:
@@ -72,4 +74,4 @@ public slots:
 private slots:
 };
 
-#endif /* FIBERRENDERER_H_ */
+#endif /* TUBERENDERER_H_ */

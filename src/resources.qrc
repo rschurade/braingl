@@ -48,6 +48,8 @@
     <file>shaders/mesh.fs</file>
     <file>shaders/text.vs</file>
     <file>shaders/text.fs</file>
+    <file>shaders/tube.vs</file>
+    <file>shaders/tube.fs</file>
     <file>shaders/colormapbar.vs</file>
     <file>shaders/colormapbar.fs</file>
     <file>shaders/colormapscale.vs</file>

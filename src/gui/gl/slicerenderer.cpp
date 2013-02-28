@@ -143,7 +143,7 @@ void SliceRenderer::setShaderVars()
     GLFunctions::setShaderVarsSlice( program, m_dataModel );
 }
 
-void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
+void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     //qDebug() << "main gl draw";
     setupTextures();
@@ -152,7 +152,7 @@ void SliceRenderer::draw( QMatrix4x4 mvp_matrix )
 
     GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "slice" )->setUniformValue( "u_picking", false );
 
     initGeometry();

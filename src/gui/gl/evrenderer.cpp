@@ -45,11 +45,11 @@ void EVRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void EVRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "ev" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "ev" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "ev" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "ev" )->setUniformValue( "u_scaling", m_scaling );
 
     initGeometry();

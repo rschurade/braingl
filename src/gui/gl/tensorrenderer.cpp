@@ -47,12 +47,12 @@ void TensorRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void TensorRenderer::draw( QMatrix4x4 mvp_matrix, QMatrix4x4 mv_matrixInvert )
+void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "superquadric" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", mvp_matrix );
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "mv_matrixInvert", mv_matrixInvert );
+    GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    GLFunctions::getShader( "superquadric" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_scaling", m_scaling );
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_faThreshold", m_faThreshold );
