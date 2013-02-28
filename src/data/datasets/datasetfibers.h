@@ -20,10 +20,8 @@ class FiberSelector;
 class DatasetFibers: public Dataset
 {
 public:
-    DatasetFibers( QString filename, QVector< QVector< float > > fibs, int numPoints, int numLines );
+    DatasetFibers( QString filename, QVector< QVector< float > > fibs );
     DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras );
-    DatasetFibers( QVector< QVector< float > > fibs );
-    DatasetFibers( QVector< QVector< float > > fibs, QVector< QVector< float > > extraData );
     virtual ~DatasetFibers();
 
     void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );

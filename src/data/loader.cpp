@@ -1032,7 +1032,7 @@ bool Loader::loadFib()
             if ( extras.size() == 0 )
             {
 
-                DatasetFibers* dataset = new DatasetFibers( fn, fibs, numPoints, numLines );
+                DatasetFibers* dataset = new DatasetFibers( fn, fibs );
                 m_dataset.push_back( dataset );
             }
             else
