@@ -201,7 +201,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
                 ColumnVector sh_signal = inv_base * tmp;
 
                 //do the convolution
-                for( int order(0), j(0), m(0); order <= max_ord; order+=2, ++i )
+                for( int order(0), j(0), m(0); order <= max_ord; order+=2, ++m )
                 {
                     for( int degree( -order ); degree <= order; ++degree, ++j )
                     {
