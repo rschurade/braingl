@@ -22,7 +22,7 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
-    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order );
+    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order, bool render1, bool render2, bool render3 );
 
 protected:
     void setupTextures();
@@ -50,6 +50,9 @@ private:
     int m_lodAdjust;
     bool m_minMaxScaling;
     int m_order;
+    bool m_render1;
+    bool m_render2;
+    bool m_render3;
 
 };
 

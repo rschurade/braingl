@@ -18,6 +18,10 @@ DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data,
     m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
     m_properties.set( Fn::Property::ORDER, 4 );
     m_properties.set( Fn::Property::LOD, 2, 0, 4, true );
+    m_properties.set( Fn::Property::RENDER_FIRST, true, true );
+    m_properties.set( Fn::Property::RENDER_SECOND, false, true );
+    m_properties.set( Fn::Property::RENDER_THIRD, false, true );
+
 
     examineDataset();
 }
@@ -86,7 +90,10 @@ void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAb
                                  m_properties.get( Fn::Property::OFFSET ).toFloat(),
                                  m_properties.get( Fn::Property::LOD ).toInt(),
                                  m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),
-                                 m_properties.get( Fn::Property::ORDER ).toInt() );
+                                 m_properties.get( Fn::Property::ORDER ).toInt(),
+                                 m_properties.get( Fn::Property::RENDER_FIRST ).toBool(),
+                                 m_properties.get( Fn::Property::RENDER_SECOND ).toBool(),
+                                 m_properties.get( Fn::Property::RENDER_THIRD ).toBool() );
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
