@@ -115,7 +115,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} GLU )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} GLU )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
