@@ -4,7 +4,7 @@
  *  Created on: 15.05.2012
  *      Author: Ralph Schurade
  */
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include "glfunctions.h"
 #include "colormapfunctions.h"

@@ -8,7 +8,7 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include "../enums.h"
 #include "../properties/propertygroup.h"

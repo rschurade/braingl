@@ -28,7 +28,7 @@
 # GLEW_LIBRARY
 
 IF (WIN32)
-    FIND_PATH( GLEW_INCLUDE_PATH glew.h
+    FIND_PATH( GLEW_INCLUDE_PATH GL/glew.h
         $ENV{PROGRAMFILES}/GLEW/include
         ${CMAKE_CURRENT_SOURCE_DIR}/glew/include
         DOC "The directory where GL/glew.h resides")
