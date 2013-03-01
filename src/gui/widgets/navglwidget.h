@@ -7,7 +7,7 @@
 #ifndef NAVGLWIDGET_H
 #define NAVGLWIDGET_H
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include <QtOpenGL/QGLWidget>
 

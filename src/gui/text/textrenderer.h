@@ -8,7 +8,7 @@
 #ifndef TEXTRENDERER_H_
 #define TEXTRENDERER_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include <QtCore/QChar>
 #include <QtCore/QHash>

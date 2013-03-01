@@ -8,7 +8,7 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include "../gl/scenerenderer.h"
 

@@ -23,8 +23,6 @@ IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 ENDIF()
 
-ADD_DEFINITIONS( -D__cplusplus )
-
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +65,7 @@ ENDIF()
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 FIND_PACKAGE( GLEW REQUIRED )
+INCLUDE_DIRECTORIES( ${GLEW_INCLUDE_PATH} )
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 # OpenGL, at least 1.2
@@ -99,6 +98,7 @@ SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp 
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
     ADD_DEFINITIONS( -D__LINUX__ )
+    ADD_DEFINITIONS( -D__cplusplus )
 	# Collect the compile-files for this target
 	COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
 
@@ -139,5 +139,6 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
 
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
+	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
 ENDIF()
 

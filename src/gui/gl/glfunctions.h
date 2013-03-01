@@ -8,7 +8,7 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
-#include "../../thirdparty/glew/include/glew.h"
+#include "GL/glew.h"
 
 #include <QtCore/QPoint>
 #include <QtCore/QList>
