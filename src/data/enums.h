@@ -119,6 +119,9 @@ namespace Fn
         MINMAX_SCALING,
         BVALUE,
         TENSOR_RENDERMODE,
+        RENDER_FIRST,
+        RENDER_SECOND,
+        RENDER_THIRD,
         ISO_VALUE,
         NUM_POINTS,
         NUM_LINES,
@@ -188,6 +191,9 @@ namespace Fn
             case Property::MINMAX_SCALING: return QString( "min max scaling" ); break;
             case Property::BVALUE: return QString( "bvalue" ); break;
             case Property::TENSOR_RENDERMODE: return QString( "tensor render mode" ); break;
+            case Property::RENDER_FIRST: return QString( "render first peak" ); break;
+            case Property::RENDER_SECOND: return QString( "render second peak" ); break;
+            case Property::RENDER_THIRD: return QString( "render third peak" ); break;
             case Property::ISO_VALUE: return QString( "iso value" ); break;
             case Property::NUM_POINTS: return QString( "num points" ); break;
             case Property::NUM_LINES: return QString( "num lines" ); break;

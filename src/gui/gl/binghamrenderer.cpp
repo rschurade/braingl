@@ -41,8 +41,11 @@ BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int 
     m_orient( 0 ),
     m_offset( 0.0 ),
     m_lodAdjust( 0 ),
-    m_minMaxScaling( false ),
-    m_order( 4 )
+    m_minMaxScaling( true),
+    m_order( 4 ),
+    m_render1( true ),
+    m_render2( false ),
+    m_render3( false )
 {
 }
 
@@ -114,7 +117,7 @@ void BinghamRenderer::setShaderVars()
     offset += sizeof(float) * 3;
     int radiusLocation = program->attributeLocation( "a_radius" );
     program->enableAttributeArray( radiusLocation );
-    glVertexAttribPointer( radiusLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
 void BinghamRenderer::initGeometry()
@@ -133,10 +136,11 @@ void BinghamRenderer::initGeometry()
     int upperY = m_visibleArea[3];
     int upperZ = m_visibleArea[5];
 
+    int renderPeaks = (int)m_render1 * 1 + (int)m_render2 * 2 + (int)m_render3 * 4;
 
     int lod = qMin( m_lodAdjust, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod);
+    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, renderPeaks, lod);
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
@@ -154,7 +158,7 @@ void BinghamRenderer::initGeometry()
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new BinghamRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, m_minMaxScaling, i ) );
+        threads.push_back( new BinghamRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, m_minMaxScaling, renderPeaks, i ) );
     }
 
     // run threads
@@ -207,7 +211,7 @@ void BinghamRenderer::initGeometry()
     indexes.clear();
 }
 
-void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
+void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order, bool render1, bool render2, bool render3 )
 {
     m_scaling = scaling;
     m_orient = orient;
@@ -215,4 +219,7 @@ void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, 
     m_lodAdjust = lodAdjust;
     m_minMaxScaling = minMaxScaling;
     m_order = order;
+    m_render1 = render1;
+    m_render2 = render2;
+    m_render3 = render3;
 }
