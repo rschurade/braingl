@@ -15,7 +15,6 @@
 SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
-                                                                QVector<int> visibleArea,
                                                                 int lod,
                                                                 int order,
                                                                 int orient,
@@ -31,7 +30,6 @@ SHRendererThread::SHRendererThread( QVector<ColumnVector>* data, int nx, int ny,
     m_xi( xi ),
     m_yi( yi ),
     m_zi( zi ),
-    m_visibleArea( visibleArea ),
     m_lod( lod ),
     m_order( order ),
     m_orient( orient ),
@@ -61,20 +59,20 @@ void SHRendererThread::run()
 
     Matrix base = ( FMath::sh_base( (*vertices), m_order ) );
 
-    int lowerX = m_visibleArea[0];
-    int lowerY = m_visibleArea[2];
-    int lowerZ = m_visibleArea[4];
-    int upperX = m_visibleArea[1];
-    int upperY = m_visibleArea[3];
-    int upperZ = m_visibleArea[5];
+    int lowerX = 0;
+    int lowerY = 0;
+    int lowerZ = 0;
+    int upperX = m_nx - 1;
+    int upperY = m_ny - 1;
+    int upperZ = m_nz - 1;
 
     float x = (float)m_xi * m_dx + m_dx / 2.;
     float y = (float)m_yi * m_dy + m_dy / 2.;
     float z = (float)m_zi * m_dz + m_dz / 2. + 0.5;
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = 1; //QThread::idealThreadCount();
 
-    if ( m_orient == 1 )
+    if ( ( m_orient & 1 ) == 1 )
     {
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
@@ -124,7 +122,7 @@ void SHRendererThread::run()
             }
         }
     }
-    else if ( m_orient == 2 )
+    if ( ( m_orient & 2 ) == 2 )
     {
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
@@ -138,17 +136,20 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
+                    if ( m_scaling )
                     {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
+                        float max = 0;
+                        float min = std::numeric_limits<float>::max();
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            max = qMax( max, (float)r(i+1) );
+                            min = qMin( min, (float)r(i+1) );
+                        }
 
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max;
+                        }
                     }
 
                     float locX = xx * m_dx + m_dx / 2;
@@ -171,7 +172,7 @@ void SHRendererThread::run()
             }
         }
     }
-    else if ( m_orient == 3 )
+    if ( ( m_orient & 4 ) == 4 )
     {
         int glyphs = ( upperX - lowerX ) * ( upperY - lowerY );
         m_verts->reserve( numVerts * glyphs * 10 );
@@ -185,17 +186,20 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny );
                     ColumnVector r = base * dv;
 
-                    float max = 0;
-                    float min = std::numeric_limits<float>::max();
-                    for ( int i = 0; i < r.Nrows(); ++i )
+                    if ( m_scaling )
                     {
-                        max = qMax( max, (float)r(i+1) );
-                        min = qMin( min, (float)r(i+1) );
-                    }
+                        float max = 0;
+                        float min = std::numeric_limits<float>::max();
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            max = qMax( max, (float)r(i+1) );
+                            min = qMin( min, (float)r(i+1) );
+                        }
 
-                    for ( int i = 0; i < r.Nrows(); ++i )
-                    {
-                        r(i+1) = r(i+1) / max;
+                        for ( int i = 0; i < r.Nrows(); ++i )
+                        {
+                            r(i+1) = r(i+1) / max;
+                        }
                     }
 
                     float locY = yy * m_dy + m_dy / 2;

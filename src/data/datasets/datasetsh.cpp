@@ -15,6 +15,9 @@ DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image*
     m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::MINMAX_SCALING, false, true );
     m_properties.set( Fn::Property::LOD, 0, 0, 5., true );
+    m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
+    m_properties.set( Fn::Property::RENDER_CORONAL, false, true );
+    m_properties.set( Fn::Property::RENDER_AXIAL, true, true );
 
     examineDataset();
 }
@@ -111,14 +114,24 @@ void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstrac
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
-                m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
+        m_renderer = new SHRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(),
+                                              m_properties.get( Fn::Property::NY ).toInt(),
+                                              m_properties.get( Fn::Property::NZ ).toInt(),
+                                              m_properties.get( Fn::Property::DX ).toFloat(),
+                                              m_properties.get( Fn::Property::DY ).toFloat(),
+                                              m_properties.get( Fn::Property::DZ ).toFloat() );
         m_renderer->setModel( globalModel );
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(), m_properties.get( Fn::Property::RENDER_SLICE ).toInt(), m_properties.get( Fn::Property::OFFSET ).toFloat(),
-            m_properties.get( Fn::Property::LOD ).toInt(), m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(), m_properties.get( Fn::Property::ORDER ).toInt() );
+    m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
+                                 m_properties.get( Fn::Property::OFFSET ).toFloat(),
+                                 m_properties.get( Fn::Property::LOD ).toInt(),
+                                 m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),
+                                 m_properties.get( Fn::Property::ORDER ).toInt(),
+                                 m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool(),
+                                 m_properties.get( Fn::Property::RENDER_CORONAL ).toBool(),
+                                 m_properties.get( Fn::Property::RENDER_AXIAL ).toBool());
 
     m_renderer->draw( mvpMatrix, mvMatrixInverse );
 }
