@@ -99,6 +99,7 @@ private:
     QAction* showSagittalAct;
 
     QAction* screenshotAct;
+    QAction* resetSettingsAct;
     QAction* aboutAct;
     QAction* aboutQtAct;
 
@@ -120,6 +121,7 @@ private slots:
     void undo();
     void about();
     void screenshot();
+    void resetSettings();
 
     void slotToggleAxialSlice();
     void slotToggleCoronalSlice();

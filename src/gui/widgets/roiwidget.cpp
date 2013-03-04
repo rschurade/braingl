@@ -15,6 +15,8 @@ ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
     QFrame( parent ),
     m_count( 0 )
 {
+    setMaximumHeight( 300 );
+
     m_treeView = new ROITreeView( this );
     m_treeView->setModel( roiModel );
     m_treeView->hideColumn( 1 );
