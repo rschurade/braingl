@@ -8,6 +8,7 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
+#include <QtGui/QTabWidget>
 #include <QtGui/QWidget>
 
 class DatasetPropertyView;
@@ -15,7 +16,7 @@ class QAbstractItemModel;
 class QItemSelectionModel;
 class QVBoxLayout;
 
-class DatasetPropertyWidget : public QWidget
+class DatasetPropertyWidget : public QTabWidget
 {
     Q_OBJECT
 
@@ -29,8 +30,13 @@ public:
 private:
     DatasetPropertyView* m_propertyView;
 
-    QVBoxLayout* m_layout;
-    QList<QWidget*>m_visibleWidgets;
+    QVBoxLayout* m_layout1;
+    QVBoxLayout* m_layout2;
+    QList<QWidget*>m_visibleWidgets1;
+    QList<QWidget*>m_visibleWidgets2;
+
+    QWidget* m_propWidget;
+    QWidget* m_colormapWidget;
 
 public slots:
     void updateWidgetVisibility();
