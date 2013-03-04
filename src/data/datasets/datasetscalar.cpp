@@ -28,6 +28,27 @@ DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image
     m_properties.set( Fn::Property::COLORMAP_DX, 400, 1, 2000, true );
     m_properties.set( Fn::Property::COLORMAP_DY, 20, 1, 100, true );
     m_properties.set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, true );
+
+    m_properties.getProperty( Fn::Property::COLORMAP_X )->getWidget()->setHidden( true );
+    m_properties.getProperty( Fn::Property::COLORMAP_Y )->getWidget()->setHidden( true );
+    m_properties.getProperty( Fn::Property::COLORMAP_DX )->getWidget()->setHidden( true );
+    m_properties.getProperty( Fn::Property::COLORMAP_DY )->getWidget()->setHidden( true );
+    m_properties.getProperty( Fn::Property::COLORMAP_TEXT_SIZE )->getWidget()->setHidden( true );
+
+    connect( m_properties.getProperty( Fn::Property::RENDER_COLORMAP ), SIGNAL( valueChanged( bool ) ),
+              m_properties.getProperty( Fn::Property::COLORMAP_X )->getWidget(), SLOT( setVisible( bool ) ) );
+    connect( m_properties.getProperty( Fn::Property::RENDER_COLORMAP ), SIGNAL( valueChanged( bool ) ),
+              m_properties.getProperty( Fn::Property::COLORMAP_Y )->getWidget(), SLOT( setVisible( bool ) ) );
+
+    connect( m_properties.getProperty( Fn::Property::RENDER_COLORMAP ), SIGNAL( valueChanged( bool ) ),
+              m_properties.getProperty( Fn::Property::COLORMAP_DX )->getWidget(), SLOT( setVisible( bool ) ) );
+
+    connect( m_properties.getProperty( Fn::Property::RENDER_COLORMAP ), SIGNAL( valueChanged( bool ) ),
+              m_properties.getProperty( Fn::Property::COLORMAP_DY )->getWidget(), SLOT( setVisible( bool ) ) );
+
+    connect( m_properties.getProperty( Fn::Property::RENDER_COLORMAP ), SIGNAL( valueChanged( bool ) ),
+              m_properties.getProperty( Fn::Property::COLORMAP_TEXT_SIZE )->getWidget(), SLOT( setVisible( bool ) ) );
+
 }
 
 DatasetScalar::~DatasetScalar()

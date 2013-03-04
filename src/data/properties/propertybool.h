@@ -37,6 +37,7 @@ private slots:
 
 signals:
     void valueChanged();
+    void valueChanged( bool state );
 
 };
 

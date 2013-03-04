@@ -41,4 +41,5 @@ void PropertyBool::widgetChanged( int value, int id )
 {
     m_value = value;
     emit( valueChanged() );
+    emit( valueChanged( value ) );
 }
