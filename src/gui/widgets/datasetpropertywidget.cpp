@@ -24,17 +24,32 @@
 #include <QtGui/QtGui>
 
 DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
-    QWidget( parent )
+    QTabWidget( parent )
 {
     m_propertyView = new DatasetPropertyView( this );
 
-    m_layout = new QVBoxLayout();
-    m_layout->setContentsMargins( 1, 1, 1, 1 );
-    m_layout->setSpacing( 1 );
-    m_layout->addStretch();
-    setLayout( m_layout );
+    m_layout1 = new QVBoxLayout();
+    m_layout1->setContentsMargins( 1, 1, 1, 1 );
+    m_layout1->setSpacing( 1 );
+    m_layout1->addStretch();
 
-    setContentsMargins( 0, 0, 0, 0 );
+    m_propWidget = new QWidget;
+    m_propWidget->setLayout( m_layout1 );
+    m_propWidget->setContentsMargins( 0, 0, 0, 0 );
+
+    m_layout2 = new QVBoxLayout();
+    m_layout2->setContentsMargins( 1, 1, 1, 1 );
+    m_layout2->setSpacing( 1 );
+    m_layout2->addStretch();
+
+    m_colormapWidget = new QWidget;
+    m_colormapWidget->setLayout( m_layout2 );
+    m_colormapWidget->setContentsMargins( 0, 0, 0, 0 );
+
+    setTabPosition( QTabWidget::South );
+
+    addTab( m_propWidget, "general" );
+    addTab( m_colormapWidget, "colormap" );
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
 }
@@ -59,13 +74,22 @@ void DatasetPropertyWidget::updateWidgetVisibility()
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
     QList<Fn::Property>visible = ds->properties()->getVisible();
 
-    for ( int i = 0; i < m_visibleWidgets.size(); ++i )
+    for ( int i = 0; i < m_visibleWidgets1.size(); ++i )
     {
-        m_visibleWidgets[i]->hide();
-        m_layout->removeWidget( m_visibleWidgets[i] );
+        m_visibleWidgets1[i]->hide();
+        m_layout1->removeWidget( m_visibleWidgets1[i] );
     }
-    m_layout->removeItem( m_layout->itemAt( 0 ) );
-    m_visibleWidgets.clear();
+    m_layout1->removeItem( m_layout1->itemAt( 0 ) );
+    m_visibleWidgets1.clear();
+
+    for ( int i = 0; i < m_visibleWidgets2.size(); ++i )
+    {
+        m_visibleWidgets2[i]->hide();
+        m_layout2->removeWidget( m_visibleWidgets2[i] );
+    }
+    m_layout2->removeItem( m_layout2->itemAt( 0 ) );
+    m_visibleWidgets2.clear();
+
     repaint();
 
     for ( int i = 0; i < visible.size(); ++i )
@@ -75,7 +99,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             case Fn::Property::COLORMAP:
             {
                 SelectWithLabel* cmapSel = new SelectWithLabel( "colormap", 0 );
-                m_visibleWidgets.push_back( cmapSel );
+                m_visibleWidgets2.push_back( cmapSel );
 
                 for ( int k = 0; k < ColormapFunctions::size(); ++k )
                 {
@@ -84,14 +108,14 @@ void DatasetPropertyWidget::updateWidgetVisibility()
                 }
                 int selectedCmap = ds->properties()->get( Fn::Property::COLORMAP ).toInt();
                 cmapSel->setCurrentIndex( selectedCmap );
-                m_layout->addWidget( cmapSel );
+                m_layout2->addWidget( cmapSel );
                 connect( cmapSel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( colormapSelectionChanged( int) ) );
 
                 float min = ds->properties()->get( Fn::Property::MIN ).toFloat();
                 float max = ds->properties()->get( Fn::Property::MAX ).toFloat();
-                ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 6, min, max );
-                m_layout->addWidget( cmapWidget );
-                m_visibleWidgets.push_back( cmapWidget );
+                ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 10, min, max );
+                m_layout2->addWidget( cmapWidget );
+                m_visibleWidgets2.push_back( cmapWidget );
                 cmapWidget->setMin( ds->properties()->get( Fn::Property::SELECTED_MIN ).toFloat() );
                 cmapWidget->setMax( ds->properties()->get( Fn::Property::SELECTED_MAX ).toFloat() );
                 cmapWidget->setLowerThreshold( ds->properties()->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
@@ -104,29 +128,31 @@ void DatasetPropertyWidget::updateWidgetVisibility()
                 connect( cmapSel, SIGNAL( currentIndexChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
                 break;
             }
+            case Fn::Property::RENDER_COLORMAP:
             case Fn::Property::COLORMAP_X:
             case Fn::Property::COLORMAP_Y:
             case Fn::Property::COLORMAP_DX:
             case Fn::Property::COLORMAP_DY:
             case Fn::Property::COLORMAP_TEXT_SIZE:
             {
-                m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
-                ds->properties()->getWidget( visible[i] )->setVisible( ds->properties()->get( Fn::Property::RENDER_COLORMAP ).toBool() );
-                m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
+                m_layout2->addWidget( ds->properties()->getWidget( visible[i] ) );
+                ds->properties()->getWidget( visible[i] )->show();
+                m_visibleWidgets2.push_back( ds->properties()->getWidget( visible[i] ) );
                 break;
             }
 
             default:
             {
-                m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
+                m_layout1->addWidget( ds->properties()->getWidget( visible[i] ) );
                 ds->properties()->getWidget( visible[i] )->show();
-                m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
+                m_visibleWidgets1.push_back( ds->properties()->getWidget( visible[i] ) );
                 break;
             }
         }
     }
 
-    m_layout->addStretch();
+    m_layout1->addStretch();
+    m_layout2->addStretch();
 }
 
 void DatasetPropertyWidget::colormapSelectionChanged( int id )
