@@ -130,10 +130,7 @@ private slots:
     void slotStandardSagittalView();
     void slotToggleShaderEdit();
 
-    void slotToggleDockTitles( bool value );
     void slotRenderCrosshairs( bool value );
-
-    void slotNewSelectionBox();
 };
 
 #endif

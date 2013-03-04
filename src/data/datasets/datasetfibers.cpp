@@ -28,7 +28,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
     m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 3, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.01f, 0.2f, true );
+    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.001f, 0.2f, true );
     m_properties.set( Fn::Property::COLORMAP, 1 );
     m_properties.set( Fn::Property::MIN, 0.0f );
     m_properties.set( Fn::Property::MAX, 1.0f );
@@ -63,7 +63,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
     m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 4, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.01f, 0.2f, true );
+    m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.001f, 0.2f, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::MIN, 0.0f );
     m_properties.set( Fn::Property::MAX, 1.0f );

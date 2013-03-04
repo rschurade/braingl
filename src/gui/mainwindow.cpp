@@ -426,7 +426,6 @@ void MainWindow::createActions()
     lockDockTitlesAct->setStatusTip( tr( "Lock all dock widgets in place" ) );
     lockDockTitlesAct->setCheckable( true );
     lockDockTitlesAct->setChecked( false );
-    connect( lockDockTitlesAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleDockTitles( bool ) ) );
 
     renderCrosshairsAct = new QAction( tr( "Render Crosshairs" ), this );
     renderCrosshairsAct->setStatusTip( tr( "render crosshairs in navigation widgets." ) );
@@ -436,7 +435,6 @@ void MainWindow::createActions()
 
     newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
-    connect( newSelectionBoxAct, SIGNAL( triggered() ), this, SLOT( slotNewSelectionBox() ) );
 
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
@@ -661,17 +659,9 @@ void MainWindow::slotToggleShaderEdit()
 
 }
 
-void MainWindow::slotToggleDockTitles( bool value )
-{
-}
-
 void MainWindow::slotRenderCrosshairs( bool value )
 {
     m_globalProps->setData( m_globalProps->index( (int)Fn::Global::RENDER_CROSSHAIRS, 0 ), value );
-}
-
-void MainWindow::slotNewSelectionBox()
-{
 }
 
 void MainWindow::screenshot()
