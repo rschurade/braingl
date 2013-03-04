@@ -22,7 +22,8 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
-    void setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order );
+    void setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, int order,
+                            bool renderSagittal, bool renderCoronal, bool renderAxial );
 
 protected:
     void setupTextures();

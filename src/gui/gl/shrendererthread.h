@@ -17,7 +17,7 @@
 class SHRendererThread : public QThread
 {
 public:
-    SHRendererThread( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz, int xi, int yi, int zi, QVector<int> visibleArea, int lod, int order, int orient, bool scaling, int id );
+    SHRendererThread( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz, int xi, int yi, int zi, int lod, int order, int orient, bool scaling, int id );
     virtual ~SHRendererThread();
 
     QVector<float>* getVerts();

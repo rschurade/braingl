@@ -110,6 +110,9 @@ namespace Fn
         GAMMA,
         OFFSET,
         RENDER_SLICE,
+        RENDER_SAGITTAL,
+        RENDER_CORONAL,
+        RENDER_AXIAL,
         RENDER_LOWER_X,
         RENDER_UPPER_X,
         RENDER_LOWER_Y,
@@ -182,6 +185,9 @@ namespace Fn
             case Property::GAMMA: return QString( "gamma" ); break;
             case Property::OFFSET: return QString( "offset" ); break;
             case Property::RENDER_SLICE: return QString( "render slice" ); break;
+            case Property::RENDER_SAGITTAL: return QString( "render sagittal" ); break;
+            case Property::RENDER_CORONAL: return QString( "render coronal" ); break;
+            case Property::RENDER_AXIAL: return QString( "render axial" ); break;
             case Property::RENDER_LOWER_X: return QString( "render lower x" ); break;
             case Property::RENDER_UPPER_X: return QString( "render upper x" ); break;
             case Property::RENDER_LOWER_Y: return QString( "render lower y" ); break;

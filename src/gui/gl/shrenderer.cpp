@@ -122,17 +122,15 @@ void SHRenderer::initGeometry()
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
+    int lowerX = 0;
+    int lowerY = 0;
+    int lowerZ = 0;
+    int upperX = m_nx - 1;
+    int upperY = m_ny - 1;
+    int upperZ = m_nz - 1;
 
-    calcBounds( m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_orient );
-
-    int lowerX = m_visibleArea[0];
-    int lowerY = m_visibleArea[2];
-    int lowerZ = m_visibleArea[4];
-    int upperX = m_visibleArea[1];
-    int upperY = m_visibleArea[3];
-    int upperZ = m_visibleArea[5];
-
-    int lod = qMin( m_lodAdjust, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
+    //int lod = qMin( 5, qMax( m_lodAdjust, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
+    int lod = m_lodAdjust;
 
     QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod);
     if ( s == m_previousSettings || m_orient == 0 )
@@ -147,13 +145,13 @@ void SHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = 1; //QThread::idealThreadCount();
 
     QVector<SHRendererThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new SHRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, m_minMaxScaling, i ) );
+        threads.push_back( new SHRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, lod, m_order, m_orient, m_minMaxScaling, i ) );
     }
 
     // run threads
@@ -206,12 +204,26 @@ void SHRenderer::initGeometry()
 
 }
 
-void SHRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order )
+void SHRenderer::setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, int order,
+                                        bool renderSagittal, bool renderCoronal, bool renderAxial )
 {
     m_scaling = scaling;
-    m_orient = orient;
     m_offset = offset;
     m_lodAdjust = lodAdjust;
     m_minMaxScaling = minMaxScaling;
     m_order = order;
+
+    m_orient = 0;
+    if ( renderAxial )
+    {
+        m_orient = 1;
+    }
+    if ( renderCoronal )
+    {
+        m_orient += 2;
+    }
+    if ( renderSagittal )
+    {
+        m_orient += 4;
+    }
 }
