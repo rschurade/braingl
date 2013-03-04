@@ -380,6 +380,11 @@ void MainWindow::createActions()
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
     connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
 
+    resetSettingsAct = new QAction( tr( "Reset Settings" ), this );
+    resetSettingsAct->setStatusTip( tr( "Reset Settings" ) );
+    connect( resetSettingsAct, SIGNAL(triggered()), this, SLOT(resetSettings()) );
+
+
     aboutAct = new QAction( tr( "&About" ), this );
     aboutAct->setStatusTip( tr( "Show the application's About box" ) );
     connect( aboutAct, SIGNAL(triggered()), this, SLOT(about()) );
@@ -470,6 +475,7 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
     helpMenu->addAction( screenshotAct );
+    helpMenu->addAction( resetSettingsAct );
     helpMenu->addAction( aboutAct );
     helpMenu->addAction( aboutQtAct );
 }
@@ -526,10 +532,11 @@ void MainWindow::createDockWindows()
     addDockWidget( Qt::LeftDockWidgetArea, dockCE );
     viewMenu->addAction( dockCE->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
+    dockCE->hide();
 
 	ROIWidget* m_roiWidget = new ROIWidget( m_roiModel, this );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockSBW );
+    addDockWidget( Qt::RightDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
@@ -545,7 +552,7 @@ void MainWindow::createDockWindows()
 
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
     FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockRP );
+    addDockWidget( Qt::RightDockWidgetArea, dockRP );
     roiProperties->setModel( m_roiModel );
     roiProperties->setSelectionModel( m_roiWidget->selectionModel() );
     viewMenu->addAction( dockRP->toggleViewAction() );
@@ -566,6 +573,10 @@ void MainWindow::createDockWindows()
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
+    dockDSI->hide();
+
+    tabifyDockWidget( dockGP, dockDSP );
+    tabifyDockWidget( dockGP, dockCE );
 
     // GL Widgets
 
@@ -604,11 +615,17 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav4, SLOT( update() ) );
 
+    dockNav1->hide();
+    dockNav2->hide();
+    dockNav3->hide();
+    dockNav4->hide();
+
     SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, m_globalProps, QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
+    dockSSHW->hide();
 
 
 
@@ -671,4 +688,27 @@ void MainWindow::screenshot()
                   QString("/screenshot_") +
                   QString::number( screenshotNumber++ ) +
                   QString( ".png" ), "PNG" );
+}
+
+void MainWindow::resetSettings()
+{
+    QMessageBox msgBox;
+    msgBox.setText("Reset settings.");
+    msgBox.setInformativeText("This will shut down fibernavigator 2. Continue?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    switch ( ret )
+    {
+        case QMessageBox::Yes :
+        {
+            QSettings settings;
+            settings.clear();
+            settings.sync();
+            exit( 0 );
+            break;
+        }
+        case QMessageBox::Cancel :
+            break;
+    }
 }
