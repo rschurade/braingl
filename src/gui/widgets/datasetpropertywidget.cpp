@@ -110,12 +110,9 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             case Fn::Property::COLORMAP_DY:
             case Fn::Property::COLORMAP_TEXT_SIZE:
             {
-                if ( ds->properties()->get( Fn::Property::RENDER_COLORMAP ).toBool() )
-                {
-                    m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
-                    ds->properties()->getWidget( visible[i] )->show();
-                    m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
-                }
+                m_layout->addWidget( ds->properties()->getWidget( visible[i] ) );
+                ds->properties()->getWidget( visible[i] )->setVisible( ds->properties()->get( Fn::Property::RENDER_COLORMAP ).toBool() );
+                m_visibleWidgets.push_back( ds->properties()->getWidget( visible[i] ) );
                 break;
             }
 
