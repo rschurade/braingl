@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QtGui/QMatrix4x4>
+
 class BinghamRenderer : public ObjectRenderer
 {
 public:
@@ -46,13 +48,16 @@ private:
 
     float m_scaling;
     int m_orient;
-    float m_offset;
+    int m_offset;
     int m_lodAdjust;
     bool m_minMaxScaling;
     int m_order;
     bool m_render1;
     bool m_render2;
     bool m_render3;
+
+    QMatrix4x4 m_pMatrix;
+    QMatrix4x4 m_mvMatrix;
 
 };
 

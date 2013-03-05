@@ -11,15 +11,17 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
+#include <QtGui/QMatrix4x4>
 
 class BinghamRendererThread : public QThread
 {
 public:
-    BinghamRendererThread( QVector<QVector<float> >* data,
+    BinghamRendererThread( int id, QVector<QVector<float> >* data,
             int m_nx, int m_ny, int m_nz,
             float m_dx, float m_dy, float m_dz,
             int xi, int yi, int zi,
-            QVector<int> visibleArea, int lod, int order, int orient, bool scaling, int renderPeaks, int id );
+            int lod, int order, int orient, bool scaling, int renderPeaks,
+            QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     virtual ~BinghamRendererThread();
 
     QVector<float>* getVerts();
@@ -27,6 +29,7 @@ public:
 private:
     void run();
 
+    int m_id;
     QVector<QVector<float> >* m_data;
 
     int m_nx;
@@ -40,13 +43,14 @@ private:
     int m_yi;
     int m_zi;
 
-    QVector<int> m_visibleArea;
     int m_lod;
     int m_order;
     int m_orient;
     bool m_scaling;
     int m_renderPeaks;
-    int m_id;
+
+    QMatrix4x4 m_pMatrix;
+    QMatrix4x4 m_mvMatrix;
 
     QVector<float>* m_verts;
 };

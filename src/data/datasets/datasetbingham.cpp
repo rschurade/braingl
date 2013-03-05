@@ -13,15 +13,16 @@ DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data,
     m_data( data ),
     m_renderer( 0 )
 {
-    m_properties.set( Fn::Property::RENDER_SLICE, 1, 1, 3, true );
-    m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f );
-    m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
+    //m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f );
+    m_properties.set( Fn::Property::OFFSET, 0, -1, 1, true );
     m_properties.set( Fn::Property::ORDER, 4 );
     m_properties.set( Fn::Property::LOD, 2, 0, 4, true );
     m_properties.set( Fn::Property::RENDER_FIRST, true, true );
     m_properties.set( Fn::Property::RENDER_SECOND, false, true );
     m_properties.set( Fn::Property::RENDER_THIRD, false, true );
-
+    m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
+    m_properties.set( Fn::Property::RENDER_CORONAL, false, true );
+    m_properties.set( Fn::Property::RENDER_AXIAL, true, true );
 
     examineDataset();
 }
@@ -85,8 +86,13 @@ void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAb
         qDebug() << "ds bingham init renderer done";
     }
 
+    int slice = (int)m_properties.get( Fn::Property::RENDER_AXIAL ).toBool() +
+                (int)m_properties.get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
+                (int)m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+
+
     m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                 m_properties.get( Fn::Property::RENDER_SLICE ).toInt(),
+                                 slice,
                                  m_properties.get( Fn::Property::OFFSET ).toFloat(),
                                  m_properties.get( Fn::Property::LOD ).toInt(),
                                  m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),

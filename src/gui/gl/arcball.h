@@ -63,7 +63,6 @@ private:
     int m_midClickX;
     int m_midClickY;
     float m_zoom;
-    float m_zoom2;
 
     QVector3D m_rotCenter;
 };
