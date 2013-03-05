@@ -153,8 +153,7 @@ void SingleSHRenderer::initGeometry()
 
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
-    QVector<QVariant>settings( { xi, yi, zi } );
-    QString s = createSettingsString( settings );
+    QString s = createSettingsString( { xi, yi, zi } );
     if ( s == m_previousSettings )
     {
         return;

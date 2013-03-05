@@ -13,6 +13,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QAbstractItemView>
 
+#include <initializer_list>
+
 class ObjectRenderer : public QAbstractItemView
 {
 public:
@@ -36,7 +38,7 @@ public:
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
 protected:
-    QString createSettingsString( QVector<QVariant>settings );
+    QString createSettingsString( std::initializer_list<QVariant> settings );
     QString m_previousSettings;
 };
 

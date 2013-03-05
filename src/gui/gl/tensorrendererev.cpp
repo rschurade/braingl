@@ -117,8 +117,7 @@ void TensorRendererEV::initGeometry()
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
-    QVector<QVariant>settings( { xi, yi, zi, m_orient, false, m_offset } );
-    QString s = createSettingsString( settings );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {

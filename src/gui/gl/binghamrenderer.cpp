@@ -129,8 +129,7 @@ void BinghamRenderer::initGeometry()
 
     int lod = m_lodAdjust;
 
-    QVector<QVariant>settings( {xi, yi, zi, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
-    QString s = createSettingsString( settings );
+    QString s = createSettingsString( {xi, yi, zi, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
