@@ -105,7 +105,7 @@ void EVRenderer::initGeometry()
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, 0, 0, 0, 0, 0, 0, false, 0, 0, m_offset);
+    QString s = createSettingsString( { xi, yi, zi, m_orient, 0, 0, 0, 0, 0, 0, false, 0, 0, m_offset } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
