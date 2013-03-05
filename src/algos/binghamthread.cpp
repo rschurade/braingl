@@ -260,7 +260,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         // the eigenvectors are the bingham parameter mu:
         //FMath::evd3x3_2( m_inertia, vecs, vals );
         //qDebug() << vecs[0](1) << vecs[0](2) << vecs[0](3);
-/*
+
         maxV = FMath::sphere2cart( FMath::SH_opt_max( FMath::cart2sphere( vecs[0] ), sh_data ) );
 
         double angle( acos( FMath::iprod( maxV, vecs[0] ) ) );
@@ -272,7 +272,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         vecs[0] = maxV;
         vecs[1] = R * vecs[1];
         vecs[2] = R * vecs[2];
-*/
+
         // copies of these vectors in spherical coordinates:
 
         ColumnVector z0( FMath::cart2sphere( vecs[0] ) );
