@@ -63,12 +63,13 @@ QRegion ObjectRenderer::visualRegionForSelection( const QItemSelection &selectio
     return QRegion();
 }
 
-QString ObjectRenderer::createSettingsString( QVector<QVariant>settings )
+QString ObjectRenderer::createSettingsString( std::initializer_list<QVariant>settings )
 {
     QString result("");
-    for ( int i = 0; i < settings.size(); ++i )
+
+    for ( auto i = settings.begin(); i != settings.end(); ++i )
     {
-        result += settings[i].toString();
+        result += (*i).toString();
     }
     return result;
 }
