@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QtGui/QMatrix4x4>
+
 class SHRenderer : public ObjectRenderer
 {
 public:
@@ -47,12 +49,15 @@ private:
 
     float m_scaling;
     int m_orient;
-    float m_offset;
+    int m_offset;
     int m_lodAdjust;
     bool m_minMaxScaling;
     int m_order;
 
     int m_oldLoD;
+
+    QMatrix4x4 m_pMatrix;
+    QMatrix4x4 m_mvMatrix;
 
 };
 

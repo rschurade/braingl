@@ -39,7 +39,7 @@ BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int 
     m_dz( m_dz ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
-    m_offset( 0.0 ),
+    m_offset( 0 ),
     m_lodAdjust( 0 ),
     m_minMaxScaling( true),
     m_order( 4 ),
@@ -66,6 +66,9 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     {
         return;
     }
+
+    m_pMatrix = p_matrix;
+    m_mvMatrix = mv_matrix;
 
     GLFunctions::getShader( "qball" )->bind();
     // Set modelview-projection matrix
@@ -99,25 +102,17 @@ void BinghamRenderer::setShaderVars()
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
-
-    // Offset for texture coordinate
-    offset += sizeof(float) * 3;
-
-    // Tell OpenGL programmable pipeline how to locate vertex normal data
-    int normalLocation = program->attributeLocation( "a_normal" );
-    program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int offsetLocation = program->attributeLocation( "a_offset" );
     program->enableAttributeArray( offsetLocation );
-    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int radiusLocation = program->attributeLocation( "a_radius" );
     program->enableAttributeArray( radiusLocation );
-    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 }
 
 void BinghamRenderer::initGeometry()
@@ -125,22 +120,16 @@ void BinghamRenderer::initGeometry()
     int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    float zoom = model()->data( model()->index( (int)Fn::Global::ZOOM, 0 ) ).toFloat();
+    float moveX = model()->data( model()->index( (int)Fn::Global::MOVEX, 0 ) ).toFloat();
+    float moveY = model()->data( model()->index( (int)Fn::Global::MOVEY, 0 ) ).toFloat();
 
-
-    calcBounds( m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_orient );
-
-    int lowerX = m_visibleArea[0];
-    int lowerY = m_visibleArea[2];
-    int lowerZ = m_visibleArea[4];
-    int upperX = m_visibleArea[1];
-    int upperY = m_visibleArea[3];
-    int upperZ = m_visibleArea[5];
 
     int renderPeaks = (int)m_render1 * 1 + (int)m_render2 * 2 + (int)m_render3 * 4;
 
-    int lod = qMin( m_lodAdjust, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
+    int lod = m_lodAdjust;
 
-    QVector<QVariant>settings( {xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, renderPeaks, lod} );
+    QVector<QVariant>settings( {xi, yi, zi, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
     QString s = createSettingsString( settings );
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -159,7 +148,9 @@ void BinghamRenderer::initGeometry()
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new BinghamRendererThread( m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_visibleArea, lod, m_order, m_orient, m_minMaxScaling, renderPeaks, i ) );
+        threads.push_back( new BinghamRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi + m_offset, yi + m_offset, zi + m_offset, lod,
+                                                      m_order, m_orient, m_minMaxScaling, renderPeaks,
+                                                      m_pMatrix, m_mvMatrix ) );
     }
 
     // run threads
@@ -186,7 +177,7 @@ void BinghamRenderer::initGeometry()
         delete threads[i];
     }
 
-    int numBalls = verts.size() / ( numVerts * 10 );
+    int numBalls = verts.size() / ( numVerts * 7 );
     m_tris1 = numTris * numBalls * 3;
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );

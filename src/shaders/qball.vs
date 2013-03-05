@@ -2,7 +2,6 @@ uniform mat4 mvp_matrix;
 uniform mat4 mv_matrixInvert;
 
 attribute vec4 a_position;
-attribute vec4 a_normal;
 attribute vec3 a_offset;
 attribute float a_radius;
 
@@ -26,7 +25,7 @@ varying vec4 v_lightDir;
 
 void main()
 {
-	v_normal = normalize( a_normal.xyz );
+	v_normal = normalize( a_position.xyz );
 	
 	float r = a_radius;
 	

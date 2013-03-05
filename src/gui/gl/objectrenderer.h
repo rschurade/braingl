@@ -37,19 +37,7 @@ public:
 
 protected:
     QString createSettingsString( QVector<QVariant>settings );
-    int getMaxLod( int orient, int lx, int ux, int ly, int uy, int lz, int uz );
-
-    void calcBounds( int nx, int ny, int nz, float dx, float dy, float dz, int orient );
-
     QString m_previousSettings;
-
-    float m_zoom;
-    float m_moveX;
-    float m_moveY;
-    float m_bbX;
-    float m_bbY;
-
-    QVector<int>m_visibleArea;
 };
 
 #endif /* OBJECTRENDERER_H_ */

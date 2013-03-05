@@ -11,8 +11,8 @@
 DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
-    m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
+    m_properties.set( Fn::Property::OFFSET, 0, -1, 1, true );
+    //m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::MINMAX_SCALING, false, true );
     m_properties.set( Fn::Property::LOD, 0, 0, 5., true );
     m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
