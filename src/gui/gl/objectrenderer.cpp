@@ -64,25 +64,13 @@ QRegion ObjectRenderer::visualRegionForSelection( const QItemSelection &selectio
     return QRegion();
 }
 
-QString ObjectRenderer::createSettingsString( int x, int y, int z, int orient,
-                                              int lx, int ux, int ly, int uy, int lz, int uz,
-                                              bool scaling, int bValue, int lod, float offset )
+QString ObjectRenderer::createSettingsString( QVector<QVariant>settings )
 {
     QString result("");
-    result += QString::number( x );
-    result += QString::number( y );
-    result += QString::number( z );
-    result += QString::number( orient );
-    result += QString::number( lx );
-    result += QString::number( ux );
-    result += QString::number( ly );
-    result += QString::number( uy );
-    result += QString::number( lz );
-    result += QString::number( uz );
-    result += QString::number( scaling );
-    result += QString::number( bValue );
-    result += QString::number( lod );
-    result += QString::number( offset );
+    for ( int i = 0; i < settings.size(); ++i )
+    {
+        result += settings[i].toString();
+    }
     return result;
 }
 

@@ -140,7 +140,7 @@ void BinghamRenderer::initGeometry()
 
     int lod = qMin( m_lodAdjust, qMax( 0, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, renderPeaks, lod);
+    QString s = createSettingsString( {xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, renderPeaks, lod});
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;

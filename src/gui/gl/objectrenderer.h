@@ -36,9 +36,7 @@ public:
     QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
 protected:
-    QString createSettingsString( int x, int y, int z, int orient,
-                                  int lx, int ux, int ly, int uy, int lz, int uz,
-                                  bool scaling=false, int bValue=0, int lod=0, float offset=0 );
+    QString createSettingsString( QVector<QVariant>settings );
     int getMaxLod( int orient, int lx, int ux, int ly, int uy, int lz, int uz );
 
     void calcBounds( int nx, int ny, int nz, float dx, float dy, float dz, int orient );

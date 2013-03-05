@@ -132,7 +132,7 @@ void SHRenderer::initGeometry()
     //int lod = qMin( 5, qMax( m_lodAdjust, getMaxLod( m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ ) ) );
     int lod = m_lodAdjust;
 
-    QString s = createSettingsString( xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod);
+    QString s = createSettingsString( { xi, yi, zi, m_orient, lowerX, upperX, lowerY, upperY, lowerZ, upperZ, m_minMaxScaling, 0, lod });
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
