@@ -12,6 +12,8 @@
 #include "../data/datasets/datasetsh.h"
 #include "../data/mesh/tesselation.h"
 
+#include "../gui/gl/glfunctions.h"
+
 BinghamThread::BinghamThread( DatasetSH* ds, int lod, int id ) :
     m_ds( ds ),
     m_lod( lod ),
@@ -31,7 +33,7 @@ QVector<QVector<float> > BinghamThread::getResultVector()
 
 void BinghamThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
     QVector<ColumnVector>* data = m_ds->getData();
 
     int num_max = 3;

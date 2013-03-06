@@ -6,6 +6,8 @@
  */
 #include "binghamrendererthread.h"
 
+#include "glfunctions.h"
+
 #include "../../algos/fmath.h"
 
 #include "../../data/mesh/tesselation.h"
@@ -66,7 +68,7 @@ void BinghamRendererThread::run()
     float y = (float)m_yi * m_dy + m_dy / 2.;
     float z = (float)m_zi * m_dz + m_dz / 2.;
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     double radius( 0.0 );
     QMatrix4x4 mvp = m_pMatrix * m_mvMatrix;

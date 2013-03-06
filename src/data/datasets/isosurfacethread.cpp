@@ -6,6 +6,8 @@
  */
 #include "isosurfacethread.h"
 
+#include "../../gui/gl/glfunctions.h"
+
 #include <QtCore/QDebug>
 
 IsoSurfaceThread::IsoSurfaceThread( QVector<float>* scalarField, QMutex* mutex, ID2POINT3DID* i2pt3idVertices, TRIANGLEVECTOR* trivecTriangles,
@@ -47,7 +49,7 @@ void IsoSurfaceThread::getXYZ( int id, int &x, int &y, int &z )
 
 void IsoSurfaceThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     int chunkSize = m_scalarField->size() / numThreads;
 

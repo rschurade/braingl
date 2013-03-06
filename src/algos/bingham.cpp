@@ -17,6 +17,8 @@
 #include "../data/datasets/datasettensor.h"
 #include "../data/mesh/tesselation.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include <QtCore/QDebug>
@@ -37,7 +39,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
     const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     qDebug() << "calculated order from sh: " << order;
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     QVector<BinghamThread*> threads;
     // create threads

@@ -15,11 +15,14 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QHash>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 
 #define NUM_TEXTURES 5
+
+int GLFunctions::idealThreadCount = QThread::idealThreadCount();
 
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 

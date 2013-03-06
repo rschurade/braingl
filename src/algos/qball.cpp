@@ -11,6 +11,8 @@
 
 #include "../data/datasets/datasetdwi.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/qmath.h>
 
@@ -97,7 +99,7 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
 
 void QBall::sharpQBall( DatasetDWI* ds, int order, QVector<ColumnVector>& out )
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     QVector<SharpQBallThread*> threads;
     // create threads

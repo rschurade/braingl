@@ -6,6 +6,8 @@
  */
 #include "meshthread.h"
 
+#include "../../gui/gl/glfunctions.h"
+
 MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int id ) :
     m_vertices( vertices ),
     m_triangles( triangles ),
@@ -25,7 +27,7 @@ QVector<QVector3D>* MeshThread::getTriNormals()
 
 void MeshThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     int chunkSize = m_numTris / numThreads;
 

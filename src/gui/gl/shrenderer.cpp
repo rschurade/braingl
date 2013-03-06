@@ -135,7 +135,7 @@ void SHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int numThreads = 1; //QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     QVector<SHRendererThread*> threads;
     // create threads
