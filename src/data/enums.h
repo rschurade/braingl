@@ -112,6 +112,7 @@ namespace Fn
         RENDER_CORONAL,
         RENDER_AXIAL,
         MINMAX_SCALING,
+        HIDE_NEGATIVE_LOBES,
         BVALUE,
         TENSOR_RENDERMODE,
         RENDER_FIRST,
@@ -179,6 +180,7 @@ namespace Fn
             case Property::RENDER_CORONAL: return QString( "render coronal" ); break;
             case Property::RENDER_AXIAL: return QString( "render axial" ); break;
             case Property::MINMAX_SCALING: return QString( "min max scaling" ); break;
+            case Property::HIDE_NEGATIVE_LOBES: return QString( "hide negative lobes" ); break;
             case Property::BVALUE: return QString( "bvalue" ); break;
             case Property::TENSOR_RENDERMODE: return QString( "tensor render mode" ); break;
             case Property::RENDER_FIRST: return QString( "render first peak" ); break;

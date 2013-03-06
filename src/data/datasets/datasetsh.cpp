@@ -14,6 +14,7 @@ DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image*
     m_properties.set( Fn::Property::OFFSET, 0, -1, 1, true );
     //m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::MINMAX_SCALING, false, true );
+    m_properties.set( Fn::Property::HIDE_NEGATIVE_LOBES, false, true );
     m_properties.set( Fn::Property::LOD, 0, 0, 5., true );
     m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
     m_properties.set( Fn::Property::RENDER_CORONAL, false, true );
@@ -124,6 +125,7 @@ void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstrac
                                  m_properties.get( Fn::Property::OFFSET ).toFloat(),
                                  m_properties.get( Fn::Property::LOD ).toInt(),
                                  m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),
+                                 m_properties.get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool(),
                                  m_properties.get( Fn::Property::ORDER ).toInt(),
                                  m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool(),
                                  m_properties.get( Fn::Property::RENDER_CORONAL ).toBool(),
