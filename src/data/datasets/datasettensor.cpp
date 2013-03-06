@@ -81,10 +81,6 @@ void DatasetTensor::examineDataset()
     m_properties.set( Fn::Property::SCALING, 1.0f );
     m_properties.set( Fn::Property::DIM, 9 );
 
-    m_properties.set( Fn::Property::RENDER_UPPER_X, nx - 1 );
-    m_properties.set( Fn::Property::RENDER_UPPER_Y, ny - 1 );
-    m_properties.set( Fn::Property::RENDER_UPPER_Z, nz - 1 );
-
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
         qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";

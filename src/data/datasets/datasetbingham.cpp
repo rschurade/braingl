@@ -56,10 +56,6 @@ void DatasetBingham::examineDataset()
     }
     m_properties.set( Fn::Property::LOWER_THRESHOLD, m_properties.get( Fn::Property::MIN ).toFloat() );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, m_properties.get( Fn::Property::MAX ).toFloat() );
-
-    m_properties.set( Fn::Property::RENDER_UPPER_X, nx - 1 );
-    m_properties.set( Fn::Property::RENDER_UPPER_Y, ny - 1 );
-    m_properties.set( Fn::Property::RENDER_UPPER_Z, nz - 1 );
 }
 
 void DatasetBingham::createTexture()

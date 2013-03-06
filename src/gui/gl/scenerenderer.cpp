@@ -39,7 +39,10 @@ SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel*
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
-    m_picked( 0 )
+    m_picked( 0 ),
+    m_sliceXPosAtPick( 0 ),
+    m_sliceYPosAtPick( 0 ),
+    m_sliceZPosAtPick( 0 )
 {
     m_sliceRenderer = new SliceRenderer( dataModel );
     m_sliceRenderer->setModel( globalModel );

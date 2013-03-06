@@ -89,8 +89,6 @@ namespace Fn
         SELECTED_MAX,
         LOWER_THRESHOLD,
         UPPER_THRESHOLD,
-        CUT_LOWER_THRESHOLD,
-        CUT_UPPER_THRESHOLD,
         COLORMAP,
         RENDER_COLORMAP,
         COLORMAP_ORIENT,
@@ -113,12 +111,6 @@ namespace Fn
         RENDER_SAGITTAL,
         RENDER_CORONAL,
         RENDER_AXIAL,
-        RENDER_LOWER_X,
-        RENDER_UPPER_X,
-        RENDER_LOWER_Y,
-        RENDER_UPPER_Y,
-        RENDER_LOWER_Z,
-        RENDER_UPPER_Z,
         MINMAX_SCALING,
         BVALUE,
         TENSOR_RENDERMODE,
@@ -164,8 +156,6 @@ namespace Fn
             case Property::SELECTED_MAX: return QString( "max" ); break;
             case Property::LOWER_THRESHOLD: return QString( "lower threshold" ); break;
             case Property::UPPER_THRESHOLD: return QString( "upper threshold" ); break;
-            case Property::CUT_LOWER_THRESHOLD: return QString( "cut at lower threshold" ); break;
-            case Property::CUT_UPPER_THRESHOLD: return QString( "cut at upper threshold" ); break;
             case Property::COLORMAP: return QString( "colormap" ); break;
             case Property::RENDER_COLORMAP: return QString( "render colormap" ); break;
             case Property::COLORMAP_ORIENT: return QString( "colormap orient" ); break;
@@ -188,12 +178,6 @@ namespace Fn
             case Property::RENDER_SAGITTAL: return QString( "render sagittal" ); break;
             case Property::RENDER_CORONAL: return QString( "render coronal" ); break;
             case Property::RENDER_AXIAL: return QString( "render axial" ); break;
-            case Property::RENDER_LOWER_X: return QString( "render lower x" ); break;
-            case Property::RENDER_UPPER_X: return QString( "render upper x" ); break;
-            case Property::RENDER_LOWER_Y: return QString( "render lower y" ); break;
-            case Property::RENDER_UPPER_Y: return QString( "render upper y" ); break;
-            case Property::RENDER_LOWER_Z: return QString( "render lower z" ); break;
-            case Property::RENDER_UPPER_Z: return QString( "render upper z" ); break;
             case Property::MINMAX_SCALING: return QString( "min max scaling" ); break;
             case Property::BVALUE: return QString( "bvalue" ); break;
             case Property::TENSOR_RENDERMODE: return QString( "tensor render mode" ); break;
