@@ -13,8 +13,10 @@
 #include "propertycolor.h"
 #include "propertyint.h"
 #include "propertyfloat.h"
+#include "propertypath.h"
 #include "propertystring.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -39,6 +41,7 @@ public:
     bool set( Fn::Global name, const char* value, bool visible = false );
     bool set( Fn::Global name, QVariant value );
     bool set( Fn::Global name, QColor value, bool visible = false );
+    bool set( Fn::Global name, QDir value, bool visible = false );
 
     bool setMin( Fn::Global name,  float value );
     bool setMax( Fn::Global name,  float value );
