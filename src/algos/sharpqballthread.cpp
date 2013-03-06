@@ -10,6 +10,8 @@
 #include "fmath.h"
 #include "../data/datasets/datasetdwi.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <QtCore/qmath.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
@@ -55,7 +57,7 @@ void SharpQBallThread::run()
     Matrix B = FMath::sh_base( gradients, m_order );
     Matrix A = ( B.t() * B ).i() * B.t();
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     int chunkSize = data->size() / numThreads;
 

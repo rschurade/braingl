@@ -11,6 +11,8 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasettensor.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <QtCore/QThread>
 
 #include "time.h"
@@ -113,7 +115,7 @@ void TrackWithCrossings::trackWholeBrain()
     FMath::evec1( *tensors3, *evec3 );
     qDebug() << "done evecs";
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     // create threads
     for ( int i = 0; i < numThreads; ++i )

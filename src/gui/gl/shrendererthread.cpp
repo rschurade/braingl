@@ -6,6 +6,8 @@
  */
 #include "shrendererthread.h"
 
+#include "glfunctions.h"
+
 #include "../../algos/fmath.h"
 #include "../../data/mesh/tesselation.h"
 
@@ -65,7 +67,7 @@ void SHRendererThread::run()
     float y = (float)m_yi * m_dy + m_dy / 2.;
     float z = (float)m_zi * m_dz + m_dz / 2.;
 
-    int numThreads = 1; //QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
     QMatrix4x4 mvp = m_pMatrix * m_mvMatrix;
     if ( ( m_orient & 1 ) == 1 )
     {

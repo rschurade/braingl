@@ -141,7 +141,7 @@ void BinghamRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     QVector<BinghamRendererThread*> threads;
     // create threads

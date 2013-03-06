@@ -12,6 +12,8 @@
 
 #include "../data/datasets/datasettensor.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <QtCore/QThread>
 
 Track::Track( DatasetTensor* ds ) :
@@ -94,7 +96,7 @@ void Track::startTracking()
 void Track::trackWholeBrain()
 {
     QAtomicInt currentId( 0 );
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     // create threads
     for ( int i = 0; i < numThreads; ++i )

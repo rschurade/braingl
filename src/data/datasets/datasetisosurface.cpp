@@ -11,6 +11,7 @@
 
 #include "../mesh/trianglemesh2.h"
 
+#include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/meshrenderer.h"
 
 #include <QtCore/QString>
@@ -49,7 +50,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 
     QMutex* mutex = new QMutex();
 
-    m_numThreads = QThread::idealThreadCount();
+    m_numThreads = GLFunctions::idealThreadCount;
 
     // create threads
     for ( int i = 0; i < m_numThreads; ++i )

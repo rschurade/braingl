@@ -7,6 +7,8 @@
 #include "trackthread.h"
 #include "fmath.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include "time.h"
 #include "math.h"
 
@@ -68,7 +70,7 @@ QVector< QVector< float > > TrackThread::getExtras()
 
 void TrackThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
     int progressCounter = 0;
 
     for ( int i = m_id; i < m_blockSize;  i += numThreads )

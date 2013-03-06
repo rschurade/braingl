@@ -71,6 +71,8 @@ public:
     static void initTextRenderer();
     static void renderText( QString text, int x, int y, int size = 10, QColor color = QColor( 0, 0, 0 ) );
 
+    static int idealThreadCount;
+
     static bool offscreen;
     static float scaleX;
     static float scaleY;

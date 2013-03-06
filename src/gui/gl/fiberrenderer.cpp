@@ -137,7 +137,7 @@ void FiberRenderer::initGeometry()
         return;
     }
     qDebug() << "create fiber vbo's...";
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     QVector<FiberRendererThread*> threads;
     // create threads

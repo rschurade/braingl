@@ -7,6 +7,8 @@
 #include "trianglemesh2.h"
 #include "meshthread.h"
 
+#include "../../gui/gl/glfunctions.h"
+
 #include <QtCore/QDebug>
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
@@ -23,7 +25,7 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     m_triangles.resize( numTris * 3 );
     m_triNormals.resize( numTris );
 
-    m_numThreads = QThread::idealThreadCount();
+    m_numThreads = GLFunctions::idealThreadCount;
 
     // create threads
     for ( int i = 0; i < m_numThreads; ++i )

@@ -6,6 +6,8 @@
  */
 #include "fiberrendererthread.h"
 
+#include "glfunctions.h"
+
 #include <QtGui/QVector3D>
 
 #include <math.h>
@@ -31,7 +33,7 @@ QVector<float>* FiberRendererThread::getVerts()
 
 void FiberRendererThread::run()
 {
-    int numThreads = QThread::idealThreadCount();
+    int numThreads = GLFunctions::idealThreadCount;
 
     int chunkSize = m_data.size() / numThreads;
 
