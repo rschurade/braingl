@@ -238,6 +238,7 @@ namespace Fn
        SAGITTAL_AXIAL,
        SAGITTAL_CORONAL,
        LAST_PATH,
+       SCREENSHOT_PATH,
        SHOW_SAGITTAL,
        SHOW_CORONAL,
        SHOW_AXIAL,
@@ -281,6 +282,7 @@ namespace Fn
                 case Global::SAGITTAL_AXIAL: return QString( "" ); break;
                 case Global::SAGITTAL_CORONAL: return QString( "" ); break;
                 case Global::LAST_PATH: return QString( "" ); break;
+                case Global::SCREENSHOT_PATH: return QString( "screenshot dir" ); break;
                 case Global::SHOW_SAGITTAL: return QString( "" ); break;
                 case Global::SHOW_CORONAL: return QString( "" ); break;
                 case Global::SHOW_AXIAL: return QString( "" ); break;

@@ -200,6 +200,26 @@ bool GlobalPropertyGroup::set( Fn::Global name, QColor value, bool visible )
     return true;
 }
 
+bool GlobalPropertyGroup::set( Fn::Global name, QDir value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value.absolutePath() );
+    }
+    else
+    {
+        PropertyPath* prop = new PropertyPath( Fn::Global2String::s( name ), value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
+
 bool GlobalPropertyGroup::setMin( Fn::Global name, float value )
 {
     if ( m_properties.contains( (int)name ) )

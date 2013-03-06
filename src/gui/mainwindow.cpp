@@ -90,6 +90,7 @@ void MainWindow::saveSettings()
 
     settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
     settings.setValue( Fn::Global2String::s( Fn::Global::LAST_PATH ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::SCREENSHOT_PATH ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_MAIN ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_COMBINED ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ) );
     settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV1 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV1, 0 ) ) );
@@ -135,6 +136,7 @@ void MainWindow::loadSettings()
         }
     }
     loadSetting( settings, Fn::Global::LAST_PATH );
+    loadSetting( settings, Fn::Global::SCREENSHOT_PATH );
     loadSetting( settings, Fn::Global::BACKGROUND_COLOR_MAIN );
     loadSetting( settings, Fn::Global::BACKGROUND_COLOR_COMBINED );
     loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV1 );
@@ -684,8 +686,14 @@ void MainWindow::slotRenderCrosshairs( bool value )
 void MainWindow::screenshot()
 {
     QImage* image = mainGLWidget->screenshot();
-    image->save( m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString() +
-                  QString("/screenshot_") +
+    QString path = m_globalProps->data( m_globalProps->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ).toString();
+    if ( !path.endsWith( '/') )
+    {
+        path += '/';
+    }
+
+    image->save(  path +
+                  QString("screenshot_") +
                   QString::number( screenshotNumber++ ) +
                   QString( ".png" ), "PNG" );
 }
