@@ -67,6 +67,13 @@ void TWCThread::run()
 
     for ( int i = m_id; i < m_blockSize;  i += numThreads )
     {
+        ++progressCounter;
+        if ( progressCounter == 100 )
+        {
+            emit( progress() );
+            progressCounter = 0;
+        }
+
         if ( m_mask->at( i ) < 0.2 )
         {
             continue;
@@ -112,12 +119,6 @@ void TWCThread::run()
 
             fibs.push_back( fib2r );
             extras.push_back( extra2r );
-        }
-        ++progressCounter;
-        if ( progressCounter == 100 )
-        {
-            emit( progress() );
-            progressCounter = 0;
         }
     }
     emit( finished() );
