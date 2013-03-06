@@ -192,9 +192,6 @@ void SingleSHRenderer::initGeometry()
             verts.push_back( (*vertices)( i+1, 1 ) );
             verts.push_back( (*vertices)( i+1, 2 ) );
             verts.push_back( (*vertices)( i+1, 3 ) );
-            verts.push_back( (*vertices)( i+1, 1 ) );
-            verts.push_back( (*vertices)( i+1, 2 ) );
-            verts.push_back( (*vertices)( i+1, 3 ) );
             verts.push_back( 1.0 );
             verts.push_back( 1.0 );
             verts.push_back( 1.0 );
@@ -275,8 +272,8 @@ void SingleSHRenderer::draw()
         GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
         GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
 
-        bool minMaxScaling = m_dataset->properties()->get( Fn::Property::MINMAX_SCALING ).toBool();
-        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", minMaxScaling );
+        bool hnl = m_dataset->properties()->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
+        GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", hnl );
 
         initGeometry();
 

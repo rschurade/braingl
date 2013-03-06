@@ -70,7 +70,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     // Set modelview-projection matrix
     GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
-    GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_minMaxScaling );
+    GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_hideNegativeLobes );
 
     initGeometry();
 
@@ -122,7 +122,7 @@ void SHRenderer::initGeometry()
 
     int lod = m_lodAdjust;
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, zoom, m_minMaxScaling, moveX, moveY, lod, m_offset } );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, zoom, m_minMaxScaling, m_hideNegativeLobes, moveX, moveY, lod, m_offset } );
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
@@ -195,13 +195,14 @@ void SHRenderer::initGeometry()
 
 }
 
-void SHRenderer::setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, int order,
+void SHRenderer::setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, bool hideNegativeLobes, int order,
                                         bool renderSagittal, bool renderCoronal, bool renderAxial )
 {
     m_scaling = scaling;
     m_offset = offset;
     m_lodAdjust = lodAdjust;
     m_minMaxScaling = minMaxScaling;
+    m_hideNegativeLobes = hideNegativeLobes;
     m_order = order;
 
     m_orient = 0;

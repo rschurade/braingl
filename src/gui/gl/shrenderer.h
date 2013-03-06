@@ -24,7 +24,7 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
-    void setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, int order,
+    void setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, bool hideNegativeLobes, int order,
                             bool renderSagittal, bool renderCoronal, bool renderAxial );
 
 protected:
@@ -52,6 +52,7 @@ private:
     int m_offset;
     int m_lodAdjust;
     bool m_minMaxScaling;
+    bool m_hideNegativeLobes;
     int m_order;
 
     int m_oldLoD;
