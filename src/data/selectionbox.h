@@ -20,7 +20,7 @@ public:
     SelectionBox( QAbstractItemModel* globals );
     virtual ~SelectionBox();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
 
     static int m_count;
 private:

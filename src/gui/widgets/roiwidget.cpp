@@ -68,6 +68,11 @@ void ROIWidget::addBox()
     m_treeView->addBox();
 }
 
+void ROIWidget::addSphere()
+{
+    m_treeView->addSphere();
+}
+
 void ROIWidget::treeClicked()
 {
 }

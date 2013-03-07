@@ -1,19 +1,19 @@
 /*
- * selectionbox.cpp
+ * roisphere.cpp
  *
- *  Created on: 02.02.2013
+ *  Created on: 06.03.2013
  *      Author: Ralph Schurade
  */
-#include "selectionbox.h"
+#include "roisphere.h"
 
-#include "../gui/gl/boxrenderer.h"
+#include "../gui/gl/sphererenderer.h"
 
 #include <QtCore/QAbstractItemModel>
 
-int SelectionBox::m_count = 0;
+int ROISphere::m_count = 0;
 
-SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
-    ROI( QString("new box") + QString::number( m_count++ ), globals ),
+ROISphere::ROISphere( QAbstractItemModel* globals ) :
+    ROI( QString("new sphere") + QString::number( m_count++ ), globals ),
     m_renderer( 0 )
 {
     float dx = globals->data( globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
@@ -36,7 +36,7 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::DY, 20., 0., yMax/2, true );
     m_properties.set( Fn::ROI::DZ, 20., 0., zMax/2, true );
     m_properties.set( Fn::ROI::NEG, false, true );
-    m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
+    m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Sphere );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::ROI::ID, m_count );
     m_properties.set( Fn::ROI::PICK_ID, 0 );
@@ -46,11 +46,11 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     connect( globals, SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
-SelectionBox::~SelectionBox()
+ROISphere::~ROISphere()
 {
 }
 
-void SelectionBox::globalChanged()
+void ROISphere::globalChanged()
 {
     if (  m_properties.get( Fn::ROI::STICK_TO_CROSSHAIR ).toBool() )
     {
@@ -69,7 +69,7 @@ void SelectionBox::globalChanged()
     }
 }
 
-void SelectionBox::propChanged()
+void ROISphere::propChanged()
 {
     if ( m_renderer)
     {
@@ -83,11 +83,11 @@ void SelectionBox::propChanged()
     }
 }
 
-void SelectionBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void ROISphere::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( !m_renderer )
     {
-        m_renderer = new BoxRenderer();
+        m_renderer = new SphereRenderer();
         m_properties.set( Fn::ROI::PICK_ID, (int)m_renderer->getPickId() );
         m_renderer->init();
         m_renderer->updateGeometry( m_properties.get( Fn::ROI::X ).toFloat(),

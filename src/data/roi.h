@@ -24,7 +24,7 @@ public:
 
     ROIPropertyGroup* properties();
 
-    virtual void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse ) = 0;
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix ) = 0;
 
 protected:
     ROIPropertyGroup m_properties;

@@ -7,6 +7,7 @@
 #include "roimodel.h"
 
 #include "selectionbox.h"
+#include "roisphere.h"
 #include "vptr.h"
 
 #include <QtCore/QDebug>
@@ -29,7 +30,7 @@ int ROIModel::rowCount( const QModelIndex &parent ) const
     {
         if ( parent.internalId() == - 1 )
         {
-            return m_boxes[parent.row()].size() - 1;
+            return m_rois[parent.row()].size() - 1;
         }
         else
         {
@@ -38,7 +39,7 @@ int ROIModel::rowCount( const QModelIndex &parent ) const
     }
     else
     {
-        return m_boxes.size();
+        return m_rois.size();
     }
 }
 
@@ -78,11 +79,11 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     QVariant roi;
     if ( index.internalId() == -1 )
     {
-        roi = m_boxes[index.row()][0];
+        roi = m_rois[index.row()][0];
     }
     else
     {
-        roi = m_boxes[index.internalId()][index.row()+1];
+        roi = m_rois[index.internalId()][index.row()+1];
     }
     switch ( role )
     {
@@ -143,11 +144,11 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             else
             {
-                VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
             }
             break;
         }
@@ -160,11 +161,11 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
             }
             if ( index.internalId() == -1 )
             {
-                VPtr<ROI>::asPtr( m_boxes[index.row()][0] )->properties()->set( (Fn::ROI)index.column(), value );
+                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( (Fn::ROI)index.column(), value );
             }
             else
             {
-                VPtr<ROI>::asPtr( m_boxes[index.internalId()][index.row()+1] )->properties()->set( (Fn::ROI)index.column(), value );
+                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( (Fn::ROI)index.column(), value );
             }
             break;
         }
@@ -194,8 +195,16 @@ Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
 
 bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
 {
-    SelectionBox* newBox = new SelectionBox( m_globalProps );
-    connect( newBox->properties(), SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
+    ROI* newROI;
+    if ( count == 0 )
+    {
+        newROI = new SelectionBox( m_globalProps );
+    }
+    else
+    {
+        newROI = new ROISphere( m_globalProps );
+    }
+    connect( newROI->properties(), SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
 
     if ( parent.isValid() )
     {
@@ -203,17 +212,17 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         if ( parent.parent().isValid() )
         {
             // child box selected
-            beginInsertRows( parent.parent(), m_boxes[parent.parent().row()].size(), m_boxes[parent.parent().row()].size() );
-            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.parent().row()][0] )->properties()->get( Fn::ROI::COLOR ) );
-            m_boxes[parent.parent().row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
+            beginInsertRows( parent.parent(), m_rois[parent.parent().row()].size(), m_rois[parent.parent().row()].size() );
+            newROI->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_rois[parent.parent().row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            m_rois[parent.parent().row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
         else
         {
             // top box selected
-            beginInsertRows( parent, m_boxes[parent.row()].size(), m_boxes[parent.row()].size() );
-            newBox->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_boxes[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
-            m_boxes[parent.row()].push_back( VPtr<ROI>::asQVariant( newBox ) );
+            beginInsertRows( parent, m_rois[parent.row()].size(), m_rois[parent.row()].size() );
+            newROI->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_rois[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            m_rois[parent.row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
     }
@@ -221,9 +230,9 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     {
         // nothing selected, insert top box
         QList<QVariant>l;
-        l.push_back( VPtr<ROI>::asQVariant( newBox ) );
-        beginInsertRows( QModelIndex(), m_boxes.size(), m_boxes.size() );
-        m_boxes.push_back( l );
+        l.push_back( VPtr<ROI>::asQVariant( newROI ) );
+        beginInsertRows( QModelIndex(), m_rois.size(), m_rois.size() );
+        m_rois.push_back( l );
         endInsertRows();
 
     }
@@ -236,13 +245,13 @@ bool ROIModel::removeRows( int row, int count, const QModelIndex &parent )
     if ( !parent.isValid() )
     {
         beginRemoveRows( QModelIndex(), row, row );
-        m_boxes.removeAt( row );
+        m_rois.removeAt( row );
         endRemoveRows();
     }
     else
     {
         beginRemoveRows( parent, row, row );
-        m_boxes[parent.row()].removeAt( row + 1 );
+        m_rois[parent.row()].removeAt( row + 1 );
         endRemoveRows();
     }
 
@@ -255,11 +264,11 @@ void ROIModel::propChanged( int value )
     bool found = false;
     int ii = -1;
     int kk = -1;
-    for ( int i = 0; i < m_boxes.size(); ++i )
+    for ( int i = 0; i < m_rois.size(); ++i )
     {
-        for ( int k = 0; k < m_boxes[i].size(); ++k )
+        for ( int k = 0; k < m_rois[i].size(); ++k )
         {
-            if ( value == VPtr<ROI>::asPtr( m_boxes[i][k] )->properties()->get( Fn::ROI::ID ).toInt() )
+            if ( value == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::ROI::ID ).toInt() )
             {
                 found = true;
                 kk = k;
@@ -292,11 +301,11 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
 
     if ( role == Qt::DisplayRole )
     {
-        for ( int i = 0; i < m_boxes.size(); ++i )
+        for ( int i = 0; i < m_rois.size(); ++i )
         {
-            for ( int k = 0; k < m_boxes[i].size(); ++k )
+            for ( int k = 0; k < m_rois[i].size(); ++k )
             {
-                if ( value.toInt() == VPtr<ROI>::asPtr( m_boxes[i][k] )->properties()->get( Fn::ROI::PICK_ID ).toInt() )
+                if ( value.toInt() == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::ROI::PICK_ID ).toInt() )
                 {
                     if ( k == 0 )
                     {

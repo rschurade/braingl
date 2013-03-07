@@ -46,6 +46,8 @@
     <file>shaders/fiber.fs</file>
     <file>shaders/mesh.vs</file>
     <file>shaders/mesh.fs</file>
+    <file>shaders/sphere.vs</file>
+    <file>shaders/sphere.fs</file>
     <file>shaders/text.vs</file>
     <file>shaders/text.fs</file>
     <file>shaders/tube.vs</file>

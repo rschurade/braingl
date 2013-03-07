@@ -35,9 +35,11 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 {
     qDebug() << "start creating kdtree";
     m_numLines = data.size();
-
+    int ls = 0;
     for ( int i = 0; i < m_numLines; ++i )
     {
+        m_lineStarts.push_back( ls );
+        m_lineLengths.push_back( data[i].size() / 3 );
         for( int k = 0; k < data[i].size() / 3; ++k )
         {
             m_kdVerts.push_back( data[i][k * 3    ] );
@@ -45,6 +47,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
             m_kdVerts.push_back( data[i][k * 3 + 2] );
             m_reverseIndexes.push_back( i );
             ++m_numPoints;
+            ++ls;
         }
     }
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
@@ -167,29 +170,31 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
 
 void FiberSelector::updateBox( int branch, int pos )
 {
-    //qDebug() << "update box" << branch << pos;
-    float x, y, z, dx, dy, dz;
-
     if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
     {
-        x = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
-        y = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
-        z = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
-        dx = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat();
-        dy = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat();
-        dz = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat();
-        m_boxMin[0] = x - dx / 2;
-        m_boxMax[0] = x + dx / 2;
-        m_boxMin[1] = y - dy / 2;
-        m_boxMax[1] = y + dy / 2;
-        m_boxMin[2] = z - dz / 2;
-        m_boxMax[2] = z + dz / 2;
+        m_x = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
+        m_y = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
+        m_z = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
+        m_dx = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
+        m_dy = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
+        m_dz = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
+        m_boxMin[0] = m_x - m_dx;
+        m_boxMax[0] = m_x + m_dx;
+        m_boxMin[1] = m_y - m_dy;
+        m_boxMax[1] = m_y + m_dy;
+        m_boxMin[2] = m_z - m_dz;
+        m_boxMax[2] = m_z + m_dz;
 
         for ( int i = 0; i < m_numLines; ++i )
         {
             m_bitfields[branch][pos][i] = false;
         }
         boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
+
+        if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::TYPE ), Qt::DisplayRole ).toInt() == (int)Fn::ROIType::Sphere )
+        {
+            sphereTest( m_bitfields[branch][pos] );
+        }
     }
     else
     {
@@ -238,6 +243,32 @@ void FiberSelector::boxTest( QVector<bool>& workfield, int left, int right, int 
     }
 }
 
+void FiberSelector::sphereTest( QVector<bool>& workfield )
+{
+    float vx,vy,vz;
+    bool hit;
+    for ( int i = 0; i < m_numLines; ++i )
+    {
+        int ls = m_lineStarts[i] * 3;
+        if ( workfield[i] )
+        {
+            hit = false;
+            for ( int k = 0; k < m_lineLengths[i]; ++k )
+            {
+                vx = ( m_kdVerts[ ls + k*3    ] - m_x ) / m_dx;
+                vy = ( m_kdVerts[ ls + k*3 + 1] - m_y ) / m_dy;
+                vz = ( m_kdVerts[ ls + k*3 + 2] - m_z ) / m_dz;
+                float r = sqrt( vx * vx + vy * vy + vz * vz );
+                if ( r < 1.0 )
+                {
+                    hit = true;
+                    break;
+                }
+            }
+            workfield[i] = hit;
+        }
+    }
+}
 
 void FiberSelector::updateBranch( int branch )
 {

@@ -193,6 +193,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "ev" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "box" );
+        GLFunctions::m_shaderNames.push_back( "sphere" );
         GLFunctions::m_shaderNames.push_back( "text" );
 
         copyShaderToString( GLFunctions::m_shaderNames[ 0 ], QString("fs") );

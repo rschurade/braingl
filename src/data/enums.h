@@ -344,6 +344,7 @@ namespace Fn
     enum class ROIType : int
     {
         Box,
+        Sphere,
         Potato
     };
 }
