@@ -100,11 +100,11 @@ void BoxRenderer::setShaderVars()
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (const void *) offset );
 }
 
-void BoxRenderer::draw( QMatrix4x4 mvp_matrix )
+void BoxRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "box" )->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "box" )->setUniformValue( "mvp_matrix", mvp_matrix );
+    GLFunctions::getShader( "box" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     if( GLFunctions::isPicking() )
     {
         float alpha =  1.0;

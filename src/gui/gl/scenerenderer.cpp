@@ -256,7 +256,7 @@ void SceneRenderer::renderRois()
        ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
        {
-           roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+           roi->draw( m_pMatrix, m_mvMatrix );
 
            QModelIndex mi = m_roiModel->index( i, 0 );
            int countBoxes = m_roiModel->rowCount(  mi );
@@ -266,7 +266,7 @@ void SceneRenderer::renderRois()
                roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
                {
-                   roi->draw( m_mvpMatrix, m_mvMatrixInverse );
+                   roi->draw( m_pMatrix, m_mvMatrix );
                }
            }
        }

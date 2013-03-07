@@ -1,24 +1,22 @@
 /*
- * slicerenderer.h
+ * sphererenderer.h
  *
- *  Created on: 04.02.2013
+ *  Created on: 07.03.2013
  *      Author: Ralph Schurade
  */
 
-#ifndef BOXRENDERER_H_
-#define BOXRENDERER_H_
+#ifndef SPHERERENDERER_H_
+#define SPHERERENDERER_H_
 
 #include "objectrenderer.h"
 
 #include <QtGui/QColor>
 
-class QGLShaderProgram;
-
-class BoxRenderer : public ObjectRenderer
+class SphereRenderer : public ObjectRenderer
 {
 public:
-	BoxRenderer();
-	virtual ~BoxRenderer();
+	SphereRenderer();
+	virtual ~SphereRenderer();
 
 	void init();
 
@@ -35,6 +33,12 @@ protected:
 private:
 	GLuint *vboIds;
 
+	float m_x;
+	float m_y;
+	float m_z;
+	float m_dx;
+    float m_dy;
+    float m_dz;
 	QColor m_color;
 
 	unsigned int m_pickId;

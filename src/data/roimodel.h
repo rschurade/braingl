@@ -38,7 +38,7 @@ public:
 private:
     QAbstractItemModel* m_globalProps;
 
-    QList< QList<QVariant> >m_boxes;
+    QList< QList<QVariant> >m_rois;
     int m_count;
 
 public slots:

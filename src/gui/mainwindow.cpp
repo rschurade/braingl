@@ -443,6 +443,9 @@ void MainWindow::createActions()
     newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
 
+    newRoiSphereAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI Sphere" ), this );
+    newRoiSphereAct->setStatusTip( tr( "Add a new ROI." ) );
+
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
         recentFileActs[ i ] = new QAction( this );
@@ -502,6 +505,7 @@ void MainWindow::createToolBars()
     editToolBar->addAction( standardViewCoronalAct );
     editToolBar->addAction( standardViewSagittalAct );
     editToolBar->addAction( newSelectionBoxAct );
+    editToolBar->addAction( newRoiSphereAct );
     editToolBar->setObjectName( "editToolbar");
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
@@ -542,6 +546,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
+    connect( newRoiSphereAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addSphere() ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( this );
 	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );

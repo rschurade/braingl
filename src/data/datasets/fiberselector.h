@@ -40,6 +40,8 @@ private:
     KdTree* m_kdTree;
     QVector<float>m_kdVerts;
     QVector<int>m_reverseIndexes;
+    QVector<int>m_lineStarts;
+    QVector<int>m_lineLengths;
 
     QVector<bool>m_rootfield;
     QList<QVector<bool> >m_branchfields;
@@ -48,6 +50,13 @@ private:
     QVector<float> m_boxMin;
     QVector<float> m_boxMax;
 
+    float m_x;
+    float m_y;
+    float m_z;
+    float m_dx;
+    float m_dy;
+    float m_dz;
+
 private slots:
     void roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
     void roiInserted( const QModelIndex &parent, int start, int end );
@@ -55,6 +64,7 @@ private slots:
 
     void updateBox( int branch, int pos );
     void boxTest( QVector<bool>& workfield, int left, int right, int axis );
+    void sphereTest( QVector<bool>& workfield );
 
     void updateBranch( int branch );
     void updateRoot();
