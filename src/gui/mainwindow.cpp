@@ -443,7 +443,7 @@ void MainWindow::createActions()
     newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
 
-    newRoiSphereAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI Sphere" ), this );
+    newRoiSphereAct = new QAction( QIcon( ":/icons/sphere.png" ), tr( "New ROI Sphere" ), this );
     newRoiSphereAct->setStatusTip( tr( "Add a new ROI." ) );
 
     for ( int i = 0; i < MaxRecentFiles; ++i )
