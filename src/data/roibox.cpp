@@ -1,18 +1,18 @@
 /*
- * selectionbox.cpp
+ * roibox.cpp
  *
  *  Created on: 02.02.2013
  *      Author: Ralph Schurade
  */
-#include "selectionbox.h"
+#include "roibox.h"
 
 #include "../gui/gl/boxrenderer.h"
 
 #include <QtCore/QAbstractItemModel>
 
-int SelectionBox::m_count = 0;
+int ROIBox::m_count = 0;
 
-SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
+ROIBox::ROIBox( QAbstractItemModel* globals ) :
     ROI( QString("new box") + QString::number( m_count++ ), globals ),
     m_renderer( 0 )
 {
@@ -46,11 +46,11 @@ SelectionBox::SelectionBox( QAbstractItemModel* globals ) :
     connect( globals, SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
-SelectionBox::~SelectionBox()
+ROIBox::~ROIBox()
 {
 }
 
-void SelectionBox::globalChanged()
+void ROIBox::globalChanged()
 {
     if (  m_properties.get( Fn::ROI::STICK_TO_CROSSHAIR ).toBool() )
     {
@@ -69,7 +69,7 @@ void SelectionBox::globalChanged()
     }
 }
 
-void SelectionBox::propChanged()
+void ROIBox::propChanged()
 {
     if ( m_renderer)
     {
@@ -83,7 +83,7 @@ void SelectionBox::propChanged()
     }
 }
 
-void SelectionBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( !m_renderer )
     {

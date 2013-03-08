@@ -6,7 +6,7 @@
  */
 #include "roimodel.h"
 
-#include "selectionbox.h"
+#include "roibox.h"
 #include "roisphere.h"
 #include "vptr.h"
 
@@ -198,7 +198,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     ROI* newROI;
     if ( count == 0 )
     {
-        newROI = new SelectionBox( m_globalProps );
+        newROI = new ROIBox( m_globalProps );
     }
     else
     {
