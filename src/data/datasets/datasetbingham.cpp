@@ -66,7 +66,7 @@ void DatasetBingham::flipX()
 {
 }
 
-void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_renderer == 0 )
     {
@@ -97,7 +97,7 @@ void DatasetBingham::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAb
                                  m_properties.get( Fn::Property::RENDER_SECOND ).toBool(),
                                  m_properties.get( Fn::Property::RENDER_THIRD ).toBool() );
 
-    m_renderer->draw( mvpMatrix, mvMatrixInverse );
+    m_renderer->draw( pMatrix, mvMatrix );
 }
 
 QString DatasetBingham::getValueAsString( int x, int y, int z )

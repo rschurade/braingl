@@ -119,7 +119,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse,
+void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
                              QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_selector == 0 )
@@ -143,7 +143,7 @@ void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse,
                                      m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
                                      m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
                                      m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-        m_renderer->draw( mvpMatrix, mvMatrixInverse, dataModel );
+        m_renderer->draw( pMatrix, mvMatrix, dataModel );
     }
     else if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
@@ -161,7 +161,7 @@ void DatasetFibers::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse,
                                          m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
                                          m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat(),
                                          m_properties.get( Fn::Property::FIBER_TUBE_THICKNESS ).toFloat() );
-        m_tubeRenderer->draw( mvpMatrix, mvMatrixInverse, dataModel );
+        m_tubeRenderer->draw( pMatrix, mvMatrix, dataModel );
     }
 }
 

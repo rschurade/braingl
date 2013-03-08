@@ -206,7 +206,7 @@ void DatasetTensor::flipX()
     m_data = newData;
 }
 
-void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() == 0 )
     {
@@ -230,7 +230,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
                                      slice,
                                      m_properties.get( Fn::Property::OFFSET ).toFloat() );
 
-        m_renderer->draw( mvpMatrix, mvMatrixInverse );
+        m_renderer->draw( pMatrix, mvMatrix );
     }
     else
     {
@@ -249,7 +249,7 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
                                        m_properties.get( Fn::Property::OFFSET ).toFloat(),
                                        m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() );
 
-        m_rendererEV->draw( mvpMatrix, mvMatrixInverse );
+        m_rendererEV->draw( pMatrix, mvMatrix );
     }
 }
 

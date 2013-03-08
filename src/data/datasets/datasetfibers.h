@@ -24,7 +24,7 @@ public:
     DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras );
     virtual ~DatasetFibers();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();

@@ -63,7 +63,7 @@ DatasetIsosurface::~DatasetIsosurface()
 {
 }
 
-void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_renderer == 0 )
     {
@@ -81,7 +81,7 @@ void DatasetIsosurface::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, 
         m_renderer->setMesh( m_mesh );
     }
 
-    m_renderer->draw( mvpMatrix, mvMatrixInverse );
+    m_renderer->draw( pMatrix, mvMatrix );
 }
 
 QString DatasetIsosurface::getValueAsString( int x, int y, int z )
