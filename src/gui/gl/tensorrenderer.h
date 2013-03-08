@@ -29,7 +29,7 @@ protected:
     void setShaderVars();
 
     void initGeometry();
-    void addGlyph( std::vector<float>* verts, float xPos, float yPos, float zPos, Matrix tensor );
+    void addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor );
 
 private:
     int m_quads;

@@ -40,6 +40,7 @@ TensorRenderer::TensorRenderer( QVector<Matrix>* data, int nx, int ny, int nz, f
 
 TensorRenderer::~TensorRenderer()
 {
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
 }
 
 void TensorRenderer::init()
@@ -49,6 +50,11 @@ void TensorRenderer::init()
 
 void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
+    if ( m_orient == 0 )
+    {
+        return;
+    }
+
     GLFunctions::getShader( "superquadric" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
@@ -80,7 +86,6 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 
 void TensorRenderer::setupTextures()
 {
-    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
 }
 
 void TensorRenderer::setShaderVars()
@@ -118,7 +123,7 @@ void TensorRenderer::initGeometry()
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset } );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, m_offset } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -138,9 +143,10 @@ void TensorRenderer::initGeometry()
     float z = (float)zi * m_dz + m_dz / 2.;
 
     m_quads = 0;
-
-    if ( m_orient == 1 )
+    qDebug() << m_orient;
+    if ( ( m_orient & 1 ) == 1 )
     {
+        qDebug() << m_orient << "1";
         for( int yy = 0; yy < m_ny; ++yy )
         {
             for ( int xx = 0; xx < m_nx; ++xx )
@@ -150,13 +156,14 @@ void TensorRenderer::initGeometry()
                 float locX = xx * m_dx + m_dx / 2;
                 float locY = yy * m_dy + m_dy / 2;
 
-                addGlyph( &verts, locX, locY, z - m_offset * m_dz , tensor );
+                addGlyph( verts, locX, locY, z - m_offset * m_dz , tensor );
                 m_quads += 24;
             }
         }
     }
-    else if ( m_orient == 2 )
+    if ( ( m_orient & 2 ) == 2 )
     {
+        qDebug() << m_orient << "2";
         for( int xx = 0; xx < m_nx; ++xx )
         {
             for ( int zz = 0; zz < m_nz; ++zz )
@@ -166,13 +173,14 @@ void TensorRenderer::initGeometry()
                 float locX = xx * m_dx + m_dx / 2;
                 float locZ = zz * m_dz + m_dz / 2;
 
-                addGlyph( &verts, locX, y + m_offset * m_dy, locZ, tensor );
+                addGlyph( verts, locX, y + m_offset * m_dy, locZ, tensor );
                 m_quads += 24;
             }
         }
     }
-    else if ( m_orient == 3 )
+    if ( ( m_orient & 4 ) == 4 )
     {
+        qDebug() << m_orient << "4";
         for( int yy = 0; yy < m_ny; ++yy )
         {
             for ( int zz = 0; zz < m_nz; ++zz )
@@ -181,21 +189,17 @@ void TensorRenderer::initGeometry()
                 float locY = yy * m_dy + m_dy / 2;
                 float locZ = zz * m_dz + m_dz / 2;
 
-                addGlyph( &verts, x + m_offset * m_dx, locY, locZ, tensor );
+                addGlyph( verts, x + m_offset * m_dx, locY, locZ, tensor );
                 m_quads += 24;
             }
         }
-    }
-    else
-    {
-        return;
     }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 }
 
-void TensorRenderer::addGlyph( std::vector<float>* verts, float xPos, float yPos, float zPos, Matrix tensor )
+void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor )
 {
     float d0 = tensor( 1, 1 );
     float d1 = tensor( 2, 2 );
@@ -205,322 +209,322 @@ void TensorRenderer::addGlyph( std::vector<float>* verts, float xPos, float yPos
     float o2 = tensor( 2, 3 );
 
     // Front Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
     // Back Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
     // Top Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
     // Bottom Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
     // Left Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
     // Right Face
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 
-    verts->push_back( xPos );
-    verts->push_back( yPos );
-    verts->push_back( zPos );
-    verts->push_back( 1.0 );
-    verts->push_back( -1.0 );
-    verts->push_back( 1.0 );
-    verts->push_back( d0 );
-    verts->push_back( d1 );
-    verts->push_back( d2 );
-    verts->push_back( o0 );
-    verts->push_back( o1 );
-    verts->push_back( o2 );
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( 1.0 );
+    verts.push_back( -1.0 );
+    verts.push_back( 1.0 );
+    verts.push_back( d0 );
+    verts.push_back( d1 );
+    verts.push_back( d2 );
+    verts.push_back( o0 );
+    verts.push_back( o1 );
+    verts.push_back( o2 );
 }
 
 void TensorRenderer::setRenderParams( float scaling, float faThreshold, float evThreshold, float gamma, int orient, float offset )
