@@ -1,24 +1,24 @@
 /*
- * selectionbox.h
+ * roibox.h
  *
  *  Created on: 02.02.2013
  *      Author: Ralph Schurade
  */
 
-#ifndef SELECTIONBOX_H_
-#define SELECTIONBOX_H_
+#ifndef ROIBOX_H_
+#define ROIBOX_H_
 
 #include "roi.h"
 
 class BoxRenderer;
 
-class SelectionBox : public ROI
+class ROIBox : public ROI
 {
     Q_OBJECT
 
 public:
-    SelectionBox( QAbstractItemModel* globals );
-    virtual ~SelectionBox();
+    ROIBox( QAbstractItemModel* globals );
+    virtual ~ROIBox();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
 
