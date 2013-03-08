@@ -24,6 +24,9 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_imag
     m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
     m_properties.set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, true );
+    m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
+    m_properties.set( Fn::Property::RENDER_CORONAL, false, true );
+    m_properties.set( Fn::Property::RENDER_AXIAL, true, true );
 
     examineDataset();
 }
@@ -54,7 +57,9 @@ DatasetTensor::DatasetTensor( QString filename, QVector<QVector<float> > data, n
     m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
     m_properties.set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, true );
-
+    m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
+    m_properties.set( Fn::Property::RENDER_CORONAL, false, true );
+    m_properties.set( Fn::Property::RENDER_AXIAL, true, true );
 
     examineDataset();
 }
@@ -213,8 +218,17 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
             m_renderer->init();
         }
 
-        m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(), m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(), m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(),
-                m_properties.get( Fn::Property::GAMMA ).toFloat(), m_properties.get( Fn::Property::RENDER_SLICE ).toInt(), m_properties.get( Fn::Property::OFFSET ).toFloat() );
+        int slice = 0;
+        slice = (int)m_properties.get( Fn::Property::RENDER_AXIAL ).toBool() +
+                (int)m_properties.get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
+                (int)m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+
+        m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
+                                     m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(),
+                                     m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(),
+                                     m_properties.get( Fn::Property::GAMMA ).toFloat(),
+                                     slice,
+                                     m_properties.get( Fn::Property::OFFSET ).toFloat() );
 
         m_renderer->draw( mvpMatrix, mvMatrixInverse );
     }
@@ -228,9 +242,12 @@ void DatasetTensor::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbs
             m_rendererEV->init();
         }
 
-        m_rendererEV->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(), m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(),
-                m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(), m_properties.get( Fn::Property::RENDER_SLICE ).toInt(), m_properties.get( Fn::Property::OFFSET ).toFloat(),
-                m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() );
+        m_rendererEV->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
+                                       m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(),
+                                       m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(),
+                                       m_properties.get( Fn::Property::RENDER_SLICE ).toInt(),
+                                       m_properties.get( Fn::Property::OFFSET ).toFloat(),
+                                       m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() );
 
         m_rendererEV->draw( mvpMatrix, mvMatrixInverse );
     }
