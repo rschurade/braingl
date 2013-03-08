@@ -107,7 +107,7 @@ void DatasetSH::flipX()
     m_data = newData;
 }
 
-void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_renderer == 0 )
     {
@@ -131,7 +131,7 @@ void DatasetSH::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstrac
                                  m_properties.get( Fn::Property::RENDER_CORONAL ).toBool(),
                                  m_properties.get( Fn::Property::RENDER_AXIAL ).toBool());
 
-    m_renderer->draw( mvpMatrix, mvMatrixInverse );
+    m_renderer->draw( pMatrix, mvMatrix );
 }
 
 QString DatasetSH::getValueAsString( int x, int y, int z )

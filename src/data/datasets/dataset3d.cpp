@@ -143,7 +143,7 @@ QVector<QVector3D>* Dataset3D::getData()
     return &m_data;
 }
 
-void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
 {
     if ( m_renderer == 0 )
     {
@@ -161,7 +161,7 @@ void Dataset3D::draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstrac
                                  m_properties.get( Fn::Property::RENDER_SLICE ).toInt(),
                                  m_properties.get( Fn::Property::OFFSET ).toFloat() );
 
-    m_renderer->draw( mvpMatrix, mvMatrixInverse );
+    m_renderer->draw( pMatrix, mvMatrix );
 }
 
 QString Dataset3D::getValueAsString( int x, int y, int z )

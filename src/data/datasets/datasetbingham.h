@@ -24,7 +24,7 @@ public:
 
     QVector<QVector<float> >* getData();
 
-    void draw( QMatrix4x4 mvpMatrix, QMatrix4x4 mvMatrixInverse, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel = 0 );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel = 0 );
     QString getValueAsString( int x, int y, int z );
 
 private:
