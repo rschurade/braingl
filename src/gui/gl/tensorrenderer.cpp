@@ -143,10 +143,9 @@ void TensorRenderer::initGeometry()
     float z = (float)zi * m_dz + m_dz / 2.;
 
     m_quads = 0;
-    qDebug() << m_orient;
+
     if ( ( m_orient & 1 ) == 1 )
     {
-        qDebug() << m_orient << "1";
         for( int yy = 0; yy < m_ny; ++yy )
         {
             for ( int xx = 0; xx < m_nx; ++xx )
@@ -163,7 +162,6 @@ void TensorRenderer::initGeometry()
     }
     if ( ( m_orient & 2 ) == 2 )
     {
-        qDebug() << m_orient << "2";
         for( int xx = 0; xx < m_nx; ++xx )
         {
             for ( int zz = 0; zz < m_nz; ++zz )
@@ -180,7 +178,6 @@ void TensorRenderer::initGeometry()
     }
     if ( ( m_orient & 4 ) == 4 )
     {
-        qDebug() << m_orient << "4";
         for( int yy = 0; yy < m_ny; ++yy )
         {
             for ( int zz = 0; zz < m_nz; ++zz )
