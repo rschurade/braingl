@@ -68,6 +68,9 @@ private slots:
 
     void updateBranch( int branch );
     void updateRoot();
+
+signals:
+    void changed();
 };
 
 #endif /* FIBERSELECTOR_H_ */

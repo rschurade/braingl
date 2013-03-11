@@ -126,6 +126,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
     {
         m_selector = new FiberSelector( roiModel );
         m_selector->init( m_fibs );
+        connect( m_selector, SIGNAL( changed() ), dataModel, SLOT( submit() ) );
     }
 
     if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 0 )

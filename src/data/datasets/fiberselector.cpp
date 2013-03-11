@@ -349,4 +349,5 @@ void FiberSelector::updateRoot()
             m_rootfield[i] = true;
         }
     }
+    emit( changed() );
 }

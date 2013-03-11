@@ -255,3 +255,10 @@ void DataStore::propChanged()
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
 }
+
+bool DataStore::submit()
+{
+    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
+    emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
+    return true;
+}
