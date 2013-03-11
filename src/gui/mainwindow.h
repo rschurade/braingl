@@ -110,7 +110,6 @@ private:
     QAction* standardViewSagittalAct;
 
     QAction* newSelectionBoxAct;
-    QAction* newRoiSphereAct;
 
     static int screenshotNumber;
 

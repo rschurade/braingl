@@ -7,7 +7,6 @@
 #include "roimodel.h"
 
 #include "roibox.h"
-#include "roisphere.h"
 #include "vptr.h"
 
 #include <QtCore/QDebug>
@@ -202,7 +201,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     }
     else
     {
-        newROI = new ROISphere( m_globalProps );
+        return false;
     }
     connect( newROI->properties(), SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
 

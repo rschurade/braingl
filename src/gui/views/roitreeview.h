@@ -20,7 +20,6 @@ public:
     virtual ~ROITreeView();
 
     void addBox();
-    void addSphere();
 
 private:
     virtual void mousePressEvent( QMouseEvent *event );

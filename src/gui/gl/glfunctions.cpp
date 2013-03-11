@@ -10,6 +10,7 @@
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
 
+#include "shaperenderer.h"
 #include "../text/textrenderer.h"
 
 #include <QtCore/QAbstractItemModel>
@@ -25,6 +26,7 @@
 int GLFunctions::idealThreadCount = QThread::idealThreadCount();
 
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
+ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
@@ -711,4 +713,19 @@ void GLFunctions::renderText( QString text, int x, int y, int size, QColor color
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
     GLFunctions::m_textRenderer->renderText( text, x, y );
+}
+
+void GLFunctions::initShapeRenderer()
+{
+    GLFunctions::m_shapeRenderer->init();
+}
+
+void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+{
+    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
+}
+
+void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+{
+    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
 }

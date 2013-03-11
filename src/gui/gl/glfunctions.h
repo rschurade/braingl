@@ -18,6 +18,7 @@
 
 class QAbstractItemModel;
 class QGLShaderProgram;
+class ShapeRenderer;
 class TextRenderer;
 
 struct VertexData
@@ -71,6 +72,10 @@ public:
     static void initTextRenderer();
     static void renderText( QString text, int x, int y, int size = 10, QColor color = QColor( 0, 0, 0 ) );
 
+    static void initShapeRenderer();
+    static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
+    static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
+
     static int idealThreadCount;
 
     static bool offscreen;
@@ -83,6 +88,7 @@ private:
     static void copyShaderToString( QString name, QString ext );
 
     static TextRenderer* m_textRenderer;
+    static ShapeRenderer* m_shapeRenderer;
 
     static QHash< QString, QString >m_shaderSources;
     static QHash< QString, QGLShaderProgram* >m_shaders;

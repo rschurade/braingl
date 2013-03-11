@@ -6,15 +6,14 @@
  */
 #include "roibox.h"
 
-#include "../gui/gl/boxrenderer.h"
+#include "../gui/gl/glfunctions.h"
 
 #include <QtCore/QAbstractItemModel>
 
 int ROIBox::m_count = 0;
 
 ROIBox::ROIBox( QAbstractItemModel* globals ) :
-    ROI( QString("new box") + QString::number( m_count++ ), globals ),
-    m_renderer( 0 )
+    ROI( QString("new roi") + QString::number( m_count++ ), globals )
 {
     float dx = globals->data( globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
     float dy = globals->data( globals->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
@@ -29,18 +28,21 @@ ROIBox::ROIBox( QAbstractItemModel* globals ) :
     float zMax = globals->data( globals->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat() * dz;
 
     m_properties.set( Fn::ROI::RENDER, true, true );
+    m_properties.set( Fn::ROI::NEG, false, true );
+    m_properties.set( Fn::ROI::SPHERE, true, true );
     m_properties.set( Fn::ROI::X, x, 0., xMax, true );
     m_properties.set( Fn::ROI::Y, y, 0., yMax, true );
     m_properties.set( Fn::ROI::Z, z, 0., zMax, true );
     m_properties.set( Fn::ROI::DX, 20., 0., xMax/2, true );
     m_properties.set( Fn::ROI::DY, 20., 0., yMax/2, true );
     m_properties.set( Fn::ROI::DZ, 20., 0., zMax/2, true );
-    m_properties.set( Fn::ROI::NEG, false, true );
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::ROI::ID, m_count );
     m_properties.set( Fn::ROI::PICK_ID, 0 );
     m_properties.set( Fn::ROI::STICK_TO_CROSSHAIR, false, true );
+
+    m_properties.set( Fn::ROI::PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
     connect( globals, SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
@@ -71,36 +73,30 @@ void ROIBox::globalChanged()
 
 void ROIBox::propChanged()
 {
-    if ( m_renderer)
-    {
-        m_renderer->updateGeometry( m_properties.get( Fn::ROI::X ).toFloat(),
-                                    m_properties.get( Fn::ROI::Y ).toFloat(),
-                                    m_properties.get( Fn::ROI::Z ).toFloat(),
-                                    m_properties.get( Fn::ROI::DX ).toFloat(),
-                                    m_properties.get( Fn::ROI::DY ).toFloat(),
-                                    m_properties.get( Fn::ROI::DZ ).toFloat(),
-                                    m_properties.get( Fn::ROI::COLOR ).value<QColor>() );
-    }
 }
 
 void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
-    if ( !m_renderer )
-    {
-        m_renderer = new BoxRenderer();
-        m_properties.set( Fn::ROI::PICK_ID, (int)m_renderer->getPickId() );
-        m_renderer->init();
-        m_renderer->updateGeometry( m_properties.get( Fn::ROI::X ).toFloat(),
-                                    m_properties.get( Fn::ROI::Y ).toFloat(),
-                                    m_properties.get( Fn::ROI::Z ).toFloat(),
-                                    m_properties.get( Fn::ROI::DX ).toFloat(),
-                                    m_properties.get( Fn::ROI::DY ).toFloat(),
-                                    m_properties.get( Fn::ROI::DZ ).toFloat(),
-                                    m_properties.get( Fn::ROI::COLOR ).value<QColor>() );
-    }
+        float x = m_properties.get( Fn::ROI::X ).toFloat();
+        float y = m_properties.get( Fn::ROI::Y ).toFloat();
+        float z = m_properties.get( Fn::ROI::Z ).toFloat();
+        float dx = m_properties.get( Fn::ROI::DX ).toFloat();
+        float dy = m_properties.get( Fn::ROI::DY ).toFloat();
+        float dz = m_properties.get( Fn::ROI::DZ ).toFloat();
+        QColor color = m_properties.get( Fn::ROI::COLOR ).value<QColor>();
+        color.setAlphaF( 0.4 );
+        int pickID = m_properties.get( Fn::ROI::PICK_ID ).toInt();
+
     if ( m_properties.get( Fn::ROI::RENDER).toBool() )
     {
-        m_renderer->draw( pMatrix, mvMatrix );
+        if ( m_properties.get( Fn::ROI::SPHERE ).toBool() )
+        {
+            GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID );
+        }
+        else
+        {
+            GLFunctions::drawBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID );
+        }
     }
 }
 
