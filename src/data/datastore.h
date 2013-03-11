@@ -38,6 +38,7 @@ public slots:
     void deleteItem( int row );
 
     void propChanged();
+    bool submit();
 
 private:
     QVariant getDatasetProperties( const QModelIndex &index ) const;
