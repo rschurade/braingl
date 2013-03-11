@@ -307,6 +307,7 @@ namespace Fn
         ACTIVE,
         COLOR,
         RENDER,
+        SPHERE,
         STICK_TO_CROSSHAIR,
         ID,
         PICK_ID,
@@ -326,11 +327,12 @@ namespace Fn
                 case ROI::DX: return QString( "dx" ); break;
                 case ROI::DY: return QString( "dy" ); break;
                 case ROI::DZ: return QString( "dz" ); break;
-                case ROI::NEG: return QString( "neg" ); break;
+                case ROI::NEG: return QString( "negate" ); break;
                 case ROI::TYPE: return QString( "type" ); break;
                 case ROI::ACTIVE: return QString( "active" ); break;
                 case ROI::COLOR: return QString( "color" ); break;
                 case ROI::RENDER: return QString( "render" ); break;
+                case ROI::SPHERE: return QString( "make sphere" ); break;
                 case ROI::STICK_TO_CROSSHAIR: return QString( "stick to crosshair" ); break;
                 case ROI::ID: return QString( "id" ); break;
                 case ROI::PICK_ID: return QString( "pick id" ); break;

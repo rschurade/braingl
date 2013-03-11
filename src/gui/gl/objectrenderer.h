@@ -22,8 +22,8 @@ public:
 	virtual ~ObjectRenderer();
 
 	virtual void init() = 0;
-	virtual void initGeometry() = 0;
-	virtual void setShaderVars() = 0;
+	virtual void initGeometry() {};
+	virtual void setShaderVars() {};
 	//virtual void draw() = 0;
 
 	// methods that must be implemented for QAbstractItemView

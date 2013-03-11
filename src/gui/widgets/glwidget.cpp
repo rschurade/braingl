@@ -38,6 +38,7 @@ void GLWidget::initializeGL()
 {
 	m_sceneRenderer->initGL();
 	GLFunctions::initTextRenderer();
+	GLFunctions::initShapeRenderer();
 }
 
 void GLWidget::paintGL()

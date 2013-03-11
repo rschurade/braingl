@@ -38,7 +38,6 @@ private:
 
 public slots:
     void addBox();
-    void addSphere();
     void deleteItem();
     void treeClicked();
     void itemSelectionChanged( const QItemSelection &selected );

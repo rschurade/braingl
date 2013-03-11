@@ -32,20 +32,6 @@ void ROITreeView::addBox()
     }
 }
 
-void ROITreeView::addSphere()
-{
-    if ( selectionModel()->hasSelection() )
-    {
-        model()->insertRows( 0, 1, selectionModel()->selectedIndexes().first() );
-        expand( selectionModel()->selectedRows().at( 0 ) );
-    }
-    else
-    {
-        // nothing selected, inserting top box
-        model()->insertRows( 0, 1, QModelIndex() );
-    }
-}
-
 void ROITreeView::mousePressEvent(QMouseEvent *event)
 {
     QModelIndex item = indexAt( event->pos() );

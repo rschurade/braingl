@@ -191,7 +191,7 @@ void FiberSelector::updateBox( int branch, int pos )
         }
         boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
 
-        if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::TYPE ), Qt::DisplayRole ).toInt() == (int)Fn::ROIType::Sphere )
+        if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::SPHERE ), Qt::DisplayRole ).toBool() )
         {
             sphereTest( m_bitfields[branch][pos] );
         }

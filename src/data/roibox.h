@@ -10,8 +10,6 @@
 
 #include "roi.h"
 
-class BoxRenderer;
-
 class ROIBox : public ROI
 {
     Q_OBJECT
@@ -24,7 +22,6 @@ public:
 
     static int m_count;
 private:
-    BoxRenderer* m_renderer;
 
 private slots:
     void propChanged();
