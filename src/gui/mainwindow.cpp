@@ -733,7 +733,6 @@ void MainWindow::slotDilbert()
     QVBoxLayout* vLayout = new QVBoxLayout();
     vLayout->setContentsMargins( 1, 1, 1, 1 );
     vLayout->setSpacing( 1 );
-    setLayout( vLayout );
     QWebView* wv = new QWebView( this );
     wv->setUrl( QUrl( "http://www.dilbert.com/fast/") );
     vLayout->addWidget( wv );
