@@ -78,8 +78,6 @@ void SingleSHRenderer::initGL()
     glEnable( GL_MULTISAMPLE );
     static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
-
-    GLFunctions::loadShaders();
 }
 
 void SingleSHRenderer::resizeGL( int width, int height )
@@ -168,6 +166,7 @@ void SingleSHRenderer::initGeometry()
     verts.reserve( numVerts * 10 );
     std::vector<int>indexes;
     indexes.reserve( numTris * 3 );
+    m_tris = 0;
 
     if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
     {
@@ -203,10 +202,11 @@ void SingleSHRenderer::initGeometry()
             indexes.push_back( faces[i*3+1] );
             indexes.push_back( faces[i*3+2] );
         }
+        m_tris = numTris * 3;
     }
 
-    m_tris1 = numTris * 3;
-    //qDebug() << m_tris1 << " " << verts.size() << " " << indexes.size();
+
+    //qDebug() << m_tris << " " << verts.size() << " " << indexes.size();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
@@ -266,23 +266,32 @@ void SingleSHRenderer::draw()
     if ( rl.size() > 0 )
     {
         m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        initGeometry();
+    }
+    else
+    {
+        m_tris = 0;
+    }
 
+    if ( m_tris != 0 )
+    {
         GLFunctions::getShader( "qball" )->bind();
         // Set modelview-projection matrix
         GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_mvpMatrix.inverted() );
+        GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_arcBall->getMVMat().inverted() );
 
         bool hnl = m_dataset->properties()->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
         GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", hnl );
-
-        initGeometry();
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+
         setShaderVars();
-        glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
+
+        glDrawElements( GL_TRIANGLES, m_tris, GL_UNSIGNED_INT, 0 );
+
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }

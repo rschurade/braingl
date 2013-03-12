@@ -60,7 +60,7 @@ private:
     float m_yb;
     float m_zb;
 
-    int m_tris1;
+    int m_tris;
 
     ArcBall* m_arcBall;
 
