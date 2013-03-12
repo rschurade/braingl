@@ -752,11 +752,21 @@ QVector<float> Loader::loadBvals( QString fileName )
     fn.replace( ".nii", ".bval" );
     QDir dir( fn );
 
+    while ( !dir.exists( dir.absolutePath() ) )
+    {
+        QString path = dir.path();
+        fn = QFileDialog::getOpenFileName( 0, "Select bval file", path );
+        dir = QDir( fn );
+    }
+
     if ( dir.exists( dir.absolutePath() ) )
     {
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
+            QMessageBox msgBox;
+            msgBox.setText("Error! Couldn't open" + fn );
+            msgBox.exec();
             qDebug() << "couldn't open " << fn;
             return bvals;
         }
@@ -772,6 +782,9 @@ QVector<float> Loader::loadBvals( QString fileName )
                 bvals.push_back( slBvals[i].toFloat( &ok ) );
                 if ( !ok )
                 {
+                    QMessageBox msgBox;
+                    msgBox.setText("Error! While parsing bvals (" + QString::number( i ) + "), conversion failure string to float!" );
+                    msgBox.exec();
                     qDebug() << "error while parsing bvals (" << i << "), conversion failure string to float";
                     bvals.clear();
                     return bvals;
@@ -784,6 +797,9 @@ QVector<float> Loader::loadBvals( QString fileName )
     }
     else
     {
+        QMessageBox msgBox;
+        msgBox.setText("Error! Couldn't open" + fn );
+        msgBox.exec();
         qDebug() << "couldn't open " << fn;
         return bvals;
     }
@@ -798,6 +814,13 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
 
     QVector<QVector3D> bvecs;
 
+    while ( !dir2.exists( dir2.absolutePath() ) )
+    {
+        QString path = dir2.path();
+        fn = QFileDialog::getOpenFileName( 0, "Select bvec file", path );
+        dir2 = QDir( fn );
+    }
+
     if ( dir2.exists( dir2.absolutePath() ) )
     {
         QStringList slBvecs;
@@ -805,6 +828,9 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
         QFile file( fn );
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
+            QMessageBox msgBox;
+            msgBox.setText("Error! Couldn't open" + fn );
+            msgBox.exec();
             qDebug() << "couldn't open " << fn;
             return bvecs;
         }
@@ -824,6 +850,9 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
         //qDebug() << "count bvals" << bvals.size() << bvals;
         if ( bvals.size() != slX.size() || bvals.size() != slY.size() || bvals.size() != slZ.size() )
         {
+            QMessageBox msgBox;
+            msgBox.setText("Error! While loading dwi dataset, bvals don't match bvecs!" );
+            msgBox.exec();
             qDebug() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
             return bvecs;
         }
@@ -836,6 +865,9 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
                 bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
                 if ( !( okX && okY && okZ ) )
                 {
+                    QMessageBox msgBox;
+                    msgBox.setText("Error! While parsing bvecs(" + QString::number( i ) +  "), conversion failure string to float" );
+                    msgBox.exec();
                     qDebug() << "error while parsing bvecs(" << i << "), conversion failure string to float";
                     bvecs.clear();
                     return bvecs;
@@ -847,6 +879,9 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
     }
     else
     {
+        QMessageBox msgBox;
+        msgBox.setText("Error! Couldn't open" + fn );
+        msgBox.exec();
         qDebug() << "couldn't open " << fn;
         return bvecs;
     }
