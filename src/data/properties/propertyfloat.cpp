@@ -50,7 +50,6 @@ void PropertyFloat::setMin( float min )
     }
     m_widget->setMin( min );
     m_widget->setValue( m_value );
-    emit( valueChanged() );
 }
 
 void PropertyFloat::setMax( float max )
@@ -62,7 +61,6 @@ void PropertyFloat::setMax( float max )
     }
     m_widget->setMax( max );
     m_widget->setValue( m_value );
-    emit( valueChanged() );
 }
 
 void PropertyFloat::widgetChanged( float value, int id )
