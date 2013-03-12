@@ -48,7 +48,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Global::SHOW_NAV_SLIDERS, true, true );
     m_properties->set( Fn::Global::SCREENSHOT_QUALITY, 1, 1, 5, true );
     m_properties->set( Fn::Global::SCREENSHOT_PATH, QDir(""), true );
-    connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+    connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
 }
 
 GlobalPropertyModel::~GlobalPropertyModel()
@@ -131,17 +131,18 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
     // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
     if ( index.row() < (int)Fn::Global::ZOOM )
     {
-        propChanged();
+        submit();
         emit dataChanged( index, index );
     }
 
     return true;
 }
 
-void GlobalPropertyModel::propChanged()
+bool GlobalPropertyModel::submit()
 {
     m_properties->setMax( Fn::Global::AXIAL, m_properties->get( Fn::Global::MAX_AXIAL ).toInt() - 1 );
     m_properties->setMax( Fn::Global::CORONAL, m_properties->get( Fn::Global::MAX_CORONAL ).toInt() - 1 );
     m_properties->setMax( Fn::Global::SAGITTAL, m_properties->get( Fn::Global::MAX_SAGITTAL ).toInt() - 1 );
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
+    return true;
 }

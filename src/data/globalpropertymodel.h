@@ -33,7 +33,7 @@ private:
     GlobalPropertyGroup* m_properties;
 
 public slots:
-    void propChanged();
+    bool submit();
 };
 
 #endif /* GLOBALPROPERTYMODEL_H_ */

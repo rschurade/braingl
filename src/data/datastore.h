@@ -37,7 +37,6 @@ public slots:
     void moveItemDown( int row );
     void deleteItem( int row );
 
-    void propChanged();
     bool submit();
 
 private:

@@ -135,7 +135,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
             m_datasetList.push_back( value );
             endInsertRows();
-            connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
+            connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
             updateGlobals();
             emit( dataChanged( index, index ) );
             emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
@@ -248,12 +248,6 @@ void DataStore::deleteItem( int row )
         delete toDelete;
         updateGlobals();
     }
-}
-
-void DataStore::propChanged()
-{
-    emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
-    emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
 }
 
 bool DataStore::submit()
