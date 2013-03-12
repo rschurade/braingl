@@ -111,6 +111,8 @@ private:
 
     QAction* newSelectionBoxAct;
 
+    QAction* dilbertAct;
+
     static int screenshotNumber;
 
 private slots:
@@ -131,6 +133,8 @@ private slots:
     void slotStandardCoronalView();
     void slotStandardSagittalView();
     void slotToggleShaderEdit();
+
+    void slotDilbert();
 
     void slotRenderCrosshairs( bool value );
 };
