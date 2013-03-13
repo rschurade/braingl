@@ -6,6 +6,7 @@ attribute vec3 a_offset;
 attribute float a_radius;
 
 uniform bool u_hideNegativeLobes;
+uniform float u_scaling;
 
 varying vec3 v_normal;
 
@@ -57,8 +58,8 @@ void main()
 	
     // Calculate vertex position in screen space
     vec4 newPos = vec4( 1.0 );
-    newPos.x = a_position.x * r + a_offset.x;
-    newPos.y = a_position.y * r + a_offset.y;
-    newPos.z = a_position.z * r + a_offset.z;
+    newPos.x = a_position.x * r * u_scaling + a_offset.x;
+    newPos.y = a_position.y * r * u_scaling + a_offset.y;
+    newPos.z = a_position.z * r * u_scaling + a_offset.z;
     gl_Position = mvp_matrix * newPos;
 }

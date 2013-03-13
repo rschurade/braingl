@@ -13,7 +13,7 @@ DatasetBingham::DatasetBingham( QString filename, QVector<QVector<float> > data,
     m_data( data ),
     m_renderer( 0 )
 {
-    //m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f );
+    m_properties.set( Fn::Property::SCALING, 1.0f, 0.1f, 2.0f, true );
     m_properties.set( Fn::Property::OFFSET, 0, -1, 1, true );
     m_properties.set( Fn::Property::ORDER, 4 );
     m_properties.set( Fn::Property::LOD, 2, 0, 4, true );

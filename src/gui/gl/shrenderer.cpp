@@ -71,6 +71,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_hideNegativeLobes );
+    GLFunctions::getShader( "qball" )->setUniformValue( "u_scaling", m_scaling );
 
     initGeometry();
 
