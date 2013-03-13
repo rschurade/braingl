@@ -20,9 +20,9 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QDebug>
+#include <QVector3D>
+#include <QMatrix4x4>
 
 #include <limits>
 

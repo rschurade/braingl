@@ -8,7 +8,7 @@
 #ifndef FIBERS_H_
 #define FIBERS_H_
 
-#include <QtCore/QVector>
+#include <QVector>
 
 class DatasetFibers;
 class DatasetScalar;

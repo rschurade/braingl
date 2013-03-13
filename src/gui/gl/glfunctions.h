@@ -10,11 +10,11 @@
 
 #include "GL/glew.h"
 
-#include <QtCore/QPoint>
-#include <QtCore/QList>
-#include <QtGui/QVector3D>
-#include <QtGui/QImage>
-#include <QtGui/QColor>
+#include <QPoint>
+#include <QList>
+#include <QVector3D>
+#include <QImage>
+#include <QColor>
 
 class QAbstractItemModel;
 class QGLShaderProgram;

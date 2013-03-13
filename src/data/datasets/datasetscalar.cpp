@@ -8,7 +8,7 @@
 
 #include "../../gui/gl/colormaprenderer.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),

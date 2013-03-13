@@ -8,7 +8,7 @@
 #ifndef CHECKBOXWITHLABEL_H_
 #define CHECKBOXWITHLABEL_H_
 
-#include <QtGui/QFrame>
+#include <QFrame>
 
 class QCheckBox;
 class QLabel;

@@ -17,8 +17,8 @@
 #include "../../../data/datasets/datasetscalar.h"
 #include "../../../data/datasets/datasettensor.h"
 
-#include <QtGui/QPushButton>
-#include <QtGui/QProgressBar>
+#include <QPushButton>
+#include <QProgressBar>
 
 CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent ) :
     m_ds( ds ),

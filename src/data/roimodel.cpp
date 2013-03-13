@@ -9,7 +9,7 @@
 #include "roibox.h"
 #include "vptr.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ROIModel::ROIModel( QAbstractItemModel* globalProps ) :
     m_globalProps( globalProps ),

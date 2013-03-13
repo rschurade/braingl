@@ -10,9 +10,9 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
 
 class DatasetDWI;
 

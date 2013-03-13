@@ -8,7 +8,7 @@
 
 #include "../gl/combinednavrenderer.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 CombinedNavGLWidget::CombinedNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )

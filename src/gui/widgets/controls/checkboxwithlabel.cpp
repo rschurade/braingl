@@ -6,10 +6,10 @@
  */
 #include "checkboxwithlabel.h"
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QCheckBox>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QCheckBox>
+#include <QLabel>
 
 CheckboxWithLabel::CheckboxWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent )

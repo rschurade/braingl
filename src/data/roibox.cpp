@@ -8,7 +8,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <QtCore/QAbstractItemModel>
+#include <QAbstractItemModel>
 
 int ROIBox::m_count = 0;
 

@@ -15,10 +15,10 @@
 #include "propertyfloat.h"
 #include "propertystring.h"
 
-#include <QtGui/QColor>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
+#include <QColor>
+#include <QObject>
+#include <QString>
+#include <QVariant>
 
 class PropertyGroup : public QObject
 {

@@ -16,10 +16,10 @@
 #include "propertypath.h"
 #include "propertystring.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
+#include <QDir>
+#include <QObject>
+#include <QString>
+#include <QVariant>
 
 class GlobalPropertyGroup : public QObject
 {

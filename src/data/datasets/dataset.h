@@ -13,12 +13,12 @@
 #include "../enums.h"
 #include "../properties/propertygroup.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtGui/QMatrix4x4>
+#include <QDebug>
+#include <QDir>
+#include <QList>
+#include <QString>
+#include <QVariant>
+#include <QMatrix4x4>
 
 #include <limits>
 

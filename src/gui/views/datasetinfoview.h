@@ -8,7 +8,7 @@
 #ifndef DATASETINFOVIEW_H_
 #define DATASETINFOVIEW_H_
 
-#include <QtGui/QTableView>
+#include <QTableView>
 
 class DatasetInfoView : public QTableView
 {

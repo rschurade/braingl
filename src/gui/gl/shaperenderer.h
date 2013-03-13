@@ -10,7 +10,7 @@
 
 #include "GL/glew.h"
 
-#include <QtGui/QMatrix4x4>
+#include <QMatrix4x4>
 
 class ShapeRenderer
 {

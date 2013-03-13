@@ -11,9 +11,9 @@
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
 
 class DatasetSH;
 

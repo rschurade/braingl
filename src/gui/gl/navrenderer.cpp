@@ -8,10 +8,10 @@
 
 #include "../gl/glfunctions.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QVector3D>
+#include <QMatrix4x4>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

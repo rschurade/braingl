@@ -7,7 +7,7 @@
 
 #include "roitreeview.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ROITreeView::ROITreeView( QWidget* parent ) :
     QTreeView( parent )

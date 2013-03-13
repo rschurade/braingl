@@ -10,7 +10,7 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
-#include <QtCore/QVector>
+#include <QVector>
 
 class DatasetDWI;
 

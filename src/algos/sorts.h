@@ -8,7 +8,7 @@
 #ifndef SORTS_H_
 #define SORTS_H_
 
-#include <QtCore/QVector>
+#include <QVector>
 
 class Sorts
 {

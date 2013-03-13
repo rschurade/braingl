@@ -9,7 +9,7 @@
 
 #include "../../gui/gl/glfunctions.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     m_numVerts( numVerts ),

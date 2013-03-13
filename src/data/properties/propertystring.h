@@ -10,7 +10,7 @@
 
 #include "property.h"
 
-#include <QtCore/QString>
+#include <QString>
 
 class EditWithLabel;
 class QWidget;

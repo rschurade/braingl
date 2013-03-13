@@ -6,11 +6,11 @@
  */
 #include "editwithlabel.h"
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QLabel>
 
 EditWithLabel::EditWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent )

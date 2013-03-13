@@ -8,8 +8,8 @@
 #ifndef TRIANGLEMESH2_H_
 #define TRIANGLEMESH2_H_
 
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include <QVector>
+#include <QVector3D>
 
 class MeshThread;
 

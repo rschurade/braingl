@@ -10,7 +10,7 @@
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 StatusBarView::StatusBarView( QAbstractItemModel* globalModel ) :
     m_globalModel( globalModel ),

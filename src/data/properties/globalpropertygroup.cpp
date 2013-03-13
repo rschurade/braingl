@@ -7,7 +7,7 @@
 #include "globalpropertygroup.h"
 #include "propertyfloat.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 GlobalPropertyGroup::GlobalPropertyGroup()
 {

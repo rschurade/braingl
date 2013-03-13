@@ -6,7 +6,7 @@
  */
 #include "arcball.h"
 
-#include <QtCore/QtDebug>
+#include <QtDebug>
 
 #include <math.h>
 

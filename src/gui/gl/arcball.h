@@ -8,9 +8,9 @@
 #ifndef ARCBALL_H_
 #define ARCBALL_H_
 
-#include <QtGui/QVector3D>
-#include <QtGui/QQuaternion>
-#include <QtGui/QMatrix4x4>
+#include <QVector3D>
+#include <QQuaternion>
+#include <QMatrix4x4>
 
 class ArcBall
 {

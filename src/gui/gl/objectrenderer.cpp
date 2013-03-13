@@ -8,7 +8,7 @@
 
 #include "../../data/enums.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ObjectRenderer::ObjectRenderer() :
 	QAbstractItemView(),

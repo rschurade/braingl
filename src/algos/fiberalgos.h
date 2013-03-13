@@ -8,7 +8,7 @@
 #ifndef FIBERALGOS_H_
 #define FIBERALGOS_H_
 
-#include <QtCore/QList>
+#include <QList>
 
 class Dataset;
 

@@ -10,10 +10,10 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtGui/QMatrix4x4>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
+#include <QMatrix4x4>
 
 class SHRendererThread : public QThread
 {

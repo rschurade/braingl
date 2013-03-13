@@ -6,11 +6,11 @@
  */
 #include "selectwithlabel.h"
 
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QComboBox>
+#include <QLabel>
 
 SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent ),

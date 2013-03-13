@@ -15,10 +15,10 @@
 #include "datasets/datasetsh.h"
 #include "mesh/trianglemesh2.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QDataStream>
-#include <QtGui/QVector3D>
-#include <QtGui/QtGui>
+#include <QDebug>
+#include <QDataStream>
+#include <QVector3D>
+#include <QtGui>
 
 Loader::Loader() :
     m_datasetType( Fn::DatasetType::UNKNOWN ),

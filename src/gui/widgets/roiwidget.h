@@ -8,7 +8,7 @@
 #ifndef ROIWIDGET_H_
 #define ROIWIDGET_H_
 
-#include <QtGui/QFrame>
+#include <QFrame>
 
 class QAbstractItemModel;
 class QVBoxLayout;

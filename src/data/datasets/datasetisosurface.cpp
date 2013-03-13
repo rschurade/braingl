@@ -14,7 +14,7 @@
 #include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/meshrenderer.h"
 
-#include <QtCore/QString>
+#include <QString>
 
 DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
         Dataset( QString( "isosurface" ), Fn::DatasetType::MESH_ISOSURFACE ),

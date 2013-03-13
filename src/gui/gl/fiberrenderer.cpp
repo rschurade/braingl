@@ -13,7 +13,7 @@
 #include "../../data/datasets/fiberselector.h"
 
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtCore/QDebug>
+#include <QDebug>
 
 FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),

@@ -8,8 +8,8 @@
 #ifndef ROITREEVIEW_H_
 #define ROITREEVIEW_H_
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QTreeView>
+#include <QMouseEvent>
+#include <QTreeView>
 
 class ROITreeView : public QTreeView
 {

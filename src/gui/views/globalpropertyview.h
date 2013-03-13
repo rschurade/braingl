@@ -8,7 +8,7 @@
 #ifndef GLOBALPROPERTYVIEW_H_
 #define GLOBALPROPERTYVIEW_H_
 
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 
 class QLineEdit;
 class QVBoxLayout;

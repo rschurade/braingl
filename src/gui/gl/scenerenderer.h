@@ -10,9 +10,9 @@
 
 #include "../../data/enums.h"
 
-#include <QtGui/QVector2D>
-#include <QtGui/QMatrix4x4>
-#include <QtCore/QModelIndex>
+#include <QVector2D>
+#include <QMatrix4x4>
+#include <QModelIndex>
 
 class ArcBall;
 class DataStore;

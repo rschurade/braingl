@@ -7,7 +7,7 @@
 #ifndef DELEGATES_H_
 #define DELEGATES_H_
 
-#include <QtGui/QStyledItemDelegate>
+#include <QStyledItemDelegate>
 
 class NiftiFormatDelegate : public QStyledItemDelegate
 {

@@ -10,7 +10,7 @@
 
 #include "dataset.h"
 
-#include <QtCore/QString>
+#include <QString>
 
 class QAbstractItemModel;
 class FiberRenderer;

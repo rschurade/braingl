@@ -8,7 +8,7 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
-#include <QtCore/QMetaType>
+#include <QMetaType>
 
 namespace Fn
 {

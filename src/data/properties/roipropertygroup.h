@@ -15,9 +15,9 @@
 #include "propertyfloat.h"
 #include "propertystring.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
+#include <QObject>
+#include <QString>
+#include <QVariant>
 
 class ROIPropertyGroup : public QObject
 {

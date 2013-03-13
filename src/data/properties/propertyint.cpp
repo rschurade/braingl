@@ -8,7 +8,7 @@
 
 #include "../../gui/widgets/controls/sliderwitheditint.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 PropertyInt::PropertyInt( QString name, int value, int min, int max ) :
     Property( name ),

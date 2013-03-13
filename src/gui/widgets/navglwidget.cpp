@@ -11,8 +11,8 @@
 #include "../gl/navrenderercoronal.h"
 #include "../gl/navrenderersagittal.h"
 
-#include <QtGui/QtGui>
-#include <QtCore/QDebug>
+#include <QtGui>
+#include <QDebug>
 
 NavGLWidget::NavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )

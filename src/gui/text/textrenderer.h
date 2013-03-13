@@ -10,10 +10,10 @@
 
 #include "GL/glew.h"
 
-#include <QtCore/QChar>
-#include <QtCore/QHash>
-#include <QtCore/QString>
-#include <QtGui/QColor>
+#include <QChar>
+#include <QHash>
+#include <QString>
+#include <QColor>
 
 class TextRenderer
 {

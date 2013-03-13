@@ -8,7 +8,7 @@
 #ifndef ROIPROPERTYWIDGET_H_
 #define ROIPROPERTYWIDGET_H_
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class ROIPropertyView;
 class QAbstractItemModel;

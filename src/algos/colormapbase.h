@@ -8,9 +8,9 @@
 #ifndef COLORMAPBASE_H_
 #define COLORMAPBASE_H_
 
-#include <QtGui/QColor>
-#include <QtCore/QVector>
-#include <QtCore/QString>
+#include <QColor>
+#include <QVector>
+#include <QString>
 
 struct ColormapPair
 {

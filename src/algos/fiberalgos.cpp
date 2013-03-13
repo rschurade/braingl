@@ -11,7 +11,7 @@
 #include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/datasetscalar.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 FiberAlgos::FiberAlgos()
 {

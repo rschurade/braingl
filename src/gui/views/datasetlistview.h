@@ -8,7 +8,7 @@
 #ifndef DATASETLISTVIEW_H_
 #define DATASETLISTVIEW_H_
 
-#include <QtGui/QListView>
+#include <QListView>
 
 class DatasetListView : public QListView
 {

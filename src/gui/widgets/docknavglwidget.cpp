@@ -12,7 +12,7 @@
 
 #include "../../data/enums.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),

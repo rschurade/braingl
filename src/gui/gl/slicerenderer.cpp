@@ -10,8 +10,8 @@
 #include "../../data/enums.h"
 
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QVector3D>
+#include <QMatrix4x4>
 
 SliceRenderer::SliceRenderer( QAbstractItemModel* dataModel ) :
     ObjectRenderer(),

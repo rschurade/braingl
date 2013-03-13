@@ -6,7 +6,7 @@
  */
 #include "sorts.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 Sorts::Sorts()
 {

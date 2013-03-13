@@ -11,8 +11,8 @@
 #include "enums.h"
 #include "properties/roipropertygroup.h"
 
-#include <QtGui/QMatrix4x4>
-#include <QtCore/QObject>
+#include <QMatrix4x4>
+#include <QObject>
 
 class QAbstractItemModel;
 

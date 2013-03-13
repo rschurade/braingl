@@ -11,8 +11,8 @@
 
 #include "datasets/dataset.h"
 
-#include <QtCore/QLocale>
-#include <QtCore/QDebug>
+#include <QLocale>
+#include <QDebug>
 
 DataStore::DataStore( QAbstractItemModel* globalProps ) :
     m_globalProperties( globalProps )

@@ -8,7 +8,7 @@
 
 #include "../gl/singleshrenderer.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 SingleSHWidget::SingleSHWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( parent, shareWidget ),

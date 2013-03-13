@@ -16,7 +16,7 @@
 #include "../../data/vptr.h"
 #include "../../data/datasets/dataset.h"
 
-#include <QtCore/QVariant>
+#include <QVariant>
 
 ToolBar::ToolBar( const QString &title, QWidget* parent ) :
     QToolBar( title, parent )

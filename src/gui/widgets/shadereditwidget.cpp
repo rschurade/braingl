@@ -8,7 +8,7 @@
 
 #include "../gl/glfunctions.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ShaderEditWidget::ShaderEditWidget( QWidget* parent ) :
     QWidget( parent )

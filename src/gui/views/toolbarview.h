@@ -10,7 +10,7 @@
 
 #include "../../data/enums.h"
 
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 
 class ToolBarView  : public QAbstractItemView
 {

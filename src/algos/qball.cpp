@@ -13,8 +13,8 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/qmath.h>
+#include <QDebug>
+#include <qmath.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 

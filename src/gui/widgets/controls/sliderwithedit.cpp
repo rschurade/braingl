@@ -6,12 +6,12 @@
  */
 #include "sliderwithedit.h"
 
-#include <QtGui/QSlider>
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
-#include <QtCore/QDebug>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     QFrame( parent )

@@ -8,7 +8,7 @@
 #ifndef STATUSBARVIEW_H_
 #define STATUSBARVIEW_H_
 
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 
 class StatusBarView  : public QAbstractItemView
 {

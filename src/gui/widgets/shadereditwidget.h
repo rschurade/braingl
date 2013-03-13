@@ -8,7 +8,7 @@
 #ifndef SHADEREDITWIDGET_H_
 #define SHADEREDITWIDGET_H_
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 class ShaderEditWidget : public QWidget
 {

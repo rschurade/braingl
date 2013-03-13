@@ -6,14 +6,14 @@
  */
 #include "sliderwitheditint.h"
 
-#include <QtGui/QSlider>
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QFontMetrics>
-#include <QtCore/QDebug>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QFontMetrics>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     QFrame( parent )

@@ -8,7 +8,7 @@
 #ifndef KDTREE_H_
 #define KDTREE_H_
 
-#include <QtCore/QThread>
+#include <QThread>
 
 #include <algorithm>
 #include <vector>

@@ -9,9 +9,9 @@
 
 #include "../enums.h"
 
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QObject>
+#include <QString>
+#include <QVariant>
+#include <QObject>
 
 #include <limits>
 
