@@ -19,6 +19,10 @@ public:
     virtual ~ScalarAlgos();
 
     static QList<Dataset*> isoSurface( Dataset* ds );
+    static QList<Dataset*> distanceMap( Dataset* ds );
+
+private:
+    static double xxgauss(double x, double sigma);
 };
 
 #endif /* SCALARALGOS_H_ */

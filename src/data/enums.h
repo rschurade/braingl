@@ -51,6 +51,7 @@ namespace Fn
         EV,
         BINGHAM,
         ISOSURFACE,
+        DISTANCE_MAP,
         TENSOR_TRACK,
         CROSSING_TRACK,
         BINGHAM_2_TENSOR,
@@ -122,7 +123,7 @@ namespace Fn
         NUM_POINTS,
         NUM_LINES,
         FIBER_COLOR,
-        FIBER_COLORMODE,
+        COLORMODE,
         FIBER_RENDERMODE,
         FIBER_TUBE_THICKNESS,
         HAS_TEXTURE,
@@ -190,7 +191,7 @@ namespace Fn
             case Property::NUM_POINTS: return QString( "num points" ); break;
             case Property::NUM_LINES: return QString( "num lines" ); break;
             case Property::FIBER_COLOR: return QString( "fiber color" ); break;
-            case Property::FIBER_COLORMODE: return QString( "fiber color mode" ); break;
+            case Property::COLORMODE: return QString( "color mode" ); break;
             case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
             case Property::FIBER_TUBE_THICKNESS: return QString( "fiber tube thickness" ); break;
             case Property::HAS_TEXTURE: return QString( "has frame" ); break;

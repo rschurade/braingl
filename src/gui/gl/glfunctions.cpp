@@ -187,13 +187,13 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "colormapbar" );
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "tube" );
+        GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "colormapscale" );
         GLFunctions::m_shaderNames.push_back( "qball" );
         GLFunctions::m_shaderNames.push_back( "crosshair" );
         GLFunctions::m_shaderNames.push_back( "superquadric" );
         GLFunctions::m_shaderNames.push_back( "tensorev" );
         GLFunctions::m_shaderNames.push_back( "ev" );
-        GLFunctions::m_shaderNames.push_back( "mesh" );
         GLFunctions::m_shaderNames.push_back( "box" );
         GLFunctions::m_shaderNames.push_back( "sphere" );
         GLFunctions::m_shaderNames.push_back( "text" );
@@ -207,9 +207,11 @@ void GLFunctions::loadShaders()
         copyShaderToString( GLFunctions::m_shaderNames[ 3 ], QString("fs") );
         copyShaderToString( GLFunctions::m_shaderNames[ 4 ], QString("vs") );
         copyShaderToString( GLFunctions::m_shaderNames[ 4 ], QString("fs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 5 ], QString("vs") );
+        copyShaderToString( GLFunctions::m_shaderNames[ 5 ], QString("fs") );
         updateColormapShader();
 
-        for ( int i = 5; i < GLFunctions::m_shaderNames.size(); ++i )
+        for ( int i = 6; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
@@ -250,14 +252,17 @@ void GLFunctions::updateColormapShader()
     copyShaderToString( "colormapbar", "fs" );
     copyShaderToString( "fiber", "fs" );
     copyShaderToString( "tube", "fs" );
+    copyShaderToString( "mesh", "fs" );
     GLFunctions::m_shaderSources[ "slice_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "slice_fs" ];
     GLFunctions::m_shaderSources[ "colormapbar_fs" ] = code + GLFunctions::m_shaderSources[ "colormapbar_fs" ];
     GLFunctions::m_shaderSources[ "fiber_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "fiber_fs" ];
     GLFunctions::m_shaderSources[ "tube_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "tube_fs" ];
+    GLFunctions::m_shaderSources[ "mesh_fs" ] = GLFunctions::m_shaderSources[ "uniforms_fs" ] + code + GLFunctions::m_shaderSources[ "mesh_fs" ];
     GLFunctions::m_shaders[ "slice" ] = initShader( "slice" );
     GLFunctions::m_shaders[ "colormapbar" ] = initShader( "colormapbar" );
     GLFunctions::m_shaders[ "fiber" ] = initShader( "fiber" );
     GLFunctions::m_shaders[ "tube" ] = initShader( "tube" );
+    GLFunctions::m_shaders[ "mesh" ] = initShader( "mesh" );
 }
 
 void GLFunctions::copyShaderToString( QString name, QString ext )

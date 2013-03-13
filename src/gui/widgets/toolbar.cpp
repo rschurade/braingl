@@ -50,6 +50,10 @@ void ToolBar::createActions()
     m_isosurfaceAct->setStatusTip( tr( "iso surface" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_distanceMapAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "distance map" ), this, Fn::Algo::DISTANCE_MAP );
+    m_distanceMapAct->setStatusTip( tr( "distance map" ) );
+    connect( m_distanceMapAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
     m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, Fn::Algo::TEST );
     m_testAct->setStatusTip( tr( "Test Action 1" ) );
     connect( m_testAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -175,6 +179,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::ISOSURFACE:
             l = ScalarAlgos::isoSurface( ds );
             break;
+        case Fn::Algo::DISTANCE_MAP:
+            l = ScalarAlgos::distanceMap( ds );
+            break;
         case Fn::Algo::FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
             break;
@@ -213,6 +220,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::NIFTI_SCALAR:
         {
             this->addAction( m_isosurfaceAct );
+            this->addAction( m_distanceMapAct );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:

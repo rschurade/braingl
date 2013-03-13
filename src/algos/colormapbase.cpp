@@ -139,9 +139,12 @@ QString ColormapBase::getCode()
     }
 
     c0 = m_values.last().color;
-    code += "if ( value >= 1.0 ) \n    color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
+    code += "if ( value >= 1.0 ) \n    ";
+    code += "{ \n";
+    code += "color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
                                                    QString::number( c0.greenF(), 'f', 2 ) + ", " +
                                                    QString::number( c0.blueF(), 'f', 2 ) + " ); \n";
+    code += "} \n";
 
     return code;
 }
