@@ -6,13 +6,13 @@
  */
 #include "colorwidgetwithlabel.h"
 
-#include <QtGui/QColorDialog>
-#include <QtCore/QDebug>
-#include <QtCore/QVariant>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
+#include <QColorDialog>
+#include <QDebug>
+#include <QVariant>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 ColorWidgetWithLabel::ColorWidgetWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent ),

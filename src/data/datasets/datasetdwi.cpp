@@ -6,7 +6,7 @@
  */
 #include "datasetdwi.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 DatasetDWI::DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ),

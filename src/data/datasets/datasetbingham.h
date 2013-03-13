@@ -10,8 +10,8 @@
 
 #include "datasetnifti.h"
 
-#include <QtGui/QVector3D>
-#include <QtCore/QVector>
+#include <QVector3D>
+#include <QVector>
 
 class QAbstractItemModel;
 class BinghamRenderer;

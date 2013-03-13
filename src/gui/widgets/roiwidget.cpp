@@ -8,8 +8,8 @@
 
 #include "../views/roitreeview.h"
 
-#include <QtCore/QDebug>
-#include <QtGui/QtGui>
+#include <QDebug>
+#include <QtGui>
 
 ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
     QFrame( parent ),

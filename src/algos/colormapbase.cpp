@@ -9,7 +9,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ColormapBase::ColormapBase() :
     m_name( "new colormap" )

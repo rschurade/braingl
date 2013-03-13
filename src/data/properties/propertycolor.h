@@ -10,7 +10,7 @@
 
 #include "property.h"
 
-#include <QtGui/QColor>
+#include <QColor>
 
 class ColorWidgetWithLabel;
 

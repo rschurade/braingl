@@ -8,10 +8,10 @@
 #ifndef BINGHAMRENDERERTHREAD_H_
 #define BINGHAMRENDERERTHREAD_H_
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtGui/QMatrix4x4>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
+#include <QMatrix4x4>
 
 class BinghamRendererThread : public QThread
 {

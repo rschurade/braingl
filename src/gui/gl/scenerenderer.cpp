@@ -19,7 +19,7 @@
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 #include <math.h>
 

@@ -1,7 +1,7 @@
-#include <QtGui/QApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QDateTime>
+#include <QApplication>
+#include <QDebug>
+#include <QDir>
+#include <QDateTime>
 
 #include "data/datastore.h"
 #include "data/globalpropertymodel.h"

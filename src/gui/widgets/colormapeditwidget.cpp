@@ -20,7 +20,7 @@
 #include "../../data/enums.h"
 #include "../../data/properties/property.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 ColormapEditWidget::ColormapEditWidget( QWidget* parent ) :
     QWidget( parent ),

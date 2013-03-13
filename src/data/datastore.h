@@ -8,11 +8,11 @@
 #ifndef DATASTORE_H_
 #define DATASTORE_H_
 
-#include <QtCore/QDir>
-#include <QtCore/QHash>
-#include <QtCore/QList>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QVector3D>
+#include <QDir>
+#include <QHash>
+#include <QList>
+#include <QAbstractItemModel>
+#include <QVector3D>
 
 class DataStore: public QAbstractItemModel
 {

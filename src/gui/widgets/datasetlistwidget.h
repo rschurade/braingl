@@ -8,7 +8,7 @@
 #ifndef DATASETVIEWWIDGET_H_
 #define DATASETVIEWWIDGET_H_
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class QVBoxLayout;
 class QPushButton;

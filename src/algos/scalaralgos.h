@@ -8,7 +8,7 @@
 #ifndef SCALARALGOS_H_
 #define SCALARALGOS_H_
 
-#include <QtCore/QList>
+#include <QList>
 
 class Dataset;
 

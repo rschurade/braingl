@@ -10,7 +10,7 @@
 
 #include "properties/globalpropertygroup.h"
 
-#include <QtCore/QAbstractItemModel>
+#include <QAbstractItemModel>
 
 class GlobalPropertyModel : public QAbstractItemModel
 {

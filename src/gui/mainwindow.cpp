@@ -37,8 +37,8 @@
 #include "../data/vptr.h"
 #include "../data/enums.h"
 
-#include <QtGui/QtGui>
-#include <QtWebKit/QWebView>
+#include <QtGui>
+#include <QWebView>
 
 int MainWindow::screenshotNumber = 0;
 
@@ -738,5 +738,4 @@ void MainWindow::slotDilbert()
     vLayout->addWidget( wv );
     widget->setLayout( vLayout );
     widget->show();
-
 }

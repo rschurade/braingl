@@ -10,9 +10,9 @@
 
 #include "../../algos/kdtree.h"
 
-#include <QtCore/QVector>
-#include <QtCore/QObject>
-#include <QtCore/QAbstractItemModel>
+#include <QVector>
+#include <QObject>
+#include <QAbstractItemModel>
 
 class FiberSelector : public QObject
 {

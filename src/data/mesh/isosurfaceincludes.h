@@ -1,8 +1,8 @@
 #ifndef ISOSURFACEINCLUDES_H_
 #define ISOSURFACEINCLUDES_H_
 
-#include <QtCore/QMap>
-#include <QtCore/QVector>
+#include <QMap>
+#include <QVector>
 
 struct POINT3DID {
     unsigned int newID;

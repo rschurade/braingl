@@ -10,8 +10,8 @@
 
 #include "../mesh/isosurfaceincludes.h"
 
-#include <QtCore/QMutex>
-#include <QtCore/QThread>
+#include <QMutex>
+#include <QThread>
 
 class IsoSurfaceThread : public QThread
 {

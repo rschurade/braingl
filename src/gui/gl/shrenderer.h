@@ -12,7 +12,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtGui/QMatrix4x4>
+#include <QMatrix4x4>
 
 class SHRenderer : public ObjectRenderer
 {

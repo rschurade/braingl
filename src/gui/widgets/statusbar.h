@@ -8,7 +8,7 @@
 #ifndef STATUSBAR_H_
 #define STATUSBAR_H_
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 class StatusBarView;
 

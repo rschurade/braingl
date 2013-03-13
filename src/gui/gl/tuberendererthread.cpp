@@ -8,7 +8,7 @@
 
 #include "glfunctions.h"
 
-#include <QtGui/QVector3D>
+#include <QVector3D>
 
 #include <math.h>
 

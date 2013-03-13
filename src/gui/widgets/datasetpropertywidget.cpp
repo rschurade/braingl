@@ -21,7 +21,7 @@
 #include "../../data/datasets/dataset.h"
 #include "../../data/properties/property.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
     QTabWidget( parent )

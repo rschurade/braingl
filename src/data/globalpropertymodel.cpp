@@ -9,9 +9,9 @@
 #include "enums.h"
 #include "vptr.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QPoint>
-#include <QtGui/QColor>
+#include <QDebug>
+#include <QPoint>
+#include <QColor>
 
 GlobalPropertyModel::GlobalPropertyModel()
 {

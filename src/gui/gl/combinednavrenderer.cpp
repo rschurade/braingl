@@ -9,9 +9,9 @@
 
 #include "../../data/enums.h"
 
-#include <QtCore/QDebug>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QDebug>
+#include <QVector3D>
+#include <QMatrix4x4>
 #include <QtOpenGL/QGLShaderProgram>
 
 #ifndef GL_MULTISAMPLE

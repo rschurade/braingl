@@ -12,8 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtGui/QVector3D>
-#include <QtCore/QVector>
+#include <QVector3D>
+#include <QVector>
 
 class QAbstractItemModel;
 

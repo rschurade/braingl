@@ -10,7 +10,7 @@
 
 #include "../../algos/colormapbase.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class SliderWithEdit;
 class ROIPropertyView;

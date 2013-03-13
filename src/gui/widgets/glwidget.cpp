@@ -8,7 +8,7 @@
 #include "glwidget.h"
 #include "../gl/glfunctions.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
 	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )

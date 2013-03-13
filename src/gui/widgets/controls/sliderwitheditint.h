@@ -8,7 +8,7 @@
 #ifndef SLIDERWITHEDITINT_H_
 #define SLIDERWITHEDITINT_H_
 
-#include <QtGui/QFrame>
+#include <QFrame>
 
 class QSlider;
 class QLineEdit;

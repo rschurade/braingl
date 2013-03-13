@@ -8,9 +8,9 @@
 #ifndef MESHTHREAD_H_
 #define MESHTHREAD_H_
 
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include <QThread>
+#include <QVector>
+#include <QVector3D>
 
 class MeshThread : public QThread
 {

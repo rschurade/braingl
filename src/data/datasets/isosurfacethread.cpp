@@ -8,7 +8,7 @@
 
 #include "../../gui/gl/glfunctions.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 IsoSurfaceThread::IsoSurfaceThread( QVector<float>* scalarField, QMutex* mutex, ID2POINT3DID* i2pt3idVertices, TRIANGLEVECTOR* trivecTriangles,
                                     int nx, int ny, int nz, float dx, float dy, float dz, int id ) :

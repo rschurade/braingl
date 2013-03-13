@@ -10,8 +10,8 @@
 
 #include "../data/enums.h"
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QSettings>
+#include <QMainWindow>
+#include <QSettings>
 
 class QAction;
 class QListView;
@@ -31,7 +31,7 @@ class ToolBar;
 
 class MainWindow: public QMainWindow
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel,  bool debug = false );

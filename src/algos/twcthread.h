@@ -10,10 +10,10 @@
 
 #include "../thirdparty/newmat10/newmat.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
+#include <QVector3D>
 
 class DatasetTensor;
 

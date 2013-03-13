@@ -9,8 +9,8 @@
 
 #include "../gl/glfunctions.h"
 
-#include <QtCore/QDebug>
-#include <QtGui/QImage>
+#include <QDebug>
+#include <QImage>
 #include <QtOpenGL/QGLShaderProgram>
 
 TextRenderer::TextRenderer() :

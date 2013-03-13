@@ -10,8 +10,8 @@
 
 #include "GL/glew.h"
 
-#include <QtGui/QVector3D>
-#include <QtGui/QAbstractItemView>
+#include <QVector3D>
+#include <QAbstractItemView>
 
 #include <initializer_list>
 

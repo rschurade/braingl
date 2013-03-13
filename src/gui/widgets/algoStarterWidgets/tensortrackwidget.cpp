@@ -15,8 +15,8 @@
 #include "../../../data/datasets/datasetfibers.h"
 #include "../../../data/datasets/datasettensor.h"
 
-#include <QtGui/QPushButton>
-#include <QtGui/QProgressBar>
+#include <QPushButton>
+#include <QProgressBar>
 
 TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent ) :
     m_progress( 0 )

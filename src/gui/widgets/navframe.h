@@ -8,8 +8,8 @@
 #ifndef NAVFRAME_H_
 #define NAVFRAME_H_
 
-#include <QtCore/QString>
-#include <QtGui/QFrame>
+#include <QString>
+#include <QFrame>
 
 class QAbstractItemModel;
 class NavGLWidget;

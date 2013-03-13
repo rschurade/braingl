@@ -8,7 +8,7 @@
 #ifndef GLOBALPROPERTYWIDGET_H_
 #define GLOBALPROPERTYWIDGET_H_
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class GlobalPropertyView;
 class QAbstractItemModel;

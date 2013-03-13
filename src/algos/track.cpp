@@ -14,7 +14,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <QtCore/QThread>
+#include <QThread>
 
 Track::Track( DatasetTensor* ds ) :
     m_dataset( ds ),

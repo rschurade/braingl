@@ -8,8 +8,8 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
-#include <QtGui/QTabWidget>
-#include <QtGui/QWidget>
+#include <QTabWidget>
+#include <QWidget>
 
 class DatasetPropertyView;
 class QAbstractItemModel;

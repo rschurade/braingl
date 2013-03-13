@@ -6,7 +6,7 @@
  */
 #include "propertygroup.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 PropertyGroup::PropertyGroup()
 {

@@ -7,7 +7,7 @@
 #include "navframe.h"
 #include "navglwidget.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 NavFrame::NavFrame( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
     QFrame( parent )

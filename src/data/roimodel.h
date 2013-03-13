@@ -8,7 +8,7 @@
 #ifndef ROIMODEL_H_
 #define ROIMODEL_H_
 
-#include <QtCore/QAbstractItemModel>
+#include <QAbstractItemModel>
 
 class ROI;
 

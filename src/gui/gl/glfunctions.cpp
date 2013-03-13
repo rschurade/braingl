@@ -13,13 +13,13 @@
 #include "shaperenderer.h"
 #include "../text/textrenderer.h"
 
-#include <QtCore/QAbstractItemModel>
-#include <QtCore/QHash>
-#include <QtCore/QFile>
-#include <QtCore/QThread>
+#include <QAbstractItemModel>
+#include <QHash>
+#include <QFile>
+#include <QThread>
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QVector3D>
+#include <QMatrix4x4>
 
 #define NUM_TEXTURES 5
 

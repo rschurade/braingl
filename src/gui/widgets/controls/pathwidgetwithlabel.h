@@ -8,8 +8,8 @@
 #ifndef PATHWIDGETWITHLABEL_H_
 #define PATHWIDGETWITHLABEL_H_
 
-#include <QtCore/QDir>
-#include <QtGui/QFrame>
+#include <QDir>
+#include <QFrame>
 
 class QLabel;
 class QLineEdit;

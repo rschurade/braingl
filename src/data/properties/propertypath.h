@@ -10,7 +10,7 @@
 
 #include "property.h"
 
-#include <QtCore/QDir>
+#include <QDir>
 
 class PathWidgetWithLabel;
 

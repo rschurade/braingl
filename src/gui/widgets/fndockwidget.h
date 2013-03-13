@@ -8,7 +8,7 @@
 #ifndef FNDOCKWIDGET_H_
 #define FNDOCKWIDGET_H_
 
-#include <QtGui/QDockWidget>
+#include <QDockWidget>
 
 class FNDockWidget : public QDockWidget
 {

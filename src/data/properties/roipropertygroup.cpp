@@ -6,7 +6,7 @@
  */
 #include "roipropertygroup.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 ROIPropertyGroup::ROIPropertyGroup()
 {

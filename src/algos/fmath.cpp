@@ -13,8 +13,8 @@
 #include "../thirdparty/newmat10/newmatrm.h"
 #include "../thirdparty/newmat10/precisio.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/qmath.h>
+#include <QDebug>
+#include <qmath.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 

@@ -8,9 +8,9 @@
 #ifndef TUBERENDERERTHREAD_H_
 #define TUBERENDERERTHREAD_H_
 
-#include <QtCore/QDebug>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QDebug>
+#include <QThread>
+#include <QVector>
 
 class TubeRendererThread : public QThread
 {

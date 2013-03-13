@@ -12,7 +12,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtGui/QColor>
+#include <QColor>
 
 class FiberSelector;
 

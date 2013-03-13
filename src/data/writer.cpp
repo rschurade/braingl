@@ -15,7 +15,7 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetfibers.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 #include <fstream>
 #include <iostream>

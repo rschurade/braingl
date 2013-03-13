@@ -24,9 +24,9 @@
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include <QDebug>
+#include <QVector>
+#include <QVector3D>
 
 
 DWIAlgos::DWIAlgos()

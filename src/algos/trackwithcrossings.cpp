@@ -13,7 +13,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <QtCore/QThread>
+#include <QThread>
 
 #include "time.h"
 #include "math.h"

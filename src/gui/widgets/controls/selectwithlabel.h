@@ -8,8 +8,8 @@
 #ifndef SELECTWITHLABEL_H_
 #define SELECTWITHLABEL_H_
 
-#include <QtCore/QVariant>
-#include <QtGui/QFrame>
+#include <QVariant>
+#include <QFrame>
 
 class QComboBox;
 class QLabel;

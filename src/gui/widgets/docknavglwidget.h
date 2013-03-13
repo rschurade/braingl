@@ -10,7 +10,7 @@
 
 #include "GL/glew.h"
 
-#include <QtCore/QVariant>
+#include <QVariant>
 #include <QtOpenGL/QGLWidget>
 
 class QAbstractItemModel;

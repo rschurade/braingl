@@ -8,8 +8,8 @@
 #ifndef COLORWIDGETWITHLABEL_H_
 #define COLORWIDGETWITHLABEL_H_
 
-#include <QtGui/QColor>
-#include <QtGui/QFrame>
+#include <QColor>
+#include <QFrame>
 
 class QLabel;
 class QPushButton;

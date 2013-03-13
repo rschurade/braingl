@@ -8,10 +8,10 @@
 #include "glfunctions.h"
 #include "../../data/enums.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
-#include <QtGui/QVector3D>
-#include <QtGui/QMatrix4x4>
+#include <QVector3D>
+#include <QMatrix4x4>
 
 NavRendererAxial::NavRendererAxial(  QAbstractItemModel* dataModel, QString name ) :
     NavRenderer( dataModel, name )

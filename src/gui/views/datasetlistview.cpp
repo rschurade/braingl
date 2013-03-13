@@ -6,7 +6,7 @@
  */
 #include "datasetlistview.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 DatasetListView::DatasetListView( QWidget *parent ) : QListView( parent )
 {

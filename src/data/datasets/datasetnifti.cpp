@@ -6,7 +6,7 @@
  */
 #include "datasetnifti.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 DatasetNifti::DatasetNifti( QString filename, Fn::DatasetType type, nifti_image* header ) :
         Dataset( filename, type ), m_header( header ), m_qform( 3, 3 ), m_sform( 3, 3 )

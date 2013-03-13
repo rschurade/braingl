@@ -8,7 +8,7 @@
 #ifndef DATASETPROPERTYVIEW_H_
 #define DATASETPROPERTYVIEW_H_
 
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 
 class QHBoxLayout;
 class QVBoxLayout;

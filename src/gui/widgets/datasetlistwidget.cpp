@@ -8,7 +8,7 @@
 
 #include "../views/datasetlistview.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QWidget( parent ),

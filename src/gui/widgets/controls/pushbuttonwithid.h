@@ -4,7 +4,7 @@
  *  Created on: Feb 13, 2013
  *      Author: schurade
  */
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
 #ifndef PUSHBUTTONWITHID_H_
 #define PUSHBUTTONWITHID_H_

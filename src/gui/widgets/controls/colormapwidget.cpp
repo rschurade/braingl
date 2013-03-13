@@ -9,7 +9,7 @@
 #include "../../gl/colormapfunctions.h"
 #include "../../../algos/colormapbase.h"
 
-#include <QtGui/QtGui>
+#include <QtGui>
 
 ColormapWidget::ColormapWidget( int width, float min, float max ) :
     m_colormap( 0 ),

@@ -8,7 +8,7 @@
 #ifndef DWIALGOS_H_
 #define DWIALGOS_H_
 
-#include <QtCore/QList>
+#include <QList>
 
 class Dataset;
 

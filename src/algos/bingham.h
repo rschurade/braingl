@@ -8,7 +8,7 @@
 #ifndef BINGHAM_H_
 #define BINGHAM_H_
 
-#include <QtCore/QList>
+#include <QList>
 
 class Dataset;
 class DatasetBingham;

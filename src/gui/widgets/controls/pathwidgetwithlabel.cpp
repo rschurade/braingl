@@ -7,14 +7,14 @@
 
 #include "pathwidgetwithlabel.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QVariant>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QFileDialog>
+#include <QDebug>
+#include <QVariant>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QFileDialog>
 
 PathWidgetWithLabel::PathWidgetWithLabel( QString label, int id, QWidget* parent )  :
     QFrame( parent ),

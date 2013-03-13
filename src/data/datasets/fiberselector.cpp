@@ -9,7 +9,7 @@
 
 #include "../enums.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 FiberSelector::FiberSelector( QAbstractItemModel* roiModel ) :
     m_roiModel( roiModel ),

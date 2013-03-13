@@ -10,7 +10,7 @@
 
 #include "../../data/mesh/tesselation.h"
 
-#include <QtCore/QDebug>
+#include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
 
 ShapeRenderer::ShapeRenderer() :

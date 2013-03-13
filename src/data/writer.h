@@ -12,7 +12,7 @@
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
-#include <QtCore/QString>
+#include <QString>
 
 class Writer
 {

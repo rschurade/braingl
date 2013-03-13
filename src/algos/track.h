@@ -10,9 +10,9 @@
 
 #include "fmath.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QVector>
-#include <QtGui/QVector3D>
+#include <QDebug>
+#include <QVector>
+#include <QVector3D>
 
 class DatasetTensor;
 class TrackThread;

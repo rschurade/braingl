@@ -12,8 +12,8 @@
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QVector>
+#include <QDir>
+#include <QVector>
 
 class Loader
 {
