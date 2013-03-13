@@ -26,7 +26,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
     m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
-    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 3, true );
+    m_properties.set( Fn::Property::COLORMODE, 0, 0, 3, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.001f, 0.2f, true );
     m_properties.set( Fn::Property::COLORMAP, 1 );
@@ -61,7 +61,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
     m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
-    m_properties.set( Fn::Property::FIBER_COLORMODE, 0, 0, 4, true );
+    m_properties.set( Fn::Property::COLORMODE, 0, 0, 4, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.001f, 0.2f, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
@@ -138,7 +138,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
             m_renderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
-        m_renderer->setRenderParams( m_properties.get( Fn::Property::FIBER_COLORMODE ).toInt(),
+        m_renderer->setRenderParams( m_properties.get( Fn::Property::COLORMODE ).toInt(),
                                      m_properties.get( Fn::Property::COLORMAP ).toInt(),
                                      m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
                                      m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
@@ -155,7 +155,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
             m_tubeRenderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
-        m_tubeRenderer->setRenderParams( m_properties.get( Fn::Property::FIBER_COLORMODE ).toInt(),
+        m_tubeRenderer->setRenderParams( m_properties.get( Fn::Property::COLORMODE ).toInt(),
                                          m_properties.get( Fn::Property::COLORMAP ).toInt(),
                                          m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
                                          m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),

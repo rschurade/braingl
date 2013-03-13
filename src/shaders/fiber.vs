@@ -49,7 +49,7 @@ void main()
     {
        gl_FrontColor =  vec4( u_color, 1.0 );
     }
-    
+    // TODO submit the actual dims in a uniform
     v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
 	
     gl_Position = mvp_matrix * a_position;

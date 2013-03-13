@@ -8,6 +8,7 @@
 
 #include "glfunctions.h"
 
+#include "../../data/enums.h"
 #include "../../data/mesh/trianglemesh2.h"
 
 #include <QtOpenGL/QGLShaderProgram>
@@ -22,7 +23,13 @@ MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     m_tris( 0 ),
     vboIds( new GLuint[ 2 ] ),
     m_mesh( mesh ),
-    m_dirty( true )
+    m_dirty( true ),
+    m_colorMode( 0 ),
+    m_colormap( 1 ),
+    m_selectedMin( 0.0 ),
+    m_selectedMax( 1.0 ),
+    m_lowerThreshold( 0.0 ),
+    m_upperThreshold( 1.0 )
 {
 
 }
@@ -44,12 +51,33 @@ void MeshRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
 {
     GLFunctions::getShader( "mesh" )->bind();
+
+    GLFunctions::setupTextures( dataModel );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ) , dataModel );
     // Set modelview-projection matrix
     GLFunctions::getShader( "mesh" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "mesh" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_colorMode", m_colorMode );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_colormap", m_colormap );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", 1.0, 1.0, 1.0 );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMin", m_selectedMin );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMax", m_selectedMax );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
+
+
+    float nx = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
+    float ny = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
+    float nz = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
     if ( m_dirty )
     {
@@ -99,3 +127,14 @@ void MeshRenderer::initGeometry()
 
     m_dirty = false;
 }
+
+void MeshRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold )
+{
+    m_colorMode = colorMode;
+    m_colormap = colormap;
+    m_selectedMin = selectedMin;
+    m_selectedMax = selectedMax;
+    m_lowerThreshold = lowerThreshold;
+    m_upperThreshold = upperThreshold;
+}
+
