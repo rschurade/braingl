@@ -12,25 +12,13 @@ uniform mat4 mv_matrixInvert;
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 1: varyings
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-// light direction
-// USAGE:
-// x,y,z components:        the light direction vector
-// w component:             unused
-// (4 varying floats)
-varying vec4 v_lightDir;
+#include lighting_vs
 
 // camera direction vector
 // USAGE:
 // x,y,z components:        the direction vector
 // w component:             unused
 varying vec4 v_planePoint;
-
-// point on projection plane of current pixel
-// USAGE:
-// x,y,z components:        the point
-// w component:             unused
-varying vec4 v_viewDir;
 
 // alpha and beta values describing the superquadric
 // USAGE:

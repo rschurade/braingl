@@ -47,10 +47,6 @@ void main()
 
     gl_Position = v_position; //< store final position
 	
-	
-	
-	
-	
 	v_extra = a_extra;
    
 	if ( u_colorMode == 0 )
