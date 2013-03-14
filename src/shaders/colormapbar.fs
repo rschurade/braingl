@@ -1,3 +1,5 @@
+#include colormap_fs
+
 varying vec3 v_texcoord;
 
 uniform float u_min;

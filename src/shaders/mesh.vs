@@ -1,3 +1,5 @@
+#include lighting_vs
+
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrixInvert;
 
@@ -8,18 +10,6 @@ attribute vec4 a_normal;
 
 varying vec3 v_normal;
 
-// point on projection plane of current pixel
-// USAGE:
-// x,y,z components:        the point
-// w component:             unused
-varying vec4 v_viewDir;
-
-// light direction
-// USAGE:
-// x,y,z components:        the light direction vector
-// w component:             unused
-// (4 varying floats)
-varying vec4 v_lightDir;
 
 varying vec3 v_texcoord;
 

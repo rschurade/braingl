@@ -85,11 +85,12 @@ private:
     GLFunctions();
     virtual ~GLFunctions();
 
-    static void copyShaderToString( QString name, QString ext );
+    static QString copyShaderToString( QString name, QString ext );
 
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;
 
+    static QHash< QString, QString >m_shaderIncludes;
     static QHash< QString, QString >m_shaderSources;
     static QHash< QString, QGLShaderProgram* >m_shaders;
     static QVector<QString>m_shaderNames;

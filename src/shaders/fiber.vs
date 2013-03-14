@@ -11,31 +11,12 @@ attribute float a_extra;
 varying vec3 v_normal;
 varying float v_extra;
 
-// point on projection plane of current pixel
-// USAGE:
-// x,y,z components:        the point
-// w component:             unused
-varying vec4 v_viewDir;
-
-// light direction
-// USAGE:
-// x,y,z components:        the light direction vector
-// w component:             unused
-// (4 varying floats)
-varying vec4 v_lightDir;
-
 varying vec3 v_texcoord;
 
 void main()
 {
 	v_normal = normalize( a_normal.xyz );
 	v_extra = a_extra;
-   
-    v_viewDir = mv_matrixInvert * vec4( 0.0, 0.0, 1.0, 0.0);
-    v_viewDir.w = 1.0;
-    
-    vec4 lightPos = vec4( 0.0, 0.0, 1.0, 0.0 );
-    v_lightDir.xyz = normalize( ( mv_matrixInvert * lightPos ).xyz );
 	
 	if ( u_colorMode == 0 )
 	{
