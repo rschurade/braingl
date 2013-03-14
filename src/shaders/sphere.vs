@@ -4,12 +4,7 @@
 void main()
 {
     v_normal = a_position;
-
-    v_viewDir = mv_matrixInvert * vec4( 0.0, 0.0, 1.0, 0.0);
-    v_viewDir.w = 1.0;
-    
-    vec4 lightPos = vec4( 0.0, 0.0, 1.0, 0.0 );
-    v_lightDir.xyz = normalize( ( mv_matrixInvert * lightPos ).xyz );
+    prepareLight();
 
     vec3 pos = a_position;
     pos.x = ( pos.x * u_dx ) + u_x;
