@@ -281,7 +281,7 @@ void ColormapEditWidget::update()
 {
     m_colormap.setName( m_nameEdit->text() );
     ColormapFunctions::updateColormap( m_selected, m_colormap );
-    GLFunctions::updateColormapShader();
+    GLFunctions::reloadShaders();
 
     emit( signalUpdate() );
 }
