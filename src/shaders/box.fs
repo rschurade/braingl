@@ -1,6 +1,6 @@
 #version 120 
 
-uniform vec4 u_color;
+#include uniforms_fs
 
 void main( void )
 {

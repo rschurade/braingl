@@ -1,15 +1,7 @@
 #include colormap_fs
 #include textures_fs
 #include lighting_fs
-
-varying vec3 v_normal;
-
-uniform int u_colorMode;
-uniform int u_colormap;
-uniform float u_selectedMin;
-uniform float u_selectedMax;
-uniform float u_lowerThreshold;
-uniform float u_upperThreshold;
+#include uniforms_fs
 
 void main()
 {

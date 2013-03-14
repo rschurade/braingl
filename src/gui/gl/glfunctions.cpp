@@ -188,6 +188,8 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderIncludes[ "textures_fs" ] = copyShaderToString( "textures", QString("fs") );
         GLFunctions::m_shaderIncludes[ "lighting_vs" ] = copyShaderToString( "lighting", QString("vs") );
         GLFunctions::m_shaderIncludes[ "lighting_fs" ] = copyShaderToString( "lighting", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "uniforms_vs" ] = copyShaderToString( "uniforms", QString("vs") );
+        GLFunctions::m_shaderIncludes[ "uniforms_fs" ] = copyShaderToString( "uniforms", QString("fs") );
 
         updateColormapShader();
 

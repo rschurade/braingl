@@ -1,16 +1,4 @@
-attribute vec4 a_position;
-
-uniform float u_width;
-uniform float u_height;
-uniform float u_scaleX;
-uniform float u_scaleY;
-
-uniform float u_x;
-uniform float u_y;
-uniform float u_sizeX;
-uniform float u_sizeY;
-uniform float u_pos;
-uniform float u_char;
+#include uniforms_vs
 
 varying vec2 v_texCoord;
 

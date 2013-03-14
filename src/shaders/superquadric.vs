@@ -1,13 +1,6 @@
 #version 120
 
-attribute vec4 a_position;
-attribute vec4 a_normal;
-attribute vec3 a_diag;
-attribute vec3 a_offdiag;
-
-uniform mat4 mvp_matrix;
-uniform mat4 mv_matrixInvert;
-
+#include uniforms_vs
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 1: varyings
@@ -32,10 +25,6 @@ varying vec4 v_alphaBeta;
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-// scale glyphs
-uniform float u_scaling;
-
 // fractional anisotropy threshold to skip some glyphs
 uniform float u_faThreshold;
 
@@ -192,27 +181,23 @@ void main()
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     // get tensor data
-    vec4 normal  = a_normal;
+    vec4 normal  = vec4( a_normal, 1.0 );
     vec3 diag    = a_diag;
     vec3 offdiag = a_offdiag;
 
     // calculate eigenvectors, and rotation matrix
     vec3 evals = getEigenvalues( diag, offdiag );
-    //evals = vec3( 1.0, 1.0, 1.0 );
 
     // first eigenvector
     vec3 ABCx = diag - evals.x;
     vec3 ev0 = getEigenvector( ABCx, offdiag );
-    //ev0 = normalize( vec3( 1.0, 0.0, 0.0 ) );
 
     // second eigenvector
     vec3 ABCy = diag - evals.y;
     vec3 ev1 = getEigenvector( ABCy, offdiag );
-    //ev1 = normalize( vec3( 0.0, 1.0, 0.0 ) );
 
     // third eigenvector
     vec3 ABCz = diag - evals.z;
-    //vec3 ev2 = getEigenvector( ABCz, offdiag );
     vec3 ev2 = cross( ev0.xyz, ev1.xyz ); // as they are orthogonal
 
     // glyphs color and anisotropy
@@ -229,7 +214,6 @@ void main()
     if( evals.z <= 0.0 )
     {
         evals.z = 0.01;
-        //v_alphaBeta.w = 1.0;
     }
     
 
@@ -269,9 +253,6 @@ void main()
     v_alphaBeta.y = 2.0 / kmBeta;
     v_alphaBeta.z = kmAlpha / kmBeta;
 
-    //evals.z = ( evals.z / evals.x );
-    //evals.y = ( evals.y / evals.x );
-    //evals.x = 1.0;
     if( evalSum > u_evThreshold )
     {
         v_alphaBeta.w = 1.0;
@@ -303,7 +284,7 @@ void main()
                                    0.0, 0.0, 0.0, 1.0 );
 
     normal.w = 0.0;
-    gl_Position = mvp_matrix * ( a_position + glyphSystem * glyphScale * normal );
+    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + glyphSystem * glyphScale * normal );
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 5: Transform light and plane as well as ray back to glyph space
