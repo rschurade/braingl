@@ -443,11 +443,11 @@ void MainWindow::createActions()
 
     newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
-
+#ifndef __WINDOWS__
     dilbertAct = new QAction( QIcon( ":/icons/box.png" ), tr( "Dilbert" ), this );
     dilbertAct->setStatusTip( tr( "Dilbert" ) );
     connect( dilbertAct, SIGNAL( triggered() ), this, SLOT( slotDilbert() ) );
-
+#endif
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
         recentFileActs[ i ] = new QAction( this );
@@ -483,7 +483,9 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
     helpMenu->addAction( screenshotAct );
     helpMenu->addAction( resetSettingsAct );
+#ifndef __WINDOWS__
     helpMenu->addAction( dilbertAct );
+#endif
     helpMenu->addAction( aboutAct );
     helpMenu->addAction( aboutQtAct );
 }
@@ -729,6 +731,7 @@ void MainWindow::resetSettings()
 
 void MainWindow::slotDilbert()
 {
+#ifndef __WINDOWS__
     QWidget* widget = new QWidget();
     QVBoxLayout* vLayout = new QVBoxLayout();
     vLayout->setContentsMargins( 1, 1, 1, 1 );
@@ -738,4 +741,5 @@ void MainWindow::slotDilbert()
     vLayout->addWidget( wv );
     widget->setLayout( vLayout );
     widget->show();
+#endif
 }
