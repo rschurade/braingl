@@ -54,15 +54,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIte
     GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ) , dataModel );
 
     // Set modelview-projection matrix
-    GLFunctions::getShader( "tube" )->setUniformValue( "p_matrix", p_matrix );
-    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrix", mv_matrix );
-    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixI", mv_matrix.inverted() );
-    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixT", mv_matrix.transposed() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
-    GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixIT", mv_matrix.inverted().transposed() );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_colorMode", m_colorMode );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMin", m_selectedMin );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMax", m_selectedMax );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );

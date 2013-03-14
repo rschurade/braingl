@@ -1,12 +1,5 @@
 #include colormap_fs
-
-varying vec3 v_texcoord;
-
-uniform float u_min;
-uniform float u_max;
-uniform float u_lowerThreshold;
-uniform float u_upperThreshold;
-uniform int u_colormap;
+#include uniforms_fs
 
 void main( void )
 {

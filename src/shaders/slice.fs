@@ -1,5 +1,6 @@
 #include colormap_fs
 #include textures_fs
+#include uniforms_fs
 
 void main()
 {

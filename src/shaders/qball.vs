@@ -1,18 +1,8 @@
-uniform mat4 mvp_matrix;
-uniform mat4 mv_matrixInvert;
-
-attribute vec4 a_position;
-attribute vec3 a_offset;
-attribute float a_radius;
-
-uniform bool u_hideNegativeLobes;
-uniform float u_scaling;
-
-varying vec3 v_normal;
+#include uniforms_vs
 
 void main()
 {
-	v_normal = normalize( a_position.xyz );
+	v_normal = normalize( a_position );
 	
 	float r = a_radius;
 	

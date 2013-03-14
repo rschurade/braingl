@@ -57,7 +57,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIt
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0 );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );

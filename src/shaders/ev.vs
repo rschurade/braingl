@@ -1,22 +1,10 @@
 #version 120
 
-attribute vec4 a_position;
-attribute float a_dir;
-attribute vec3 a_vec;
-
-uniform mat4 mvp_matrix;
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// 2: uniforms
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-// scale glyphs
-uniform float u_scaling;
+#include uniforms_vs
 
 varying float v_discard;
 
 
-// simple default color map, but with precomputed FA values
 vec4 getColor( vec3 vec )
 {
     vec4 color;
@@ -42,5 +30,5 @@ void main()
     }
     
     
-    gl_Position = mvp_matrix * ( a_position + vec );
+    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + vec );
 }

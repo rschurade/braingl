@@ -1,10 +1,6 @@
 #version 120 
 
-uniform vec4 u_color;
-uniform bool u_picking;
-
-varying vec3 v_normal;
-
+#include uniforms_fs
 #include lighting_fs
 
 void main( void )

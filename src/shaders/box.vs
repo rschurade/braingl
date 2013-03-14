@@ -1,15 +1,6 @@
 #version 120
 
-attribute vec3 a_position;
-
-uniform mat4 mvp_matrix;
-
-uniform float u_x;
-uniform float u_y;
-uniform float u_z;
-uniform float u_dx;
-uniform float u_dy;
-uniform float u_dz;
+#include uniforms_vs
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms

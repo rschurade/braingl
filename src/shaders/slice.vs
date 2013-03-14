@@ -1,9 +1,5 @@
-attribute vec3 a_position;
-attribute vec3 a_texcoord;
-
-uniform mat4 mvp_matrix;
-
-varying vec3 v_texcoord;
+#include textures_vs
+#include uniforms_vs
 
 void main()
 {

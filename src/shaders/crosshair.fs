@@ -1,4 +1,4 @@
-uniform vec3 u_color;
+#include uniforms_fs
 
 void main()
 {

@@ -1,19 +1,10 @@
 #version 120
 
-attribute vec4 a_position;
-attribute float a_dir;
-attribute vec3 a_diag;
-attribute vec3 a_offdiag;
-
-uniform mat4 mvp_matrix;
+#include uniforms_vs
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-// scale glyphs
-uniform float u_scaling;
-
 // fractional anisotropy threshold to skip some glyphs
 uniform float u_faThreshold;
 
@@ -177,27 +168,21 @@ void main()
 
     // calculate eigenvectors, and rotation matrix
     vec3 evals = getEigenvalues( diag, offdiag );
-    //evals = vec3( 1.0, 1.0, 1.0 );
 
     // first eigenvector
     vec3 ABCx = diag - evals.x;
     vec3 ev0 = getEigenvector( ABCx, offdiag );
-    //ev0 = normalize( vec3( 1.0, 0.0, 0.0 ) );
 
     // second eigenvector
     vec3 ABCy = diag - evals.y;
     vec3 ev1 = getEigenvector( ABCy, offdiag );
-    //ev1 = normalize( vec3( 0.0, 1.0, 0.0 ) );
 
     // third eigenvector
     vec3 ABCz = diag - evals.z;
-    //vec3 ev2 = getEigenvector( ABCz, offdiag );
     vec3 ev2 = cross( ev0.xyz, ev1.xyz ); // as they are orthogonal
 
     // glyphs color and anisotropy
     float FA = getFA( evals );
-    //FA = clamp( FA, 0.0, 1.000 ); // filter out invalid FA values later
-    //gl_FrontColor = getColor( ev0.xyz, FA );
     
     float evalSum =    evals.x + evals.y + evals.z;
     
@@ -228,5 +213,5 @@ void main()
         evtmp = vec4( ev2.rgb, 0.0 ) * dir * u_scaling;
         gl_FrontColor = getColor( ev2.xyz, 1.0 );
     }
-    gl_Position = mvp_matrix * ( a_position + evtmp );
+    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + evtmp );
 }

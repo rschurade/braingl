@@ -28,37 +28,40 @@
 	<file>icons/eigenvector.png</file>
 	<file>icons/iso_surface.png</file>
 	<file>icons/droidsansmono256.png</file>
-	<file>shaders/textures.vs</file>
-	<file>shaders/textures.fs</file>
-	<file>shaders/lighting.vs</file>
-    <file>shaders/lighting.fs</file>
-	<file>shaders/slice.vs</file>
-	<file>shaders/slice.fs</file>
-	<file>shaders/qball.vs</file>
-	<file>shaders/qball.fs</file>
-	<file>shaders/superquadric.vs</file>
-    <file>shaders/superquadric.fs</file>
-	<file>shaders/crosshair.vs</file>
-    <file>shaders/crosshair.fs</file>
-    <file>shaders/tensorev.vs</file>
-    <file>shaders/tensorev.fs</file>
-    <file>shaders/ev.vs</file>
-    <file>shaders/ev.fs</file>
-    <file>shaders/box.vs</file>
+	<file>shaders/box.vs</file>
     <file>shaders/box.fs</file>
-    <file>shaders/fiber.vs</file>
-    <file>shaders/fiber.fs</file>
-    <file>shaders/mesh.vs</file>
-    <file>shaders/mesh.fs</file>
-    <file>shaders/sphere.vs</file>
-    <file>shaders/sphere.fs</file>
-    <file>shaders/text.vs</file>
-    <file>shaders/text.fs</file>
-    <file>shaders/tube.vs</file>
-    <file>shaders/tube.fs</file>
-    <file>shaders/colormapbar.vs</file>
+	<file>shaders/colormapbar.vs</file>
     <file>shaders/colormapbar.fs</file>
     <file>shaders/colormapscale.vs</file>
     <file>shaders/colormapscale.fs</file>
+    <file>shaders/crosshair.vs</file>
+    <file>shaders/crosshair.fs</file>
+    <file>shaders/ev.vs</file>
+    <file>shaders/ev.fs</file>
+    <file>shaders/fiber.vs</file>
+    <file>shaders/fiber.fs</file>
+    <file>shaders/lighting.vs</file>
+    <file>shaders/lighting.fs</file>
+    <file>shaders/mesh.vs</file>
+    <file>shaders/mesh.fs</file>
+    <file>shaders/qball.vs</file>
+    <file>shaders/qball.fs</file>
+    <file>shaders/slice.vs</file>
+    <file>shaders/slice.fs</file>
+    <file>shaders/sphere.vs</file>
+    <file>shaders/sphere.fs</file>
+    <file>shaders/superquadric.vs</file>
+    <file>shaders/superquadric.fs</file>
+    <file>shaders/tensorev.vs</file>
+    <file>shaders/tensorev.fs</file>
+    <file>shaders/text.vs</file>
+    <file>shaders/text.fs</file>
+    <file>shaders/textures.vs</file>
+    <file>shaders/textures.fs</file>
+    <file>shaders/tube.vs</file>
+    <file>shaders/tube.fs</file>
+    <file>shaders/uniforms.vs</file>
+    <file>shaders/uniforms.fs</file>
+    
  </qresource>
  </RCC>
