@@ -173,7 +173,8 @@ void GLFunctions::setShaderCode( QString name, QString source )
 
 void GLFunctions::reloadShaders()
 {
-    for ( int i = 1; i < GLFunctions::m_shaderNames.size(); ++i )
+    updateColormapShader();
+    for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
         GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
     }
@@ -257,13 +258,6 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
         code += "\n";
     }
 
-    QHashIterator<QString, QString> i( GLFunctions::m_shaderIncludes );
-    while (i.hasNext() )
-    {
-        i.next();
-        code = code.replace( QString( "#include " + i.key() ), QString( i.value() ) );
-    }
-
     return code;
 }
 
@@ -274,15 +268,31 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     // Overriding system locale until shaders are compiled
     setlocale( LC_NUMERIC, "C" );
 
+    QString code = GLFunctions::m_shaderSources[ name + "_vs" ];
+    QHashIterator<QString, QString> i( GLFunctions::m_shaderIncludes );
+    while (i.hasNext() )
+    {
+        i.next();
+        code = code.replace( QString( "#include " + i.key() ), QString( i.value() ) );
+    }
+
     // Compiling vertex shader
-    if ( !program->addShaderFromSourceCode( QGLShader::Vertex, GLFunctions::m_shaderSources[ name + "_vs" ] ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Vertex, code ) )
     {
         qCritical() << "Error while compiling vertex shader: " << name << "!";
         //exit( false );
     }
 
+    code = GLFunctions::m_shaderSources[ name + "_fs" ];
+    QHashIterator<QString, QString> j( GLFunctions::m_shaderIncludes );
+    while (j.hasNext() )
+    {
+        j.next();
+        code = code.replace( QString( "#include " + j.key() ), QString( j.value() ) );
+    }
+
     // Compiling fragment shader
-    if ( !program->addShaderFromSourceCode( QGLShader::Fragment, GLFunctions::m_shaderSources[ name + "_fs" ] ) )
+    if ( !program->addShaderFromSourceCode( QGLShader::Fragment, code ) )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
         //exit( false );
