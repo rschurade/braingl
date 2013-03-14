@@ -63,7 +63,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIte
 
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_colorMode", m_colorMode );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", 1.0, 1.0, 1.0 );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", 1.0, 1.0, 1.0, 1.0 );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMin", m_selectedMin );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMax", m_selectedMax );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
