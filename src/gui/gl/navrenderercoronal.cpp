@@ -171,7 +171,7 @@ void NavRendererCoronal::draw()
         GLFunctions::getShader( "crosshair" )->bind();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
         QColor ccolor = model()->data( model()->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ).value<QColor>();
-        GLFunctions::getShader( "crosshair" )->setUniformValue( "u_color", ccolor.redF(), ccolor.greenF(), ccolor.blueF() );
+        GLFunctions::getShader( "crosshair" )->setUniformValue( "u_color", ccolor.redF(), ccolor.greenF(), ccolor.blueF(), 1.0f );
         // Tell OpenGL which VBOs to use
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
