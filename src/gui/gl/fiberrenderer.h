@@ -26,9 +26,10 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel, QAbstractItemModel* globalModel );
 
-    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );
+    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold,
+                            float dx, float dy, float dz, float x, float y, float z, float lineWidth );
 
 
 protected:
@@ -64,6 +65,13 @@ private:
     float m_selectedMax;
     float m_lowerThreshold;
     float m_upperThreshold;
+    float m_dx;
+    float m_dy;
+    float m_dz;
+    float m_x;
+    float m_y;
+    float m_z;
+    float m_lineWidth;
     QVector<QColor>m_colorField;
 
 public slots:

@@ -29,6 +29,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::COLORMODE, 0, 0, 3, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::FIBER_TUBE_THICKNESS, 0.01f, 0.001f, 0.2f, true );
+    m_properties.set( Fn::Property::FIBER_LINE_THICKNESS, 1.0f, 1.0, 5.0f, true );
     m_properties.set( Fn::Property::COLORMAP, 1 );
     m_properties.set( Fn::Property::MIN, 0.0f );
     m_properties.set( Fn::Property::MAX, 1.0f );
@@ -36,6 +37,12 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f );
     m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
+    m_properties.set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::NX, 800, 0, 1600, true );
+    m_properties.set( Fn::Property::NY, 1000, 0, 2000, true );
+    m_properties.set( Fn::Property::NZ, 800, 0, 1600, true );
 
     m_extraData.reserve( fibs.size() );
     for ( int i = 0; i < fibs.size(); ++i )
@@ -143,8 +150,15 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
                                      m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
                                      m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
                                      m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-        m_renderer->draw( pMatrix, mvMatrix, dataModel );
+                                     m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat(),
+                                     m_properties.get( Fn::Property::DX ).toFloat(),
+                                     m_properties.get( Fn::Property::DY ).toFloat(),
+                                     m_properties.get( Fn::Property::DZ ).toFloat(),
+                                     m_properties.get( Fn::Property::NX ).toFloat(),
+                                     m_properties.get( Fn::Property::NY ).toFloat(),
+                                     m_properties.get( Fn::Property::NZ ).toFloat(),
+                                     m_properties.get( Fn::Property::FIBER_LINE_THICKNESS ).toFloat() );
+        m_renderer->draw( pMatrix, mvMatrix, dataModel, globalModel );
     }
     else if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
