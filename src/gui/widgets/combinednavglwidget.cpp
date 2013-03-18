@@ -6,17 +6,19 @@
  */
 #include "combinednavglwidget.h"
 
+#include "../../data/models.h"
+
 #include "../gl/combinednavrenderer.h"
 
 #include <QtGui>
 
-CombinedNavGLWidget::CombinedNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+CombinedNavGLWidget::CombinedNavGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_renderer = new CombinedNavRenderer( dataModel, name );
-    m_renderer->setModel( globalModel );
-    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer = new CombinedNavRenderer( name );
+    m_renderer->setModel( Models::g() );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 CombinedNavGLWidget::~CombinedNavGLWidget()

@@ -14,6 +14,7 @@
 #include "../../algos/scalaralgos.h"
 #include "../../algos/fiberalgos.h"
 #include "../../data/vptr.h"
+#include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
 
 #include <QVariant>
@@ -23,6 +24,7 @@ ToolBar::ToolBar( const QString &title, QWidget* parent ) :
 {
     setObjectName( title );
     m_toolBarView = new ToolBarView( this );
+    m_toolBarView->setModel( Models::d() );
 
     connect( m_toolBarView, SIGNAL( sigSelectionChanged( int ) ), this, SLOT( slotSelectionChanged( int ) ) );
 
@@ -31,12 +33,6 @@ ToolBar::ToolBar( const QString &title, QWidget* parent ) :
 
 ToolBar::~ToolBar()
 {
-}
-
-void ToolBar::setModel( QAbstractItemModel* model )
-{
-    m_toolBarView->setModel( model );
-
 }
 
 void ToolBar::setSelectionModel( QItemSelectionModel* selectionModel )

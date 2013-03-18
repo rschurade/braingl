@@ -17,7 +17,7 @@ class QGLShaderProgram;
 class NavRendererSagittal : public NavRenderer
 {
 public:
-	NavRendererSagittal(  QAbstractItemModel* dataModel, QString name );
+	NavRendererSagittal( QString name );
 	virtual ~NavRendererSagittal();
 
 	void draw();

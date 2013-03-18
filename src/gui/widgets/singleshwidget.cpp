@@ -8,16 +8,17 @@
 
 #include "../gl/singleshrenderer.h"
 
+#include "../../data/models.h"
+
 #include <QtGui>
 
-SingleSHWidget::SingleSHWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget ),
-    m_globalModel( globalModel)
+SingleSHWidget::SingleSHWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
+    QGLWidget( parent, shareWidget )
 {
-    m_renderer = new SingleSHRenderer( m_globalModel );
-    m_renderer->setModel( dataModel );
-    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_renderer = new SingleSHRenderer();
+    m_renderer->setModel( Models::d() );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 SingleSHWidget::~SingleSHWidget()

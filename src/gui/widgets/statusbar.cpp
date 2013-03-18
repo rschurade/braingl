@@ -8,11 +8,13 @@
 
 #include "../views/statusbarview.h"
 
-StatusBar::StatusBar( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QWidget* parent ) :
+#include "../../data/models.h"
+
+StatusBar::StatusBar( QWidget* parent ) :
     QStatusBar( parent )
 {
-    m_statusBarView = new StatusBarView( globalModel );
-    m_statusBarView->setModel( dataModel );
+    m_statusBarView = new StatusBarView();
+    m_statusBarView->setModel( Models::d() );
 
     connect( m_statusBarView, SIGNAL( sigStatusChanged( QString ) ), this, SLOT( slotStatusChanged( QString ) ) );
 }

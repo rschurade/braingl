@@ -11,14 +11,13 @@
 #include <QString>
 #include <QFrame>
 
-class QAbstractItemModel;
 class NavGLWidget;
 class QGLWidget;
 
 class NavFrame : public QFrame
 {
 public:
-    NavFrame( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget );
+    NavFrame( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget );
     virtual ~NavFrame();
 
     void update();

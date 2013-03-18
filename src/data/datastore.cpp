@@ -6,6 +6,8 @@
  */
 #include "datastore.h"
 
+#include "models.h"
+
 #include "vptr.h"
 #include "enums.h"
 
@@ -14,8 +16,7 @@
 #include <QLocale>
 #include <QDebug>
 
-DataStore::DataStore( QAbstractItemModel* globalProps ) :
-    m_globalProperties( globalProps )
+DataStore::DataStore()
 {
 }
 
@@ -31,20 +32,20 @@ void DataStore::updateGlobals()
     {
         if ( m_datasetList.size() > 0 )
         {
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::MAX_AXIAL,    0 ), ds->properties()->get( Fn::Property::NZ ).toInt() );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::MAX_CORONAL,  0 ), ds->properties()->get( Fn::Property::NY ).toInt() );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::MAX_SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::SLICE_DX,     0 ), ds->properties()->get( Fn::Property::DX ).toFloat() );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::SLICE_DY,     0 ), ds->properties()->get( Fn::Property::DY ).toFloat() );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties()->get( Fn::Property::DZ ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_AXIAL,    0 ), ds->properties()->get( Fn::Property::NZ ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_CORONAL,  0 ), ds->properties()->get( Fn::Property::NY ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DX,     0 ), ds->properties()->get( Fn::Property::DX ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DY,     0 ), ds->properties()->get( Fn::Property::DY ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties()->get( Fn::Property::DZ ).toFloat() );
 
             emit dataChanged( index( 0, (int)Fn::Global::SAGITTAL ), index( 0, (int)Fn::Global::SLICE_DZ ) );
         }
         if ( m_datasetList.size() == 1 )
         {
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
-            m_globalProperties->setData( m_globalProperties->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
         }
 
     }

@@ -5,6 +5,7 @@
  *      Author: Ralph Schurade
  */
 #include "dataset3d.h"
+#include "../models.h"
 
 #include "../../gui/gl/evrenderer.h"
 
@@ -143,7 +144,7 @@ QVector<QVector3D>* Dataset3D::getData()
     return &m_data;
 }
 
-void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_renderer == 0 )
     {
@@ -153,7 +154,7 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemMode
                                               m_properties.get( Fn::Property::DX ).toFloat(),
                                               m_properties.get( Fn::Property::DY ).toFloat(),
                                               m_properties.get( Fn::Property::DZ ).toFloat() );
-        m_renderer->setModel( globalModel );
+        m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
 

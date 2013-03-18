@@ -9,11 +9,11 @@
 #include "../../data/enums.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
+#include "../../data/models.h"
 
 #include <QDebug>
 
-StatusBarView::StatusBarView( QAbstractItemModel* globalModel ) :
-    m_globalModel( globalModel ),
+StatusBarView::StatusBarView() :
     m_selected( 0 ),
     m_globalInfo( "" ),
     m_datasetInfo( "" ),
@@ -21,7 +21,7 @@ StatusBarView::StatusBarView( QAbstractItemModel* globalModel ) :
     m_y( 0 ),
     m_z( 0 )
 {
-    connect( m_globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( dataChanged( QModelIndex, QModelIndex ) ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( dataChanged( QModelIndex, QModelIndex ) ) );
 }
 
 StatusBarView::~StatusBarView()
@@ -96,26 +96,26 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     m_globalInfo = "[";
 
     QModelIndex mi;
-    mi = m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 );
+    mi = Models::g()->index( (int)Fn::Global::SAGITTAL, 0 );
     if ( mi.isValid() )
     {
-        m_x = m_globalModel->data( mi ).toInt();
+        m_x = Models::g()->data( mi ).toInt();
         m_globalInfo +=  QString::number( m_x );
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( (int)Fn::Global::CORONAL, 0 );
+    mi = Models::g()->index( (int)Fn::Global::CORONAL, 0 );
     if ( mi.isValid() )
     {
-        m_y = m_globalModel->data( mi ).toInt();
+        m_y = Models::g()->data( mi ).toInt();
         m_globalInfo += QString::number( m_y );
         m_globalInfo += ",";
     }
 
-    mi = m_globalModel->index( (int)Fn::Global::AXIAL, 0 );
+    mi = Models::g()->index( (int)Fn::Global::AXIAL, 0 );
     if ( mi.isValid() )
     {
-        m_z = m_globalModel->data( mi ).toInt();
+        m_z = Models::g()->data( mi ).toInt();
         m_globalInfo += QString::number( m_z );
         m_globalInfo += "]";
     }

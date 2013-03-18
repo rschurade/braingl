@@ -7,12 +7,12 @@
 
 #include "fiberselector.h"
 
+#include "../models.h"
 #include "../enums.h"
 
 #include <QDebug>
 
-FiberSelector::FiberSelector( QAbstractItemModel* roiModel ) :
-    m_roiModel( roiModel ),
+FiberSelector::FiberSelector() :
     m_numLines( 0 ),
     m_numPoints( 0 ),
     m_isInitialized( false )
@@ -53,9 +53,9 @@ void FiberSelector::init( QVector< QVector< float > >& data )
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
     qDebug() << "end creating kdtree";
 
-    connect( m_roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
-    connect( m_roiModel, SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );
-    connect( m_roiModel, SIGNAL( rowsRemoved( QModelIndex, int, int ) ), this, SLOT( roiDeleted( QModelIndex, int, int ) ) );
+    connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
+    connect( Models::r(), SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );
+    connect( Models::r(), SIGNAL( rowsRemoved( QModelIndex, int, int ) ), this, SLOT( roiDeleted( QModelIndex, int, int ) ) );
 
     m_rootfield.resize( m_numLines );
     for ( int i = 0; i < m_numLines; ++i )
@@ -70,7 +70,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 void FiberSelector::updatePresentRois()
 {
     qDebug() << "updatePresentRois";
-    int numBranches = m_roiModel->rowCount( QModelIndex() );
+    int numBranches = Models::r()->rowCount( QModelIndex() );
 
     for ( int i = 0; i < numBranches; ++i )
     {
@@ -81,7 +81,7 @@ void FiberSelector::updatePresentRois()
         m_bitfields.push_back( newBranch );
         updateBox( m_bitfields.size() - 1, 0 );
 
-        int leafCount = m_roiModel->rowCount( createIndex( i, 0, 0 ) );
+        int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
 
         for ( int k = 0; k < leafCount; ++k )
         {
@@ -163,21 +163,21 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
     else
     {
         row = pos - 1;
-        parent = m_roiModel->index( branch, 0 );
+        parent = Models::r()->index( branch, 0 );
     }
-    return m_roiModel->index( row, column, parent );
+    return Models::r()->index( row, column, parent );
 }
 
 void FiberSelector::updateBox( int branch, int pos )
 {
-    if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
     {
-        m_x = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
-        m_y = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
-        m_z = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
-        m_dx = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
-        m_dy = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
-        m_dz = m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
+        m_x = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
+        m_y = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
+        m_z = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
+        m_dx = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
+        m_dy = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
+        m_dz = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
         m_boxMin[0] = m_x - m_dx;
         m_boxMax[0] = m_x + m_dx;
         m_boxMin[1] = m_y - m_dy;
@@ -191,7 +191,7 @@ void FiberSelector::updateBox( int branch, int pos )
         }
         boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
 
-        if ( m_roiModel->data( createIndex( branch, pos, (int)Fn::ROI::SPHERE ), Qt::DisplayRole ).toBool() )
+        if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SPHERE ), Qt::DisplayRole ).toBool() )
         {
             sphereTest( m_bitfields[branch][pos] );
         }
@@ -207,7 +207,7 @@ void FiberSelector::updateBox( int branch, int pos )
     updateBranch( branch );
     if ( m_isInitialized )
     {
-        m_roiModel->setData( createIndex( branch, pos, (int)Fn::ROI::UPDATED ), true, Qt::DisplayRole );
+        Models::r()->setData( createIndex( branch, pos, (int)Fn::ROI::UPDATED ), true, Qt::DisplayRole );
     }
 }
 
@@ -275,7 +275,7 @@ void FiberSelector::updateBranch( int branch )
     //qDebug() << "update branch" << branch;
     int current = 0;
 
-    bool neg = m_roiModel->data( createIndex( branch, current, (int)Fn::ROI::NEG ), Qt::DisplayRole ).toBool();
+    bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::ROI::NEG ), Qt::DisplayRole ).toBool();
     if ( neg )
     {
         for ( int k = 0; k < m_numLines; ++k )
@@ -294,9 +294,9 @@ void FiberSelector::updateBranch( int branch )
 
     while ( current < m_bitfields[branch].size() )
     {
-        if ( m_roiModel->data( createIndex( branch, current, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
+        if ( Models::r()->data( createIndex( branch, current, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
         {
-            bool neg = m_roiModel->data( createIndex( branch, current, (int)Fn::ROI::NEG ), Qt::DisplayRole ).toBool();
+            bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::ROI::NEG ), Qt::DisplayRole ).toBool();
             if ( neg )
             {
                 for ( int k = 0; k < m_numLines; ++k )
@@ -333,7 +333,7 @@ void FiberSelector::updateRoot()
 
         for ( int i = 0; i < m_branchfields.size(); ++i )
         {
-            if ( m_roiModel->data( createIndex( i, 0, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
+            if ( Models::r()->data( createIndex( i, 0, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
             {
                 for ( int k = 0; k < m_numLines; ++k )
                 {

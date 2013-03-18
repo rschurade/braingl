@@ -5,7 +5,9 @@
  *      Author: Ralph Schurade
  */
 #include "datasetfibers.h"
+
 #include "fiberselector.h"
+#include "../models.h"
 #include "../../gui/gl/fiberrenderer.h"
 #include "../../gui/gl/tuberenderer.h"
 
@@ -126,22 +128,21 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
-                             QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_selector == 0 )
     {
-        m_selector = new FiberSelector( roiModel );
+        m_selector = new FiberSelector();
         m_selector->init( m_fibs );
-        connect( m_selector, SIGNAL( changed() ), dataModel, SLOT( submit() ) );
+        connect( m_selector, SIGNAL( changed() ), Models::d(), SLOT( submit() ) );
     }
 
     if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new FiberRenderer( roiModel, m_selector, m_fibs, m_extraData );
-            m_renderer->setModel( globalModel );
+            m_renderer = new FiberRenderer( m_selector, m_fibs, m_extraData );
+            m_renderer->setModel( Models::g() );
             m_renderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
@@ -158,14 +159,14 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
                                      m_properties.get( Fn::Property::NY ).toFloat(),
                                      m_properties.get( Fn::Property::NZ ).toFloat(),
                                      m_properties.get( Fn::Property::FIBER_LINE_THICKNESS ).toFloat() );
-        m_renderer->draw( pMatrix, mvMatrix, dataModel, globalModel );
+        m_renderer->draw( pMatrix, mvMatrix );
     }
     else if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
         if ( m_tubeRenderer == 0 )
         {
-            m_tubeRenderer = new TubeRenderer( roiModel, m_selector, m_fibs, m_extraData );
-            m_tubeRenderer->setModel( globalModel );
+            m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_extraData );
+            m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
@@ -176,7 +177,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix,
                                          m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
                                          m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat(),
                                          m_properties.get( Fn::Property::FIBER_TUBE_THICKNESS ).toFloat() );
-        m_tubeRenderer->draw( pMatrix, mvMatrix, dataModel );
+        m_tubeRenderer->draw( pMatrix, mvMatrix );
     }
 }
 

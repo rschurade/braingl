@@ -26,7 +26,6 @@ public:
     ToolBar( const QString &title, QWidget* parent=0 );
     virtual ~ToolBar();
 
-    void setModel( QAbstractItemModel* model );
     void setSelectionModel( QItemSelectionModel* selectionModel );
 
 private:

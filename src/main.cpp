@@ -3,9 +3,7 @@
 #include <QDir>
 #include <QDateTime>
 
-#include "data/datastore.h"
-#include "data/globalpropertymodel.h"
-#include "data/roimodel.h"
+#include "data/models.h"
 #include "data/loader.h"
 #include "data/vptr.h"
 #include "gui/mainwindow.h"
@@ -16,10 +14,10 @@ QTextStream *out = 0;
 bool logToFile = false;
 bool verbose = false;
 
-void logOutput(QtMsgType type, const char *msg)
+void logOutput( QtMsgType type, const char *msg )
 {
-    QString filedate = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss:zzz");
-    QString debugdate = QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
+    QString filedate = QDateTime::currentDateTime().toString( "yyyy.MM.dd hh:mm:ss:zzz" );
+    QString debugdate = QDateTime::currentDateTime().toString( "hh:mm:ss:zzz" );
 
     switch (type)
     {
@@ -94,11 +92,9 @@ int main( int argc, char *argv[] )
     debug = true;
 #endif
 
-    GlobalPropertyModel* globalProps = new GlobalPropertyModel();
-    DataStore* dataStore = new DataStore( globalProps );
-    ROIModel* roiModel = new ROIModel( globalProps );
+    Models::init();
 
-    MainWindow mainWin( dataStore, globalProps, roiModel, debug );
+    MainWindow mainWin( debug );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )

@@ -6,6 +6,8 @@
  */
 #include "datasettensor.h"
 
+#include "../models.h"
+
 #include "../../algos/fmath.h"
 #include "../../gui/gl/tensorrenderer.h"
 #include "../../gui/gl/tensorrendererev.h"
@@ -206,7 +208,7 @@ void DatasetTensor::flipX()
     m_data = newData;
 }
 
-void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() == 0 )
     {
@@ -214,7 +216,7 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItem
         {
             m_renderer = new TensorRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
                     m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
-            m_renderer->setModel( globalModel );
+            m_renderer->setModel( Models::g() );
             m_renderer->init();
         }
 
@@ -238,7 +240,7 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItem
         {
             m_rendererEV = new TensorRendererEV( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
                     m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
-            m_rendererEV->setModel( globalModel );
+            m_rendererEV->setModel( Models::g() );
             m_rendererEV->init();
         }
 

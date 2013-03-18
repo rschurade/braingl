@@ -23,9 +23,6 @@ class DatasetListWidget;
 class ROIWidget;
 class ShaderEditWidget;
 
-class DataStore;
-class GlobalPropertyModel;
-class ROIModel;
 class GLWidget;
 class ToolBar;
 
@@ -34,7 +31,7 @@ class MainWindow: public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel,  bool debug = false );
+    MainWindow( bool debug = false );
 
     void closeEvent( QCloseEvent *event );
     void load( QString fileName );
@@ -55,10 +52,6 @@ private:
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();
     QString strippedName( const QString &fullFileName );
-
-    DataStore* m_dataStore;
-    GlobalPropertyModel* m_globalProps;
-    ROIModel* m_roiModel;
 
     bool m_debug;
 

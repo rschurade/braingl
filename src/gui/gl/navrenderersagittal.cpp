@@ -16,8 +16,8 @@
 
 
 
-NavRendererSagittal::NavRendererSagittal(  QAbstractItemModel* dataModel, QString name ) :
-    NavRenderer( dataModel, name )
+NavRendererSagittal::NavRendererSagittal( QString name ) :
+    NavRenderer( name )
 {
 }
 

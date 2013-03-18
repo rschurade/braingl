@@ -14,12 +14,10 @@
 #include <QMatrix4x4>
 #include <QObject>
 
-class QAbstractItemModel;
-
 class ROI : public QObject
 {
 public:
-    ROI( QString name, QAbstractItemModel* globals );
+    ROI( QString name );
     virtual ~ROI();
 
     ROIPropertyGroup* properties();
@@ -28,7 +26,6 @@ public:
 
 protected:
     ROIPropertyGroup m_properties;
-    QAbstractItemModel* m_globals;
 };
 
 #endif /* ROI_H_ */

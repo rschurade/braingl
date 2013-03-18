@@ -15,9 +15,8 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
+FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),
-    m_roiModel( roiModel ),
     m_selector( selector ),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
@@ -49,23 +48,17 @@ void FiberRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel, QAbstractItemModel* globalModel )
+void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "fiber" )->bind();
 
-    GLFunctions::setupTextures( dataModel );
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) , dataModel );
+    GLFunctions::setupTextures();
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) );
 
     // Set modelview-projection matrix
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
-//    float x = globalModel->data( globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-//    float y = globalModel->data( globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-//    float z = globalModel->data( globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
-//    float dx = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-//    float dy = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-//    float dz = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_x", m_x );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_y", m_y );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_z", m_z );

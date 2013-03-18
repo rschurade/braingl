@@ -20,7 +20,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
     void setMesh( TriangleMesh2* mesh );
     void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );

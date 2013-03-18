@@ -6,13 +6,14 @@
  */
 #include "roimodel.h"
 
+#include "models.h"
+
 #include "roibox.h"
 #include "vptr.h"
 
 #include <QDebug>
 
-ROIModel::ROIModel( QAbstractItemModel* globalProps ) :
-    m_globalProps( globalProps ),
+ROIModel::ROIModel() :
     m_count( 0 )
 {
 
@@ -197,7 +198,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     ROI* newROI;
     if ( count == 0 )
     {
-        newROI = new ROIBox( m_globalProps );
+        newROI = new ROIBox();
     }
     else
     {

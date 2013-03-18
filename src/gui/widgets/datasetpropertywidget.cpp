@@ -18,6 +18,7 @@
 
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
+#include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/properties/property.h"
 
@@ -27,6 +28,7 @@ DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
     QTabWidget( parent )
 {
     m_propertyView = new DatasetPropertyView( this );
+    m_propertyView->setModel( Models::d() );
 
     m_layout1 = new QVBoxLayout();
     m_layout1->setContentsMargins( 1, 1, 1, 1 );
@@ -56,11 +58,6 @@ DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
 
 DatasetPropertyWidget::~DatasetPropertyWidget()
 {
-}
-
-void DatasetPropertyWidget::setModel( QAbstractItemModel* model )
-{
-    m_propertyView->setModel( model );
 }
 
 void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionModel )

@@ -8,17 +8,19 @@
 
 #include "../views/roitreeview.h"
 
+#include "../../data/models.h"
+
 #include <QDebug>
 #include <QtGui>
 
-ROIWidget::ROIWidget( QAbstractItemModel* roiModel, QWidget* parent ) :
+ROIWidget::ROIWidget( QWidget* parent ) :
     QFrame( parent ),
     m_count( 0 )
 {
     setMaximumHeight( 300 );
 
     m_treeView = new ROITreeView( this );
-    m_treeView->setModel( roiModel );
+    m_treeView->setModel( Models::r() );
     m_treeView->hideColumn( 1 );
     connect( m_treeView, SIGNAL( clicked( QModelIndex ) ), this, SLOT( treeClicked() ) );
 

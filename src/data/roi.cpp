@@ -7,8 +7,7 @@
 
 #include "roi.h"
 
-ROI::ROI( QString name, QAbstractItemModel* globals ) :
-    m_globals( globals )
+ROI::ROI( QString name )
 {
     m_properties.set( Fn::ROI::NAME, name, true );
     m_properties.set( Fn::ROI::ACTIVE, true, true );

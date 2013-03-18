@@ -9,10 +9,10 @@
 
 #include <QtGui>
 
-NavFrame::NavFrame( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
+NavFrame::NavFrame( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
     QFrame( parent )
 {
-    m_widget = new NavGLWidget( dataModel, globalModel, name, orient, parent, shareWidget );
+    m_widget = new NavGLWidget( name, orient, parent, shareWidget );
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget( m_widget );
 

@@ -18,9 +18,8 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-CombinedNavRenderer::CombinedNavRenderer( QAbstractItemModel* dataModel, QString name ) :
+CombinedNavRenderer::CombinedNavRenderer( QString name ) :
     ObjectRenderer(),
-    m_dataModel( dataModel ),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),
@@ -423,13 +422,13 @@ void CombinedNavRenderer::initGeometry()
 
 void CombinedNavRenderer::setupTextures()
 {
-    GLFunctions::setupTextures( m_dataModel );
+    GLFunctions::setupTextures();
 }
 
 void CombinedNavRenderer::setShaderVars()
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program, m_dataModel );
+    GLFunctions::setShaderVarsSlice( program );
 }
 
 void CombinedNavRenderer::draw()

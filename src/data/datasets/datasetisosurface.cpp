@@ -9,6 +9,8 @@
 #include "datasetscalar.h"
 #include "isosurfacethread.h"
 
+#include "../models.h"
+
 #include "../mesh/trianglemesh2.h"
 
 #include "../../gui/gl/glfunctions.h"
@@ -73,12 +75,12 @@ DatasetIsosurface::~DatasetIsosurface()
 {
 }
 
-void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( m_mesh );
-        m_renderer->setModel( globalModel );
+        m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
 
@@ -96,7 +98,7 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstract
                                      m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
                                      m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
                                      m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-    m_renderer->draw( pMatrix, mvMatrix, dataModel );
+    m_renderer->draw( pMatrix, mvMatrix );
 }
 
 QString DatasetIsosurface::getValueAsString( int x, int y, int z )

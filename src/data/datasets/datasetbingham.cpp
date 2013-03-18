@@ -5,6 +5,7 @@
  *      Author: Ralph Schurade
  */
 #include "datasetbingham.h"
+#include "../models.h"
 
 #include "../../gui/gl/binghamrenderer.h"
 
@@ -66,7 +67,7 @@ void DatasetBingham::flipX()
 {
 }
 
-void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel )
+void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_renderer == 0 )
     {
@@ -77,7 +78,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractIte
                                                   m_properties.get( Fn::Property::DX ).toFloat(),
                                                   m_properties.get( Fn::Property::DY ).toFloat(),
                                                   m_properties.get( Fn::Property::DZ ).toFloat() );
-        m_renderer->setModel( globalModel );
+        m_renderer->setModel( Models::g() );
         m_renderer->init();
         qDebug() << "ds bingham init renderer done";
     }
