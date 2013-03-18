@@ -30,7 +30,11 @@ FiberRenderer::FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selec
     m_selectedMin( 0.0 ),
     m_selectedMax( 1.0 ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 )
+    m_upperThreshold( 1.0 ),
+    m_dx( 0.0 ),
+    m_dy( 0.0 ),
+    m_dz( 0.0 ),
+    m_lineWidth( 1 )
 {
 }
 
@@ -45,7 +49,7 @@ void FiberRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
+void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel, QAbstractItemModel* globalModel )
 {
     GLFunctions::getShader( "fiber" )->bind();
 
@@ -55,19 +59,24 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractIt
     // Set modelview-projection matrix
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
+
+//    float x = globalModel->data( globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+//    float y = globalModel->data( globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+//    float z = globalModel->data( globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+//    float dx = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+//    float dy = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+//    float dz = globalModel->data( globalModel->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_x", m_x );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_y", m_y );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_z", m_z );
 
     initGeometry();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
+
+    glLineWidth( m_lineWidth );
 
     QVector<bool>*selected = m_selector->getSelection();
 
@@ -128,6 +137,17 @@ void FiberRenderer::setShaderVars()
     int extraLocation = program->attributeLocation( "a_extra" );
     program->enableAttributeArray( extraLocation );
     glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dx", m_dx );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dy", m_dy );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dz", m_dz );
 }
 
 void FiberRenderer::initGeometry()
@@ -197,7 +217,9 @@ void FiberRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void FiberRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold )
+void FiberRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax,
+                                            float lowerThreshold, float upperThreshold, float dx, float dy, float dz,
+                                            float x, float y, float z, float lineWidth )
 {
     m_colorMode = colorMode;
     m_colormap = colormap;
@@ -205,6 +227,13 @@ void FiberRenderer::setRenderParams( int colorMode, int colormap, float selected
     m_selectedMax = selectedMax;
     m_lowerThreshold = lowerThreshold;
     m_upperThreshold = upperThreshold;
+    m_dx = dx;
+    m_dy = dy;
+    m_dz = dz;
+    m_x = x / 10.;
+    m_y = y / 10.;
+    m_z = z / 10.;
+    m_lineWidth = lineWidth;
 }
 
 void FiberRenderer::colorChanged( QColor color )

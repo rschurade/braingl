@@ -1,5 +1,7 @@
 #include uniforms_vs
 
+varying float v_discard;
+
 void main()
 {
 	v_normal = normalize( a_normal );
@@ -17,6 +19,14 @@ void main()
     {
        gl_FrontColor =  vec4( u_color.xyz, 1.0 );
     }
+    v_discard = 0.0;
+    if ( a_position.x <= ( u_x - u_dx ) || a_position.x >= ( u_x + u_dx ) || 
+         a_position.y <= ( u_y - u_dy ) || a_position.y >= ( u_y + u_dy ) ||
+         a_position.z <= ( u_z - u_dz ) || a_position.z >= ( u_z + u_dz ) )
+    {
+        v_discard = 1.0;
+    } 
+    
     // TODO submit the actual dims in a uniform
     v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
 	

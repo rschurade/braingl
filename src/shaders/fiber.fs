@@ -2,9 +2,14 @@
 #include textures_fs
 #include uniforms_fs
 
+varying float v_discard;
 
 void main()
 {
+    if ( v_discard > 0.0 )
+    {
+        discard;
+    }
     if ( u_colorMode == 3 )
     {
         vec4 color = texColor( v_texcoord );
