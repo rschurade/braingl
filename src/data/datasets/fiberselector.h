@@ -19,7 +19,7 @@ class FiberSelector : public QObject
     Q_OBJECT
 
 public:
-    FiberSelector( QAbstractItemModel* roiModel );
+    FiberSelector();
     virtual ~FiberSelector();
 
     void init( QVector< QVector< float > >& data );
@@ -29,8 +29,6 @@ public:
 private:
     QModelIndex createIndex( int branch, int pos, int column );
     void updatePresentRois();
-
-    QAbstractItemModel* m_roiModel;
 
     int m_numLines;
     int m_numPoints;

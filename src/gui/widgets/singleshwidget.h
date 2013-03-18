@@ -12,14 +12,13 @@
 #include <QtOpenGL/QGLWidget>
 
 class SingleSHRenderer;
-class QAbstractItemModel;
 
 class SingleSHWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-    SingleSHWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
+    SingleSHWidget( QString name, QWidget *parent = 0, const QGLWidget *shareWidget = 0 );
     virtual ~SingleSHWidget();
 
     QSize minimumSizeHint() const;
@@ -39,7 +38,6 @@ protected:
     void mouseMoveEvent( QMouseEvent *event );
 
 private:
-    QAbstractItemModel* m_globalModel;
     SingleSHRenderer* m_renderer;
 };
 

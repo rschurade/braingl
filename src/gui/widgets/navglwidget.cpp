@@ -11,34 +11,36 @@
 #include "../gl/navrenderercoronal.h"
 #include "../gl/navrenderersagittal.h"
 
+#include "../../data/models.h"
+
 #include <QtGui>
 #include <QDebug>
 
-NavGLWidget::NavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
+NavGLWidget::NavGLWidget( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
     switch( orient )
     {
         case 0:
         {
-            m_navRenderer = new NavRendererSagittal( dataModel, name );
+            m_navRenderer = new NavRendererSagittal( name );
             break;
         }
         case 1:
         {
-            m_navRenderer = new NavRendererCoronal( dataModel, name );
+            m_navRenderer = new NavRendererCoronal( name );
             break;
         }
         case 2:
         {
-            m_navRenderer = new NavRendererAxial( dataModel, name );
+            m_navRenderer = new NavRendererAxial( name );
             break;
         }
     }
 
-    m_navRenderer->setModel( globalModel );
-    connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-    connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    m_navRenderer->setModel( Models::g() );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 NavGLWidget::~NavGLWidget()

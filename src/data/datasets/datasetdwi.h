@@ -15,8 +15,6 @@
 #include <QVector3D>
 #include <QVector>
 
-class QAbstractItemModel;
-
 class DatasetDWI: public DatasetNifti
 {
     Q_OBJECT
@@ -33,7 +31,7 @@ public:
 
     QVector<QVector3D> getBvecs();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     QString getValueAsString( int x, int y, int z );
 
 private:

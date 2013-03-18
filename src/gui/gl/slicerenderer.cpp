@@ -13,9 +13,8 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
-SliceRenderer::SliceRenderer( QAbstractItemModel* dataModel ) :
+SliceRenderer::SliceRenderer() :
     ObjectRenderer(),
-    m_dataModel( dataModel ),
     vboIds( new GLuint[ 4 ] ),
     m_x( 0. ),
     m_y( 0. ),
@@ -134,13 +133,13 @@ void SliceRenderer::initGeometry()
 
 void SliceRenderer::setupTextures()
 {
-    GLFunctions::setupTextures( m_dataModel );
+    GLFunctions::setupTextures();
 }
 
 void SliceRenderer::setShaderVars()
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program, m_dataModel );
+    GLFunctions::setShaderVarsSlice( program );
 }
 
 void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )

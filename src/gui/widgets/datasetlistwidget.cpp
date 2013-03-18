@@ -8,6 +8,8 @@
 
 #include "../views/datasetlistview.h"
 
+#include "../../data/models.h"
+
 #include <QtGui>
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
@@ -21,6 +23,7 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QVBoxLayout* layout = new QVBoxLayout();
 
 	m_listView = new DatasetListView( frame );
+	m_listView->setModel( Models::d() );
 	m_listView->setToolTip( QString( "datasets" ) );
 	m_listView->setStyleSheet( "border: none" );
     layout->addWidget( m_listView );
@@ -66,11 +69,6 @@ DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 
 DatasetListWidget::~DatasetListWidget()
 {
-}
-
-void DatasetListWidget::setModel (QAbstractItemModel  *model )
-{
-	m_listView->setModel( model );
 }
 
 QItemSelectionModel* DatasetListWidget::selectionModel()

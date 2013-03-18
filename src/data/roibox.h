@@ -15,7 +15,7 @@ class ROIBox : public ROI
     Q_OBJECT
 
 public:
-    ROIBox( QAbstractItemModel* globals );
+    ROIBox();
     virtual ~ROIBox();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );

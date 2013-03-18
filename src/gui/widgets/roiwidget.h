@@ -22,7 +22,7 @@ class ROIWidget : public QFrame
     Q_OBJECT
 
 public:
-    ROIWidget( QAbstractItemModel* ROIModel, QWidget* parent = 0 );
+    ROIWidget( QWidget* parent = 0 );
     virtual ~ROIWidget();
 
     QItemSelectionModel* selectionModel();

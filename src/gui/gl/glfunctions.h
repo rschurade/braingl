@@ -16,7 +16,6 @@
 #include <QImage>
 #include <QColor>
 
-class QAbstractItemModel;
 class QGLShaderProgram;
 class ShapeRenderer;
 class TextRenderer;
@@ -31,19 +30,19 @@ struct VertexData
 class GLFunctions
 {
 public:
-    static void setupTextures( QAbstractItemModel* model );
-    static void setTexInterpolation( QAbstractItemModel* model, int row );
+    static void setupTextures();
+    static void setTexInterpolation( int row );
 
     static QGLShaderProgram* initShader( QString name );
     static void loadShaders();
     static void reloadShaders();
 
-    static QList<int> getTextureIndexes( QAbstractItemModel* model );
+    static QList<int> getTextureIndexes();
 
     static QGLShaderProgram* getShader( QString name );
 
-    static void setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model );
-    static void setTextureUniforms( QGLShaderProgram* program, QAbstractItemModel* model );
+    static void setShaderVarsSlice( QGLShaderProgram* program );
+    static void setTextureUniforms( QGLShaderProgram* program );
 
     static QVector<QString> getShaderNames();
     static QString getShaderCode( QString name );

@@ -11,6 +11,7 @@
 
 #include "../../data/datasets/datasetdwi.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/vptr.h"
 #include "../../algos/fmath.h"
 #include "../../algos/qball.h"
@@ -26,9 +27,8 @@
 
 #include <limits>
 
-SingleSHRenderer::SingleSHRenderer( QAbstractItemModel* globalModel ) :
+SingleSHRenderer::SingleSHRenderer() :
     ObjectRenderer(),
-    m_globalModel( globalModel ),
     vboIds( new GLuint[ 2 ] ),
     m_width( 1 ),
     m_height( 1 ),
@@ -130,15 +130,15 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+    m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+    m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
-    int xbi = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
-    int ybi = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
-    //int zbi = model()->data( m_globalModel->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+    int xbi = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
+    int ybi = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
+    //int zbi = model()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 

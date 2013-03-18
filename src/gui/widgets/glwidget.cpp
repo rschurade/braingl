@@ -8,16 +8,18 @@
 #include "glwidget.h"
 #include "../gl/glfunctions.h"
 
+#include "../../data/models.h"
+
 #include <QtGui>
 
-GLWidget::GLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
+GLWidget::GLWidget( QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
 	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-	m_sceneRenderer = new SceneRenderer( dataModel, globalModel, roiModel, roiSelectionModel );
+	m_sceneRenderer = new SceneRenderer( roiSelectionModel );
 
-	connect( dataModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-	connect( roiModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-	connect( globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+	connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+	connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+	connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 GLWidget::~GLWidget()

@@ -6,26 +6,28 @@
  */
 #include "roibox.h"
 
+#include "models.h"
+
 #include "../gui/gl/glfunctions.h"
 
 #include <QAbstractItemModel>
 
 int ROIBox::m_count = 0;
 
-ROIBox::ROIBox( QAbstractItemModel* globals ) :
-    ROI( QString("new roi") + QString::number( m_count++ ), globals )
+ROIBox::ROIBox() :
+    ROI( QString("new roi") + QString::number( m_count++ ) )
 {
-    float dx = globals->data( globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = globals->data( globals->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = globals->data( globals->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-    float x = globals->data( globals->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
-    float y = globals->data( globals->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
-    float z = globals->data( globals->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
+    float x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
+    float y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
+    float z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
 
-    float xMax = globals->data( globals->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat() * dx;
-    float yMax = globals->data( globals->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat() * dy;
-    float zMax = globals->data( globals->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat() * dz;
+    float xMax = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat() * dx;
+    float yMax = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat() * dy;
+    float zMax = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat() * dz;
 
     m_properties.set( Fn::ROI::RENDER, true, true );
     m_properties.set( Fn::ROI::NEG, false, true );
@@ -45,7 +47,7 @@ ROIBox::ROIBox( QAbstractItemModel* globals ) :
     m_properties.set( Fn::ROI::PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
-    connect( globals, SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
+    connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
 ROIBox::~ROIBox()
@@ -56,13 +58,13 @@ void ROIBox::globalChanged()
 {
     if (  m_properties.get( Fn::ROI::STICK_TO_CROSSHAIR ).toBool() )
     {
-        float dx = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-        float dy = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-        float dz = m_globals->data( m_globals->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+        float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+        float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+        float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-        float x = m_globals->data( m_globals->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
-        float y = m_globals->data( m_globals->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
-        float z = m_globals->data( m_globals->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
+        float x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
+        float y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
+        float z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
 
         m_properties.set( Fn::ROI::X, x );
         m_properties.set( Fn::ROI::Y, y );

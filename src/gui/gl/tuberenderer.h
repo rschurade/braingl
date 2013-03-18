@@ -21,12 +21,12 @@ class TubeRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    TubeRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
+    TubeRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
     virtual ~TubeRenderer();
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
     void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax,
                             float lowerThreshold, float upperThreshold, float tubeThickness );
@@ -43,7 +43,6 @@ protected:
 private:
     QModelIndex createIndex( int branch, int pos, int column );
 
-    QAbstractItemModel* m_roiModel;
     FiberSelector* m_selector;
     GLuint *vboIds;
 

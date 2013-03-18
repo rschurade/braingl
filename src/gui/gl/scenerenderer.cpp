@@ -15,6 +15,7 @@
 
 #include "../../data/datastore.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
@@ -27,10 +28,7 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel ) :
-    m_dataModel( dataModel ),
-    m_globalModel( globalModel ),
-    m_roiModel( roiModel ),
+SceneRenderer::SceneRenderer( QItemSelectionModel* roiSelectionModel ) :
     m_roiSelectionModel( roiSelectionModel ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
@@ -44,8 +42,8 @@ SceneRenderer::SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel*
     m_sliceYPosAtPick( 0 ),
     m_sliceZPosAtPick( 0 )
 {
-    m_sliceRenderer = new SliceRenderer( dataModel );
-    m_sliceRenderer->setModel( globalModel );
+    m_sliceRenderer = new SliceRenderer();
+    m_sliceRenderer->setModel( Models::g() );
 
     m_arcBall = new ArcBall( 400, 400 );
 
@@ -71,7 +69,7 @@ void SceneRenderer::initGL()
         qDebug() << "OpenGL initialized.";
     }
 
-    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glEnable( GL_DEPTH_TEST );
@@ -101,8 +99,8 @@ void SceneRenderer::initGL()
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -119,12 +117,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::calcMVPMatrix()
 {
-    m_nx = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = m_globalModel->data( m_globalModel->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
-    float dx = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    m_nx = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
@@ -156,18 +154,18 @@ void SceneRenderer::calcMVPMatrix()
     m_mvMatrixInverse = m_mvMatrix.inverted();
     m_mvpMatrix = m_pMatrix * m_mvMatrix;
 
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::MOVEY, 0 ), m_arcBall->getMoveY() );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::BBX, 0 ), bbx );
-    m_globalModel->setData( m_globalModel->index( (int)Fn::Global::BBY, 0 ), bby );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEY, 0 ), m_arcBall->getMoveY() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::BBX, 0 ), bbx );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::BBY, 0 ), bby );
 
     //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
 
 void SceneRenderer::draw()
 {
-    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -190,7 +188,7 @@ QImage* SceneRenderer::screenshot()
 {
     qDebug() << "rendering screenshot";
 
-    int size = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int size = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
     int texX;
     int texY;
     if ( m_width >= m_height )
@@ -210,7 +208,7 @@ QImage* SceneRenderer::screenshot()
 
     glViewport( 0, 0, texX, texY );
 
-    QColor color = m_globalModel->data( m_globalModel->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -236,34 +234,34 @@ QImage* SceneRenderer::screenshot()
 
 void SceneRenderer::renderDatasets()
 {
-    int countDatasets = m_dataModel->rowCount();
+    int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::ACTIVE );
-        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_pMatrix, m_mvMatrix, m_globalModel, m_roiModel, m_dataModel );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            ds->draw( m_pMatrix, m_mvMatrix );
         }
     }
 }
 
 void SceneRenderer::renderRois()
 {
-   int countTopBoxes = m_roiModel->rowCount();
+   int countTopBoxes = Models::r()->rowCount();
    for ( int i = 0; i < countTopBoxes; ++i )
    {
-       ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
+       ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
        {
            roi->draw( m_pMatrix, m_mvMatrix );
 
-           QModelIndex mi = m_roiModel->index( i, 0 );
-           int countBoxes = m_roiModel->rowCount(  mi );
+           QModelIndex mi = Models::r()->index( i, 0 );
+           int countBoxes = Models::r()->rowCount(  mi );
 
            for ( int k = 0; k < countBoxes; ++k )
            {
-               roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
+               roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
                {
                    roi->draw( m_pMatrix, m_mvMatrix );
@@ -276,13 +274,13 @@ void SceneRenderer::renderRois()
 void SceneRenderer::setView( Fn::Orient view )
 {
     m_arcBall->setView( (int)view );
-    int countDatasets = m_dataModel->rowCount();
+    int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::ACTIVE );
-        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
             ds->properties()->set( Fn::Property::RENDER_SLICE, (int)view );
         }
     }
@@ -337,10 +335,10 @@ void SceneRenderer::rightMouseDown( int x, int y )
     m_picked = GLFunctions::get_object_id( x, y );
     //qDebug() << "picked object id: " << m_picked;
 
-    if ( m_roiModel->rowCount() > 0 )
+    if ( Models::r()->rowCount() > 0 )
     {
-        QModelIndex mi = m_roiModel->index( 0, (int)Fn::ROI::PICK_ID );
-        QModelIndexList l = ( m_roiModel->match( mi, Qt::DisplayRole, m_picked ) );
+        QModelIndex mi = Models::r()->index( 0, (int)Fn::ROI::PICK_ID );
+        QModelIndexList l = ( Models::r()->match( mi, Qt::DisplayRole, m_picked ) );
         if ( l.size() > 0 )
         {
             m_roiSelectionModel->clear();
@@ -351,9 +349,9 @@ void SceneRenderer::rightMouseDown( int x, int y )
     /* return to the default frame buffer */
     GLFunctions::endPicking();
 
-    m_sliceXPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    m_sliceYPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    m_sliceZPosAtPick = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+    m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+    m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
@@ -367,9 +365,9 @@ void SceneRenderer::rightMouseDrag( int x, int y )
 
     m_pickOld = QVector2D( x, y );
 
-    int m_x = m_globalModel->data( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    int m_y = m_globalModel->data( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    int m_z = m_globalModel->data( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
+    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
+    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
     float slowDown = 4.0f * m_arcBall->getZoom();
 
     switch ( m_picked )
@@ -384,7 +382,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
-            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
             break;
         }
         case 2:
@@ -395,7 +393,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
-            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
 
             break;
         }
@@ -407,7 +405,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
-            m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
 
             break;
         }
@@ -416,7 +414,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             if ( m_roiSelectionModel->hasSelection() )
             {
                 QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( m_roiModel->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
+                ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
                 float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
                 float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
                 float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();

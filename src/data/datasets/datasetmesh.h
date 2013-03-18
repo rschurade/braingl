@@ -12,7 +12,6 @@
 
 #include <QString>
 
-class QAbstractItemModel;
 class TriangleMesh2;
 
 class DatasetMesh: public Dataset
@@ -21,7 +20,7 @@ public:
     DatasetMesh( TriangleMesh2* mesh, QString filename = QString( "new mesh" ) );
     virtual ~DatasetMesh();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     QString getValueAsString( int x, int y, int z );
 
 private:

@@ -11,18 +11,18 @@
 #include "../widgets/controls/sliderwitheditint2.h"
 
 #include "../../data/enums.h"
+#include "../../data/models.h"
 
 #include <QtGui>
 
-DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
+DockNavGLWidget::DockNavGLWidget( QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),
-    m_name( name ),
-    m_globalModel( globalModel )
+    m_name( name )
 {
 
     setObjectName( QString("nav gl ") + name );
 
-    m_glWidget = new NavFrame( dataModel, globalModel, name, orient, this, shareWidget );
+    m_glWidget = new NavFrame( name, orient, this, shareWidget );
     m_glWidget->setToolTip( QString( "nav gl" ) );
 
     m_layout = new QVBoxLayout();
@@ -48,7 +48,7 @@ DockNavGLWidget::DockNavGLWidget( QAbstractItemModel* dataModel, QAbstractItemMo
     settingChanged();
     setContentsMargins( 1, 1, 1, 1 );
 
-    connect( m_globalModel, SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( settingChanged() ) );
 }
 
 DockNavGLWidget::~DockNavGLWidget()
@@ -70,23 +70,23 @@ void DockNavGLWidget::sliderChanged( int value )
 {
     if  ( m_name == "sagittal")
     {
-        m_globalModel->setData( m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 ), value );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), value );
     }
     else if ( m_name == "coronal" )
     {
-        m_globalModel->setData( m_globalModel->index( (int)Fn::Global::CORONAL, 0 ), value );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), value );
     }
     else if ( m_name == "axial" )
     {
-        m_globalModel->setData( m_globalModel->index( (int)Fn::Global::AXIAL, 0 ), value );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), value );
     }
 }
 
 void DockNavGLWidget::settingChanged()
 {
     QModelIndex mi;
-    mi = m_globalModel->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 );
-    if ( m_globalModel->data( mi ).toBool() )
+    mi = Models::g()->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 );
+    if ( Models::g()->data( mi ).toBool() )
     {
         m_slider->show();
     }
@@ -97,41 +97,41 @@ void DockNavGLWidget::settingChanged()
 
     if  ( m_name == "sagittal")
     {
-        mi = m_globalModel->index( (int)Fn::Global::SAGITTAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::SAGITTAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_globalModel->data( mi ).toInt() );
+            m_slider->setValue( Models::g()->data( mi ).toInt() );
         }
-        mi = m_globalModel->index( (int)Fn::Global::MAX_SAGITTAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
+            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
         }
     }
     else if ( m_name == "coronal" )
     {
-        mi = m_globalModel->index( (int)Fn::Global::CORONAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::CORONAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_globalModel->data( mi ).toInt() );
+            m_slider->setValue( Models::g()->data( mi ).toInt() );
         }
-        mi = m_globalModel->index( (int)Fn::Global::MAX_CORONAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
+            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
         }
     }
     else if ( m_name == "axial" )
     {
-        mi = m_globalModel->index( (int)Fn::Global::AXIAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::AXIAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setValue( m_globalModel->data( mi ).toInt() );
+            m_slider->setValue( Models::g()->data( mi ).toInt() );
         }
-        mi = m_globalModel->index( (int)Fn::Global::MAX_AXIAL, 0 );
+        mi = Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 );
         if ( mi.isValid() )
         {
-            m_slider->setMax( m_globalModel->data( mi ).toInt() - 1 );
+            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
         }
     }
 }

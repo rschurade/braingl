@@ -14,8 +14,6 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-class QAbstractItemModel;
-
 class DatasetNifti: public Dataset
 {
 public:
@@ -27,7 +25,7 @@ public:
     Matrix getQForm();
     Matrix getSForm();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel ) = 0;
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
     static QString getNiftiDataType( const int type );

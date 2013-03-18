@@ -29,24 +29,19 @@
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
 
-#include "../data/datastore.h"
-#include "../data/globalpropertymodel.h"
-#include "../data/roimodel.h"
 #include "../data/loader.h"
 #include "../data/writer.h"
 #include "../data/vptr.h"
 #include "../data/enums.h"
+#include "../data/models.h"
 
 #include <QtGui>
 #include <QWebView>
 
 int MainWindow::screenshotNumber = 0;
 
-MainWindow::MainWindow( DataStore* dataStore, GlobalPropertyModel* globalProps, ROIModel* roiModel, bool debug ) :
+MainWindow::MainWindow( bool debug ) :
 	QMainWindow(),
-    m_dataStore( dataStore ),
-    m_globalProps( globalProps ),
-    m_roiModel( roiModel ),
     m_debug( debug )
 {
 	m_centralWidget = new QMainWindow();
@@ -90,15 +85,15 @@ void MainWindow::saveSettings()
     settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
 
     settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
-    settings.setValue( Fn::Global2String::s( Fn::Global::LAST_PATH ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::SCREENSHOT_PATH ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_MAIN ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_COMBINED ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV1 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV1, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV2 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::CROSSHAIR_COLOR ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::SHOW_NAV_SLIDERS ), m_globalProps->data( m_globalProps->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::LAST_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::SCREENSHOT_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV1, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ) );
+    settings.setValue( Fn::Global2String::s( Fn::Global::SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 ) ) );
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -152,7 +147,7 @@ void MainWindow::loadSetting( QSettings &settings, Fn::Global setting )
     if ( settings.contains( Fn::Global2String::s( setting) ) )
     {
         QVariant s = settings.value( Fn::Global2String::s( setting ) );
-        m_globalProps->setData( m_globalProps->index( (int)setting, 0 ), s );
+        Models::g()->setData( Models::g()->index( (int)setting, 0 ), s );
     }
 }
 
@@ -215,7 +210,7 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
     QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn );
     for ( int i = 0; i < fileNames.size(); ++i )
     {
@@ -243,12 +238,12 @@ void MainWindow::load( QString fileName )
         {
             for ( int k = 0; k < loader.getNumDatasets(); ++k )
             {
-                m_dataStore->setData( m_dataStore->index( m_dataStore->rowCount(), (int)Fn::Property::NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
             }
             QFileInfo fi( fileName );
             QDir dir = fi.absoluteDir();
             QString lastPath = dir.absolutePath();
-            m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
 
             setCurrentFile(fileName);
         }
@@ -304,7 +299,7 @@ QString MainWindow::strippedName( const QString &fullFileName )
 
 void MainWindow::save()
 {
-    QString fn = m_globalProps->data( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
     if ( !fileName.isEmpty() )
@@ -322,7 +317,7 @@ void MainWindow::save()
             {
                 case QMessageBox::Save :
                 {
-                    Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
+                    Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
                     Writer writer( ds, fileName );
                     writer.save();
                     break;
@@ -333,7 +328,7 @@ void MainWindow::save()
         }
         else
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( m_dataStore->data( m_dataStore->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
             Writer writer( ds, fileName );
             writer.save();
         }
@@ -341,7 +336,7 @@ void MainWindow::save()
         QFileInfo fi( fileName );
         dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        m_globalProps->setData( m_globalProps->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
     }
 }
 
@@ -513,13 +508,12 @@ void MainWindow::createToolBars()
     editToolBar->setObjectName( "editToolbar");
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
-    m_toolsToolBar->setModel( m_dataStore );
     addToolBar( m_toolsToolBar );
 }
 
 void MainWindow::createStatusBar()
 {
-    StatusBar* sbar = new StatusBar( m_dataStore, m_globalProps, this );
+    StatusBar* sbar = new StatusBar( this );
     sbar->setSelectionModel( m_datasetWidget->selectionModel() );
     this->setStatusBar( sbar );
 }
@@ -527,15 +521,14 @@ void MainWindow::createStatusBar()
 void MainWindow::createDockWindows()
 {
     m_datasetWidget = new DatasetListWidget();
-	m_datasetWidget->setModel( m_dataStore );
 	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
 	addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
 	viewMenu->addAction( dockDSW->toggleViewAction() );
 	connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSW, SLOT( toggleTitleWidget() ) );
 
-	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), m_dataStore, SLOT( moveItemUp( int ) ) );
-	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), m_dataStore, SLOT( moveItemDown( int ) ) );
-	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), m_dataStore, SLOT( deleteItem( int ) ) );
+	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), Models::d(), SLOT( moveItemUp( int ) ) );
+	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), Models::d(), SLOT( moveItemDown( int ) ) );
+	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), Models::d(), SLOT( deleteItem( int ) ) );
 
 	ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
     FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
@@ -544,7 +537,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
     dockCE->hide();
 
-	ROIWidget* m_roiWidget = new ROIWidget( m_roiModel, this );
+	ROIWidget* m_roiWidget = new ROIWidget( this );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
     addDockWidget( Qt::RightDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
@@ -554,7 +547,6 @@ void MainWindow::createDockWindows()
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( this );
 	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP );
-    dsProperties->setModel( m_dataStore );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
@@ -563,7 +555,7 @@ void MainWindow::createDockWindows()
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
     FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
     addDockWidget( Qt::RightDockWidgetArea, dockRP );
-    roiProperties->setModel( m_roiModel );
+    roiProperties->setModel( Models::r() );
     roiProperties->setSelectionModel( m_roiWidget->selectionModel() );
     viewMenu->addAction( dockRP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockRP, SLOT( toggleTitleWidget() ) );
@@ -572,14 +564,14 @@ void MainWindow::createDockWindows()
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
     FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockGP );
-    globalProperties->setModel( m_globalProps );
+    globalProperties->setModel( Models::g() );
     viewMenu->addAction( dockGP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGP, SLOT( toggleTitleWidget() ) );
 
 	DatasetInfoView *dsInfo = new DatasetInfoView( this );
 	FNDockWidget* dockDSI = new FNDockWidget( QString("dataset info"), dsInfo, this );
 	addDockWidget( Qt::BottomDockWidgetArea, dockDSI );
-	dsInfo->setModel( m_dataStore );
+	dsInfo->setModel( Models::d() );
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
@@ -590,35 +582,35 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
 
-    mainGLWidget = new GLWidget( m_dataStore, m_globalProps, m_roiModel, m_roiWidget->selectionModel() );
+    mainGLWidget = new GLWidget( m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget, SLOT( update() ) );
 
-    DockNavGLWidget* nav1 = new DockNavGLWidget( m_dataStore, m_globalProps, QString("axial"), 2, this, mainGLWidget );
+    DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav1, SLOT( update() ) );
 
-    DockNavGLWidget* nav2 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "sagittal" ), 0, this, mainGLWidget );
+    DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
 
-    DockNavGLWidget* nav3 = new DockNavGLWidget( m_dataStore, m_globalProps, QString( "coronal" ), 1, this, mainGLWidget );
+    DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav3, SLOT( update() ) );
 
-    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( m_dataStore, m_globalProps, QString( "combined" ), this, mainGLWidget );
+    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
@@ -630,7 +622,7 @@ void MainWindow::createDockWindows()
     dockNav3->hide();
     dockNav4->hide();
 
-    SingleSHWidget* sshw = new SingleSHWidget( m_dataStore, m_globalProps, QString( "single sh" ), this, mainGLWidget );
+    SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
@@ -646,34 +638,34 @@ void MainWindow::createDockWindows()
 
 void MainWindow::slotToggleAxialSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
 }
 
 void  MainWindow::slotStandardAxialView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::AXIAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::AXIAL );
     mainGLWidget->setView( Fn::Orient::AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::CORONAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::CORONAL );
     mainGLWidget->setView( Fn::Orient::CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
     mainGLWidget->setView( Fn::Orient::SAGITTAL );
 }
 
@@ -688,13 +680,13 @@ void MainWindow::slotToggleShaderEdit()
 
 void MainWindow::slotRenderCrosshairs( bool value )
 {
-    m_globalProps->setData( m_globalProps->index( (int)Fn::Global::RENDER_CROSSHAIRS, 0 ), value );
+    Models::g()->setData( Models::g()->index( (int)Fn::Global::RENDER_CROSSHAIRS, 0 ), value );
 }
 
 void MainWindow::screenshot()
 {
     QImage* image = mainGLWidget->screenshot();
-    QString path = m_globalProps->data( m_globalProps->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ).toString();
+    QString path = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ).toString();
     if ( !path.endsWith( '/') )
     {
         path += '/';

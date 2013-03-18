@@ -19,7 +19,7 @@ class DataStore: public QAbstractItemModel
     Q_OBJECT
 
 public:
-    DataStore( QAbstractItemModel* globalProps );
+    DataStore();
     virtual ~DataStore();
 
     // reimplemented from QAbstractItemModel
@@ -45,8 +45,6 @@ private:
     void updateGlobals();
 
     QList<QVariant> m_datasetList;
-
-    QAbstractItemModel* m_globalProperties;
 
 signals:
 };

@@ -21,12 +21,12 @@ class FiberRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    FiberRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
+    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData );
     virtual ~FiberRenderer();
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel, QAbstractItemModel* globalModel );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
 
     void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold,
                             float dx, float dy, float dz, float x, float y, float z, float lineWidth );
@@ -43,7 +43,6 @@ protected:
 private:
     QModelIndex createIndex( int branch, int pos, int column );
 
-    QAbstractItemModel* m_roiModel;
     FiberSelector* m_selector;
     GLuint *vboIds;
 

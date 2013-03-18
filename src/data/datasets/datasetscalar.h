@@ -10,7 +10,6 @@
 
 #include "datasetnifti.h"
 
-class QAbstractItemModel;
 class ColormapRenderer;
 
 class DatasetScalar: public DatasetNifti
@@ -21,7 +20,7 @@ public:
 
     QVector<float>* getData();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     QString getValueAsString( int x, int y, int z );
 
 private:

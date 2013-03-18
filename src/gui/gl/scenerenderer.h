@@ -17,13 +17,12 @@
 class ArcBall;
 class DataStore;
 class SliceRenderer;
-class QAbstractItemModel;
 class QItemSelectionModel;
 
 class SceneRenderer
 {
 public:
-	SceneRenderer( QAbstractItemModel* dataModel, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QItemSelectionModel* roiSelectionModel );
+	SceneRenderer( QItemSelectionModel* roiSelectionModel );
 	virtual ~SceneRenderer();
 
 	void resizeGL( int width, int height );
@@ -53,9 +52,6 @@ private:
 	ArcBall* m_arcBall;
 	SliceRenderer* m_sliceRenderer;
 
-	QAbstractItemModel* m_dataModel;
-	QAbstractItemModel* m_globalModel;
-	QAbstractItemModel* m_roiModel;
 	QItemSelectionModel* m_roiSelectionModel;
 
 	int m_boundingbox;

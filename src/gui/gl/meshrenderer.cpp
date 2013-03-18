@@ -51,12 +51,12 @@ void MeshRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "mesh" )->bind();
 
-    GLFunctions::setupTextures( dataModel );
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ) , dataModel );
+    GLFunctions::setupTextures();
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ) );
     // Set modelview-projection matrix
     GLFunctions::getShader( "mesh" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "mesh" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );

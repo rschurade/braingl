@@ -12,7 +12,6 @@
 #include <QWidget>
 
 class DatasetPropertyView;
-class QAbstractItemModel;
 class QItemSelectionModel;
 class QVBoxLayout;
 
@@ -24,7 +23,6 @@ public:
     DatasetPropertyWidget( QWidget* parent = 0 );
     virtual ~DatasetPropertyWidget();
 
-    void setModel( QAbstractItemModel* model );
     void setSelectionModel( QItemSelectionModel* selectionModel );
 
 private:

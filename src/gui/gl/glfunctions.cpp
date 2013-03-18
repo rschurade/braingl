@@ -9,6 +9,7 @@
 #include "glfunctions.h"
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 
 #include "shaperenderer.h"
 #include "../text/textrenderer.h"
@@ -67,9 +68,10 @@ QPoint GLFunctions::getScreenSize()
     return QPoint( GLFunctions::screenWidth, GLFunctions::screenHeight );
 }
 
-void GLFunctions::setupTextures( QAbstractItemModel* model )
+void GLFunctions::setupTextures()
 {
-    QList< int > tl = getTextureIndexes( model );
+    QAbstractItemModel* model = Models::d();
+    QList< int > tl = getTextureIndexes();
     QModelIndex index;
     int texIndex = 4;
     switch ( tl.size() )
@@ -82,7 +84,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
-            setTexInterpolation( model, tl.at( texIndex ) );
+            setTexInterpolation( tl.at( texIndex ) );
         }
             /* no break */
         case 4:
@@ -93,7 +95,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
-            setTexInterpolation( model, tl.at( texIndex ) );
+            setTexInterpolation( tl.at( texIndex ) );
         }
             /* no break */
         case 3:
@@ -104,7 +106,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
-            setTexInterpolation( model, tl.at( texIndex ) );
+            setTexInterpolation( tl.at( texIndex ) );
         }
             /* no break */
         case 2:
@@ -115,7 +117,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
-            setTexInterpolation( model, tl.at( texIndex ) );
+            setTexInterpolation( tl.at( texIndex ) );
         }
             /* no break */
         case 1:
@@ -126,7 +128,7 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE0 );
             glBindTexture( GL_TEXTURE_3D, tex );
-            setTexInterpolation( model, tl.at( texIndex ) );
+            setTexInterpolation( tl.at( texIndex ) );
             break;
         }
         default:
@@ -134,8 +136,9 @@ void GLFunctions::setupTextures( QAbstractItemModel* model )
     }
 }
 
-void GLFunctions::setTexInterpolation( QAbstractItemModel* model, int row )
+void GLFunctions::setTexInterpolation( int row )
 {
+    QAbstractItemModel* model = Models::d();
     QModelIndex index = model->index( row,  (int)Fn::Property::INTERPOLATION );
     bool interpolation = model->data( index, Qt::DisplayRole ).toBool();
     if ( interpolation )
@@ -320,7 +323,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     return program;
 }
 
-void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program )
 {
     program->bind();
     // Offset for position
@@ -339,9 +342,9 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QAbstractItemMo
     program->enableAttributeArray( texcoordLocation );
     glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
-    setTextureUniforms( program, model );
+    setTextureUniforms( program );
 }
-void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QAbstractItemModel* model )
+void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
 {
     program->setUniformValue( "texture0", 0 );
     program->setUniformValue( "texture1", 1 );
@@ -355,7 +358,8 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QAbstractItemMo
     program->setUniformValue( "u_texActive3", false );
     program->setUniformValue( "u_texActive4", false );
 
-    QList< int > tl = getTextureIndexes( model );
+    QList< int > tl = getTextureIndexes();
+    QAbstractItemModel* model = Models::d();
     QModelIndex index;
     int texIndex = 4;
     float texMin = 0;
@@ -478,10 +482,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QAbstractItemMo
     }
 }
 
-QList< int > GLFunctions::getTextureIndexes( QAbstractItemModel* model )
+QList< int > GLFunctions::getTextureIndexes()
 {
     QList< int > tl;
-
+    QAbstractItemModel* model = Models::d();
     int countDatasets = model->rowCount();
     int allocatedTextureCount = 0;
     for ( int i = 0; i < countDatasets; ++i )

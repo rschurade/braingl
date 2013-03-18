@@ -22,8 +22,6 @@
 
 #include <limits>
 
-class QAbstractItemModel;
-
 class Dataset : public QObject
 {
 public:
@@ -34,7 +32,7 @@ public:
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, QAbstractItemModel* globalModel, QAbstractItemModel* roiModel, QAbstractItemModel* dataModel = 0 );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
 
     virtual QString getValueAsString( int x, int y, int z );
 

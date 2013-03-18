@@ -17,7 +17,7 @@ class ROIModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    ROIModel( QAbstractItemModel* globalProps );
+    ROIModel();
     virtual ~ROIModel();
 
     // reimplemented from QAbstractItemModel
@@ -36,8 +36,6 @@ public:
     QModelIndexList match( const QModelIndex &start, int role, const QVariant &value, int hits=1, Qt::MatchFlags flags=Qt::MatchFlags( Qt::MatchStartsWith | Qt::MatchWrap ) ) const;
 
 private:
-    QAbstractItemModel* m_globalProps;
-
     QList< QList<QVariant> >m_rois;
     int m_count;
 

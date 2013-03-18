@@ -15,9 +15,8 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-TubeRenderer::TubeRenderer( QAbstractItemModel* roiModel, FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
+TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),
-    m_roiModel( roiModel ),
     m_selector( selector ),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
@@ -46,12 +45,12 @@ void TubeRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QAbstractItemModel* dataModel )
+void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 {
     GLFunctions::getShader( "tube" )->bind();
 
-    GLFunctions::setupTextures( dataModel );
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ) , dataModel );
+    GLFunctions::setupTextures();
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ) );
 
     // Set modelview-projection matrix
     GLFunctions::getShader( "tube" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
