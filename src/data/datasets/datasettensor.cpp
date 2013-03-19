@@ -23,7 +23,7 @@ DatasetTensor::DatasetTensor( QString filename, QVector<Matrix> data, nifti_imag
     m_properties.set( Fn::Property::FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
     m_properties.set( Fn::Property::EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
     m_properties.set( Fn::Property::GAMMA, 0.1f, 0.0f, 10.0f, true );
-    m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
+    m_properties.set( Fn::Property::OFFSET, 0.0f, -1.0f, 1.0f, true );
     m_properties.set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, true );
     m_properties.set( Fn::Property::RENDER_SAGITTAL, false, true );
@@ -214,8 +214,12 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new TensorRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(), m_properties.get( Fn::Property::NY ).toInt(), m_properties.get( Fn::Property::NZ ).toInt(),
-                    m_properties.get( Fn::Property::DX ).toFloat(), m_properties.get( Fn::Property::DY ).toFloat(), m_properties.get( Fn::Property::DZ ).toFloat() );
+            m_renderer = new TensorRenderer( &m_data, m_properties.get( Fn::Property::NX ).toInt(),
+                                                      m_properties.get( Fn::Property::NY ).toInt(),
+                                                      m_properties.get( Fn::Property::NZ ).toInt(),
+                                                      m_properties.get( Fn::Property::DX ).toFloat(),
+                                                      m_properties.get( Fn::Property::DY ).toFloat(),
+                                                      m_properties.get( Fn::Property::DZ ).toFloat() );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
         }
@@ -240,8 +244,26 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
 QString DatasetTensor::getValueAsString( int x, int y, int z )
 {
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    float m_dx = m_properties.get( Fn::Property::DX ).toFloat();
+    float m_dy = m_properties.get( Fn::Property::DY ).toFloat();
+    float m_dz = m_properties.get( Fn::Property::DZ ).toFloat();
+
+    x = x * ( dx / m_dx );
+    y = y * ( dy / m_dy );
+    z = z * ( dz / m_dz );
+
     int nx = m_properties.get( Fn::Property::NX ).toInt();
     int ny = m_properties.get( Fn::Property::NY ).toInt();
+    int nz = m_properties.get( Fn::Property::NZ ).toInt();
+
+    x = qMax( 0, qMin( x, nx - 1) );
+    y = qMax( 0, qMin( y, ny - 1) );
+    z = qMax( 0, qMin( z, nz - 1) );
+
     Matrix data = m_data.at( x + y * nx + z * nx * ny );
     return QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
             + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );

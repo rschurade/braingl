@@ -123,9 +123,17 @@ void TensorRenderer::setShaderVars()
 
 void TensorRenderer::initGeometry()
 {
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+
+    xi = qMax( 0, qMin( xi, m_nx - 1) );
+    yi = qMax( 0, qMin( yi, m_ny - 1) );
+    zi = qMax( 0, qMin( zi, m_nz - 1) );
 
     QString s = createSettingsString( { xi, yi, zi, m_orient, m_offset } );
 
@@ -142,9 +150,9 @@ void TensorRenderer::initGeometry()
 
     ColumnVector newVert( 3 );
 
-    float x = (float)xi * m_dx + m_dx / 2.;
-    float y = (float)yi * m_dy + m_dy / 2.;
-    float z = (float)zi * m_dz + m_dz / 2.;
+    float x = (float)xi * m_dx + m_dx;
+    float y = (float)yi * m_dy + m_dy;
+    float z = (float)zi * m_dz + m_dz;
 
     m_quads = 0;
 
