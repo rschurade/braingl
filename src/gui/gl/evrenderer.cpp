@@ -9,6 +9,8 @@
 
 #include "../../algos/fmath.h"
 #include "../../data/enums.h"
+#include "../../data/properties/propertygroup.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
@@ -45,8 +47,12 @@ void EVRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_orient = props->get( Fn::Property::RENDER_SLICE ).toInt();
+    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+
     GLFunctions::getShader( "ev" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "ev" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
@@ -200,9 +206,3 @@ void EVRenderer::addGlyph( std::vector<float> &verts, float xPos, float yPos, fl
     verts.push_back( v2 );
 }
 
-void EVRenderer::setRenderParams( float scaling, int orient, float offset )
-{
-    m_scaling = scaling;
-    m_orient = orient;
-    m_offset = offset;
-}

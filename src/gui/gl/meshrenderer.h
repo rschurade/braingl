@@ -11,6 +11,7 @@
 #include "objectrenderer.h"
 
 class TriangleMesh2;
+class PropertyGroup;
 
 class MeshRenderer  : public ObjectRenderer
 {
@@ -20,15 +21,14 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props );
 
     void setMesh( TriangleMesh2* mesh );
-    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold );
 
 protected:
     void setupTextures();
     void setShaderVars();
-
+    void setRenderParams( PropertyGroup* props );
     void initGeometry();
 
 private:

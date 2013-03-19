@@ -15,6 +15,7 @@
 #include "../../algos/qball.h"
 
 #include "../../data/mesh/tesselation.h"
+#include "../../data/properties/propertygroup.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -57,8 +58,10 @@ void SHRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    setRenderParams( props );
+
     if ( m_orient == 0 )
     {
         return;
@@ -196,26 +199,25 @@ void SHRenderer::initGeometry()
 
 }
 
-void SHRenderer::setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, bool hideNegativeLobes, int order,
-                                        bool renderSagittal, bool renderCoronal, bool renderAxial )
+void SHRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = scaling;
-    m_offset = offset;
-    m_lodAdjust = lodAdjust;
-    m_minMaxScaling = minMaxScaling;
-    m_hideNegativeLobes = hideNegativeLobes;
-    m_order = order;
+    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+    m_lodAdjust = props->get( Fn::Property::LOD ).toInt();
+    m_minMaxScaling = props->get( Fn::Property::MINMAX_SCALING ).toBool();
+    m_hideNegativeLobes = props->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
+    m_order = props->get( Fn::Property::ORDER ).toInt();
 
     m_orient = 0;
-    if ( renderAxial )
+    if ( props->get( Fn::Property::RENDER_AXIAL ).toBool() )
     {
         m_orient = 1;
     }
-    if ( renderCoronal )
+    if ( props->get( Fn::Property::RENDER_CORONAL ).toBool() )
     {
         m_orient += 2;
     }
-    if ( renderSagittal )
+    if ( props->get( Fn::Property::RENDER_SAGITTAL ).toBool() )
     {
         m_orient += 4;
     }

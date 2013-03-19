@@ -123,17 +123,7 @@ void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                 m_properties.get( Fn::Property::OFFSET ).toFloat(),
-                                 m_properties.get( Fn::Property::LOD ).toInt(),
-                                 m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),
-                                 m_properties.get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool(),
-                                 m_properties.get( Fn::Property::ORDER ).toInt(),
-                                 m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool(),
-                                 m_properties.get( Fn::Property::RENDER_CORONAL ).toBool(),
-                                 m_properties.get( Fn::Property::RENDER_AXIAL ).toBool());
-
-    m_renderer->draw( pMatrix, mvMatrix );
+    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
 }
 
 QString DatasetSH::getValueAsString( int x, int y, int z )

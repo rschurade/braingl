@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+class PropertyGroup;
+
 class EVRenderer : public ObjectRenderer
 {
 public:
@@ -20,9 +22,7 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
-
-    void setRenderParams( float scaling, int orient, float offset );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props );
 
 protected:
     void setupTextures();

@@ -158,11 +158,9 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_renderer->init();
     }
 
-    m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                 m_properties.get( Fn::Property::RENDER_SLICE ).toInt(),
-                                 m_properties.get( Fn::Property::OFFSET ).toFloat() );
 
-    m_renderer->draw( pMatrix, mvMatrix );
+
+    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
 }
 
 QString Dataset3D::getValueAsString( int x, int y, int z )
