@@ -24,14 +24,7 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >
     m_extraData( extraData ),
     m_numLines( data.size() ),
     m_numPoints( 0 ),
-    m_isInitialized( false ),
-    m_colorMode( 0 ),
-    m_colormap( 1 ),
-    m_selectedMin( 0.0 ),
-    m_selectedMax( 1.0 ),
-    m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 ),
-    m_tubeThickness( 0.05 )
+    m_isInitialized( false )
 {
 }
 
@@ -67,7 +60,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGrou
     setShaderVars( props );
 
     QVector<bool>*selected = m_selector->getSelection();
-    if ( m_colorMode != 2 )
+    if ( props->get( Fn::Property::COLORMODE ).toInt() != 2 )
     {
         for ( int i = 0; i < m_data.size(); ++i )
         {

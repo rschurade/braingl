@@ -9,6 +9,8 @@
 
 #include "../../algos/fmath.h"
 #include "../../data/enums.h"
+#include "../../data/properties/propertygroup.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
@@ -48,12 +50,16 @@ void TensorRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    setRenderParams( props );
+
     if ( m_orient == 0 )
     {
         return;
     }
+
+    initGeometry();
 
     GLFunctions::getShader( "superquadric" )->bind();
     // Set modelview-projection matrix
@@ -64,8 +70,6 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_faThreshold", m_faThreshold );
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_evThreshold", m_evThreshold );
     GLFunctions::getShader( "superquadric" )->setUniformValue( "u_gamma", m_gamma );
-
-    initGeometry();
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars();
@@ -524,12 +528,17 @@ void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos
     verts.push_back( o2 );
 }
 
-void TensorRenderer::setRenderParams( float scaling, float faThreshold, float evThreshold, float gamma, int orient, float offset )
+void TensorRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = scaling;
-    m_faThreshold = faThreshold;
-    m_evThreshold = evThreshold;
-    m_gamma = gamma;
-    m_orient = orient;
-    m_offset = offset;
+    int slice = 0;
+    slice = (int)props->get( Fn::Property::RENDER_AXIAL ).toBool() +
+            (int)props->get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
+            (int)props->get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+
+    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_faThreshold = props->get( Fn::Property::FA_THRESHOLD ).toFloat();
+    m_evThreshold = props->get( Fn::Property::EV_THRESHOLD ).toFloat();
+    m_gamma = props->get( Fn::Property::GAMMA ).toFloat();
+    m_orient = slice;
+    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
 }

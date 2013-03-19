@@ -92,13 +92,8 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_oldIsoValue = m_isoLevel;
         m_renderer->setMesh( m_mesh );
     }
-    m_renderer->setRenderParams( m_properties.get( Fn::Property::COLORMODE ).toInt(),
-                                     m_properties.get( Fn::Property::COLORMAP ).toInt(),
-                                     m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
-                                     m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
-                                     m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-    m_renderer->draw( pMatrix, mvMatrix );
+
+    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
 }
 
 QString DatasetIsosurface::getValueAsString( int x, int y, int z )

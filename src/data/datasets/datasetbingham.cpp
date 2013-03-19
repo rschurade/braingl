@@ -83,22 +83,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         qDebug() << "ds bingham init renderer done";
     }
 
-    int slice = (int)m_properties.get( Fn::Property::RENDER_AXIAL ).toBool() +
-                (int)m_properties.get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
-                (int)m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
-
-
-    m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                 slice,
-                                 m_properties.get( Fn::Property::OFFSET ).toFloat(),
-                                 m_properties.get( Fn::Property::LOD ).toInt(),
-                                 m_properties.get( Fn::Property::MINMAX_SCALING ).toBool(),
-                                 m_properties.get( Fn::Property::ORDER ).toInt(),
-                                 m_properties.get( Fn::Property::RENDER_FIRST ).toBool(),
-                                 m_properties.get( Fn::Property::RENDER_SECOND ).toBool(),
-                                 m_properties.get( Fn::Property::RENDER_THIRD ).toBool() );
-
-    m_renderer->draw( pMatrix, mvMatrix );
+    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
 }
 
 QString DatasetBingham::getValueAsString( int x, int y, int z )

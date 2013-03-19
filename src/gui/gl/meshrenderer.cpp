@@ -10,6 +10,7 @@
 
 #include "../../data/enums.h"
 #include "../../data/mesh/trianglemesh2.h"
+#include "../../data/properties/propertygroup.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
@@ -51,8 +52,10 @@ void MeshRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    setRenderParams( props );
+
     GLFunctions::getShader( "mesh" )->bind();
 
     GLFunctions::setupTextures();
@@ -128,13 +131,13 @@ void MeshRenderer::initGeometry()
     m_dirty = false;
 }
 
-void MeshRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold, float upperThreshold )
+void MeshRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_colorMode = colorMode;
-    m_colormap = colormap;
-    m_selectedMin = selectedMin;
-    m_selectedMax = selectedMax;
-    m_lowerThreshold = lowerThreshold;
-    m_upperThreshold = upperThreshold;
+    m_colorMode = props->get( Fn::Property::COLORMODE ).toInt();
+    m_colormap = props->get( Fn::Property::COLORMAP ).toInt();
+    m_selectedMin = props->get( Fn::Property::SELECTED_MIN ).toFloat();
+    m_selectedMax = props->get( Fn::Property::SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props->get( Fn::Property::LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props->get( Fn::Property::UPPER_THRESHOLD ).toFloat();
 }
 

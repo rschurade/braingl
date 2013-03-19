@@ -14,6 +14,8 @@
 
 #include <QMatrix4x4>
 
+class PropertyGroup;
+
 class SHRenderer : public ObjectRenderer
 {
 public:
@@ -22,14 +24,14 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props );
 
-    void setRenderParams( float scaling, float offset, int lodAdjust, bool minMaxScaling, bool hideNegativeLobes, int order,
-                            bool renderSagittal, bool renderCoronal, bool renderAxial );
+
 
 protected:
     void setupTextures();
     void setShaderVars();
+    void setRenderParams( PropertyGroup* props );
 
     void initGeometry();
 

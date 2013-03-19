@@ -16,6 +16,7 @@
 #include "../../algos/qball.h"
 
 #include "../../data/mesh/tesselation.h"
+#include "../../data/properties/propertygroup.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -60,7 +61,7 @@ void BinghamRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
     if ( m_orient == 0 )
     {
@@ -70,14 +71,15 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     m_pMatrix = p_matrix;
     m_mvMatrix = mv_matrix;
 
+    setRenderParams( props );
+    initGeometry();
+
     GLFunctions::getShader( "qball" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_minMaxScaling );
     GLFunctions::getShader( "qball" )->setUniformValue( "u_scaling", m_scaling );
-
-    initGeometry();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
@@ -202,15 +204,19 @@ void BinghamRenderer::initGeometry()
     indexes.clear();
 }
 
-void BinghamRenderer::setRenderParams( float scaling, int orient, float offset, int lodAdjust, bool minMaxScaling, int order, bool render1, bool render2, bool render3 )
+void BinghamRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = scaling;
-    m_orient = orient;
-    m_offset = offset;
-    m_lodAdjust = lodAdjust;
-    m_minMaxScaling = minMaxScaling;
-    m_order = order;
-    m_render1 = render1;
-    m_render2 = render2;
-    m_render3 = render3;
+    int slice = (int)props->get( Fn::Property::RENDER_AXIAL ).toBool() +
+                    (int)props->get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
+                    (int)props->get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+
+    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_orient = slice;
+    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+    m_lodAdjust = props->get( Fn::Property::LOD ).toInt();
+    m_minMaxScaling = props->get( Fn::Property::MINMAX_SCALING ).toBool();
+    m_order = props->get( Fn::Property::ORDER ).toInt();
+    m_render1 = props->get( Fn::Property::RENDER_FIRST ).toBool();
+    m_render2 = props->get( Fn::Property::RENDER_SECOND ).toBool();
+    m_render3 = props->get( Fn::Property::RENDER_THIRD ).toBool();
 }

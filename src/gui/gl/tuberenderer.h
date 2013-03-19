@@ -55,13 +55,6 @@ private:
 
     bool m_isInitialized;
 
-    int m_colorMode;
-    int m_colormap;
-    float m_selectedMin;
-    float m_selectedMax;
-    float m_lowerThreshold;
-    float m_upperThreshold;
-    float m_tubeThickness;
     QVector<QColor>m_colorField;
 
 public slots:

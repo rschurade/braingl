@@ -9,6 +9,7 @@
 
 #include "../../algos/fmath.h"
 #include "../../data/enums.h"
+#include "../../data/properties/propertygroup.h"
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
@@ -48,8 +49,10 @@ void TensorRendererEV::init()
     glGenBuffers( 1, vboIds );
 }
 
-void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    setRenderParams( props );
+
     GLFunctions::getShader( "tensorev" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "tensorev" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
@@ -221,12 +224,12 @@ void TensorRendererEV::addGlyph( std::vector<float>* verts, float xPos, float yP
     verts->push_back( o2 );
 }
 
-void TensorRendererEV::setRenderParams( float scaling, float faThreshold, float evThreshold, int orient, float offset, int evSelect )
+void TensorRendererEV::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = scaling;
-    m_faThreshold = faThreshold;
-    m_evThreshold = evThreshold;
-    m_orient = orient;
-    m_offset = offset;
-    m_evSelect = evSelect;
+    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_faThreshold = props->get( Fn::Property::FA_THRESHOLD ).toFloat();
+    m_evThreshold = props->get( Fn::Property::EV_THRESHOLD ).toFloat();
+    m_orient = props->get( Fn::Property::RENDER_SLICE ).toInt();
+    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+    m_evSelect = props->get( Fn::Property::TENSOR_RENDERMODE ).toInt();
 }

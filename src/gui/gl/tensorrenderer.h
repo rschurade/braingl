@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+class PropertyGroup;
+
 class TensorRenderer : public ObjectRenderer
 {
 public:
@@ -20,13 +22,12 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
-
-    void setRenderParams( float scaling, float faThreshold, float evThreshold, float gamma, int orient, float offset );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props );
 
 protected:
     void setupTextures();
     void setShaderVars();
+    void setRenderParams( PropertyGroup* props );
 
     void initGeometry();
     void addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor );

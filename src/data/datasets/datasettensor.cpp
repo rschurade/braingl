@@ -220,19 +220,7 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_renderer->init();
         }
 
-        int slice = 0;
-        slice = (int)m_properties.get( Fn::Property::RENDER_AXIAL ).toBool() +
-                (int)m_properties.get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
-                (int)m_properties.get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
-
-        m_renderer->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                     m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::GAMMA ).toFloat(),
-                                     slice,
-                                     m_properties.get( Fn::Property::OFFSET ).toFloat() );
-
-        m_renderer->draw( pMatrix, mvMatrix );
+        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
     }
     else
     {
@@ -244,14 +232,9 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_rendererEV->init();
         }
 
-        m_rendererEV->setRenderParams( m_properties.get( Fn::Property::SCALING ).toFloat(),
-                                       m_properties.get( Fn::Property::FA_THRESHOLD ).toFloat(),
-                                       m_properties.get( Fn::Property::EV_THRESHOLD ).toFloat(),
-                                       m_properties.get( Fn::Property::RENDER_SLICE ).toInt(),
-                                       m_properties.get( Fn::Property::OFFSET ).toFloat(),
-                                       m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() );
 
-        m_rendererEV->draw( pMatrix, mvMatrix );
+
+        m_rendererEV->draw( pMatrix, mvMatrix, &m_properties );
     }
 }
 
