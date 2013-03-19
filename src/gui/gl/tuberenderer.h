@@ -15,6 +15,7 @@
 #include <QColor>
 
 class FiberSelector;
+class PropertyGroup;
 
 class TubeRenderer : public ObjectRenderer
 {
@@ -26,15 +27,11 @@ public:
 
     void init();
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix );
-
-    void setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax,
-                            float lowerThreshold, float upperThreshold, float tubeThickness );
-
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props );
 
 protected:
     void setupTextures();
-    void setShaderVars();
+    void setShaderVars( PropertyGroup* props );
 
     void initGeometry();
 

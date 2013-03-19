@@ -12,6 +12,8 @@
 #include "../../data/enums.h"
 #include "../../data/datasets/fiberselector.h"
 
+#include "../../data/properties/propertygroup.h"
+
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
@@ -23,17 +25,7 @@ FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float >
     m_extraData( extraData ),
     m_numLines( data.size() ),
     m_numPoints( 0 ),
-    m_isInitialized( false ),
-    m_colorMode( 0 ),
-    m_colormap( 1 ),
-    m_selectedMin( 0.0 ),
-    m_selectedMax( 1.0 ),
-    m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 ),
-    m_dx( 0.0 ),
-    m_dy( 0.0 ),
-    m_dz( 0.0 ),
-    m_lineWidth( 1 )
+    m_isInitialized( false )
 {
 }
 
@@ -48,7 +40,7 @@ void FiberRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
     GLFunctions::getShader( "fiber" )->bind();
 
@@ -59,21 +51,17 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_x", m_x );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_y", m_y );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_z", m_z );
-
     initGeometry();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( props );
 
-    glLineWidth( m_lineWidth );
+    glLineWidth( props->get( Fn::Property::FIBER_LINE_THICKNESS ).toFloat() );
 
     QVector<bool>*selected = m_selector->getSelection();
 
-    if ( m_colorMode != 2 )
+    if ( props->get( Fn::Property::COLORMODE ).toInt() != 2 )
     {
         for ( int i = 0; i < m_data.size(); ++i )
         {
@@ -103,7 +91,7 @@ void FiberRenderer::setupTextures()
 {
 }
 
-void FiberRenderer::setShaderVars()
+void FiberRenderer::setShaderVars( PropertyGroup* props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "fiber" );
 
@@ -131,16 +119,20 @@ void FiberRenderer::setShaderVars()
     program->enableAttributeArray( extraLocation );
     glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", m_colorMode );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", m_colormap );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", props->get( Fn::Property::COLORMODE ).toInt() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", props->get( Fn::Property::COLORMAP ).toInt() );
     GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", m_selectedMin );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", m_selectedMax );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dx", m_dx );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dy", m_dy );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dz", m_dz );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", props->get( Fn::Property::SELECTED_MIN ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", props->get( Fn::Property::SELECTED_MAX ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dx", props->get( Fn::Property::DX ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dy", props->get( Fn::Property::DY ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dz", props->get( Fn::Property::DZ ).toFloat() );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_x", props->get( Fn::Property::NX ).toFloat() / 10.f );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_y", props->get( Fn::Property::NY ).toFloat() / 10.f );
+    GLFunctions::getShader( "fiber" )->setUniformValue( "u_z", props->get( Fn::Property::NZ ).toFloat() / 10.f );
+
 }
 
 void FiberRenderer::initGeometry()
@@ -208,25 +200,6 @@ void FiberRenderer::initGeometry()
     }
 
     m_isInitialized = true;
-}
-
-void FiberRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax,
-                                            float lowerThreshold, float upperThreshold, float dx, float dy, float dz,
-                                            float x, float y, float z, float lineWidth )
-{
-    m_colorMode = colorMode;
-    m_colormap = colormap;
-    m_selectedMin = selectedMin;
-    m_selectedMax = selectedMax;
-    m_lowerThreshold = lowerThreshold;
-    m_upperThreshold = upperThreshold;
-    m_dx = dx;
-    m_dy = dy;
-    m_dz = dz;
-    m_x = x / 10.;
-    m_y = y / 10.;
-    m_z = z / 10.;
-    m_lineWidth = lineWidth;
 }
 
 void FiberRenderer::colorChanged( QColor color )
