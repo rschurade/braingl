@@ -31,8 +31,6 @@ TextRenderer::~TextRenderer()
 
 void TextRenderer::init()
 {
-    GLFunctions::loadShaders();
-
     createFontTexture();
 
     glGenBuffers( 1, vboIds );

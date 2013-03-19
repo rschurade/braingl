@@ -69,6 +69,8 @@ void SceneRenderer::initGL()
         qDebug() << "OpenGL initialized.";
     }
 
+    GLFunctions::loadShaders();
+
     QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
