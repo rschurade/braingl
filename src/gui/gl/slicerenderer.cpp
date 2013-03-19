@@ -42,7 +42,6 @@ SliceRenderer::~SliceRenderer()
 
 void SliceRenderer::init()
 {
-    GLFunctions::loadShaders();
     glGenBuffers( 4, vboIds );
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };

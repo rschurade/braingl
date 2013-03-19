@@ -86,8 +86,6 @@ void NavRenderer::initGL()
     static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
-    GLFunctions::loadShaders();
-
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
     GLushort crosshairIndices[] = { 0, 1, 2, 3 };
 

@@ -44,13 +44,6 @@ QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
 
-GLFunctions::GLFunctions()
-{
-}
-
-GLFunctions::~GLFunctions()
-{
-}
 
 int GLFunctions::getPickIndex()
 {

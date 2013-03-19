@@ -81,8 +81,8 @@ public:
     static float scaleX;
     static float scaleY;
 private:
-    GLFunctions();
-    virtual ~GLFunctions();
+    GLFunctions() {};
+    virtual ~GLFunctions() {};
 
     static QString copyShaderToString( QString name, QString ext );
 
