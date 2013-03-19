@@ -11,6 +11,7 @@
 
 #include "../../data/enums.h"
 #include "../../data/datasets/fiberselector.h"
+#include "../../data/properties/propertygroup.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
@@ -45,7 +46,7 @@ void TubeRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
+void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
     GLFunctions::getShader( "tube" )->bind();
 
@@ -55,14 +56,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
     // Set modelview-projection matrix
     GLFunctions::getShader( "tube" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     GLFunctions::getShader( "tube" )->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_colorMode", m_colorMode );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMin", m_selectedMin );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMax", m_selectedMax );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_thickness", m_tubeThickness );
+
 
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
@@ -70,7 +64,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( props );
 
     QVector<bool>*selected = m_selector->getSelection();
     if ( m_colorMode != 2 )
@@ -105,7 +99,7 @@ void TubeRenderer::setupTextures()
 {
 }
 
-void TubeRenderer::setShaderVars()
+void TubeRenderer::setShaderVars( PropertyGroup* props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "tube" );
 
@@ -137,6 +131,15 @@ void TubeRenderer::setShaderVars()
     int dirLocation = program->attributeLocation( "a_direction" );
     program->enableAttributeArray( dirLocation );
     glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_colorMode", props->get( Fn::Property::COLORMODE ).toInt() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_colormap", props->get( Fn::Property::COLORMAP ).toInt() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMin", props->get( Fn::Property::SELECTED_MIN ).toFloat() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMax", props->get( Fn::Property::SELECTED_MAX ).toFloat() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_upperThreshold", props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_thickness", props->get( Fn::Property::FIBER_TUBE_THICKNESS ).toFloat()  );
 }
 
 void TubeRenderer::initGeometry()
@@ -204,18 +207,6 @@ void TubeRenderer::initGeometry()
     }
 
     m_isInitialized = true;
-}
-
-void TubeRenderer::setRenderParams( int colorMode, int colormap, float selectedMin, float selectedMax, float lowerThreshold,
-                                        float upperThreshold, float tubeThickness )
-{
-    m_colorMode = colorMode;
-    m_colormap = colormap;
-    m_selectedMin = selectedMin;
-    m_selectedMax = selectedMax;
-    m_lowerThreshold = lowerThreshold;
-    m_upperThreshold = upperThreshold;
-    m_tubeThickness = tubeThickness;
 }
 
 void TubeRenderer::colorChanged( QColor color )

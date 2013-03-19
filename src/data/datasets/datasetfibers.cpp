@@ -146,20 +146,8 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_renderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
-        m_renderer->setRenderParams( m_properties.get( Fn::Property::COLORMODE ).toInt(),
-                                     m_properties.get( Fn::Property::COLORMAP ).toInt(),
-                                     m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
-                                     m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
-                                     m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat(),
-                                     m_properties.get( Fn::Property::DX ).toFloat(),
-                                     m_properties.get( Fn::Property::DY ).toFloat(),
-                                     m_properties.get( Fn::Property::DZ ).toFloat(),
-                                     m_properties.get( Fn::Property::NX ).toFloat(),
-                                     m_properties.get( Fn::Property::NY ).toFloat(),
-                                     m_properties.get( Fn::Property::NZ ).toFloat(),
-                                     m_properties.get( Fn::Property::FIBER_LINE_THICKNESS ).toFloat() );
-        m_renderer->draw( pMatrix, mvMatrix );
+
+        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
     }
     else if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
@@ -170,14 +158,8 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_tubeRenderer->init();
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
-        m_tubeRenderer->setRenderParams( m_properties.get( Fn::Property::COLORMODE ).toInt(),
-                                         m_properties.get( Fn::Property::COLORMAP ).toInt(),
-                                         m_properties.get( Fn::Property::SELECTED_MIN ).toFloat(),
-                                         m_properties.get( Fn::Property::SELECTED_MAX ).toFloat(),
-                                         m_properties.get( Fn::Property::LOWER_THRESHOLD ).toFloat(),
-                                         m_properties.get( Fn::Property::UPPER_THRESHOLD ).toFloat(),
-                                         m_properties.get( Fn::Property::FIBER_TUBE_THICKNESS ).toFloat() );
-        m_tubeRenderer->draw( pMatrix, mvMatrix );
+
+        m_tubeRenderer->draw( pMatrix, mvMatrix, &m_properties );
     }
 }
 
