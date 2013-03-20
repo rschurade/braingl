@@ -26,12 +26,13 @@ DataStore::~DataStore()
 
 void DataStore::updateGlobals()
 {
-    Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
-
-    if ( ds->properties()->get( Fn::Property::TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
+    if ( m_datasetList.size() > 0 )
     {
-        if ( m_datasetList.size() > 0 )
+        Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
+
+        if ( ds->properties()->get( Fn::Property::TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
         {
+
             Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_AXIAL,    0 ), ds->properties()->get( Fn::Property::NZ ).toInt() );
             Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_CORONAL,  0 ), ds->properties()->get( Fn::Property::NY ).toInt() );
             Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() );
@@ -40,14 +41,13 @@ void DataStore::updateGlobals()
             Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties()->get( Fn::Property::DZ ).toFloat() );
 
             emit dataChanged( index( 0, (int)Fn::Global::SAGITTAL ), index( 0, (int)Fn::Global::SLICE_DZ ) );
+            if ( m_datasetList.size() == 1 )
+            {
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
+            }
         }
-        if ( m_datasetList.size() == 1 )
-        {
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
-        }
-
     }
 }
 
