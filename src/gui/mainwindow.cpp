@@ -595,6 +595,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav1, SLOT( update() ) );
+    connect( dockNav1, SIGNAL( visibilityChanged( bool) ), nav1, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
@@ -602,6 +603,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
+    connect( dockNav2, SIGNAL( visibilityChanged( bool) ), nav2, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
@@ -609,6 +611,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav3, SLOT( update() ) );
+    connect( dockNav3, SIGNAL( visibilityChanged( bool) ), nav3, SLOT( setWidgetVisible( bool ) ) );
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
@@ -616,6 +619,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav4, SLOT( update() ) );
+    connect( dockNav4, SIGNAL( visibilityChanged( bool) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
     dockNav1->hide();
     dockNav2->hide();

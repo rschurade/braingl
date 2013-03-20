@@ -54,6 +54,8 @@ private:
 
 	QItemSelectionModel* m_roiSelectionModel;
 
+	bool skipDraw;
+
 	int m_boundingbox;
 
 	float m_nx;

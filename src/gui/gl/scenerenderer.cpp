@@ -30,6 +30,7 @@
 
 SceneRenderer::SceneRenderer( QItemSelectionModel* roiSelectionModel ) :
     m_roiSelectionModel( roiSelectionModel ),
+    skipDraw( false ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
     m_ny( 200 ),
@@ -167,23 +168,30 @@ void SceneRenderer::calcMVPMatrix()
 
 void SceneRenderer::draw()
 {
-    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
-    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+    if ( !skipDraw )
+    {
+        QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+        glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
 
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable( GL_BLEND );
 
-    glShadeModel( GL_SMOOTH );
-    //glEnable( GL_LIGHTING );
-    //glEnable( GL_LIGHT0 );
-    glEnable( GL_MULTISAMPLE );
+        glShadeModel( GL_SMOOTH );
+        //glEnable( GL_LIGHTING );
+        //glEnable( GL_LIGHT0 );
+        glEnable( GL_MULTISAMPLE );
 
-    renderDatasets();
+        renderDatasets();
 
-    renderRois();
+        renderRois();
+    }
+    else
+    {
+        skipDraw = false;
+    }
 }
 
 QImage* SceneRenderer::screenshot()
@@ -385,6 +393,8 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
             Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+            skipDraw = true;
+            Models::g()->submit();
             break;
         }
         case 2:
@@ -396,6 +406,8 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
             Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+            skipDraw = true;
+            Models::g()->submit();
 
             break;
         }
@@ -408,7 +420,8 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
             Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
-
+            skipDraw = true;
+            Models::g()->submit();
             break;
         }
         default:

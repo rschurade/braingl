@@ -83,6 +83,7 @@ void NavRendererAxial::leftMouseDown( int x, int y )
     if ( mi.isValid() )
     {
         model()->setData( mi, p );
+        model()->submit();
     }
 }
 

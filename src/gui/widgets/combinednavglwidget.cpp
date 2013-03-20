@@ -13,7 +13,8 @@
 #include <QtGui>
 
 CombinedNavGLWidget::CombinedNavGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-	QGLWidget( parent, shareWidget )
+	QGLWidget( parent, shareWidget ),
+	m_visible( true )
 {
     m_renderer = new CombinedNavRenderer( name );
     m_renderer->setModel( Models::g() );
@@ -42,7 +43,10 @@ void CombinedNavGLWidget::initializeGL()
 
 void CombinedNavGLWidget::paintGL()
 {
-	m_renderer->draw();
+    if ( m_visible )
+    {
+        m_renderer->draw();
+    }
 }
 
 void CombinedNavGLWidget::resizeGL( int width, int height )
@@ -76,4 +80,9 @@ void CombinedNavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 void CombinedNavGLWidget::update()
 {
     updateGL();
+}
+
+void CombinedNavGLWidget::setWidgetVisible( bool visible )
+{
+    m_visible = visible;
 }

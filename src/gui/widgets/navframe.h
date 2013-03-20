@@ -21,6 +21,7 @@ public:
     virtual ~NavFrame();
 
     void update();
+    void setWidgetVisible( bool visible );
 
 private:
     NavGLWidget* m_widget;

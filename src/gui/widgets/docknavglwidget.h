@@ -34,9 +34,11 @@ private:
     NavFrame* m_glWidget;
     QVBoxLayout* m_layout;
     SliderWithEditInt2* m_slider;
+    bool m_visible;
 
 public slots:
     void update();
+    void setWidgetVisible( bool visible );
 
 private slots:
     void sliderChanged( int value );
