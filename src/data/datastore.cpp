@@ -24,9 +24,9 @@ DataStore::~DataStore()
 {
 }
 
-void DataStore::updateGlobals()
+void DataStore::updateGlobals( int row )
 {
-    if ( m_datasetList.size() > 0 )
+    if ( m_datasetList.size() > 0 && row == 0 )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
 
@@ -40,13 +40,22 @@ void DataStore::updateGlobals()
             Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DY,     0 ), ds->properties()->get( Fn::Property::DY ).toFloat() );
             Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties()->get( Fn::Property::DZ ).toFloat() );
 
-            emit dataChanged( index( 0, (int)Fn::Global::SAGITTAL ), index( 0, (int)Fn::Global::SLICE_DZ ) );
-            if ( m_datasetList.size() == 1 )
+            bool dimsChanged = false;
+            if ( m_datasetList.size() >= 2 )
+            {
+                Dataset* ds2 = VPtr<Dataset>::asPtr( m_datasetList[1] );
+
+                dimsChanged = ds->properties()->get( Fn::Property::NX ).toInt() != ds2->properties()->get( Fn::Property::NX ).toInt();
+            }
+
+            if ( m_datasetList.size() == 1 || dimsChanged )
             {
                 Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
                 Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
                 Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
             }
+
+            Models::g()->submit();
         }
     }
 }
@@ -137,7 +146,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             m_datasetList.push_back( value );
             endInsertRows();
             connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
-            updateGlobals();
+            updateGlobals( m_datasetList.size() - 1 );
             emit( dataChanged( index, index ) );
             emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
             return true;
@@ -217,7 +226,7 @@ void DataStore::moveItemUp( int row )
         beginMoveRows( index( row, 0 ), row, row, index( row - 1, 0 ), row - 1 );
         m_datasetList.swap( row, row - 1 );
         endMoveRows();
-        updateGlobals();
+        updateGlobals( row - 1 );
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
@@ -229,7 +238,7 @@ void DataStore::moveItemDown( int row )
         beginMoveRows( index( row, 0 ), row, row, index( row + 1, 0 ), row + 1 );
         m_datasetList.swap( row, row + 1 );
         endMoveRows();
-        updateGlobals();
+        updateGlobals( row );
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
@@ -247,7 +256,7 @@ void DataStore::deleteItem( int row )
         endResetModel();
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
         delete toDelete;
-        updateGlobals();
+        updateGlobals( row );
     }
 }
 

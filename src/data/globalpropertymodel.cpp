@@ -128,12 +128,6 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
             m_properties->set( (Fn::Global)index.row(), value );
             break;
     }
-    // zoom - bby are updated in the render loop, emiting their changes causes an infinite event loop and seg fault
-    if ( index.row() < (int)Fn::Global::ZOOM )
-    {
-        submit();
-        emit dataChanged( index, index );
-    }
 
     return true;
 }
