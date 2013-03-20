@@ -33,12 +33,9 @@ SingleSHRenderer::SingleSHRenderer() :
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
-    m_x( 0. ),
-    m_y( 0. ),
-    m_z( 0. ),
-    m_xb( 0 ),
-    m_yb( 0 ),
-    m_zb( 0 )
+    m_dx( 1.0 ),
+    m_dy( 1.0 ),
+    m_dz( 1.0 )
 {
     m_arcBall = new ArcBall( 50, 50 );
 }
@@ -130,15 +127,27 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
-    int xi = m_x;
-    int yi = m_y;
-    int zi = m_z;
-    int xbi = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
-    int ybi = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
-    //int zbi = model()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+    m_dx = m_dataset->properties()->get( Fn::Property::DX ).toFloat();
+    m_dy = m_dataset->properties()->get( Fn::Property::DY ).toFloat();
+    m_dz = m_dataset->properties()->get( Fn::Property::DZ ).toFloat();
+
+    m_nx = m_dataset->properties()->get( Fn::Property::NX ).toInt();
+    m_ny = m_dataset->properties()->get( Fn::Property::NY ).toInt();
+    m_nz = m_dataset->properties()->get( Fn::Property::NZ ).toInt();
+
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    int xi = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+
+    xi = qMax( 0, qMin( xi, m_nx - 1) );
+    yi = qMax( 0, qMin( yi, m_ny - 1) );
+    zi = qMax( 0, qMin( zi, m_nz - 1) );
+
+
 
     int lod = 4; //m_dataset->getProperty( "lod" ).toInt();
 
@@ -152,6 +161,7 @@ void SingleSHRenderer::initGeometry()
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
     QString s = createSettingsString( { xi, yi, zi } );
+
     if ( s == m_previousSettings )
     {
         return;
@@ -168,9 +178,9 @@ void SingleSHRenderer::initGeometry()
     indexes.reserve( numTris * 3 );
     m_tris = 0;
 
-    if ( ( fabs( data->at( xi + yi * xbi + zi * xbi * ybi )(1) ) > 0.0001 ) )
+    if ( ( fabs( data->at( xi + yi * m_nx + zi * m_nx * m_ny )(1) ) > 0.0001 ) )
     {
-        ColumnVector dv = data->at( xi + yi * xbi + zi * xbi * ybi );
+        ColumnVector dv = data->at( xi + yi * m_nx + zi * m_nx * m_ny );
         ColumnVector r = base * dv;
 
         float max = 0;
@@ -206,7 +216,7 @@ void SingleSHRenderer::initGeometry()
     }
 
 
-    //qDebug() << m_tris << " " << verts.size() << " " << indexes.size();
+    qDebug() << m_tris << " " << verts.size() << " " << indexes.size();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
