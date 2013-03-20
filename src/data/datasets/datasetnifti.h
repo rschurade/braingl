@@ -30,6 +30,8 @@ public:
 
     static QString getNiftiDataType( const int type );
 
+    int getIdFromPos( float x, float y, float z );
+
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;

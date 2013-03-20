@@ -248,24 +248,32 @@ QString DatasetTensor::getValueAsString( int x, int y, int z )
     float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
     float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-    float m_dx = m_properties.get( Fn::Property::DX ).toFloat();
-    float m_dy = m_properties.get( Fn::Property::DY ).toFloat();
-    float m_dz = m_properties.get( Fn::Property::DZ ).toFloat();
+    x *= dx;
+    y *= dy;
+    z *= dz;
 
-    x = x * ( dx / m_dx );
-    y = y * ( dy / m_dy );
-    z = z * ( dz / m_dz );
+    Matrix data = m_data.at( getIdFromPos( x, y, z ) );
 
-    int nx = m_properties.get( Fn::Property::NX ).toInt();
-    int ny = m_properties.get( Fn::Property::NY ).toInt();
-    int nz = m_properties.get( Fn::Property::NZ ).toInt();
+    QString out( "" );
 
-    x = qMax( 0, qMin( x, nx - 1) );
-    y = qMax( 0, qMin( y, ny - 1) );
-    z = qMax( 0, qMin( z, nz - 1) );
+    int idx = ( dx * 1000 );
+    int idx2 = ( m_properties.get( Fn::Property::DX ).toFloat() * 1000 );
 
-    Matrix data = m_data.at( x + y * nx + z * nx * ny );
-    return QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
+    if ( idx != idx2 )
+    {
+        out += " [";
+        out += QString::number( (int)( x / m_properties.get( Fn::Property::DX ).toFloat() ) );
+        out += ",";
+        out += QString::number( (int)( y / m_properties.get( Fn::Property::DY ).toFloat() ) );
+        out += ",";
+        out += QString::number( (int)( z / m_properties.get( Fn::Property::DZ ).toFloat() ) );
+        out += "] ";
+    }
+
+
+    out += QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
             + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );
+
+    return out;
 }
 
