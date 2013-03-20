@@ -162,8 +162,6 @@ void SceneRenderer::calcMVPMatrix()
     Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEY, 0 ), m_arcBall->getMoveY() );
     Models::g()->setData( Models::g()->index( (int)Fn::Global::BBX, 0 ), bbx );
     Models::g()->setData( Models::g()->index( (int)Fn::Global::BBY, 0 ), bby );
-
-    //m_shRenderer->setSceneStats( m_arcBall->getZoom(), m_arcBall->getMoveX(), m_arcBall->getMoveY(), bbx, bby );
 }
 
 void SceneRenderer::draw()
@@ -375,9 +373,9 @@ void SceneRenderer::rightMouseDrag( int x, int y )
 
     m_pickOld = QVector2D( x, y );
 
-    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
     float slowDown = 4.0f * m_arcBall->getZoom();
 
     switch ( m_picked )
@@ -392,9 +390,12 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
-            skipDraw = true;
-            Models::g()->submit();
+            if ( m_z != newSlice )
+            {
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+                skipDraw = true;
+                Models::g()->submit();
+            }
             break;
         }
         case 2:
@@ -405,10 +406,12 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
-            skipDraw = true;
-            Models::g()->submit();
-
+            if ( m_y != newSlice )
+            {
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+                skipDraw = true;
+                Models::g()->submit();
+            }
             break;
         }
         case 3:
@@ -419,9 +422,12 @@ void SceneRenderer::rightMouseDrag( int x, int y )
             float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
             float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
             int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
-            skipDraw = true;
-            Models::g()->submit();
+            if ( m_x != newSlice )
+            {
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
+                skipDraw = true;
+                Models::g()->submit();
+            }
             break;
         }
         default:
