@@ -17,7 +17,8 @@
 
 DockNavGLWidget::DockNavGLWidget( QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),
-    m_name( name )
+    m_name( name ),
+    m_visible( true )
 {
 
     setObjectName( QString("nav gl ") + name );
@@ -80,6 +81,7 @@ void DockNavGLWidget::sliderChanged( int value )
     {
         Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), value );
     }
+    Models::g()->submit();
 }
 
 void DockNavGLWidget::settingChanged()
@@ -138,5 +140,14 @@ void DockNavGLWidget::settingChanged()
 
 void DockNavGLWidget::update()
 {
-    m_glWidget->update();
+    if ( m_visible )
+    {
+        m_glWidget->update();
+    }
+}
+
+void DockNavGLWidget::setWidgetVisible( bool visible )
+{
+    m_visible = visible;
+    m_glWidget->setWidgetVisible( visible );
 }

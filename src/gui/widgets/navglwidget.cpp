@@ -65,7 +65,10 @@ void NavGLWidget::initializeGL()
 
 void NavGLWidget::paintGL()
 {
-	m_navRenderer->draw();
+    if ( m_visible )
+    {
+        m_navRenderer->draw();
+    }
 }
 
 void NavGLWidget::resizeGL( int width, int height )
@@ -117,4 +120,9 @@ void NavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 void NavGLWidget::update()
 {
     updateGL();
+}
+
+void NavGLWidget::setWidgetVisible( bool visible )
+{
+    m_visible = visible;
 }

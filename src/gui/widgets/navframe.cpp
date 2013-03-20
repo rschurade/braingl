@@ -32,3 +32,8 @@ void NavFrame::update()
 {
     m_widget->update();
 }
+
+void NavFrame::setWidgetVisible( bool visible )
+{
+    m_widget->setWidgetVisible( visible );
+}

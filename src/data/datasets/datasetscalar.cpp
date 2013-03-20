@@ -5,6 +5,7 @@
  *      Author: Ralph Schurade
  */
 #include "datasetscalar.h"
+#include "../models.h"
 
 #include "../../gui/gl/colormaprenderer.h"
 
@@ -178,8 +179,14 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
 QString DatasetScalar::getValueAsString( int x, int y, int z )
 {
-    int nx = m_properties.get( Fn::Property::NX ).toInt();
-    int ny = m_properties.get( Fn::Property::NY ).toInt();
-    float data = m_data[x + y * nx + z * nx * ny];
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    x *= dx;
+    y *= dy;
+    z *= dz;
+
+    float data = m_data[ getIdFromPos( x, y, z ) ];
     return QString::number( data );
 }

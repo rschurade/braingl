@@ -26,6 +26,7 @@ public:
 
 public slots:
     void update();
+    void setWidgetVisible( bool visible );
 
 signals:
 
@@ -39,6 +40,7 @@ protected:
 
 private:
     CombinedNavRenderer* m_renderer;
+    bool m_visible;
 };
 
 #endif
