@@ -63,6 +63,8 @@ void BinghamRenderer::init()
 
 void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    setRenderParams( props );
+
     if ( m_orient == 0 )
     {
         return;
@@ -71,7 +73,7 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyG
     m_pMatrix = p_matrix;
     m_mvMatrix = mv_matrix;
 
-    setRenderParams( props );
+
     initGeometry();
 
     GLFunctions::getShader( "qball" )->bind();
@@ -119,9 +121,18 @@ void BinghamRenderer::setShaderVars()
 
 void BinghamRenderer::initGeometry()
 {
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+
+    xi = qMax( 0, qMin( xi, m_nx - 1) );
+    yi = qMax( 0, qMin( yi, m_ny - 1) );
+    zi = qMax( 0, qMin( zi, m_nz - 1) );
+
     float zoom = model()->data( model()->index( (int)Fn::Global::ZOOM, 0 ) ).toFloat();
     float moveX = model()->data( model()->index( (int)Fn::Global::MOVEX, 0 ) ).toFloat();
     float moveY = model()->data( model()->index( (int)Fn::Global::MOVEY, 0 ) ).toFloat();
@@ -132,6 +143,7 @@ void BinghamRenderer::initGeometry()
     int lod = m_lodAdjust;
 
     QString s = createSettingsString( {xi, yi, zi, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
+
     if ( s == m_previousSettings || m_orient == 0 )
     {
         return;
