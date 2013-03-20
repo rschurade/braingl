@@ -116,9 +116,17 @@ void TensorRendererEV::setShaderVars()
 
 void TensorRendererEV::initGeometry()
 {
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+
+    xi = qMax( 0, qMin( xi, m_nx - 1) );
+    yi = qMax( 0, qMin( yi, m_ny - 1) );
+    zi = qMax( 0, qMin( zi, m_nz - 1) );
 
     QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset } );
 
