@@ -156,3 +156,24 @@ QString DatasetNifti::getNiftiDataType( const int type )
     }
     return QString( "unknown" );
 }
+
+int DatasetNifti::getIdFromPos( float x, float y, float z )
+{
+    float dx = m_properties.get( Fn::Property::DX ).toFloat();
+    float dy = m_properties.get( Fn::Property::DY ).toFloat();
+    float dz = m_properties.get( Fn::Property::DZ ).toFloat();
+
+    int nx = m_properties.get( Fn::Property::NX ).toInt();
+    int ny = m_properties.get( Fn::Property::NY ).toInt();
+    int nz = m_properties.get( Fn::Property::NZ ).toInt();
+
+    int px = x / dx;
+    int py = y / dy;
+    int pz = z / dz;
+
+    px = qMax( 0, qMin( px, nx - 1) );
+    py = qMax( 0, qMin( py, ny - 1) );
+    pz = qMax( 0, qMin( pz, nz - 1) );
+
+    return px + py * nx + pz * nx * ny;
+}
