@@ -165,8 +165,15 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
 QString Dataset3D::getValueAsString( int x, int y, int z )
 {
-    int nx = m_properties.get( Fn::Property::NX ).toInt();
-    int ny = m_properties.get( Fn::Property::NY ).toInt();
-    QVector3D data = m_data[x + y * nx + z * nx * ny];
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+    x *= dx;
+    y *= dy;
+    z *= dz;
+
+    QVector3D data = m_data[ getIdFromPos( x, y, z ) ];
+
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }
