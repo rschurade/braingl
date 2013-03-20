@@ -42,7 +42,7 @@ public slots:
 private:
     QVariant getDatasetProperties( const QModelIndex &index ) const;
 
-    void updateGlobals();
+    void updateGlobals( int row );
 
     QList<QVariant> m_datasetList;
 
