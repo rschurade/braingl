@@ -132,7 +132,7 @@ void TubeRenderer::setShaderVars( PropertyGroup* props )
     GLFunctions::getShader( "tube" )->setUniformValue( "u_selectedMax", props->get( Fn::Property::SELECTED_MAX ).toFloat() );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
     GLFunctions::getShader( "tube" )->setUniformValue( "u_upperThreshold", props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-    GLFunctions::getShader( "tube" )->setUniformValue( "u_thickness", props->get( Fn::Property::FIBER_TUBE_THICKNESS ).toFloat()  );
+    GLFunctions::getShader( "tube" )->setUniformValue( "u_thickness", props->get( Fn::Property::FIBER_THICKNESS ).toFloat() / 100.f );
 }
 
 void TubeRenderer::initGeometry()

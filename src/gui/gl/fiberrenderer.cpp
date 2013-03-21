@@ -57,7 +57,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGro
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars( props );
 
-    glLineWidth( props->get( Fn::Property::FIBER_LINE_THICKNESS ).toFloat() );
+    glLineWidth( props->get( Fn::Property::FIBER_THICKNESS ).toFloat() );
 
     QVector<bool>*selected = m_selector->getSelection();
 
