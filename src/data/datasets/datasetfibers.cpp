@@ -80,6 +80,13 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f, true );
     m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
+    m_properties.set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, true );
+    m_properties.set( Fn::Property::NX, 800, 0, 1600, true );
+    m_properties.set( Fn::Property::NY, 1000, 0, 2000, true );
+    m_properties.set( Fn::Property::NZ, 800, 0, 1600, true );
+
 
     connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );

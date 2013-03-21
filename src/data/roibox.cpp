@@ -75,6 +75,21 @@ void ROIBox::globalChanged()
 
 void ROIBox::propChanged()
 {
+    if (  m_properties.get( Fn::ROI::STICK_TO_CROSSHAIR ).toBool() )
+    {
+        float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+        float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+        float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+
+        float x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * dx;
+        float y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * dy;
+        float z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * dz;
+
+        m_properties.set( Fn::ROI::X, x );
+        m_properties.set( Fn::ROI::Y, y );
+        m_properties.set( Fn::ROI::Z, z );
+
+    }
 }
 
 void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
