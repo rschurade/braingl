@@ -26,6 +26,7 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >
     m_numPoints( 0 ),
     m_isInitialized( false )
 {
+    m_colorField.resize( m_numLines );
 }
 
 TubeRenderer::~TubeRenderer()
@@ -76,7 +77,9 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGrou
         {
             if ( selected->at( i ) )
             {
-                GLFunctions::getShader( "tube" )->setUniformValue( "u_color", m_colorField[i].redF(), m_colorField[i].greenF(), m_colorField[i].blueF() );
+                GLFunctions::getShader( "tube" )->setUniformValue( "u_color", m_colorField[i].redF(),
+                                                                                m_colorField[i].greenF(),
+                                                                                m_colorField[i].blueF(), 1.0 );
                 glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
             }
         }
@@ -191,13 +194,6 @@ void TubeRenderer::initGeometry()
     qDebug() << "create fiber vbo's done";
 
     m_numPoints = verts.size() / 10;
-
-    m_colorField.reserve( m_numLines );
-    QColor color( 255, 0, 0 );
-    for ( int i = 0; i < m_numLines; ++i )
-    {
-        m_colorField.push_back( color );
-    }
 
     m_isInitialized = true;
 }

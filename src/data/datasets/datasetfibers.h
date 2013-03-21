@@ -18,6 +18,8 @@ class FiberSelector;
 
 class DatasetFibers: public Dataset
 {
+    Q_OBJECT
+
 public:
     DatasetFibers( QString filename, QVector< QVector< float > > fibs );
     DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras );
@@ -40,6 +42,9 @@ private:
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
+
+private slots:
+    void colorChanged();
 };
 
 #endif /* DATASETFIBERS_H_ */

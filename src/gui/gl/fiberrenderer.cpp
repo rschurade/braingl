@@ -27,6 +27,7 @@ FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float >
     m_numPoints( 0 ),
     m_isInitialized( false )
 {
+    m_colorField.resize( m_numLines );
 }
 
 FiberRenderer::~FiberRenderer()
@@ -77,7 +78,9 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGro
         {
             if ( selected->at( i ) )
             {
-                GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", m_colorField[i].redF(), m_colorField[i].greenF(), m_colorField[i].blueF() );
+                GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", m_colorField[i].redF(),
+                                                                                 m_colorField[i].greenF(),
+                                                                                 m_colorField[i].blueF(), 1.0 );
                 glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
             }
         }
@@ -191,13 +194,6 @@ void FiberRenderer::initGeometry()
     qDebug() << "create fiber vbo's done";
 
     m_numPoints = verts.size() / 10;
-
-    m_colorField.reserve( m_numLines );
-    QColor color( 255, 0, 0 );
-    for ( int i = 0; i < m_numLines; ++i )
-    {
-        m_colorField.push_back( color );
-    }
 
     m_isInitialized = true;
 }
