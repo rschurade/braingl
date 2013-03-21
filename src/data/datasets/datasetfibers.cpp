@@ -50,6 +50,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     {
         m_extraData.push_back( QVector<float>( fibs[i].size() / 3 ) );
     }
+    connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
 }
 
 DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras ) :
@@ -89,6 +90,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
               m_properties.getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
     connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
 }
 
 DatasetFibers::~DatasetFibers()
@@ -143,6 +145,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_renderer = new FiberRenderer( m_selector, m_fibs, m_extraData );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
+            m_renderer->colorChanged( m_properties.get( Fn::Property::FIBER_COLOR ).value<QColor>() );
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
 
@@ -155,6 +158,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_extraData );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
+            m_tubeRenderer->colorChanged( m_properties.get( Fn::Property::FIBER_COLOR ).value<QColor>() );
             connect( m_properties.getProperty( Fn::Property::FIBER_COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
 
@@ -165,4 +169,9 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 QString DatasetFibers::getValueAsString( int x, int y, int z )
 {
     return QString( "" );
+}
+
+void DatasetFibers::colorChanged()
+{
+    m_properties.set( Fn::Property::COLORMODE, 2 );
 }
