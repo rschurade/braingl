@@ -1,8 +1,8 @@
 /*
  * navframe.cpp
  *
- *  Created on: Jan 23, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 23, 2013
+ * @author Ralph Schurade
  */
 #include "navframe.h"
 #include "navglwidget.h"

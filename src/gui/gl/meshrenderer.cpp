@@ -1,8 +1,8 @@
 /*
  * memeshRenderer.cpp
  *
- *  Created on: Dec 4, 2012
- *      Author: Ralph Schurade
+ * Created on: Dec 4, 2012
+ * @author Ralph Schurade
  */
 #include "meshrenderer.h"
 

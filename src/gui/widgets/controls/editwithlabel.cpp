@@ -1,8 +1,8 @@
 /*
  * checkboxwithlabel.cpp
  *
- *  Created on: 14.07.2012
- *      Author: Ralph Schurade
+ * Created on: 14.07.2012
+ * @author Ralph Schurade
  */
 #include "editwithlabel.h"
 

@@ -1,8 +1,8 @@
 /*
  * selectwithlabel.h
  *
- *  Created on: 12.07.2012
- *      Author: Ralph Schurade
+ * Created on: 12.07.2012
+ * @author Ralph Schurade
  */
 
 #ifndef SELECTWITHLABEL_H_

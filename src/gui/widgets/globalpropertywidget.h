@@ -1,8 +1,8 @@
 /*
  * globalpropertywidget.h
  *
- *  Created on: 13.05.2012
- *      Author: Ralph Schurade
+ * Created on: 13.05.2012
+ * @author Ralph Schurade
  */
 
 #ifndef GLOBALPROPERTYWIDGET_H_

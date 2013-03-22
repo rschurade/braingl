@@ -1,8 +1,8 @@
 /*
  * toolbarview.cpp
  *
- *  Created on: 14.06.2012
- *      Author: Ralph Schurade
+ * Created on: 14.06.2012
+ * @author Ralph Schurade
  */
 #include "toolbarview.h"
 

@@ -1,8 +1,8 @@
 /*
  * delegates.h
  *
- *  Created on: Jan 22, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 22, 2013
+ * @author Ralph Schurade
  */
 #ifndef DELEGATES_H_
 #define DELEGATES_H_

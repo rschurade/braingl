@@ -1,8 +1,8 @@
 /*
  * Loader.cpp
  *
- *  Created on: May 3, 2012
- *      Author: Ralph Schurade
+ * Created on: May 3, 2012
+ * @author Ralph Schurade
  */
 #include "loader.h"
 

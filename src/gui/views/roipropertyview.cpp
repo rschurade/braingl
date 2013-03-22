@@ -1,8 +1,8 @@
 /*
  * roipropertyview.cpp
  *
- *  Created on: 03.02.2012
- *      Author: Ralph Schurade
+ * Created on: 03.02.2012
+ * @author Ralph Schurade
  */
 #include "roipropertyview.h"
 

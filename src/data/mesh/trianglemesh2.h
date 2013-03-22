@@ -1,8 +1,8 @@
 /*
  * trianglemesh2.h
  *
- *  Created on: Dec 4, 2012
- *      Author: Ralph Schurade
+ * Created on: Dec 4, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef TRIANGLEMESH2_H_

@@ -1,8 +1,8 @@
 /*
  * models.h
  *
- *  Created on: Mar 18, 2013
- *      Author: schurade
+ * Created on: Mar 18, 2013
+ * @author schurade
  */
 
 #ifndef MODELS_H_

@@ -1,8 +1,8 @@
 /*
  * dataset.h
  *
- *  Created on: May 3, 2012
- *      Author: Ralph Schurade
+ * Created on: May 3, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASET_H_

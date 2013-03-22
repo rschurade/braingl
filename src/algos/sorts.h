@@ -1,8 +1,8 @@
 /*
  * sorts.h
  *
- *  Created on: Nov 26, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 26, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef SORTS_H_

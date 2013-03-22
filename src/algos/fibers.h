@@ -1,8 +1,8 @@
 /*
  * fibers.h
  *
- *  Created on: Jan 24, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 24, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef FIBERS_H_

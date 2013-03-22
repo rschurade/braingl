@@ -1,8 +1,8 @@
 /*
  * colormapwidget.h
  *
- *  Created on: 12.02.2013
- *      Author: Ralph Schurade
+ * Created on: 12.02.2013
+ * @author Ralph Schurade
  */
 
 #ifndef COLORMAPEDITWIDGET_H_

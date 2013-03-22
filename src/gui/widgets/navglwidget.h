@@ -1,8 +1,8 @@
 /*
  * navglwidget.h
  *
- *  Created on: May 03, 2012
- *      Author: Ralph Schurade
+ * Created on: May 03, 2012
+ * @author Ralph Schurade
  */
 #ifndef NAVGLWIDGET_H
 #define NAVGLWIDGET_H

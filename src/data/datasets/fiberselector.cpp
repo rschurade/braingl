@@ -1,8 +1,8 @@
 /*
  * fiberselector.cpp
  *
- *  Created on: Feb 26, 2013
- *      Author: schurade
+ * Created on: Feb 26, 2013
+ * @author schurade
  */
 
 #include "fiberselector.h"

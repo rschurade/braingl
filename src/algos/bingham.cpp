@@ -1,8 +1,8 @@
 /*
  * bingham.cpp
  *
- *  Created on: Nov 23, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 23, 2012
+ * @author Ralph Schurade
  */
 #include "bingham.h"
 #include "binghamthread.h"

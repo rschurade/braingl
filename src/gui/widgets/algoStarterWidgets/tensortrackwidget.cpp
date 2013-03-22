@@ -1,8 +1,8 @@
 /*
  * tensortrackwidget.cpp
  *
- *  Created on: 26.01.2013
- *      Author: Ralph Schurade
+ * Created on: 26.01.2013
+ * @author Ralph Schurade
  */
 #include "tensortrackwidget.h"
 

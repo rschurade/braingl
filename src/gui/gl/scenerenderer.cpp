@@ -1,8 +1,8 @@
 /*
  * scenerenderer.cpp
  *
- *  Created on: 09.05.2012
- *      Author: Ralph Schurade
+ * Created on: 09.05.2012
+ * @author Ralph Schurade
  */
 #include "GL/glew.h"
 

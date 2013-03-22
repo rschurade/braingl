@@ -1,8 +1,8 @@
 /*
  * kdtree.h
  *
- *  Created on: 05.02.2013
- *      Author: Ralph Schurade
+ * Created on: 05.02.2013
+ * @author Ralph Schurade
  */
 
 #ifndef KDTREE_H_

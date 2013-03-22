@@ -1,8 +1,8 @@
 /*
  * datasetinfoview.cpp
  *
- *  Created on: 12.05.2012
- *      Author: Ralph Schurade
+ * Created on: 12.05.2012
+ * @author Ralph Schurade
  */
 #include "datasetinfoview.h"
 

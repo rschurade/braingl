@@ -1,8 +1,8 @@
 /*
  * dwialgos.cpp
  *
- *  Created on: Jun 18, 2012
- *      Author: Ralph Schurade
+ * Created on: Jun 18, 2012
+ * @author Ralph Schurade
  */
 #include "dwialgos.h"
 #include "../data/enums.h"

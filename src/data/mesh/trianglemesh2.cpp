@@ -1,8 +1,8 @@
 /*
  * trianglemesh2.cpp
  *
- *  Created on: Dec 4, 2012
- *      Author: Ralph Schurade
+ * Created on: Dec 4, 2012
+ * @author Ralph Schurade
  */
 #include "trianglemesh2.h"
 #include "meshthread.h"

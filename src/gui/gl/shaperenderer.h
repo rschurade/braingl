@@ -1,8 +1,8 @@
 /*
  * shaperenderer.h
  *
- *  Created on: Mar 11, 2013
- *      Author: schurade
+ * Created on: Mar 11, 2013
+ * @author schurade
  */
 
 #ifndef SHAPERENDERER_H_

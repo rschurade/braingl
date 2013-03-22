@@ -1,8 +1,8 @@
 /*
  * colorwidgetwithlabel.h
  *
- *  Created on: Feb 4, 2013
- *      Author: Ralph Schurade
+ * Created on: Feb 4, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef COLORWIDGETWITHLABEL_H_

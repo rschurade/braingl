@@ -1,8 +1,8 @@
 /*
  * globalpropertygroup.cpp
  *
- *  Created on: Jan 17, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 17, 2013
+ * @author Ralph Schurade
  */
 #include "globalpropertygroup.h"
 #include "propertyfloat.h"

@@ -1,8 +1,8 @@
 /*
  * fiberselector.h
  *
- *  Created on: Feb 26, 2013
- *      Author: schurade
+ * Created on: Feb 26, 2013
+ * @author schurade
  */
 
 #ifndef FIBERSELECTOR_H_

@@ -1,8 +1,8 @@
 /*
  * colormapbase.cpp
  *
- *  Created on: Feb 12, 2013
- *      Author: schurade
+ * Created on: Feb 12, 2013
+ * @author schurade
  */
 
 #include "colormapbase.h"

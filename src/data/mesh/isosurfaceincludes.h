@@ -1,3 +1,10 @@
+/*
+ * isosurfaceincludes.h
+ *
+ * Created on: Nov 23, 2012
+ *  @author Ralph Schurade
+ */
+
 #ifndef ISOSURFACEINCLUDES_H_
 #define ISOSURFACEINCLUDES_H_
 

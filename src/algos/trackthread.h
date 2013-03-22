@@ -1,8 +1,8 @@
 /*
  * trackthread.h
  *
- *  Created on: 25.12.2012
- *      Author: Ralph Schurade
+ * Created on: 25.12.2012
+ * @author Ralph Schurade
  */
 
 #ifndef TRACKTHREAD_H_

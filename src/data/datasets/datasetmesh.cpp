@@ -1,8 +1,8 @@
 /*
  * datasetmesh.cpp
  *
- *  Created on: Jul 19, 2012
- *      Author: Ralph Schurade
+ * Created on: Jul 19, 2012
+ * @author Ralph Schurade
  */
 #include "datasetmesh.h"
 

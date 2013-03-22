@@ -1,8 +1,8 @@
 /*
  * shaperenderer.cpp
  *
- *  Created on: Mar 11, 2013
- *      Author: schurade
+ * Created on: Mar 11, 2013
+ * @author schurade
  */
 
 #include "shaperenderer.h"

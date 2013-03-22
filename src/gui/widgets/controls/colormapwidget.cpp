@@ -1,8 +1,8 @@
 /*
  * colormapwidget.cpp
  *
- *  Created on: Jan 29, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 29, 2013
+ * @author Ralph Schurade
  */
 #include "colormapwidget.h"
 #include "../../gl/glfunctions.h"

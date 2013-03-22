@@ -1,8 +1,8 @@
 /*
  * roipropertygroup.h
  *
- *  Created on: Feb 02, 2013
- *      Author: Ralph Schurade
+ * Created on: Feb 02, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef ROIPROPERTYGROUP_H_

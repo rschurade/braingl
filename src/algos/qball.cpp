@@ -1,8 +1,8 @@
 /*
  * qball.cpp
  *
- *  Created on: 10.07.2012
- *      Author: Ralph Schurade
+ * Created on: 10.07.2012
+ * @author Ralph Schurade
  */
 #include "qball.h"
 #include "sharpqballthread.h"

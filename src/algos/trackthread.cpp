@@ -1,8 +1,8 @@
 /*
  * trackthread.cpp
  *
- *  Created on: 25.12.2012
- *      Author: Ralph Schurade
+ * Created on: 25.12.2012
+ * @author Ralph Schurade
  */
 #include "trackthread.h"
 #include "fmath.h"

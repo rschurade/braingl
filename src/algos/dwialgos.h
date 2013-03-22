@@ -1,8 +1,8 @@
 /*
  * dwialgos.h
  *
- *  Created on: Jun 18, 2012
- *      Author: Ralph Schurade
+ * Created on: Jun 18, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DWIALGOS_H_

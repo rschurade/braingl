@@ -1,8 +1,8 @@
 /*
  * arcball.h
  *
- *  Created on: 10.05.2012
- *      Author: Ralph Schurade
+ * Created on: 10.05.2012
+ * @author Ralph Schurade
  */
 
 #ifndef ARCBALL_H_

@@ -1,8 +1,8 @@
 /*
  * fiberrenderer.h
  *
- *  Created on: 28.12.2012
- *      Author: Ralph Schurade
+ * Created on: 28.12.2012
+ * @author Ralph Schurade
  */
 
 #ifndef FIBERRENDERER_H_

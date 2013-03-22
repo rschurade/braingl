@@ -1,8 +1,8 @@
 /*
  * statusbar.cpp
  *
- *  Created on: Nov 13, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 13, 2012
+ * @author Ralph Schurade
  */
 #include "statusbar.h"
 
