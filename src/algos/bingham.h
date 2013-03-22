@@ -1,8 +1,8 @@
 /*
  * bingham.h
  *
- *  Created on: Nov 23, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 23, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef BINGHAM_H_

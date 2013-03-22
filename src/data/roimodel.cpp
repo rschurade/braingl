@@ -1,8 +1,8 @@
 /*
  * roimodel.cpp
  *
- *  Created on: 02.02.2013
- *      Author: Ralph Schurade
+ * Created on: 02.02.2013
+ * @author Ralph Schurade
  */
 #include "roimodel.h"
 

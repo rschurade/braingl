@@ -1,8 +1,8 @@
 /*
  * datastore.cpp
  *
- *  Created on: May 4, 2012
- *      Author: Ralph Schurade
+ * Created on: May 4, 2012
+ * @author Ralph Schurade
  */
 #include "datastore.h"
 

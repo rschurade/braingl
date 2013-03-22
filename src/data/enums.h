@@ -1,8 +1,8 @@
 /*
  * enums.h
  *
- *  Created on: May 04, 2012
- *      Author: Ralph Schurade
+ * Created on: May 04, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef ENUMS_H_

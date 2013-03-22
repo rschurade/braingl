@@ -1,8 +1,8 @@
 /*
  * dataset3d.cpp
  *
- *  Created on: May 9, 2012
- *      Author: Ralph Schurade
+ * Created on: May 9, 2012
+ * @author Ralph Schurade
  */
 #include "datasetdwi.h"
 

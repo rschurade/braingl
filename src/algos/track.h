@@ -1,8 +1,8 @@
 /*
  * track.h
  *
- *  Created on: Dec 11, 2012
- *      Author: Ralph Schurade
+ * Created on: Dec 11, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef TRACK_H_

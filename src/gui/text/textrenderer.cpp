@@ -1,8 +1,8 @@
 /*
  * textrenderer.cpp
  *
- *  Created on: Feb 20, 2013
- *      Author: schurade
+ * Created on: Feb 20, 2013
+ * @author schurade
  */
 
 #include "textrenderer.h"

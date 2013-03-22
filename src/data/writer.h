@@ -1,8 +1,8 @@
 /*
  * writer.h
  *
- *  Created on: Jun 1, 2012
- *      Author: Ralph Schurade
+ * Created on: Jun 1, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef WRITER_H_

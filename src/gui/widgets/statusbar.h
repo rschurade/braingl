@@ -1,8 +1,8 @@
 /*
  * statusbar.h
  *
- *  Created on: Nov 13, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 13, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef STATUSBAR_H_

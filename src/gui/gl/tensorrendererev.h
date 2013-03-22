@@ -1,8 +1,8 @@
 /*
  * shrenderer.h
  *
- *  Created on: 03.07.2012
- *      Author: Ralph Schurade
+ * Created on: 03.07.2012
+ * @author Ralph Schurade
  */
 
 #ifndef TENSORRENDEREREV_H_

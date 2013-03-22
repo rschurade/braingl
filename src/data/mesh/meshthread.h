@@ -1,8 +1,8 @@
 /*
  * meshthread.h
  *
- *  Created on: 29.12.2012
- *      Author: Ralph Schurade
+ * Created on: 29.12.2012
+ * @author Ralph Schurade
  */
 
 #ifndef MESHTHREAD_H_

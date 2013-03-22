@@ -1,8 +1,8 @@
 /*
  * datasetlistview.cpp
  *
- *  Created on: 08.05.2012
- *      Author: Ralph Schurade
+ * Created on: 08.05.2012
+ * @author Ralph Schurade
  */
 #include "datasetlistview.h"
 

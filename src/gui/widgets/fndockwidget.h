@@ -1,8 +1,8 @@
 /*
  * fndockwidget.h
  *
- *  Created on: Jan 23, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 23, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef FNDOCKWIDGET_H_

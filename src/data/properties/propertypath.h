@@ -1,8 +1,8 @@
 /*
  * propertypath.h
  *
- *  Created on: Mar 6, 2013
- *      Author: Ralph Schurade
+ * Created on: Mar 6, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef PROPERTYPATH_H_

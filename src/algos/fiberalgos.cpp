@@ -1,8 +1,8 @@
 /*
  * fiberalgos.cpp
  *
- *  Created on: 09.07.2012
- *      Author: Ralph Schurade
+ * Created on: 09.07.2012
+ * @author Ralph Schurade
  */
 #include "fiberalgos.h"
 

@@ -1,8 +1,8 @@
 /*
  * datasetnifti.h
  *
- *  Created on: May 9, 2012
- *      Author: Ralph Schurade
+ * Created on: May 9, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASETNIFTI_H_

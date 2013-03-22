@@ -1,8 +1,8 @@
 /*
  * datasetlistview.h
  *
- *  Created on: 08.05.2012
- *      Author: Ralph Schurade
+ * Created on: 08.05.2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASETLISTVIEW_H_

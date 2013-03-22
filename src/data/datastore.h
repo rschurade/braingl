@@ -1,8 +1,8 @@
 /*
  * datastore.h
  *
- *  Created on: May 4, 2012
- *      Author: Ralph Schurade
+ * Created on: May 4, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASTORE_H_

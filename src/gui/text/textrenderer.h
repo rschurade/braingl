@@ -1,8 +1,8 @@
 /*
  * textrenderer.h
  *
- *  Created on: Feb 20, 2013
- *      Author: schurade
+ * Created on: Feb 20, 2013
+ * @author schurade
  */
 
 #ifndef TEXTRENDERER_H_

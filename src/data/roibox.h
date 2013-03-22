@@ -1,8 +1,8 @@
 /*
  * roibox.h
  *
- *  Created on: 02.02.2013
- *      Author: Ralph Schurade
+ * Created on: 02.02.2013
+ * @author Ralph Schurade
  */
 
 #ifndef ROIBOX_H_

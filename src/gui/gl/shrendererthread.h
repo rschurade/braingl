@@ -1,8 +1,8 @@
 /*
  * shrendererthread.h
  *
- *  Created on: 27.12.2012
- *      Author: Ralph Schurade
+ * Created on: 27.12.2012
+ * @author Ralph Schurade
  */
 
 #ifndef SHRENDERERTHREAD_H_

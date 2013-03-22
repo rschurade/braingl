@@ -1,8 +1,8 @@
 /*
  * pushbuttonwithid.h
  *
- *  Created on: Feb 13, 2013
- *      Author: schurade
+ * Created on: Feb 13, 2013
+ * @author schurade
  */
 #include <QPushButton>
 

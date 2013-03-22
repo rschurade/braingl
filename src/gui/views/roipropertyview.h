@@ -1,8 +1,8 @@
 /*
  * roipropertyview.h
  *
- *  Created on: 03.02.2013
- *      Author: Ralph Schurade
+ * Created on: 03.02.2013
+ * @author Ralph Schurade
  */
 
 #ifndef ROIPROPERTYVIEW_H_

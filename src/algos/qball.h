@@ -1,8 +1,8 @@
 /*
  * qball.h
  *
- *  Created on: 10.07.2012
- *      Author: Ralph Schurade
+ * Created on: 10.07.2012
+ * @author Ralph Schurade
  */
 
 #ifndef QBALL_H_

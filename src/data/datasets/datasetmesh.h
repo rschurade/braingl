@@ -1,8 +1,8 @@
 /*
  * datasetmesh.h
  *
- *  Created on: Jul 19, 2012
- *      Author: Ralph Schurade
+ * Created on: Jul 19, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASETMESH_H_

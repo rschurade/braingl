@@ -1,8 +1,8 @@
 /*
  * tuberendererthread.cpp
  *
- *  Created on: 26.02.2012
- *      Author: Ralph Schurade
+ * Created on: 26.02.2012
+ * @author Ralph Schurade
  */
 #include "tuberendererthread.h"
 

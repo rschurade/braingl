@@ -1,8 +1,8 @@
 /*
  * datasetbingham.cpp
  *
- *  Created on: Nov 23, 2012
- *      Author: Ralph Schurade
+ * Created on: Nov 23, 2012
+ * @author Ralph Schurade
  */
 #include "datasetbingham.h"
 #include "../models.h"

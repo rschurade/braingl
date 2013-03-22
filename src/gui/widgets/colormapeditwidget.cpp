@@ -1,8 +1,8 @@
 /*
  * colormapeditwidget.cpp
  *
- *  Created on: 12.02.2013
- *      Author: Ralph Schurade
+ * Created on: 12.02.2013
+ * @author Ralph Schurade
  */
 #include "colormapeditwidget.h"
 

@@ -1,8 +1,8 @@
 /*
  * dataset3d.h
  *
- *  Created on: May 9, 2012
- *      Author: Ralph Schurade
+ * Created on: May 9, 2012
+ * @author Ralph Schurade
  */
 
 #ifndef DATASETTENSOR_H_

@@ -1,8 +1,8 @@
 /*
  * trackwithcrossings.h
  *
- *  Created on: Jan 28, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 28, 2013
+ * @author Ralph Schurade
  */
 
 #ifndef TRACKWITHCROSSINGS_H_

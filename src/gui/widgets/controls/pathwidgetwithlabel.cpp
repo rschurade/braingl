@@ -1,8 +1,8 @@
 /*
  * pathwidgetwithlabel.cpp
  *
- *  Created on: Mar 6, 2013
- *      Author: schurade
+ * Created on: Mar 6, 2013
+ * @author schurade
  */
 
 #include "pathwidgetwithlabel.h"

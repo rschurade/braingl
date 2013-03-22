@@ -1,8 +1,8 @@
 /*
  * vptr.h
  *
- *  Created on: 17.06.2012
- *      Author: Ralph Schurade
+ * Created on: 17.06.2012
+ * @author Ralph Schurade
  */
 
 #ifndef VPTR_H_

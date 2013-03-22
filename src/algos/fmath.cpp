@@ -1,8 +1,8 @@
 /*
  * fmath.cpp
  *
- *  Created on: Jul 17, 2012
- *      Author: Ralph Schurade
+ * Created on: Jul 17, 2012
+ * @author Ralph Schurade
  */
 #include "fmath.h"
 

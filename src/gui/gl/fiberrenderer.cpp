@@ -1,8 +1,8 @@
 /*
  * fiberrenderer.cpp
  *
- *  Created on: 28.12.2012
- *      Author: Ralph Schurade
+ * Created on: 28.12.2012
+ * @author Ralph Schurade
  */
 #include "fiberrenderer.h"
 #include "fiberrendererthread.h"

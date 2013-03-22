@@ -1,8 +1,8 @@
 /*
  * tuberendererthread.h
  *
- *  Created on: 26.02.2013
- *      Author: Ralph Schurade
+ * Created on: 26.02.2013
+ * @author Ralph Schurade
  */
 
 #ifndef TUBERENDERERTHREAD_H_

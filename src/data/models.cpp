@@ -1,8 +1,8 @@
 /*
  * models.cpp
  *
- *  Created on: Mar 18, 2013
- *      Author: schurade
+ * Created on: Mar 18, 2013
+ * @author schurade
  */
 
 #include "models.h"

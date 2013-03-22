@@ -1,8 +1,8 @@
 /*
  * colormapfunctions.h
  *
- *  Created on: Feb 14, 2013
- *      Author: schurade
+ * Created on: Feb 14, 2013
+ * @author schurade
  */
 
 #ifndef COLORMAPFUNCTIONS_H_

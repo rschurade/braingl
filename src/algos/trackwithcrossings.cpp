@@ -1,8 +1,8 @@
 /*
  * trackwithcrossings.cpp
  *
- *  Created on: Jan 28, 2013
- *      Author: Ralph Schurade
+ * Created on: Jan 28, 2013
+ * @author Ralph Schurade
  */
 #include "trackwithcrossings.h"
 #include "twcthread.h"
