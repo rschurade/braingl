@@ -700,6 +700,7 @@ void MainWindow::screenshot()
                   QString("screenshot_") +
                   QString::number( screenshotNumber++ ) +
                   QString( ".png" ), "PNG" );
+    delete image;
 }
 
 void MainWindow::resetSettings()
