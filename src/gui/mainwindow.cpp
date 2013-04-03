@@ -695,10 +695,16 @@ void MainWindow::screenshot()
     {
         path += '/';
     }
+    QString numberString = QString::number( screenshotNumber++ );
+    int nss = numberString.size();
+    for ( int i = 0; i < 4 - nss; ++i )
+    {
+        numberString = "0" + numberString;
+    }
 
     image->save(  path +
                   QString("screenshot_") +
-                  QString::number( screenshotNumber++ ) +
+                  numberString +
                   QString( ".png" ), "PNG" );
     delete image;
 }
