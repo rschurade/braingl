@@ -650,6 +650,11 @@ void GLFunctions::endOffscreen( const int screen_width, const int screen_height 
     GLFunctions::screenHeight = screen_height;
     GLFunctions::scaleX = 1.0;
     GLFunctions::scaleY = 1.0;
+    glDeleteTextures( 1, &GLFunctions::tex );
+    glDeleteFramebuffers( 1, &GLFunctions::fbo );
+    glDeleteRenderbuffers( 1, &GLFunctions::rbo );
+    glDeleteBuffers( 1, &GLFunctions::pbo_a );
+    glDeleteBuffers( 1, &GLFunctions::pbo_b );
 }
 
 QImage* GLFunctions::getOffscreenTexture()
@@ -665,7 +670,7 @@ QImage* GLFunctions::getOffscreenTexture()
     if (frame_event == 0)
     {
         frame_event = 1;
-        read_pbo = GLFunctions::pbo_b;
+        read_pbo = GLFunctions::pbo_a;
         map_pbo = GLFunctions::pbo_a;
     }
     else {
