@@ -18,6 +18,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
 {
     m_properties.set( Fn::Property::COLORMODE, 0, 0, 1 );
     m_properties.set( Fn::Property::COLORMAP, 1 );
+    m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
 }
 
 DatasetMesh::~DatasetMesh()

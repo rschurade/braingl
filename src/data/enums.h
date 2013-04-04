@@ -124,7 +124,7 @@ namespace Fn
         ISO_VALUE,
         NUM_POINTS,
         NUM_LINES,
-        FIBER_COLOR,
+        COLOR,
         COLORMODE,
         FIBER_RENDERMODE,
         FIBER_THICKNESS,
@@ -193,7 +193,7 @@ namespace Fn
             case Property::ISO_VALUE: return QString( "iso value" ); break;
             case Property::NUM_POINTS: return QString( "num points" ); break;
             case Property::NUM_LINES: return QString( "num lines" ); break;
-            case Property::FIBER_COLOR: return QString( "fiber color" ); break;
+            case Property::COLOR: return QString( "color" ); break;
             case Property::COLORMODE: return QString( "color mode" ); break;
             case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
             case Property::FIBER_THICKNESS: return QString( "fiber thickness" ); break;

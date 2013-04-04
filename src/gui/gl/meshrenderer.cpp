@@ -66,7 +66,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGrou
 
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_colorMode", m_colorMode );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", 1.0, 1.0, 1.0, 1.0 );
+    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMin", m_selectedMin );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMax", m_selectedMax );
     GLFunctions::getShader( "mesh" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
@@ -139,5 +139,6 @@ void MeshRenderer::setRenderParams( PropertyGroup* props )
     m_selectedMax = props->get( Fn::Property::SELECTED_MAX ).toFloat();
     m_lowerThreshold = props->get( Fn::Property::LOWER_THRESHOLD ).toFloat();
     m_upperThreshold = props->get( Fn::Property::UPPER_THRESHOLD ).toFloat();
+    m_color = props->get( Fn::Property::COLOR ).value<QColor>();
 }
 
