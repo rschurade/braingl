@@ -46,6 +46,7 @@ private:
     float m_selectedMax;
     float m_lowerThreshold;
     float m_upperThreshold;
+    QColor m_color;
 };
 
 #endif /* MESHRENDERER_H_ */

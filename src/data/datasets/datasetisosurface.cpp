@@ -39,7 +39,8 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties.set( Fn::Property::NAME, QString( "isosurface" ) );
     m_properties.set( Fn::Property::ISO_VALUE, 80.0f, ds->properties()->get( Fn::Property::MIN ).toFloat(), ds->properties()->get( Fn::Property::MAX ).toFloat(), true );
 
-    m_properties.set( Fn::Property::COLORMODE, 0, 0, 1, true );
+    m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
+    m_properties.set( Fn::Property::COLORMODE, { "user", "mri" }, 0, true );
     m_properties.set( Fn::Property::COLORMAP, 1 );
     m_properties.set( Fn::Property::MIN, 0.0f );
     m_properties.set( Fn::Property::MAX, 1.0f );
