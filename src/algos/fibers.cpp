@@ -8,6 +8,9 @@
 
 #include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/dataset3d.h"
+
+#include <QSet>
 
 #include <limits>
 #include <math.h>
@@ -147,5 +150,92 @@ DatasetScalar* Fibers::tractDensity()
     int dims[8] = { 3, 160, 200, 160, 1, 1, 1 };
     nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
     DatasetScalar* out = new DatasetScalar( "tract density", data, header );
+    return out;
+}
+
+Dataset3D* Fibers::tractColor()
+{
+    m_nx = 320;
+    m_ny = 400;
+    m_nz = 320;
+    m_dx = 0.5;
+    m_dy = 0.5;
+    m_dz = 0.5;
+    m_blockSize = m_nx * m_ny * m_nz;
+    QVector<QVector3D> data( m_blockSize );
+    QVector<int> count( m_blockSize, 0 );
+    QVector< QVector< float > > fibs = m_dataset->getFibs();
+    float x, y, z;
+    QSet<int> visited;
+    int id = 0;
+    for ( int i = 0; i < fibs.size(); ++i )
+    {
+        QVector<float> fib = fibs[i];
+        visited.clear();
+
+        QVector3D localColor( fabs( fib[0] - fib[3] ), fabs( fib[1] - fib[4] ), fabs( fib[2] - fib[5] ) );
+        localColor.normalize();
+        x = fib.at( 0 );
+        y = fib.at( 1 );
+        z = fib.at( 2 );
+        id = getID( x, y, z );
+        if ( !visited.contains( id) )
+        {
+            ++count[ id ];
+            data[ id ] += localColor;
+            visited.insert( id );
+        }
+
+        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        {
+            QVector3D localColor( fabs( fib[k*3-3] - fib[k*3+3] ), fabs( fib[k*3-2] - fib[k*3+4] ), fabs( fib[k*3-1] - fib[k*3+5] ) );
+            localColor.normalize();
+
+            x = fib.at( k * 3 );
+            y = fib.at( k * 3 + 1 );
+            z = fib.at( k * 3 + 2 );
+            id = getID( x, y, z );
+            if ( !visited.contains( id) )
+            {
+                ++count[ id ];
+                data[ id ] += localColor;
+                visited.insert( id );
+            }
+        }
+
+        int numFloats = fib.size();
+        QVector3D localColor2( fabs( fib[numFloats-6] - fib[numFloats-3] ), fabs( fib[numFloats-5] - fib[numFloats-2] ), fabs( fib[numFloats-4] - fib[numFloats-1] ) );
+        localColor.normalize();
+
+        x = fib.at( numFloats - 3 );
+        y = fib.at( numFloats - 2 );
+        z = fib.at( numFloats - 1 );
+        id = getID( x, y, z );
+        if ( !visited.contains( id) )
+        {
+            ++count[ id ];
+            data[ id ] += localColor;
+            visited.insert( id );
+        }
+    }
+
+    for ( int i = 0; i < m_blockSize; ++i )
+    {
+        data[i] /= count[i];
+        count[i] = qMin( count[i], 10 );
+    }
+    float div;
+    for ( int i = 0; i < m_blockSize; ++i )
+    {
+        div = ( (float)count[i] / 20. ) + 0.5;
+        data[i] *= div;
+    }
+
+    int dims[8] = { 3, m_nx, m_ny, m_nz, 3, 1, 1 };
+    nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
+    header->dx = m_dx;
+    header->dy = m_dy;
+    header->dz = m_dz;
+    Dataset3D* out = new Dataset3D( "tract color", data, header );
     return out;
 }

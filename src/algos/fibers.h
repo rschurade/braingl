@@ -12,6 +12,7 @@
 
 class DatasetFibers;
 class DatasetScalar;
+class Dataset3D;
 
 class Fibers
 {
@@ -21,6 +22,7 @@ public:
 
     DatasetFibers* thinOut();
     DatasetScalar* tractDensity();
+    Dataset3D* tractColor();
 
 private:
     DatasetFibers* m_dataset;

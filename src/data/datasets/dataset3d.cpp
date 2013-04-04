@@ -21,6 +21,8 @@ Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* he
     m_properties.set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
     m_properties.set( Fn::Property::OFFSET, 0.0f, -0.5, 0.5, true );
 
+    m_properties.set(Fn::Property::RENDER_VECTORS_STICKS, false, true );
+
     m_properties.set( Fn::Property::HAS_TEXTURE, true );
 
     examineDataset();
@@ -159,8 +161,10 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
     }
 
 
-
-    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+    if ( m_properties.get( Fn::Property::RENDER_VECTORS_STICKS ).toBool() )
+    {
+        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+    }
 }
 
 QString Dataset3D::getValueAsString( int x, int y, int z )
