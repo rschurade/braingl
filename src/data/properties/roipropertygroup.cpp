@@ -199,6 +199,25 @@ bool ROIPropertyGroup::set( Fn::ROI name, QColor value, bool visible )
     return true;
 }
 
+bool ROIPropertyGroup::set( Fn::ROI name, std::initializer_list<QString>options, int value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value );
+    }
+    else
+    {
+        PropertySelection* prop = new PropertySelection( Fn::ROI2String::s( name ), options, value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
 QList<Fn::ROI> ROIPropertyGroup::getVisible()
 {
     return m_visible;
