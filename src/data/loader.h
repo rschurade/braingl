@@ -48,6 +48,7 @@ private:
 
     bool loadMesh();
     bool loadMeshBinary();
+    bool loadMeshVTK();
 
     QString readLine( QDataStream& in );
 

@@ -10,6 +10,7 @@
 #include "datasets/dataset3d.h"
 #include "datasets/datasetbingham.h"
 #include "datasets/datasetdwi.h"
+#include "datasets/datasetmesh.h"
 #include "datasets/datasetfibers.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
@@ -68,6 +69,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".fib" ) )
     {
         return loadFib();
+    }
+
+    if ( m_fileName.path().endsWith( ".vtk" ) )
+    {
+        return loadMeshVTK();
     }
 
     return false;
@@ -958,6 +964,114 @@ bool Loader::loadMeshBinary()
     }
 */
     return false;
+}
+
+bool Loader::loadMeshVTK()
+{
+    QString fn = m_fileName.path();
+
+    QFile file( fn );
+    if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Error! Couldn't open" + fn );
+        msgBox.exec();
+        qDebug() << "couldn't open " << fn;
+        return false;
+    }
+    QString line;
+    QStringList tokens;
+
+    QTextStream in( &file );
+    if( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( line != "# vtk DataFile Version 3.0" )
+        {
+            qDebug() << "unexpected fields in vtk fib file";
+            return false;
+        }
+    }
+    if( !in.atEnd() )
+    {
+        in.readLine();
+        //skipping line
+    }
+    if( !in.atEnd() )
+    {
+        line = in.readLine();
+        if( line != "ASCII" )
+        {
+            qDebug() << "only ASCII supported for now";
+            return false;
+        }
+    }
+    if( !in.atEnd() )
+    {
+        in.readLine();
+        // skipping line
+    }
+    int numVerts = 0;
+    if( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( !( line.startsWith( "POINTS") && line.endsWith( "float") ) )
+        {
+            qDebug() << "unexpected fields in vtk fib file, no point definition";
+            return false;
+        }
+        tokens = line.split( " ", QString::SkipEmptyParts );
+        qDebug() << tokens[1].toInt() << "points";
+        numVerts = tokens[1].toInt();
+    }
+    QVector<float>tmpVerts;
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( line.startsWith( "POLYGONS" ) )
+        {
+            break;
+        }
+        tokens = line.split( " ", QString::SkipEmptyParts );
+
+        for ( int i = 0; i < tokens.size(); ++i )
+        {
+            tmpVerts.push_back( tokens[i].toFloat() );
+        }
+
+    }
+    tokens = line.split( " ", QString::SkipEmptyParts );
+    qDebug() << tokens[1].toInt() << "triangles";
+    int numTriangles = tokens[1].toInt();
+
+    TriangleMesh2* mesh = new TriangleMesh2( numVerts, numTriangles );
+
+    for ( int i = 0; i < numVerts; ++i )
+    {
+        mesh->addVertex( tmpVerts[i*3], tmpVerts[i*3+1], tmpVerts[i*3+2] );
+    }
+
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        tokens = line.split( " ", QString::SkipEmptyParts );
+        if ( tokens.size() == 4 && tokens[0].toInt() == 3 )
+        {
+            mesh->addTriangle( tokens[1].toInt(), tokens[2].toInt(), tokens[3].toInt() );
+        }
+
+        --numTriangles;
+        if ( numTriangles == 0 )
+        {
+            break;
+        }
+    }
+    mesh->finalize();
+    DatasetMesh* dataset = new DatasetMesh( mesh, fn );
+    m_dataset.push_back( dataset );
+
+
+    return true;
 }
 
 bool Loader::loadFib()
