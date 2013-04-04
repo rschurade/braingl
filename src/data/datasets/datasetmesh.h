@@ -13,6 +13,7 @@
 #include <QString>
 
 class TriangleMesh2;
+class MeshRenderer;
 
 class DatasetMesh: public Dataset
 {
@@ -25,6 +26,7 @@ public:
 
 private:
     TriangleMesh2* m_mesh;
+    MeshRenderer* m_renderer;
 };
 
 #endif /* DATASETMESH_H_ */
