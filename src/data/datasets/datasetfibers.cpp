@@ -69,7 +69,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
 
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties.set( Fn::Property::FIBER_RENDERMODE, 0, 0, 1, true );
+    m_properties.set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
     m_properties.set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "fa from tracking" }, 0, true );
     m_properties.set( Fn::Property::FIBER_COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
