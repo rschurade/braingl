@@ -31,7 +31,7 @@ ROIBox::ROIBox() :
 
     m_properties.set( Fn::ROI::RENDER, true, true );
     m_properties.set( Fn::ROI::NEG, false, true );
-    m_properties.set( Fn::ROI::SPHERE, true, true );
+    m_properties.set( Fn::ROI::SHAPE, { "sphere", "box" }, 0, true );
     m_properties.set( Fn::ROI::X, x, 0., xMax, true );
     m_properties.set( Fn::ROI::Y, y, 0., yMax, true );
     m_properties.set( Fn::ROI::Z, z, 0., zMax, true );
@@ -106,7 +106,7 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
     if ( m_properties.get( Fn::ROI::RENDER).toBool() )
     {
-        if ( m_properties.get( Fn::ROI::SPHERE ).toBool() )
+        if ( m_properties.get( Fn::ROI::SHAPE ).toInt() == 0 )
         {
             GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID );
         }

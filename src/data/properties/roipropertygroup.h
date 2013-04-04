@@ -14,6 +14,7 @@
 #include "propertyint.h"
 #include "propertyfloat.h"
 #include "propertystring.h"
+#include "propertyselection.h"
 
 #include <QObject>
 #include <QString>
@@ -39,6 +40,7 @@ public:
     bool set( Fn::ROI name, const char* value, bool visible = false );
     bool set( Fn::ROI name, QVariant value );
     bool set( Fn::ROI name, QColor value, bool visible = false );
+    bool set( Fn::ROI name, std::initializer_list<QString>options, int value = 0, bool visible = false );
 
     int size() const;
 
