@@ -98,6 +98,11 @@ void ToolBar::createActions()
     m_fiberTractDensityAct->setStatusTip( tr( "tract density" ) );
     connect( m_fiberTractDensityAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_fiberTractColorAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tract color" ), this, Fn::Algo::TRACT_COLOR );
+    m_fiberTractColorAct->setStatusTip( tr( "tract color" ) );
+    connect( m_fiberTractColorAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+
     m_bingham2tensorAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bingham 2 Tensor" ), this, Fn::Algo::BINGHAM_2_TENSOR );
     m_bingham2tensorAction->setStatusTip( tr( "create tensors from bingham fit" ) );
     connect( m_bingham2tensorAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -184,6 +189,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::TRACT_DENSITY:
             l = FiberAlgos::tractDensity( ds );
             break;
+        case Fn::Algo::TRACT_COLOR:
+            l = FiberAlgos::tractColor( ds );
+            break;
         case Fn::Algo::BINGHAM_2_TENSOR:
             l = DWIAlgos::bingham2DWI( ds );
             break;
@@ -257,6 +265,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_cutSelectedFibersAction );
             this->addAction( m_fiberThinningAct );
             this->addAction( m_fiberTractDensityAct );
+            this->addAction( m_fiberTractColorAct );
             break;
         }
         default:

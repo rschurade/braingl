@@ -73,7 +73,10 @@ vec4 texColor( vec3 texCoord )
         vec4 color1 = texture3D( texture1, texCoord );
         if ( u_colormap1 == -1 )
         {
-            color = mix( color, color1, u_alpha1 );
+            if ( ( color1.r + color1.g + color1.b > 0.0 ) )
+            {
+                color = mix( color, color1, u_alpha1 );
+            }
         }
         else
         { 
@@ -86,7 +89,10 @@ vec4 texColor( vec3 texCoord )
         vec4 color2 = texture3D( texture2, texCoord );
         if ( u_colormap2 == -1 )
         {
-            color = mix( color, color2, u_alpha2 );
+            if ( ( color2.r + color2.g + color2.b > 0.0 ) )
+            {
+                color = mix( color, color2, u_alpha2 );
+            }
         }
         else
         { 
@@ -99,7 +105,10 @@ vec4 texColor( vec3 texCoord )
         vec4 color3 = texture3D( texture3, texCoord );
         if ( u_colormap4 == -1 )
         {
-            color = mix( color, color3, u_alpha3 );
+            if ( ( color3.r + color3.g + color3.b > 0.0 ) )
+            {
+                color = mix( color, color3, u_alpha3 );
+            }
         }
         else
         { 
@@ -112,7 +121,10 @@ vec4 texColor( vec3 texCoord )
         vec4 color4 = texture3D( texture4, texCoord );
         if ( u_colormap4 == -1 )
         {
-            color = mix( color, color4, u_alpha4 );
+            if ( ( color4.r + color4.g + color4.b > 0.0 ) )
+            {
+                color = mix( color, color4, u_alpha4 );
+            }
         }
         else
         { 

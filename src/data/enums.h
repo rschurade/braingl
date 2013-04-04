@@ -57,6 +57,7 @@ namespace Fn
         BINGHAM_2_TENSOR,
         FIBER_THINNING,
         TRACT_DENSITY,
+        TRACT_COLOR,
         CUT_SELECTED_FIBERS
     };
 
@@ -119,6 +120,7 @@ namespace Fn
         RENDER_FIRST,
         RENDER_SECOND,
         RENDER_THIRD,
+        RENDER_VECTORS_STICKS,
         ISO_VALUE,
         NUM_POINTS,
         NUM_LINES,
@@ -187,6 +189,7 @@ namespace Fn
             case Property::RENDER_FIRST: return QString( "render first peak" ); break;
             case Property::RENDER_SECOND: return QString( "render second peak" ); break;
             case Property::RENDER_THIRD: return QString( "render third peak" ); break;
+            case Property::RENDER_VECTORS_STICKS: return QString( "render vector sticks" ); break;
             case Property::ISO_VALUE: return QString( "iso value" ); break;
             case Property::NUM_POINTS: return QString( "num points" ); break;
             case Property::NUM_LINES: return QString( "num lines" ); break;

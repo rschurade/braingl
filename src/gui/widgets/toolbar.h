@@ -46,6 +46,7 @@ private:
     FNAction* m_crossingTrackingAct;
     FNAction* m_fiberThinningAct;
     FNAction* m_fiberTractDensityAct;
+    FNAction* m_fiberTractColorAct;
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
     FNAction* m_cutSelectedFibersAction;

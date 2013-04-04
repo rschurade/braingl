@@ -10,6 +10,7 @@
 
 #include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/dataset3d.h"
 
 #include <QDebug>
 
@@ -38,6 +39,16 @@ QList<Dataset*> FiberAlgos::tractDensity( Dataset* ds )
     l.push_back( out );
     return l;
 }
+
+QList<Dataset*> FiberAlgos::tractColor( Dataset* ds )
+{
+    Fibers* fa = new Fibers( dynamic_cast<DatasetFibers*>( ds ) );
+    Dataset3D* out = fa->tractColor();
+    QList<Dataset*> l;
+    l.push_back( out );
+    return l;
+}
+
 
 QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
 {
