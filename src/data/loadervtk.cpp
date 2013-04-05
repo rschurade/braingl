@@ -9,6 +9,7 @@
 
 #include <QDir>
 #include <QTextStream>
+#include <QDebug>
 
 
 LoaderVTK::LoaderVTK( QString fn ) :
@@ -44,6 +45,16 @@ QVector<float> LoaderVTK::getPoints()
 QVector<int> LoaderVTK::getPrimitives()
 {
     return m_primitives;
+}
+
+QVector<QVector<float> > LoaderVTK::getPointData()
+{
+    return m_pointData;
+}
+
+QVector<QString>LoaderVTK::getDataNames()
+{
+    return m_dataNames;
 }
 
 int LoaderVTK::getNumPoints()
@@ -183,6 +194,8 @@ bool LoaderVTK::loadAscii()
     {
         return false;
     }
+    loadPointDataAscii();
+
     return true;
 }
 
@@ -294,7 +307,96 @@ bool LoaderVTK::loadPrimitivesAscii()
     return true;
 }
 
+bool LoaderVTK::loadPointDataAscii()
+{
+    QString line;
+    QStringList tokens;
+    m_file->seek( 0 );
+    QTextStream in( m_file );
+
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( line.startsWith( "POINT_DATA") )
+        {
+            break;
+        }
+    }
+
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( line.startsWith( "FIELD") )
+        {
+            break;
+        }
+    }
+
+    if ( line.startsWith( "FIELD") )
+    {
+        tokens = line.split( " ", QString::SkipEmptyParts );
+        int numFields = tokens.last().toInt();
+
+        for( int curField = 0; curField < numFields; ++curField )
+        {
+            line = in.readLine();
+            tokens = line.split( " ", QString::SkipEmptyParts );
+
+            int entrySize = tokens[1].toInt();
+            int numEntries = tokens[2].toInt();
+
+            if ( numEntries == m_numPoints )
+            {
+                m_dataNames.push_back( tokens[0] );
+
+                QVector<float> data;
+                while( !in.atEnd() )
+                {
+                    line = in.readLine();
+                    tokens = line.split( " ", QString::SkipEmptyParts );
+
+                    for ( int i = 0; i < tokens.size(); ++i )
+                    {
+                        data.push_back( tokens[i].toFloat() );
+                    }
+
+                    if ( data.size() ==  ( m_numPoints * entrySize ) )
+                    {
+                        break;
+                    }
+                }
+                m_pointData.push_back( data );
+
+            }
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return false;
+}
+
 bool LoaderVTK::loadBinary()
+{
+    if ( !loadPointsBinary() )
+    {
+        return false;
+    }
+    if ( !loadPrimitivesBinary() )
+    {
+        return false;
+    }
+    return true;
+}
+
+bool LoaderVTK::loadPointsBinary()
+{
+    return false;
+}
+
+bool LoaderVTK::loadPrimitivesBinary()
 {
     return false;
 }

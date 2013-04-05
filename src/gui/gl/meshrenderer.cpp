@@ -111,12 +111,22 @@ void MeshRenderer::setShaderVars()
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+
+    offset += sizeof(float) * 4;
+    int valueLocation = program->attributeLocation( "a_value" );
+    program->enableAttributeArray( valueLocation );
+    glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
 
 }
 
@@ -126,7 +136,7 @@ void MeshRenderer::initGeometry()
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numTris() * 3 * sizeof(GLuint), m_mesh->getIndexes(), GL_STATIC_DRAW );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numVerts() * 6 * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numVerts() * 11 * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
 
     m_dirty = false;
 }

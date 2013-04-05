@@ -43,7 +43,8 @@ public:
     bool set( Fn::Property name, const char* value, bool visible = false );
     bool set( Fn::Property name, QVariant value );
     bool set( Fn::Property name, QColor value, bool visible = false );
-    bool set( Fn::Property name, std::initializer_list<QString>options, int value = 0, bool visible = false );
+    bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, bool visible = false );
+    bool set( Fn::Property name, QVector<QString> options, int value = 0, bool visible = false );
 
     int size() const;
 

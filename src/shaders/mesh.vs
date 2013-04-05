@@ -1,9 +1,12 @@
 #include uniforms_vs
 #include lighting_vs
 
+varying float v_value;
+
 void main()
 {
 	v_normal = normalize( a_normal );
+    v_value = a_value;
    
     prepareLight();
 	

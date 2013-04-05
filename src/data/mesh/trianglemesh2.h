@@ -24,6 +24,12 @@ public:
     void addTriangle( int id, int v0, int v1, int v2 );
     void addTriangle( int v0, int v1, int v2 );
 
+    void setVertexColor( int id, QColor color );
+    void setVertexColor( int id, float r, float g, float b, float a );
+
+    void setVertexData( int id, float value );
+    float getVertexData( int id );
+
     void finalize();
 
     float* getVertices();
@@ -40,8 +46,7 @@ private:
     int m_numTris;
 
     QVector<float>m_vertices;
-    QVector<float>m_normals;
-    QVector<float>m_colors;
+
     QVector<QVector<int> >m_vertIsInTriangle;
     QVector<QVector<int> >m_vertNeighbors;
 

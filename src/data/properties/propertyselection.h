@@ -19,7 +19,8 @@ class PropertySelection : public Property
     Q_OBJECT
 
 public:
-    PropertySelection( QString name, std::initializer_list<QString>options, int value = 0 );
+    PropertySelection( QString name, std::initializer_list<QString> options, int value = 0 );
+    PropertySelection( QString name, QVector<QString> options, int value = 0 );
     virtual ~PropertySelection();
 
     QWidget* getWidget();

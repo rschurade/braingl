@@ -24,6 +24,8 @@ public:
     int getPrimitiveType();
     QVector<float> getPoints();
     QVector<int>getPrimitives();
+    QVector<QVector<float> >getPointData();
+    QVector<QString>getDataNames();
 
     int getNumPoints();
     int getNumPrimitives();
@@ -36,8 +38,11 @@ private:
     bool loadAscii();
     bool loadPointsAscii();
     bool loadPrimitivesAscii();
+    bool loadPointDataAscii();
 
     bool loadBinary();
+    bool loadPointsBinary();
+    bool loadPrimitivesBinary();
 
     QString readLine( QDataStream& in );
 
@@ -55,6 +60,8 @@ private:
 
     QVector<float>m_points;
     QVector<int>m_primitives;
+    QVector<QVector<float> >m_pointData;
+    QVector<QString>m_dataNames;
 };
 
 #endif /* LOADERVTK_H_ */

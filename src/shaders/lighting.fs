@@ -49,13 +49,13 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
     return vec4( ambientV + ( diffuseV + specularV ) * lightColor, 1.0 );
 }
 
-void light()
+void light( vec4 color )
 {
     gl_FragColor = blinnPhongIllumination(
             // material properties
-            u_color.rgb * 0.2,                    // ambient color
-            u_color.rgb,                    // diffuse color
-            u_color.rgb,                          // specular color
+            color.rgb * 0.2,                    // ambient color
+            color.rgb,                    // diffuse color
+            color.rgb,                          // specular color
             1.0,                                  // shininess
         
             // light color properties

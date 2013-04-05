@@ -4,6 +4,7 @@ attribute vec3 a_normal;
 attribute vec4 a_color;
 
 attribute float a_extra;
+attribute float a_value;
 attribute float a_dir;
 attribute vec3 a_vec;
 attribute vec3 a_offset;

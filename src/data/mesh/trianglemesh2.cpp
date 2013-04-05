@@ -17,8 +17,7 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     m_vertexInsertId( 0 ),
     m_triangleInsertId( 0 )
 {
-    m_vertices.resize( numVerts * 6 );
-    m_colors.resize( numVerts * 4 );
+    m_vertices.resize( numVerts * 11 );
     m_vertIsInTriangle.resize( numVerts );
     m_vertNeighbors.resize( numVerts );
 
@@ -46,9 +45,9 @@ void TriangleMesh2::finalize()
 
 void TriangleMesh2::addVertex( int id, float x, float y, float z )
 {
-    m_vertices[ id * 6     ] = x;
-    m_vertices[ id * 6 + 1 ] = y;
-    m_vertices[ id * 6 + 2 ] = z;
+    m_vertices[ id * 11     ] = x;
+    m_vertices[ id * 11 + 1 ] = y;
+    m_vertices[ id * 11 + 2 ] = z;
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -56,7 +55,7 @@ void TriangleMesh2::addVertex( float x, float y, float z )
     m_vertices[ m_vertexInsertId++ ] = x;
     m_vertices[ m_vertexInsertId++ ] = y;
     m_vertices[ m_vertexInsertId++ ] = z;
-    m_vertexInsertId += 3;
+    m_vertexInsertId += 8;
 }
 
 void TriangleMesh2::addTriangle( int id, int v0, int v1, int v2 )
@@ -80,6 +79,29 @@ void TriangleMesh2::addTriangle( int v0, int v1, int v2 )
     m_triangles[ m_triangleInsertId++ ] = v0;
     m_triangles[ m_triangleInsertId++ ] = v1;
     m_triangles[ m_triangleInsertId++ ] = v2;
+}
+
+void TriangleMesh2::setVertexColor( int id, QColor color )
+{
+    setVertexColor( id, color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+}
+
+void TriangleMesh2::setVertexColor( int id, float r, float g, float b, float a )
+{
+    m_vertices[ id * 11 + 6  ] = r;
+    m_vertices[ id * 11 + 7 ] = g;
+    m_vertices[ id * 11 + 8 ] = b;
+    m_vertices[ id * 11 + 9 ] = a;
+}
+
+void TriangleMesh2::setVertexData( int id, float value )
+{
+    m_vertices[ id * 11 + 10 ] = value;
+}
+
+float TriangleMesh2::getVertexData( int id )
+{
+    return m_vertices[ id * 11 + 10 ];
 }
 
 float* TriangleMesh2::getVertices()
@@ -124,8 +146,8 @@ void TriangleMesh2::calcVertNormals()
             sum += m_triNormals[m_vertIsInTriangle[i][k]];
         }
         sum.normalize();
-        m_vertices[ 6 * i + 3 ] = sum.x();
-        m_vertices[ 6 * i + 4 ] = sum.y();
-        m_vertices[ 6 * i + 5 ] = sum.z();
+        m_vertices[ 11 * i + 3 ] = sum.x();
+        m_vertices[ 11 * i + 4 ] = sum.y();
+        m_vertices[ 11 * i + 5 ] = sum.z();
     }
 }
