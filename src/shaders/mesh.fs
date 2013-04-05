@@ -3,6 +3,7 @@
 #include uniforms_fs
 #include lighting_fs
 
+varying float v_value;
 
 void main()
 {
@@ -14,8 +15,14 @@ void main()
         
         gl_FragColor = color;
     }
+    else if ( u_colorMode == 3 )
+    {
+        vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 );
+        color = colormap( v_value, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
+        light( color );
+    }
     else
     {
-        light();
+        light( u_color );
     }    
 }

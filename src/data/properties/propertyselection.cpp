@@ -24,6 +24,22 @@ PropertySelection::PropertySelection( QString name, std::initializer_list<QStrin
 
 }
 
+PropertySelection::PropertySelection( QString name, QVector<QString>options, int value ) :
+    Property( name ),
+    m_value( value )
+{
+    m_widget = new SelectWithLabel( name, 0 );
+    int index = 0;
+    for ( int  i = 0; i < options.size(); ++i )
+    {
+        m_widget->insertItem( index++, options[i] );
+    }
+
+    m_widget->setCurrentIndex( value );
+
+    connect( m_widget, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( widgetChanged( int) ) );
+
+}
 PropertySelection::~PropertySelection()
 {
 }

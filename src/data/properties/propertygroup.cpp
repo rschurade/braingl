@@ -218,6 +218,25 @@ bool PropertyGroup::set( Fn::Property name, std::initializer_list<QString>option
     return true;
 }
 
+bool PropertyGroup::set( Fn::Property name, QVector<QString> options, int value, bool visible )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        m_properties[(int)name]->setValue( value );
+    }
+    else
+    {
+        PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        m_properties[(int)name] = prop;
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        if ( visible )
+        {
+            m_visible.append( name );
+        }
+    }
+    return true;
+}
+
 QList<Fn::Property> PropertyGroup::getVisible()
 {
     return m_visible;

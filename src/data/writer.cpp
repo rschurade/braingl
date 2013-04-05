@@ -361,7 +361,7 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
 void Writer::saveFibs( QString filename )
 {
     QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
-    QVector< QVector<float> >extra = dynamic_cast<DatasetFibers*>( m_dataset )->getExtra();
+    QVector< QVector< QVector<float> > >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData();
 
     using std::fstream;
     fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
@@ -402,7 +402,7 @@ void Writer::saveFibs( QString filename )
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3] );
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+1] );
             rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+2] );
-            rawFAData[faPosOffset++] = static_cast< float >( extra[i][j] );
+            //rawFAData[faPosOffset++] = static_cast< float >( extra[i][j] );
         }
     }
 
@@ -414,8 +414,8 @@ void Writer::saveFibs( QString filename )
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
     out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
     out << lineDelimiter;
-    out << "FA " << numPoints << " float" << lineDelimiter;
-    out.write( reinterpret_cast< char* >( rawFAData ), sizeof( float ) * numPoints );
-    out << lineDelimiter;
+//    out << "FA " << numPoints << " float" << lineDelimiter;
+//    out.write( reinterpret_cast< char* >( rawFAData ), sizeof( float ) * numPoints );
+//    out << lineDelimiter;
     out.close();
 }

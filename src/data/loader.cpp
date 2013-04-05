@@ -1005,8 +1005,96 @@ bool Loader::loadVTK()
             mesh->addTriangle( triangles[i*4+1], triangles[i*4+2], triangles[i*4+3] );
         }
 
+        QVector<QVector<float> >values = lv->getPointData();
+
+        if ( values.size() > 0 )
+        {
+            QVector<float>data = values[0];
+            if ( data.size() == numPoints )
+            {
+                for ( int i = 0; i < numPoints; ++i )
+                {
+                    mesh->setVertexData( i, data[i] );
+                }
+            }
+        }
+
         mesh->finalize();
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
+        m_dataset.push_back( dataset );
+
+        return true;
+    }
+
+    if ( lv->getPrimitiveType() == 2 )
+    {
+        QVector<float> points = lv->getPoints();
+        QVector<int>lines = lv->getPrimitives();
+        int numLines = lv->getNumPrimitives();
+
+        QVector< QVector< float > > fibs;
+
+        int lc = 0;
+        int pc = 0;
+        for ( int i = 0; i < numLines; ++i )
+        {
+            QVector<float>fib;
+            int lineSize = lines[lc];
+            for ( int k = 0; k < lineSize*3; ++k )
+            {
+                fib.push_back( points[pc++] );
+            }
+            lc += lineSize+1;
+            fibs.push_back( fib );
+        }
+
+        QVector< QVector<float> >pointData = lv->getPointData();
+        QVector< QVector< QVector<float> > >data;
+        QVector<QString> dataNames = lv->getDataNames();
+
+        qDebug() << pointData.size();
+
+        QVector<float>mins;
+        QVector<float>maxes;
+        for ( int curField = 0; curField < pointData.size(); ++ curField )
+        {
+            QVector<float> field = pointData[curField];
+            float min = std::numeric_limits<float>::max();
+            float max = std::numeric_limits<float>::min();
+
+            for ( int i = 0; i < field.size(); ++i )
+            {
+                float value = field[i];
+                min = qMin( min, value );
+                max = qMax( max, value );
+            }
+            mins.push_back( min );
+            maxes.push_back( max );
+        }
+        for ( int curField = 0; curField < pointData.size(); ++ curField )
+        {
+            QVector<float> field = pointData[curField];
+
+            QVector< QVector< float > > dataField;
+
+            int lc = 0;
+            int pc = 0;
+            for ( int i = 0; i < numLines; ++i )
+            {
+                QVector<float>fib;
+                int lineSize = lines[lc];
+                for ( int k = 0; k < lineSize; ++k )
+                {
+                    fib.push_back( field[pc++] );
+                }
+                lc += lineSize+1;
+                dataField.push_back( fib );
+            }
+
+            data.push_back( dataField );
+        }
+
+        DatasetFibers* dataset = new DatasetFibers( fn, fibs, data, dataNames, mins, maxes );
         m_dataset.push_back( dataset );
 
         return true;
@@ -1090,46 +1178,9 @@ bool Loader::loadFib()
                 fibs.push_back( fib );
             }
 
-            readLine( in );
-            QVector< QVector< float > > extras;
-            if ( !in.atEnd() )
-            {
-                QString l6 = readLine( in );
 
-                if ( ( l6.startsWith( "FA") && l4.endsWith( "float") ) )
-                {
-                    QStringList fsl = l6.split( ' ' );
-                    int numPoints = fsl[1].toInt();
-                    qDebug() << numPoints << "fa entries";
-                    char* faField = new char[numPoints * sizeof( float )];
-                    in.readRawData( faField, numPoints * sizeof( float ) );
-
-                    float* rawFAData = reinterpret_cast<float*>( faField );
-                    switchByteOrderOfArray< float >( rawFAData, numPoints );
-
-                    int pc = 0;
-                    for ( int i = 0; i < fibs.size(); ++i )
-                    {
-                        QVector<float>extra;
-                        for ( int k = 0; k < fibs[i].size()/3; ++k )
-                        {
-                            extra.push_back( rawFAData[pc++] );
-                        }
-                        extras.push_back( extra );
-                    }
-                }
-            }
-            if ( extras.size() == 0 )
-            {
-
-                DatasetFibers* dataset = new DatasetFibers( fn, fibs );
-                m_dataset.push_back( dataset );
-            }
-            else
-            {
-                DatasetFibers* dataset = new DatasetFibers( fn, fibs, extras );
-                m_dataset.push_back( dataset );
-            }
+            DatasetFibers* dataset = new DatasetFibers( fn, fibs );
+            m_dataset.push_back( dataset );
 
             return true;
         }

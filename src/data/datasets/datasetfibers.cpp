@@ -45,18 +45,29 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::NY, 1000, 0, 2000, true );
     m_properties.set( Fn::Property::NZ, 800, 0, 1600, true );
 
-    m_extraData.reserve( fibs.size() );
+    QVector<QVector<float> >data0;
+    data0.reserve( fibs.size() );
     for ( int i = 0; i < fibs.size(); ++i )
     {
-        m_extraData.push_back( QVector<float>( fibs[i].size() / 3 ) );
+        data0.push_back( QVector<float>( fibs[i].size() / 3 ) );
     }
+    m_data.push_back( data0 );
+    m_dataNames.push_back( "no data" );
     connect( m_properties.getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
 }
 
-DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs, QVector< QVector< float > > extras ) :
+DatasetFibers::DatasetFibers( QString filename,
+                                 QVector< QVector< float > > fibs,
+                                 QVector< QVector< QVector< float > > >data,
+                                 QVector<QString>dataNames,
+                                 QVector< float > mins,
+                                 QVector<float> maxes ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
-    m_extraData( extras ),
+    m_data( data ),
+    m_dataNames( dataNames ),
+    m_dataMins( mins ),
+    m_dataMaxes( maxes ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
     m_selector( 0 )
@@ -70,7 +81,8 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::NUM_POINTS, numPoints );
     m_properties.set( Fn::Property::NUM_LINES, fibs.size() );
     m_properties.set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
-    m_properties.set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "fa from tracking" }, 0, true );
+    m_properties.set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, true );
+    m_properties.set( Fn::Property::DATAMODE, dataNames, 0, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
@@ -87,7 +99,6 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::NY, 1000, 0, 2000, true );
     m_properties.set( Fn::Property::NZ, 800, 0, 1600, true );
 
-
     connect( m_properties.getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
     connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
@@ -98,6 +109,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
     connect( m_properties.getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
+    connect( m_properties.getProperty( Fn::Property::DATAMODE ), SIGNAL( valueChanged( int ) ), this, SLOT( dataModeChanged() ) );
 }
 
 DatasetFibers::~DatasetFibers()
@@ -110,9 +122,9 @@ QVector< QVector< float > > DatasetFibers::getFibs()
     return m_fibs;
 }
 
-QVector< QVector< float > > DatasetFibers::getExtra()
+QVector< QVector< QVector< float > > > DatasetFibers::getData()
 {
-    return m_extraData;
+    return m_data;
 }
 
 QVector< QVector< float > > DatasetFibers::getSelectedFibs()
@@ -149,7 +161,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new FiberRenderer( m_selector, m_fibs, m_extraData );
+            m_renderer = new FiberRenderer( m_selector, m_fibs, m_data[m_properties.get( Fn::Property::DATAMODE).toInt()] );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
             m_renderer->colorChanged( m_properties.get( Fn::Property::COLOR ).value<QColor>() );
@@ -162,7 +174,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
     {
         if ( m_tubeRenderer == 0 )
         {
-            m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_extraData );
+            m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_data[m_properties.get( Fn::Property::DATAMODE).toInt()] );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
             m_tubeRenderer->colorChanged( m_properties.get( Fn::Property::COLOR ).value<QColor>() );
@@ -181,4 +193,28 @@ QString DatasetFibers::getValueAsString( int x, int y, int z )
 void DatasetFibers::colorChanged()
 {
     m_properties.set( Fn::Property::COLORMODE, 2 );
+}
+
+void DatasetFibers::dataModeChanged()
+{
+    if ( m_renderer != 0 )
+    {
+        delete m_renderer;
+        m_renderer = 0;
+    }
+    if ( m_tubeRenderer != 0 )
+    {
+        delete m_tubeRenderer;
+        m_tubeRenderer = 0;
+    }
+    float min = m_dataMins[ m_properties.get( Fn::Property::DATAMODE).toInt()];
+    float max = m_dataMaxes[ m_properties.get( Fn::Property::DATAMODE).toInt()];
+
+    m_properties.set( Fn::Property::MIN, min );
+    m_properties.set( Fn::Property::MAX, max );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MIN ) )->setMin( min );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MIN ) )->setMax( max );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MAX ) )->setMin( min );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MAX ) )->setMax( max );
+    Models::d()->submit();
 }

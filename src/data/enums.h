@@ -126,6 +126,7 @@ namespace Fn
         NUM_LINES,
         COLOR,
         COLORMODE,
+        DATAMODE,
         FIBER_RENDERMODE,
         FIBER_THICKNESS,
         HAS_TEXTURE,
@@ -195,6 +196,7 @@ namespace Fn
             case Property::NUM_LINES: return QString( "num lines" ); break;
             case Property::COLOR: return QString( "color" ); break;
             case Property::COLORMODE: return QString( "color mode" ); break;
+            case Property::DATAMODE: return QString( "select data" ); break;
             case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
             case Property::FIBER_THICKNESS: return QString( "fiber thickness" ); break;
             case Property::HAS_TEXTURE: return QString( "has frame" ); break;

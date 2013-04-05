@@ -11,6 +11,6 @@ void main( void )
     }
     else
     {
-        light();
+        light( u_color );
     }
 }
