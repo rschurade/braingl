@@ -216,5 +216,7 @@ void DatasetFibers::dataModeChanged()
     static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MIN ) )->setMax( max );
     static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MAX ) )->setMin( min );
     static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MAX ) )->setMax( max );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MIN ) )->setValue( min );
+    static_cast<PropertyFloat*> ( m_properties.getProperty( Fn::Property::SELECTED_MAX ) )->setValue( max );
     Models::d()->submit();
 }
