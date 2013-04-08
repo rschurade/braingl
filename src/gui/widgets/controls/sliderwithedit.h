@@ -28,6 +28,8 @@ public:
    void setMin( float min );
    void setMax( float max );
 
+   void setDigits( int digits );
+
 public slots:
     void sliderChanged( int value );
     void sliderMoved( int value );
@@ -42,6 +44,7 @@ private:
    QLabel* m_label;
 
    int m_id;
+   int m_digits;
 };
 
 #endif /* SLIDERWITHEDIT_H_ */

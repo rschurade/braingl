@@ -25,7 +25,7 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
 
     m_edit = new QLineEdit( this );
     m_edit->setMaxLength( 10 );
-    m_edit->setMaximumWidth( 45 );
+    m_edit->setMaximumWidth( 60 );
     m_edit->setAlignment( Qt::AlignCenter );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
@@ -46,13 +46,12 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     m_label = new QLabel( name, this );
     hLayout->addWidget( m_label );
     hLayout->addStretch();
+    hLayout->addWidget( m_edit );
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
     hLayout2->addWidget( m_button1 );
-    hLayout2->addWidget( m_slider, 55 );
+    hLayout2->addWidget( m_slider );
     hLayout2->addWidget( m_button2 );
-    hLayout2->addWidget( m_edit, 25 );
-
 
     vLayout->addLayout( hLayout );
     vLayout->addLayout( hLayout2 );
