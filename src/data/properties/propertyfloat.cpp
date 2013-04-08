@@ -8,6 +8,8 @@
 
 #include "../../gui/widgets/controls/sliderwithedit.h"
 
+#include <QDebug>
+
 PropertyFloat::PropertyFloat( QString name, float value, float min, float max ) :
     Property( name ),
     m_value( value ),
@@ -48,6 +50,7 @@ void PropertyFloat::setMin( float min )
     {
         m_value = m_min;
     }
+
     m_widget->setMin( min );
     m_widget->setValue( m_value );
 }
@@ -59,6 +62,7 @@ void PropertyFloat::setMax( float max )
     {
         m_value = m_max;
     }
+    m_widget->setDigits( determineDigits() );
     m_widget->setMax( max );
     m_widget->setValue( m_value );
 }
@@ -68,4 +72,30 @@ void PropertyFloat::widgetChanged( float value, int id )
     m_value = value;
     emit( valueChanged() );
     emit( valueChanged( value ) );
+}
+
+
+int PropertyFloat::determineDigits()
+{
+    int d = 0;
+
+    if ( m_max > m_min )
+    {
+        float v = m_max - m_min;
+
+        while( v < 1 )
+        {
+            v *= 10;
+            ++d;
+            if ( v / 10. > 1 )
+            {
+                break;
+            }
+        }
+        return qMin( 10, qMax( 2, d + 2 ) );
+    }
+    else
+    {
+        return 2;
+    }
 }

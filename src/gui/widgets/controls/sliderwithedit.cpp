@@ -13,17 +13,19 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
-SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
-    QFrame( parent )
-{
-    m_id = id;
+#define SLIDERMULT 100000.f
 
+SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
+    QFrame( parent ),
+    m_id( id ),
+    m_digits( 2 )
+{
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
 
     m_edit = new QLineEdit();
     m_edit->setMaxLength( 10 );
-    m_edit->setMaximumWidth( 55 );
+    m_edit->setMaximumWidth( 100 );
     m_edit->setAlignment( Qt::AlignCenter );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
@@ -36,10 +38,10 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     m_label = new QLabel( name );
     hLayout->addWidget( m_label );
     hLayout->addStretch();
+    hLayout->addWidget( m_edit );
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
-    hLayout2->addWidget( m_slider, 70 );
-    hLayout2->addWidget( m_edit, 30 );
+    hLayout2->addWidget( m_slider );
 
     if ( name != "" )
     {
@@ -71,45 +73,50 @@ SliderWithEdit::~SliderWithEdit()
 
 void SliderWithEdit::sliderChanged( int value )
 {
-    m_edit->setText( QString::number( static_cast<double>( value ) / 100., 'f', 2 ) );
+    m_edit->setText( QString::number( static_cast<double>( value ) / SLIDERMULT, 'f', m_digits ) );
     m_slider->repaint();
 }
 
 void SliderWithEdit::sliderMoved( int value )
 {
-    m_edit->setText( QString::number( static_cast<float>( value ) / 100., 'f', 2 ) );
+    m_edit->setText( QString::number( static_cast<float>( value ) / SLIDERMULT, 'f', m_digits ) );
     m_slider->repaint();
-    emit( valueChanged( ( static_cast<float>( value ) / 100. ), m_id  ) );
+    emit( valueChanged( ( static_cast<float>( value ) / SLIDERMULT ), m_id  ) );
 }
 
 void SliderWithEdit::editEdited()
 {
     QString text = m_edit->text();
-    m_slider->setValue( static_cast<int>( text.toFloat() * 100 ) );
+    m_slider->setValue( static_cast<int>( text.toFloat() * SLIDERMULT ) );
     emit( valueChanged( text.toFloat(), m_id ) );
     m_slider->repaint();
 }
 
 void SliderWithEdit::setValue( float value )
 {
-    m_slider->setValue( value * 100 );
+    m_slider->setValue( value * SLIDERMULT );
     m_slider->repaint();
 }
 
 float SliderWithEdit::getValue()
 {
-    return static_cast<float>( m_slider->value() ) / 100.;
+    return static_cast<float>( m_slider->value() ) / SLIDERMULT;
 }
 
 void SliderWithEdit::setMin( float min )
 {
-    m_slider->setMinimum( min * 100 );
+    m_slider->setMinimum( min * SLIDERMULT );
     m_slider->repaint();
 }
 
 
 void SliderWithEdit::setMax( float max )
 {
-    m_slider->setMaximum( max * 100 );
+    m_slider->setMaximum( max * SLIDERMULT );
     m_slider->repaint();
+}
+
+void SliderWithEdit::setDigits( int digits )
+{
+    m_digits = digits;
 }

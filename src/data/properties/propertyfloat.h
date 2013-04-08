@@ -29,6 +29,8 @@ public:
     QVariant getValue();
 
 private:
+    int determineDigits();
+
     float m_value;
     float m_min;
     float m_max;
