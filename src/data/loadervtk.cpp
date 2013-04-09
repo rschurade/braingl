@@ -19,7 +19,8 @@ LoaderVTK::LoaderVTK( QString fn ) :
     m_primitiveType( 0 ),
     m_numPoints( 0 ),
     m_numPrimitives( 0 ),
-    m_primitiveSize( 0 )
+    m_primitiveSize( 0 ),
+    m_binFileSize( 0 )
 {
 }
 
@@ -125,7 +126,7 @@ bool LoaderVTK::exists()
 bool LoaderVTK::open()
 {
     m_file = new QFile( m_filename );
-    if ( !m_file->open( QIODevice::ReadOnly | QIODevice::Text ) )
+    if ( !m_file->open( QIODevice::ReadOnly ) )
     {
         m_status = "*ERROR* couldn't open file " + m_filename;
         return false;
@@ -380,6 +381,15 @@ bool LoaderVTK::loadPointDataAscii()
 
 bool LoaderVTK::loadBinary()
 {
+    QDataStream in( m_file );
+    m_binFileSize = m_file->size();
+    qDebug() << m_binFileSize;
+    m_binaryFile = new char[ m_binFileSize ];
+    m_file->seek( 0 );
+    int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
+
+    qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
+
     if ( !loadPointsBinary() )
     {
         return false;
@@ -393,10 +403,157 @@ bool LoaderVTK::loadBinary()
 
 bool LoaderVTK::loadPointsBinary()
 {
-    return false;
+    int pos = searchBinaryFile( "POINTS" );
+    QString line;
+    QStringList tokens;
+    if ( pos != -1 )
+    {
+        line = getStringFromBinaryFile( pos );
+        qDebug() << line;
+        tokens = line.split( " ", QString::SkipEmptyParts );
+        if ( ( tokens.size() == 3 ) && line.startsWith( "POINTS") && line.endsWith( "float") )
+        {
+            m_numPoints = tokens[1].toInt();
+        }
+        else
+        {
+            m_status = "*ERROR* unexpected field in points declaration " + m_filename;
+            return false;
+        }
+    }
+    else
+    {
+        m_status = "*ERROR* while searching for point declaration, unexpected EOF in file " + m_filename;
+        return false;
+    }
+
+    char* pointField = new char[m_numPoints * sizeof( float ) * 3];
+
+    int begin = pos + line.size() + 1;
+    int end = begin + m_numPoints * sizeof( float ) * 3;
+    int i, j;
+    for ( i = begin, j = 0; i < end; ++i, ++j )
+    {
+        pointField[j] = m_binaryFile[i];
+    }
+
+    float* rawPointData = reinterpret_cast<float*>( pointField );
+    switchByteOrderOfArray< float >( rawPointData, m_numPoints * 3 );
+
+    m_points.resize( m_numPoints * 3 );
+    for ( int k = 0; k < m_points.size(); ++k )
+    {
+        m_points[k] = rawPointData[k];
+    }
+
+    return true;
 }
 
 bool LoaderVTK::loadPrimitivesBinary()
 {
-    return false;
+    QString line;
+    QStringList tokens;
+
+    int pos = searchBinaryFile( "POLYGONS" );
+
+    if ( pos != -1 )
+    {
+        m_primitiveType = 1;
+    }
+
+    pos = searchBinaryFile( "LINES" );
+
+    if ( pos != -1 )
+    {
+        m_primitiveType = 2;
+    }
+
+    if ( m_primitiveType == 0 )
+    {
+        m_status = "*ERROR* while searching for primitive declaration, unexpected EOF in file " + m_filename;
+        return false;
+    }
+
+    line = getStringFromBinaryFile( pos );
+    qDebug() << line;
+    tokens = line.split( " ", QString::SkipEmptyParts );
+
+    if ( tokens.size() == 3 )
+    {
+        m_numPrimitives = tokens[1].toInt();
+        m_primitiveSize = tokens[2].toInt();
+    }
+    else
+    {
+        m_status = "*ERROR* unexpected field in primitive declaration " + m_filename;
+        return false;
+    }
+
+    char* primitiveField = new char[ m_primitiveSize * sizeof( int ) ];
+
+    int begin = pos + line.size() + 1;
+    int end = begin + m_primitiveSize * sizeof( int );
+
+    int i, j;
+    for ( i = begin, j = 0; i < end; ++i, ++j )
+    {
+        primitiveField[j] = m_binaryFile[i];
+    }
+
+    int* rawPrimitiveData = reinterpret_cast<int*>( primitiveField );
+    switchByteOrderOfArray< int >( rawPrimitiveData, m_primitiveSize );
+
+
+
+    m_primitives.resize( m_primitiveSize );
+
+    for ( int k = 0; k < m_primitiveSize; ++k )
+    {
+        m_primitives[k] = rawPrimitiveData[k];
+    }
+    qDebug() << "done loading primitive field";
+    return true;
+}
+
+int LoaderVTK::searchBinaryFile( QString string )
+{
+    char first = string.at( 0 ).toLatin1();
+    int found = -1;
+    for ( int i = 0; i < m_binFileSize; ++i )
+    {
+        if ( m_binaryFile[i] == first )
+        {
+            if ( testPos( i, string ) )
+            {
+                found = i;
+                break;
+            }
+        }
+    }
+    return found;
+}
+
+bool LoaderVTK::testPos( int pos, QString string )
+{
+    bool match = true;
+    for ( int i = 0; i < string.size(); ++i )
+    {
+        if ( m_binaryFile[pos + i] != string.at( i ).toLatin1() )
+        {
+            match = false;
+            break;
+        }
+    }
+    return match;
+}
+
+QString LoaderVTK::getStringFromBinaryFile( int pos )
+{
+    QString out;
+    int i = 0;
+    while( m_binaryFile[ pos + i ] != '\n' )
+    {
+        out += m_binaryFile[ pos + i++ ];
+    }
+    return out;
 }
