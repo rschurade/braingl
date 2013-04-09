@@ -69,7 +69,7 @@ bool Loader::load()
 
     if ( m_fileName.path().endsWith( ".fib" ) )
     {
-        return loadFib();
+        return loadVTK();
     }
 
     if ( m_fileName.path().endsWith( ".vtk" ) )
@@ -1032,6 +1032,8 @@ bool Loader::loadVTK()
         QVector<int>lines = lv->getPrimitives();
         int numLines = lv->getNumPrimitives();
 
+        qDebug() << points.size() << lines.size() << numLines;
+
         QVector< QVector< float > > fibs;
 
         int lc = 0;
@@ -1040,11 +1042,12 @@ bool Loader::loadVTK()
         {
             QVector<float>fib;
             int lineSize = lines[lc];
-            for ( int k = 0; k < lineSize*3; ++k )
+
+            for ( int k = 0; k < lineSize * 3; ++k )
             {
                 fib.push_back( points[pc++] );
             }
-            lc += lineSize+1;
+            lc += lineSize + 1;
             fibs.push_back( fib );
         }
 
@@ -1052,156 +1055,60 @@ bool Loader::loadVTK()
         QVector< QVector< QVector<float> > >data;
         QVector<QString> dataNames = lv->getDataNames();
 
-        qDebug() << pointData.size();
+        qDebug() << pointData.size() << "point data fields found";
 
-        QVector<float>mins;
-        QVector<float>maxes;
-        for ( int curField = 0; curField < pointData.size(); ++ curField )
+        if (  pointData.size() > 0 )
         {
-            QVector<float> field = pointData[curField];
-            float min = std::numeric_limits<float>::max();
-            float max = std::numeric_limits<float>::min();
-
-            for ( int i = 0; i < field.size(); ++i )
+            QVector<float>mins;
+            QVector<float>maxes;
+            for ( int curField = 0; curField < pointData.size(); ++ curField )
             {
-                float value = field[i];
-                min = qMin( min, value );
-                max = qMax( max, value );
-            }
-            mins.push_back( min );
-            maxes.push_back( max );
-        }
-        for ( int curField = 0; curField < pointData.size(); ++ curField )
-        {
-            QVector<float> field = pointData[curField];
+                QVector<float> field = pointData[curField];
+                float min = std::numeric_limits<float>::max();
+                float max = std::numeric_limits<float>::min();
 
-            QVector< QVector< float > > dataField;
-
-            int lc = 0;
-            int pc = 0;
-            for ( int i = 0; i < numLines; ++i )
-            {
-                QVector<float>fib;
-                int lineSize = lines[lc];
-                for ( int k = 0; k < lineSize; ++k )
+                for ( int i = 0; i < field.size(); ++i )
                 {
-                    fib.push_back( field[pc++] );
+                    float value = field[i];
+                    min = qMin( min, value );
+                    max = qMax( max, value );
                 }
-                lc += lineSize+1;
-                dataField.push_back( fib );
+                mins.push_back( min );
+                maxes.push_back( max );
             }
+            for ( int curField = 0; curField < pointData.size(); ++ curField )
+            {
+                QVector<float> field = pointData[curField];
 
-            data.push_back( dataField );
+                QVector< QVector< float > > dataField;
+
+                int lc = 0;
+                int pc = 0;
+                for ( int i = 0; i < numLines; ++i )
+                {
+                    QVector<float>fib;
+                    int lineSize = lines[lc];
+                    for ( int k = 0; k < lineSize; ++k )
+                    {
+                        fib.push_back( field[pc++] );
+                    }
+                    lc += lineSize + 1;
+                    dataField.push_back( fib );
+                }
+
+                data.push_back( dataField );
+            }
+            DatasetFibers* dataset = new DatasetFibers( fn, fibs, data, dataNames, mins, maxes );
+            m_dataset.push_back( dataset );
         }
-
-        DatasetFibers* dataset = new DatasetFibers( fn, fibs, data, dataNames, mins, maxes );
-        m_dataset.push_back( dataset );
+        else
+        {
+            DatasetFibers* dataset = new DatasetFibers( fn, fibs );
+            m_dataset.push_back( dataset );
+        }
 
         return true;
     }
 
     return false;
-}
-
-bool Loader::loadFib()
-{
-    QString fn = m_fileName.path();
-
-    QDir dir( fn );
-
-    if ( dir.exists( dir.absolutePath() ) )
-    {
-        QFile file( fn );
-        if ( !file.open( QIODevice::ReadOnly ) )
-        {
-            qDebug() << "couldn't open " << fn;
-        }
-
-        QDataStream in( &file );
-        QString l0 = readLine( in );
-        QString l1 = readLine( in );
-        QString l2 = readLine( in );
-        QString l3 = readLine( in );
-
-        if ( !( ( l0 == "# vtk DataFile Version 3.0" ) && ( l3 == "DATASET POLYDATA" )  ) )
-        {
-            qDebug() << "unexpected fields in vtk fib file";
-            return false;
-        }
-        if ( l2 == "BINARY" )
-        {
-            qDebug() << "load binary fib file";
-            QString l4 = readLine( in );
-
-            if ( !( l4.startsWith( "POINTS") && l4.endsWith( "float") ) )
-            {
-                qDebug() << "unexpected fields in vtk fib file, no point definition";
-                return false;
-            }
-            QStringList psl = l4.split( ' ' );
-            int numPoints = psl[1].toInt();
-            qDebug() << numPoints << "points";
-            char* pointField = new char[numPoints * sizeof( float ) * 3];
-            in.readRawData( pointField, numPoints * sizeof( float ) * 3 );
-            readLine( in );
-            QString l5 = readLine( in );
-            if ( !( l5.startsWith( "LINES" ) ) )
-            {
-                qDebug() << "unexpected fields in vtk fib file, no line definition";
-                return false;
-            }
-            QStringList lsl = l5.split( ' ' );
-            int numLines = lsl[1].toInt();
-            int lineFieldSize = lsl[2].toInt();
-            qDebug() << numLines << "lines with a size of" << lineFieldSize;
-
-            char* lineField = new char[lineFieldSize * sizeof( int )];
-            in.readRawData( lineField, lineFieldSize * sizeof( int ) );
-
-            float* rawPointData = reinterpret_cast<float*>( pointField );
-            unsigned int * rawLineData = reinterpret_cast<unsigned int*>( lineField );
-            switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
-            switchByteOrderOfArray< unsigned int >( rawLineData, lineFieldSize );
-
-            QVector< QVector< float > > fibs;
-            int lc = 0;
-            int pc = 0;
-            for ( int i = 0; i < numLines; ++i )
-            {
-                QVector<float>fib;
-                int lineSize = rawLineData[lc];
-                for ( int k = 0; k < lineSize*3; ++k )
-                {
-                    fib.push_back( rawPointData[pc++] );
-                }
-                lc += lineSize+1;
-                fibs.push_back( fib );
-            }
-
-
-            DatasetFibers* dataset = new DatasetFibers( fn, fibs );
-            m_dataset.push_back( dataset );
-
-            return true;
-        }
-        else if ( l2 == "ASCII" )
-        {
-            qDebug() << "load ascii fib file";
-        }
-    }
-    return false;
-}
-
-QString Loader::readLine( QDataStream& in )
-{
-    char* s = new char[1];
-    QString out;
-    do
-    {
-        in.readRawData( s, 1 );
-        out += s[0];
-    }
-    while( s[0] != '\n' );
-
-    return out.mid( 0, out.size() - 1 );
 }
