@@ -446,6 +446,8 @@ bool LoaderVTK::loadPointsBinary()
         m_points[k] = rawPointData[k];
     }
 
+    delete rawPointData;
+
     return true;
 }
 
@@ -460,12 +462,14 @@ bool LoaderVTK::loadPrimitivesBinary()
     {
         m_primitiveType = 1;
     }
-
-    pos = searchBinaryFile( "LINES" );
-
-    if ( pos != -1 )
+    else
     {
-        m_primitiveType = 2;
+        pos = searchBinaryFile( "LINES" );
+
+        if ( pos != -1 )
+        {
+            m_primitiveType = 2;
+        }
     }
 
     if ( m_primitiveType == 0 )
@@ -511,7 +515,9 @@ bool LoaderVTK::loadPrimitivesBinary()
     {
         m_primitives[k] = rawPrimitiveData[k];
     }
-    qDebug() << "done loading primitive field";
+
+    delete rawPrimitiveData;
+
     return true;
 }
 
