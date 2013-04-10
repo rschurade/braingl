@@ -20,6 +20,8 @@
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
 
+#include "../../thirdparty/newmat10/newmat.h"
+
 #include <QDebug>
 
 #include <math.h>
@@ -360,6 +362,19 @@ void SceneRenderer::rightMouseDown( int x, int y )
     m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
     m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+
+//    float px = ( (float)x / GLFunctions::getScreenSize().x() * 2 ) - 1;
+//    float py = 1. - ( (float)y / GLFunctions::getScreenSize().y() * 2 );
+//
+//    QVector3D v0( px, py, -1 );
+//    QVector3D v1( px, py, 1 );
+//    QVector3D v2 = m_mvMatrix.inverted() * m_pMatrix.inverted() * v0;
+//    QVector3D v3 = m_mvMatrix.inverted() * m_pMatrix.inverted() * v1;
+//
+//    QVector3D result;
+//    bool hit = GLFunctions::linePlaneIntersection( result, v3 - v2, v2, QVector3D( 0, 0, 1 ), QVector3D( m_sliceXPosAtPick, m_sliceYPosAtPick, m_sliceZPosAtPick ) );
+//
+//    qDebug() << hit << result;
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
