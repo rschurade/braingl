@@ -86,31 +86,23 @@ void Dataset3D::createTexture()
     int ny = m_properties.get( Fn::Property::NY ).toInt();
     int nz = m_properties.get( Fn::Property::NZ ).toInt();
 
+    float div = 1.0;
     if ( type == DT_UNSIGNED_CHAR )
     {
-        float* data = new float[nx * ny * nz * 3];
-
-        int size = nx * ny * nz * 3;
-        for ( int i = 0; i < size; ++i )
-        {
-            data[i] = qMax( data[i], data[i] * -1.0f ) / 255;
-        }
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
+        div = 255.;
     }
 
-    if ( type == DT_FLOAT )
+    int blockSize = nx * ny * nz;
+    float* data = new float[blockSize * 3];
+
+    for ( int i = 0; i < blockSize; ++i )
     {
-        int blockSize = nx * ny * nz;
-        float* data = new float[blockSize * 3];
-
-        for ( int i = 0; i < blockSize; ++i )
-        {
-            data[i * 3] = fabs( m_data[i].x() );
-            data[i * 3 + 1] = fabs( m_data[i].y() );
-            data[i * 3 + 2] = fabs( m_data[i].z() );
-        }
-        glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
+        data[i * 3] = fabs( m_data[i].x() ) / div;
+        data[i * 3 + 1] = fabs( m_data[i].y() ) / div;
+        data[i * 3 + 2] = fabs( m_data[i].z() ) / div;
     }
+    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
+
 }
 
 void Dataset3D::flipX()
