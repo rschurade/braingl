@@ -38,9 +38,13 @@ public:
     int numVerts() { return m_numVerts; };
     int numTris() { return m_numTris; };
 
+    int bufferSize();
+
 private:
     void calcTriNormals();
     void calcVertNormals();
+
+    int m_bufferSize;
 
     int m_numVerts;
     int m_numTris;

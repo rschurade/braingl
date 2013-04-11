@@ -12,12 +12,13 @@
 #include <QDebug>
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
+    m_bufferSize( 11 ),
     m_numVerts( numVerts ),
     m_numTris( numTris ),
     m_vertexInsertId( 0 ),
     m_triangleInsertId( 0 )
 {
-    m_vertices.resize( numVerts * 11 );
+    m_vertices.resize( numVerts * m_bufferSize );
     m_vertIsInTriangle.resize( numVerts );
     m_vertNeighbors.resize( numVerts );
 
@@ -29,7 +30,7 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     // create threads
     for ( int i = 0; i < m_numThreads; ++i )
     {
-        m_threads.push_back( new MeshThread( &m_vertices, &m_triangles, m_numTris, i ) );
+        m_threads.push_back( new MeshThread( &m_vertices, &m_triangles, m_numTris, m_bufferSize, i ) );
     }
 }
 
@@ -37,17 +38,23 @@ TriangleMesh2::~TriangleMesh2()
 {
 }
 
+int TriangleMesh2::bufferSize()
+{
+    return m_bufferSize;
+}
+
 void TriangleMesh2::finalize()
 {
     calcTriNormals();
     calcVertNormals();
+    qDebug() << m_numVerts << "vertices";
 }
 
 void TriangleMesh2::addVertex( int id, float x, float y, float z )
 {
-    m_vertices[ id * 11     ] = x;
-    m_vertices[ id * 11 + 1 ] = y;
-    m_vertices[ id * 11 + 2 ] = z;
+    m_vertices[ id * m_bufferSize     ] = x;
+    m_vertices[ id * m_bufferSize + 1 ] = y;
+    m_vertices[ id * m_bufferSize + 2 ] = z;
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -88,20 +95,20 @@ void TriangleMesh2::setVertexColor( int id, QColor color )
 
 void TriangleMesh2::setVertexColor( int id, float r, float g, float b, float a )
 {
-    m_vertices[ id * 11 + 6  ] = r;
-    m_vertices[ id * 11 + 7 ] = g;
-    m_vertices[ id * 11 + 8 ] = b;
-    m_vertices[ id * 11 + 9 ] = a;
+    m_vertices[ id * m_bufferSize + 6  ] = r;
+    m_vertices[ id * m_bufferSize + 7 ] = g;
+    m_vertices[ id * m_bufferSize + 8 ] = b;
+    m_vertices[ id * m_bufferSize + 9 ] = a;
 }
 
 void TriangleMesh2::setVertexData( int id, float value )
 {
-    m_vertices[ id * 11 + 10 ] = value;
+    m_vertices[ id * m_bufferSize + 10 ] = value;
 }
 
 float TriangleMesh2::getVertexData( int id )
 {
-    return m_vertices[ id * 11 + 10 ];
+    return m_vertices[ id * m_bufferSize + 10 ];
 }
 
 float* TriangleMesh2::getVertices()
@@ -146,8 +153,8 @@ void TriangleMesh2::calcVertNormals()
             sum += m_triNormals[m_vertIsInTriangle[i][k]];
         }
         sum.normalize();
-        m_vertices[ 11 * i + 3 ] = sum.x();
-        m_vertices[ 11 * i + 4 ] = sum.y();
-        m_vertices[ 11 * i + 5 ] = sum.z();
+        m_vertices[ m_bufferSize * i + 3 ] = sum.x();
+        m_vertices[ m_bufferSize * i + 4 ] = sum.y();
+        m_vertices[ m_bufferSize * i + 5 ] = sum.z();
     }
 }

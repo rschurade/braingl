@@ -8,10 +8,11 @@
 
 #include "../../gui/gl/glfunctions.h"
 
-MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int id ) :
+MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int bufferSize, int id ) :
     m_vertices( vertices ),
     m_triangles( triangles ),
     m_numTris( numTris ),
+    m_bufferSize( bufferSize ),
     m_id( id )
 {
 }
@@ -46,13 +47,13 @@ void MeshThread::run()
 
     for ( int i = begin; i < end; ++i )
     {
-        v1x = m_vertices->at( 11 * m_triangles->at( 3 * i + 1 ) )     - m_vertices->at( 11 * m_triangles->at( 3 * i ) );
-        v1y = m_vertices->at( 11 * m_triangles->at( 3 * i + 1 ) + 1 ) - m_vertices->at( 11 * m_triangles->at( 3 * i ) + 1 );
-        v1z = m_vertices->at( 11 * m_triangles->at( 3 * i + 1 ) + 2 ) - m_vertices->at( 11 * m_triangles->at( 3 * i ) + 2 );
+        v1x = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 1 ) )     - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) );
+        v1y = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 1 ) + 1 ) - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) + 1 );
+        v1z = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 1 ) + 2 ) - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) + 2 );
 
-        v2x = m_vertices->at( 11 * m_triangles->at( 3 * i + 2 ) )     - m_vertices->at( 11 * m_triangles->at( 3 * i ) );
-        v2y = m_vertices->at( 11 * m_triangles->at( 3 * i + 2 ) + 1 ) - m_vertices->at( 11 * m_triangles->at( 3 * i ) + 1 );
-        v2z = m_vertices->at( 11 * m_triangles->at( 3 * i + 2 ) + 2 ) - m_vertices->at( 11 * m_triangles->at( 3 * i ) + 2 );
+        v2x = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 2 ) )     - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) );
+        v2y = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 2 ) + 1 ) - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) + 1 );
+        v2z = m_vertices->at( m_bufferSize * m_triangles->at( 3 * i + 2 ) + 2 ) - m_vertices->at( m_bufferSize * m_triangles->at( 3 * i ) + 2 );
 
         m_triNormals[i - begin].setX( v1y * v2z - v1z * v2y );
         m_triNormals[i - begin].setY( v1z * v2x - v1x * v2z );

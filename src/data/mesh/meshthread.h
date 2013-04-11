@@ -15,7 +15,7 @@
 class MeshThread : public QThread
 {
 public:
-    MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int id );
+    MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int bufferSize, int id );
     virtual ~MeshThread();
 
     QVector<QVector3D>* getTriNormals();
@@ -27,6 +27,7 @@ private:
     QVector<int>* m_triangles;
     QVector<QVector3D> m_triNormals;
     int m_numTris;
+    int m_bufferSize;
     int m_id;
 };
 
