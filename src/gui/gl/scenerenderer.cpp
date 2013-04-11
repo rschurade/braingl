@@ -343,7 +343,7 @@ void SceneRenderer::rightMouseDown( int x, int y )
 
     // get id
     m_picked = GLFunctions::get_object_id( x, y );
-    //qDebug() << "picked object id: " << m_picked;
+    qDebug() << "picked object id: " << m_picked;
 
     if ( Models::r()->rowCount() > 0 )
     {
