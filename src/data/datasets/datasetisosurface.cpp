@@ -157,3 +157,18 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
 }
+
+void DatasetIsosurface::mousePick( int pickId, QVector3D pos )
+{
+   if ( pickId == 0 )
+   {
+       return;
+   }
+   QVector<int>picked = m_mesh->pick( pos, 30 );
+   m_renderer->beginUpdateColor();
+   for ( int i = 0; i < picked.size(); ++i )
+   {
+       m_renderer->updateColor( picked[i], 1.0, 0.0, 0.0, 1.0 );
+   }
+   m_renderer->endUpdateColor();
+}

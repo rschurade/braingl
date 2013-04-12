@@ -10,7 +10,7 @@ void main()
    
     prepareLight();
 	
-	gl_FrontColor = vec4( 1.0 );
+	gl_FrontColor = a_color;
 	
 	v_texcoord = vec3( a_position.x / u_dims.x, a_position.y / u_dims.y, a_position.z / u_dims.z );
 	

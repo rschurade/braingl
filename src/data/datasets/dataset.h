@@ -36,6 +36,8 @@ public:
 
     virtual QString getValueAsString( int x, int y, int z );
 
+    virtual void mousePick( int pickId, QVector3D pos );
+
 protected:
     virtual void createTexture();
 

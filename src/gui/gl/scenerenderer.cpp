@@ -340,10 +340,25 @@ void SceneRenderer::rightMouseDown( int x, int y )
     //render_picking_scene();
     m_sliceRenderer->drawPick( m_mvpMatrix );
     renderRois();
+    renderDatasets();
 
     // get id
     m_picked = GLFunctions::get_object_id( x, y );
     qDebug() << "picked object id: " << m_picked;
+
+    QVector3D pickPos = mapMouse2World( x, y );
+
+    int countDatasets = Models::d()->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            ds->mousePick( m_picked, pickPos );
+        }
+    }
+
 
     if ( Models::r()->rowCount() > 0 )
     {
@@ -392,6 +407,19 @@ void SceneRenderer::rightMouseDrag( int x, int y )
     int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
     float slowDown = 4.0f * m_arcBall->getZoom();
+
+    QVector3D pickPos = mapMouse2World( x, y );
+
+    int countDatasets = Models::d()->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            ds->mousePick( m_picked, pickPos );
+        }
+    }
 
     switch ( m_picked )
     {
@@ -468,12 +496,8 @@ void SceneRenderer::rightMouseDrag( int x, int y )
 QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
 {
     GLint viewport[4];
-    //GLdouble modelview[16];
-    //GLdouble projection[16];
     GLfloat winX, winY;
 
-//  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-//  glGetDoublev( GL_PROJECTION_MATRIX, projection );
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     winX = (float) x;
@@ -492,4 +516,24 @@ QVector2D SceneRenderer::mapWorld2Mouse( float x, float y, float z )
     GLdouble winX, winY, winZ;
     gluProject( x, y, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &winX, &winY, &winZ );
     return QVector2D( winX, winY );
+}
+
+QVector3D SceneRenderer::mapMouse2World( float x, float y )
+{
+    GLint viewport[4];
+    GLfloat winX, winY;
+
+    glGetIntegerv( GL_VIEWPORT, viewport );
+
+    winX = (float) x;
+    winY = (float) viewport[3] - (float) y;
+
+    GLfloat z;
+    glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)&z);
+
+    GLdouble posX, posY, posZ;
+    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+
+    QVector3D v( posX, posY, posZ );
+    return v;
 }
