@@ -12,6 +12,7 @@
 #include <QVector3D>
 
 class MeshThread;
+class OcTree;
 
 class TriangleMesh2
 {
@@ -33,6 +34,8 @@ public:
     void finalize();
 
     float* getVertices();
+    float* getVertexColors();
+    float* getVertexPickColors();
     int* getIndexes();
 
     int numVerts() { return m_numVerts; };
@@ -40,9 +43,16 @@ public:
 
     int bufferSize();
 
+    QVector<int> pick( QVector3D pos, float radius );
+
+
+
 private:
     void calcTriNormals();
     void calcVertNormals();
+
+    void buildOcTree();
+    void collapseVertex( int toId, int toRemoveId );
 
     int m_bufferSize;
 
@@ -50,6 +60,8 @@ private:
     int m_numTris;
 
     QVector<float>m_vertices;
+    QVector<float>m_vertexColors;
+    QVector<float>m_vertexPickColors;
 
     QVector<QVector<int> >m_vertIsInTriangle;
     QVector<QVector<int> >m_vertNeighbors;
@@ -61,7 +73,14 @@ private:
     QVector<MeshThread*> m_threads;
 
     int m_vertexInsertId;
+    int m_colorInsertId;
     int m_triangleInsertId;
+
+
+    int m_startingPickId;
+
+    OcTree* m_ocTree;
+    QVector<int>m_toRemove;
 };
 
 #endif /* TRIANGLEMESH2_H_ */

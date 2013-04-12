@@ -26,6 +26,8 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     QString getValueAsString( int x, int y, int z );
 
+    void mousePick( int pickId, QVector3D pos );
+
 protected:
     void createTexture() {};
 

@@ -22,7 +22,8 @@
 MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     ObjectRenderer(),
     m_tris( 0 ),
-    vboIds( new GLuint[ 2 ] ),
+    vboIds( new GLuint[ 4 ] ),
+    m_pickId( GLFunctions::getPickIndex() ),
     m_mesh( mesh ),
     m_dirty( true ),
     m_colorMode( 0 ),
@@ -39,6 +40,8 @@ MeshRenderer::~MeshRenderer()
 {
     glDeleteBuffers(1, &( vboIds[ 0 ] ) );
     glDeleteBuffers(1, &( vboIds[ 1 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 2 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 3 ] ) );
 }
 
 void MeshRenderer::setMesh( TriangleMesh2* mesh )
@@ -49,7 +52,7 @@ void MeshRenderer::setMesh( TriangleMesh2* mesh )
 
 void MeshRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 4, vboIds );
 }
 
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
@@ -115,21 +118,32 @@ void MeshRenderer::setShaderVars()
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
-
     offset += sizeof(float) * 3;
+
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
     glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
-
     offset += sizeof(float) * 3;
-    int colorLocation = program->attributeLocation( "a_color" );
-    program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
 
-    offset += sizeof(float) * 4;
     int valueLocation = program->attributeLocation( "a_value" );
     program->enableAttributeArray( valueLocation );
     glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
+    offset += sizeof(float) * 1;
+
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    if( GLFunctions::isPicking() )
+    {
+        glShadeModel( GL_FLAT );
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    }
+    else
+    {
+        glShadeModel( GL_SMOOTH );
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    }
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0 );
 }
 
 void MeshRenderer::initGeometry()
@@ -139,8 +153,14 @@ void MeshRenderer::initGeometry()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numTris() * 3 * sizeof(GLuint), m_mesh->getIndexes(), GL_STATIC_DRAW );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numVerts() * bufferSize * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * bufferSize * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexColors(), GL_DYNAMIC_DRAW );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexPickColors(), GL_DYNAMIC_DRAW );
 
     m_dirty = false;
 }
@@ -156,3 +176,28 @@ void MeshRenderer::setRenderParams( PropertyGroup* props )
     m_color = props->get( Fn::Property::COLOR ).value<QColor>();
 }
 
+void MeshRenderer::beginUpdateColor()
+{
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    m_colorBufferPointer = (float*)glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+}
+
+void MeshRenderer::endUpdateColor()
+{
+    glUnmapBuffer( GL_ARRAY_BUFFER );
+    m_colorBufferPointer = 0;
+}
+
+void MeshRenderer::updateColor( int id, float r, float g, float b, float a )
+{
+    if ( id != -1 )
+    {
+        if( m_colorBufferPointer )
+        {
+            m_colorBufferPointer[ id * 4 ] = r;
+            m_colorBufferPointer[ id * 4 + 1] = g;
+            m_colorBufferPointer[ id * 4 + 2] = b;
+            m_colorBufferPointer[ id * 4 + 3] = a;
+        }
+    }
+}

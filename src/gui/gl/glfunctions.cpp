@@ -627,6 +627,11 @@ void GLFunctions::endPicking()
 {
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     GLFunctions::picking = false;
+    glDeleteTextures( 1, &GLFunctions::tex );
+    glDeleteFramebuffers( 1, &GLFunctions::fbo );
+    glDeleteRenderbuffers( 1, &GLFunctions::rbo );
+    glDeleteBuffers( 1, &GLFunctions::pbo_a );
+    glDeleteBuffers( 1, &GLFunctions::pbo_b );
 }
 
 bool GLFunctions::isPicking()

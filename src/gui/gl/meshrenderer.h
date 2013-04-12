@@ -25,6 +25,10 @@ public:
 
     void setMesh( TriangleMesh2* mesh );
 
+    void beginUpdateColor();
+    void endUpdateColor();
+    void updateColor( int id, float r, float g, float b, float a );
+
 protected:
     void setupTextures();
     void setShaderVars();
@@ -35,8 +39,10 @@ private:
     int m_tris;
 
     GLuint *vboIds;
+    int m_pickId;
 
     TriangleMesh2* m_mesh;
+    float* m_colorBufferPointer;
 
     bool m_dirty;
 

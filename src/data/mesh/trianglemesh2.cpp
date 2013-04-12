@@ -6,19 +6,25 @@
  */
 #include "trianglemesh2.h"
 #include "meshthread.h"
+#include "octree.h"
 
 #include "../../gui/gl/glfunctions.h"
 
 #include <QDebug>
 
 TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
-    m_bufferSize( 11 ),
+    m_bufferSize( 7 ),
     m_numVerts( numVerts ),
     m_numTris( numTris ),
     m_vertexInsertId( 0 ),
-    m_triangleInsertId( 0 )
+    m_colorInsertId( 0 ),
+    m_triangleInsertId( 0 ),
+    m_startingPickId( GLFunctions::getPickIndex() + 1 ),
+    m_ocTree( 0 )
 {
     m_vertices.resize( numVerts * m_bufferSize );
+    m_vertexColors.resize( numVerts * 4 );
+    m_vertexPickColors.resize( numVerts * 4 );
     m_vertIsInTriangle.resize( numVerts );
     m_vertNeighbors.resize( numVerts );
 
@@ -45,6 +51,11 @@ int TriangleMesh2::bufferSize()
 
 void TriangleMesh2::finalize()
 {
+    if ( m_ocTree == 0 )
+    {
+        buildOcTree();
+    }
+
     calcTriNormals();
     calcVertNormals();
     qDebug() << m_numVerts << "vertices";
@@ -55,6 +66,21 @@ void TriangleMesh2::addVertex( int id, float x, float y, float z )
     m_vertices[ id * m_bufferSize     ] = x;
     m_vertices[ id * m_bufferSize + 1 ] = y;
     m_vertices[ id * m_bufferSize + 2 ] = z;
+
+    m_vertexColors[ id * 4     ] = 1.0;
+    m_vertexColors[ id * 4 + 1 ] = 1.0;
+    m_vertexColors[ id * 4 + 2 ] = 1.0;
+    m_vertexColors[ id * 4 + 3 ] = 1.0;
+
+    int pickId = GLFunctions::getPickIndex();
+    float blue =  (float)(( pickId ) & 0xFF) / 255.f;
+    float green = (float)(( pickId >> 8 ) & 0xFF) / 255.f;
+    float red =   (float)(( pickId >> 16 ) & 0xFF) / 255.f;
+
+    m_vertexPickColors[ id * 4     ] = blue;
+    m_vertexPickColors[ id * 4 + 1 ] = green;
+    m_vertexPickColors[ id * 4 + 2 ] = red;
+    m_vertexPickColors[ id * 4 + 3 ] = 1.0;
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -62,7 +88,22 @@ void TriangleMesh2::addVertex( float x, float y, float z )
     m_vertices[ m_vertexInsertId++ ] = x;
     m_vertices[ m_vertexInsertId++ ] = y;
     m_vertices[ m_vertexInsertId++ ] = z;
-    m_vertexInsertId += 8;
+
+    m_vertexInsertId += 4;
+
+    int pickId = GLFunctions::getPickIndex();
+    float blue =  (float)(( pickId ) & 0xFF) / 255.f;
+    float green = (float)(( pickId >> 8 ) & 0xFF) / 255.f;
+    float red =   (float)(( pickId >> 16 ) & 0xFF) / 255.f;
+
+    m_vertexColors[ m_colorInsertId ] = 1.0;
+    m_vertexPickColors[ m_colorInsertId++ ] = blue;
+    m_vertexColors[ m_colorInsertId ] = 1.0;
+    m_vertexPickColors[ m_colorInsertId++ ] = green;
+    m_vertexColors[ m_colorInsertId ] = 1.0;
+    m_vertexPickColors[ m_colorInsertId++ ] = red;
+    m_vertexColors[ m_colorInsertId ] = 1.0;
+    m_vertexPickColors[ m_colorInsertId++ ] = 1.0;
 }
 
 void TriangleMesh2::addTriangle( int id, int v0, int v1, int v2 )
@@ -95,25 +136,35 @@ void TriangleMesh2::setVertexColor( int id, QColor color )
 
 void TriangleMesh2::setVertexColor( int id, float r, float g, float b, float a )
 {
-    m_vertices[ id * m_bufferSize + 6  ] = r;
-    m_vertices[ id * m_bufferSize + 7 ] = g;
-    m_vertices[ id * m_bufferSize + 8 ] = b;
-    m_vertices[ id * m_bufferSize + 9 ] = a;
+    m_vertexColors[ id * 4     ] = r;
+    m_vertexColors[ id * 4 + 1 ] = g;
+    m_vertexColors[ id * 4 + 2 ] = b;
+    m_vertexColors[ id * 4 + 3 ] = a;
 }
 
 void TriangleMesh2::setVertexData( int id, float value )
 {
-    m_vertices[ id * m_bufferSize + 10 ] = value;
+    m_vertices[ id * m_bufferSize + 7 ] = value;
 }
 
 float TriangleMesh2::getVertexData( int id )
 {
-    return m_vertices[ id * m_bufferSize + 10 ];
+    return m_vertices[ id * m_bufferSize + 7 ];
 }
 
 float* TriangleMesh2::getVertices()
 {
     return m_vertices.data();
+}
+
+float* TriangleMesh2::getVertexColors()
+{
+    return m_vertexColors.data();
+}
+
+float* TriangleMesh2::getVertexPickColors()
+{
+    return m_vertexPickColors.data();
 }
 
 int* TriangleMesh2::getIndexes()
@@ -158,3 +209,56 @@ void TriangleMesh2::calcVertNormals()
         m_vertices[ m_bufferSize * i + 5 ] = sum.z();
     }
 }
+
+void TriangleMesh2::buildOcTree()
+{
+    qDebug() << "start building OcTree";
+
+    m_ocTree = new OcTree( QVector3D( 0, 0, 0), 512 );
+    for( int i = 0; i < m_numVerts; ++i )
+    {
+        m_ocTree->insert( i, QVector3D( m_vertices[ m_bufferSize * i], m_vertices[ m_bufferSize * i + 1], m_vertices[ m_bufferSize * i + 2] ) );
+        /*
+        int id = m_ocTree->insert( i, QVector3D( m_vertices[ m_bufferSize * i], m_vertices[ m_bufferSize * i + 1], m_vertices[ m_bufferSize * i + 2] ) );
+
+        if ( id != -1 )
+        {
+            collapseVertex( id, i );
+        }
+        */
+    }
+    //qDebug() << "collapsed" << m_toRemove.size() << "vertexes";
+    qDebug() << "end building OcTree";
+}
+
+void TriangleMesh2::collapseVertex( int toId, int toRemoveId )
+{
+    m_toRemove.push_back( toRemoveId );
+    for( int i = 0; i < m_triangles.size(); ++i )
+    {
+        if( m_triangles[i] == toRemoveId )
+        {
+            m_triangles[i] = toId;
+        }
+    }
+}
+
+QVector<int> TriangleMesh2::pick( QVector3D pos, float radius )
+{
+    QVector<int> result;
+
+    for ( int i = 0; i < m_numVerts; ++i )
+    {
+        float d = ( QVector3D( m_vertices[i*m_bufferSize], m_vertices[i*m_bufferSize+1], m_vertices[i*m_bufferSize+2]) - pos ).lengthSquared();
+        if ( d < radius )
+        {
+            result.push_back( i );
+        }
+    }
+
+//    int result = m_ocTree->pick( pos, -1 );
+//    setVertexColor( result, 1.0, 0.0, 0.0, 1.0 );
+//    qDebug() << "picked vertex id:" << result;
+    return result;
+}
+

@@ -29,14 +29,14 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
 
     float min = 0; //std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::min();
-
+/*
     for ( int i = 0; i < mesh->numVerts(); ++i )
     {
         float value = mesh->getVertexData( i );
         min = qMin( min, value );
         max = qMax( max, value );
     }
-
+*/
     m_properties.set( Fn::Property::MIN, min );
     m_properties.set( Fn::Property::MAX, max );
     m_properties.set( Fn::Property::SELECTED_MIN, min, min, max, true );
@@ -65,4 +65,9 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 QString DatasetMesh::getValueAsString( int x, int y, int z )
 {
     return QString( "" );
+}
+
+void DatasetMesh::mousePick( int pickId, QVector3D pos )
+{
+    //m_renderer->updateColor( m_mesh->pick( pos ), 1.0, 0.0, 0.0, 1.0 );
 }
