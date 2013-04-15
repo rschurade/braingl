@@ -62,7 +62,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup*
 {
     setRenderParams( props );
 
-    if ( m_orient == 0 )
+    if ( m_orient == 0 || GLFunctions::isPicking() )
     {
         return;
     }
@@ -125,9 +125,9 @@ void SHRenderer::initGeometry()
     int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
     int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
-    xi = qMax( 0, qMin( xi, m_nx - 1) );
-    yi = qMax( 0, qMin( yi, m_ny - 1) );
-    zi = qMax( 0, qMin( zi, m_nz - 1) );
+    xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
+    yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
+    zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
     float zoom = model()->data( model()->index( (int)Fn::Global::ZOOM, 0 ) ).toFloat();
     float moveX = model()->data( model()->index( (int)Fn::Global::MOVEX, 0 ) ).toFloat();
@@ -152,9 +152,10 @@ void SHRenderer::initGeometry()
 
     QVector<SHRendererThread*> threads;
     // create threads
+
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi + m_offset, yi+ m_offset, zi+ m_offset, lod,
+        threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, lod,
                                                     m_order, m_orient, m_minMaxScaling, m_pMatrix, m_mvMatrix ) );
     }
 
@@ -211,7 +212,7 @@ void SHRenderer::initGeometry()
 void SHRenderer::setRenderParams( PropertyGroup* props )
 {
     m_scaling = props->get( Fn::Property::SCALING ).toFloat();
-    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+    m_offset = props->get( Fn::Property::OFFSET ).toInt();
     m_lodAdjust = props->get( Fn::Property::LOD ).toInt();
     m_minMaxScaling = props->get( Fn::Property::MINMAX_SCALING ).toBool();
     m_hideNegativeLobes = props->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
