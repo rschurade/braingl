@@ -582,13 +582,14 @@ uint GLFunctions::get_object_id( int x, int y )
     if (frame_event == 0)
     {
         frame_event = 1;
-        read_pbo = GLFunctions::pbo_b;
-        map_pbo = GLFunctions::pbo_a;
+        read_pbo = GLFunctions::pbo_a;
+        map_pbo = GLFunctions::pbo_b;
     }
     else {
         frame_event = 0;
-        map_pbo = GLFunctions::pbo_a;
         read_pbo = GLFunctions::pbo_b;
+        map_pbo = GLFunctions::pbo_a;
+
     }
     /* read one pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
@@ -676,12 +677,12 @@ QImage* GLFunctions::getOffscreenTexture()
     {
         frame_event = 1;
         read_pbo = GLFunctions::pbo_a;
-        map_pbo = GLFunctions::pbo_a;
+        map_pbo = GLFunctions::pbo_b;
     }
     else {
         frame_event = 0;
-        map_pbo = GLFunctions::pbo_a;
         read_pbo = GLFunctions::pbo_b;
+        map_pbo = GLFunctions::pbo_a;
     }
     /* read one pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;

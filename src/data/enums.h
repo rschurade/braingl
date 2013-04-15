@@ -127,6 +127,9 @@ namespace Fn
         COLOR,
         COLORMODE,
         DATAMODE,
+        PAINTMODE,
+        PAINTSIZE,
+        PAINTCOLOR,
         FIBER_RENDERMODE,
         FIBER_THICKNESS,
         HAS_TEXTURE,
@@ -197,6 +200,9 @@ namespace Fn
             case Property::COLOR: return QString( "color" ); break;
             case Property::COLORMODE: return QString( "color mode" ); break;
             case Property::DATAMODE: return QString( "select data" ); break;
+            case Property::PAINTMODE: return QString( "paint mode" ); break;
+            case Property::PAINTSIZE: return QString( "brush size" ); break;
+            case Property::PAINTCOLOR: return QString( "paint color" ); break;
             case Property::FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
             case Property::FIBER_THICKNESS: return QString( "fiber thickness" ); break;
             case Property::HAS_TEXTURE: return QString( "has frame" ); break;

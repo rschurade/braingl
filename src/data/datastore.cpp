@@ -134,7 +134,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
         ds->properties()->set( Fn::Property::ACTIVE, !ds->properties()->get( Fn::Property::ACTIVE ).toBool() );
         emit( dataChanged( index, index ) );
-        emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
     }
 
     if ( role == Qt::DisplayRole )
@@ -148,7 +147,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
             updateGlobals( m_datasetList.size() - 1 );
             emit( dataChanged( index, index ) );
-            emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
             return true;
         }
         // everything else
@@ -156,8 +154,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         {
             VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) )->properties()->set( (Fn::Property)index.column(), value );
         }
-        emit( dataChanged( index, index ) );
-        emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
         return true;
     }
     return false;
@@ -263,6 +259,5 @@ void DataStore::deleteItem( int row )
 bool DataStore::submit()
 {
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
-    emit( headerDataChanged( Qt::Horizontal, 0, 0 ) );
     return true;
 }
