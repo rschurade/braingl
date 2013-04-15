@@ -49,6 +49,10 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
 
+    m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
+    m_properties.set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
+    m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
+
 
     m_nX = m_properties.get( Fn::Property::NX ).toInt() - 1;
     m_nY = m_properties.get( Fn::Property::NY ).toInt() - 1;
@@ -164,11 +168,30 @@ void DatasetIsosurface::mousePick( int pickId, QVector3D pos )
    {
        return;
    }
-   QVector<int>picked = m_mesh->pick( pos, 30 );
-   m_renderer->beginUpdateColor();
-   for ( int i = 0; i < picked.size(); ++i )
+
+   int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
+   if (  paintMode != 0 )
    {
-       m_renderer->updateColor( picked[i], 1.0, 0.0, 0.0, 1.0 );
+       QColor color;
+       if ( paintMode == 1 )
+       {
+           color = m_properties.get( Fn::Property::PAINTCOLOR ).value<QColor>();
+       }
+       else if ( paintMode == 2 )
+       {
+           color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
+       }
+
+       QVector<int>picked = m_mesh->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
+
+       if ( picked.size() > 0 )
+       {
+           m_renderer->beginUpdateColor();
+           for ( int i = 0; i < picked.size(); ++i )
+           {
+               m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+           }
+           m_renderer->endUpdateColor();
+       }
    }
-   m_renderer->endUpdateColor();
 }

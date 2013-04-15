@@ -46,6 +46,8 @@ private:
 	void renderDatasets();
 	void renderRois();
 
+	void pick();
+
 	QVector3D mapMouse2World( int x, int y, int dir );
 	QVector2D mapWorld2Mouse( float x, float y, float z );
 	QVector3D mapMouse2World( float x, float y );

@@ -93,6 +93,11 @@ void GLWidget::mouseReleaseEvent( QMouseEvent *event )
     updateGL();
 }
 
+void GLWidget::enterEvent( QEvent *event )
+{
+    updateGL();
+}
+
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
      int numDegrees = event->delta() / 8;

@@ -27,6 +27,10 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
     m_properties.set( Fn::Property::COLORMAP_DY, 20, 1, 100, true );
     m_properties.set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, true );
 
+    m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
+    m_properties.set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
+    m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
+
     float min = 0; //std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::min();
 /*
@@ -69,5 +73,34 @@ QString DatasetMesh::getValueAsString( int x, int y, int z )
 
 void DatasetMesh::mousePick( int pickId, QVector3D pos )
 {
-    //m_renderer->updateColor( m_mesh->pick( pos ), 1.0, 0.0, 0.0, 1.0 );
+    if ( pickId == 0 )
+   {
+       return;
+   }
+
+   int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
+   if (  paintMode != 0 )
+   {
+       QColor color;
+       if ( paintMode == 1 )
+       {
+           color = m_properties.get( Fn::Property::PAINTCOLOR ).value<QColor>();
+       }
+       else if ( paintMode == 2 )
+       {
+           color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
+       }
+
+       QVector<int>picked = m_mesh->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
+
+       if ( picked.size() > 0 )
+       {
+           m_renderer->beginUpdateColor();
+           for ( int i = 0; i < picked.size(); ++i )
+           {
+               m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+           }
+           m_renderer->endUpdateColor();
+       }
+   }
 }

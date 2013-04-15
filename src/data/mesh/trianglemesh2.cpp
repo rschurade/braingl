@@ -51,10 +51,10 @@ int TriangleMesh2::bufferSize()
 
 void TriangleMesh2::finalize()
 {
-    if ( m_ocTree == 0 )
-    {
-        buildOcTree();
-    }
+//    if ( m_ocTree == 0 )
+//    {
+//        buildOcTree();
+//    }
 
     calcTriNormals();
     calcVertNormals();
@@ -256,9 +256,6 @@ QVector<int> TriangleMesh2::pick( QVector3D pos, float radius )
         }
     }
 
-//    int result = m_ocTree->pick( pos, -1 );
-//    setVertexColor( result, 1.0, 0.0, 0.0, 1.0 );
-//    qDebug() << "picked vertex id:" << result;
     return result;
 }
 
