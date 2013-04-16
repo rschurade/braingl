@@ -8,7 +8,7 @@
 #ifndef DATASETISOSURFACE_H_
 #define DATASETISOSURFACE_H_
 
-#include "dataset.h"
+#include "datasetmesh.h"
 
 #include "../mesh/isosurfaceincludes.h"
 
@@ -17,18 +17,13 @@ class MeshRenderer;
 class TriangleMesh2;
 class IsoSurfaceThread;
 
-class DatasetIsosurface : public Dataset
+class DatasetIsosurface : public DatasetMesh
 {
 public:
     DatasetIsosurface( DatasetScalar* ds );
     virtual ~DatasetIsosurface();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
-    QString getValueAsString( int x, int y, int z );
-
-    void mousePick( int pickId, QVector3D pos );
-
-    TriangleMesh2* getMesh();
 
 protected:
     void createTexture() {};
@@ -38,10 +33,6 @@ private:
     void renameVerticesAndTriangles();
 
     QVector<float> m_scalarField;
-
-    TriangleMesh2* m_mesh;
-
-    MeshRenderer* m_renderer;
 
     float m_oldIsoValue;
 

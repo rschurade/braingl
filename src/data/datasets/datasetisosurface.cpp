@@ -6,6 +6,7 @@
  */
 #include "datasetisosurface.h"
 
+#include "datasetmesh.h"
 #include "datasetscalar.h"
 #include "isosurfacethread.h"
 
@@ -19,9 +20,7 @@
 #include <QString>
 
 DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
-        Dataset( QString( "isosurface" ), Fn::DatasetType::MESH_ISOSURFACE ),
-        m_mesh( 0 ),
-        m_renderer( 0 ),
+        DatasetMesh( QString( "isosurface" ), Fn::DatasetType::MESH_ISOSURFACE ),
         m_oldIsoValue( -1 )
 {
     m_scalarField = *(ds->getData() );
@@ -38,21 +37,6 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties.set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
     m_properties.set( Fn::Property::NAME, QString( "isosurface" ) );
     m_properties.set( Fn::Property::ISO_VALUE, 80.0f, ds->properties()->get( Fn::Property::MIN ).toFloat(), ds->properties()->get( Fn::Property::MAX ).toFloat(), true );
-
-    m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
-    m_properties.set( Fn::Property::COLORMODE, { "user", "mri" }, 0, true );
-    m_properties.set( Fn::Property::COLORMAP, 1 );
-    m_properties.set( Fn::Property::MIN, 0.0f );
-    m_properties.set( Fn::Property::MAX, 1.0f );
-    m_properties.set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-    m_properties.set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-
-    m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
-    m_properties.set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
-    m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
-
 
     m_nX = m_properties.get( Fn::Property::NX ).toInt() - 1;
     m_nY = m_properties.get( Fn::Property::NY ).toInt() - 1;
@@ -74,41 +58,12 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     {
         m_threads.push_back( new IsoSurfaceThread( &m_scalarField, mutex, &m_i2pt3idVertices, &m_trivecTriangles, m_nX, m_nY, m_nZ, m_dX, m_dY, m_dZ, i ) );
     }
+
+    generateSurface();
 }
 
 DatasetIsosurface::~DatasetIsosurface()
 {
-}
-
-TriangleMesh2* DatasetIsosurface::getMesh()
-{
-    return m_mesh;
-}
-
-void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
-{
-    if ( m_renderer == 0 )
-    {
-        m_renderer = new MeshRenderer( m_mesh );
-        m_renderer->setModel( Models::g() );
-        m_renderer->init();
-    }
-
-    m_isoLevel = m_properties.get( Fn::Property::ISO_VALUE ).toFloat();
-    if ( m_oldIsoValue != m_isoLevel )
-    {
-        delete m_mesh;
-        generateSurface();
-        m_oldIsoValue = m_isoLevel;
-        m_renderer->setMesh( m_mesh );
-    }
-
-    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
-}
-
-QString DatasetIsosurface::getValueAsString( int x, int y, int z )
-{
-    return QString( "" );
 }
 
 void DatasetIsosurface::generateSurface()
@@ -167,37 +122,23 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     m_trivecTriangles.clear();
 }
 
-void DatasetIsosurface::mousePick( int pickId, QVector3D pos )
+void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
-   if ( pickId == 0 )
-   {
-       return;
-   }
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new MeshRenderer( m_mesh );
+        m_renderer->setModel( Models::g() );
+        m_renderer->init();
+    }
 
-   int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
-   if (  paintMode != 0 )
-   {
-       QColor color;
-       if ( paintMode == 1 )
-       {
-           color = m_properties.get( Fn::Property::PAINTCOLOR ).value<QColor>();
-       }
-       else if ( paintMode == 2 )
-       {
-           color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
-       }
+    m_isoLevel = m_properties.get( Fn::Property::ISO_VALUE ).toFloat();
+    if ( m_oldIsoValue != m_isoLevel )
+    {
+        delete m_mesh;
+        generateSurface();
+        m_oldIsoValue = m_isoLevel;
+        m_renderer->setMesh( m_mesh );
+    }
 
-       QVector<int>picked = m_mesh->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
-
-       if ( picked.size() > 0 )
-       {
-           m_renderer->beginUpdateColor();
-           for ( int i = 0; i < picked.size(); ++i )
-           {
-               m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-               m_mesh->setVertexColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-           }
-           m_renderer->endUpdateColor();
-       }
-   }
+    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
 }
