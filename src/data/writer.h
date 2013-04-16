@@ -14,6 +14,8 @@
 
 #include <QString>
 
+class TriangleMesh2;
+
 class Writer
 {
 public:
@@ -31,6 +33,7 @@ private:
     void setDescrip( nifti_image* hdr, QString descrip );
 
     void saveFibs( QString filename );
+    void saveMeshVTK( QString filename, TriangleMesh2* mesh );
 
     template< class T > T switchByteOrder( const T value )
     {

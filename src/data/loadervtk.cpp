@@ -20,7 +20,9 @@ LoaderVTK::LoaderVTK( QString fn ) :
     m_numPoints( 0 ),
     m_numPrimitives( 0 ),
     m_primitiveSize( 0 ),
-    m_binFileSize( 0 )
+    m_binFileSize( 0 ),
+    m_hasPointData( false ),
+    m_hasPointColors( false )
 {
 }
 
@@ -52,6 +54,12 @@ QVector<QVector<float> > LoaderVTK::getPointData()
 {
     return m_pointData;
 }
+
+QVector<float> LoaderVTK::getPointColors()
+{
+    return m_pointColors;
+}
+
 
 QVector<QString>LoaderVTK::getDataNames()
 {
@@ -195,7 +203,8 @@ bool LoaderVTK::loadAscii()
     {
         return false;
     }
-    loadPointDataAscii();
+    m_hasPointData = loadPointDataAscii();
+    m_hasPointColors = loadPointColorsAscii();
 
     return true;
 }
@@ -379,11 +388,59 @@ bool LoaderVTK::loadPointDataAscii()
     return false;
 }
 
+bool LoaderVTK::loadPointColorsAscii()
+{
+    QString line;
+    QStringList tokens;
+    m_file->seek( 0 );
+    QTextStream in( m_file );
+
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        if ( line.startsWith( "POINT_DATA") )
+        {
+            line = in.readLine();
+            if ( line.startsWith( "COLOR_SCALARS") )
+            {
+                break;
+            }
+        }
+    }
+    if ( !line.startsWith( "COLOR_SCALARS") )
+    {
+        return false;
+    }
+
+    while( !in.atEnd() )
+    {
+        line = in.readLine();
+        tokens = line.split( " ", QString::SkipEmptyParts );
+
+        for ( int i = 0; i < tokens.size(); ++i )
+        {
+            m_pointColors.push_back( tokens[i].toFloat() );
+        }
+
+        if ( m_pointColors.size() == m_numPoints * 3 )
+        {
+            break;
+        }
+    }
+    if ( m_pointColors.size() != ( m_numPoints * 3 ) )
+    {
+        m_status = "*ERROR* unexpected EOF while loading POINT COLORS in file" + m_filename;
+        return false;
+    }
+
+    return true;
+}
+
 bool LoaderVTK::loadBinary()
 {
     QDataStream in( m_file );
     m_binFileSize = m_file->size();
-    qDebug() << m_binFileSize;
+
     m_binaryFile = new char[ m_binFileSize ];
     m_file->seek( 0 );
     int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
@@ -398,6 +455,7 @@ bool LoaderVTK::loadBinary()
     {
         return false;
     }
+    m_hasPointColors = loadPointColorsBinary();
     return true;
 }
 
@@ -409,7 +467,6 @@ bool LoaderVTK::loadPointsBinary()
     if ( pos != -1 )
     {
         line = getStringFromBinaryFile( pos );
-        qDebug() << line;
         tokens = line.split( " ", QString::SkipEmptyParts );
         if ( ( tokens.size() == 3 ) && line.startsWith( "POINTS") && line.endsWith( "float") )
         {
@@ -479,7 +536,7 @@ bool LoaderVTK::loadPrimitivesBinary()
     }
 
     line = getStringFromBinaryFile( pos );
-    qDebug() << line;
+
     tokens = line.split( " ", QString::SkipEmptyParts );
 
     if ( tokens.size() == 3 )
@@ -517,6 +574,42 @@ bool LoaderVTK::loadPrimitivesBinary()
     }
 
     delete rawPrimitiveData;
+
+    return true;
+}
+
+bool LoaderVTK::loadPointColorsBinary()
+{
+    QString line;
+    QStringList tokens;
+
+    int pos = searchBinaryFile( "POINT_DATA" );
+    line = getStringFromBinaryFile( pos );
+    pos = pos + line.size() + 1;
+    line = getStringFromBinaryFile( pos );
+
+    char* colorField = new char[ m_numPoints * sizeof( int ) * 3];
+
+    int begin = pos + line.size() + 1;
+    int end = begin + ( m_numPoints * sizeof( int ) * 3 );
+
+    int i, j;
+    for ( i = begin, j = 0; i < end; ++i, ++j )
+    {
+        colorField[j] = m_binaryFile[i];
+    }
+
+    float* rawColorData = reinterpret_cast<float*>( colorField );
+    switchByteOrderOfArray< float >( rawColorData, m_numPoints * 3 );
+
+    m_pointColors.resize( m_numPoints * 3 );
+
+    for ( int k = 0; k < m_numPoints*3; ++k )
+    {
+        m_pointColors[k] = rawColorData[k];
+    }
+
+    delete rawColorData;
 
     return true;
 }

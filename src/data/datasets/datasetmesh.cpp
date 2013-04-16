@@ -53,6 +53,11 @@ DatasetMesh::~DatasetMesh()
 {
 }
 
+TriangleMesh2* DatasetMesh::getMesh()
+{
+    return m_mesh;
+}
+
 void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 {
     if ( m_renderer == 0 )
@@ -99,6 +104,7 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos )
            for ( int i = 0; i < picked.size(); ++i )
            {
                m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+               m_mesh->setVertexColor( picked[i], color );
            }
            m_renderer->endUpdateColor();
        }
