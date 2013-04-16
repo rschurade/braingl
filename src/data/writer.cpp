@@ -14,6 +14,10 @@
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 #include "datasets/datasetfibers.h"
+#include "datasets/datasetmesh.h"
+#include "datasets/datasetisosurface.h"
+
+#include "mesh/trianglemesh2.h"
 
 #include <QDebug>
 
@@ -282,6 +286,18 @@ bool Writer::save()
             saveFibs( m_fileName );
             break;
         }
+        case Fn::DatasetType::MESH_BINARY:
+        {
+            TriangleMesh2* mesh = dynamic_cast<DatasetMesh*>( m_dataset )->getMesh();
+            saveMeshVTK( m_fileName, mesh );
+            break;
+        }
+        case Fn::DatasetType::MESH_ISOSURFACE:
+        {
+            TriangleMesh2* mesh = dynamic_cast<DatasetIsosurface*>( m_dataset )->getMesh();
+            saveMeshVTK( m_fileName, mesh );
+            break;
+        }
         default:
             break;
     }
@@ -418,4 +434,75 @@ void Writer::saveFibs( QString filename )
 //    out.write( reinterpret_cast< char* >( rawFAData ), sizeof( float ) * numPoints );
 //    out << lineDelimiter;
     out.close();
+}
+
+void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
+{
+    int bufferSize = mesh->bufferSize();
+    float* points = mesh->getVertices();
+    int* indexes = mesh->getIndexes();
+    float* colors = mesh->getVertexColors();
+
+    int numPoints = mesh->numVerts();
+    int numTris = mesh->numTris();
+
+    float* pointsOut = new float[ numPoints * 3 ];
+    float* colorsOut = new float[ numPoints * 3 ];
+    int* trisOut = new int[numTris*4];
+
+    for ( int i = 0; i < numTris; ++i )
+    {
+        trisOut[ 4 * i    ] = 3;
+        trisOut[4 * i + 1 ] = indexes[ 3 * i ];
+        trisOut[4 * i + 2 ] = indexes[ 3 * i + 1];
+        trisOut[4 * i + 3 ] = indexes[ 3 * i + 2];
+    }
+
+    for ( int i = 0; i < numPoints; ++i )
+    {
+        pointsOut[3*i  ] = points[bufferSize * i];
+        pointsOut[3*i+1] = points[bufferSize * i+1];
+        pointsOut[3*i+2] = points[bufferSize * i+2];
+        colorsOut[3*i  ] = colors[4*i];
+        colorsOut[3*i+1] = colors[4*i+1];
+        colorsOut[3*i+2] = colors[4*i+2];
+    }
+
+    switchByteOrderOfArray< float >( pointsOut, numPoints * 3 );
+    switchByteOrderOfArray< float >( colorsOut, numPoints * 3 );
+    switchByteOrderOfArray< int >( trisOut, numTris * 4 );
+
+
+    using std::fstream;
+    fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
+    if( !out || out.bad() )
+    {
+        // error
+    }
+    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
+    char lineDelimiter = '\n';
+
+    out << "# vtk DataFile Version 3.0" << lineDelimiter;
+    out << "Fibernavigator 2 Mesh" << lineDelimiter;
+    out << "BINARY" << lineDelimiter;
+    out << "DATASET POLYDATA" << lineDelimiter;
+
+    out << "POINTS " << numPoints << " float" << lineDelimiter;
+    out.write( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
+    out << lineDelimiter;
+
+    out << "POLYGONS " << numTris << " " << numTris * 4 << lineDelimiter;
+    out.write( reinterpret_cast< char* >( trisOut ), sizeof( int ) * ( numTris * 4 ) );
+    out << lineDelimiter;
+
+    out << "POINT_DATA " << numPoints << lineDelimiter;
+    out << "COLOR_SCALARS Colors 3" << lineDelimiter;
+    out.write( reinterpret_cast< char* >( colorsOut ), sizeof( float ) * numPoints * 3 );
+    out << lineDelimiter;
+
+    out.close();
+
+    delete[] pointsOut;
+    delete[] colorsOut;
+    delete[] trisOut;
 }

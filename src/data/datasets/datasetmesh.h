@@ -26,6 +26,8 @@ public:
 
     void mousePick( int pickId, QVector3D pos );
 
+    TriangleMesh2* getMesh();
+
 private:
     TriangleMesh2* m_mesh;
     MeshRenderer* m_renderer;

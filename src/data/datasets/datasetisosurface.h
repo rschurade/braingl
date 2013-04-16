@@ -28,6 +28,8 @@ public:
 
     void mousePick( int pickId, QVector3D pos );
 
+    TriangleMesh2* getMesh();
+
 protected:
     void createTexture() {};
 

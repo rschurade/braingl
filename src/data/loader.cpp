@@ -1019,6 +1019,15 @@ bool Loader::loadVTK()
             }
         }
 
+        QVector<float>colors = lv->getPointColors();
+        if( colors.size() == points.size() )
+        {
+            for ( int i = 0; i < numPoints; ++i )
+            {
+                mesh->setVertexColor( i, colors[i*3], colors[i*3+1], colors[i*3+2], 1.0 );
+            }
+        }
+
         mesh->finalize();
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
         m_dataset.push_back( dataset );

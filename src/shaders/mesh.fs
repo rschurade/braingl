@@ -13,7 +13,11 @@ void main()
     }
     else
     {
-        if ( u_colorMode == 1 )
+        if ( u_colorMode == 0 )
+        {
+            light( u_color );
+        }
+        else if ( u_colorMode == 1 )
         {
             vec4 color = texColor( v_texcoord );
         
