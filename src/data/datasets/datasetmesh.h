@@ -17,20 +17,27 @@ class MeshRenderer;
 
 class DatasetMesh: public Dataset
 {
+    Q_OBJECT
+
 public:
     DatasetMesh( TriangleMesh2* mesh, QString filename = QString( "new mesh" ) );
+    DatasetMesh( QString filename, Fn::DatasetType type );
     virtual ~DatasetMesh();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     QString getValueAsString( int x, int y, int z );
 
     void mousePick( int pickId, QVector3D pos );
 
     TriangleMesh2* getMesh();
 
-private:
+protected:
     TriangleMesh2* m_mesh;
     MeshRenderer* m_renderer;
+
+private slots:
+    void paintModeChanged( int mode );
+
 };
 
 #endif /* DATASETMESH_H_ */

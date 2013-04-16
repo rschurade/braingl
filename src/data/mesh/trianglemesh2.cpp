@@ -58,7 +58,7 @@ void TriangleMesh2::finalize()
 
     calcTriNormals();
     calcVertNormals();
-    qDebug() << m_numVerts << "vertices";
+    //qDebug() << m_numVerts << "vertices";
 }
 
 void TriangleMesh2::addVertex( int id, float x, float y, float z )
