@@ -57,6 +57,8 @@ public:
                                                  QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                  QVector<QVector3D>& evec3, QVector<float>& eval3 );
 
+    static bool linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord);
+
 
     static Matrix expT( Matrix& t );
 
