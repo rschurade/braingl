@@ -1209,3 +1209,29 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
     }
 
 }
+
+bool FMath::linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord )
+{
+    // calculate plane
+    float d = QVector3D::dotProduct( normal, coord );
+
+    if ( QVector3D::dotProduct( normal, ray ) == 0 )
+    {
+        return false; // avoid divide by zero
+    }
+
+    // Compute the t value for the directed line ray intersecting the plane
+    float t = ( d - QVector3D::dotProduct( normal, rayOrigin ) ) / QVector3D::dotProduct( normal, ray );
+
+    // scale the ray by t
+    QVector3D newRay = ray * t;
+
+    // calc contact point
+    contact = rayOrigin + newRay;
+
+    if ( t >= 0.0f && t <= 1.0f )
+    {
+        return true; // line intersects plane
+    }
+    return false; // line does not
+}
