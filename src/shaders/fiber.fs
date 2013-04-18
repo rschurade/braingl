@@ -1,30 +1,34 @@
 #include colormap_fs
 #include textures_fs
 #include uniforms_fs
+#include peel_fs
 
 varying float v_discard;
 
 void main()
 {
+    vec3 color = gl_Color.rgb;
     if ( v_discard > 0.0 )
     {
         discard;
     }
     if ( u_colorMode == 3 )
     {
-        vec4 color = texColor( v_texcoord );
+        vec4 tcolor = texColor( v_texcoord );
 	    
-	    if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
+	    if ( !( tcolor.r + tcolor.g + tcolor.b > 0.0 ) ) discard;
 	    
-	    gl_FragColor = color;
+	    color = tcolor.rgb;
     }
     else if ( u_colorMode == 4 )
     {
-        vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 );
-        gl_FragColor = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
+        vec4 mcolor = vec4( 0.0, 0.0, 0.0, 1.0 );
+        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, mcolor ).rgb;
     }
     else
     {
-        gl_FragColor = gl_Color;
+        color = gl_Color.rgb;
     }
+    
+    writePeel( color );
 }

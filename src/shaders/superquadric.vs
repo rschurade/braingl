@@ -1,6 +1,7 @@
 #version 120
 
 #include uniforms_vs
+#include peel_vs
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 1: varyings
@@ -284,7 +285,8 @@ void main()
                                    0.0, 0.0, 0.0, 1.0 );
 
     normal.w = 0.0;
-    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + glyphSystem * glyphScale * normal );
+    v_position = mvp_matrix * ( vec4( a_position, 1.0 ) + glyphSystem * glyphScale * normal );
+    gl_Position = v_position;
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     // 5: Transform light and plane as well as ray back to glyph space

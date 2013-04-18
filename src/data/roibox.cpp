@@ -40,6 +40,7 @@ ROIBox::ROIBox() :
     m_properties.set( Fn::ROI::DZ, 20., 0., zMax/2, true );
     m_properties.set( Fn::ROI::TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::ROI::ALPHA, 0.4f, 0.f, 1.f, true );
     m_properties.set( Fn::ROI::ID, m_count );
     m_properties.set( Fn::ROI::PICK_ID, 0 );
     m_properties.set( Fn::ROI::STICK_TO_CROSSHAIR, false, true );
@@ -101,7 +102,7 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         float dy = m_properties.get( Fn::ROI::DY ).toFloat();
         float dz = m_properties.get( Fn::ROI::DZ ).toFloat();
         QColor color = m_properties.get( Fn::ROI::COLOR ).value<QColor>();
-        color.setAlphaF( 0.4 );
+        color.setAlphaF( m_properties.get( Fn::ROI::ALPHA ).toFloat() );
         int pickID = m_properties.get( Fn::ROI::PICK_ID ).toInt();
 
     if ( m_properties.get( Fn::ROI::RENDER).toBool() )

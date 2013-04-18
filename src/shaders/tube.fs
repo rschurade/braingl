@@ -1,6 +1,7 @@
 #include colormap_fs
 #include textures_fs
 #include uniforms_fs
+#include peel_fs
 
 varying float v_sparam; // s parameter of texture [-1..1]
 varying float v_tangent_dot_view;
@@ -26,6 +27,6 @@ void main()
     float view_dot_normal = sqrt( 1. - v_sparam * v_sparam ) + .1;    
     color = clamp( view_dot_normal * ( color + 0.15 * pow( view_dot_normal, 10. ) * pow( v_tangent_dot_view, 10. ) ), 0., 1. );
     color.a = 1.0;
-    gl_FragColor = color;
     
+    writePeel( color.rgb );
 }

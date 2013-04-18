@@ -19,6 +19,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
     m_properties.set( Fn::Property::COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
+    m_properties.set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
 
     m_properties.set( Fn::Property::RENDER_COLORMAP, false, true );
     m_properties.set( Fn::Property::COLORMAP_X, 50, 1, 2000, true );
@@ -59,6 +60,7 @@ DatasetMesh::DatasetMesh( QString fileName, Fn::DatasetType type ) :
     m_properties.set( Fn::Property::COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
+    m_properties.set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
 
     m_properties.set( Fn::Property::RENDER_COLORMAP, false, true );
     m_properties.set( Fn::Property::COLORMAP_X, 50, 1, 2000, true );

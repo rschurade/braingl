@@ -38,6 +38,7 @@ float GLFunctions::scaleY = 1.0;
 
 int GLFunctions::screenWidth = 0;
 int GLFunctions::screenHeight = 0;
+int GLFunctions::renderMode = 0;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
@@ -186,6 +187,8 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderIncludes[ "lighting_fs" ] = copyShaderToString( "lighting", QString("fs") );
         GLFunctions::m_shaderIncludes[ "uniforms_vs" ] = copyShaderToString( "uniforms", QString("vs") );
         GLFunctions::m_shaderIncludes[ "uniforms_fs" ] = copyShaderToString( "uniforms", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "peel_vs" ] = copyShaderToString( "peel", QString("vs") );
+        GLFunctions::m_shaderIncludes[ "peel_fs" ] = copyShaderToString( "peel", QString("fs") );
 
         updateColormapShader();
 
@@ -203,6 +206,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "box" );
         GLFunctions::m_shaderNames.push_back( "sphere" );
         GLFunctions::m_shaderNames.push_back( "text" );
+        GLFunctions::m_shaderNames.push_back( "merge" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
@@ -350,6 +354,9 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
     program->setUniformValue( "u_texActive2", false );
     program->setUniformValue( "u_texActive3", false );
     program->setUniformValue( "u_texActive4", false );
+
+    program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
 
     QList< int > tl = getTextureIndexes();
     QAbstractItemModel* model = Models::d();
@@ -622,6 +629,7 @@ void GLFunctions::beginPicking()
 {
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
     GLFunctions::picking = true;
+    GLFunctions::renderMode = 1;
 }
 
 void GLFunctions::endPicking()
@@ -743,29 +751,78 @@ void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
 }
 
-bool GLFunctions::linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord )
+QHash< QString, GLuint > GLFunctions::peelTextures;
+GLuint GLFunctions::peelRBO = 0;
+GLuint GLFunctions::peelFBO = 0;
+
+
+void GLFunctions::initPeel()
 {
-    // calculate plane
-    float d = QVector3D::dotProduct( normal, coord );
+    GLFunctions::peelTextures[ "C0" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "C1" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "C2" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "C3" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "D0" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "D1" ] = createPeelTexture();
+    GLFunctions::peelTextures[ "D2" ] = createPeelTexture();
 
-    if ( QVector3D::dotProduct( normal, ray ) == 0 )
+    qDebug() << GLFunctions::screenWidth << GLFunctions::screenHeight;
+    /* create a framebuffer object */
+    glGenFramebuffers( 1, &GLFunctions::peelFBO );
+    /* attach the texture and the render buffer to the frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::peelFBO );
+
+    /* create a renderbuffer object for the depth buffer */
+    glGenRenderbuffers( 1, &GLFunctions::peelRBO );
+    /* bind the texture */
+    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::peelRBO );
+    /* create the render buffer in the GPU */
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, GLFunctions::screenWidth, GLFunctions::screenHeight );
+
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::peelTextures["C0"], 0 );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::peelRBO );
+    /* check the frame buffer */
+    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
     {
-        return false; // avoid divide by zero
+        /* handle an error : frame buffer incomplete */
+        qDebug() << "frame buffer incomplete";
     }
 
-    // Compute the t value for the directed line ray intersecting the plane
-    float t = ( d - QVector3D::dotProduct( normal, rayOrigin ) ) / QVector3D::dotProduct( normal, ray );
-
-    // scale the ray by t
-    QVector3D newRay = ray * t;
-
-    // calc contact point
-    contact = rayOrigin + newRay;
-
-    if ( t >= 0.0f && t <= 1.0f )
-    {
-        return true; // line intersects plane
-    }
-    return false; // line does not
+    /* unbind the render buffer */
+    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
+GLuint GLFunctions::createPeelTexture()
+{
+    /* generate a texture id */
+    GLuint ptex;
+    glGenTextures( 1, &ptex );
+    /* bind the texture */
+    glBindTexture( GL_TEXTURE_2D, ptex );
+    /* set texture parameters */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    /* create the texture in the GPU */
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GLFunctions::screenWidth, GLFunctions::screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+    /* unbind the texture */
+    glBindTexture( GL_TEXTURE_2D, 0 );
+
+    return ptex;
+}
+
+void GLFunctions::setRenderTarget( QString target )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::peelFBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::peelTextures[target], 0 );
+
+//    GLenum DrawBuffers[2] = {GL_COLOR_ATTACHMENT0};
+//    glDrawBuffers(1, DrawBuffers);
+}
+
+GLuint GLFunctions::getPeelTexture( QString name )
+{
+    return GLFunctions::peelTextures[name];
+}

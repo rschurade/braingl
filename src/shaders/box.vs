@@ -1,6 +1,7 @@
 #version 120
 
 #include uniforms_vs
+#include peel_vs
 
 void main()
 {
@@ -9,5 +10,7 @@ void main()
     pos.y = ( pos.y * u_dy ) + u_y;
     pos.z = ( pos.z * u_dz ) + u_z;
     
-    gl_Position = mvp_matrix * vec4( pos, 1.0 );     
+    v_position = mvp_matrix * vec4( pos, 1.0 );
+    
+    gl_Position = v_position;      
 }

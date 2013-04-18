@@ -43,20 +43,50 @@ void FiberRenderer::init()
 
 void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
-    GLFunctions::getShader( "fiber" )->bind();
+    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
+    int renderMode = GLFunctions::renderMode;
+    if ( renderMode != 1 ) // we are not picking
+    {
+        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        {
+            if ( alpha < 1.0 )
+            {
+                // obviously not opaque
+                return;
+            }
+        }
+        else // we are drawing tranparent objects
+        {
+            if ( !(alpha < 1.0 ) )
+            {
+                // not transparent
+                return;
+            }
+        }
+    }
+
+    QGLShaderProgram* program = GLFunctions::getShader( "fiber" );
+    program->bind();
 
     GLFunctions::setupTextures();
     GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) );
 
     // Set modelview-projection matrix
-    GLFunctions::getShader( "fiber" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
     initGeometry();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars( props );
+
+    program->setUniformValue( "u_alpha", alpha );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
 
     glLineWidth( props->get( Fn::Property::FIBER_THICKNESS ).toFloat() );
 
@@ -78,7 +108,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGro
         {
             if ( selected->at( i ) )
             {
-                GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", m_colorField[i].redF(),
+                program->setUniformValue( "u_color", m_colorField[i].redF(),
                                                                                  m_colorField[i].greenF(),
                                                                                  m_colorField[i].blueF(), 1.0 );
                 glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
@@ -122,20 +152,19 @@ void FiberRenderer::setShaderVars( PropertyGroup* props )
     program->enableAttributeArray( extraLocation );
     glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colorMode", props->get( Fn::Property::COLORMODE ).toInt() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_colormap", props->get( Fn::Property::COLORMAP ).toInt() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMin", props->get( Fn::Property::SELECTED_MIN ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_selectedMax", props->get( Fn::Property::SELECTED_MAX ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_upperThreshold", props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dx", props->get( Fn::Property::DX ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dy", props->get( Fn::Property::DY ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_dz", props->get( Fn::Property::DZ ).toFloat() );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_x", props->get( Fn::Property::NX ).toFloat() / 10.f );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_y", props->get( Fn::Property::NY ).toFloat() / 10.f );
-    GLFunctions::getShader( "fiber" )->setUniformValue( "u_z", props->get( Fn::Property::NZ ).toFloat() / 10.f );
-
+    program->setUniformValue( "u_colorMode", props->get( Fn::Property::COLORMODE ).toInt() );
+    program->setUniformValue( "u_colormap", props->get( Fn::Property::COLORMAP ).toInt() );
+    program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
+    program->setUniformValue( "u_selectedMin", props->get( Fn::Property::SELECTED_MIN ).toFloat() );
+    program->setUniformValue( "u_selectedMax", props->get( Fn::Property::SELECTED_MAX ).toFloat() );
+    program->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_upperThreshold", props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_dx", props->get( Fn::Property::DX ).toFloat() );
+    program->setUniformValue( "u_dy", props->get( Fn::Property::DY ).toFloat() );
+    program->setUniformValue( "u_dz", props->get( Fn::Property::DZ ).toFloat() );
+    program->setUniformValue( "u_x", props->get( Fn::Property::NX ).toFloat() / 10.f );
+    program->setUniformValue( "u_y", props->get( Fn::Property::NY ).toFloat() / 10.f );
+    program->setUniformValue( "u_z", props->get( Fn::Property::NZ ).toFloat() / 10.f );
 }
 
 void FiberRenderer::initGeometry()

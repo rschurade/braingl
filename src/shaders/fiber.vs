@@ -1,4 +1,5 @@
 #include uniforms_vs
+#include peel_vs
 
 varying float v_discard;
 
@@ -30,5 +31,6 @@ void main()
     // TODO submit the actual dims in a uniform
     v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
 	
-    gl_Position = mvp_matrix * vec4( a_position, 1.0 );
+	v_position = mvp_matrix * vec4( a_position, 1.0 );
+    gl_Position = v_position;
 }

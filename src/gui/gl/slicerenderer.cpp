@@ -148,10 +148,18 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix )
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
-    GLFunctions::getShader( "slice" )->bind();
+    QGLShaderProgram* program = GLFunctions::getShader( "slice" );
+
+    program->bind();
     // Set modelview-projection matrix
-    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "slice" )->setUniformValue( "u_picking", false );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "u_picking", false );
+    program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
 
     initGeometry();
 

@@ -51,16 +51,36 @@ void TensorRendererEV::init()
 
 void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    int renderMode = GLFunctions::renderMode;
+    if ( !( renderMode == 4 || renderMode == 5) ) // we are drawing opaque objects
+    {
+        // obviously not opaque
+        return;
+    }
+
     setRenderParams( props );
 
-    GLFunctions::getShader( "tensorev" )->bind();
-    // Set modelview-projection matrix
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    QGLShaderProgram* program = GLFunctions::getShader( "tensorev" );
 
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "u_scaling", m_scaling );
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "u_faThreshold", m_faThreshold );
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "u_evThreshold", m_evThreshold );
-    GLFunctions::getShader( "tensorev" )->setUniformValue( "u_evSelect", m_evSelect );
+    program->bind();
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "u_scaling", m_scaling );
+
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+
+    program->setUniformValue( "u_scaling", m_scaling );
+    program->setUniformValue( "u_faThreshold", m_faThreshold );
+    program->setUniformValue( "u_evThreshold", m_evThreshold );
+    program->setUniformValue( "u_evSelect", m_evSelect );
 
     initGeometry();
 

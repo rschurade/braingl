@@ -8,6 +8,8 @@
 #ifndef SCENERENDERER_H_
 #define SCENERENDERER_H_
 
+#include "GL/glew.h"
+
 #include "../../data/enums.h"
 
 #include <QVector2D>
@@ -29,6 +31,7 @@ public:
 
 	void initGL();
 	void draw();
+	void renderMerge();
 	QImage* screenshot();
 
 	void leftMouseDown( int x, int y );
@@ -56,6 +59,8 @@ private:
 	SliceRenderer* m_sliceRenderer;
 
 	QItemSelectionModel* m_roiSelectionModel;
+
+	GLuint *vboIds;
 
 	bool skipDraw;
 

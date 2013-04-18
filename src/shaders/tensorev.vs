@@ -1,6 +1,7 @@
 #version 120
 
 #include uniforms_vs
+#include peel_vs
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms
@@ -213,5 +214,6 @@ void main()
         evtmp = vec4( ev2.rgb, 0.0 ) * dir * u_scaling;
         gl_FrontColor = getColor( ev2.xyz, 1.0 );
     }
-    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + evtmp );
+    v_position = mvp_matrix * ( vec4( a_position, 1.0 ) + evtmp );
+    gl_Position = v_position;
 }

@@ -2,6 +2,7 @@
 
 #include uniforms_fs
 #include lighting_fs
+#include peel_fs
 
 // camera direction vector
 // USAGE:
@@ -212,7 +213,7 @@ void main( void )
     if( hit )
     {
         // draw shaded pixel
-        gl_FragColor = blinnPhongIllumination(
+        writePeel( blinnPhongIllumination(
         // material properties
         gl_Color.rgb * 0.2,                    // ambient color
         gl_Color.rgb * 2.0,                    // diffuse color
@@ -226,7 +227,7 @@ void main( void )
         // directions
         normalize( grad ),                     // normal
         v_viewDir.xyz,                         // viewdir
-        v_lightDir.xyz );                      // light direction
+        v_lightDir.xyz ).rgb );                      // light direction
     }
     else // no hit: discard
     {
