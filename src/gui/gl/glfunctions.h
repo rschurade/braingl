@@ -86,6 +86,7 @@ public:
     static float scaleX;
     static float scaleY;
     static int renderMode;
+    static float sliceAlpha;
 
 private:
     GLFunctions() {};
