@@ -1,4 +1,5 @@
 #include uniforms_vs
+#include peel_fs
 
 void main()
 {
@@ -31,5 +32,7 @@ void main()
     newPos.x = a_position.x * r * u_scaling + a_offset.x;
     newPos.y = a_position.y * r * u_scaling + a_offset.y;
     newPos.z = a_position.z * r * u_scaling + a_offset.z;
-    gl_Position = mvp_matrix * newPos;
+    
+    v_position = mvp_matrix * newPos;
+    gl_Position = v_position;
 }

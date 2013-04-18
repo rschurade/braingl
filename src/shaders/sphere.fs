@@ -3,14 +3,11 @@
 #include uniforms_fs
 #include lighting_fs
 
+#include peel_fs
+
 void main( void )
 {
-    if ( u_picking )
-    {
-        gl_FragColor = u_color;
-    }
-    else
-    {
-        light( u_color );
-    }
+    vec3 color = light( u_color ).rgb;
+    
+    writePeel( color );
 }

@@ -1,8 +1,11 @@
 #version 120 
 
 #include uniforms_fs
+#include peel_fs
 
 void main( void )
 {
-    gl_FragColor = u_color;
+    vec3 color = u_color.rgb;
+    
+    writePeel( color );
 }

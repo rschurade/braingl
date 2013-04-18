@@ -1,6 +1,7 @@
 #version 120
 
 #include uniforms_vs
+#include peel_vs
 
 varying float v_discard;
 
@@ -29,6 +30,6 @@ void main()
         v_discard = 1.0;
     }
     
-    
-    gl_Position = mvp_matrix * ( vec4( a_position, 1.0 ) + vec );
+    v_position = mvp_matrix * ( vec4( a_position, 1.0 ) + vec );
+    gl_Position = v_position;
 }

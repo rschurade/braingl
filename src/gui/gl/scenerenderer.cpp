@@ -4,8 +4,6 @@
  * Created on: 09.05.2012
  * @author Ralph Schurade
  */
-#include "GL/glew.h"
-
 #include "glfunctions.h"
 
 #include "scenerenderer.h"
@@ -22,6 +20,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
 #include <math.h>
@@ -32,6 +31,7 @@
 
 SceneRenderer::SceneRenderer( QItemSelectionModel* roiSelectionModel ) :
     m_roiSelectionModel( roiSelectionModel ),
+    vboIds( new GLuint[ 2 ] ),
     skipDraw( false ),
     m_boundingbox( 200 ),
     m_nx( 160 ),
@@ -79,9 +79,6 @@ void SceneRenderer::initGL()
 
     glEnable( GL_DEPTH_TEST );
 
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glEnable( GL_BLEND );
-
     glShadeModel( GL_SMOOTH );
     glEnable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
@@ -106,6 +103,23 @@ void SceneRenderer::initGL()
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
     Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
     Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
+
+    VertexData vertices[] =
+
+    {
+        { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( 1.0,  -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
+        { QVector3D( 1.0,  1.0,  0 ), QVector3D( 1.0, 1.0, 0.0 ) },
+        { QVector3D( -1.0, 1.0,  0 ), QVector3D( 0.0, 1.0, 0.0 ) }
+    };
+    glGenBuffers( 2, vboIds );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
+
+    GLushort indices[] = { 0, 1, 2, 3 };
+    // Transfer index data to VBO 0
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -116,6 +130,9 @@ void SceneRenderer::resizeGL( int width, int height )
 
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
+
+    GLFunctions::setScreenSize( m_width, m_height );
+    GLFunctions::initPeel();
 
     calcMVPMatrix();
 }
@@ -170,28 +187,217 @@ void SceneRenderer::draw()
 {
     if ( !skipDraw )
     {
-        QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
-        glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
+        QColor bgColor = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
 
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc( GL_LEQUAL );
+        glClearDepth( 1 );
+
+        GLuint tex = GLFunctions::getPeelTexture( "D0" );
+        glActiveTexture( GL_TEXTURE9 );
+        glBindTexture( GL_TEXTURE_2D, tex );
+
+        tex = GLFunctions::getPeelTexture( "D1" );
+        glActiveTexture( GL_TEXTURE10 );
+        glBindTexture( GL_TEXTURE_2D, tex );
+
+        tex = GLFunctions::getPeelTexture( "D2" );
+        glActiveTexture( GL_TEXTURE11 );
+        glBindTexture( GL_TEXTURE_2D, tex );
+
+        //***************************************************************************************************
+        //
+        // Pass 1 - draw opaque objects
+        //
+        //***************************************************************************************************/
+        GLFunctions::renderMode = 4;
+        GLFunctions::setRenderTarget( "C0" );
+
+        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
         m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        renderDatasets();
+        renderRois();
 
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-        glEnable( GL_BLEND );
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        glShadeModel( GL_SMOOTH );
-        //glEnable( GL_LIGHTING );
-        //glEnable( GL_LIGHT0 );
-        glEnable( GL_MULTISAMPLE );
+        GLFunctions::renderMode = 5;
+        GLFunctions::setRenderTarget( "D0" );
+
+        glClearColor( 0.0, 0.0, 0.0, 0.0 );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        //***************************************************************************************************
+        //
+        // Pass 2
+        //
+        //***************************************************************************************************/
+        GLFunctions::renderMode = 9;
+        GLFunctions::setRenderTarget( "C1" );
+
+        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         renderDatasets();
-
         renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        GLFunctions::renderMode = 6;
+        GLFunctions::setRenderTarget( "D1" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        //***************************************************************************************************
+        //
+        // Pass 3
+        //
+        //***************************************************************************************************/
+        GLFunctions::renderMode = 10;
+        GLFunctions::setRenderTarget( "C2" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        GLFunctions::renderMode = 7;
+        GLFunctions::setRenderTarget( "D2" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        //***************************************************************************************************
+        //
+        // Pass 4
+        //
+        //***************************************************************************************************/
+        GLFunctions::renderMode = 11;
+        GLFunctions::setRenderTarget( "C3" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+        GLFunctions::renderMode = 8;
+        GLFunctions::setRenderTarget( "D1" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+        //***************************************************************************************************
+        //
+        // Pass 5
+        //
+        //***************************************************************************************************/
+        GLFunctions::renderMode = 12;
+        GLFunctions::setRenderTarget( "D2" );
+
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        renderDatasets();
+        renderRois();
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+        //***************************************************************************************************
+        //
+        // Pass 6 - merge previous results and render on quad
+        //
+        //***************************************************************************************************/
+
+        renderMerge();
     }
     else
     {
         skipDraw = false;
     }
+}
+
+void SceneRenderer::renderMerge()
+{
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+
+    GLuint tex = GLFunctions::getPeelTexture( "C0" );
+    glActiveTexture( GL_TEXTURE5 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getPeelTexture( "C1" );
+    glActiveTexture( GL_TEXTURE6 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getPeelTexture( "C2" );
+    glActiveTexture( GL_TEXTURE7 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getPeelTexture( "C3" );
+    glActiveTexture( GL_TEXTURE8 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getPeelTexture( "D0" );
+    glActiveTexture( GL_TEXTURE9 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getPeelTexture( "D2" );
+    glActiveTexture( GL_TEXTURE11 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    QGLShaderProgram* program = GLFunctions::getShader( "merge" );
+    program->bind();
+    // Offset for position
+    long int offset = 0;
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+
+    // Offset for texture coordinate
+    offset += sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+    int texcoordLocation = program->attributeLocation( "a_texcoord" );
+    program->enableAttributeArray( texcoordLocation );
+    glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+
+    program->setUniformValue( "C0", 5 );
+    program->setUniformValue( "C1", 6 );
+    program->setUniformValue( "C2", 7 );
+    program->setUniformValue( "C3", 8 );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D2", 11 );
+
+    glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+
 }
 
 QImage* SceneRenderer::screenshot()

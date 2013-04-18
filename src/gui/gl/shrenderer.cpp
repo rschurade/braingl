@@ -60,6 +60,13 @@ void SHRenderer::init()
 
 void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    int renderMode = GLFunctions::renderMode;
+    if ( !( renderMode == 4 || renderMode == 5) ) // we are drawing opaque objects
+    {
+        // obviously not opaque
+        return;
+    }
+
     setRenderParams( props );
 
     if ( m_orient == 0 || GLFunctions::isPicking() )
@@ -69,12 +76,21 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup*
     m_pMatrix = p_matrix;
     m_mvMatrix = mv_matrix;
 
-    GLFunctions::getShader( "qball" )->bind();
+    QGLShaderProgram* program = GLFunctions::getShader( "qball" );
+    program->bind();
+
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
     // Set modelview-projection matrix
-    GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
-    GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", m_hideNegativeLobes );
-    GLFunctions::getShader( "qball" )->setUniformValue( "u_scaling", m_scaling );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "u_hideNegativeLobes", m_hideNegativeLobes );
+    program->setUniformValue( "u_scaling", m_scaling );
 
     initGeometry();
 

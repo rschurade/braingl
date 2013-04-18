@@ -1,5 +1,9 @@
 #version 120 
 
+uniform vec4 u_color;
+
+#include peel_fs
+
 varying float v_discard;
 
 void main( void )
@@ -9,5 +13,5 @@ void main( void )
         discard;
     }
 
-    gl_FragColor = vec4( gl_Color.rgb, 1.0 );
+    writePeel( gl_Color.rgb );
 }

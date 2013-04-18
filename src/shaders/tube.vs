@@ -1,4 +1,5 @@
 #include uniforms_vs
+#include peel_vs
 
 attribute float a_direction;
 
@@ -11,7 +12,7 @@ varying float v_location;
 
 void main()
 {
-    vec4 v_position = mvp_matrix * vec4( a_position, 1.0 );
+    v_position = mvp_matrix * vec4( a_position, 1.0 );
     
     v_normal = normalize( a_normal );
 

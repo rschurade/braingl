@@ -75,13 +75,18 @@ public:
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
     static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
 
-    static bool linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord);
+    static void initPeel();
+    static GLuint createPeelTexture();
+    static void setRenderTarget( QString target );
+    static GLuint getPeelTexture( QString name );
 
     static int idealThreadCount;
 
     static bool offscreen;
     static float scaleX;
     static float scaleY;
+    static int renderMode;
+
 private:
     GLFunctions() {};
     virtual ~GLFunctions() {};
@@ -107,6 +112,10 @@ private:
     static GLuint pbo_b;
     static int screenWidth;
     static int screenHeight;
+
+    static QHash<QString, GLuint>peelTextures;
+    static GLuint peelRBO;
+    static GLuint peelFBO;
 };
 
 #endif /* GLFUNCTIONS_H_ */

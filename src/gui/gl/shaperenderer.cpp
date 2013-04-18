@@ -108,6 +108,28 @@ void ShapeRenderer::initSphere()
 
 void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
 {
+    float alpha = color.alphaF();
+    int renderMode = GLFunctions::renderMode;
+    if ( renderMode != 1 ) // we are not picking
+    {
+        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        {
+            if ( alpha < 1.0 )
+            {
+                // obviously not opaque
+                return;
+            }
+        }
+        else // we are drawing tranparent objects
+        {
+            if ( !(alpha < 1.0 ) || alpha == 0.0 )
+            {
+                // not transparent
+                return;
+            }
+        }
+    }
+
     QGLShaderProgram* program = GLFunctions::getShader( "box" );
 
     // Tell OpenGL which VBOs to use
@@ -132,12 +154,22 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
         float red =   (float)(( pickID >> 16 ) & 0xFF) / 255.f;
 
         //qDebug() << " input" << red << green << blue << alpha ;
+        program->setUniformValue( "u_picking", true );
+        program->setUniformValue( "u_renderMode", 1 );
         program->setUniformValue( "u_color", red, green , blue, alpha );
     }
     else
     {
+        program->setUniformValue( "u_picking", false );
         program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+        program->setUniformValue( "u_alpha", (float)color.alphaF() );
+        program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+        program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
     }
+
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
 
     program->setUniformValue( "u_x", x );
     program->setUniformValue( "u_y", y );
@@ -146,8 +178,14 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
     program->setUniformValue( "u_dy", dy / 2 );
     program->setUniformValue( "u_dz", dz / 2 );
 
+    glEnable(GL_CULL_FACE);
+    glCullFace( GL_BACK );
+    glFrontFace( GL_CCW );
+
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_QUADS, 24, GL_UNSIGNED_SHORT, 0 );
+
+    glDisable(GL_CULL_FACE);
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -155,6 +193,29 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
 
 void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
 {
+    float alpha = color.alphaF();
+    int renderMode = GLFunctions::renderMode;
+    if ( renderMode != 1 ) // we are not picking
+    {
+        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        {
+            if ( alpha < 1.0 )
+            {
+                // obviously not opaque
+                return;
+            }
+        }
+        else // we are drawing tranparent objects
+        {
+            if ( !(alpha < 1.0 )  || alpha == 0.0 )
+            {
+                // not transparent
+                return;
+            }
+        }
+    }
+
+
     QGLShaderProgram* program = GLFunctions::getShader( "sphere" );
 
     program->bind();
@@ -191,17 +252,30 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float
         //qDebug() << " input" << red << green << blue << alpha ;
         program->setUniformValue( "u_color", red, green , blue, alpha );
         program->setUniformValue( "u_picking", true );
+        program->setUniformValue( "u_renderMode", 1 );
     }
     else
     {
-        program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
         program->setUniformValue( "u_picking", false );
+        program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+        program->setUniformValue( "u_alpha", (float)color.alphaF() );
+        program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+        program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
     }
 
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
+    glEnable(GL_CULL_FACE);
+    glCullFace( GL_BACK );
+    glFrontFace( GL_CCW );
 
     glDrawElements( GL_TRIANGLES, tess::n_faces( 3 ) * 3, GL_UNSIGNED_INT, 0 );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glDisable(GL_CULL_FACE);
 }
 
 

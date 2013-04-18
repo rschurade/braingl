@@ -57,24 +57,46 @@ void MeshRenderer::init()
 
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
-    setRenderParams( props );
+    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
+    int renderMode = GLFunctions::renderMode;
+    if ( renderMode != 1 ) // we are not picking
+    {
+        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        {
+            if ( alpha < 1.0 )
+            {
+                // obviously not opaque
+                return;
+            }
+        }
+        else // we are drawing tranparent objects
+        {
+            if ( !(alpha < 1.0 ) )
+            {
+                // not transparent
+                return;
+            }
+        }
+    }
 
-    GLFunctions::getShader( "mesh" )->bind();
+    setRenderParams( props );
+    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
+
+    program->bind();
 
     GLFunctions::setupTextures();
     GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ) );
     // Set modelview-projection matrix
-    GLFunctions::getShader( "mesh" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_colorMode", m_colorMode );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_colormap", m_colormap );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMin", m_selectedMin );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_selectedMax", m_selectedMax );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_upperThreshold", m_upperThreshold );
-
+    program->setUniformValue( "u_colorMode", m_colorMode );
+    program->setUniformValue( "u_colormap", m_colormap );
+    program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
+    program->setUniformValue( "u_selectedMin", m_selectedMin );
+    program->setUniformValue( "u_selectedMax", m_selectedMax );
+    program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    program->setUniformValue( "u_upperThreshold", m_upperThreshold );
 
     float nx = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
     float ny = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
@@ -83,7 +105,14 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGrou
     float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
     float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-    GLFunctions::getShader( "mesh" )->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
+    program->setUniformValue( "u_alpha", alpha );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
+    program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
     if ( m_dirty )
     {
@@ -93,7 +122,14 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGrou
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
+
+    glEnable(GL_CULL_FACE);
+    glCullFace( GL_BACK );
+    glFrontFace( GL_CW );
+
     glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+
+    glDisable(GL_CULL_FACE);
 
     glShadeModel( GL_SMOOTH );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

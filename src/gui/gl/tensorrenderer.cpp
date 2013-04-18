@@ -52,6 +52,13 @@ void TensorRenderer::init()
 
 void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGroup* props )
 {
+    int renderMode = GLFunctions::renderMode;
+    if ( !( renderMode == 4 || renderMode == 5) ) // we are drawing opaque objects
+    {
+        // obviously not opaque
+        return;
+    }
+
     setRenderParams( props );
 
     if ( m_orient == 0 )
@@ -61,15 +68,28 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, PropertyGr
 
     initGeometry();
 
-    GLFunctions::getShader( "superquadric" )->bind();
-    // Set modelview-projection matrix
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    QGLShaderProgram* program = GLFunctions::getShader( "superquadric" );
 
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "u_scaling", m_scaling );
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "u_faThreshold", m_faThreshold );
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "u_evThreshold", m_evThreshold );
-    GLFunctions::getShader( "superquadric" )->setUniformValue( "u_gamma", m_gamma );
+    program->bind();
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "u_scaling", m_scaling );
+
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    program->setUniformValue( "u_scaling", m_scaling );
+    program->setUniformValue( "u_faThreshold", m_faThreshold );
+    program->setUniformValue( "u_evThreshold", m_evThreshold );
+    program->setUniformValue( "u_gamma", m_gamma );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars();

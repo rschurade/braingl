@@ -30,6 +30,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     m_properties.set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
     m_properties.set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
     m_properties.set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
     m_properties.set( Fn::Property::COLORMAP, 1 );
     m_properties.set( Fn::Property::MIN, 0.0f );
@@ -84,6 +85,7 @@ DatasetFibers::DatasetFibers( QString filename,
     m_properties.set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, true );
     m_properties.set( Fn::Property::DATAMODE, dataNames, 0, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
     m_properties.set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::MIN, 0.0f );
