@@ -245,6 +245,7 @@ void SceneRenderer::draw()
         glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -255,6 +256,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -270,6 +272,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -280,6 +283,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -295,6 +299,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -305,6 +310,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 
@@ -319,6 +325,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
         renderDatasets();
         renderRois();
 

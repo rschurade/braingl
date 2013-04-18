@@ -35,6 +35,7 @@ bool GLFunctions::picking = false;
 bool GLFunctions::offscreen = false;
 float GLFunctions::scaleX = 1.0;
 float GLFunctions::scaleY = 1.0;
+float GLFunctions::sliceAlpha = 1.0;
 
 int GLFunctions::screenWidth = 0;
 int GLFunctions::screenHeight = 0;
@@ -472,7 +473,8 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
             program->setUniformValue( "u_colormap0", model->data( index, Qt::DisplayRole ).toInt() );
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            program->setUniformValue( "u_alpha0", model->data( index, Qt::DisplayRole ).toFloat() );
+            GLFunctions::sliceAlpha = model->data( index, Qt::DisplayRole ).toFloat();
+            program->setUniformValue( "u_alpha0", GLFunctions::sliceAlpha );
             program->setUniformValue( "u_texActive0", true );
 
         }
