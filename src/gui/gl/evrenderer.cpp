@@ -47,9 +47,8 @@ void EVRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, PropertyGroup* props )
+void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    int renderMode = GLFunctions::renderMode;
     if ( !( renderMode == 4 || renderMode == 5) ) // we are drawing opaque objects
     {
         // obviously not opaque

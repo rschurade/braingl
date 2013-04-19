@@ -141,10 +141,10 @@ void SliceRenderer::setShaderVars()
     GLFunctions::setShaderVarsSlice( program );
 }
 
-void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height )
+void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode )
 {
     float alpha = GLFunctions::sliceAlpha;
-    int renderMode = GLFunctions::renderMode;
+
     if ( renderMode != 1 ) // we are not picking
     {
         if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects

@@ -20,7 +20,7 @@ public:
 
 	void init();
 
-	void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height );
+	void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode );
 	void drawPick( QMatrix4x4 mvp_matrix );
 
 protected:

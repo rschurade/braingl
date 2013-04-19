@@ -72,6 +72,7 @@ private:
 
 	int m_width;
 	int m_height;
+	int m_renderMode;
 	float m_ratio;
 
 	QMatrix4x4 m_mvMatrix;

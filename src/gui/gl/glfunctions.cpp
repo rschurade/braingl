@@ -34,8 +34,6 @@ unsigned int GLFunctions::pickIndex = 4;
 bool GLFunctions::offscreen = false;
 float GLFunctions::sliceAlpha = 1.0;
 
-int GLFunctions::renderMode = 0;
-
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
@@ -661,16 +659,16 @@ void GLFunctions::initShapeRenderer()
 
 void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                               float x, float y, float z, float dx, float dy, float dz,
-                              QColor color, int pickID, int width, int height )
+                              QColor color, int pickID, int width, int height, int renderMode )
 {
-    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height );
+    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
 void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                  float x, float y, float z, float dx, float dy, float dz,
-                                 QColor color, int pickID, int width, int height )
+                                 QColor color, int pickID, int width, int height, int renderMode )
 {
-    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height );
+    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
 QHash< QString, GLuint > GLFunctions::textures;

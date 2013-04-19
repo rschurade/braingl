@@ -108,10 +108,10 @@ void ShapeRenderer::initSphere()
 
 void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                 float x, float y, float z, float dx, float dy, float dz,
-                                QColor color, int pickID, int width, int height )
+                                QColor color, int pickID, int width, int height, int renderMode )
 {
     float alpha = color.alphaF();
-    int renderMode = GLFunctions::renderMode;
+
     if ( renderMode != 1 ) // we are not picking
     {
         if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
@@ -148,7 +148,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    if( GLFunctions::renderMode == 1 )
+    if( renderMode == 1 )
     {
         float alpha =  1.0;
         float blue =  (float)(( pickID ) & 0xFF) / 255.f;
@@ -165,7 +165,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_picking", false );
         program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
-        program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+        program->setUniformValue( "u_renderMode", renderMode );
         program->setUniformValue( "u_canvasSize", width, height );
     }
 
@@ -195,10 +195,10 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 
 void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                     float x, float y, float z, float dx, float dy, float dz,
-                                    QColor color, int pickID, int width, int height )
+                                    QColor color, int pickID, int width, int height, int renderMode )
 {
     float alpha = color.alphaF();
-    int renderMode = GLFunctions::renderMode;
+
     if ( renderMode != 1 ) // we are not picking
     {
         if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
@@ -246,7 +246,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     program->setUniformValue( "u_dx", dx / 2 );
     program->setUniformValue( "u_dy", dy / 2 );
     program->setUniformValue( "u_dz", dz / 2 );
-    if( GLFunctions::renderMode == 1 )
+    if( renderMode == 1 )
     {
         float alpha =  1.0;
         float blue =  (float)(( pickID ) & 0xFF) / 255.f;
@@ -263,7 +263,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_picking", false );
         program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
-        program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
+        program->setUniformValue( "u_renderMode", renderMode );
         program->setUniformValue( "u_canvasSize", width, height );
     }
 

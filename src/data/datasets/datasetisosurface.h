@@ -23,7 +23,7 @@ public:
     DatasetIsosurface( DatasetScalar* ds );
     virtual ~DatasetIsosurface();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
 
 protected:
     void createTexture() {};

@@ -67,7 +67,7 @@ void DatasetBingham::flipX()
 {
 }
 
-void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
+void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
     if ( m_renderer == 0 )
     {
@@ -83,7 +83,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         qDebug() << "ds bingham init renderer done";
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
 }
 
 QString DatasetBingham::getValueAsString( int x, int y, int z )

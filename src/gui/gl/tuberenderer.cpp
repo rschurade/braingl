@@ -40,10 +40,10 @@ void TubeRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, PropertyGroup* props )
+void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
-    int renderMode = GLFunctions::renderMode;
+
     if ( renderMode != 1 ) // we are not picking
     {
         if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects

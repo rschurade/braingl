@@ -25,7 +25,7 @@ public:
     Matrix getQForm();
     Matrix getSForm();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height ) = 0;
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
     static QString getNiftiDataType( const int type );

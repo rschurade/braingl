@@ -292,6 +292,7 @@ void SingleSHRenderer::draw()
 
         bool hnl = m_dataset->properties()->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
         GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", hnl );
+        GLFunctions::getShader( "qball" )->setUniformValue( "u_renderMode", 0 );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
