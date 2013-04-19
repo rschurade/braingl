@@ -146,7 +146,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    if( GLFunctions::isPicking() )
+    if( GLFunctions::renderMode == 1 )
     {
         float alpha =  1.0;
         float blue =  (float)(( pickID ) & 0xFF) / 255.f;
@@ -242,7 +242,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float
     program->setUniformValue( "u_dx", dx / 2 );
     program->setUniformValue( "u_dy", dy / 2 );
     program->setUniformValue( "u_dz", dz / 2 );
-    if( GLFunctions::isPicking() )
+    if( GLFunctions::renderMode == 1 )
     {
         float alpha =  1.0;
         float blue =  (float)(( pickID ) & 0xFF) / 255.f;

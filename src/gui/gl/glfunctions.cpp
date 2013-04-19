@@ -31,7 +31,6 @@ ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
-bool GLFunctions::picking = false;
 bool GLFunctions::offscreen = false;
 float GLFunctions::scaleX = 1.0;
 float GLFunctions::scaleY = 1.0;
@@ -510,55 +509,8 @@ QList< int > GLFunctions::getTextureIndexes()
     return tl;
 }
 
-GLuint GLFunctions::tex = 0;
-GLuint GLFunctions::rbo = 0;
-GLuint GLFunctions::fbo = 0;
 GLuint GLFunctions::pbo_a = 0;
 GLuint GLFunctions::pbo_b = 0;
-
-void GLFunctions::generate_frame_buffer_texture( const int screen_width, const int screen_height )
-{
-    GLFunctions::scaleX = (float)screen_width / (float)GLFunctions::screenWidth;
-    GLFunctions::scaleY = (float)screen_height /(float)GLFunctions::screenHeight;
-
-    GLFunctions::screenWidth = screen_width;
-    GLFunctions::screenHeight = screen_height;
-
-    /* generate a texture id */
-    glGenTextures( 1, &GLFunctions::tex );
-    /* bind the texture */
-    glBindTexture( GL_TEXTURE_2D, GLFunctions::tex );
-    /* set texture parameters */
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    /* create the texture in the GPU */
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL );
-    /* unbind the texture */
-    glBindTexture( GL_TEXTURE_2D, 0 );
-    /* create a renderbuffer object for the depth buffer */
-    glGenRenderbuffers( 1, &GLFunctions::rbo );
-    /* bind the texture */
-    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::rbo );
-    /* create the render buffer in the GPU */
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screen_width, screen_height );
-    /* unbind the render buffer */
-    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
-    /* create a framebuffer object */
-    glGenFramebuffers( 1, &GLFunctions::fbo );
-    /* attach the texture and the render buffer to the frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::tex, 0 );
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::rbo );
-    /* check the frame buffer */
-    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-    {
-        /* handle an error : frame buffer incomplete */
-    }
-
-    /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-}
 
 void GLFunctions::generate_pixel_buffer_objects()
 {
@@ -583,7 +535,7 @@ uint GLFunctions::get_object_id( int x, int y )
     int read_pbo, map_pbo;
     uint object_id;
 
-    uint red, green, blue, alpha, pixel_index;
+    uint red, green, blue, pixel_index;
     GLubyte* ptr;
 
     GLFunctions::generate_pixel_buffer_objects();
@@ -617,65 +569,47 @@ uint GLFunctions::get_object_id( int x, int y )
         blue = ptr[pixel_index];
         green = ptr[pixel_index + 1];
         red = ptr[pixel_index + 2];
-        alpha = ptr[pixel_index + 3];
+        //alpha = ptr[pixel_index + 3];
         //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
         object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
         //qDebug() << "output" << red << green << blue << alpha;
     }
     glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
-    return object_id;
-}
 
-void GLFunctions::beginPicking()
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
-    GLFunctions::picking = true;
-    GLFunctions::renderMode = 1;
-}
-
-void GLFunctions::endPicking()
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-    GLFunctions::picking = false;
-    glDeleteTextures( 1, &GLFunctions::tex );
-    glDeleteFramebuffers( 1, &GLFunctions::fbo );
-    glDeleteRenderbuffers( 1, &GLFunctions::rbo );
     glDeleteBuffers( 1, &GLFunctions::pbo_a );
     glDeleteBuffers( 1, &GLFunctions::pbo_b );
-}
 
-bool GLFunctions::isPicking()
-{
-    return GLFunctions::picking;
+    return object_id;
 }
 
 void GLFunctions::beginOffscreen( const int screen_width, const int screen_height )
 {
+    /*
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
     GLFunctions::offscreen = true;
     GLFunctions::screenWidth = screen_width;
     GLFunctions::screenHeight = screen_height;
+    */
 }
 
 void GLFunctions::endOffscreen( const int screen_width, const int screen_height )
 {
+    /*
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     GLFunctions::offscreen = false;
     GLFunctions::screenWidth = screen_width;
     GLFunctions::screenHeight = screen_height;
     GLFunctions::scaleX = 1.0;
     GLFunctions::scaleY = 1.0;
-    glDeleteTextures( 1, &GLFunctions::tex );
-    glDeleteFramebuffers( 1, &GLFunctions::fbo );
-    glDeleteRenderbuffers( 1, &GLFunctions::rbo );
     glDeleteBuffers( 1, &GLFunctions::pbo_a );
     glDeleteBuffers( 1, &GLFunctions::pbo_b );
+    */
 }
 
 QImage* GLFunctions::getOffscreenTexture()
 {
-    static int frame_event = 0;
+     static int frame_event = 0;
     int read_pbo, map_pbo;
 
     uint red, green, blue, alpha, pixel_index;
@@ -753,36 +687,37 @@ void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
 }
 
-QHash< QString, GLuint > GLFunctions::peelTextures;
-GLuint GLFunctions::peelRBO = 0;
-GLuint GLFunctions::peelFBO = 0;
+QHash< QString, GLuint > GLFunctions::textures;
+GLuint GLFunctions::RBO = 0;
+GLuint GLFunctions::FBO = 0;
 
 
-void GLFunctions::initPeel()
+void GLFunctions::initFBO()
 {
-    GLFunctions::peelTextures[ "C0" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "C1" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "C2" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "C3" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "D0" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "D1" ] = createPeelTexture();
-    GLFunctions::peelTextures[ "D2" ] = createPeelTexture();
+    GLFunctions::textures[ "C0" ] = createTexture();
+    GLFunctions::textures[ "C1" ] = createTexture();
+    GLFunctions::textures[ "C2" ] = createTexture();
+    GLFunctions::textures[ "C3" ] = createTexture();
+    GLFunctions::textures[ "D0" ] = createTexture();
+    GLFunctions::textures[ "D1" ] = createTexture();
+    GLFunctions::textures[ "D2" ] = createTexture();
+    GLFunctions::textures[ "PICK" ] = createTexture();
 
     qDebug() << GLFunctions::screenWidth << GLFunctions::screenHeight;
     /* create a framebuffer object */
-    glGenFramebuffers( 1, &GLFunctions::peelFBO );
+    glGenFramebuffers( 1, &GLFunctions::FBO );
     /* attach the texture and the render buffer to the frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::peelFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
 
     /* create a renderbuffer object for the depth buffer */
-    glGenRenderbuffers( 1, &GLFunctions::peelRBO );
+    glGenRenderbuffers( 1, &GLFunctions::RBO );
     /* bind the texture */
-    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::peelRBO );
+    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::RBO );
     /* create the render buffer in the GPU */
     glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, GLFunctions::screenWidth, GLFunctions::screenHeight );
 
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::peelTextures["C0"], 0 );
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::peelRBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures["C0"], 0 );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::RBO );
     /* check the frame buffer */
     if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
     {
@@ -796,7 +731,7 @@ void GLFunctions::initPeel()
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-GLuint GLFunctions::createPeelTexture()
+GLuint GLFunctions::createTexture()
 {
     /* generate a texture id */
     GLuint ptex;
@@ -817,14 +752,11 @@ GLuint GLFunctions::createPeelTexture()
 
 void GLFunctions::setRenderTarget( QString target )
 {
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::peelFBO );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::peelTextures[target], 0 );
-
-//    GLenum DrawBuffers[2] = {GL_COLOR_ATTACHMENT0};
-//    glDrawBuffers(1, DrawBuffers);
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target], 0 );
 }
 
-GLuint GLFunctions::getPeelTexture( QString name )
+GLuint GLFunctions::getTexture( QString name )
 {
-    return GLFunctions::peelTextures[name];
+    return GLFunctions::textures[name];
 }
