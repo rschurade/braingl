@@ -53,11 +53,6 @@ public:
     static void generate_pixel_buffer_objects( int width, int height );
     static uint get_object_id( int x, int y, int width, int height );
 
-    static void beginOffscreen( const int screen_width, const int screen_height );
-    static void endOffscreen( const int screen_width, const int screen_height );
-
-    static QImage* getOffscreenTexture( int width, int height );
-
     static void updateColormapShader();
 
     static void initTextRenderer();
@@ -77,8 +72,6 @@ public:
     static GLuint getTexture( QString name );
 
     static int idealThreadCount;
-
-    static bool offscreen;
     static float sliceAlpha;
 
 private:
