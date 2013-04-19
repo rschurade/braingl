@@ -22,11 +22,11 @@ public:
 
     void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                     float x, float y, float z, float dx, float dy, float dz,
-                    QColor color, int pickID, int width, int height );
+                    QColor color, int pickID, int width, int height, int renderMode );
 
     void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                         float x, float y, float z, float dx, float dy, float dz,
-                        QColor color, int pickID, int width, int height );
+                        QColor color, int pickID, int width, int height, int renderMode );
 
 private:
     GLuint *vboIds;

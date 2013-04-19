@@ -66,10 +66,10 @@ public:
     static void initShapeRenderer();
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                             float x, float y, float z, float dx, float dy, float dz,
-                            QColor color, int pickID, int width, int height );
+                            QColor color, int pickID, int width, int height, int renderMode );
     static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                float x, float y, float z, float dx, float dy, float dz,
-                               QColor color, int pickID, int width, int height );
+                               QColor color, int pickID, int width, int height, int renderMode );
 
     static void initFBO( int width, int height );
     static GLuint createTexture( int width, int height );
@@ -79,7 +79,6 @@ public:
     static int idealThreadCount;
 
     static bool offscreen;
-    static int renderMode;
     static float sliceAlpha;
 
 private:

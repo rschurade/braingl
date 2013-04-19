@@ -101,7 +101,7 @@ TriangleMesh2* DatasetMesh::getMesh()
     return m_mesh;
 }
 
-void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
+void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
     if ( m_renderer == 0 )
     {
@@ -111,7 +111,7 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     }
 
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
 }
 
 QString DatasetMesh::getValueAsString( int x, int y, int z )

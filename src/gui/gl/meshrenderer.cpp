@@ -26,6 +26,7 @@ MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     m_pickId( GLFunctions::getPickIndex() ),
     m_mesh( mesh ),
     m_dirty( true ),
+    m_renderMode( 0 ),
     m_colorMode( 0 ),
     m_colormap( 1 ),
     m_selectedMin( 0.0 ),
@@ -55,10 +56,10 @@ void MeshRenderer::init()
     glGenBuffers( 4, vboIds );
 }
 
-void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, PropertyGroup* props )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
-    int renderMode = GLFunctions::renderMode;
+    m_renderMode = renderMode;
     if ( renderMode != 1 ) // we are not picking
     {
         if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
@@ -167,7 +168,7 @@ void MeshRenderer::setShaderVars()
     offset += sizeof(float) * 1;
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    if( GLFunctions::renderMode == 1 )
+    if( m_renderMode == 1 )
     {
         glShadeModel( GL_FLAT );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );

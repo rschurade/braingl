@@ -165,7 +165,7 @@ void DatasetDWI::flipX()
 {
 }
 
-void DatasetDWI::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
+void DatasetDWI::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
 }
 

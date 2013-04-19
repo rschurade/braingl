@@ -24,7 +24,7 @@ public:
     DatasetMesh( QString filename, Fn::DatasetType type );
     virtual ~DatasetMesh();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
     QString getValueAsString( int x, int y, int z );
 
     void mousePick( int pickId, QVector3D pos );

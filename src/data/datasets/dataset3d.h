@@ -21,7 +21,7 @@ public:
     Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
     QString getValueAsString( int x, int y, int z );
 
     QVector<QVector3D>* getData();

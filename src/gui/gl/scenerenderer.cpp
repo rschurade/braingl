@@ -39,6 +39,7 @@ SceneRenderer::SceneRenderer( QItemSelectionModel* roiSelectionModel ) :
     m_nz( 160 ),
     m_width( 1 ),
     m_height( 1 ),
+    m_renderMode( 0 ),
     m_ratio( 1.0 ),
     m_picked( 0 ),
     m_sliceXPosAtPick( 0 ),
@@ -209,25 +210,25 @@ void SceneRenderer::draw()
         // Pass 1 - draw opaque objects
         //
         //***************************************************************************************************/
-        GLFunctions::renderMode = 4;
+        m_renderMode = 4;
         GLFunctions::setRenderTarget( "C0" );
 
         glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        GLFunctions::renderMode = 5;
+        m_renderMode = 5;
         GLFunctions::setRenderTarget( "D0" );
 
         glClearColor( 0.0, 0.0, 0.0, 0.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
@@ -238,24 +239,24 @@ void SceneRenderer::draw()
         // Pass 2
         //
         //***************************************************************************************************/
-        GLFunctions::renderMode = 9;
+        m_renderMode = 9;
         GLFunctions::setRenderTarget( "C1" );
 
         glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        GLFunctions::renderMode = 6;
+        m_renderMode = 6;
         GLFunctions::setRenderTarget( "D1" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
@@ -266,23 +267,23 @@ void SceneRenderer::draw()
         // Pass 3
         //
         //***************************************************************************************************/
-        GLFunctions::renderMode = 10;
+        m_renderMode = 10;
         GLFunctions::setRenderTarget( "C2" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        GLFunctions::renderMode = 7;
+        m_renderMode = 7;
         GLFunctions::setRenderTarget( "D2" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
@@ -293,23 +294,23 @@ void SceneRenderer::draw()
         // Pass 4
         //
         //***************************************************************************************************/
-        GLFunctions::renderMode = 11;
+        m_renderMode = 11;
         GLFunctions::setRenderTarget( "C3" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-        GLFunctions::renderMode = 8;
+        m_renderMode = 8;
         GLFunctions::setRenderTarget( "D1" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
@@ -319,12 +320,12 @@ void SceneRenderer::draw()
         // Pass 5
         //
         //***************************************************************************************************/
-        GLFunctions::renderMode = 12;
+        m_renderMode = 12;
         GLFunctions::setRenderTarget( "D2" );
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
 
@@ -465,7 +466,7 @@ void SceneRenderer::renderDatasets()
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+            ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         }
     }
 }
@@ -478,7 +479,7 @@ void SceneRenderer::renderRois()
        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
        {
-           roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+           roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
 
            QModelIndex mi = Models::r()->index( i, 0 );
            int countBoxes = Models::r()->rowCount(  mi );
@@ -488,7 +489,7 @@ void SceneRenderer::renderRois()
                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
                {
-                   roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
+                   roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
                }
            }
        }
@@ -542,7 +543,7 @@ void SceneRenderer::mouseWheel( int step )
 void SceneRenderer::renderPick()
 {
     // render
-    GLFunctions::renderMode = 1;
+    m_renderMode = 1;
     GLFunctions::setRenderTarget( "PICK" );
 
     glEnable( GL_DEPTH_TEST );
