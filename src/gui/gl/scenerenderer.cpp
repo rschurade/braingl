@@ -132,7 +132,7 @@ void SceneRenderer::resizeGL( int width, int height )
     glViewport( 0, 0, width, height );
 
     GLFunctions::setScreenSize( m_width, m_height );
-    GLFunctions::initPeel();
+    GLFunctions::initFBO();
 
     calcMVPMatrix();
 }
@@ -193,15 +193,15 @@ void SceneRenderer::draw()
         glDepthFunc( GL_LEQUAL );
         glClearDepth( 1 );
 
-        GLuint tex = GLFunctions::getPeelTexture( "D0" );
+        GLuint tex = GLFunctions::getTexture( "D0" );
         glActiveTexture( GL_TEXTURE9 );
         glBindTexture( GL_TEXTURE_2D, tex );
 
-        tex = GLFunctions::getPeelTexture( "D1" );
+        tex = GLFunctions::getTexture( "D1" );
         glActiveTexture( GL_TEXTURE10 );
         glBindTexture( GL_TEXTURE_2D, tex );
 
-        tex = GLFunctions::getPeelTexture( "D2" );
+        tex = GLFunctions::getTexture( "D2" );
         glActiveTexture( GL_TEXTURE11 );
         glBindTexture( GL_TEXTURE_2D, tex );
 
@@ -350,27 +350,27 @@ void SceneRenderer::renderMerge()
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
 
-    GLuint tex = GLFunctions::getPeelTexture( "C0" );
+    GLuint tex = GLFunctions::getTexture( "C0" );
     glActiveTexture( GL_TEXTURE5 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getPeelTexture( "C1" );
+    tex = GLFunctions::getTexture( "C1" );
     glActiveTexture( GL_TEXTURE6 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getPeelTexture( "C2" );
+    tex = GLFunctions::getTexture( "C2" );
     glActiveTexture( GL_TEXTURE7 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getPeelTexture( "C3" );
+    tex = GLFunctions::getTexture( "C3" );
     glActiveTexture( GL_TEXTURE8 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getPeelTexture( "D0" );
+    tex = GLFunctions::getTexture( "D0" );
     glActiveTexture( GL_TEXTURE9 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getPeelTexture( "D2" );
+    tex = GLFunctions::getTexture( "D2" );
     glActiveTexture( GL_TEXTURE11 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
@@ -409,6 +409,7 @@ void SceneRenderer::renderMerge()
 
 QImage* SceneRenderer::screenshot()
 {
+    /*
     qDebug() << "rendering screenshot";
 
     int size = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
@@ -453,6 +454,7 @@ QImage* SceneRenderer::screenshot()
     GLFunctions::endOffscreen( m_width, m_height );
     glViewport( 0, 0, m_width, m_height );
     return image;
+    */
 }
 
 void SceneRenderer::renderDatasets()
@@ -538,12 +540,11 @@ void SceneRenderer::mouseWheel( int step )
     calcMVPMatrix();
 }
 
-void SceneRenderer::rightMouseDown( int x, int y )
+void SceneRenderer::renderPick()
 {
-    // create offscreen texture
-    GLFunctions::generate_frame_buffer_texture( m_width, m_height );
     // render
-    GLFunctions::beginPicking();
+    GLFunctions::renderMode = 1;
+    GLFunctions::setRenderTarget( "PICK" );
 
     glEnable( GL_DEPTH_TEST );
     /* clear the frame buffer */
@@ -554,12 +555,19 @@ void SceneRenderer::rightMouseDown( int x, int y )
     m_sliceRenderer->drawPick( m_mvpMatrix );
     renderRois();
     renderDatasets();
+}
 
+void SceneRenderer::rightMouseDown( int x, int y )
+{
+    renderPick();
     // get id
     m_picked = GLFunctions::get_object_id( x, y );
     qDebug() << "picked object id: " << m_picked;
 
     QVector3D pickPos = mapMouse2World( x, y );
+
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
@@ -572,7 +580,6 @@ void SceneRenderer::rightMouseDown( int x, int y )
         }
     }
 
-
     if ( Models::r()->rowCount() > 0 )
     {
         QModelIndex mi = Models::r()->index( 0, (int)Fn::ROI::PICK_ID );
@@ -584,25 +591,9 @@ void SceneRenderer::rightMouseDown( int x, int y )
         }
     }
 
-    /* return to the default frame buffer */
-    GLFunctions::endPicking();
-
     m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
     m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
     m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
-
-//    float px = ( (float)x / GLFunctions::getScreenSize().x() * 2 ) - 1;
-//    float py = 1. - ( (float)y / GLFunctions::getScreenSize().y() * 2 );
-//
-//    QVector3D v0( px, py, -1 );
-//    QVector3D v1( px, py, 1 );
-//    QVector3D v2 = m_mvMatrix.inverted() * m_pMatrix.inverted() * v0;
-//    QVector3D v3 = m_mvMatrix.inverted() * m_pMatrix.inverted() * v1;
-//
-//    QVector3D result;
-//    bool hit = GLFunctions::linePlaneIntersection( result, v3 - v2, v2, QVector3D( 0, 0, 1 ), QVector3D( m_sliceXPosAtPick, m_sliceYPosAtPick, m_sliceZPosAtPick ) );
-//
-//    qDebug() << hit << result;
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
@@ -621,7 +612,10 @@ void SceneRenderer::rightMouseDrag( int x, int y )
     int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
     float slowDown = 4.0f * m_arcBall->getZoom();
 
+    renderPick();
     QVector3D pickPos = mapMouse2World( x, y );
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )

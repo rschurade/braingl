@@ -167,7 +167,7 @@ void MeshRenderer::setShaderVars()
     offset += sizeof(float) * 1;
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    if( GLFunctions::isPicking() )
+    if( GLFunctions::renderMode == 1 )
     {
         glShadeModel( GL_FLAT );
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );

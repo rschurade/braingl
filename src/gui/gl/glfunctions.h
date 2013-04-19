@@ -50,13 +50,8 @@ public:
 
     static int getPickIndex();
 
-    static void generate_frame_buffer_texture( const int screen_width, const int screen_height );
     static void generate_pixel_buffer_objects();
     static uint get_object_id( int x, int y );
-
-    static void beginPicking();
-    static void endPicking();
-    static bool isPicking();
 
     static void beginOffscreen( const int screen_width, const int screen_height );
     static void endOffscreen( const int screen_width, const int screen_height );
@@ -75,10 +70,10 @@ public:
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
     static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
 
-    static void initPeel();
-    static GLuint createPeelTexture();
+    static void initFBO();
+    static GLuint createTexture();
     static void setRenderTarget( QString target );
-    static GLuint getPeelTexture( QString name );
+    static GLuint getTexture( QString name );
 
     static int idealThreadCount;
 
@@ -104,19 +99,15 @@ private:
 
     static bool shadersLoaded;
     static unsigned int pickIndex;
-    static bool picking;
 
-    static GLuint tex;
-    static GLuint rbo;
-    static GLuint fbo;
     static GLuint pbo_a;
     static GLuint pbo_b;
     static int screenWidth;
     static int screenHeight;
 
-    static QHash<QString, GLuint>peelTextures;
-    static GLuint peelRBO;
-    static GLuint peelFBO;
+    static QHash<QString, GLuint>textures;
+    static GLuint RBO;
+    static GLuint FBO;
 };
 
 #endif /* GLFUNCTIONS_H_ */
