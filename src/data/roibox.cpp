@@ -93,7 +93,7 @@ void ROIBox::propChanged()
     }
 }
 
-void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
         float x = m_properties.get( Fn::ROI::X ).toFloat();
         float y = m_properties.get( Fn::ROI::Y ).toFloat();
@@ -109,11 +109,11 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
     {
         if ( m_properties.get( Fn::ROI::SHAPE ).toInt() == 0 )
         {
-            GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID );
+            GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height );
         }
         else
         {
-            GLFunctions::drawBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID );
+            GLFunctions::drawBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height );
         }
     }
 }

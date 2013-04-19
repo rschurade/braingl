@@ -106,7 +106,9 @@ void ShapeRenderer::initSphere()
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 }
 
-void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                                float x, float y, float z, float dx, float dy, float dz,
+                                QColor color, int pickID, int width, int height )
 {
     float alpha = color.alphaF();
     int renderMode = GLFunctions::renderMode;
@@ -164,7 +166,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
         program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
         program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
-        program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+        program->setUniformValue( "u_canvasSize", width, height );
     }
 
     program->setUniformValue( "D0", 9 );
@@ -191,7 +193,9 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x,
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                                    float x, float y, float z, float dx, float dy, float dz,
+                                    QColor color, int pickID, int width, int height )
 {
     float alpha = color.alphaF();
     int renderMode = GLFunctions::renderMode;
@@ -260,7 +264,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float
         program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
         program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
-        program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
+        program->setUniformValue( "u_canvasSize", width, height );
     }
 
     program->setUniformValue( "D0", 9 );

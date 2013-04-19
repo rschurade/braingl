@@ -142,19 +142,15 @@ void ColormapRenderer::setShaderVars()
     program->setUniformValue( "u_max", m_selectedMax / m_max );
     program->setUniformValue( "u_lowerThreshold", m_lowerThreshold / m_max );
     program->setUniformValue( "u_upperThreshold", m_upperThreshold / m_max );
-    program->setUniformValue( "u_width", (float)GLFunctions::getScreenSize().x() );
-    program->setUniformValue( "u_height", (float)GLFunctions::getScreenSize().y() );
-    program->setUniformValue( "u_scaleX", GLFunctions::scaleX );
-    program->setUniformValue( "u_scaleY", GLFunctions::scaleY );
 
     if ( GLFunctions::offscreen )
     {
-        qDebug() << GLFunctions::getScreenSize().x() << GLFunctions::getScreenSize().y() << GLFunctions::scaleX << GLFunctions::scaleY;
+        //qDebug() << GLFunctions::getScreenSize().x() << GLFunctions::getScreenSize().y() << GLFunctions::scaleX << GLFunctions::scaleY;
     }
 
 }
 
-void ColormapRenderer::draw()
+void ColormapRenderer::draw( int width, int height )
 {
     GLFunctions::getShader( "colormapbar" )->bind();
     // Set modelview-projection matrix
@@ -182,10 +178,10 @@ void ColormapRenderer::draw()
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (const void *) offset );
 
-    program->setUniformValue( "u_width", (float)GLFunctions::getScreenSize().x() );
-    program->setUniformValue( "u_height", (float)GLFunctions::getScreenSize().y() );
-    program->setUniformValue( "u_scaleX", GLFunctions::scaleX );
-    program->setUniformValue( "u_scaleY", GLFunctions::scaleY );
+    program->setUniformValue( "u_width", (float)width );
+    program->setUniformValue( "u_height", (float)height );
+    program->setUniformValue( "u_scaleX", 1.0f );
+    program->setUniformValue( "u_scaleY", 1.0f );
 
     glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
 
@@ -194,12 +190,12 @@ void ColormapRenderer::draw()
     for ( int i = 0; i < m_labels.size(); ++i )
     {
         QString label = QString::number( m_labels[i].z(), 'f', 2 );
-        float xOffset = ( ( label.size() - 3 )  * ( ( (float)m_textSize / 4 ) / (float)GLFunctions::getScreenSize().x() ) ) * (float)GLFunctions::getScreenSize().x() +
-                        ( 0.5f  * ( ( (float)m_textSize / 4 ) / (float)GLFunctions::getScreenSize().x() ) ) * (float)GLFunctions::getScreenSize().x();
-        float yOffset = m_dy +  ( (float)m_textSize / 2 ) / (float)GLFunctions::getScreenSize().y() * (float)GLFunctions::getScreenSize().y() ;
+        float xOffset = ( ( label.size() - 3 )  * ( ( (float)m_textSize / 4 ) / (float)width ) ) * (float)width +
+                        ( 0.5f  * ( ( (float)m_textSize / 4 ) / (float)width ) ) * (float)width;
+        float yOffset = m_dy +  ( (float)m_textSize / 2 ) / (float)height * (float)height ;
 
 
-        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize );
+        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, QColor( 0,0,0 ) );
     }
 
 }

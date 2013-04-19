@@ -38,7 +38,7 @@ PropertyGroup* Dataset::properties()
     return &m_properties;
 }
 
-void Dataset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void Dataset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     // do nothing here
 }

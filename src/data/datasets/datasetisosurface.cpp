@@ -122,7 +122,7 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     m_trivecTriangles.clear();
 }
 
-void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_renderer == 0 )
     {
@@ -140,5 +140,5 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_renderer->setMesh( m_mesh );
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
 }

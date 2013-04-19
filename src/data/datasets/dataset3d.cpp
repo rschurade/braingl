@@ -138,7 +138,7 @@ QVector<QVector3D>* Dataset3D::getData()
     return &m_data;
 }
 
-void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_renderer == 0 )
     {
@@ -155,7 +155,7 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
     if ( m_properties.get( Fn::Property::RENDER_VECTORS_STICKS ).toBool() )
     {
-        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+        m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
     }
 }
 

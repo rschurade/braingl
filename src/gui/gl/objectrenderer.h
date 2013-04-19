@@ -11,9 +11,12 @@
 #include "GL/glew.h"
 
 #include <QVector3D>
+#include <QMatrix4x4>
 #include <QAbstractItemView>
 
 #include <initializer_list>
+
+class PropertyGroup;
 
 class ObjectRenderer : public QAbstractItemView
 {
@@ -24,7 +27,7 @@ public:
 	virtual void init() = 0;
 	virtual void initGeometry() {};
 	virtual void setShaderVars() {};
-	//virtual void draw() = 0;
+	//virtual void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, PropertyGroup* props );
 
 	// methods that must be implemented for QAbstractItemView
 	QRect visualRect( const QModelIndex &index ) const;

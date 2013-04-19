@@ -150,7 +150,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_selector == 0 )
     {
@@ -170,7 +170,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             connect( m_properties.getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
 
-        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+        m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
     }
     else if ( m_properties.get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
@@ -183,7 +183,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             connect( m_properties.getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
 
-        m_tubeRenderer->draw( pMatrix, mvMatrix, &m_properties );
+        m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
     }
 }
 

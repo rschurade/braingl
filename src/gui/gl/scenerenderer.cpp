@@ -131,8 +131,7 @@ void SceneRenderer::resizeGL( int width, int height )
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
 
-    GLFunctions::setScreenSize( m_width, m_height );
-    GLFunctions::initFBO();
+    GLFunctions::initFBO( width, height );
 
     calcMVPMatrix();
 }
@@ -216,7 +215,7 @@ void SceneRenderer::draw()
         glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -228,7 +227,7 @@ void SceneRenderer::draw()
         glClearColor( 0.0, 0.0, 0.0, 0.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -245,7 +244,7 @@ void SceneRenderer::draw()
         glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -256,7 +255,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -272,7 +271,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -283,7 +282,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -299,7 +298,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -310,7 +309,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -325,7 +324,7 @@ void SceneRenderer::draw()
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
+        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         renderDatasets();
         renderRois();
 
@@ -466,7 +465,7 @@ void SceneRenderer::renderDatasets()
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_pMatrix, m_mvMatrix );
+            ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
         }
     }
 }
@@ -479,7 +478,7 @@ void SceneRenderer::renderRois()
        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
        {
-           roi->draw( m_pMatrix, m_mvMatrix );
+           roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
 
            QModelIndex mi = Models::r()->index( i, 0 );
            int countBoxes = Models::r()->rowCount(  mi );
@@ -489,7 +488,7 @@ void SceneRenderer::renderRois()
                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
                {
-                   roi->draw( m_pMatrix, m_mvMatrix );
+                   roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height );
                }
            }
        }
@@ -561,7 +560,7 @@ void SceneRenderer::rightMouseDown( int x, int y )
 {
     renderPick();
     // get id
-    m_picked = GLFunctions::get_object_id( x, y );
+    m_picked = GLFunctions::get_object_id( x, y, m_width, m_height );
     qDebug() << "picked object id: " << m_picked;
 
     QVector3D pickPos = mapMouse2World( x, y );

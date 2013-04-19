@@ -208,7 +208,7 @@ void DatasetTensor::flipX()
     m_data = newData;
 }
 
-void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_properties.get( Fn::Property::TENSOR_RENDERMODE ).toInt() == 0 )
     {
@@ -224,7 +224,7 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
             m_renderer->init();
         }
 
-        m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+        m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
     }
     else
     {
@@ -238,7 +238,7 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
 
 
 
-        m_rendererEV->draw( pMatrix, mvMatrix, &m_properties );
+        m_rendererEV->draw( pMatrix, mvMatrix, width, height, &m_properties );
     }
 }
 

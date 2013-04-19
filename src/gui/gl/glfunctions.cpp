@@ -32,12 +32,8 @@ ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
 bool GLFunctions::offscreen = false;
-float GLFunctions::scaleX = 1.0;
-float GLFunctions::scaleY = 1.0;
 float GLFunctions::sliceAlpha = 1.0;
 
-int GLFunctions::screenWidth = 0;
-int GLFunctions::screenHeight = 0;
 int GLFunctions::renderMode = 0;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
@@ -49,17 +45,6 @@ QVector< QString > GLFunctions::m_shaderNames;
 int GLFunctions::getPickIndex()
 {
     return GLFunctions::pickIndex++;
-}
-
-void GLFunctions::setScreenSize( int width, int height )
-{
-    GLFunctions::screenWidth = width;
-    GLFunctions::screenHeight = height;
-}
-
-QPoint GLFunctions::getScreenSize()
-{
-    return QPoint( GLFunctions::screenWidth, GLFunctions::screenHeight );
 }
 
 void GLFunctions::setupTextures()
@@ -355,9 +340,6 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
     program->setUniformValue( "u_texActive3", false );
     program->setUniformValue( "u_texActive4", false );
 
-    program->setUniformValue( "u_renderMode", GLFunctions::renderMode );
-    program->setUniformValue( "u_canvasSize", GLFunctions::getScreenSize().x(), GLFunctions::getScreenSize().y() );
-
     QList< int > tl = getTextureIndexes();
     QAbstractItemModel* model = Models::d();
     QModelIndex index;
@@ -512,24 +494,24 @@ QList< int > GLFunctions::getTextureIndexes()
 GLuint GLFunctions::pbo_a = 0;
 GLuint GLFunctions::pbo_b = 0;
 
-void GLFunctions::generate_pixel_buffer_objects()
+void GLFunctions::generate_pixel_buffer_objects( int width, int height )
 {
     /* generate the first pixel buffer objects */
     glGenBuffers( 1, &GLFunctions::pbo_a );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_a );
-    glBufferData( GL_PIXEL_PACK_BUFFER, GLFunctions::screenWidth * GLFunctions::screenHeight * 4, NULL, GL_STREAM_READ );
+    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
     /* to avoid weird behaviour the first frame the data is loaded */
-    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
     /* generate the second pixel buffer objects */
     glGenBuffers( 1, &GLFunctions::pbo_b );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_b );
-    glBufferData( GL_PIXEL_PACK_BUFFER, GLFunctions::screenWidth * GLFunctions::screenHeight * 4, NULL, GL_STREAM_READ );
-    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
     /* unbind */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
 }
 
-uint GLFunctions::get_object_id( int x, int y )
+uint GLFunctions::get_object_id( int x, int y, int width, int height )
 {
     static int frame_event = 0;
     int read_pbo, map_pbo;
@@ -538,7 +520,7 @@ uint GLFunctions::get_object_id( int x, int y )
     uint red, green, blue, pixel_index;
     GLubyte* ptr;
 
-    GLFunctions::generate_pixel_buffer_objects();
+    GLFunctions::generate_pixel_buffer_objects( width, height );
     /* switch between pixel buffer objects */
     if (frame_event == 0)
     {
@@ -554,18 +536,18 @@ uint GLFunctions::get_object_id( int x, int y )
     }
     /* read one pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
-    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
     /* map the other pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
     ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
     /* get the mouse coordinates */
     /* OpenGL has the {0,0} at the down-left corner of the screen */
-    y = GLFunctions::screenHeight - y;
+    y = height - y;
     object_id = -1;
 
-    if ( x >= 0 && x < GLFunctions::screenWidth && y >= 0 && y < GLFunctions::screenHeight )
+    if ( x >= 0 && x < width && y >= 0 && y < height )
     {
-        pixel_index = ( x + y * GLFunctions::screenWidth ) * 4;
+        pixel_index = ( x + y * width ) * 4;
         blue = ptr[pixel_index];
         green = ptr[pixel_index + 1];
         red = ptr[pixel_index + 2];
@@ -588,8 +570,8 @@ void GLFunctions::beginOffscreen( const int screen_width, const int screen_heigh
     /*
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
     GLFunctions::offscreen = true;
-    GLFunctions::screenWidth = screen_width;
-    GLFunctions::screenHeight = screen_height;
+    width = screen_width;
+    height = screen_height;
     */
 }
 
@@ -598,8 +580,8 @@ void GLFunctions::endOffscreen( const int screen_width, const int screen_height 
     /*
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     GLFunctions::offscreen = false;
-    GLFunctions::screenWidth = screen_width;
-    GLFunctions::screenHeight = screen_height;
+    width = screen_width;
+    height = screen_height;
     GLFunctions::scaleX = 1.0;
     GLFunctions::scaleY = 1.0;
     glDeleteBuffers( 1, &GLFunctions::pbo_a );
@@ -607,7 +589,7 @@ void GLFunctions::endOffscreen( const int screen_width, const int screen_height 
     */
 }
 
-QImage* GLFunctions::getOffscreenTexture()
+QImage* GLFunctions::getOffscreenTexture( int width, int height )
 {
      static int frame_event = 0;
     int read_pbo, map_pbo;
@@ -615,7 +597,7 @@ QImage* GLFunctions::getOffscreenTexture()
     uint red, green, blue, alpha, pixel_index;
     GLubyte* ptr;
 
-    GLFunctions::generate_pixel_buffer_objects();
+    GLFunctions::generate_pixel_buffer_objects( width, height );
     /* switch between pixel buffer objects */
     if (frame_event == 0)
     {
@@ -630,27 +612,27 @@ QImage* GLFunctions::getOffscreenTexture()
     }
     /* read one pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
-    glReadPixels( 0, 0, GLFunctions::screenWidth, GLFunctions::screenHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
     /* map the other pixel buffer */
     glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
     ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
     /* get the mouse coordinates */
     /* OpenGL has the {0,0} at the down-left corner of the screen */
 
-    QImage* image = new QImage( GLFunctions::screenWidth, GLFunctions::screenHeight, QImage::Format_RGB32 );
+    QImage* image = new QImage( width, height, QImage::Format_RGB32 );
     QColor c;
-    for ( int x = 0; x < GLFunctions::screenWidth; ++x )
+    for ( int x = 0; x < width; ++x )
     {
-        for ( int y = 0; y < GLFunctions::screenHeight; ++y )
+        for ( int y = 0; y < height; ++y )
         {
-            pixel_index = ( x + y * GLFunctions::screenWidth ) * 4;
+            pixel_index = ( x + y * width ) * 4;
             blue = ptr[pixel_index];
             green = ptr[pixel_index + 1];
             red = ptr[pixel_index + 2];
             alpha = ptr[pixel_index + 3];
 
             c = QColor( red, green, blue, alpha );
-            image->setPixel( x, ( GLFunctions::screenHeight - y )-1, c.rgba() );
+            image->setPixel( x, ( height - y )-1, c.rgba() );
         }
     }
 
@@ -665,11 +647,11 @@ void GLFunctions::initTextRenderer()
     GLFunctions::m_textRenderer->init();
 }
 
-void GLFunctions::renderText( QString text, int x, int y, int size, QColor color )
+void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color )
 {
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
-    GLFunctions::m_textRenderer->renderText( text, x, y );
+    GLFunctions::m_textRenderer->renderText( text, x, y, width, height );
 }
 
 void GLFunctions::initShapeRenderer()
@@ -677,14 +659,18 @@ void GLFunctions::initShapeRenderer()
     GLFunctions::m_shapeRenderer->init();
 }
 
-void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                              float x, float y, float z, float dx, float dy, float dz,
+                              QColor color, int pickID, int width, int height )
 {
-    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
+    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height );
 }
 
-void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID )
+void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                                 float x, float y, float z, float dx, float dy, float dz,
+                                 QColor color, int pickID, int width, int height )
 {
-    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID );
+    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height );
 }
 
 QHash< QString, GLuint > GLFunctions::textures;
@@ -692,18 +678,17 @@ GLuint GLFunctions::RBO = 0;
 GLuint GLFunctions::FBO = 0;
 
 
-void GLFunctions::initFBO()
+void GLFunctions::initFBO( int width, int height )
 {
-    GLFunctions::textures[ "C0" ] = createTexture();
-    GLFunctions::textures[ "C1" ] = createTexture();
-    GLFunctions::textures[ "C2" ] = createTexture();
-    GLFunctions::textures[ "C3" ] = createTexture();
-    GLFunctions::textures[ "D0" ] = createTexture();
-    GLFunctions::textures[ "D1" ] = createTexture();
-    GLFunctions::textures[ "D2" ] = createTexture();
-    GLFunctions::textures[ "PICK" ] = createTexture();
+    GLFunctions::textures[ "C0" ] = createTexture( width, height );
+    GLFunctions::textures[ "C1" ] = createTexture( width, height );
+    GLFunctions::textures[ "C2" ] = createTexture( width, height );
+    GLFunctions::textures[ "C3" ] = createTexture( width, height );
+    GLFunctions::textures[ "D0" ] = createTexture( width, height );
+    GLFunctions::textures[ "D1" ] = createTexture( width, height );
+    GLFunctions::textures[ "D2" ] = createTexture( width, height );
+    GLFunctions::textures[ "PICK" ] = createTexture( width, height );
 
-    qDebug() << GLFunctions::screenWidth << GLFunctions::screenHeight;
     /* create a framebuffer object */
     glGenFramebuffers( 1, &GLFunctions::FBO );
     /* attach the texture and the render buffer to the frame buffer */
@@ -714,7 +699,7 @@ void GLFunctions::initFBO()
     /* bind the texture */
     glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::RBO );
     /* create the render buffer in the GPU */
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, GLFunctions::screenWidth, GLFunctions::screenHeight );
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
 
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures["C0"], 0 );
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::RBO );
@@ -731,7 +716,7 @@ void GLFunctions::initFBO()
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
-GLuint GLFunctions::createTexture()
+GLuint GLFunctions::createTexture( int width, int height )
 {
     /* generate a texture id */
     GLuint ptex;
@@ -743,7 +728,7 @@ GLuint GLFunctions::createTexture()
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     /* create the texture in the GPU */
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GLFunctions::screenWidth, GLFunctions::screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
     /* unbind the texture */
     glBindTexture( GL_TEXTURE_2D, 0 );
 

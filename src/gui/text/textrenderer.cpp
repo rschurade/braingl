@@ -50,7 +50,7 @@ void TextRenderer::createFontTexture()
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
-void TextRenderer::renderText( QString text, int x, int y )
+void TextRenderer::renderText( QString text, int x, int y, int width, int height )
 {
     //qDebug() << text << x << y;
     glActiveTexture( GL_TEXTURE0 );
@@ -70,10 +70,10 @@ void TextRenderer::renderText( QString text, int x, int y )
 
     program->setUniformValue( "u_x", (float)x );
     program->setUniformValue( "u_y", (float)y );
-    program->setUniformValue( "u_width", (float)GLFunctions::getScreenSize().x() );
-    program->setUniformValue( "u_height", (float)GLFunctions::getScreenSize().y() );
-    program->setUniformValue( "u_scaleX", GLFunctions::scaleX );
-    program->setUniformValue( "u_scaleY", GLFunctions::scaleY );
+    program->setUniformValue( "u_width", width );
+    program->setUniformValue( "u_height", height );
+    program->setUniformValue( "u_scaleX", 1.0f );
+    program->setUniformValue( "u_scaleY", 1.0f );
     program->setUniformValue( "u_sizeX", m_textSizeX );
     program->setUniformValue( "u_sizeY", m_textSizeY );
 
@@ -104,10 +104,10 @@ void TextRenderer::initGeometry()
     glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(float), vertices, GL_STATIC_DRAW );
 }
 
-void TextRenderer::setSize( int size )
+void TextRenderer::setSize( float size )
 {
-    m_textSizeX = (float)size / (float)GLFunctions::getScreenSize().x();
-    m_textSizeY = (float)size / (float)GLFunctions::getScreenSize().y();
+    m_textSizeX = size;
+    m_textSizeY = size;
 }
 
 void TextRenderer::setColor( QColor color )
