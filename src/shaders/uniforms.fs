@@ -1,5 +1,4 @@
 
-uniform bool u_picking;
 uniform vec4 u_pickColor;
 uniform vec4 u_color;
 uniform int u_colorMode;

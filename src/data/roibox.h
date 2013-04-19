@@ -18,7 +18,7 @@ public:
     ROIBox();
     virtual ~ROIBox();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
 
     static int m_count;
 private:

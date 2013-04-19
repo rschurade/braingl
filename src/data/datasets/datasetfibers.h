@@ -30,7 +30,7 @@ public:
                      QVector<float> maxes );
     virtual ~DatasetFibers();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
     QString getValueAsString( int x, int y, int z );
 
     QVector< QVector< float > > getFibs();

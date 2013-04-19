@@ -21,7 +21,7 @@ public:
     virtual ~ColormapRenderer();
 
     void init();
-    void draw();
+    void draw( int width, int height );
 
 private:
 

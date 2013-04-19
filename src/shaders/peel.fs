@@ -27,7 +27,11 @@ float decode( vec4 d )
 void writePeel( vec3 color )
 {
     // picking
-    if ( u_renderMode == 1 )
+    if ( u_renderMode == 0 )
+    {
+        gl_FragColor = vec4( color, 1.0 );
+    }
+    else if ( u_renderMode == 1 )
     {
         gl_FragColor = u_color;
     }

@@ -20,8 +20,13 @@ public:
 
     void init();
 
-    void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
-    void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
+    void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                    float x, float y, float z, float dx, float dy, float dz,
+                    QColor color, int pickID, int width, int height );
+
+    void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                        float x, float y, float z, float dx, float dy, float dz,
+                        QColor color, int pickID, int width, int height );
 
 private:
     GLuint *vboIds;

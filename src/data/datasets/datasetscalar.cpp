@@ -150,7 +150,7 @@ void DatasetScalar::flipX()
     m_data = newData;
 }
 
-void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_properties.get( Fn::Property::RENDER_COLORMAP ).toBool() )
     {
@@ -173,7 +173,7 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_colormapRenderer->setLowerThreshold( m_properties.get( Fn::Property::LOWER_THRESHOLD).toFloat() );
         m_colormapRenderer->setUpperThreshold( m_properties.get( Fn::Property::UPPER_THRESHOLD).toFloat() );
 
-        m_colormapRenderer->draw();
+        m_colormapRenderer->draw( width, height );
     }
 }
 

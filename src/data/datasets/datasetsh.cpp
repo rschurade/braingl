@@ -109,7 +109,7 @@ void DatasetSH::flipX()
     m_data = newData;
 }
 
-void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
+void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height )
 {
     if ( m_renderer == 0 )
     {
@@ -123,7 +123,7 @@ void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix )
         m_renderer->init();
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, &m_properties );
 }
 
 QString DatasetSH::getValueAsString( int x, int y, int z )

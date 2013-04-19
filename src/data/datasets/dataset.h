@@ -32,7 +32,7 @@ public:
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height );
 
     virtual QString getValueAsString( int x, int y, int z );
 

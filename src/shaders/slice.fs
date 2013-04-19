@@ -8,12 +8,13 @@
 void main()
 {
     vec4 color = texColor( v_texcoord );
-    if ( u_picking )
+    if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
+    
+    if ( u_renderMode == 1 )
     {
+    
         color = u_pickColor;
     }
-
-	if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
 	
 	writePeel( color.rgb );   
 }

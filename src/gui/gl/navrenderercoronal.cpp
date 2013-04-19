@@ -155,6 +155,7 @@ void NavRendererCoronal::draw()
     GLFunctions::getShader( "slice" )->bind();
     // Set modelview-projection matrix
     GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
+    GLFunctions::getShader( "slice" )->setUniformValue( "u_renderMode", 0 );
 
     initGeometry();
 

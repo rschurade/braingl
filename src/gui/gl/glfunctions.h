@@ -50,36 +50,35 @@ public:
 
     static int getPickIndex();
 
-    static void generate_pixel_buffer_objects();
-    static uint get_object_id( int x, int y );
+    static void generate_pixel_buffer_objects( int width, int height );
+    static uint get_object_id( int x, int y, int width, int height );
 
     static void beginOffscreen( const int screen_width, const int screen_height );
     static void endOffscreen( const int screen_width, const int screen_height );
 
-    static QImage* getOffscreenTexture();
+    static QImage* getOffscreenTexture( int width, int height );
 
     static void updateColormapShader();
 
-    static void setScreenSize( int width, int height );
-    static QPoint getScreenSize();
-
     static void initTextRenderer();
-    static void renderText( QString text, int x, int y, int size = 10, QColor color = QColor( 0, 0, 0 ) );
+    static void renderText( QString text, int x, int y, int size, int width, int height, QColor color = QColor( 0, 0, 0 ) );
 
     static void initShapeRenderer();
-    static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
-    static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, float x, float y, float z, float dx, float dy, float dz, QColor color, int pickID );
+    static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                            float x, float y, float z, float dx, float dy, float dz,
+                            QColor color, int pickID, int width, int height );
+    static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                               float x, float y, float z, float dx, float dy, float dz,
+                               QColor color, int pickID, int width, int height );
 
-    static void initFBO();
-    static GLuint createTexture();
+    static void initFBO( int width, int height );
+    static GLuint createTexture( int width, int height );
     static void setRenderTarget( QString target );
     static GLuint getTexture( QString name );
 
     static int idealThreadCount;
 
     static bool offscreen;
-    static float scaleX;
-    static float scaleY;
     static int renderMode;
     static float sliceAlpha;
 
@@ -102,8 +101,6 @@ private:
 
     static GLuint pbo_a;
     static GLuint pbo_b;
-    static int screenWidth;
-    static int screenHeight;
 
     static QHash<QString, GLuint>textures;
     static GLuint RBO;
