@@ -403,58 +403,10 @@ void SceneRenderer::renderMerge()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-
 }
 
 QImage* SceneRenderer::screenshot()
 {
-    /*
-    qDebug() << "rendering screenshot";
-
-    int size = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
-    int texX;
-    int texY;
-    if ( m_width >= m_height )
-    {
-        texX = size;
-        texY = texX * m_height / m_width;
-    }
-    else
-    {
-        texY = size;
-        texX = m_width * texY / m_height;
-    }
-
-    // create offscreen texture
-    GLFunctions::generate_frame_buffer_texture( texX , texY );
-    GLFunctions::beginOffscreen( texX, texY );
-
-    glViewport( 0, 0, texX, texY );
-
-    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
-    glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix );
-
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glEnable( GL_BLEND );
-
-    glShadeModel( GL_SMOOTH );
-    //glEnable( GL_LIGHTING );
-    //glEnable( GL_LIGHT0 );
-    glEnable( GL_MULTISAMPLE );
-
-    renderDatasets();
-
-    renderRois();
-
-    QImage* image = GLFunctions::getOffscreenTexture();
-    GLFunctions::endOffscreen( m_width, m_height );
-    glViewport( 0, 0, m_width, m_height );
-    return image;
-    */
 }
 
 void SceneRenderer::renderDatasets()

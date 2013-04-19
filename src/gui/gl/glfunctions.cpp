@@ -31,7 +31,6 @@ ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
-bool GLFunctions::offscreen = false;
 float GLFunctions::sliceAlpha = 1.0;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
@@ -489,6 +488,37 @@ QList< int > GLFunctions::getTextureIndexes()
     return tl;
 }
 
+void GLFunctions::initTextRenderer()
+{
+    GLFunctions::m_textRenderer->init();
+}
+
+void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color )
+{
+    GLFunctions::m_textRenderer->setSize( size );
+    GLFunctions::m_textRenderer->setColor( color );
+    GLFunctions::m_textRenderer->renderText( text, x, y, width, height );
+}
+
+void GLFunctions::initShapeRenderer()
+{
+    GLFunctions::m_shapeRenderer->init();
+}
+
+void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                              float x, float y, float z, float dx, float dy, float dz,
+                              QColor color, int pickID, int width, int height, int renderMode )
+{
+    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
+}
+
+void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+                                 float x, float y, float z, float dx, float dy, float dz,
+                                 QColor color, int pickID, int width, int height, int renderMode )
+{
+    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
+}
+
 GLuint GLFunctions::pbo_a = 0;
 GLuint GLFunctions::pbo_b = 0;
 
@@ -563,113 +593,7 @@ uint GLFunctions::get_object_id( int x, int y, int width, int height )
     return object_id;
 }
 
-void GLFunctions::beginOffscreen( const int screen_width, const int screen_height )
-{
-    /*
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::fbo );
-    GLFunctions::offscreen = true;
-    width = screen_width;
-    height = screen_height;
-    */
-}
 
-void GLFunctions::endOffscreen( const int screen_width, const int screen_height )
-{
-    /*
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-    GLFunctions::offscreen = false;
-    width = screen_width;
-    height = screen_height;
-    GLFunctions::scaleX = 1.0;
-    GLFunctions::scaleY = 1.0;
-    glDeleteBuffers( 1, &GLFunctions::pbo_a );
-    glDeleteBuffers( 1, &GLFunctions::pbo_b );
-    */
-}
-
-QImage* GLFunctions::getOffscreenTexture( int width, int height )
-{
-     static int frame_event = 0;
-    int read_pbo, map_pbo;
-
-    uint red, green, blue, alpha, pixel_index;
-    GLubyte* ptr;
-
-    GLFunctions::generate_pixel_buffer_objects( width, height );
-    /* switch between pixel buffer objects */
-    if (frame_event == 0)
-    {
-        frame_event = 1;
-        read_pbo = GLFunctions::pbo_a;
-        map_pbo = GLFunctions::pbo_b;
-    }
-    else {
-        frame_event = 0;
-        read_pbo = GLFunctions::pbo_b;
-        map_pbo = GLFunctions::pbo_a;
-    }
-    /* read one pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
-    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* map the other pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
-    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
-    /* get the mouse coordinates */
-    /* OpenGL has the {0,0} at the down-left corner of the screen */
-
-    QImage* image = new QImage( width, height, QImage::Format_RGB32 );
-    QColor c;
-    for ( int x = 0; x < width; ++x )
-    {
-        for ( int y = 0; y < height; ++y )
-        {
-            pixel_index = ( x + y * width ) * 4;
-            blue = ptr[pixel_index];
-            green = ptr[pixel_index + 1];
-            red = ptr[pixel_index + 2];
-            alpha = ptr[pixel_index + 3];
-
-            c = QColor( red, green, blue, alpha );
-            image->setPixel( x, ( height - y )-1, c.rgba() );
-        }
-    }
-
-    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
-
-    return image;
-}
-
-void GLFunctions::initTextRenderer()
-{
-    GLFunctions::m_textRenderer->init();
-}
-
-void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color )
-{
-    GLFunctions::m_textRenderer->setSize( size );
-    GLFunctions::m_textRenderer->setColor( color );
-    GLFunctions::m_textRenderer->renderText( text, x, y, width, height );
-}
-
-void GLFunctions::initShapeRenderer()
-{
-    GLFunctions::m_shapeRenderer->init();
-}
-
-void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
-                              float x, float y, float z, float dx, float dy, float dz,
-                              QColor color, int pickID, int width, int height, int renderMode )
-{
-    GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
-}
-
-void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
-                                 float x, float y, float z, float dx, float dy, float dz,
-                                 QColor color, int pickID, int width, int height, int renderMode )
-{
-    GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
-}
 
 QHash< QString, GLuint > GLFunctions::textures;
 GLuint GLFunctions::RBO = 0;
@@ -678,6 +602,17 @@ GLuint GLFunctions::FBO = 0;
 
 void GLFunctions::initFBO( int width, int height )
 {
+    if ( GLFunctions::textures.size() > 0 )
+    {
+        foreach ( GLuint tex, GLFunctions::textures )
+        {
+            glDeleteTextures( 1, &tex );
+        }
+        glDeleteFramebuffers( 1, &GLFunctions::FBO );
+        glDeleteRenderbuffers( 1, &GLFunctions::RBO );
+
+    }
+
     GLFunctions::textures[ "C0" ] = createTexture( width, height );
     GLFunctions::textures[ "C1" ] = createTexture( width, height );
     GLFunctions::textures[ "C2" ] = createTexture( width, height );

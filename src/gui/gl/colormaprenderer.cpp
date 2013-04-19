@@ -142,12 +142,6 @@ void ColormapRenderer::setShaderVars()
     program->setUniformValue( "u_max", m_selectedMax / m_max );
     program->setUniformValue( "u_lowerThreshold", m_lowerThreshold / m_max );
     program->setUniformValue( "u_upperThreshold", m_upperThreshold / m_max );
-
-    if ( GLFunctions::offscreen )
-    {
-        //qDebug() << GLFunctions::getScreenSize().x() << GLFunctions::getScreenSize().y() << GLFunctions::scaleX << GLFunctions::scaleY;
-    }
-
 }
 
 void ColormapRenderer::draw( int width, int height )
