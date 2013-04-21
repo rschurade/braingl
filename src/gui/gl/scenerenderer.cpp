@@ -112,15 +112,20 @@ void SceneRenderer::initGL()
         { QVector3D( 1.0,  -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
         { QVector3D( 1.0,  1.0,  0 ), QVector3D( 1.0, 1.0, 0.0 ) },
         { QVector3D( -1.0, 1.0,  0 ), QVector3D( 0.0, 1.0, 0.0 ) }
+
+//        { QVector3D( -1.0, -1.0, -0.2 ), QVector3D( 0.0, 0.0, 0.0 ) },
+//        { QVector3D( 0.0,  -1.0, -0.2 ), QVector3D( 1.0, 0.0, 0.0 ) },
+//        { QVector3D( 0.0,  0.0,  -0.2 ), QVector3D( 1.0, 1.0, 0.0 ) },
+//        { QVector3D( -1.0, 0.0,  -0.2 ), QVector3D( 0.0, 1.0, 0.0 ) }
     };
     glGenBuffers( 2, vboIds );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
 
-    GLushort indices[] = { 0, 1, 2, 3 };
+    GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -192,6 +197,7 @@ void SceneRenderer::draw()
         glEnable( GL_DEPTH_TEST );
         glDepthFunc( GL_LEQUAL );
         glClearDepth( 1 );
+        glDisable( GL_BLEND );
 
         GLuint tex = GLFunctions::getTexture( "D0" );
         glActiveTexture( GL_TEXTURE9 );
@@ -210,6 +216,9 @@ void SceneRenderer::draw()
         // Pass 1 - draw opaque objects
         //
         //***************************************************************************************************/
+        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
         m_renderMode = 4;
         GLFunctions::setRenderTarget( "C0" );
 
@@ -397,9 +406,26 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C2", 7 );
     program->setUniformValue( "C3", 8 );
     program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D0", 10 );
     program->setUniformValue( "D2", 11 );
 
-    glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
+    GLenum errCode;
+    const GLubyte *errString;
+    //qDebug() << "1";
+    if ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error 1: %s\n", errString);
+    }
+
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+    //qDebug() << "2";
+    if ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error 2: %s\n", errString);
+    }
+
+
+
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
