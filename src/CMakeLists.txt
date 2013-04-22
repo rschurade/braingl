@@ -91,7 +91,11 @@ INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
+IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x -stdlib=libc++" )
+ELSE()
+    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
+ENDIF()
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
@@ -143,5 +147,50 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
 
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
 	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
+ENDIF()
+
+IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+
+    IF (CMAKE_VERBOSE_MAKEFILE)
+          MESSAGE(STATUS)
+          MESSAGE(STATUS "*******************************************************************************")
+          MESSAGE(STATUS "*        SUMMARY OF USED VARIABLES -> Details in AllVariables.txt             *")
+          MESSAGE(STATUS "*******************************************************************************")
+          MESSAGE(STATUS "COMPILING FOR OSX, platforms: ${CMAKE_OSX_ARCHITECTURES}")
+          MESSAGE(STATUS "CMAKE_ROOT ........................... = ${CMAKE_ROOT}")
+          MESSAGE(STATUS "CMAKE_HOME_DIRECTORY ................. = ${CMAKE_HOME_DIRECTORY}")
+          MESSAGE(STATUS "CMAKE_VERSION ........................ = ${CMAKE_VERSION}")
+          MESSAGE(STATUS "CMAKE_GENERATOR ...................... = ${CMAKE_GENERATOR}")
+          MESSAGE(STATUS "CMAKE_MODULE_PATH .................... = ${CMAKE_MODULE_PATH}")
+          MESSAGE(STATUS "CMAKE_HOST_SYSTEM .................... = ${CMAKE_HOST_SYSTEM}")
+          MESSAGE(STATUS "CMAKE_HOST_SYSTEM_VERSION ............ = ${CMAKE_HOST_SYSTEM_VERSION}")
+          MESSAGE(STATUS "CMAKE_HOST_SYSTEM_NAME ............... = ${CMAKE_HOST_SYSTEM_NAME}")
+          MESSAGE(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR .......... = ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+          MESSAGE(STATUS "CMAKE_HOST_UNIX ...................... = ${CMAKE_HOST_UNIX}")
+          MESSAGE(STATUS "CMAKE_BUILD_TYPE ..................... = ${CMAKE_BUILD_TYPE}")
+          MESSAGE(STATUS "CMAKE_C_COMPILER ..................... = ${CMAKE_C_COMPILER}")
+          MESSAGE(STATUS "CMAKE_CXX_COMPILER ................... = ${CMAKE_CXX_COMPILER}")
+          MESSAGE(STATUS "CMAKE_CURRENT_SOURCE_DIR ............. = ${CMAKE_CURRENT_SOURCE_DIR}")
+          MESSAGE(STATUS "CMAKE_CURRENT_BINARY_DIR ............. = ${CMAKE_CURRENT_BINARY_DIR}")
+          MESSAGE(STATUS "CMAKE_LIBRARY_PATH ................... = ${CMAKE_LIBRARY_PATH}")          
+    ENDIF()
+        
+    # Collect the compile-files for this target
+    COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
+
+    SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
+
+    # This is needed since the mocs will be generated there
+    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR})
+
+    QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
+    
+    QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
+
+    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+
+    # Some linux distributions need to explicitily link against X11. We add this lib here.
+    SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
+    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} z)
 ENDIF()
 

@@ -22,6 +22,8 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
+#include <locale.h>
+
 #define NUM_TEXTURES 5
 
 int GLFunctions::idealThreadCount = QThread::idealThreadCount();
