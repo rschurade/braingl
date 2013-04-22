@@ -63,7 +63,7 @@ MainWindow::MainWindow( bool debug ) :
 
     createStatusBar();
 
-    setWindowTitle( tr( "Fibernavigator 2" ) );
+    setWindowTitle( tr( "brainGL" ) );
 
     setUnifiedTitleAndToolBarOnMac( true );
 
