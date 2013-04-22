@@ -32,7 +32,7 @@ public:
     TriangleMesh2* getMesh();
 
 protected:
-    TriangleMesh2* m_mesh;
+    QVector<TriangleMesh2*> m_mesh;
     MeshRenderer* m_renderer;
 
 private slots:
