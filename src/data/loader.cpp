@@ -6,6 +6,7 @@
  */
 #include "loader.h"
 #include "loadervtk.h"
+#include "loaderfreesurfer.h"
 
 #include "datasets/datasetscalar.h"
 #include "datasets/dataset3d.h"
@@ -15,6 +16,7 @@
 #include "datasets/datasetfibers.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
+#include "datasets/datasetsurfaceset.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -23,8 +25,7 @@
 #include <QtGui>
 
 Loader::Loader() :
-    m_datasetType( Fn::DatasetType::UNKNOWN ),
-    m_success( false )
+        m_datasetType( Fn::DatasetType::UNKNOWN ), m_success( false )
 {
 }
 
@@ -75,6 +76,17 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".vtk" ) )
     {
         return loadVTK();
+    }
+
+    if ( m_fileName.path().endsWith( ".asc" ) )
+    {
+        //TODO: Deal with offsets: Check if orig is always the same size?
+        return loadASC( QVector3D( 128, 128, 128 ) );
+    }
+
+    if ( m_fileName.path().endsWith( ".set" ) )
+    {
+        return loadSet();
     }
 
     return false;
@@ -431,7 +443,7 @@ bool Loader::loadNiftiQBall( QString fileName )
 
             DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
             //out->properties()->set "name", "QBall" );
-            out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::QBALL );
+            out->properties()->set( Fn::Property::CREATED_BY, (int) Fn::Algo::QBALL );
             out->properties()->set( Fn::Property::LOD, 2 );
             out->properties()->set( Fn::Property::ORDER, order );
             out->properties()->set( Fn::Property::RENDER_SLICE, 1 );
@@ -477,7 +489,7 @@ bool Loader::loadNiftiBingham( QString fileName )
 
             DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
             //out->properties()->set "name", "QBall" );
-            out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::BINGHAM );
+            out->properties()->set( Fn::Property::CREATED_BY, (int) Fn::Algo::BINGHAM );
             out->properties()->set( Fn::Property::LOD, 2 );
             out->properties()->set( Fn::Property::RENDER_SLICE, 1 );
 
@@ -772,7 +784,7 @@ QVector<float> Loader::loadBvals( QString fileName )
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
             QMessageBox msgBox;
-            msgBox.setText("Error! Couldn't open" + fn );
+            msgBox.setText( "Error! Couldn't open" + fn );
             msgBox.exec();
             qDebug() << "couldn't open " << fn;
             return bvals;
@@ -790,7 +802,7 @@ QVector<float> Loader::loadBvals( QString fileName )
                 if ( !ok )
                 {
                     QMessageBox msgBox;
-                    msgBox.setText("Error! While parsing bvals (" + QString::number( i ) + "), conversion failure string to float!" );
+                    msgBox.setText( "Error! While parsing bvals (" + QString::number( i ) + "), conversion failure string to float!" );
                     msgBox.exec();
                     qDebug() << "error while parsing bvals (" << i << "), conversion failure string to float";
                     bvals.clear();
@@ -805,7 +817,7 @@ QVector<float> Loader::loadBvals( QString fileName )
     else
     {
         QMessageBox msgBox;
-        msgBox.setText("Error! Couldn't open" + fn );
+        msgBox.setText( "Error! Couldn't open" + fn );
         msgBox.exec();
         qDebug() << "couldn't open " << fn;
         return bvals;
@@ -836,7 +848,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
         if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
         {
             QMessageBox msgBox;
-            msgBox.setText("Error! Couldn't open" + fn );
+            msgBox.setText( "Error! Couldn't open" + fn );
             msgBox.exec();
             qDebug() << "couldn't open " << fn;
             return bvecs;
@@ -858,7 +870,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
         if ( bvals.size() != slX.size() || bvals.size() != slY.size() || bvals.size() != slZ.size() )
         {
             QMessageBox msgBox;
-            msgBox.setText("Error! While loading dwi dataset, bvals don't match bvecs!" );
+            msgBox.setText( "Error! While loading dwi dataset, bvals don't match bvecs!" );
             msgBox.exec();
             qDebug() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
             return bvecs;
@@ -873,7 +885,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
                 if ( !( okX && okY && okZ ) )
                 {
                     QMessageBox msgBox;
-                    msgBox.setText("Error! While parsing bvecs(" + QString::number( i ) +  "), conversion failure string to float" );
+                    msgBox.setText( "Error! While parsing bvecs(" + QString::number( i ) + "), conversion failure string to float" );
                     msgBox.exec();
                     qDebug() << "error while parsing bvecs(" << i << "), conversion failure string to float";
                     bvecs.clear();
@@ -887,7 +899,7 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
     else
     {
         QMessageBox msgBox;
-        msgBox.setText("Error! Couldn't open" + fn );
+        msgBox.setText( "Error! Couldn't open" + fn );
         msgBox.exec();
         qDebug() << "couldn't open " << fn;
         return bvecs;
@@ -902,68 +914,68 @@ bool Loader::loadMesh()
 bool Loader::loadMeshBinary()
 {
     /*
-    qDebug() << "load mesh";
-    QFile file( m_fileName.path() );
-    file.open( QIODevice::ReadOnly );
-    QDataStream in( &file );
-    char* s = new char[29];
-    char* s1 = new char[10];
-    for ( int i = 0; i < 9; ++i )
-    {
-        s1[i] = s[i];
-    }
-    s1[9] = 0;
-    QString s2 = QString::fromLocal8Bit( s1 );
-    if ( s2 == "binarABCD" )
-    {
-        in.setByteOrder( QDataStream::BigEndian );
-        //qDebug() << "big endian";
-    }
-    else if ( s2 == "binarDCBA" )
-    {
-        in.setByteOrder( QDataStream::LittleEndian );
-        //qDebug() << "little endian";
-    }
-    else
-    {
-        qDebug() << "unknown entry in file";
-        return false;
-    }
-    m_datasetType = FNDT_MESH_BINARY;
+     qDebug() << "load mesh";
+     QFile file( m_fileName.path() );
+     file.open( QIODevice::ReadOnly );
+     QDataStream in( &file );
+     char* s = new char[29];
+     char* s1 = new char[10];
+     for ( int i = 0; i < 9; ++i )
+     {
+     s1[i] = s[i];
+     }
+     s1[9] = 0;
+     QString s2 = QString::fromLocal8Bit( s1 );
+     if ( s2 == "binarABCD" )
+     {
+     in.setByteOrder( QDataStream::BigEndian );
+     //qDebug() << "big endian";
+     }
+     else if ( s2 == "binarDCBA" )
+     {
+     in.setByteOrder( QDataStream::LittleEndian );
+     //qDebug() << "little endian";
+     }
+     else
+     {
+     qDebug() << "unknown entry in file";
+     return false;
+     }
+     m_datasetType = FNDT_MESH_BINARY;
 
-    in.setFloatingPointPrecision( QDataStream::SinglePrecision );
-    qint32 iVal;
-    TriangleMesh* tmesh = new TriangleMesh();
-    in >> iVal;
-    qDebug() << iVal;
-    float x, y, z;
-    for ( qint32 i = 0; i < iVal; ++i )
-    {
-        in >> x;
-        in >> y;
-        in >> z;
-        tmesh->addVertex( x, y, z );
-    }
-    in >> iVal;
-    qDebug() << iVal;
-    for ( qint32 i = 0; i < iVal; ++i )
-    {
-        in >> x;
-        in >> y;
-        in >> z;
-    }
-    in >> iVal;
-    in >> iVal;
-    qDebug() << iVal;
-    qint32 v1, v2, v3;
-    for ( qint32 i = 0; i < iVal; ++i )
-    {
-        in >> v1;
-        in >> v2;
-        in >> v3;
-        tmesh->addTriangle( v1, v2, v3 );
-    }
-*/
+     in.setFloatingPointPrecision( QDataStream::SinglePrecision );
+     qint32 iVal;
+     TriangleMesh* tmesh = new TriangleMesh();
+     in >> iVal;
+     qDebug() << iVal;
+     float x, y, z;
+     for ( qint32 i = 0; i < iVal; ++i )
+     {
+     in >> x;
+     in >> y;
+     in >> z;
+     tmesh->addVertex( x, y, z );
+     }
+     in >> iVal;
+     qDebug() << iVal;
+     for ( qint32 i = 0; i < iVal; ++i )
+     {
+     in >> x;
+     in >> y;
+     in >> z;
+     }
+     in >> iVal;
+     in >> iVal;
+     qDebug() << iVal;
+     qint32 v1, v2, v3;
+     for ( qint32 i = 0; i < iVal; ++i )
+     {
+     in >> v1;
+     in >> v2;
+     in >> v3;
+     tmesh->addTriangle( v1, v2, v3 );
+     }
+     */
     return false;
 }
 
@@ -973,7 +985,7 @@ bool Loader::loadVTK()
 
     LoaderVTK* lv = new LoaderVTK( fn );
 
-    if( !lv->load() )
+    if ( !lv->load() )
     {
         qDebug() << lv->getStatus();
         return false;
@@ -982,7 +994,7 @@ bool Loader::loadVTK()
     if ( lv->getPrimitiveType() == 1 )
     {
         QVector<float> points = lv->getPoints();
-        QVector<int>triangles = lv->getPrimitives();
+        QVector<int> triangles = lv->getPrimitives();
 
         if ( triangles[0] != 3 )
         {
@@ -997,19 +1009,19 @@ bool Loader::loadVTK()
 
         for ( int i = 0; i < numPoints; ++i )
         {
-            mesh->addVertex( points[i*3], points[i*3+1], points[i*3+2] );
+            mesh->addVertex( points[i * 3], points[i * 3 + 1], points[i * 3 + 2] );
         }
 
         for ( int i = 0; i < numTriangles; ++i )
         {
-            mesh->addTriangle( triangles[i*4+1], triangles[i*4+2], triangles[i*4+3] );
+            mesh->addTriangle( triangles[i * 4 + 1], triangles[i * 4 + 2], triangles[i * 4 + 3] );
         }
 
-        QVector<QVector<float> >values = lv->getPointData();
+        QVector<QVector<float> > values = lv->getPointData();
 
         if ( values.size() > 0 )
         {
-            QVector<float>data = values[0];
+            QVector<float> data = values[0];
             if ( data.size() == numPoints )
             {
                 for ( int i = 0; i < numPoints; ++i )
@@ -1019,12 +1031,12 @@ bool Loader::loadVTK()
             }
         }
 
-        QVector<float>colors = lv->getPointColors();
-        if( colors.size() == points.size() )
+        QVector<float> colors = lv->getPointColors();
+        if ( colors.size() == points.size() )
         {
             for ( int i = 0; i < numPoints; ++i )
             {
-                mesh->setVertexColor( i, colors[i*3], colors[i*3+1], colors[i*3+2], 1.0 );
+                mesh->setVertexColor( i, colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2], 1.0 );
             }
         }
 
@@ -1038,18 +1050,18 @@ bool Loader::loadVTK()
     if ( lv->getPrimitiveType() == 2 )
     {
         QVector<float> points = lv->getPoints();
-        QVector<int>lines = lv->getPrimitives();
+        QVector<int> lines = lv->getPrimitives();
         int numLines = lv->getNumPrimitives();
 
         qDebug() << points.size() << lines.size() << numLines;
 
-        QVector< QVector< float > > fibs;
+        QVector<QVector<float> > fibs;
 
         int lc = 0;
         int pc = 0;
         for ( int i = 0; i < numLines; ++i )
         {
-            QVector<float>fib;
+            QVector<float> fib;
             int lineSize = lines[lc];
 
             for ( int k = 0; k < lineSize * 3; ++k )
@@ -1060,17 +1072,17 @@ bool Loader::loadVTK()
             fibs.push_back( fib );
         }
 
-        QVector< QVector<float> >pointData = lv->getPointData();
-        QVector< QVector< QVector<float> > >data;
+        QVector<QVector<float> > pointData = lv->getPointData();
+        QVector<QVector<QVector<float> > > data;
         QVector<QString> dataNames = lv->getDataNames();
 
         qDebug() << pointData.size() << "point data fields found";
 
-        if (  pointData.size() > 0 )
+        if ( pointData.size() > 0 )
         {
-            QVector<float>mins;
-            QVector<float>maxes;
-            for ( int curField = 0; curField < pointData.size(); ++ curField )
+            QVector<float> mins;
+            QVector<float> maxes;
+            for ( int curField = 0; curField < pointData.size(); ++curField )
             {
                 QVector<float> field = pointData[curField];
                 float min = std::numeric_limits<float>::max();
@@ -1085,17 +1097,17 @@ bool Loader::loadVTK()
                 mins.push_back( min );
                 maxes.push_back( max );
             }
-            for ( int curField = 0; curField < pointData.size(); ++ curField )
+            for ( int curField = 0; curField < pointData.size(); ++curField )
             {
                 QVector<float> field = pointData[curField];
 
-                QVector< QVector< float > > dataField;
+                QVector<QVector<float> > dataField;
 
                 int lc = 0;
                 int pc = 0;
                 for ( int i = 0; i < numLines; ++i )
                 {
-                    QVector<float>fib;
+                    QVector<float> fib;
                     int lineSize = lines[lc];
                     for ( int k = 0; k < lineSize; ++k )
                     {
@@ -1120,4 +1132,109 @@ bool Loader::loadVTK()
     }
 
     return false;
+}
+
+bool Loader::loadASC( QVector3D offset )
+{
+    QString fn = m_fileName.path();
+
+    LoaderFreesurfer* lf = new LoaderFreesurfer();
+
+    if ( !lf->loadASC( fn ) )
+    {
+        qDebug() << "unable to load: " << fn;
+        return false;
+    }
+
+    QVector<float> points = lf->getPoints();
+    QVector<int> triangles = lf->getTriangles();
+    int numPoints = points.size() / 3;
+    int numTriangles = triangles.size() / 3;
+
+    TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
+    for ( int i = 0; i < numPoints; ++i )
+    {
+        mesh->addVertex( points[i * 3] + offset.x(), points[i * 3 + 1] + offset.y(), points[i * 3 + 2] + offset.z() );
+    }
+    for ( int i = 0; i < numTriangles; ++i )
+    {
+        //TODO: Check orientation change (0,2,1)...
+        mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
+    }
+    mesh->finalize();
+    DatasetMesh* dataset = new DatasetMesh( mesh, fn );
+    m_dataset.push_back( dataset );
+
+    return true;
+}
+
+bool Loader::loadSet()
+{
+    QString fn = m_fileName.path();
+
+    DatasetSurfaceset* dataset = new DatasetSurfaceset( fn );
+
+    qDebug() << "loading surface set: " << fn;
+
+    QFile setfile( fn );
+    if ( !setfile.open( QIODevice::ReadOnly ) )
+    {
+        qDebug( "set file unreadable" );
+    }
+    QTextStream ts( &setfile );
+    QString nl;
+    //TODO: Will windows have a problem with this?
+    QString trunk = QFileInfo( fn ).path();
+    while ( !ts.atEnd() )
+    {
+        nl = ts.readLine();
+        //For commenting out stuff in the setfiles
+        if ( !nl.startsWith( "#" ) )
+        {
+            QStringList sl = nl.split( " " );
+            QString fullname = trunk + QDir::separator() + sl.at( 0 );
+            float x = 0;
+            float y = 0;
+            float z = 0;
+            if ( sl.length() > 1 )
+                x = sl.at( 1 ).toFloat();
+            if ( sl.length() > 2 )
+                y = sl.at( 2 ).toFloat();
+            if ( sl.length() > 3 )
+                z = sl.at( 3 ).toFloat();
+            QVector3D s( x, y, z );
+
+            LoaderFreesurfer lf;
+
+            if ( !lf.loadASC( fullname ) )
+            {
+                qDebug() << "unable to load: " << fn;
+                return false;
+            }
+
+            QVector<float> points = lf.getPoints();
+            QVector<int> triangles = lf.getTriangles();
+            int numPoints = points.size() / 3;
+            int numTriangles = triangles.size() / 3;
+
+            TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
+            for ( int i = 0; i < numPoints; ++i )
+            {
+                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+            }
+            for ( int i = 0; i < numTriangles; ++i )
+            {
+                //TODO: Check orientation change (0,2,1)...
+                mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
+            }
+            mesh->finalize();
+
+            dataset->addMesh( mesh, sl.at( 0 ) );
+        }
+    }
+    dataset->setProperty();
+    m_dataset.push_back( dataset );
+
+    return true;
+
 }
