@@ -12,6 +12,8 @@
 
 #include <QDebug>
 
+#include <math.h>
+
 FiberSelector::FiberSelector() :
     m_numLines( 0 ),
     m_numPoints( 0 ),
