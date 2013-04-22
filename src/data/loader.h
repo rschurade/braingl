@@ -47,6 +47,8 @@ private:
     bool loadMesh();
     bool loadMeshBinary();
     bool loadVTK();
+    bool loadASC( QVector3D offset = QVector3D(0,0,0) );
+    bool loadSet();
 
     nifti_image* m_header;
     QDir m_fileName;

@@ -137,7 +137,8 @@ namespace Fn
         TEXTURE_GLUINT,
         DATASET_POINTER,
         NEW_DATASET,
-        DATASET_LIST
+        DATASET_LIST,
+        SURFACE
     };
 
     struct Prop2String {
@@ -211,6 +212,7 @@ namespace Fn
             case Property::DATASET_POINTER: return QString( "dataset pointer" ); break;
             case Property::NEW_DATASET: return QString( "new dataset" ); break;
             case Property::DATASET_LIST: return QString( "dataset list" ); break;
+            case Property::SURFACE: return QString( "surfaceset surface" ); break;
 
             }
             return QString( "property not defined" );

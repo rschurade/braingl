@@ -138,7 +138,7 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos )
            color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
        }
 
-       QVector<int>picked = m_mesh[0]->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
+       QVector<int>picked = getMesh()->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
 
        if ( picked.size() > 0 )
        {
