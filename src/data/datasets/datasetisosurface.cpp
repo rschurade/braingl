@@ -92,7 +92,8 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     QMap<int, POINT3DID>::iterator mapIterator = m_i2pt3idVertices.begin();
     TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
 
-    m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
+    TriangleMesh2* mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
+    m_mesh.push_back( mesh );
 
     float xOff = 0.5f;
     float yOff = 0.5f;
@@ -102,7 +103,7 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
         ( *mapIterator ).newID = nextID++;
-        m_mesh->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
+        m_mesh[0]->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
         ++mapIterator;
     }
 
@@ -113,10 +114,10 @@ void DatasetIsosurface::renameVerticesAndTriangles()
         ( *vecIterator ).pointID[ 1 ] = m_i2pt3idVertices[ ( *vecIterator ).pointID[ 1 ] ].newID;
         ( *vecIterator ).pointID[ 2 ] = m_i2pt3idVertices[ ( *vecIterator ).pointID[ 2 ] ].newID;
 
-        m_mesh->addTriangle( ( *vecIterator ).pointID[ 0 ], ( *vecIterator ).pointID[ 1 ], ( *vecIterator ).pointID[ 2 ] );
+        m_mesh[0]->addTriangle( ( *vecIterator ).pointID[ 0 ], ( *vecIterator ).pointID[ 1 ], ( *vecIterator ).pointID[ 2 ] );
         ++vecIterator;
     }
-    m_mesh->finalize();
+    m_mesh[0]->finalize();
 
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
@@ -126,7 +127,7 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new MeshRenderer( m_mesh );
+        m_renderer = new MeshRenderer( m_mesh[0] );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
@@ -134,10 +135,11 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
     m_isoLevel = m_properties.get( Fn::Property::ISO_VALUE ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
-        delete m_mesh;
+        delete m_mesh[0];
+        m_mesh.clear();
         generateSurface();
         m_oldIsoValue = m_isoLevel;
-        m_renderer->setMesh( m_mesh );
+        m_renderer->setMesh( m_mesh[0] );
     }
 
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );

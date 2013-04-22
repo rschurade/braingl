@@ -13,9 +13,9 @@
 
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
     Dataset( fileName, Fn::DatasetType::MESH_BINARY ),
-    m_mesh( mesh ),
     m_renderer( 0 )
 {
+    m_mesh.push_back( mesh );
     m_properties.set( Fn::Property::COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, true );
     m_properties.set( Fn::Property::COLORMAP, 1, true );
     m_properties.set( Fn::Property::COLOR, QColor( 255, 255, 255 ), true );
@@ -54,7 +54,6 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
 
 DatasetMesh::DatasetMesh( QString fileName, Fn::DatasetType type ) :
     Dataset( fileName, type ),
-    m_mesh( 0 ),
     m_renderer( 0 )
 {
     m_properties.set( Fn::Property::COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, true );
@@ -98,14 +97,14 @@ DatasetMesh::~DatasetMesh()
 
 TriangleMesh2* DatasetMesh::getMesh()
 {
-    return m_mesh;
+    return m_mesh[0];
 }
 
 void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new MeshRenderer( m_mesh );
+        m_renderer = new MeshRenderer( m_mesh[0] );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
@@ -139,7 +138,7 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos )
            color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
        }
 
-       QVector<int>picked = m_mesh->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
+       QVector<int>picked = m_mesh[0]->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
 
        if ( picked.size() > 0 )
        {
@@ -147,7 +146,7 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos )
            for ( int i = 0; i < picked.size(); ++i )
            {
                m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-               m_mesh->setVertexColor( picked[i], color );
+               m_mesh[0]->setVertexColor( picked[i], color );
            }
            m_renderer->endUpdateColor();
        }
