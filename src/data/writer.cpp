@@ -385,13 +385,8 @@ void Writer::saveFibs( QString filename )
     {
         // error
     }
-    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
-    char lineDelimiter = '\n';
 
-    out << "# vtk DataFile Version 3.0" << lineDelimiter;
-    out << "Fibers" << lineDelimiter;
-    out << "BINARY" << lineDelimiter;
-    out << "DATASET POLYDATA" << lineDelimiter;
+
 
     unsigned int numPoints = 0;
     unsigned int numLines = fibs.size();
@@ -399,7 +394,8 @@ void Writer::saveFibs( QString filename )
     {
         numPoints += fibs[i].size()/3;
     }
-    out << "POINTS " << numPoints << " float" << lineDelimiter;
+
+
     unsigned int *rawLineData = new unsigned int[numPoints + numLines];
     float *rawPointData = new float[numPoints * 3];
 
@@ -421,8 +417,20 @@ void Writer::saveFibs( QString filename )
 
     switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
     switchByteOrderOfArray< unsigned int >( rawLineData, numLines + numPoints );
+
+    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
+    char lineDelimiter = '\n';
+
+    out << "# vtk DataFile Version 3.0" << lineDelimiter;
+    out << "Fibers" << lineDelimiter;
+    out << "BINARY" << lineDelimiter;
+    out << "DATASET POLYDATA" << lineDelimiter;
+
+    out << "POINTS " << numPoints << " float" << lineDelimiter;
     out.write( reinterpret_cast< char* >( rawPointData ), sizeof( float ) * numPoints * 3 );
     out << lineDelimiter;
+
+
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
     out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
     out << lineDelimiter;
