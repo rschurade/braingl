@@ -28,6 +28,8 @@ public:
 
     void setValue( QVariant value );
     void setValue( QDir value );
+    void setMin( QVariant value ) {};
+    void setMax( QVariant value ) {};
 
 
 private:

@@ -52,7 +52,7 @@ ColormapWidget::~ColormapWidget()
 
 void ColormapWidget::resizeEvent( QResizeEvent* event )
 {
-    m_width = this->width() - 6;
+    m_width = this->width() - 10;
     QImage* image;
     image = createImage( m_width );
     QPixmap pix( m_width, 20 );

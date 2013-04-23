@@ -28,6 +28,8 @@ public:
 
     void setValue( QVariant value );
     void setValue( QColor value );
+    void setMin( QVariant value ) {};
+    void setMax( QVariant value ) {};
 
 private:
     QColor m_value;

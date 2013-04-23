@@ -33,9 +33,9 @@ private:
     SliderWithEditInt* m_widget;
 
 public slots:
-void setValue( QVariant value );
-    void setMin( int min );
-    void setMax( int max );
+    void setValue( QVariant value );
+    void setMin( QVariant min );
+    void setMax( QVariant max );
 
 private slots:
     void widgetChanged( int value, int id );
