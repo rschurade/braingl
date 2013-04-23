@@ -69,6 +69,19 @@ namespace Fn
         SAGITTAL
     };
 
+    enum class Position : int
+    {
+        CENTER = 0x00,
+        NORTH = 0x01,
+        NORTH_EAST = 0x02,
+        EAST = 0x04,
+        SOUTH_EAST = 0x08,
+        SOUTH = 0x10,
+        SOUTH_WEST = 0x11,
+        WEST = 0x12,
+        NORTH_WEST = 0x14
+    };
+
     enum class Property : int
     {
         // dataset properties

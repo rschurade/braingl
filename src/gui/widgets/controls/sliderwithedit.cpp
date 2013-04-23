@@ -15,7 +15,7 @@
 
 #define SLIDERMULT 100000.f
 
-SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
+SliderWithEdit::SliderWithEdit( QString name,  Fn::Position editPos, int id, QWidget* parent ) :
     QFrame( parent ),
     m_id( id ),
     m_digits( 2 )
@@ -38,10 +38,18 @@ SliderWithEdit::SliderWithEdit( QString name, int id, QWidget* parent ) :
     m_label = new QLabel( name );
     hLayout->addWidget( m_label );
     hLayout->addStretch();
-    hLayout->addWidget( m_edit );
+
+    if ( editPos == Fn::Position::NORTH_EAST )
+    {
+        hLayout->addWidget( m_edit );
+    }
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
     hLayout2->addWidget( m_slider );
+    if ( editPos == Fn::Position::EAST )
+    {
+        hLayout2->addWidget( m_edit );
+    }
 
     if ( name != "" )
     {

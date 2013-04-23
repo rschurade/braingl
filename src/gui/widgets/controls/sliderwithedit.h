@@ -8,6 +8,8 @@
 #ifndef SLIDERWITHEDIT_H_
 #define SLIDERWITHEDIT_H_
 
+#include "../../../data/enums.h"
+
 #include <QFrame>
 
 class QSlider;
@@ -19,7 +21,7 @@ class SliderWithEdit : public QFrame
     Q_OBJECT
 
 public:
-    SliderWithEdit( QString name, int id = 0, QWidget* parent = 0 );
+    SliderWithEdit( QString name, Fn::Position editPos = Fn::Position::NORTH_EAST, int id = 0, QWidget* parent = 0 );
     virtual ~SliderWithEdit();
 
     void setValue( float value );
