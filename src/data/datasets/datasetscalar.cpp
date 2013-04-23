@@ -173,7 +173,7 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         m_colormapRenderer->setLowerThreshold( m_properties.get( Fn::Property::LOWER_THRESHOLD).toFloat() );
         m_colormapRenderer->setUpperThreshold( m_properties.get( Fn::Property::UPPER_THRESHOLD).toFloat() );
 
-        m_colormapRenderer->draw( width, height );
+        m_colormapRenderer->draw( width, height, renderMode );
     }
 }
 

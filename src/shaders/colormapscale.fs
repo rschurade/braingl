@@ -1,5 +1,9 @@
+uniform vec4 u_color;
+
+#include peel_fs
 
 void main()
 {
-	gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+	vec3 color = vec3( 0.0 );
+	writePeel( color );
 }

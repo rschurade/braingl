@@ -211,6 +211,14 @@ void SceneRenderer::draw()
         glActiveTexture( GL_TEXTURE11 );
         glBindTexture( GL_TEXTURE_2D, tex );
 
+        GLenum errCode;
+        const GLubyte *errString;
+        while ((errCode = glGetError()) != GL_NO_ERROR) {
+            errString = gluErrorString(errCode);
+           fprintf (stderr, "OpenGL Error 0: %s\n", errString);
+        }
+
+
         //***************************************************************************************************
         //
         // Pass 1 - draw opaque objects
@@ -226,6 +234,10 @@ void SceneRenderer::draw()
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+        while ((errCode = glGetError()) != GL_NO_ERROR) {
+            errString = gluErrorString(errCode);
+           fprintf (stderr, "OpenGL Error 0: %s\n", errString);
+        }
         renderDatasets();
         renderRois();
 
@@ -240,6 +252,10 @@ void SceneRenderer::draw()
         m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
         renderDatasets();
         renderRois();
+        while ((errCode = glGetError()) != GL_NO_ERROR) {
+            errString = gluErrorString(errCode);
+           fprintf (stderr, "OpenGL Error 01: %s\n", errString);
+        }
 
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
@@ -423,8 +439,6 @@ void SceneRenderer::renderMerge()
         errString = gluErrorString(errCode);
        fprintf (stderr, "OpenGL Error 2: %s\n", errString);
     }
-
-
 
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

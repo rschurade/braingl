@@ -1,4 +1,5 @@
 #include uniforms_vs
+#include peel_vs
 
 varying vec2 v_texCoord;
 
@@ -12,7 +13,9 @@ void main()
     float x = ( a_position.x * u_scaleX * u_sizeX * fontRatio ) + ( u_pos * u_scaleX * u_sizeX * fontRatio ) + originX;
     float y = ( a_position.y * u_scaleY * u_sizeY ) + originY;
 
-    gl_Position = vec4( x, y, a_position.z, 1.0 );
+    v_position = vec4( x, y, a_position.z, 1.0 );
+    gl_Position = v_position; 
+    
         
     float row = 8.0 - floor( u_char / 12.0 );
     float column = u_char - ( row * 12.0 ); 

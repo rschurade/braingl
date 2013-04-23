@@ -23,7 +23,7 @@ public:
 
     void init();
 
-    void renderText( QString text, int x, int y, int width, int height );
+    void renderText( QString text, int x, int y, int width, int height, int renderMode );
     void setSize( float size );
     void setColor( QColor color );
 

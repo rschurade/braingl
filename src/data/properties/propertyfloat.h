@@ -41,6 +41,8 @@ public slots:
     void setValue( QVariant value );
     void setMin( QVariant min );
     void setMax( QVariant max );
+    void setMin( float min );
+    void setMax( float max );
 
 private slots:
     void widgetChanged( float value, int id );

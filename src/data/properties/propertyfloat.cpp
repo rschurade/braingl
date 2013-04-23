@@ -67,6 +67,30 @@ void PropertyFloat::setMax( QVariant max )
     m_widget->setValue( m_value );
 }
 
+void PropertyFloat::setMin( float min )
+{
+    m_min = min;
+    if ( m_value < m_min )
+    {
+        m_value = m_min;
+    }
+
+    m_widget->setMin( m_min );
+    m_widget->setValue( m_value );
+}
+
+void PropertyFloat::setMax( float max )
+{
+    m_max = max;
+    if ( m_value > m_max )
+    {
+        m_value = m_max;
+    }
+    m_widget->setDigits( determineDigits() );
+    m_widget->setMax( m_max );
+    m_widget->setValue( m_value );
+}
+
 void PropertyFloat::widgetChanged( float value, int id )
 {
     m_value = value;
