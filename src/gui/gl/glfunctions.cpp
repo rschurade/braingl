@@ -495,11 +495,11 @@ void GLFunctions::initTextRenderer()
     GLFunctions::m_textRenderer->init();
 }
 
-void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color )
+void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode )
 {
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
-    GLFunctions::m_textRenderer->renderText( text, x, y, width, height );
+    GLFunctions::m_textRenderer->renderText( text, x, y, width, height, renderMode );
 }
 
 void GLFunctions::initShapeRenderer()

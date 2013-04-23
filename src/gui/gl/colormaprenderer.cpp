@@ -12,7 +12,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 ColormapRenderer::ColormapRenderer() :
-    vboIds( new GLuint[ 3 ] ),
+    vboIds( new GLuint[ 2 ] ),
     m_orient( 0 ),
     m_x( 0.0f ),
     m_y( 0.0f ),
@@ -32,7 +32,7 @@ ColormapRenderer::~ColormapRenderer()
 
 void ColormapRenderer::init()
 {
-    glGenBuffers( 3, vboIds );
+    glGenBuffers( 2, vboIds );
 
     initGeometry();
 }
@@ -40,10 +40,6 @@ void ColormapRenderer::init()
 
 void ColormapRenderer::initGeometry()
 {
-    GLushort indices[] = { 0, 1, 2, 3 };
-    // Transfer index data to VBO 0
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLushort), indices, GL_STATIC_DRAW );
     float z = -0.5f;
     VertexData vertices[] =
     {
@@ -54,7 +50,7 @@ void ColormapRenderer::initGeometry()
     };
 
     // Transfer vertex data to VBO 1
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
 
     z = -0.51f;
@@ -112,7 +108,7 @@ void ColormapRenderer::initGeometry()
         m_x + m_dx,             m_y - m_dy,               z
     };
     // Transfer vertex data to VBO 1
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, 72 * sizeof(float), scaleVertices, GL_STATIC_DRAW );
 }
 
@@ -144,25 +140,40 @@ void ColormapRenderer::setShaderVars()
     program->setUniformValue( "u_upperThreshold", m_upperThreshold / m_max );
 }
 
-void ColormapRenderer::draw( int width, int height )
+void ColormapRenderer::draw( int width, int height, int renderMode )
 {
-    GLFunctions::getShader( "colormapbar" )->bind();
-    // Set modelview-projection matrix
+    if ( !( renderMode == 4 || renderMode == 5 ) ) // we are drawing opaque objects
+    {
+        return;
+    }
 
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars();
 
-    // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
+    QGLShaderProgram* program = GLFunctions::getShader( "colormapbar" );
+    program->bind();
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", width, height );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    program->setUniformValue( "u_width", (float)width );
+    program->setUniformValue( "u_height", (float)height );
+    program->setUniformValue( "u_scaleX", 1.0f );
+    program->setUniformValue( "u_scaleY", 1.0f );
+
+    // Draw cube geometry using indices from VBO 0
+    //glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
+    glDrawArrays( GL_QUADS, 0, 4 );
+
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
 
-    QGLShaderProgram* program = GLFunctions::getShader( "colormapscale" );
+    program = GLFunctions::getShader( "colormapscale" );
     program->bind();
     // Offset for position
     long int offset = 0;
@@ -177,6 +188,13 @@ void ColormapRenderer::draw( int width, int height )
     program->setUniformValue( "u_scaleX", 1.0f );
     program->setUniformValue( "u_scaleY", 1.0f );
 
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", width, height );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+
     glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -189,7 +207,7 @@ void ColormapRenderer::draw( int width, int height )
         float yOffset = m_dy +  ( (float)m_textSize / 2 ) / (float)height * (float)height ;
 
 
-        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, QColor( 0,0,0 ) );
+        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, QColor( 0,0,0 ), renderMode );
     }
 
 }

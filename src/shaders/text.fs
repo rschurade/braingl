@@ -1,6 +1,9 @@
-uniform sampler2D fontTex;
+uniform vec4 u_color;
 
+uniform sampler2D fontTex;
 varying vec2 v_texCoord;
+
+#include peel_fs
 
 void main()
 {
@@ -8,5 +11,5 @@ void main()
     
     color.a = 1.0 - color.r;
     
-	gl_FragColor = color;
+	writePeel( color.rgb );
 }

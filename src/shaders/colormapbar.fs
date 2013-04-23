@@ -1,5 +1,6 @@
 #include colormap_fs
 #include uniforms_fs
+#include peel_fs
 
 void main( void )
 {
@@ -29,5 +30,6 @@ void main( void )
     //float value = ( v_texcoord.x - u_min ) / ( u_max - u_min );
     //float value = v_texcoord.x * ( u_upperThreshold - u_lowerThreshold  ) + u_lowerThreshold;
     value = max( 0.0, min( 1.0, value ) );
-    gl_FragColor =  colormap( value, u_colormap, 0.0, 1.0, 0.0, 1.0, 1.0, color );
+    
+    writePeel( colormap( value, u_colormap, 0.0, 1.0, 0.0, 1.0, 1.0, color ).rgb );
 }

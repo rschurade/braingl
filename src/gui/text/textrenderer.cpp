@@ -50,7 +50,7 @@ void TextRenderer::createFontTexture()
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
-void TextRenderer::renderText( QString text, int x, int y, int width, int height )
+void TextRenderer::renderText( QString text, int x, int y, int width, int height, int renderMode )
 {
     //qDebug() << text << x << y;
     glActiveTexture( GL_TEXTURE0 );
@@ -70,12 +70,19 @@ void TextRenderer::renderText( QString text, int x, int y, int width, int height
 
     program->setUniformValue( "u_x", (float)x );
     program->setUniformValue( "u_y", (float)y );
-    program->setUniformValue( "u_width", width );
-    program->setUniformValue( "u_height", height );
+    program->setUniformValue( "u_width", (float)width );
+    program->setUniformValue( "u_height", (float)height );
     program->setUniformValue( "u_scaleX", 1.0f );
     program->setUniformValue( "u_scaleY", 1.0f );
-    program->setUniformValue( "u_sizeX", m_textSizeX );
-    program->setUniformValue( "u_sizeY", m_textSizeY );
+    program->setUniformValue( "u_sizeX", m_textSizeX  / (float)width );
+    program->setUniformValue( "u_sizeY", m_textSizeY  / (float)height);
+
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", width, height );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
 
     for ( int i = 0; i < text.size(); ++i )
     {

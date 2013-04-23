@@ -56,7 +56,7 @@ public:
     static void updateColormapShader();
 
     static void initTextRenderer();
-    static void renderText( QString text, int x, int y, int size, int width, int height, QColor color = QColor( 0, 0, 0 ) );
+    static void renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode );
 
     static void initShapeRenderer();
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
