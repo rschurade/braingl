@@ -150,7 +150,7 @@ QVBoxLayout* ColormapEditWidget::createButtonPanel()
         vLayout->addLayout( hLayout4 );
 
         QHBoxLayout* hLayout2 = new QHBoxLayout();
-        SliderWithEdit* slider = new SliderWithEdit( tr(""), i );
+        SliderWithEdit* slider = new SliderWithEdit( tr(""), Fn::Position::EAST, i );
         m_sliders.push_back( slider );
         slider->setValue( m_colormap.get( i ).value );
         slider->setMin( m_colormap.get( i - 1 ).value );
