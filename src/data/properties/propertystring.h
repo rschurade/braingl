@@ -28,6 +28,8 @@ public:
     QVariant getValue();
 
     void setValue( QVariant value );
+    void setMin( QVariant value ) {};
+    void setMax( QVariant value ) {};
 
 private:
     QString m_value;

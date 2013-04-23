@@ -48,25 +48,25 @@ void PropertyInt::setValue( QVariant value )
     m_widget->setValue( m_value );
 }
 
-void PropertyInt::setMin( int min )
+void PropertyInt::setMin( QVariant min )
 {
-    m_min = min;
+    m_min = min.toInt();
     if ( m_value < m_min )
     {
         m_value = m_min;
     }
-    m_widget->setMin( min );
+    m_widget->setMin( m_min );
     m_widget->setValue( m_value );
 }
 
-void PropertyInt::setMax( int max )
+void PropertyInt::setMax( QVariant max )
 {
-    m_max = max;
+    m_max = max.toInt();
     if ( m_value > m_max )
     {
         m_value = m_max;
     }
-    m_widget->setMax( max );
+    m_widget->setMax( m_max );
     m_widget->setValue( m_value );
 }
 

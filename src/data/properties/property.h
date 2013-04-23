@@ -28,6 +28,8 @@ public:
     virtual QWidget* getWidget() = 0;
     virtual QVariant getValue() = 0;
     virtual void setValue( QVariant value ) = 0;
+    virtual void setMin( QVariant value ) = 0;
+    virtual void setMax( QVariant value ) = 0;
 
 protected:
     QString m_name; // used for access

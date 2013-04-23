@@ -43,27 +43,27 @@ void PropertyFloat::setValue( QVariant value )
     m_widget->setValue( m_value );
 }
 
-void PropertyFloat::setMin( float min )
+void PropertyFloat::setMin( QVariant min )
 {
-    m_min = min;
+    m_min = min.toFloat();
     if ( m_value < m_min )
     {
         m_value = m_min;
     }
 
-    m_widget->setMin( min );
+    m_widget->setMin( m_min );
     m_widget->setValue( m_value );
 }
 
-void PropertyFloat::setMax( float max )
+void PropertyFloat::setMax( QVariant max )
 {
-    m_max = max;
+    m_max = max.toFloat();
     if ( m_value > m_max )
     {
         m_value = m_max;
     }
     m_widget->setDigits( determineDigits() );
-    m_widget->setMax( max );
+    m_widget->setMax( m_max );
     m_widget->setValue( m_value );
 }
 

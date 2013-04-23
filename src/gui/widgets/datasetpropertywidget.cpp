@@ -110,7 +110,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
 
                 float min = ds->properties()->get( Fn::Property::MIN ).toFloat();
                 float max = ds->properties()->get( Fn::Property::MAX ).toFloat();
-                ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 10, min, max );
+                ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 14, min, max );
                 m_layout2->addWidget( cmapWidget );
                 m_visibleWidgets2.push_back( cmapWidget );
                 cmapWidget->setMin( ds->properties()->get( Fn::Property::SELECTED_MIN ).toFloat() );
