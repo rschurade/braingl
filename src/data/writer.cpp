@@ -386,8 +386,6 @@ void Writer::saveFibs( QString filename )
         // error
     }
 
-
-
     unsigned int numPoints = 0;
     unsigned int numLines = fibs.size();
     for( int i = 0; i < fibs.size(); ++i )
