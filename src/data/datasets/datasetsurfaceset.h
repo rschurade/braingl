@@ -21,13 +21,13 @@ public:
 
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );
 
-    void setProperty();
+    void setProperties();
 
     TriangleMesh2* getMesh();
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
     void mousePick( int pickId, QVector3D pos );
 
-private:
+protected:
     QVector<QString> m_displayList;
 };
 

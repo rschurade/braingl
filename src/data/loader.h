@@ -49,6 +49,7 @@ private:
     bool loadVTK();
     bool loadASC( QVector3D offset = QVector3D(0,0,0) );
     bool loadSet();
+    bool loadGlyphset();
 
     nifti_image* m_header;
     QDir m_fileName;

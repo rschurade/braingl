@@ -48,6 +48,8 @@
     <file>shaders/mesh.fs</file>
     <file>shaders/peel.vs</file>
     <file>shaders/peel.fs</file>
+    <file>shaders/points.vs</file>
+    <file>shaders/points.fs</file>
     <file>shaders/qball.vs</file>
     <file>shaders/qball.fs</file>
     <file>shaders/slice.vs</file>

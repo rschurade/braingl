@@ -17,6 +17,7 @@
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 #include "datasets/datasetsurfaceset.h"
+#include "datasets/datasetglyphset.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -87,6 +88,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".set" ) )
     {
         return loadSet();
+    }
+
+    if ( m_fileName.path().endsWith( ".glyphset" ) )
+    {
+        return loadGlyphset();
     }
 
     return false;
@@ -1232,9 +1238,104 @@ bool Loader::loadSet()
             dataset->addMesh( mesh, sl.at( 0 ) );
         }
     }
-    dataset->setProperty();
+    dataset->setProperties();
     m_dataset.push_back( dataset );
 
     return true;
 
+}
+
+bool Loader::loadGlyphset()
+{
+    QString glyphsetname = m_fileName.path();
+    QFile glyphsetfile( glyphsetname );
+    if ( !glyphsetfile.open( QIODevice::ReadOnly ) )
+    {
+        qDebug( "glyphset file unreadable" );
+    }
+    QTextStream gts( &glyphsetfile );
+    //TODO: Will windows have a problem with this?
+    QString trunk = QFileInfo( glyphsetname ).path();
+
+    //glyphsetfile has three lines: 1: nifti (skip), 2: surfaceset, 3: connectivity matrix
+
+    //1: TODO: skip nifti for now
+    QString gnl = gts.readLine();
+    qDebug() << "skipping: " << gnl;
+
+    //2: load surfaceset
+    gnl = gts.readLine();
+    DatasetGlyphset* dataset = new DatasetGlyphset( gnl );
+    qDebug() << "loading glyph set: " << gnl;
+
+    QFile setfile( trunk + QDir::separator() + gnl );
+    if ( !setfile.open( QIODevice::ReadOnly ) )
+    {
+        qDebug( "set file unreadable" );
+    }
+    QTextStream ts( &setfile );
+    QString nl;
+    while ( !ts.atEnd() )
+    {
+        nl = ts.readLine();
+        qDebug() << nl;
+        //For commenting out stuff in the setfiles
+        if ( !nl.startsWith( "#" ) )
+        {
+            QStringList sl = nl.split( " " );
+            QString fullname = trunk + QDir::separator() + sl.at( 0 );
+
+            LoaderFreesurfer lf;
+
+            if ( !lf.loadASC( fullname ) )
+            {
+                qDebug() << "unable to load: " << fullname;
+                return false;
+            }
+
+            float x = 0;
+            float y = 0;
+            float z = 0;
+            if ( sl.length() > 1 )
+                x = sl.at( 1 ).toFloat();
+            if ( sl.length() > 2 )
+                y = sl.at( 2 ).toFloat();
+            if ( sl.length() > 3 )
+                z = sl.at( 3 ).toFloat();
+            QVector3D s( x, y, z );
+
+            QVector<float> points = lf.getPoints();
+            QVector<int> triangles = lf.getTriangles();
+            int numPoints = points.size() / 3;
+            int numTriangles = triangles.size() / 3;
+
+            TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
+            for ( int i = 0; i < numPoints; ++i )
+            {
+                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+            }
+            for ( int i = 0; i < numTriangles; ++i )
+            {
+                //TODO: Check orientation change (0,2,1)...
+                mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
+            }
+            mesh->finalize();
+
+            dataset->addMesh( mesh, sl.at( 0 ) );
+        }
+    }
+    dataset->setProperties();
+
+    //3: load connectivity: put this into seperate loader / dataset / here
+    gnl  = gts.readLine();
+    qDebug() << "loading connectivity";
+    QStringList sl2 = gnl.split( " " );
+    dataset->readConnectivity( trunk + QDir::separator() + sl2.at(0) );
+
+    //init conn.-crap...
+    dataset->setMinthresh( sl2.at( 1 ).toFloat());
+
+    m_dataset.push_back( dataset );
+
+    return true;
 }
