@@ -191,6 +191,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "sphere" );
         GLFunctions::m_shaderNames.push_back( "text" );
         GLFunctions::m_shaderNames.push_back( "merge" );
+        GLFunctions::m_shaderNames.push_back( "points" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {

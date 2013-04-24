@@ -30,7 +30,7 @@ void DatasetSurfaceset::addMesh( TriangleMesh2* tm, QString displayString )
     m_displayList << displayString;
 }
 
-void DatasetSurfaceset::setProperty()
+void DatasetSurfaceset::setProperties()
 {
     m_properties.set( Fn::Property::SURFACE, m_displayList, 0, true );
 }
