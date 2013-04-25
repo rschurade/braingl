@@ -68,6 +68,8 @@
     <file>shaders/tube.fs</file>
     <file>shaders/uniforms.vs</file>
     <file>shaders/uniforms.fs</file>
+    <file>shaders/vectors.vs</file>
+    <file>shaders/vectors.fs</file>
     
  </qresource>
  </RCC>

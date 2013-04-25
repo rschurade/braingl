@@ -1,43 +1,41 @@
 /*
- * pointglyphrenderer.cpp
+ * vectorglyphrenderer.cpp
  *
- *  Created on: Apr 24, 2013
+ *  Created on: Apr 25, 2013
  *      Author: boettgerj
  */
 
-#include "pointglyphrenderer.h"
+#include "vectorglyphrenderer.h"
 
 #include "glfunctions.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 
-PointGlyphRenderer::PointGlyphRenderer() :
+VectorGlyphRenderer::VectorGlyphRenderer() :
         ObjectRenderer(),
         vboIds( new GLuint[1] ),
         ps( new float[1] ),
         np( 1 ),
-        ao( 13 )
+        ao( 14 )
 {
 
 }
 
-PointGlyphRenderer::~PointGlyphRenderer()
+VectorGlyphRenderer::~VectorGlyphRenderer()
 {
     glDeleteBuffers( 1, &( vboIds[0] ) );
     delete[] ps;
     ps = NULL;
 }
 
-void PointGlyphRenderer::init()
+void VectorGlyphRenderer::init()
 {
     glGenBuffers( 1, vboIds );
 }
 
-void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    qDebug() << "pointrenderer draw";
-
-    QGLShaderProgram* program = GLFunctions::getShader( "points" );
+    QGLShaderProgram* program = GLFunctions::getShader( "vectors" );
     program->bind();
 
     // Set modelview-projection matrix
@@ -53,32 +51,30 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
-    float scale = (mv_matrix*QVector4D(1,0,0,1)).length();
+    float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
-    setShaderVars(props);
+    setShaderVars( props );
 
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_POINT_SMOOTH);
+    glShadeModel( GL_SMOOTH );
+    glEnable( GL_POINT_SMOOTH );
 
-    glDrawArrays( GL_POINTS, 0, np );
+    glDrawArrays( GL_LINES, 0, np * 2 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-    qDebug() << "pointrenderer postdraw";
 }
 
-void PointGlyphRenderer::setupTextures()
+void VectorGlyphRenderer::setupTextures()
 {
 
 }
 
 
-void PointGlyphRenderer::setShaderVars(PropertyGroup* props)
+void VectorGlyphRenderer::setShaderVars(PropertyGroup* props)
 {
-    QGLShaderProgram* program = GLFunctions::getShader( "points" );
+    QGLShaderProgram* program = GLFunctions::getShader( "vectors" );
 
     program->bind();
 
@@ -92,38 +88,44 @@ void PointGlyphRenderer::setShaderVars(PropertyGroup* props)
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
-
     offset += sizeof(float) * 3;
-    int valueLocation = program->attributeLocation( "a_value" );
-    program->enableAttributeArray( valueLocation );
-    glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
 
-    offset += sizeof(float) * 1;
     int toLocation = program->attributeLocation( "a_to" );
     program->enableAttributeArray( toLocation );
     glVertexAttribPointer( toLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
-
     offset += sizeof(float) * 3;
+
+    int valueLocation = program->attributeLocation( "a_value" );
+    program->enableAttributeArray( valueLocation );
+    glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
+    offset += sizeof(float) * 1;
+
+    //TODO: throw flag out, or use it for something cool?
+    int flagLocation = program->attributeLocation( "a_flag" );
+    program->enableAttributeArray( flagLocation );
+    glVertexAttribPointer( flagLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
+    offset += sizeof(float) * 1;
+
     int dgLocation = program->attributeLocation( "dg" );
     program->enableAttributeArray( dgLocation );
     glVertexAttribPointer( dgLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
-
     offset += sizeof(float) * 3;
+
     int dcLocation = program->attributeLocation( "dc" );
     program->enableAttributeArray( dcLocation );
     glVertexAttribPointer( dcLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
 }
 
-void PointGlyphRenderer::initGeometry( float* points, int number )
+void VectorGlyphRenderer::initGeometry( float* points, int number )
 {
     ps = points;
     np = number;
 
     qDebug() << "number of points: " << np;
 
-    qDebug() << np * ao * sizeof(GLfloat);
+    qDebug() << np * 2 * ao * sizeof(GLfloat);
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
-    glBufferData( GL_ARRAY_BUFFER,  np * ao * sizeof(GLfloat), ps , GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER,  np  * 2 * ao * sizeof(GLfloat), ps , GL_STATIC_DRAW );
 }
