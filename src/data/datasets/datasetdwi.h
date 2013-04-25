@@ -20,7 +20,7 @@ class DatasetDWI: public DatasetNifti
     Q_OBJECT
 
 public:
-    DatasetDWI( QString filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
 
     QVector<ColumnVector>* getData();

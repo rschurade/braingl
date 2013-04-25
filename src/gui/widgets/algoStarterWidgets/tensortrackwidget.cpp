@@ -126,7 +126,7 @@ QList<Dataset*> TensorTrackWidget::getFibs()
     mins.push_back( 0.0 );
     QVector<float>maxes;
     maxes.push_back( 1.0 );
-    DatasetFibers* fibs = new DatasetFibers( "new fibers", m_tracker->getFibs(), data, names, mins, maxes );
+    DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers" ), m_tracker->getFibs(), data, names, mins, maxes );
     l.push_back( fibs );
     return l;
 }

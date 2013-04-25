@@ -54,7 +54,7 @@ QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
 {
     DatasetFibers* f = dynamic_cast<DatasetFibers*>( ds );
     QVector<QVector<float> >selected = f->getSelectedFibs();
-    DatasetFibers* out = new DatasetFibers( "new fibers", selected );
+    DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), selected );
     QList<Dataset*> l;
     l.push_back( out );
     return l;

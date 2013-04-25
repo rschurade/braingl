@@ -84,7 +84,7 @@ namespace Fn
         : int
         {
             // dataset properties
-        NAME,
+        NAME, //name that is shown in the dataset list widget
         DIM,
         DATATYPE,
         SIZE,

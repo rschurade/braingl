@@ -17,7 +17,7 @@
 class DatasetGlyphset: public DatasetSurfaceset
 {
 public:
-    DatasetGlyphset( QString filename );
+    DatasetGlyphset( QDir filename );
     virtual ~DatasetGlyphset();
     void readConnectivity( QString filename );
     void setMinthresh( float mt );

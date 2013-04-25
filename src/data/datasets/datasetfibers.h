@@ -21,8 +21,8 @@ class DatasetFibers: public Dataset
     Q_OBJECT
 
 public:
-    DatasetFibers( QString filename, QVector< QVector< float > > fibs );
-    DatasetFibers( QString filename,
+    DatasetFibers( QDir filename, QVector< QVector< float > > fibs );
+    DatasetFibers( QDir filename,
                      QVector< QVector< float > > fibs,
                      QVector<QVector< QVector< float > > >data,
                      QVector<QString> dataNames,

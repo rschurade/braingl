@@ -15,7 +15,7 @@ class ColormapRenderer;
 class DatasetScalar: public DatasetNifti
 {
 public:
-    DatasetScalar( QString filename, QVector<float> data, nifti_image* header );
+    DatasetScalar( QDir filename, QVector<float> data, nifti_image* header );
     virtual ~DatasetScalar();
 
     QVector<float>* getData();

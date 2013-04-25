@@ -87,7 +87,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         delete threads[i];
     }
 
-    DatasetBingham* out1 = new DatasetBingham( "Bingham", out, sh->getHeader() );
+    DatasetBingham* out1 = new DatasetBingham( QDir( "Bingham" ), out, sh->getHeader() );
     dsout.push_back( out1 );
 
     return dsout;
@@ -230,7 +230,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
-        DatasetDWI* out = new DatasetDWI( "dwifrombingham", *(sigs[i]), b0Data, bvals, bvecs, ds->getHeader() );
+        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, ds->getHeader() );
 
         dsout.push_back( out );
     }
