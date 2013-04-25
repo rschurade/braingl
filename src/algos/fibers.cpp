@@ -79,7 +79,7 @@ DatasetFibers* Fibers::thinOut()
         mergedFibs.clear();
         qDebug() << fibs.size() + unmergedFibs.size() << "fibers after merging";
     }
-    return new DatasetFibers( "new fibers", fibs + unmergedFibs );
+    return new DatasetFibers( QDir( "new fibers" ), fibs + unmergedFibs );
 }
 
 QVector<float> Fibers::mergeFibs( QVector< float >& lhs, QVector< float >& rhs )
@@ -149,7 +149,7 @@ DatasetScalar* Fibers::tractDensity()
 
     int dims[8] = { 3, 160, 200, 160, 1, 1, 1 };
     nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
-    DatasetScalar* out = new DatasetScalar( "tract density", data, header );
+    DatasetScalar* out = new DatasetScalar( QDir( "tract density" ), data, header );
     return out;
 }
 
@@ -236,6 +236,6 @@ Dataset3D* Fibers::tractColor()
     header->dx = m_dx;
     header->dy = m_dy;
     header->dz = m_dz;
-    Dataset3D* out = new Dataset3D( "tract color", data, header );
+    Dataset3D* out = new Dataset3D( QDir( "tract color" ), data, header );
     return out;
 }

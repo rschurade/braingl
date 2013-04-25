@@ -12,7 +12,7 @@
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
 
-DatasetSurfaceset::DatasetSurfaceset( QString fn, Fn::DatasetType type ) :
+DatasetSurfaceset::DatasetSurfaceset( QDir fn, Fn::DatasetType type ) :
         DatasetMesh( fn, type )
 {
     // TODO Auto-generated constructor stub

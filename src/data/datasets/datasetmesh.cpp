@@ -11,7 +11,7 @@
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
 
-DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
+DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     Dataset( fileName, Fn::DatasetType::MESH_BINARY ),
     m_renderer( 0 )
 {
@@ -52,7 +52,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QString fileName ) :
     connect( m_properties.getProperty( Fn::Property::PAINTMODE ), SIGNAL( valueChanged( int ) ), this, SLOT( paintModeChanged( int ) ) );
 }
 
-DatasetMesh::DatasetMesh( QString fileName, Fn::DatasetType type ) :
+DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     Dataset( fileName, type ),
     m_renderer( 0 )
 {

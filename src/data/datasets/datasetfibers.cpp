@@ -12,7 +12,7 @@
 #include "../../gui/gl/tuberenderer.h"
 
 
-DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs ) :
+DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 ),
@@ -57,7 +57,7 @@ DatasetFibers::DatasetFibers( QString filename, QVector< QVector< float > > fibs
     connect( m_properties.getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
 }
 
-DatasetFibers::DatasetFibers( QString filename,
+DatasetFibers::DatasetFibers( QDir filename,
                                  QVector< QVector< float > > fibs,
                                  QVector< QVector< QVector< float > > >data,
                                  QVector<QString>dataNames,

@@ -11,7 +11,7 @@
 
 #include <QDebug>
 
-DatasetScalar::DatasetScalar( QString filename, QVector<float> data, nifti_image* header ) :
+DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
         m_colormapRenderer( 0 )
 {

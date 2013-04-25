@@ -9,7 +9,7 @@
 
 #include "../../gui/gl/evrenderer.h"
 
-Dataset3D::Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header ) :
+Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties.set( Fn::Property::COLORMAP, -1 );

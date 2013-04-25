@@ -63,8 +63,7 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
         qBallVector.push_back( qBallBase * data->at( i ) );
     }
 
-    DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties()->set( Fn::Property::FILENAME, "QBall" );
+    DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "QBall" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::QBALL );
     out->properties()->set( Fn::Property::LOD, 2 );
@@ -86,10 +85,10 @@ QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
     QVector<ColumnVector> qBallVector;
     QBall::sharpQBall( dynamic_cast<DatasetDWI*>( ds ), order, qBallVector );
     qDebug() << "create dataset";
-    DatasetSH* out = new DatasetSH( "Q-Ball", qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties()->set( Fn::Property::FILENAME, "Q-Ball" );
 
     QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->properties()->get( Fn::Property::NAME ).toString() );
+
+    DatasetSH* out = new DatasetSH( QDir( name ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, name );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::QBALL );
     out->properties()->set( Fn::Property::LOD, 2 );
@@ -116,8 +115,7 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
     QVector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
-    DatasetTensor* out = new DatasetTensor( ds->properties()->get( Fn::Property::FILENAME ).toString(), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties()->set( Fn::Property::FILENAME, "Tensor" );
+    DatasetTensor* out = new DatasetTensor( QDir( ds->properties()->get( Fn::Property::FILENAME ).toString() ), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "Tensor" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::TENSORFIT );
     out->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
@@ -140,8 +138,7 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
     QVector<float> fa;
     FMath::fa( tensors, fa );
 
-    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties()->set( Fn::Property::FILENAME, "FA" );
+    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "FA" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::FA );
     out->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
@@ -174,12 +171,12 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 
     FMath::evecs( tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
-    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "evec 1" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
     out->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
 
-    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out2->properties()->set( Fn::Property::NAME, "eval 1" );
     out2->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
     out2->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
@@ -197,8 +194,7 @@ QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
     QVector<float> fa;
     FMath::fa( *tensors, fa );
 
-    DatasetScalar* out = new DatasetScalar( "fa.nii.gz", fa, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
-    out->properties()->set( Fn::Property::FILENAME, "FA" );
+    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "FA" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::FA );
     out->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
@@ -225,12 +221,12 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
 
     FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
-    Dataset3D* out = new Dataset3D( "evec1.nii.gz", evec1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
     out->properties()->set( Fn::Property::NAME, "evec 1" );
     out->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
     out->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
 
-    DatasetScalar* out2 = new DatasetScalar( "eval1.nii.gz", eval1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
     out2->properties()->set( Fn::Property::NAME, "eval 1" );
     out2->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
     out2->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );
@@ -264,7 +260,7 @@ QList<Dataset*> DWIAlgos::tensorTrack( Dataset* ds )
     tracker->startTracking();
 
     QList<Dataset*> l;
-    DatasetFibers* fibs = new DatasetFibers( "new fibers", tracker->getFibs() );
+    DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers"  ), tracker->getFibs() );
     l.push_back( fibs );
 
     return l;
@@ -275,7 +271,6 @@ QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
     QList<Dataset*> l= Bingham::bingham2Tensor( dynamic_cast<DatasetBingham*>( ds ) );
     for ( int i = 0; i < l.size(); ++i )
     {
-        l[i]->properties()->set( Fn::Property::FILENAME, "Tensor" );
         l[i]->properties()->set( Fn::Property::NAME, "DWI FROM BINGHAM " + QString::number( i ) );
         l[i]->properties()->set( Fn::Property::CREATED_BY, (int)Fn::Algo::BINGHAM_2_TENSOR );
         l[i]->properties()->set( Fn::Property::DATATYPE, DT_FLOAT );

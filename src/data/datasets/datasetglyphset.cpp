@@ -13,7 +13,7 @@
 
 #include "qmath.h"
 
-DatasetGlyphset::DatasetGlyphset( QString filename ) :
+DatasetGlyphset::DatasetGlyphset( QDir filename ) :
         DatasetSurfaceset( filename ), m_prenderer( NULL ), prevGeo( -1 ), prevGlyph( -1 ), prevCol( -1 ), prevGlyphstyle( -1 )
 {
     m_properties.set( Fn::Property::THRESHOLD, minthresh, minthresh, 1.0f, true );

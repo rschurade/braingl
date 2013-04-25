@@ -18,7 +18,7 @@ class EVRenderer;
 class Dataset3D: public DatasetNifti
 {
 public:
-    Dataset3D( QString filename, QVector<QVector3D> data, nifti_image* header );
+    Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );

@@ -20,8 +20,8 @@ class DatasetMesh: public Dataset
     Q_OBJECT
 
 public:
-    DatasetMesh( TriangleMesh2* mesh, QString filename = QString( "new mesh" ) );
-    DatasetMesh( QString filename, Fn::DatasetType type );
+    DatasetMesh( TriangleMesh2* mesh, QDir filename = QDir( "new mesh" ) );
+    DatasetMesh( QDir filename, Fn::DatasetType type );
     virtual ~DatasetMesh();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );

@@ -17,7 +17,7 @@
 class DatasetNifti: public Dataset
 {
 public:
-    DatasetNifti( QString filename, Fn::DatasetType type, nifti_image* header );
+    DatasetNifti( QDir filename, Fn::DatasetType type, nifti_image* header );
     virtual ~DatasetNifti();
 
     nifti_image* getHeader();

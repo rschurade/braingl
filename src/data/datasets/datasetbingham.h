@@ -18,7 +18,7 @@ class BinghamRenderer;
 class DatasetBingham : public DatasetNifti
 {
 public:
-    DatasetBingham( QString filename, QVector<QVector<float> > data, nifti_image* header );
+    DatasetBingham( QDir filename, QVector<QVector<float> > data, nifti_image* header );
     virtual ~DatasetBingham();
 
     QVector<QVector<float> >* getData();

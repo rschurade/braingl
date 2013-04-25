@@ -9,7 +9,7 @@
 
 #include "../../gui/gl/shrenderer.h"
 
-DatasetSH::DatasetSH( QString filename, QVector<ColumnVector> data, nifti_image* header ) :
+DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties.set( Fn::Property::OFFSET, 0, -1, 1, true );

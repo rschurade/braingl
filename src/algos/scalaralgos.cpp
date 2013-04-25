@@ -302,7 +302,7 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
     out = tmp;
 
-    DatasetScalar* dsOut = new DatasetScalar( "distance map", out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    DatasetScalar* dsOut = new DatasetScalar( QDir( "distance map" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
