@@ -59,8 +59,8 @@ int main( int argc, char *argv[] )
 {
     QApplication app( argc, argv );
 
-    QCoreApplication::setOrganizationDomain( "braingl" );
-	QCoreApplication::setOrganizationName( "brainglInc" );
+    QCoreApplication::setOrganizationDomain( "braingl.de" );
+	QCoreApplication::setOrganizationName( "MPI CBS" );
 	QCoreApplication::setApplicationName( "braingl" );
 	QCoreApplication::setApplicationVersion( "1.0.0" );
 
