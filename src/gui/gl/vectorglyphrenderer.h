@@ -1,22 +1,22 @@
 /*
- * pointglyphrenderer.h
+ * vectorglyphrenderer.h
  *
- *  Created on: Apr 24, 2013
+ *  Created on: Apr 25, 2013
  *      Author: boettgerj
  */
 
-#ifndef POINTGLYPHRENDERER_H_
-#define POINTGLYPHRENDERER_H_
+#ifndef VECTORGLYPHRENDERER_H_
+#define VECTORGLYPHRENDERER_H_
 
 #include "objectrenderer.h"
 
 #include "../../data/properties/propertygroup.h"
 
-class PointGlyphRenderer: public ObjectRenderer
+class VectorGlyphRenderer: public ObjectRenderer
 {
 public:
-    PointGlyphRenderer();
-    virtual ~PointGlyphRenderer();
+    VectorGlyphRenderer();
+    virtual ~VectorGlyphRenderer();
 
     void init();
 
@@ -37,4 +37,4 @@ private:
     int ao;
 };
 
-#endif /* POINTGLYPHRENDERER_H_ */
+#endif /* VECTORGLYPHRENDERER_H_ */

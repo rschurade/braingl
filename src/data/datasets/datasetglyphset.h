@@ -8,6 +8,7 @@
 #include "datasetsurfaceset.h"
 
 #include "../../gui/gl/pointglyphrenderer.h"
+#include "../../gui/gl/vectorglyphrenderer.h"
 
 #include <qstring.h>
 
@@ -24,16 +25,26 @@ public:
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
 
-    float* getCons();
     void setProperties();
+
+    void makeCons();
     int consNumber;
+
+    void makeVecs();
+    int vecsNumber;
+
 private:
     float minthresh;
     float** conn; //square connectivity matrix
+
     int n;  //number of vertices, has to match size of matrix
 
     float* consArray;
+    float* vecsArray;
+
     PointGlyphRenderer* m_prenderer;
+    VectorGlyphRenderer* m_vrenderer;
+
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle;
 };
 
