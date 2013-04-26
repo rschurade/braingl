@@ -147,7 +147,7 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     if ( renderMode != 1 ) // we are not picking
     {
-        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        if ( renderMode == 4 ) // we are drawing opaque objects
         {
             if ( alpha < 1.0 )
             {
@@ -155,9 +155,9 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
                 return;
             }
         }
-        else // we are drawing tranparent objects
+        else // we are drawing transparent objects
         {
-            if ( !(alpha < 1.0 ) )
+            if ( alpha == 1.0  )
             {
                 // not transparent
                 return;

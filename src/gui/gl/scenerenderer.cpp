@@ -73,6 +73,21 @@ void SceneRenderer::initGL()
         qDebug() << "OpenGL initialized.";
     }
 
+    const GLubyte *renderer = glGetString( GL_RENDERER );
+    const GLubyte *vendor = glGetString( GL_VENDOR );
+    const GLubyte *version = glGetString( GL_VERSION );
+    const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+    GLint major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+    qDebug() << "GL Vendor :" << QString( (char*) vendor );
+    qDebug() << "GL Renderer :" << QString( (char*) renderer );
+    qDebug() << "GL Version (string) :" << QString( (char*) version );
+    qDebug() << "GL Version (integer) :" << major << "." << minor;
+    qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
+
     GLFunctions::loadShaders();
 
     QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
@@ -84,14 +99,6 @@ void SceneRenderer::initGL()
     glEnable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     glEnable( GL_MULTISAMPLE );
-
-//    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-//    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-//    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-//
-//    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-//    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-//    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 
     static GLfloat lightPosition[ 4 ] =
     { 0.5, 5.0, -3000.0, 1.0 };
@@ -112,11 +119,6 @@ void SceneRenderer::initGL()
         { QVector3D( 1.0,  -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
         { QVector3D( 1.0,  1.0,  0 ), QVector3D( 1.0, 1.0, 0.0 ) },
         { QVector3D( -1.0, 1.0,  0 ), QVector3D( 0.0, 1.0, 0.0 ) }
-
-//        { QVector3D( -1.0, -1.0, -0.2 ), QVector3D( 0.0, 0.0, 0.0 ) },
-//        { QVector3D( 0.0,  -1.0, -0.2 ), QVector3D( 1.0, 0.0, 0.0 ) },
-//        { QVector3D( 0.0,  0.0,  -0.2 ), QVector3D( 1.0, 1.0, 0.0 ) },
-//        { QVector3D( -1.0, 0.0,  -0.2 ), QVector3D( 0.0, 1.0, 0.0 ) }
     };
     glGenBuffers( 2, vboIds );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -236,7 +238,6 @@ void SceneRenderer::renderScene()
        fprintf (stderr, "OpenGL Error 0: %s\n", errString);
     }
 
-
     //***************************************************************************************************
     //
     // Pass 1 - draw opaque objects
@@ -245,128 +246,69 @@ void SceneRenderer::renderScene()
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_renderMode = 4;
-    GLFunctions::setRenderTarget( "C0" );
-
-    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    while ((errCode = glGetError()) != GL_NO_ERROR) {
-        errString = gluErrorString(errCode);
-       fprintf (stderr, "OpenGL Error 0: %s\n", errString);
-    }
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    m_renderMode = 5;
     GLFunctions::setRenderTarget( "D0" );
-
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-    while ((errCode = glGetError()) != GL_NO_ERROR) {
-        errString = gluErrorString(errCode);
-       fprintf (stderr, "OpenGL Error 01: %s\n", errString);
-    }
+    GLFunctions::setRenderTarget( "C0" );
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    renderScenePart( 4, "C0", "D0" );
 
     //***************************************************************************************************
     //
     // Pass 2
     //
     //***************************************************************************************************/
-    m_renderMode = 9;
-    GLFunctions::setRenderTarget( "C1" );
-
+    GLFunctions::setRenderTargets( "C1", "D1" );
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    m_renderMode = 6;
-    GLFunctions::setRenderTarget( "D1" );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    renderScenePart( 5, "C1", "D1" );
 
     //***************************************************************************************************
     //
     // Pass 3
     //
     //***************************************************************************************************/
-    m_renderMode = 10;
-    GLFunctions::setRenderTarget( "C2" );
-
+    GLFunctions::setRenderTargets( "C2", "D2" );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    m_renderMode = 7;
-    GLFunctions::setRenderTarget( "D2" );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    renderScenePart( 6, "C2", "D2" );
 
     //***************************************************************************************************
     //
     // Pass 4
     //
     //***************************************************************************************************/
-    m_renderMode = 11;
-    GLFunctions::setRenderTarget( "C3" );
 
+    GLFunctions::setRenderTargets( "C3", "D1" );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
+    renderScenePart( 7, "C3", "D1" );
 
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    m_renderMode = 8;
-    GLFunctions::setRenderTarget( "D1" );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-    renderDatasets();
-    renderRois();
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     //***************************************************************************************************
     //
     // Pass 5
     //
     //***************************************************************************************************/
-    m_renderMode = 12;
+    m_renderMode = 6;
     GLFunctions::setRenderTarget( "D2" );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+void SceneRenderer::renderScenePart( int renderMode, QString target0, QString target1 )
+{
+    m_renderMode = renderMode;
+    GLFunctions::setRenderTargets( target0, target1 );
 
     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
     renderDatasets();

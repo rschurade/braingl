@@ -35,6 +35,13 @@ void PointGlyphRenderer::init()
 
 void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
+    // todo: joachim
+    if ( renderMode != 4 ) // we are drawing opaque objects
+    {
+        // obviously not opaque
+        return;
+    }
+
     qDebug() << "pointrenderer draw";
 
     QGLShaderProgram* program = GLFunctions::getShader( "points" );
