@@ -1,7 +1,9 @@
+#version 330
+
 #include uniforms_vs
 #include peel_vs
 
-varying vec2 v_texCoord;
+out vec2 v_texCoord;
 
 void main()
 {

@@ -1,6 +1,6 @@
 uniform int u_renderMode;
 
-varying vec4 v_position;
+out vec4 v_position;
 
 vec4 encode( float k ) 
 { // assumes k is >= 0

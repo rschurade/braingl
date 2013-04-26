@@ -1,8 +1,8 @@
+#version 330
+
 #include uniforms_vs
 #include lighting_vs
 #include peel_vs
-
-varying float v_value;
 
 void main()
 {
@@ -11,7 +11,7 @@ void main()
    
     prepareLight();
 	
-	gl_FrontColor = a_color;
+	frontColor = a_color;
 	
 	v_texcoord = vec3( a_position.x / u_dims.x, a_position.y / u_dims.y, a_position.z / u_dims.z );
 	

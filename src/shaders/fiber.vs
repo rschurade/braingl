@@ -1,7 +1,9 @@
+#version 330
+
 #include uniforms_vs
 #include peel_vs
 
-varying float v_discard;
+out float v_discard;
 
 void main()
 {
@@ -10,15 +12,15 @@ void main()
 	
 	if ( u_colorMode == 0 )
 	{
-	   gl_FrontColor = a_color;
+	   frontColor = a_color;
 	}
 	else if ( u_colorMode == 1 )
 	{
-	   gl_FrontColor = vec4( abs( v_normal ), 1.0 );
+	   frontColor = vec4( abs( v_normal ), 1.0 );
 	}
 	else
     {
-       gl_FrontColor =  vec4( u_color.xyz, 1.0 );
+       frontColor =  vec4( u_color.xyz, 1.0 );
     }
     v_discard = 0.0;
     if ( a_position.x <= ( u_x - u_dx ) || a_position.x >= ( u_x + u_dx ) || 

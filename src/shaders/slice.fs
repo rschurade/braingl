@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 #include colormap_fs
 #include textures_fs

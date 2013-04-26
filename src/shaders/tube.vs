@@ -1,14 +1,15 @@
+#version 330
+
 #include uniforms_vs
 #include peel_vs
 
-attribute float a_direction;
+in float a_direction;
 
 uniform float u_thickness;
 
-varying float v_sparam;
-
-varying float v_tangent_dot_view;
-varying float v_location;
+out float v_sparam;
+out float v_tangent_dot_view;
+out float v_location;
 
 void main()
 {
@@ -36,15 +37,15 @@ void main()
    
 	if ( u_colorMode == 0 )
 	{
-	   gl_FrontColor = a_color;
+	   frontColor = a_color;
 	}
 	else if ( u_colorMode == 1 )
 	{
-	   gl_FrontColor = vec4( abs( v_normal ), 1.0 );
+	   frontColor = vec4( abs( v_normal ), 1.0 );
 	}
 	else
     {
-       gl_FrontColor =  vec4( u_color.xyz, 1.0 );
+       frontColor =  vec4( u_color.xyz, 1.0 );
     }
     
     v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );

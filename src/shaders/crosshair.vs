@@ -1,3 +1,5 @@
+#version 330
+
 #include uniforms_vs
 
 void main()

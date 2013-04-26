@@ -1,16 +1,22 @@
-attribute vec3 a_position;
-attribute vec3 a_texcoord;
-attribute vec3 a_normal;
-attribute vec4 a_color;
+in vec3 a_position;
+in vec3 a_texcoord;
+in vec3 a_normal;
+in vec4 a_color;
 
-attribute float a_extra;
-attribute float a_value;
-attribute float a_dir;
-attribute vec3 a_vec;
-attribute vec3 a_offset;
-attribute float a_radius;
-attribute vec3 a_diag;
-attribute vec3 a_offdiag;
+in float a_extra;
+in float a_value;
+in float a_dir;
+in vec3 a_vec;
+in vec3 a_offset;
+in float a_radius;
+in vec3 a_diag;
+in vec3 a_offdiag;
+
+out vec3 v_texcoord;
+out vec3 v_normal;
+out float v_extra;
+out vec4 frontColor;
+out float v_value;
 
 uniform mat4 mv_matrixTI;
 uniform mat4 mvp_matrix;
@@ -34,10 +40,6 @@ uniform float u_scaleX;
 uniform float u_scaleY;
 
 uniform float u_scaling;
-
-varying vec3 v_texcoord;
-varying vec3 v_normal;
-varying float v_extra;
 
 uniform bool u_hideNegativeLobes;
 

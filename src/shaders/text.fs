@@ -1,7 +1,7 @@
-uniform vec4 u_color;
+#version 330
 
 uniform sampler2D fontTex;
-varying vec2 v_texCoord;
+in vec2 v_texCoord;
 
 #include peel_fs
 

@@ -1,13 +1,15 @@
+#version 330
+
 #include colormap_fs
 #include textures_fs
 #include uniforms_fs
 #include peel_fs
 
-varying float v_discard;
+in float v_discard;
 
 void main()
 {
-    vec3 color = gl_Color.rgb;
+    vec3 color = frontColor.rgb;
     if ( v_discard > 0.0 )
     {
         discard;
@@ -27,7 +29,7 @@ void main()
     }
     else
     {
-        color = gl_Color.rgb;
+        color = frontColor.rgb;
     }
     
     writePeel( color );

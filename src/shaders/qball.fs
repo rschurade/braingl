@@ -1,10 +1,10 @@
-uniform vec4 u_color;
+#version 330
+
+in vec4 frontColor;
 
 #include peel_fs
 
-
-
 void main()
 {
-    writePeel( gl_Color.rgb );
+    writePeel( frontColor.rgb );
 }
