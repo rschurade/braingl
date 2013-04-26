@@ -476,7 +476,7 @@ void MainWindow::createMenus()
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
-//    helpMenu->addAction( screenshotAct );
+    helpMenu->addAction( screenshotAct );
     helpMenu->addAction( resetSettingsAct );
 #ifndef __WINDOWS__
     helpMenu->addAction( dilbertAct );
