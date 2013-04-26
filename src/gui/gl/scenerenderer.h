@@ -46,6 +46,8 @@ public:
 	void calcMVPMatrix();
 
 private:
+	void renderScene();
+
 	void renderDatasets();
 	void renderRois();
 

@@ -192,169 +192,8 @@ void SceneRenderer::draw()
 {
     if ( !skipDraw )
     {
-        QColor bgColor = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+        renderScene();
 
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc( GL_LEQUAL );
-        glClearDepth( 1 );
-        glDisable( GL_BLEND );
-
-        GLuint tex = GLFunctions::getTexture( "D0" );
-        glActiveTexture( GL_TEXTURE9 );
-        glBindTexture( GL_TEXTURE_2D, tex );
-
-        tex = GLFunctions::getTexture( "D1" );
-        glActiveTexture( GL_TEXTURE10 );
-        glBindTexture( GL_TEXTURE_2D, tex );
-
-        tex = GLFunctions::getTexture( "D2" );
-        glActiveTexture( GL_TEXTURE11 );
-        glBindTexture( GL_TEXTURE_2D, tex );
-
-        GLenum errCode;
-        const GLubyte *errString;
-        while ((errCode = glGetError()) != GL_NO_ERROR) {
-            errString = gluErrorString(errCode);
-           fprintf (stderr, "OpenGL Error 0: %s\n", errString);
-        }
-
-
-        //***************************************************************************************************
-        //
-        // Pass 1 - draw opaque objects
-        //
-        //***************************************************************************************************/
-        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_renderMode = 4;
-        GLFunctions::setRenderTarget( "C0" );
-
-        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        while ((errCode = glGetError()) != GL_NO_ERROR) {
-            errString = gluErrorString(errCode);
-           fprintf (stderr, "OpenGL Error 0: %s\n", errString);
-        }
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        m_renderMode = 5;
-        GLFunctions::setRenderTarget( "D0" );
-
-        glClearColor( 0.0, 0.0, 0.0, 0.0 );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-        while ((errCode = glGetError()) != GL_NO_ERROR) {
-            errString = gluErrorString(errCode);
-           fprintf (stderr, "OpenGL Error 01: %s\n", errString);
-        }
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        //***************************************************************************************************
-        //
-        // Pass 2
-        //
-        //***************************************************************************************************/
-        m_renderMode = 9;
-        GLFunctions::setRenderTarget( "C1" );
-
-        glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        m_renderMode = 6;
-        GLFunctions::setRenderTarget( "D1" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        //***************************************************************************************************
-        //
-        // Pass 3
-        //
-        //***************************************************************************************************/
-        m_renderMode = 10;
-        GLFunctions::setRenderTarget( "C2" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        m_renderMode = 7;
-        GLFunctions::setRenderTarget( "D2" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        //***************************************************************************************************
-        //
-        // Pass 4
-        //
-        //***************************************************************************************************/
-        m_renderMode = 11;
-        GLFunctions::setRenderTarget( "C3" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-        m_renderMode = 8;
-        GLFunctions::setRenderTarget( "D1" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-        //***************************************************************************************************
-        //
-        // Pass 5
-        //
-        //***************************************************************************************************/
-        m_renderMode = 12;
-        GLFunctions::setRenderTarget( "D2" );
-
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        renderDatasets();
-        renderRois();
-
-        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
         //***************************************************************************************************
         //
         // Pass 6 - merge previous results and render on quad
@@ -367,6 +206,173 @@ void SceneRenderer::draw()
     {
         skipDraw = false;
     }
+}
+
+void SceneRenderer::renderScene()
+{
+    QColor bgColor = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LEQUAL );
+    glClearDepth( 1 );
+    glDisable( GL_BLEND );
+
+    GLuint tex = GLFunctions::getTexture( "D0" );
+    glActiveTexture( GL_TEXTURE9 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getTexture( "D1" );
+    glActiveTexture( GL_TEXTURE10 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    tex = GLFunctions::getTexture( "D2" );
+    glActiveTexture( GL_TEXTURE11 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+    GLenum errCode;
+    const GLubyte *errString;
+    while ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error 0: %s\n", errString);
+    }
+
+
+    //***************************************************************************************************
+    //
+    // Pass 1 - draw opaque objects
+    //
+    //***************************************************************************************************/
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_renderMode = 4;
+    GLFunctions::setRenderTarget( "C0" );
+
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    while ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error 0: %s\n", errString);
+    }
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    m_renderMode = 5;
+    GLFunctions::setRenderTarget( "D0" );
+
+    glClearColor( 0.0, 0.0, 0.0, 0.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+    while ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error 01: %s\n", errString);
+    }
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    //***************************************************************************************************
+    //
+    // Pass 2
+    //
+    //***************************************************************************************************/
+    m_renderMode = 9;
+    GLFunctions::setRenderTarget( "C1" );
+
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    m_renderMode = 6;
+    GLFunctions::setRenderTarget( "D1" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    //***************************************************************************************************
+    //
+    // Pass 3
+    //
+    //***************************************************************************************************/
+    m_renderMode = 10;
+    GLFunctions::setRenderTarget( "C2" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    m_renderMode = 7;
+    GLFunctions::setRenderTarget( "D2" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    //***************************************************************************************************
+    //
+    // Pass 4
+    //
+    //***************************************************************************************************/
+    m_renderMode = 11;
+    GLFunctions::setRenderTarget( "C3" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    m_renderMode = 8;
+    GLFunctions::setRenderTarget( "D1" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    //***************************************************************************************************
+    //
+    // Pass 5
+    //
+    //***************************************************************************************************/
+    m_renderMode = 12;
+    GLFunctions::setRenderTarget( "D2" );
+
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    renderDatasets();
+    renderRois();
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 void SceneRenderer::renderMerge()
@@ -422,7 +428,7 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C2", 7 );
     program->setUniformValue( "C3", 8 );
     program->setUniformValue( "D0", 9 );
-    program->setUniformValue( "D0", 10 );
+    program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
     GLenum errCode;
@@ -447,6 +453,21 @@ void SceneRenderer::renderMerge()
 
 QImage* SceneRenderer::screenshot()
 {
+    int size = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int tmpWidth = m_width;
+    int tmpHeight = m_height;
+    resizeGL( size, size );
+    renderScene();
+    GLFunctions::setRenderTarget( "SCREENSHOT" );
+    renderMerge();
+
+    QImage* out = GLFunctions::getOffscreenTexture( m_width, m_height );
+
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    resizeGL( tmpWidth, tmpHeight );
+
+    return out;
+
 }
 
 void SceneRenderer::renderDatasets()
