@@ -1,7 +1,9 @@
-attribute vec3 a_position;
-attribute vec3 a_texcoord;
+#version 330
 
-varying vec3 v_texcoord;
+in vec3 a_position;
+in vec3 a_texcoord;
+
+out vec3 v_texcoord;
 
 void main(void) {
     v_texcoord = a_texcoord;

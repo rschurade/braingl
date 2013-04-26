@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 #include uniforms_vs
 #include peel_vs
@@ -14,7 +14,7 @@ uniform float u_evThreshold;
 
 uniform int u_evSelect;
 
-varying float v_discard;
+out float v_discard;
 
 // (c) 2007 by Mario Hlawitschka
 
@@ -202,17 +202,17 @@ void main()
     if ( u_evSelect == 1 )
     {
         evtmp = vec4( ev0.rgb, 0.0 ) * dir * u_scaling;
-        gl_FrontColor = getColor( ev0.xyz, 1.0 );
+        frontColor = getColor( ev0.xyz, 1.0 );
     }
     else if ( u_evSelect == 2 )
     {
         evtmp = vec4( ev1.rgb, 0.0 ) * dir * u_scaling;
-        gl_FrontColor = getColor( ev1.xyz, 1.0 );
+        frontColor = getColor( ev1.xyz, 1.0 );
     }
     else if ( u_evSelect == 3 )
     {
         evtmp = vec4( ev2.rgb, 0.0 ) * dir * u_scaling;
-        gl_FrontColor = getColor( ev2.xyz, 1.0 );
+        frontColor = getColor( ev2.xyz, 1.0 );
     }
     v_position = mvp_matrix * ( vec4( a_position, 1.0 ) + evtmp );
     gl_Position = v_position;

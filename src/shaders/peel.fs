@@ -1,12 +1,15 @@
 uniform vec2 u_canvasSize;
 uniform int u_renderMode;
 uniform float u_alpha;
-
-varying vec4 v_position;
+uniform vec4 u_color;
 
 uniform sampler2D D0; // TEXTURE3 - opaque depth map (uMinorMode 5)
 uniform sampler2D D1; // TEXTURE4 - 1st of two ping-pong depth maps (uMinorMode 6)
 uniform sampler2D D2; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 7); also used for C4
+
+in vec4 v_position;
+
+out vec4 fragColor;
 
 vec4 encode( float k ) 
 { // assumes k is >= 0
@@ -29,18 +32,18 @@ void writePeel( vec3 color )
     // picking
     if ( u_renderMode == 0 )
     {
-        gl_FragColor = vec4( color, 1.0 );
+        fragColor = vec4( color, 1.0 );
     }
     else if ( u_renderMode == 1 )
     {
-        gl_FragColor = u_color;
+        fragColor = u_color;
     }
     else 
     {
         // opaque
         if ( u_renderMode == 4 )
         { 
-            gl_FragColor = vec4( color, 1.0 );
+            fragColor = vec4( color, 1.0 );
         }
         else if ( u_renderMode > 7 )
         {
@@ -52,7 +55,7 @@ void writePeel( vec3 color )
             { // C1
                 if (z > zmin) 
                 {
-                    gl_FragColor = vec4( color, u_alpha );
+                    fragColor = vec4( color, u_alpha );
                 } 
                 else 
                 {
@@ -73,7 +76,7 @@ void writePeel( vec3 color )
                 }
                 if ( zmin < z && z < zmax ) 
                 {
-                    gl_FragColor = vec4( color, u_alpha );
+                    fragColor = vec4( color, u_alpha );
                 } 
                 else 
                 {
@@ -88,7 +91,7 @@ void writePeel( vec3 color )
             float z = decode(c);
             if (u_renderMode == 5) 
             { // D0
-                gl_FragColor = c;
+                fragColor = c;
             } 
             else 
             {
@@ -99,7 +102,7 @@ void writePeel( vec3 color )
                 { // first creation of D1
                     if (z > zmin) 
                     {
-                        gl_FragColor = c;
+                        fragColor = c;
                     } else 
                     {
                         discard;
@@ -117,7 +120,7 @@ void writePeel( vec3 color )
                     }
                     if (zmin < z && z < zmax) 
                     {
-                        gl_FragColor = c;
+                        fragColor = c;
                     } 
                     else 
                     {

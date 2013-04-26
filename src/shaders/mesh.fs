@@ -1,10 +1,12 @@
+#version 330
+
 #include colormap_fs
 #include textures_fs
 #include uniforms_fs
 #include lighting_fs
 #include peel_fs
 
-varying float v_value;
+in float v_value;
 
 void main()
 {
@@ -30,7 +32,7 @@ void main()
     }
     else
     {
-        color = light( gl_Color ).rgb;
+        color = light( frontColor ).rgb;
     }
     
     writePeel( color );

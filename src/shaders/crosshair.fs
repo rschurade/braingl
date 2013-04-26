@@ -1,6 +1,11 @@
+#version 330
+
 #include uniforms_fs
+
+uniform vec4 u_color;
+out vec4 fragColor;
 
 void main()
 {
-	gl_FragColor = vec4( u_color.rgb, 1.0 );
+	fragColor = vec4( u_color.rgb, 1.0 );
 }

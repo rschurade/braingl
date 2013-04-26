@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 #include uniforms_vs
 #include peel_vs

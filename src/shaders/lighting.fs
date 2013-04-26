@@ -3,13 +3,13 @@
 // x,y,z components:        the light direction vector
 // w component:             unused
 // (4 varying floats)
-varying vec4 v_lightDir;
+in vec4 v_lightDir;
 
 // point on projection plane of current pixel
 // USAGE:
 // x,y,z components:        the point
 // w component:             unused
-varying vec4 v_viewDir;
+in vec4 v_viewDir;
 
 /**
  * Function to calculate lighting based on "Real-Time Volume Graphics, p 119, chapter 5.4, Listing 5.1".
@@ -51,6 +51,9 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
 vec4 light( vec4 color )
 {
+    vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
+    vec3 ambient = vec3( 1.0, 1.0, 1.0 );
+
     return blinnPhongIllumination(
             // material properties
             color.rgb * 0.2,                    // ambient color
@@ -59,8 +62,8 @@ vec4 light( vec4 color )
             1.0,                                  // shininess
         
             // light color properties
-            gl_LightSource[0].diffuse.rgb * 0.5,         // light color
-            gl_LightSource[0].ambient.rgb * 0.5,         // ambient light
+            diffuse * 0.5,         // light color
+            ambient * 0.5,         // ambient light
         
             // directions
             normalize( v_normal ),                 // normal

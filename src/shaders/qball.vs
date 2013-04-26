@@ -1,5 +1,7 @@
+#version 330
+
 #include uniforms_vs
-#include peel_fs
+#include peel_vs
 
 void main()
 {
@@ -13,17 +15,17 @@ void main()
 		{
 		   r = 0.0;
 		}
-		gl_FrontColor = vec4(abs(v_normal), 1.0 );
+		frontColor = vec4(abs(v_normal), 1.0 );
     }
     else
     {
         if ( r < 0.0 )
         {
-           gl_FrontColor = vec4( 0.5, 0.5, 0.5, 1.0 );
+           frontColor = vec4( 0.5, 0.5, 0.5, 1.0 );
         }
         else
         {
-            gl_FrontColor = vec4(abs(v_normal), 1.0 );
+            frontColor = vec4(abs(v_normal), 1.0 );
         }
     }
 	

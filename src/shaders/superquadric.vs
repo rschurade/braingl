@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 #include uniforms_vs
 #include peel_vs
@@ -12,7 +12,7 @@
 // USAGE:
 // x,y,z components:        the direction vector
 // w component:             unused
-varying vec4 v_planePoint;
+out vec4 v_planePoint;
 
 // alpha and beta values describing the superquadric
 // USAGE:
@@ -21,7 +21,7 @@ varying vec4 v_planePoint;
 // z component:             alpha/beta
 // w component:             is !=0 when the glyph has to be dropped
 // (4 varying floats)
-varying vec4 v_alphaBeta;
+out vec4 v_alphaBeta;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms
@@ -204,7 +204,7 @@ void main()
     // glyphs color and anisotropy
     float FA = getFA( evals );
     FA = clamp( FA, 0.0, 1.000 ); // filter out invalid FA values later
-    gl_FrontColor = getColor( ev0.xyz, FA );
+    frontColor = getColor( ev0.xyz, FA );
 
     // throw away glyphs whose FA is below threshold and whose eigenvalues are below threshold
     v_alphaBeta.w = 0.0;

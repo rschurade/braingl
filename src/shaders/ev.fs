@@ -1,9 +1,9 @@
-#version 120 
+#version 330
 
-uniform vec4 u_color;
 #include peel_fs
 
-varying float v_discard;
+in float v_discard;
+in vec4 frontColor;
 
 void main( void )
 {
@@ -12,5 +12,5 @@ void main( void )
         discard;
     }
 
-    writePeel( gl_Color.rgb );
+    writePeel( frontColor.rgb );
 }

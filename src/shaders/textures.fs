@@ -57,7 +57,7 @@ vec4 texColor( vec3 texCoord )
 
     if ( u_texActive0 )
     {
-        vec4 color0 = texture3D( texture0, texCoord );
+        vec4 color0 = texture( texture0, texCoord );
         if ( u_colormap0 == -1 )
         {
             color = color0;
@@ -70,7 +70,7 @@ vec4 texColor( vec3 texCoord )
 
     if ( u_texActive1 )
     {
-        vec4 color1 = texture3D( texture1, texCoord );
+        vec4 color1 = texture( texture1, texCoord );
         if ( u_colormap1 == -1 )
         {
             if ( ( color1.r + color1.g + color1.b > 0.0 ) )
@@ -86,7 +86,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive2 )
     {
-        vec4 color2 = texture3D( texture2, texCoord );
+        vec4 color2 = texture( texture2, texCoord );
         if ( u_colormap2 == -1 )
         {
             if ( ( color2.r + color2.g + color2.b > 0.0 ) )
@@ -102,7 +102,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive3 )
     {
-        vec4 color3 = texture3D( texture3, texCoord );
+        vec4 color3 = texture( texture3, texCoord );
         if ( u_colormap4 == -1 )
         {
             if ( ( color3.r + color3.g + color3.b > 0.0 ) )
@@ -118,7 +118,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive4 )
     {
-        vec4 color4 = texture3D( texture4, texCoord );
+        vec4 color4 = texture( texture4, texCoord );
         if ( u_colormap4 == -1 )
         {
             if ( ( color4.r + color4.g + color4.b > 0.0 ) )

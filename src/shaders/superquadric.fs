@@ -1,4 +1,4 @@
-#version 120 
+#version 330 
 
 #include uniforms_fs
 #include lighting_fs
@@ -8,7 +8,7 @@
 // USAGE:
 // x,y,z components:        the direction vector
 // w component:             unused
-varying vec4 v_planePoint;
+in vec4 v_planePoint;
 
 // alpha and beta values describing the superquadric
 // USAGE:
@@ -17,7 +17,7 @@ varying vec4 v_planePoint;
 // z component:             alpha/beta
 // w component:             is !=0 when the glyph has to be dropped
 // (4 varying floats)
-varying vec4 v_alphaBeta;
+in vec4 v_alphaBeta;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // 2: uniforms
@@ -212,17 +212,20 @@ void main( void )
 
     if( hit )
     {
+        vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
+        vec3 ambient = vec3( 1.0, 1.0, 1.0 );
+    
         // draw shaded pixel
         writePeel( blinnPhongIllumination(
         // material properties
-        gl_Color.rgb * 0.2,                    // ambient color
-        gl_Color.rgb * 2.0,                    // diffuse color
-        gl_Color.rgb,                          // specular color
+        frontColor.rgb * 0.2,                    // ambient color
+        frontColor.rgb * 2.0,                    // diffuse color
+        frontColor.rgb,                          // specular color
         30.0,                                  // shininess
 
         // light color properties
-        gl_LightSource[0].diffuse.rgb,         // light color
-        gl_LightSource[0].ambient.rgb,         // ambient light
+        diffuse,         // light color
+        ambient,         // ambient light
 
         // directions
         normalize( grad ),                     // normal
@@ -231,8 +234,6 @@ void main( void )
     }
     else // no hit: discard
     {
-        // want to see the bounding box? uncomment this line
-        // gl_FragColor=vec4(0.5, 0.5, 1., 1.0);
         discard;
     }
 }

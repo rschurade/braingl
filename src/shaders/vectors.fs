@@ -1,7 +1,9 @@
+#version 330
+
 #include uniforms_fs
 #include peel_fs
 
-varying float v_discard;
+in float v_discard;
 
 void main()
 { 
@@ -9,5 +11,5 @@ void main()
     {
         discard;
     }
-    writePeel( gl_Color.rgb );
+    writePeel( frontColor.rgb );
 }
