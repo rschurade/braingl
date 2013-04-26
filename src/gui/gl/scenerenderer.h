@@ -47,6 +47,7 @@ public:
 
 private:
 	void renderScene();
+	void renderScenePart( int renderMode, QString target0, QString target1 );
 
 	void renderDatasets();
 	void renderRois();

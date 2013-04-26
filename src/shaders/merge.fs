@@ -23,7 +23,9 @@ void main(void) {
                  (1.0-c2.a)*(c3.rgb*c3.a +
                  (1.0-c3.a)*(c4.rgb*c4.a + 
                  (1.0-c4.a)*c0.rgb)));
-           
-                 
+         
+    //vec4 d0 = texture2D( D0, v_texcoord.xy );
+    //fragColor = vec4 ( d0.rgb, 1.0 );
+    
     fragColor = vec4 (mcolor, 1.0);
 }

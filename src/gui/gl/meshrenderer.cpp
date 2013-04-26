@@ -62,7 +62,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     m_renderMode = renderMode;
     if ( renderMode != 1 ) // we are not picking
     {
-        if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+        if ( renderMode == 4 ) // we are drawing opaque objects
         {
             if ( alpha < 1.0 )
             {

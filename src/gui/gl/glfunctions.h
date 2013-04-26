@@ -70,6 +70,7 @@ public:
     static void initFBO( int width, int height );
     static GLuint createTexture( int width, int height );
     static void setRenderTarget( QString target );
+    static void setRenderTargets( QString target0, QString target1 );
     static GLuint getTexture( QString name );
 
     static int idealThreadCount;

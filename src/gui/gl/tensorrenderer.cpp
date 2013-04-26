@@ -52,7 +52,7 @@ void TensorRenderer::init()
 
 void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    if ( !( renderMode == 4 || renderMode == 5) ) // we are drawing opaque objects
+    if ( renderMode != 4 ) // we are drawing opaque objects
     {
         // obviously not opaque
         return;

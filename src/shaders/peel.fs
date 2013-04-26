@@ -9,7 +9,8 @@ uniform sampler2D D2; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 
 
 in vec4 v_position;
 
-out vec4 fragColor;
+layout( location = 0 ) out vec4 fragColor;
+layout( location = 1 ) out vec4 fragDepth;
 
 vec4 encode( float k ) 
 { // assumes k is >= 0
@@ -41,93 +42,63 @@ void writePeel( vec3 color )
     else 
     {
         // opaque
+        vec4 c = encode( 1.0 - gl_FragCoord.z );
+        float z = decode(c);
+        float zmin;
+        float zmax;
         if ( u_renderMode == 4 )
         { 
             fragColor = vec4( color, 1.0 );
-        }
-        else if ( u_renderMode > 7 )
-        {
-            vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
-            float z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
-            float zmin = decode( texture2D( D0, loc ) );
-            float zmax;
-            if ( u_renderMode == 9 ) 
-            { // C1
-                if (z > zmin) 
-                {
-                    fragColor = vec4( color, u_alpha );
-                } 
-                else 
-                {
-                    discard;
-                }
-            } 
-            else 
-            {
-                if ( u_renderMode == 11 ) 
-                { 
-                    // C3 (11)
-                    zmax = decode( texture2D( D2, loc ) );
-                } 
-                else 
-                { 
-                    // C2 (10) or C4 (12)
-                    zmax = decode( texture2D( D1, loc ) );
-                }
-                if ( zmin < z && z < zmax ) 
-                {
-                    fragColor = vec4( color, u_alpha );
-                } 
-                else 
-                {
-                    discard;
-                }
-            }
+            fragDepth = c;
         }
         else
         {
-            // create depth map, D0 (5); ping-pong D1 (6) and D2 (7)
-            vec4 c = encode(1.0-gl_FragCoord.z);
-            float z = decode(c);
-            if (u_renderMode == 5) 
-            { // D0
-                fragColor = c;
-            } 
-            else 
+            vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
+            z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
+            zmin = decode( texture2D( D0, loc ) );
+            if ( u_renderMode == 5 )
             {
-                vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
-                float zmin = decode( texture2D( D0, loc ) );
-                float zmax;
-                if ( u_renderMode == 6 ) 
-                { // first creation of D1
-                    if (z > zmin) 
-                    {
-                        fragColor = c;
-                    } else 
-                    {
-                        discard;
-                    }
+                //first creation of D1
+                if ( z > zmin ) 
+                {
+                    fragColor = vec4( color, u_alpha );
+                    fragDepth = c;
                 } 
                 else 
                 {
-                    if (u_renderMode == 7) 
-                    {
-                        zmax = decode(texture2D(D1, loc)); // create D2
-                    } 
-                    else 
-                    {
-                        zmax = decode(texture2D(D2, loc)); // D1b; create D1 again
-                    }
-                    if (zmin < z && z < zmax) 
-                    {
-                        fragColor = c;
-                    } 
-                    else 
-                    {
-                        discard; // All pixels are discarded, since (zmax < z && z < zmax) is always false
-                    }
+                    discard;
+                }
+                
+            }
+            else if ( u_renderMode == 6 )
+            {
+                zmax = decode( texture2D( D1, loc ) );
+                if ( zmin < z && z < zmax )
+                {
+                    fragColor = vec4( color, u_alpha );
+                    fragDepth = c;
+                } 
+                else 
+                {
+                    discard;
+                }
+            
+                
+                
+            }
+            else if ( u_renderMode == 7 )
+            {
+                zmax = decode( texture2D( D2, loc ) );
+                if ( zmin < z && z < zmax ) 
+                {
+                    fragColor = vec4( color, u_alpha );
+                    fragDepth = c;
+                } 
+                else 
+                {
+                    discard;
                 }
             }
         }
-    }
+    }    
 }
