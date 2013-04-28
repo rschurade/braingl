@@ -61,10 +61,18 @@ void ColorWidgetWithLabel::setValue( QColor value )
 
 void ColorWidgetWithLabel::slotButton()
 {
-    m_value = QColorDialog::getColor( m_value );
+    QColorDialog* cd = new QColorDialog( m_value );
+    cd->open();
+    connect( cd, SIGNAL( colorSelected( QColor ) ), this, SLOT( currentColorChanged( QColor ) ) );
+}
+
+void ColorWidgetWithLabel::currentColorChanged( QColor color )
+{
+    m_value = color;
 
     setStyleSheet( "QFrame { background-color : " + m_value.name() + " }"
                      "QLabel { font:  bold 12px } "
                      "QPushButton { font:  bold 12px; max-height: 16px; } ");
     emit( colorChanged( m_value, m_id ) );
+
 }
