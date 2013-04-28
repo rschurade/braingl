@@ -217,7 +217,7 @@ void SceneRenderer::renderScene()
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
     glClearDepth( 1 );
-    glDisable( GL_BLEND );
+    //glDisable( GL_BLEND );
 
     GLuint tex = GLFunctions::getTexture( "D0" );
     glActiveTexture( GL_TEXTURE9 );
