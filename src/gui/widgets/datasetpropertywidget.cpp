@@ -48,10 +48,20 @@ DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
     m_colormapWidget->setLayout( m_layout2 );
     m_colormapWidget->setContentsMargins( 0, 0, 0, 0 );
 
+    m_layout3 = new QVBoxLayout();
+    m_layout3->setContentsMargins( 1, 1, 1, 1 );
+    m_layout3->setSpacing( 1 );
+    m_layout3->addStretch();
+
+    m_paintWidget = new QWidget;
+    m_paintWidget->setLayout( m_layout3 );
+    m_paintWidget->setContentsMargins( 0, 0, 0, 0 );
+
     setTabPosition( QTabWidget::South );
 
     addTab( m_propWidget, "general" );
     addTab( m_colormapWidget, "colormap" );
+    addTab( m_paintWidget, "paint" );
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
 }
@@ -86,6 +96,14 @@ void DatasetPropertyWidget::updateWidgetVisibility()
     }
     m_layout2->removeItem( m_layout2->itemAt( 0 ) );
     m_visibleWidgets2.clear();
+
+    for ( int i = 0; i < m_visibleWidgets3.size(); ++i )
+    {
+        m_visibleWidgets3[i]->hide();
+        m_layout3->removeWidget( m_visibleWidgets3[i] );
+    }
+    m_layout3->removeItem( m_layout3->itemAt( 0 ) );
+    m_visibleWidgets3.clear();
 
     repaint();
 
@@ -138,6 +156,16 @@ void DatasetPropertyWidget::updateWidgetVisibility()
                 break;
             }
 
+            case Fn::Property::PAINTMODE:
+            case Fn::Property::PAINTSIZE:
+            case Fn::Property::PAINTCOLOR:
+            {
+                m_layout3->addWidget( ds->properties()->getWidget( visible[i] ) );
+                ds->properties()->getWidget( visible[i] )->show();
+                m_visibleWidgets3.push_back( ds->properties()->getWidget( visible[i] ) );
+                break;
+            }
+
             default:
             {
                 m_layout1->addWidget( ds->properties()->getWidget( visible[i] ) );
@@ -150,6 +178,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
 
     m_layout1->addStretch();
     m_layout2->addStretch();
+    m_layout3->addStretch();
 }
 
 void DatasetPropertyWidget::colormapSelectionChanged( int id )
