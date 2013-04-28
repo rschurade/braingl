@@ -33,6 +33,7 @@ private:
 
 private slots:
     void slotButton();
+    void currentColorChanged( QColor color );
 
 signals:
     void colorChanged( QColor, int );
