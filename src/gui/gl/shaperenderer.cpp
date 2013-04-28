@@ -14,36 +14,48 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 ShapeRenderer::ShapeRenderer() :
-    vboIds( new GLuint[ 4 ] )
+    vboIds( new GLuint[ 5 ] )
 {
 }
 
 ShapeRenderer::~ShapeRenderer()
 {
-    glDeleteBuffers( 4, vboIds );
+    glDeleteBuffers( 5, vboIds );
     delete[] vboIds;
 }
 
 void ShapeRenderer::init()
 {
-    glGenBuffers( 4, vboIds );
+    glGenBuffers( 5, vboIds );
     initBox();
     initSphere();
 }
 
 void ShapeRenderer::initBox()
 {
-    GLushort indices[] = { 3, 2, 1, 0, //bottom
-                           0, 1, 5, 4, // front
-                           1, 2, 6, 5, // right
-                           2, 3, 7, 6, // back
-                           3, 0, 4, 7, // left
-                           4, 5, 6, 7 // top
-
-                         };
+    GLushort indices[] = {
+        3, 2, 1, 0, //bottom
+        0, 1, 5, 4, // front
+        1, 2, 6, 5, // right
+        2, 3, 7, 6, // back
+        3, 0, 4, 7, // left
+        4, 5, 6, 7 // top
+    };
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 24 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+    GLushort lineIndices[] = {
+        0, 1, 1, 2, 2, 3, 3, 0,
+        4, 5, 5, 6, 6, 7, 7, 4,
+        0, 4, 1, 5, 2, 6, 3, 7
+    };
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 4 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 24 * sizeof(GLushort), lineIndices, GL_STATIC_DRAW );
+
+
 
     float x1 = -1.0f;
     float y1 = -1.0f;
@@ -190,6 +202,22 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     glDrawElements( GL_QUADS, 24, GL_UNSIGNED_SHORT, 0 );
 
     glDisable(GL_CULL_FACE);
+
+    if( renderMode != 1 )
+    {
+        program->setUniformValue( "u_picking", false );
+        program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+        program->setUniformValue( "u_alpha", 1.0f );
+        program->setUniformValue( "u_renderMode", renderMode );
+        program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "u_lighting", false );
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 4 ] );
+        glDrawElements( GL_LINES, 24, GL_UNSIGNED_SHORT, 0 );
+    }
+
+
+
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
