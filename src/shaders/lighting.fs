@@ -11,6 +11,8 @@ in vec4 v_lightDir;
 // w component:             unused
 in vec4 v_viewDir;
 
+uniform bool u_lighting;
+
 /**
  * Function to calculate lighting based on "Real-Time Volume Graphics, p 119, chapter 5.4, Listing 5.1".
  *

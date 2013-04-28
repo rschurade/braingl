@@ -132,7 +132,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         }
     }
 
-    QGLShaderProgram* program = GLFunctions::getShader( "box" );
+    QGLShaderProgram* program = GLFunctions::getShader( "shape" );
 
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -159,6 +159,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_picking", true );
         program->setUniformValue( "u_renderMode", 1 );
         program->setUniformValue( "u_color", red, green , blue, alpha );
+        program->setUniformValue( "u_lighting", false );
     }
     else
     {
@@ -167,6 +168,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
         program->setUniformValue( "u_renderMode", renderMode );
         program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "u_lighting", false );
     }
 
     program->setUniformValue( "D0", 9 );
@@ -220,7 +222,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     }
 
 
-    QGLShaderProgram* program = GLFunctions::getShader( "sphere" );
+    QGLShaderProgram* program = GLFunctions::getShader( "shape" );
 
     program->bind();
 
@@ -257,6 +259,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_color", red, green , blue, alpha );
         program->setUniformValue( "u_picking", true );
         program->setUniformValue( "u_renderMode", 1 );
+        program->setUniformValue( "u_lighting", false );
     }
     else
     {
@@ -265,6 +268,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
         program->setUniformValue( "u_alpha", (float)color.alphaF() );
         program->setUniformValue( "u_renderMode", renderMode );
         program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "u_lighting", true );
     }
 
     program->setUniformValue( "D0", 9 );

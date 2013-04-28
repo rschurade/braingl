@@ -187,8 +187,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "superquadric" );
         GLFunctions::m_shaderNames.push_back( "tensorev" );
         GLFunctions::m_shaderNames.push_back( "ev" );
-        GLFunctions::m_shaderNames.push_back( "box" );
-        GLFunctions::m_shaderNames.push_back( "sphere" );
+        GLFunctions::m_shaderNames.push_back( "shape" );
         GLFunctions::m_shaderNames.push_back( "text" );
         GLFunctions::m_shaderNames.push_back( "merge" );
         GLFunctions::m_shaderNames.push_back( "points" );
