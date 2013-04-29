@@ -2,15 +2,18 @@ uniform vec2 u_canvasSize;
 uniform int u_renderMode;
 uniform float u_alpha;
 uniform vec4 u_color;
+uniform vec4 u_pickColor;
 
 uniform sampler2D D0; // TEXTURE3 - opaque depth map (uMinorMode 5)
 uniform sampler2D D1; // TEXTURE4 - 1st of two ping-pong depth maps (uMinorMode 6)
 uniform sampler2D D2; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 7); also used for C4
+uniform sampler2D P0; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 7); also used for C4
 
 in vec4 v_position;
 
 layout( location = 0 ) out vec4 fragColor;
 layout( location = 1 ) out vec4 fragDepth;
+layout( location = 2 ) out vec4 pickColor;
 
 vec4 encode( float k ) 
 { // assumes k is >= 0
@@ -30,75 +33,66 @@ float decode( vec4 d )
 
 void writePeel( vec3 color )
 {
-    // picking
-    if ( u_renderMode == 0 )
-    {
+    // opaque
+    vec4 c = encode( 1.0 - gl_FragCoord.z );
+    float z = decode(c);
+    float zmin;
+    float zmax;
+    if ( u_renderMode == 1 || u_renderMode == 0 )
+    { 
         fragColor = vec4( color, 1.0 );
+        fragDepth = c;
+        pickColor = u_pickColor;
     }
-    else if ( u_renderMode == 1 )
+    else
     {
-        fragColor = u_color;
-    }
-    else 
-    {
-        // opaque
-        vec4 c = encode( 1.0 - gl_FragCoord.z );
-        float z = decode(c);
-        float zmin;
-        float zmax;
-        if ( u_renderMode == 4 )
-        { 
-            fragColor = vec4( color, 1.0 );
-            fragDepth = c;
-        }
-        else
+        vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
+        z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
+        zmin = decode( texture2D( D0, loc ) );
+        if ( u_renderMode == 2 )
         {
-            vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
-            z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
-            zmin = decode( texture2D( D0, loc ) );
-            if ( u_renderMode == 5 )
+            //first creation of D1
+            if ( z > zmin ) 
             {
-                //first creation of D1
-                if ( z > zmin ) 
-                {
-                    fragColor = vec4( color, u_alpha );
-                    fragDepth = c;
-                } 
-                else 
-                {
-                    discard;
-                }
-                
+                fragColor = vec4( color, u_alpha );
+                fragDepth = c;
+                pickColor = u_pickColor;
+            } 
+            else 
+            {
+                discard;
             }
-            else if ( u_renderMode == 6 )
-            {
-                zmax = decode( texture2D( D1, loc ) );
-                if ( zmin < z && z < zmax )
-                {
-                    fragColor = vec4( color, u_alpha );
-                    fragDepth = c;
-                } 
-                else 
-                {
-                    discard;
-                }
             
-                
-                
-            }
-            else if ( u_renderMode == 7 )
+        }
+        else if ( u_renderMode == 3 )
+        {
+            zmax = decode( texture2D( D1, loc ) );
+            if ( zmin < z && z < zmax )
             {
-                zmax = decode( texture2D( D2, loc ) );
-                if ( zmin < z && z < zmax ) 
-                {
-                    fragColor = vec4( color, u_alpha );
-                    fragDepth = c;
-                } 
-                else 
-                {
-                    discard;
-                }
+                fragColor = vec4( color, u_alpha );
+                fragDepth = c;
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
             }
         }
-    }    
+        else if ( u_renderMode == 4 )
+        {
+            zmax = decode( texture2D( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                fragColor = vec4( color, u_alpha );
+                fragDepth = c;
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+    }
 }

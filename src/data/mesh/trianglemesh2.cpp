@@ -19,12 +19,10 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     m_vertexInsertId( 0 ),
     m_colorInsertId( 0 ),
     m_triangleInsertId( 0 ),
-    m_startingPickId( GLFunctions::getPickIndex() + 1 ),
     m_ocTree( 0 )
 {
     m_vertices.resize( numVerts * m_bufferSize );
     m_vertexColors.resize( numVerts * 4 );
-    m_vertexPickColors.resize( numVerts * 4 );
     m_vertIsInTriangle.resize( numVerts );
     m_vertNeighbors.resize( numVerts );
 
@@ -71,16 +69,6 @@ void TriangleMesh2::addVertex( int id, float x, float y, float z )
     m_vertexColors[ id * 4 + 1 ] = 1.0;
     m_vertexColors[ id * 4 + 2 ] = 1.0;
     m_vertexColors[ id * 4 + 3 ] = 1.0;
-
-    int pickId = GLFunctions::getPickIndex();
-    float blue =  (float)(( pickId ) & 0xFF) / 255.f;
-    float green = (float)(( pickId >> 8 ) & 0xFF) / 255.f;
-    float red =   (float)(( pickId >> 16 ) & 0xFF) / 255.f;
-
-    m_vertexPickColors[ id * 4     ] = blue;
-    m_vertexPickColors[ id * 4 + 1 ] = green;
-    m_vertexPickColors[ id * 4 + 2 ] = red;
-    m_vertexPickColors[ id * 4 + 3 ] = 1.0;
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -91,19 +79,10 @@ void TriangleMesh2::addVertex( float x, float y, float z )
 
     m_vertexInsertId += 4;
 
-    int pickId = GLFunctions::getPickIndex();
-    float blue =  (float)(( pickId ) & 0xFF) / 255.f;
-    float green = (float)(( pickId >> 8 ) & 0xFF) / 255.f;
-    float red =   (float)(( pickId >> 16 ) & 0xFF) / 255.f;
-
-    m_vertexColors[ m_colorInsertId ] = 1.0;
-    m_vertexPickColors[ m_colorInsertId++ ] = blue;
-    m_vertexColors[ m_colorInsertId ] = 1.0;
-    m_vertexPickColors[ m_colorInsertId++ ] = green;
-    m_vertexColors[ m_colorInsertId ] = 1.0;
-    m_vertexPickColors[ m_colorInsertId++ ] = red;
-    m_vertexColors[ m_colorInsertId ] = 1.0;
-    m_vertexPickColors[ m_colorInsertId++ ] = 1.0;
+    m_vertexColors[ m_colorInsertId++ ] = 1.0;
+    m_vertexColors[ m_colorInsertId++ ] = 1.0;
+    m_vertexColors[ m_colorInsertId++ ] = 1.0;
+    m_vertexColors[ m_colorInsertId++ ] = 1.0;
 }
 
 void TriangleMesh2::addTriangle( int id, int v0, int v1, int v2 )
@@ -160,11 +139,6 @@ float* TriangleMesh2::getVertices()
 float* TriangleMesh2::getVertexColors()
 {
     return m_vertexColors.data();
-}
-
-float* TriangleMesh2::getVertexPickColors()
-{
-    return m_vertexPickColors.data();
 }
 
 int* TriangleMesh2::getIndexes()

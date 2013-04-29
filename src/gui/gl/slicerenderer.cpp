@@ -145,27 +145,29 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 {
     float alpha = GLFunctions::sliceAlpha;
 
-    if ( renderMode != 1 ) // we are not picking
+    switch ( renderMode )
     {
-        if ( renderMode == 4 ) // we are drawing opaque objects
+        case 0:
+            break;
+        case 1:
         {
-            if ( alpha < 1.0 )
+            if ( alpha < 1.0 ) // obviously not opaque
             {
-                // obviously not opaque
                 return;
             }
+            break;
         }
-        else // we are drawing transparent objects
+        default:
         {
-            if ( alpha == 1.0  )
+            if ( alpha == 1.0  ) // not transparent
             {
-                // not transparent
                 return;
             }
+            break;
         }
     }
 
-    //qDebug() << "main gl draw";
+    //qDebug() << "main gl draw, renderMode:" << renderMode;
     setupTextures();
 
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
@@ -182,62 +184,30 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
-
-    initGeometry();
-
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_AXIAL, 0 ) ).toBool() )
-    {
-        drawAxial();
-    }
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_CORONAL, 0 ) ).toBool() )
-    {
-        drawCoronal();
-    }
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
-    {
-        drawSagittal();
-    }
-}
-
-void SliceRenderer::drawPick( QMatrix4x4 mvp_matrix )
-{
-    //qDebug() << "main gl draw";
-    setupTextures();
-
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
-
-    GLFunctions::getShader( "slice" )->bind();
-    // Set modelview-projection matrix
-    GLFunctions::getShader( "slice" )->setUniformValue( "mvp_matrix", mvp_matrix );
-    GLFunctions::getShader( "slice" )->setUniformValue( "u_picking", true );
-    GLFunctions::getShader( "slice" )->setUniformValue( "u_renderMode", 1 );
-
-    initGeometry();
-
-    float alpha =  1.0;
+    float pAlpha =  1.0;
     float green = 0.0f;
     float red =   0.0f;
+
+    initGeometry();
 
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_AXIAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 1 ) & 0xFF) / 255.f;
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_color", red, green , blue, alpha );
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawAxial();
     }
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_CORONAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 2 ) & 0xFF) / 255.f;
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_color", red, green , blue, alpha );
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawCoronal();
     }
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 3 ) & 0xFF) / 255.f;
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, alpha );
-        GLFunctions::getShader( "slice" )->setUniformValue( "u_color", red, green , blue, alpha );
+        GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawSagittal();
     }
 }

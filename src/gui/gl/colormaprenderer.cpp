@@ -142,7 +142,7 @@ void ColormapRenderer::setShaderVars()
 
 void ColormapRenderer::draw( int width, int height, int renderMode )
 {
-    if ( renderMode != 4 ) // we are drawing opaque objects
+    if ( renderMode != 1 ) // we are drawing opaque objects
     {
         return;
     }
@@ -159,6 +159,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
     program->setUniformValue( "u_width", (float)width );
     program->setUniformValue( "u_height", (float)height );

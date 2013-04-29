@@ -1,5 +1,4 @@
 
-uniform vec4 u_pickColor;
 uniform int u_colorMode;
 uniform int u_colormap;
 uniform float u_min;

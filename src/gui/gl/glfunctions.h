@@ -72,6 +72,7 @@ public:
     static void setRenderTarget( QString target );
     static void setRenderTargets( QString target0, QString target1 );
     static GLuint getTexture( QString name );
+    static void clearTexture( QString name, float r, float g, float b, float a );
 
     static int idealThreadCount;
     static float sliceAlpha;
