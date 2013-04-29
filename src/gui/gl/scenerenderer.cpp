@@ -231,6 +231,11 @@ void SceneRenderer::renderScene()
     glActiveTexture( GL_TEXTURE11 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
+    tex = GLFunctions::getTexture( "PICK" );
+    glActiveTexture( GL_TEXTURE12 );
+    glBindTexture( GL_TEXTURE_2D, tex );
+
+
     GLenum errCode;
     const GLubyte *errString;
     while ((errCode = glGetError()) != GL_NO_ERROR) {
@@ -246,36 +251,31 @@ void SceneRenderer::renderScene()
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    GLFunctions::setRenderTarget( "D0" );
-    glClearColor( 0.0, 0.0, 0.0, 0.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    GLFunctions::setRenderTarget( "C0" );
-    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    renderScenePart( 4, "C0", "D0" );
+    GLFunctions::clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
+    GLFunctions::clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );
+    GLFunctions::clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    GLFunctions::setRenderTargets( "C0", "D0" );
+    renderScenePart( 1, "C0", "D0" );
 
     //***************************************************************************************************
     //
     // Pass 2
     //
     //***************************************************************************************************/
-    GLFunctions::setRenderTargets( "C1", "D1" );
-    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLFunctions::clearTexture( "C1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    GLFunctions::clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
-    renderScenePart( 5, "C1", "D1" );
+    renderScenePart( 2, "C1", "D1" );
 
     //***************************************************************************************************
     //
     // Pass 3
     //
     //***************************************************************************************************/
-    GLFunctions::setRenderTargets( "C2", "D2" );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLFunctions::clearTexture( "C2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    GLFunctions::clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
-    renderScenePart( 6, "C2", "D2" );
+    renderScenePart( 3, "C2", "D2" );
 
     //***************************************************************************************************
     //
@@ -283,20 +283,20 @@ void SceneRenderer::renderScene()
     //
     //***************************************************************************************************/
 
-    GLFunctions::setRenderTargets( "C3", "D1" );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLFunctions::clearTexture( "C3", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    GLFunctions::clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
-    renderScenePart( 7, "C3", "D1" );
+
+    renderScenePart( 4, "C3", "D1" );
 
     //***************************************************************************************************
     //
     // Pass 5
     //
     //***************************************************************************************************/
-    m_renderMode = 6;
+    m_renderMode = 3;
+    GLFunctions::clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     GLFunctions::setRenderTarget( "D2" );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
     renderDatasets();
@@ -319,6 +319,8 @@ void SceneRenderer::renderScenePart( int renderMode, QString target0, QString ta
 
 void SceneRenderer::renderMerge()
 {
+    m_renderMode = 0;
+
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
@@ -498,8 +500,8 @@ void SceneRenderer::mouseWheel( int step )
 void SceneRenderer::renderPick()
 {
     // render
-    m_renderMode = 1;
-    GLFunctions::setRenderTarget( "PICK" );
+    m_renderMode = 0;
+    GLFunctions::setRenderTarget( "C0" );
 
     glEnable( GL_DEPTH_TEST );
     /* clear the frame buffer */
@@ -507,22 +509,22 @@ void SceneRenderer::renderPick()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     //render_picking_scene();
-    m_sliceRenderer->drawPick( m_mvpMatrix );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
     renderRois();
     renderDatasets();
 }
 
 void SceneRenderer::rightMouseDown( int x, int y )
 {
-    renderPick();
+    m_rightMouseDown = QVector2D( x, y );
     // get id
     m_picked = GLFunctions::get_object_id( x, y, m_width, m_height );
-    qDebug() << "picked object id: " << m_picked;
 
+    renderPick();
     QVector3D pickPos = mapMouse2World( x, y );
-
-    /* return to the default frame buffer */
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+    qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )

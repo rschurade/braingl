@@ -35,7 +35,6 @@ public:
 
     float* getVertices();
     float* getVertexColors();
-    float* getVertexPickColors();
     int* getIndexes();
 
     int numVerts() { return m_numVerts; };
@@ -61,7 +60,6 @@ private:
 
     QVector<float>m_vertices;
     QVector<float>m_vertexColors;
-    QVector<float>m_vertexPickColors;
 
     QVector<QVector<int> >m_vertIsInTriangle;
     QVector<QVector<int> >m_vertNeighbors;
@@ -75,9 +73,6 @@ private:
     int m_vertexInsertId;
     int m_colorInsertId;
     int m_triangleInsertId;
-
-
-    int m_startingPickId;
 
     OcTree* m_ocTree;
     QVector<int>m_toRemove;

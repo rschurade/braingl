@@ -36,7 +36,7 @@ void PointGlyphRenderer::init()
 void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
     // todo: joachim
-    if ( renderMode != 4 ) // we are drawing opaque objects
+    if ( renderMode != 1 ) // we are drawing opaque objects
     {
         // obviously not opaque
         return;
@@ -59,6 +59,7 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
     float scale = (mv_matrix*QVector4D(1,0,0,1)).length();
     program->setUniformValue( "u_scale", scale );

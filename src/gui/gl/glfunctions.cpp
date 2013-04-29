@@ -544,6 +544,9 @@ void GLFunctions::generate_pixel_buffer_objects( int width, int height )
 
 uint GLFunctions::get_object_id( int x, int y, int width, int height )
 {
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
+    glReadBuffer( GL_COLOR_ATTACHMENT2 );
+
     static int frame_event = 0;
     int read_pbo, map_pbo;
     uint object_id;
@@ -686,8 +689,8 @@ void GLFunctions::initFBO( int width, int height )
     /* attach the texture and the render buffer to the frame buffer */
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
 
-    GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers( 2,  attachments );
+    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers( 3,  attachments );
 
     /* create a renderbuffer object for the depth buffer */
     glGenRenderbuffers( 1, &GLFunctions::RBO );
@@ -735,6 +738,7 @@ void GLFunctions::setRenderTarget( QString target )
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target], 0 );
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, GLFunctions::textures["PICK"], 0 );
 }
 
 void GLFunctions::setRenderTargets( QString target0, QString target1 )
@@ -742,6 +746,18 @@ void GLFunctions::setRenderTargets( QString target0, QString target1 )
     glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target0], 0 );
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, GLFunctions::textures[target1], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, GLFunctions::textures["PICK"], 0 );
+}
+
+void GLFunctions::clearTexture( QString target, float r, float g, float b, float a )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, 0, 0 );
+    glClearColor( r, g, b, a );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 GLuint GLFunctions::getTexture( QString name )

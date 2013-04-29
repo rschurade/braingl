@@ -22,7 +22,7 @@
 MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     ObjectRenderer(),
     m_tris( 0 ),
-    vboIds( new GLuint[ 4 ] ),
+    vboIds( new GLuint[ 3 ] ),
     m_pickId( GLFunctions::getPickIndex() ),
     m_mesh( mesh ),
     m_dirty( true ),
@@ -42,7 +42,6 @@ MeshRenderer::~MeshRenderer()
     glDeleteBuffers(1, &( vboIds[ 0 ] ) );
     glDeleteBuffers(1, &( vboIds[ 1 ] ) );
     glDeleteBuffers(1, &( vboIds[ 2 ] ) );
-    glDeleteBuffers(1, &( vboIds[ 3 ] ) );
 }
 
 void MeshRenderer::setMesh( TriangleMesh2* mesh )
@@ -53,30 +52,33 @@ void MeshRenderer::setMesh( TriangleMesh2* mesh )
 
 void MeshRenderer::init()
 {
-    glGenBuffers( 4, vboIds );
+    glGenBuffers( 3, vboIds );
 }
 
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
     m_renderMode = renderMode;
-    if ( renderMode != 1 ) // we are not picking
+
+    switch ( renderMode )
     {
-        if ( renderMode == 4 ) // we are drawing opaque objects
+        case 0:
+            break;
+        case 1:
         {
-            if ( alpha < 1.0 )
+            if ( alpha < 1.0 ) // obviously not opaque
             {
-                // obviously not opaque
                 return;
             }
+            break;
         }
-        else // we are drawing tranparent objects
+        default:
         {
-            if ( !(alpha < 1.0 ) )
+            if ( alpha == 1.0  ) // not transparent
             {
-                // not transparent
                 return;
             }
+            break;
         }
     }
 
@@ -112,6 +114,13 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
+
+    float pAlpha =  1.0;
+    float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
+    float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
+    float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
+    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
 
     program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
@@ -168,16 +177,8 @@ void MeshRenderer::setShaderVars()
     offset += sizeof(float) * 1;
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    if( m_renderMode == 1 )
-    {
-        glShadeModel( GL_FLAT );
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
-    }
-    else
-    {
-        glShadeModel( GL_SMOOTH );
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-    }
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
     glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0 );
@@ -195,9 +196,6 @@ void MeshRenderer::initGeometry()
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexColors(), GL_DYNAMIC_DRAW );
-
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
-    glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexPickColors(), GL_DYNAMIC_DRAW );
 
     m_dirty = false;
 }

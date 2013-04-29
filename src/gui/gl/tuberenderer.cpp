@@ -44,23 +44,20 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 {
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
 
-    if ( renderMode != 1 ) // we are not picking
+    if ( renderMode == 1 ) // we are drawing opaque objects
     {
-        if ( renderMode == 4 ) // we are drawing opaque objects
+        if ( alpha < 1.0 )
         {
-            if ( alpha < 1.0 )
-            {
-                // obviously not opaque
-                return;
-            }
+            // obviously not opaque
+            return;
         }
-        else // we are drawing tranparent objects
+    }
+    else // we are drawing tranparent objects
+    {
+        if ( !(alpha < 1.0 ) )
         {
-            if ( !(alpha < 1.0 ) )
-            {
-                // not transparent
-                return;
-            }
+            // not transparent
+            return;
         }
     }
 
@@ -89,6 +86,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
     QVector<bool>*selected = m_selector->getSelection();
     if ( props->get( Fn::Property::COLORMODE ).toInt() != 2 )

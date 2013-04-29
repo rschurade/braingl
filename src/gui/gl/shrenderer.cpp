@@ -60,7 +60,7 @@ void SHRenderer::init()
 
 void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    if ( renderMode != 4 ) // we are drawing opaque objects
+    if ( renderMode != 1 ) // we are drawing opaque objects
     {
         // obviously not opaque
         return;
@@ -68,7 +68,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     setRenderParams( props );
 
-    if ( m_orient == 0 || ( renderMode == 1 ) )
+    if ( m_orient == 0 )
     {
         return;
     }
@@ -84,6 +84,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
