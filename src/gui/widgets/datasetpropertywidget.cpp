@@ -159,6 +159,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             case Fn::Property::PAINTMODE:
             case Fn::Property::PAINTSIZE:
             case Fn::Property::PAINTCOLOR:
+            case Fn::Property::PAINTVALUE:
             {
                 m_layout3->addWidget( ds->properties()->getWidget( visible[i] ) );
                 ds->properties()->getWidget( visible[i] )->show();

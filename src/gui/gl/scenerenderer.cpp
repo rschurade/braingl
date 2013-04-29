@@ -524,7 +524,7 @@ void SceneRenderer::rightMouseDown( int x, int y )
     QVector3D pickPos = mapMouse2World( x, y );
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-    qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
+    //qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )

@@ -82,6 +82,11 @@ void DatasetScalar::examineDataset()
         qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
         flipX();
     }
+
+    m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
+    m_properties.set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
+    m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::Property::PAINTVALUE, min, min, max, true );
 }
 
 void DatasetScalar::createTexture()
@@ -189,4 +194,52 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
 
     float data = m_data[ getIdFromPos( x, y, z ) ];
     return QString::number( data );
+}
+
+void DatasetScalar::mousePick( int pickId, QVector3D pos )
+{
+    if ( pickId == 0 )
+   {
+       return;
+   }
+
+   int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
+   if (  paintMode != 0 )
+   {
+       QColor color;
+       if ( paintMode == 1 )
+       {
+           color = m_properties.get( Fn::Property::PAINTCOLOR ).value<QColor>();
+       }
+       else if ( paintMode == 2 )
+       {
+           color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
+       }
+
+       float paintValue = m_properties.get( Fn::Property::PAINTVALUE ).toFloat();
+       m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
+
+       int brushSize = m_properties.get( Fn::Property::PAINTSIZE ).toInt();
+
+       for ( int i = 0; i < brushSize; ++i )
+       {
+           for ( int j = 0; j < brushSize; ++j )
+           {
+               for ( int k = 0; k < brushSize; ++k )
+               {
+                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() - k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() + k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() - k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() + k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() - k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() + k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() - k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() + k ) ] = paintValue;
+               }
+           }
+       }
+
+       glDeleteTextures( 1, &m_textureGLuint );
+       m_textureGLuint = 0;
+   }
 }
