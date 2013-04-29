@@ -26,6 +26,8 @@ public:
 
     QVector<QVector3D>* getData();
 
+    void mousePick( int pickId, QVector3D pos );
+
 private:
     void examineDataset();
     void createTexture();

@@ -23,6 +23,8 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
     QString getValueAsString( int x, int y, int z );
 
+    void mousePick( int pickId, QVector3D pos );
+
 private:
     QVector<float> m_data;
 
