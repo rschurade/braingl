@@ -316,3 +316,18 @@ double ScalarAlgos::xxgauss(double x, double sigma)
     y = exp((double) -z * z * 0.5) / (sigma * a);
     return y;
 }
+
+QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
+{
+    QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
+    QVector<float> out( data->size() );
+
+    float max = static_cast<DatasetScalar*>( ds )->properties()->get( Fn::Property::MAX ).toFloat();
+    out[0] = max;
+
+
+    DatasetScalar* dsOut = new DatasetScalar( QDir( "distance map" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    QList<Dataset*> l;
+    l.push_back( dsOut );
+    return l;
+}

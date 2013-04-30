@@ -21,6 +21,8 @@ public:
     static QList<Dataset*> isoSurface( Dataset* ds );
     static QList<Dataset*> distanceMap( Dataset* ds );
 
+    static QList<Dataset*> createNew( Dataset* ds );
+
 private:
     static double xxgauss(double x, double sigma);
 };
