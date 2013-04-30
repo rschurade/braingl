@@ -77,11 +77,21 @@ void DatasetScalar::examineDataset()
     connect( m_properties.getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
               m_properties.getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
 
-    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
+    if ( m_qform.Determinant() < 0.0 && m_qform( 1, 1 ) < 0 )
     {
-        qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
+        qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
         flipX();
     }
+    else
+    {
+        if ( m_sform.Determinant() < 0.0 && m_sform( 1, 1 ) < 0 )
+        {
+            qDebug() << m_properties.get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation in s-form detected. Flipping voxels on X-Axis";
+            flipX();
+        }
+    }
+
+
 
     m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
     m_properties.set( Fn::Property::PAINTSIZE, 1, 1, 5, true );
