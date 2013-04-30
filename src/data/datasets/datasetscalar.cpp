@@ -84,7 +84,7 @@ void DatasetScalar::examineDataset()
     }
 
     m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
-    m_properties.set( Fn::Property::PAINTSIZE, 1.f, 1.f, 100.f, true );
+    m_properties.set( Fn::Property::PAINTSIZE, 1, 1, 5, true );
     //m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
     m_properties.set( Fn::Property::PAINTVALUE, min, min, max - 1.0, true );
 }
@@ -199,9 +199,13 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
 void DatasetScalar::mousePick( int pickId, QVector3D pos )
 {
     if ( pickId == 0 )
-   {
-       return;
-   }
+    {
+        return;
+    }
+
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
    int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
    if (  paintMode != 0 )
@@ -227,14 +231,14 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos )
            {
                for ( int k = 0; k < brushSize; ++k )
                {
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() + k ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
                }
            }
        }
