@@ -50,6 +50,11 @@ void ToolBar::createActions()
     m_distanceMapAct->setStatusTip( tr( "distance map" ) );
     connect( m_distanceMapAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_createNewAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create new" ), this, Fn::Algo::CREATE_NEW );
+    m_createNewAct->setStatusTip( tr( "create a new empty dataset with the dimensions of the selected dataset" ) );
+    connect( m_createNewAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+
     m_testAct = new FNAction( QIcon( ":/icons/tmp3.png" ), tr( "Test" ), this, Fn::Algo::TEST );
     m_testAct->setStatusTip( tr( "Test Action 1" ) );
     connect( m_testAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -183,6 +188,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::DISTANCE_MAP:
             l = ScalarAlgos::distanceMap( ds );
             break;
+        case Fn::Algo::CREATE_NEW:
+            l = ScalarAlgos::createNew( ds );
+            break;
         case Fn::Algo::FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
             break;
@@ -225,6 +233,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_isosurfaceAct );
             this->addAction( m_distanceMapAct );
+            this->addAction( m_createNewAct );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:

@@ -47,6 +47,7 @@ namespace Fn
         BINGHAM,
         ISOSURFACE,
         DISTANCE_MAP,
+        CREATE_NEW,
         TENSOR_TRACK,
         CROSSING_TRACK,
         BINGHAM_2_TENSOR,
