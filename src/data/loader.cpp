@@ -1265,10 +1265,18 @@ bool Loader::loadGlyphset()
 
     //2: load surfaceset
     gnl = gts.readLine();
-    DatasetGlyphset* dataset = new DatasetGlyphset( gnl );
-    qDebug() << "loading glyph set: " << gnl;
+    QString datasetName = gnl;
 
-    QFile setfile( trunk + QDir::separator() + gnl );
+    gnl = gts.readLine();
+    QStringList sl2 = gnl.split( " " );
+
+    QString connectivityName = trunk + QDir::separator() + sl2.at(0);
+    float mt = sl2.at( 1 ).toFloat();
+
+    DatasetGlyphset* dataset = new DatasetGlyphset( datasetName, mt );
+    qDebug() << "loading glyph set: " << datasetName;
+
+    QFile setfile( trunk + QDir::separator() + datasetName );
     if ( !setfile.open( QIODevice::ReadOnly ) )
     {
         qDebug( "set file unreadable" );
@@ -1324,16 +1332,15 @@ bool Loader::loadGlyphset()
             dataset->addMesh( mesh, sl.at( 0 ) );
         }
     }
-    dataset->setProperties();
 
     //3: load connectivity: put this into seperate loader / dataset / here
-    gnl  = gts.readLine();
     qDebug() << "loading connectivity";
-    QStringList sl2 = gnl.split( " " );
-    dataset->readConnectivity( trunk + QDir::separator() + sl2.at(0) );
+    dataset->readConnectivity( connectivityName );
 
-    //init conn.-crap...
-    dataset->setMinthresh( sl2.at( 1 ).toFloat());
+    //TODO: init conn.-crap...
+    //dataset->setMinthresh( mt );
+
+    dataset->setProperties();
 
     m_dataset.push_back( dataset );
 

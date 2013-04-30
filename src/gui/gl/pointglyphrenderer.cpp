@@ -42,8 +42,6 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
         return;
     }
 
-    qDebug() << "pointrenderer draw";
-
     QGLShaderProgram* program = GLFunctions::getShader( "points" );
     program->bind();
 
@@ -68,14 +66,13 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
 
     setShaderVars(props);
 
+    glEnable(GL_BLEND);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_POINT_SMOOTH);
 
     glDrawArrays( GL_POINTS, 0, np );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-    qDebug() << "pointrenderer postdraw";
 }
 
 void PointGlyphRenderer::setupTextures()
