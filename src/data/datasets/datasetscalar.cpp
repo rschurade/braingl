@@ -58,7 +58,7 @@ void DatasetScalar::examineDataset()
         min = qMin( min, m_data[i] );
         max = qMax( max, m_data[i] );
     }
-
+    max += 1.0f;
     m_properties.set( Fn::Property::SIZE, static_cast<int>( size * sizeof(float) ) );
     m_properties.set( Fn::Property::MIN, min );
     m_properties.set( Fn::Property::MAX, max );
@@ -84,9 +84,9 @@ void DatasetScalar::examineDataset()
     }
 
     m_properties.set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
-    m_properties.set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
-    m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::Property::PAINTVALUE, min, min, max, true );
+    m_properties.set( Fn::Property::PAINTSIZE, 1.f, 1.f, 100.f, true );
+    //m_properties.set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
+    m_properties.set( Fn::Property::PAINTVALUE, min, min, max - 1.0, true );
 }
 
 void DatasetScalar::createTexture()
