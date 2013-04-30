@@ -9,14 +9,29 @@
 
 #include "../mesh/trianglemesh2.h"
 
+#include "../../algos/connection.h"
+
 #include "qfile.h"
 
 #include "qmath.h"
 
-DatasetGlyphset::DatasetGlyphset( QDir filename ) :
-        DatasetSurfaceset( filename ), m_prenderer( NULL ), m_vrenderer( NULL ), prevGeo( -1 ), prevGlyph( -1 ), prevCol( -1 ), prevGlyphstyle( -1 )
+#include <qcoreapplication.h>
+
+DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
+                DatasetSurfaceset( filename ),
+                minthresh( mt ),
+                m_prenderer( NULL ),
+                m_vrenderer( NULL ),
+                m_pierenderer( NULL ),
+                prevGeo( -1 ),
+                prevGlyph( -1 ),
+                prevCol( -1 ),
+                prevGlyphstyle( -1 ),
+                prevThresh( -1 )
 {
-    m_properties.set( Fn::Property::THRESHOLD, minthresh, minthresh, 1.0f, true );
+    qDebug() << "minthresh set to: " << minthresh;
+
+    m_properties.set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
     m_properties.set( Fn::Property::GLYPHSTYLE,
     { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
     m_properties.set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
@@ -25,6 +40,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename ) :
     m_properties.set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
     m_properties.set( Fn::Property::DRAW_SURFACE, true, true );
     m_properties.set( Fn::Property::DRAW_GLYPHS, true, true );
+    pieArrays = NULL;
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -67,12 +83,12 @@ void DatasetGlyphset::readConnectivity( QString filename )
 
 void DatasetGlyphset::setMinthresh( float mt )
 {
+    //TODO: Check how I set that...
     minthresh = mt;
 }
 
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
-    qDebug() << "glyphset draw";
 
     if ( m_properties.get( Fn::Property::DRAW_SURFACE ).toBool() )
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode );
@@ -82,64 +98,78 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     int geoCol = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
     int glyphstyle = m_properties.get( Fn::Property::GLYPHSTYLE ).toInt();
 
+    float threshold = m_properties.get( Fn::Property::THRESHOLD ).toFloat();
+    float minlength = m_properties.get( Fn::Property::MINLENGTH ).toFloat();
+
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
     glPointSize( m_properties.get( Fn::Property::PRIMSIZE ).toFloat() );
 
-    if ( renderMode == 4 || renderMode == 5 ) // we are drawing opaque objects
+    //TODO: Make transparency right, using other rendermodes, adapt shaders?
+
+    if ( ( glyphstyle == 0 )
+            && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
+                    || ( prevGlyphstyle != glyphstyle ) ) )
     {
-        //TODO: Make transparency right, using other rendermodes, adapt shaders?
-
-        if ( ( glyphstyle == 0 )
-                && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
-                        || ( prevGlyphstyle != glyphstyle ) ) )
-        {
-            if ( m_prenderer )
-                delete m_prenderer;
-            m_prenderer = new PointGlyphRenderer();
-            m_prenderer->init();
-            makeCons();
-            m_prenderer->initGeometry( consArray, consNumber );
-        }
-
-        if ( ( glyphstyle == 1 )
-                && ( m_vrenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
-                        || ( prevGlyphstyle != glyphstyle ) ) )
-        {
-            if ( m_vrenderer )
-                delete m_vrenderer;
-            m_vrenderer = new VectorGlyphRenderer();
-            m_vrenderer->init();
-            //TODO: vector fields:
-            makeVecs();
-            m_vrenderer->initGeometry( vecsArray, vecsNumber );
-        }
-
-        //TODO: Deal with multiple passes / switching btw. styles etc.:
-        //TODO: Optimize switching of stuff
-        prevGeo = geoSurf;
-        prevGlyph = geoGlyph;
-        prevCol = geoCol;
-        prevGlyphstyle = glyphstyle;
-
-        qDebug() << "glyphset predraw";
-
-        if ( m_properties.get( Fn::Property::DRAW_GLYPHS ).toBool() )
-        {
-            if ( glyphstyle == 0 )
-            {
-                m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
-            }
-            if ( glyphstyle == 1 )
-            {
-                m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
-            }
-        }
-
-        qDebug() << "glyphset postdraw";
+        if ( m_prenderer )
+            delete m_prenderer;
+        m_prenderer = new PointGlyphRenderer();
+        m_prenderer->init();
+        makeCons();
+        m_prenderer->initGeometry( consArray, consNumber );
     }
+
+    if ( ( glyphstyle == 1 )
+            && ( m_vrenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol ) || ( prevGlyphstyle != glyphstyle ) ) )
+    {
+        if ( m_vrenderer )
+            delete m_vrenderer;
+        m_vrenderer = new VectorGlyphRenderer();
+        m_vrenderer->init();
+        //TODO: vector fields:
+        makeVecs();
+        m_vrenderer->initGeometry( vecsArray, vecsNumber );
+    }
+
+    if ( ( glyphstyle == 2 )
+            && ( m_pierenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
+                    || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) ) )
+    {
+        if ( m_pierenderer )
+            delete m_pierenderer;
+        m_pierenderer = new PieGlyphRenderer();
+        m_pierenderer->init();
+        makePies();
+        m_pierenderer->initGeometry( pieArrays, numbers );
+    }
+
+    //TODO: Deal with multiple passes / switching btw. styles etc.:
+    //TODO: Optimize switching of stuff
+    prevGeo = geoSurf;
+    prevGlyph = geoGlyph;
+    prevCol = geoCol;
+    prevGlyphstyle = glyphstyle;
+    prevThresh = threshold;
+    prevMinlength = minlength;
+
+    if ( m_properties.get( Fn::Property::DRAW_GLYPHS ).toBool() )
+    {
+        if ( glyphstyle == 0 )
+        {
+            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+        }
+        if ( glyphstyle == 1 )
+        {
+            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+        }
+        if ( glyphstyle == 2 )
+        {
+            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+        }
+    }
+
 }
 
 void DatasetGlyphset::makeCons()
@@ -306,9 +336,125 @@ void DatasetGlyphset::makeVecs()
     }
 }
 
+//TODO: replace with something nicer...
+bool edgeCompare( Connection* e1, Connection* e2 )
+{
+    QColor c1( e1->r * 255, e1->g * 255, e1->b * 255 );
+    QColor c2( e2->r * 255, e2->g * 255, e2->b * 255 );
+    return c1.hueF() > c2.hueF();
+}
+
+void DatasetGlyphset::makePies()
+{
+
+    qDebug() << "makePies begin";
+
+    float minlength = m_properties.get( Fn::Property::MINLENGTH ).toFloat();
+    float threshold = m_properties.get( Fn::Property::THRESHOLD ).toFloat();
+    if ( threshold < minthresh )
+        threshold = minthresh;
+
+    qDebug() << "threshold: " << threshold;
+
+    if ( pieArrays )
+    {
+        for ( int i = 0; i < pieArrays->size(); ++i )
+        {
+            if ( pieArrays->at( i ) != NULL )
+                delete[] (float*) pieArrays->at( i );
+        }
+        delete pieArrays;
+        pieArrays = NULL;
+        delete numbers;
+        numbers = NULL;
+    }
+
+    qDebug() << "calcPies after deletion";
+
+    int geo = m_properties.get( Fn::Property::SURFACE ).toInt();
+    int glyph = m_properties.get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int col = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+
+    float* nodes = m_mesh.at( geo )->getVertices();
+    float* glyphnodes = m_mesh.at( glyph )->getVertices();
+    float* colornodes = m_mesh.at( col )->getVertices();
+
+    n = m_mesh.at( geo )->numVerts();
+    pieArrays = new QVector<float*>( n, NULL );
+    numbers = new QVector<int>( n );
+
+    //for all nodes in the current surface...
+    //count first and throw super-threshold connections in sortable list, then create arrays...
+    //TODO: Parallelize, protect from renderthread interruptions?...
+    for ( int i = 0; i < n; ++i )
+    {
+        int count = 0;
+
+        QList<Connection*> sortlist;
+
+        for ( int j = 0; j < n; ++j )
+        {
+            if ( conn[i][j] > threshold )
+            {
+                int triangleshift = 7; //TODO: Why 7?
+
+                QVector3D f = QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
+                QVector3D t = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+                QVector3D gdiff = t - f;
+
+                QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
+                QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
+                QVector3D dg = tg - fg;
+
+                QVector3D fc = QVector3D( colornodes[i * triangleshift], colornodes[i * triangleshift + 1], colornodes[i * triangleshift + 2] );
+                QVector3D tc = QVector3D( colornodes[j * triangleshift], colornodes[j * triangleshift + 1], colornodes[j * triangleshift + 2] );
+                QVector3D dc = tc - fc;
+
+                if ( gdiff.length() > minlength )
+                {
+                    sortlist.push_back( new Connection( f, dc, conn[i][j] ) );
+                    ++count;
+                }
+            }
+        }
+        numbers->replace( i, count );
+        //qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
+
+        //Magic!:
+        //TODO: There is some memory leakage somewhere...
+        qSort( sortlist.begin(), sortlist.end(), edgeCompare );
+
+        int offset = 8;
+        float* pieNodeArray = NULL;
+        if ( count > 0 )
+            pieNodeArray = new float[offset * count];
+        for ( int nodecount = 0; nodecount < count; ++nodecount )
+        {
+            Connection* c = sortlist.at( nodecount );
+
+            //TODO: values for pie charts?
+            float v = c->v;
+
+            int o = nodecount * offset;
+            pieNodeArray[o] = c->fn.x();
+            pieNodeArray[o + 1] = c->fn.y();
+            pieNodeArray[o + 2] = c->fn.z();
+
+            pieNodeArray[o + 3] = c->r;
+            pieNodeArray[o + 4] = c->g;
+            pieNodeArray[o + 5] = c->b;
+
+            pieNodeArray[o + 6] = nodecount;
+            pieNodeArray[o + 7] = count;
+        }
+        pieArrays->replace( i, pieNodeArray );
+    }
+}
+
 void DatasetGlyphset::setProperties()
 {
     DatasetSurfaceset::setProperties();
     m_properties.set( Fn::Property::SURFACE_GLYPH_GEOMETRY, m_displayList, 0, true );
     m_properties.set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, true );
 }
+

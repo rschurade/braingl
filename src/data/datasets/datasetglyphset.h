@@ -9,6 +9,7 @@
 
 #include "../../gui/gl/pointglyphrenderer.h"
 #include "../../gui/gl/vectorglyphrenderer.h"
+#include "../../gui/gl/pieglyphrenderer.h"
 
 #include <qstring.h>
 
@@ -18,7 +19,7 @@
 class DatasetGlyphset: public DatasetSurfaceset
 {
 public:
-    DatasetGlyphset( QDir filename );
+    DatasetGlyphset( QDir filename, float mt );
     virtual ~DatasetGlyphset();
     void readConnectivity( QString filename );
     void setMinthresh( float mt );
@@ -33,6 +34,8 @@ public:
     void makeVecs();
     int vecsNumber;
 
+    void makePies();
+
 private:
     float minthresh;
     float** conn; //square connectivity matrix
@@ -42,10 +45,15 @@ private:
     float* consArray;
     float* vecsArray;
 
+    QVector<float*>* pieArrays;
+    QVector<int>* numbers;
+
     PointGlyphRenderer* m_prenderer;
     VectorGlyphRenderer* m_vrenderer;
+    PieGlyphRenderer* m_pierenderer;
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle;
+    float prevThresh, prevMinlength;
 };
 
 #endif /* DATASETGLYPHSET_H_ */

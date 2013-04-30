@@ -192,6 +192,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "merge" );
         GLFunctions::m_shaderNames.push_back( "points" );
         GLFunctions::m_shaderNames.push_back( "vectors" );
+        GLFunctions::m_shaderNames.push_back( "pies" );
 
         for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
