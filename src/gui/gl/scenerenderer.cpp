@@ -585,6 +585,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
         }
     }
 
+
     switch ( m_picked )
     {
         case 0:
@@ -657,7 +658,7 @@ void SceneRenderer::rightMouseDrag( int x, int y )
     }
 }
 
-QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
+QVector3D SceneRenderer::mapMouse2World( int x, int y, int z )
 {
     GLint viewport[4];
     GLfloat winX, winY;
@@ -667,7 +668,7 @@ QVector3D SceneRenderer::mapMouse2World( int x, int y, int dir )
     winX = (float) x;
     winY = (float) viewport[3] - (float) y;
     GLdouble posX, posY, posZ;
-    gluUnProject( winX, winY, dir, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
 
     QVector3D v( posX, posY, posZ );
     return v;
