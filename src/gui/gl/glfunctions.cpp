@@ -765,3 +765,15 @@ GLuint GLFunctions::getTexture( QString name )
 {
     return GLFunctions::textures[name];
 }
+
+void GLFunctions::getAndPrintGLError( QString prefix )
+{
+    GLenum errCode;
+    const GLubyte *errString;
+
+    while ( ( errCode = glGetError() ) != GL_NO_ERROR )
+    {
+        errString = gluErrorString( errCode );
+        qDebug() << "OpenGL Error:" << prefix << QString( (char*) errString );
+    }
+}
