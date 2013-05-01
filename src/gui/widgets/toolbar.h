@@ -51,6 +51,8 @@ private:
     FNAction* m_binghamAction;
     FNAction* m_bingham2tensorAction;
     FNAction* m_cutSelectedFibersAction;
+    FNAction* m_bundleAction;
+    FNAction* m_makeConsAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

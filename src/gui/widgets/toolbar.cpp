@@ -16,6 +16,8 @@
 #include "../../data/vptr.h"
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasetcons.h"
+#include "../../data/datasets/datasetglyphset.h"
 
 #include <QVariant>
 
@@ -115,6 +117,15 @@ void ToolBar::createActions()
     m_cutSelectedFibersAction = new FNAction( QIcon( ":/icons/cut.png" ), tr( "Cut selected fibers" ), this, Fn::Algo::CUT_SELECTED_FIBERS );
     m_cutSelectedFibersAction->setStatusTip( tr( "create new fiber dataset from selected fibers" ) );
     connect( m_cutSelectedFibersAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_bundleAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Bundle connections" ), this, Fn::Algo::BUNDLE );
+    m_bundleAction->setStatusTip( tr( "create new fiber dataset from bundling of selected connections" ) );
+    connect( m_bundleAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_makeConsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Make new connections" ), this, Fn::Algo::MAKECONS );
+    m_makeConsAction->setStatusTip( tr( "create new connections for bundling from thresholded connectivity" ) );
+    connect( m_makeConsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -215,6 +226,15 @@ void ToolBar::slot( Fn::Algo algo )
                 l = FiberAlgos::cutSelecteded( ds );
             }
             break;
+        case Fn::Algo::BUNDLE:
+            qDebug() << "BUNDLING...";
+            ((DatasetCons*)ds)->getCons()->fullAttract();
+            ((DatasetCons*)ds)->getCons()->writeBinaryVTK();
+            break;
+        case Fn::Algo::MAKECONS:
+            qDebug() << "Making new connections...";
+            l = ((DatasetGlyphset*)ds)->createConnections();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -275,6 +295,16 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_fiberThinningAct );
             this->addAction( m_fiberTractDensityAct );
             this->addAction( m_fiberTractColorAct );
+            break;
+        }
+        case Fn::DatasetType::GLYPHSET:
+        {
+            this->addAction( m_makeConsAction );
+            break;
+        }
+        case Fn::DatasetType::CONS:
+        {
+            this->addAction( m_bundleAction );
             break;
         }
         default:

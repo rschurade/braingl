@@ -35,6 +35,7 @@ public:
     int vecsNumber;
 
     void makePies();
+    QList<Dataset*> createConnections();
 
 private:
     float minthresh;
