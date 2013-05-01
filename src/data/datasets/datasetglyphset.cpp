@@ -6,10 +6,12 @@
  */
 
 #include "datasetglyphset.h"
+#include "datasetcons.h"
 
 #include "../mesh/trianglemesh2.h"
 
 #include "../../algos/connection.h"
+#include "../../algos/connections.h"
 
 #include "qfile.h"
 
@@ -18,7 +20,7 @@
 #include <qcoreapplication.h>
 
 DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
-                DatasetSurfaceset( filename ),
+                DatasetSurfaceset( filename, Fn::DatasetType::GLYPHSET ),
                 minthresh( mt ),
                 m_prenderer( NULL ),
                 m_vrenderer( NULL ),
@@ -27,7 +29,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
                 prevGlyph( -1 ),
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
-                prevThresh( -1 )
+                prevThresh( -1 ),
+                prevMinlength( -1 )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -40,7 +43,6 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, true );
-    pieArrays = NULL;
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -90,22 +92,22 @@ void DatasetGlyphset::setMinthresh( float mt )
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
 
-    if ( m_properties["maingl"]->get( Fn::Property::DRAW_SURFACE ).toBool() )
+    if ( m_properties["maingl"]->get( Fn::Property::DRAW_SURFACE ).toBool() ) 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode );
 
     int geoSurf = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
     int geoGlyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
     int geoCol = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
     int glyphstyle = m_properties["maingl"]->get( Fn::Property::GLYPHSTYLE ).toInt();
-
+     
     float threshold = m_properties["maingl"]->get( Fn::Property::THRESHOLD ).toFloat();
     float minlength = m_properties["maingl"]->get( Fn::Property::MINLENGTH ).toFloat();
-
+    
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
-    glPointSize( m_properties["maingl"]->get( Fn::Property::PRIMSIZE ).toFloat() );
+     glPointSize( m_properties["maingl"]->get( Fn::Property::PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 
@@ -372,11 +374,11 @@ void DatasetGlyphset::makePies()
     qDebug() << "calcPies after deletion";
 
     int geo = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
-    int glyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    //int glyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
 
     float* nodes = m_mesh.at( geo )->getVertices();
-    float* glyphnodes = m_mesh.at( glyph )->getVertices();
+    //float* glyphnodes = m_mesh.at( glyph )->getVertices();
     float* colornodes = m_mesh.at( col )->getVertices();
 
     n = m_mesh.at( geo )->numVerts();
@@ -402,9 +404,9 @@ void DatasetGlyphset::makePies()
                 QVector3D t = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
                 QVector3D gdiff = t - f;
 
-                QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
-                QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
-                QVector3D dg = tg - fg;
+                //QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
+                //QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
+                //QVector3D dg = tg - fg;
 
                 QVector3D fc = QVector3D( colornodes[i * triangleshift], colornodes[i * triangleshift + 1], colornodes[i * triangleshift + 2] );
                 QVector3D tc = QVector3D( colornodes[j * triangleshift], colornodes[j * triangleshift + 1], colornodes[j * triangleshift + 2] );
@@ -433,7 +435,7 @@ void DatasetGlyphset::makePies()
             Connection* c = sortlist.at( nodecount );
 
             //TODO: values for pie charts?
-            float v = c->v;
+            //float v = c->v;
 
             int o = nodecount * offset;
             pieNodeArray[o] = c->fn.x();
@@ -449,6 +451,43 @@ void DatasetGlyphset::makePies()
         }
         pieArrays->replace( i, pieNodeArray );
     }
+}
+
+QList<Dataset*> DatasetGlyphset::createConnections()
+{
+    int geo = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    n = m_mesh.at( geo )->numVerts();
+    float* nodes = m_mesh.at( geo )->getVertices();
+
+    float thresh = m_properties["maingl"]->get( Fn::Property::THRESHOLD ).toFloat();
+    float minlength = m_properties["maingl"]->get( Fn::Property::MINLENGTH ).toFloat();
+    Connections* cons = new Connections();
+    for ( int i = 0; i < n; ++i )
+    {
+        for ( int j = i + 1; j < n; ++j )
+        {
+            float v = conn[i][j];
+            if ( v > thresh )
+            {
+                int triangleshift = 7; //TODO: Why 7?
+
+                QVector3D* f = new QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
+                QVector3D* t = new QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+
+                Edge* aedge = new Edge( *f, *t );
+
+                if ( aedge->length() > minlength )
+                {
+                    cons->nodes << *f;
+                    cons->nodes << *t;
+                    cons->edges << aedge;
+                }
+            }
+        }
+    }
+    QList<Dataset*> l;
+    l.push_back( new DatasetCons( cons ) );
+    return l;
 }
 
 void DatasetGlyphset::setProperties()

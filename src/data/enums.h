@@ -25,7 +25,9 @@ namespace Fn
         MESH_ASCII,
         MESH_BINARY,
         MESH_ISOSURFACE,
-        FIBERS
+        FIBERS,
+        GLYPHSET,
+        CONS
     };
 
     enum class ColormapEnum : int
@@ -54,7 +56,9 @@ namespace Fn
         TRACT_DENSITY,
         TRACT_COLOR,
         CUT_SELECTED_FIBERS,
-        CREATE_NEW_DATASET
+        CREATE_NEW_DATASET,
+        MAKECONS,
+        BUNDLE
     };
 
     enum class Orient : int
@@ -231,17 +235,17 @@ namespace Fn
                 case Property::DATASET_POINTER: return QString( "dataset pointer" ); break;
                 case Property::NEW_DATASET: return QString( "new dataset" ); break;
                 case Property::DATASET_LIST: return QString( "dataset list" ); break;
-                case Property::SURFACE: return QString( "surfaceset surface" ); break;
-                case Property::THRESHOLD: return QString( "surface glyph threshold" ); break;
-                case Property::GLYPHSTYLE: return QString( "surface glyph style" ); break;
-                case Property::GLYPHRADIUS: return QString( "glyph scaling factor" ); break;
-                case Property::NORMALIZATION: return QString( "pie glyph normalization factor" ); break;
-                case Property::PRIMSIZE: return QString( "thickness of points or vector primitives" ); break;
-                case Property::MINLENGTH: return QString( "minimum length of connections" ); break;
+                case Property::SURFACE: return QString( "surface" ); break;
+                case Property::THRESHOLD: return QString( "threshold" ); break;
+                case Property::GLYPHSTYLE: return QString( "glyph style" ); break;
+                case Property::GLYPHRADIUS: return QString( "scale" ); break;
+                case Property::NORMALIZATION: return QString( "pie normalization" ); break;
+                case Property::PRIMSIZE: return QString( "points / vector primitive size" ); break;
+                case Property::MINLENGTH: return QString( "minimum length" ); break;
                 case Property::DRAW_SURFACE: return QString( "surface visibility" ); break;
                 case Property::DRAW_GLYPHS: return QString( "glyph visibility" ); break;
                 case Property::SURFACE_GLYPH_GEOMETRY: return QString( "glyph geometry" ); break;
-                case Property::SURFACE_GLYPH_COLOR: return QString( "glyph color space" ); break;
+                case Property::SURFACE_GLYPH_COLOR: return QString( "glyph color" ); break;
             }
             return QString( "property not defined" );
         }
