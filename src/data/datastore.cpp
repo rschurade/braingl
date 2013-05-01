@@ -30,29 +30,29 @@ void DataStore::updateGlobals( int row )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.first() );
 
-        if ( ds->properties()->get( Fn::Property::TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
+        if ( ds->properties( "maingl" )->get( Fn::Property::TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
         {
 
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_AXIAL,    0 ), ds->properties()->get( Fn::Property::NZ ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_CORONAL,  0 ), ds->properties()->get( Fn::Property::NY ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DX,     0 ), ds->properties()->get( Fn::Property::DX ).toFloat() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DY,     0 ), ds->properties()->get( Fn::Property::DY ).toFloat() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties()->get( Fn::Property::DZ ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_AXIAL,    0 ), ds->properties( "maingl" )->get( Fn::Property::NZ ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_CORONAL,  0 ), ds->properties( "maingl" )->get( Fn::Property::NY ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ), ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DX,     0 ), ds->properties( "maingl" )->get( Fn::Property::DX ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DY,     0 ), ds->properties( "maingl" )->get( Fn::Property::DY ).toFloat() );
+            Models::g()->setData( Models::g()->index( (int)Fn::Global::SLICE_DZ,     0 ), ds->properties( "maingl" )->get( Fn::Property::DZ ).toFloat() );
 
             bool dimsChanged = false;
             if ( m_datasetList.size() >= 2 )
             {
                 Dataset* ds2 = VPtr<Dataset>::asPtr( m_datasetList[1] );
 
-                dimsChanged = ds->properties()->get( Fn::Property::NX ).toInt() != ds2->properties()->get( Fn::Property::NX ).toInt();
+                dimsChanged = ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() != ds2->properties( "maingl" )->get( Fn::Property::NX ).toInt();
             }
 
             if ( m_datasetList.size() == 1 || dimsChanged )
             {
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties()->get( Fn::Property::NZ ).toInt() / 2 );
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties()->get( Fn::Property::NY ).toInt() / 2 );
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties()->get( Fn::Property::NX ).toInt() / 2 );
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), ds->properties( "maingl" )->get( Fn::Property::NZ ).toInt() / 2 );
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), ds->properties( "maingl" )->get( Fn::Property::NY ).toInt() / 2 );
+                Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() / 2 );
             }
 
             Models::g()->submit();
@@ -82,7 +82,7 @@ QVariant DataStore::data( const QModelIndex &index, int role ) const
             if ( index.column() == 0 )
             {
                 Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
-                return ds->properties()->get( Fn::Property::ACTIVE ).toBool();
+                return ds->properties( "maingl" )->get( Fn::Property::ACTIVE ).toBool();
                 break;
             }
             else
@@ -118,7 +118,7 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
             break;
     }
     // everything else
-    return ds->properties()->get( (Fn::Property)index.column() );
+    return ds->properties( "maingl" )->get( (Fn::Property)index.column() );
 }
 
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
@@ -132,7 +132,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     if ( role == Qt::CheckStateRole )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
-        ds->properties()->set( Fn::Property::ACTIVE, !ds->properties()->get( Fn::Property::ACTIVE ).toBool() );
+        ds->properties( "maingl" )->set( Fn::Property::ACTIVE, !ds->properties( "maingl" )->get( Fn::Property::ACTIVE ).toBool() );
         emit( dataChanged( index, index ) );
     }
 
@@ -144,7 +144,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
             m_datasetList.push_back( value );
             endInsertRows();
-            connect( VPtr<Dataset>::asPtr( value )->properties(), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
+            connect( VPtr<Dataset>::asPtr( value )->properties( "maingl" ), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
             updateGlobals( m_datasetList.size() - 1 );
             emit( dataChanged( index, index ) );
             return true;
@@ -152,7 +152,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         // everything else
         if ( index.row() >= 0 && index.row() < m_datasetList.size() )
         {
-            VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) )->properties()->set( (Fn::Property)index.column(), value );
+            VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) )->properties( "maingl" )->set( (Fn::Property)index.column(), value );
         }
         return true;
     }
@@ -169,7 +169,7 @@ QVariant DataStore::headerData( int section, Qt::Orientation orientation, int ro
         }
         else
         {
-            return VPtr<Dataset>::asPtr( m_datasetList.at( section ) )->properties()->get( Fn::Property::NAME ).toString();
+            return VPtr<Dataset>::asPtr( m_datasetList.at( section ) )->properties( "maingl" )->get( Fn::Property::NAME ).toString();
         }
     }
     return QVariant();

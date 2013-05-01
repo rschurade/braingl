@@ -20,64 +20,64 @@ DatasetNifti::~DatasetNifti()
 
 void DatasetNifti::parseNiftiHeader()
 {
-    m_properties.set( Fn::Property::DIM, m_header->ndim );
-    m_properties.set( Fn::Property::NX, m_header->nx );
-    m_properties.set( Fn::Property::NY, m_header->ny );
-    m_properties.set( Fn::Property::NZ, m_header->nz );
+    m_properties["maingl"]->set( Fn::Property::DIM, m_header->ndim );
+    m_properties["maingl"]->set( Fn::Property::NX, m_header->nx );
+    m_properties["maingl"]->set( Fn::Property::NY, m_header->ny );
+    m_properties["maingl"]->set( Fn::Property::NZ, m_header->nz );
 
-//    m_properties.set( Fn::Property::NT, m_header->nt );
-//    m_properties.set( Fn::Property::NU, m_header->nu );
-//    m_properties.set( Fn::Property::NV, m_header->nv );
-//    m_properties.set( Fn::Property::NW, m_header->nw );
-//    m_properties.set("dim", m_header->dim );
-//    m_properties.set( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
-//    m_properties.set( Fn::Property::NBYPER, m_header->nbyper );
-    m_properties.set( Fn::Property::DATATYPE, m_header->datatype );
-    m_properties.set( Fn::Property::DX, m_header->dx );
-    m_properties.set( Fn::Property::DY, m_header->dy );
-    m_properties.set( Fn::Property::DZ, m_header->dz );
-//    m_properties.set( Fn::Property::DT, m_header->dt );
-//    m_properties.set( Fn::Property::DU, m_header->du );
-//    m_properties.set( Fn::Property::DV, m_header->dv );
-//    m_properties.set( Fn::Property::DW, m_header->dw );
-//    m_properties.set( Fn::Property::"pixdim", m_header->pixdim );
-//    m_properties.set( Fn::Property::"scl_slope", m_header->scl_slope );
-//    m_properties.set( Fn::Property::"scl_inter", m_header->scl_inter );
-//    m_properties.set( Fn::Property::"cal_min", m_header->cal_min );
-//    m_properties.set( Fn::Property::"cal_max", m_header->cal_max );
-//    m_properties.set( Fn::Property::"qform_code", m_header->qform_code );
-//    m_properties.set( Fn::Property::"sform_code", m_header->sform_code );
-//    m_properties.set( Fn::Property::"freq_dim", m_header->freq_dim );
-//    m_properties.set( Fn::Property::"phase_dim", m_header->phase_dim );
-//    m_properties.set( Fn::Property::"slice_dim", m_header->slice_dim );
-//    m_properties.set( Fn::Property::"slice_code", m_header->slice_code );
-//    m_properties.set( Fn::Property::"slice_start", m_header->slice_start );
-//    m_properties.set( Fn::Property::"slice_end", m_header->slice_end );
-//    m_properties.set( Fn::Property::"slice_duration", m_header->slice_duration );
-//    m_properties.set( Fn::Property::"quatern_b", m_header->quatern_b );
-//    m_properties.set( Fn::Property::"quatern_c", m_header->quatern_c );
-//    m_properties.set( Fn::Property::"quatern_d", m_header->quatern_d );
-//    m_properties.set( Fn::Property::"qoffset_x", m_header->qoffset_x );
-//    m_properties.set( Fn::Property::"qoffset_y", m_header->qoffset_y );
-//    m_properties.set( Fn::Property::"qoffset_z", m_header->qoffset_z );
-//    m_properties.set( Fn::Property::"qfac", m_header->qfac );
-//    m_properties.set( Fn::Property::qto_xyz", m_header->qto_xyz );
-//    m_properties.set( Fn::Property::qto_ijk", m_header->qto_ijk );
-//    m_properties.set( Fn::Property:: sto_xyz", m_header->sto_xyz );
-//    m_properties.set( Fn::Property::"sto_ijk", m_header->sto_ijk );
-//    m_properties.set( Fn::Property::"toffset", m_header->toffset );
-//    m_properties.set( Fn::Property::"xyz_units", m_header->xyz_units );
-//    m_properties.set( Fn::Property::"time_units", m_header->time_units );
-//    m_properties.set( Fn::Property::"nifti_type", m_header->nifti_type );
-//    m_properties.set( Fn::Property::"intent_code", m_header->intent_code );
-//    m_properties.set( Fn::Property::"intent_p1", m_header->intent_p1 );
-//    m_properties.set( Fn::Property::"intent_p2", m_header->intent_p2 );
-//    m_properties.set( Fn::Property::"intent_p3", m_header->intent_p3 );
-//    m_properties.set( Fn::Property::"intent_name", m_header->intent_name );
-//    m_properties.set( Fn::Property::"descrip", m_header->descrip );
-//    m_properties.set( Fn::Property::"aux_file", m_header->aux_file );
-//    m_properties.set( Fn::Property::"swapsize", m_header->swapsize );
-//    m_properties.set( Fn::Property::"byteorder", m_header->byteorder );
+//    m_properties["maingl"]->set( Fn::Property::NT, m_header->nt );
+//    m_properties["maingl"]->set( Fn::Property::NU, m_header->nu );
+//    m_properties["maingl"]->set( Fn::Property::NV, m_header->nv );
+//    m_properties["maingl"]->set( Fn::Property::NW, m_header->nw );
+//    m_properties["maingl"]->set("dim", m_header->dim );
+//    m_properties["maingl"]->set( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
+//    m_properties["maingl"]->set( Fn::Property::NBYPER, m_header->nbyper );
+    m_properties["maingl"]->set( Fn::Property::DATATYPE, m_header->datatype );
+    m_properties["maingl"]->set( Fn::Property::DX, m_header->dx );
+    m_properties["maingl"]->set( Fn::Property::DY, m_header->dy );
+    m_properties["maingl"]->set( Fn::Property::DZ, m_header->dz );
+//    m_properties["maingl"]->set( Fn::Property::DT, m_header->dt );
+//    m_properties["maingl"]->set( Fn::Property::DU, m_header->du );
+//    m_properties["maingl"]->set( Fn::Property::DV, m_header->dv );
+//    m_properties["maingl"]->set( Fn::Property::DW, m_header->dw );
+//    m_properties["maingl"]->set( Fn::Property::"pixdim", m_header->pixdim );
+//    m_properties["maingl"]->set( Fn::Property::"scl_slope", m_header->scl_slope );
+//    m_properties["maingl"]->set( Fn::Property::"scl_inter", m_header->scl_inter );
+//    m_properties["maingl"]->set( Fn::Property::"cal_min", m_header->cal_min );
+//    m_properties["maingl"]->set( Fn::Property::"cal_max", m_header->cal_max );
+//    m_properties["maingl"]->set( Fn::Property::"qform_code", m_header->qform_code );
+//    m_properties["maingl"]->set( Fn::Property::"sform_code", m_header->sform_code );
+//    m_properties["maingl"]->set( Fn::Property::"freq_dim", m_header->freq_dim );
+//    m_properties["maingl"]->set( Fn::Property::"phase_dim", m_header->phase_dim );
+//    m_properties["maingl"]->set( Fn::Property::"slice_dim", m_header->slice_dim );
+//    m_properties["maingl"]->set( Fn::Property::"slice_code", m_header->slice_code );
+//    m_properties["maingl"]->set( Fn::Property::"slice_start", m_header->slice_start );
+//    m_properties["maingl"]->set( Fn::Property::"slice_end", m_header->slice_end );
+//    m_properties["maingl"]->set( Fn::Property::"slice_duration", m_header->slice_duration );
+//    m_properties["maingl"]->set( Fn::Property::"quatern_b", m_header->quatern_b );
+//    m_properties["maingl"]->set( Fn::Property::"quatern_c", m_header->quatern_c );
+//    m_properties["maingl"]->set( Fn::Property::"quatern_d", m_header->quatern_d );
+//    m_properties["maingl"]->set( Fn::Property::"qoffset_x", m_header->qoffset_x );
+//    m_properties["maingl"]->set( Fn::Property::"qoffset_y", m_header->qoffset_y );
+//    m_properties["maingl"]->set( Fn::Property::"qoffset_z", m_header->qoffset_z );
+//    m_properties["maingl"]->set( Fn::Property::"qfac", m_header->qfac );
+//    m_properties["maingl"]->set( Fn::Property::qto_xyz", m_header->qto_xyz );
+//    m_properties["maingl"]->set( Fn::Property::qto_ijk", m_header->qto_ijk );
+//    m_properties["maingl"]->set( Fn::Property:: sto_xyz", m_header->sto_xyz );
+//    m_properties["maingl"]->set( Fn::Property::"sto_ijk", m_header->sto_ijk );
+//    m_properties["maingl"]->set( Fn::Property::"toffset", m_header->toffset );
+//    m_properties["maingl"]->set( Fn::Property::"xyz_units", m_header->xyz_units );
+//    m_properties["maingl"]->set( Fn::Property::"time_units", m_header->time_units );
+//    m_properties["maingl"]->set( Fn::Property::"nifti_type", m_header->nifti_type );
+//    m_properties["maingl"]->set( Fn::Property::"intent_code", m_header->intent_code );
+//    m_properties["maingl"]->set( Fn::Property::"intent_p1", m_header->intent_p1 );
+//    m_properties["maingl"]->set( Fn::Property::"intent_p2", m_header->intent_p2 );
+//    m_properties["maingl"]->set( Fn::Property::"intent_p3", m_header->intent_p3 );
+//    m_properties["maingl"]->set( Fn::Property::"intent_name", m_header->intent_name );
+//    m_properties["maingl"]->set( Fn::Property::"descrip", m_header->descrip );
+//    m_properties["maingl"]->set( Fn::Property::"aux_file", m_header->aux_file );
+//    m_properties["maingl"]->set( Fn::Property::"swapsize", m_header->swapsize );
+//    m_properties["maingl"]->set( Fn::Property::"byteorder", m_header->byteorder );
 
     for ( int i = 0; i < 3; ++i )
     {
@@ -159,13 +159,13 @@ QString DatasetNifti::getNiftiDataType( const int type )
 
 int DatasetNifti::getIdFromPos( float x, float y, float z )
 {
-    float dx = m_properties.get( Fn::Property::DX ).toFloat();
-    float dy = m_properties.get( Fn::Property::DY ).toFloat();
-    float dz = m_properties.get( Fn::Property::DZ ).toFloat();
+    float dx = m_properties["maingl"]->get( Fn::Property::DX ).toFloat();
+    float dy = m_properties["maingl"]->get( Fn::Property::DY ).toFloat();
+    float dz = m_properties["maingl"]->get( Fn::Property::DZ ).toFloat();
 
-    int nx = m_properties.get( Fn::Property::NX ).toInt();
-    int ny = m_properties.get( Fn::Property::NY ).toInt();
-    int nz = m_properties.get( Fn::Property::NZ ).toInt();
+    int nx = m_properties["maingl"]->get( Fn::Property::NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::NZ ).toInt();
 
     int px = x / dx;
     int py = y / dy;
