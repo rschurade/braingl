@@ -50,7 +50,7 @@ void ToolBar::createActions()
     m_distanceMapAct->setStatusTip( tr( "distance map" ) );
     connect( m_distanceMapAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_createNewAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create new" ), this, Fn::Algo::CREATE_NEW );
+    m_createNewAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create new" ), this, Fn::Algo::CREATE_NEW_DATASET );
     m_createNewAct->setStatusTip( tr( "create a new empty dataset with the dimensions of the selected dataset" ) );
     connect( m_createNewAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
@@ -188,7 +188,7 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::DISTANCE_MAP:
             l = ScalarAlgos::distanceMap( ds );
             break;
-        case Fn::Algo::CREATE_NEW:
+        case Fn::Algo::CREATE_NEW_DATASET:
             l = ScalarAlgos::createNew( ds );
             break;
         case Fn::Algo::FIBER_THINNING:
