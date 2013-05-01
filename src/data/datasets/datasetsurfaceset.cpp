@@ -32,12 +32,12 @@ void DatasetSurfaceset::addMesh( TriangleMesh2* tm, QString displayString )
 
 void DatasetSurfaceset::setProperties()
 {
-    m_properties.set( Fn::Property::SURFACE, m_displayList, 0, true );
+    m_properties["maingl"]->set( Fn::Property::SURFACE, m_displayList, 0, true );
 }
 
 TriangleMesh2* DatasetSurfaceset::getMesh()
 {
-    int n = m_properties.get( Fn::Property::SURFACE ).toInt();
+    int n = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
     return m_mesh[n];
 }
 
@@ -50,7 +50,7 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->init();
     }
     m_renderer->setMesh( getMesh() );
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
 }
 
 void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )
@@ -60,20 +60,20 @@ void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )
         return;
     }
 
-    int paintMode = m_properties.get( Fn::Property::PAINTMODE ).toInt();
+    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
     if ( paintMode != 0 )
     {
         QColor color;
         if ( paintMode == 1 )
         {
-            color = m_properties.get( Fn::Property::PAINTCOLOR ).value<QColor>();
+            color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
         }
         else if ( paintMode == 2 )
         {
-            color = m_properties.get( Fn::Property::COLOR ).value<QColor>();
+            color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
         }
 
-        QVector<int> picked = getMesh()->pick( pos, m_properties.get( Fn::Property::PAINTSIZE ).toFloat() );
+        QVector<int> picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
 
         if ( picked.size() > 0 )
         {

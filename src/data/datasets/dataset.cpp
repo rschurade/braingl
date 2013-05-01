@@ -9,15 +9,18 @@
 Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_textureGLuint( 0 )
 {
+    PropertyGroup* props = new PropertyGroup();
     // add standard properties
-    m_properties.set( Fn::Property::ACTIVE, true );
-    m_properties.set( Fn::Property::FILENAME, fileName.path() );
-    m_properties.set( Fn::Property::TYPE, (int)type );
-    m_properties.set( Fn::Property::NAME, fileName.path().split( "/" ).last(), true );
-    m_properties.set( Fn::Property::SIZE, -1 );
-    m_properties.set( Fn::Property::CREATED_BY, (int)Fn::Algo::NONE );
+    props->set( Fn::Property::ACTIVE, true );
+    props->set( Fn::Property::FILENAME, fileName.path() );
+    props->set( Fn::Property::TYPE, (int)type );
+    props->set( Fn::Property::NAME, fileName.path().split( "/" ).last(), true );
+    props->set( Fn::Property::SIZE, -1 );
+    props->set( Fn::Property::CREATED_BY, (int)Fn::Algo::NONE );
 
-    m_properties.set( Fn::Property::HAS_TEXTURE, false );
+    props->set( Fn::Property::HAS_TEXTURE, false );
+
+    m_properties.insert( "maingl", props );
 }
 
 Dataset::~Dataset()
@@ -33,14 +36,9 @@ GLuint Dataset::getTextureGLuint()
     return m_textureGLuint;
 }
 
-PropertyGroup* Dataset::properties()
+PropertyGroup* Dataset::properties( QString target )
 {
-    return &m_properties;
-}
-
-void Dataset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
-{
-    // do nothing here
+    return m_properties[target];
 }
 
 QString Dataset::getValueAsString( int x, int y, int z )

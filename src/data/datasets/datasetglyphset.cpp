@@ -31,15 +31,15 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
 {
     qDebug() << "minthresh set to: " << minthresh;
 
-    m_properties.set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
-    m_properties.set( Fn::Property::GLYPHSTYLE,
+    m_properties["maingl"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPHSTYLE,
     { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
-    m_properties.set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
-    m_properties.set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
-    m_properties.set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
-    m_properties.set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
-    m_properties.set( Fn::Property::DRAW_SURFACE, true, true );
-    m_properties.set( Fn::Property::DRAW_GLYPHS, true, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
+    m_properties["maingl"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
+    m_properties["maingl"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
+    m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
+    m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, true );
+    m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, true );
     pieArrays = NULL;
 }
 
@@ -90,22 +90,22 @@ void DatasetGlyphset::setMinthresh( float mt )
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
 
-    if ( m_properties.get( Fn::Property::DRAW_SURFACE ).toBool() )
+    if ( m_properties["maingl"]->get( Fn::Property::DRAW_SURFACE ).toBool() )
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode );
 
-    int geoSurf = m_properties.get( Fn::Property::SURFACE ).toInt();
-    int geoGlyph = m_properties.get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
-    int geoCol = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
-    int glyphstyle = m_properties.get( Fn::Property::GLYPHSTYLE ).toInt();
+    int geoSurf = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    int geoGlyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int geoCol = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+    int glyphstyle = m_properties["maingl"]->get( Fn::Property::GLYPHSTYLE ).toInt();
 
-    float threshold = m_properties.get( Fn::Property::THRESHOLD ).toFloat();
-    float minlength = m_properties.get( Fn::Property::MINLENGTH ).toFloat();
+    float threshold = m_properties["maingl"]->get( Fn::Property::THRESHOLD ).toFloat();
+    float minlength = m_properties["maingl"]->get( Fn::Property::MINLENGTH ).toFloat();
 
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
-    glPointSize( m_properties.get( Fn::Property::PRIMSIZE ).toFloat() );
+    glPointSize( m_properties["maingl"]->get( Fn::Property::PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 
@@ -154,19 +154,19 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     prevThresh = threshold;
     prevMinlength = minlength;
 
-    if ( m_properties.get( Fn::Property::DRAW_GLYPHS ).toBool() )
+    if ( m_properties["maingl"]->get( Fn::Property::DRAW_GLYPHS ).toBool() )
     {
         if ( glyphstyle == 0 )
         {
-            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
         }
         if ( glyphstyle == 1 )
         {
-            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
         }
         if ( glyphstyle == 2 )
         {
-            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
         }
     }
 
@@ -176,9 +176,9 @@ void DatasetGlyphset::makeCons()
 {
     qDebug() << "making consArray: " << minthresh;
     //if (consArray) delete[] consArray;
-    int geo = m_properties.get( Fn::Property::SURFACE ).toInt();
-    int glyph = m_properties.get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
-    int col = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+    int geo = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    int glyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int col = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
 
     float* nodes = m_mesh.at( geo )->getVertices();
     float* glyphnodes = m_mesh.at( glyph )->getVertices();
@@ -248,9 +248,9 @@ void DatasetGlyphset::makeVecs()
 {
     qDebug() << "making vecsArray: " << minthresh;
     //if (vecsArray) delete[] vecsArray;
-    int geo = m_properties.get( Fn::Property::SURFACE ).toInt();
-    int glyph = m_properties.get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
-    int col = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+    int geo = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    int glyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int col = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
 
     float* nodes = m_mesh.at( geo )->getVertices();
     float* glyphnodes = m_mesh.at( glyph )->getVertices();
@@ -349,8 +349,8 @@ void DatasetGlyphset::makePies()
 
     qDebug() << "makePies begin";
 
-    float minlength = m_properties.get( Fn::Property::MINLENGTH ).toFloat();
-    float threshold = m_properties.get( Fn::Property::THRESHOLD ).toFloat();
+    float minlength = m_properties["maingl"]->get( Fn::Property::MINLENGTH ).toFloat();
+    float threshold = m_properties["maingl"]->get( Fn::Property::THRESHOLD ).toFloat();
     if ( threshold < minthresh )
         threshold = minthresh;
 
@@ -371,9 +371,9 @@ void DatasetGlyphset::makePies()
 
     qDebug() << "calcPies after deletion";
 
-    int geo = m_properties.get( Fn::Property::SURFACE ).toInt();
-    int glyph = m_properties.get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
-    int col = m_properties.get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+    int geo = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    int glyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int col = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
 
     float* nodes = m_mesh.at( geo )->getVertices();
     float* glyphnodes = m_mesh.at( glyph )->getVertices();
@@ -454,7 +454,7 @@ void DatasetGlyphset::makePies()
 void DatasetGlyphset::setProperties()
 {
     DatasetSurfaceset::setProperties();
-    m_properties.set( Fn::Property::SURFACE_GLYPH_GEOMETRY, m_displayList, 0, true );
-    m_properties.set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, true );
+    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_GEOMETRY, m_displayList, 0, true );
+    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, true );
 }
 

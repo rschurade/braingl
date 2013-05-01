@@ -25,26 +25,26 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 {
     m_scalarField = *(ds->getData() );
 
-    m_properties.set( Fn::Property::NX, ds->properties()->get( Fn::Property::NX ).toInt() );
-    m_properties.set( Fn::Property::NY, ds->properties()->get( Fn::Property::NY ).toInt() );
-    m_properties.set( Fn::Property::NZ, ds->properties()->get( Fn::Property::NZ ).toInt() );
-    m_properties.set( Fn::Property::DX, ds->properties()->get( Fn::Property::DX ).toFloat() );
-    m_properties.set( Fn::Property::DY, ds->properties()->get( Fn::Property::DY ).toFloat() );
-    m_properties.set( Fn::Property::DZ, ds->properties()->get( Fn::Property::DZ ).toFloat() );
+    m_properties["maingl"]->set( Fn::Property::NX, ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() );
+    m_properties["maingl"]->set( Fn::Property::NY, ds->properties( "maingl" )->get( Fn::Property::NY ).toInt() );
+    m_properties["maingl"]->set( Fn::Property::NZ, ds->properties( "maingl" )->get( Fn::Property::NZ ).toInt() );
+    m_properties["maingl"]->set( Fn::Property::DX, ds->properties( "maingl" )->get( Fn::Property::DX ).toFloat() );
+    m_properties["maingl"]->set( Fn::Property::DY, ds->properties( "maingl" )->get( Fn::Property::DY ).toFloat() );
+    m_properties["maingl"]->set( Fn::Property::DZ, ds->properties( "maingl" )->get( Fn::Property::DZ ).toFloat() );
 
-    m_properties.set( Fn::Property::DIM, 0 );
-    m_properties.set( Fn::Property::CREATED_BY, (int)Fn::Algo::ISOSURFACE );
-    m_properties.set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
-    m_properties.set( Fn::Property::NAME, QString( "isosurface" ) );
-    m_properties.set( Fn::Property::ISO_VALUE, 80.0f, ds->properties()->get( Fn::Property::MIN ).toFloat(), ds->properties()->get( Fn::Property::MAX ).toFloat(), true );
+    m_properties["maingl"]->set( Fn::Property::DIM, 0 );
+    m_properties["maingl"]->set( Fn::Property::CREATED_BY, (int)Fn::Algo::ISOSURFACE );
+    m_properties["maingl"]->set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
+    m_properties["maingl"]->set( Fn::Property::NAME, QString( "isosurface" ) );
+    m_properties["maingl"]->set( Fn::Property::ISO_VALUE, 80.0f, ds->properties( "maingl" )->get( Fn::Property::MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::MAX ).toFloat(), true );
 
-    m_nX = m_properties.get( Fn::Property::NX ).toInt() - 1;
-    m_nY = m_properties.get( Fn::Property::NY ).toInt() - 1;
-    m_nZ = m_properties.get( Fn::Property::NZ ).toInt() - 1;
+    m_nX = m_properties["maingl"]->get( Fn::Property::NX ).toInt() - 1;
+    m_nY = m_properties["maingl"]->get( Fn::Property::NY ).toInt() - 1;
+    m_nZ = m_properties["maingl"]->get( Fn::Property::NZ ).toInt() - 1;
 
-    m_dX = m_properties.get( Fn::Property::DX ).toFloat();
-    m_dY = m_properties.get( Fn::Property::DY ).toFloat();
-    m_dZ = m_properties.get( Fn::Property::DZ ).toFloat();
+    m_dX = m_properties["maingl"]->get( Fn::Property::DX ).toFloat();
+    m_dY = m_properties["maingl"]->get( Fn::Property::DY ).toFloat();
+    m_dZ = m_properties["maingl"]->get( Fn::Property::DZ ).toFloat();
 
     m_nPointsInXDirection = ( m_nX + 1 );
     m_nPointsInSlice = m_nPointsInXDirection * ( m_nY + 1 );
@@ -132,7 +132,7 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->init();
     }
 
-    m_isoLevel = m_properties.get( Fn::Property::ISO_VALUE ).toFloat();
+    m_isoLevel = m_properties["maingl"]->get( Fn::Property::ISO_VALUE ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh[0];
@@ -142,5 +142,5 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->setMesh( m_mesh[0] );
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, &m_properties );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
 }

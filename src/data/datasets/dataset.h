@@ -15,6 +15,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QHash>
 #include <QList>
 #include <QString>
 #include <QVariant>
@@ -28,11 +29,11 @@ public:
     Dataset( QDir fileName, Fn::DatasetType type );
     virtual ~Dataset();
 
-    PropertyGroup* properties();
+    PropertyGroup* properties( QString target = "maingl" );
 
     GLuint getTextureGLuint();
 
-    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
+    virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode ) = 0;
 
     virtual QString getValueAsString( int x, int y, int z );
 
@@ -41,7 +42,7 @@ public:
 protected:
     virtual void createTexture();
 
-    PropertyGroup m_properties;
+    QHash< QString, PropertyGroup* >m_properties;
 
     GLuint m_textureGLuint;
 };
