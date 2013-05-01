@@ -352,7 +352,7 @@ void SceneRenderer::renderMerge()
     QGLShaderProgram* program = GLFunctions::getShader( "merge" );
     program->bind();
     // Offset for position
-    long int offset = 0;
+    intptr_t offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );

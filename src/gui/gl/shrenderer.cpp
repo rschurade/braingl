@@ -113,7 +113,7 @@ void SHRenderer::setShaderVars()
 
     program->bind();
 
-    long int offset = 0;
+    intptr_t offset = 0;
     int countValues = 7;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );

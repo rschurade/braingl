@@ -90,7 +90,7 @@ void VectorGlyphRenderer::setShaderVars(PropertyGroup* props)
     program->setUniformValue("radius",props->get(Fn::Property::GLYPHRADIUS).toFloat());
     program->setUniformValue("minlength",props->get(Fn::Property::MINLENGTH).toFloat());
 
-    long int offset = 0;
+    intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int vertexLocation = program->attributeLocation( "a_position" );
