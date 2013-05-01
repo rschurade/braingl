@@ -118,7 +118,7 @@ void TensorRenderer::setShaderVars()
 
     program->bind();
 
-    long int offset = 0;
+    intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int vertexLocation = program->attributeLocation( "a_position" );

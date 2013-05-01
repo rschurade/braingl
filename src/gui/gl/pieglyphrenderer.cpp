@@ -98,7 +98,7 @@ void PieGlyphRenderer::setShaderVars( PropertyGroup* props )
     program->setUniformValue( "normalization", props->get( Fn::Property::NORMALIZATION ).toFloat() );
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
-    long int offset = 0;
+    intptr_t offset = 0;
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );

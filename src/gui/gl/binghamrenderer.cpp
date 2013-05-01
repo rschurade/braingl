@@ -26,6 +26,7 @@
 #include <QMatrix4x4>
 
 #include <limits>
+#include <stdint.h>
 
 BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
@@ -118,7 +119,7 @@ void BinghamRenderer::setShaderVars()
 
     program->bind();
 
-    long int offset = 0;
+    intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );

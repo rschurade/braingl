@@ -156,7 +156,7 @@ void MeshRenderer::setShaderVars()
 
     program->bind();
 
-    long int offset = 0;
+    intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int bufferSize = m_mesh->bufferSize();

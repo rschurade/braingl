@@ -154,7 +154,7 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 
     program->bind();
     // Offset for position
-    long int offset = 0;
+    intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
@@ -247,7 +247,7 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 
 
     // Offset for position
-    long int offset = 0;
+    intptr_t offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );

@@ -118,7 +118,7 @@ void ColormapRenderer::setShaderVars()
     program->bind();
 
     // Offset for position
-    long int offset = 0;
+    intptr_t offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
@@ -177,7 +177,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program = GLFunctions::getShader( "colormapscale" );
     program->bind();
     // Offset for position
-    long int offset = 0;
+    intptr_t offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
