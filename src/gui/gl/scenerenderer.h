@@ -80,8 +80,6 @@ private:
 
 	QMatrix4x4 m_mvMatrix;
 	QMatrix4x4 m_pMatrix;
-	QMatrix4x4 m_mvpMatrix;
-	QMatrix4x4 m_mvMatrixInverse;
 
 	int m_picked;
 	QVector2D m_rightMouseDown;
