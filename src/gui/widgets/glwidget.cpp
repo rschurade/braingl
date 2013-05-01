@@ -13,13 +13,13 @@
 #include <QtGui>
 
 GLWidget::GLWidget( QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-	QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
+        QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-	m_sceneRenderer = new SceneRenderer( roiSelectionModel );
+    m_sceneRenderer = new SceneRenderer( roiSelectionModel );
 
-	connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-	connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
-	connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
 
 GLWidget::~GLWidget()
@@ -38,19 +38,19 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::initializeGL()
 {
-	m_sceneRenderer->initGL();
-	GLFunctions::initTextRenderer();
-	GLFunctions::initShapeRenderer();
+    m_sceneRenderer->initGL();
+    GLFunctions::initTextRenderer();
+    GLFunctions::initShapeRenderer();
 }
 
 void GLWidget::paintGL()
 {
-	m_sceneRenderer->draw();
+    m_sceneRenderer->draw();
 }
 
 void GLWidget::resizeGL( int width, int height )
 {
-	m_sceneRenderer->resizeGL( width, height );
+    m_sceneRenderer->resizeGL( width, height );
 }
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
@@ -97,13 +97,12 @@ void GLWidget::enterEvent( QEvent *event )
     updateGL();
 }
 
-void GLWidget::wheelEvent(QWheelEvent *event)
+void GLWidget::wheelEvent( QWheelEvent *event )
 {
-     int numDegrees = event->delta() / 8;
-     int numSteps = numDegrees / 15;
-     m_sceneRenderer->mouseWheel( numSteps );
-     updateGL();
-
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+    m_sceneRenderer->mouseWheel( numSteps );
+    updateGL();
 }
 
 void GLWidget::update()

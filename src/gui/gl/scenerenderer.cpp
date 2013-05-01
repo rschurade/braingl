@@ -210,6 +210,7 @@ void SceneRenderer::draw()
 
 void SceneRenderer::renderScene()
 {
+    GLFunctions::getAndPrintGLError( "before render scene");
     QColor bgColor = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
 
     glEnable( GL_DEPTH_TEST );
@@ -233,13 +234,6 @@ void SceneRenderer::renderScene()
     glActiveTexture( GL_TEXTURE12 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-
-    GLenum errCode;
-    const GLubyte *errString;
-    while ((errCode = glGetError()) != GL_NO_ERROR) {
-        errString = gluErrorString(errCode);
-       fprintf (stderr, "OpenGL Error 0: %s\n", errString);
-    }
 
     //***************************************************************************************************
     //
@@ -373,24 +367,12 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
-    GLenum errCode;
-    const GLubyte *errString;
-    //qDebug() << "1";
-    if ((errCode = glGetError()) != GL_NO_ERROR) {
-        errString = gluErrorString(errCode);
-       fprintf (stderr, "OpenGL Error 1: %s\n", errString);
-    }
-
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
-    //qDebug() << "2";
-    if ((errCode = glGetError()) != GL_NO_ERROR) {
-        errString = gluErrorString(errCode);
-       fprintf (stderr, "OpenGL Error 2: %s\n", errString);
-    }
-
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    GLFunctions::getAndPrintGLError( "after render scene");
 }
 
 QImage* SceneRenderer::screenshot()

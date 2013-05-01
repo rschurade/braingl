@@ -74,6 +74,8 @@ public:
     static GLuint getTexture( QString name );
     static void clearTexture( QString name, float r, float g, float b, float a );
 
+    static void getAndPrintGLError( QString prefix = "" );
+
     static int idealThreadCount;
     static float sliceAlpha;
 
