@@ -180,8 +180,6 @@ void SceneRenderer::calcMVPMatrix()
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
-    m_mvMatrixInverse = m_mvMatrix.inverted();
-    m_mvpMatrix = m_pMatrix * m_mvMatrix;
 
     Models::g()->setData( Models::g()->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
     Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
