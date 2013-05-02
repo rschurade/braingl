@@ -68,6 +68,7 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
         int number = m_numbers->at( i );
         if ( number != 0 )
         {
+            number += 2;
             glDrawArrays( GL_TRIANGLE_FAN, start, number );
         }
         start += number;
@@ -127,7 +128,8 @@ void PieGlyphRenderer::initGeometry( QVector<float*>* pieArrays, QVector<int>* n
     int numPoints = 0;
     for ( int i = 0; i < n; i++ )
     {
-        numPoints += numbers->at( i );
+        if ( numbers->at( i ) != 0 )
+            numPoints += numbers->at( i ) + 2; // +2 for middle and closing point
         //qDebug() << numPoints;
     }
     qDebug() << "numPoints: " << numPoints;
@@ -137,26 +139,45 @@ void PieGlyphRenderer::initGeometry( QVector<float*>* pieArrays, QVector<int>* n
     pies = new float[numPoints * 8];
     qDebug() << "new pies made";
     numPoints = 0;
-    for ( int i = 0; i < n; i++ )
+    for ( int i = 0; i < n; i++ )  //for all pie charts:
     {
         float* ps = pieArrays->at( i );
         //qDebug() << "numbers at: " << i << " is: " << numbers->at(i);
-        if ( numbers->at(i) != 0  )
+        if ( numbers->at( i ) != 0 )
         {
-            //TODO: Deal with first and last point here?
+            //first point:
+            pies[( numPoints ) * 8] = ps[0];
+            pies[( numPoints ) * 8 + 1] = ps[1];
+            pies[( numPoints ) * 8 + 2] = ps[2];
+            pies[( numPoints ) * 8 + 3] = ps[3];
+            pies[( numPoints ) * 8 + 4] = ps[4];
+            pies[( numPoints ) * 8 + 5] = ps[5];
+            pies[( numPoints ) * 8 + 6] = -1;
+            pies[( numPoints ) * 8 + 7] = ps[7];
+
             np = numbers->at( i );
-            for ( int i2 = 0; i2 < np; i2++ )
+            for ( int i2 = 0; i2 < np; ++i2 )
             {
-                pies[( numPoints + i2 ) * 8] = ps[i2 * 8];
-                pies[( numPoints + i2 ) * 8 + 1] = ps[i2 * 8 + 1];
-                pies[( numPoints + i2 ) * 8 + 2] = ps[i2 * 8 + 2];
-                pies[( numPoints + i2 ) * 8 + 3] = ps[i2 * 8 + 3];
-                pies[( numPoints + i2 ) * 8 + 4] = ps[i2 * 8 + 4];
-                pies[( numPoints + i2 ) * 8 + 5] = ps[i2 * 8 + 5];
-                pies[( numPoints + i2 ) * 8 + 6] = ps[i2 * 8 + 6];
-                pies[( numPoints + i2 ) * 8 + 7] = ps[i2 * 8 + 7];
+                pies[( numPoints + i2 + 1 ) * 8] = ps[i2 * 8];
+                pies[( numPoints + i2 + 1 ) * 8 + 1] = ps[i2 * 8 + 1];
+                pies[( numPoints + i2 + 1 ) * 8 + 2] = ps[i2 * 8 + 2];
+                pies[( numPoints + i2 + 1 ) * 8 + 3] = ps[i2 * 8 + 3];
+                pies[( numPoints + i2 + 1 ) * 8 + 4] = ps[i2 * 8 + 4];
+                pies[( numPoints + i2 + 1 ) * 8 + 5] = ps[i2 * 8 + 5];
+                pies[( numPoints + i2 + 1 ) * 8 + 6] = ps[i2 * 8 + 6];
+                pies[( numPoints + i2 + 1 ) * 8 + 7] = ps[i2 * 8 + 7];
             }
-            numPoints += np;
+
+            //closing point:
+            pies[( numPoints + np + 1 ) * 8] = ps[0];
+            pies[( numPoints + np + 1 ) * 8 + 1] = ps[1];
+            pies[( numPoints + np + 1 ) * 8 + 2] = ps[2];
+            pies[( numPoints + np + 1 ) * 8 + 3] = ps[3];
+            pies[( numPoints + np + 1 ) * 8 + 4] = ps[4];
+            pies[( numPoints + np + 1 ) * 8 + 5] = ps[5];
+            pies[( numPoints + np + 1 ) * 8 + 6] = ps[6];
+            pies[( numPoints + np + 1 ) * 8 + 7] = ps[7];
+            numPoints += np + 2;
         }
     }
     qDebug() << "pre-bind";

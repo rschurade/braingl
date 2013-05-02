@@ -358,7 +358,7 @@ void DatasetGlyphset::makePies()
 
     qDebug() << "threshold: " << threshold;
 
-    if ( pieArrays )
+    /*if ( pieArrays )
     {
         for ( int i = 0; i < pieArrays->size(); ++i )
         {
@@ -369,7 +369,7 @@ void DatasetGlyphset::makePies()
         pieArrays = NULL;
         delete numbers;
         numbers = NULL;
-    }
+    }*/
 
     qDebug() << "calcPies after deletion";
 
