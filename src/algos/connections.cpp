@@ -363,10 +363,52 @@ void Connections::writeVTK()
     qDebug() << "file written";
 }
 
+QList<Dataset*> Connections::createDatasetFibers()
+{
+    int n = edges.size();
+    //int m = edges.at( 0 )->points.size();
+
+    QVector<QVector<float> > fibers;
+    for ( int e = 0; e < n; e++ )
+    {
+        Edge* ed = edges.at( e );
+        QVector<float> line;
+        for ( int p = 0; p < ed->points.size(); p++ )
+        {
+            QVector3D po = ed->points.at( p );
+            line.push_back( po.x() );
+            line.push_back( po.y() );
+            line.push_back( po.z() );
+        }
+        fibers.push_back( line );
+    }
+
+    //out << "LINES " << n << " " << n * ( m + 1 ) << endl;
+
+    /*int i = 0;
+     QVector<QVector<int> > lines;
+     for ( int e = 0; e < n; e++ )
+     {
+     QVector<int> line;
+     for ( int p = 0; p < m; p++ )
+     {
+     line.push_back( i++ );
+     }
+     lines.push_back(line);
+     }*/
+
+    DatasetFibers* ds = new DatasetFibers( QString( "new" ), fibers );
+    QList<Dataset*> l;
+    l.push_back( ds );
+    return l;
+
+}
+
 void Connections::writeBinaryVTK()
 {
     qDebug() << "writing binary vtk file";
-    writeBinaryVTK (name());}
+    writeBinaryVTK( name() );
+}
 
 void Connections::writeBinaryVTK( QString name )
 {
