@@ -19,6 +19,7 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     props->set( Fn::Property::CREATED_BY, (int)Fn::Algo::NONE );
 
     props->set( Fn::Property::HAS_TEXTURE, false );
+    props->set( Fn::Property::RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
 }
@@ -38,7 +39,14 @@ GLuint Dataset::getTextureGLuint()
 
 PropertyGroup* Dataset::properties( QString target )
 {
-    return m_properties[target];
+    if ( m_properties.contains( target ) )
+    {
+        return m_properties[target];
+    }
+    else
+    {
+        return m_properties["maingl"];
+    }
 }
 
 QString Dataset::getValueAsString( int x, int y, int z )

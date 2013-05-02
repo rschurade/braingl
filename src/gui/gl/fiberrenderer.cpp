@@ -65,7 +65,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->bind();
 
     GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ) );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "fiber" ), "maingl" );
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );

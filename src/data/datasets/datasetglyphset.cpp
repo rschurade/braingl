@@ -89,25 +89,30 @@ void DatasetGlyphset::setMinthresh( float mt )
     minthresh = mt;
 }
 
-void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
+    if ( properties( target )->get( Fn::Property::DRAW_SURFACE ).toBool() )
+    {
+        DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
+    }
 
-    if ( m_properties["maingl"]->get( Fn::Property::DRAW_SURFACE ).toBool() ) 
-        DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode );
-
-    int geoSurf = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
-    int geoGlyph = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
-    int geoCol = m_properties["maingl"]->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
-    int glyphstyle = m_properties["maingl"]->get( Fn::Property::GLYPHSTYLE ).toInt();
+    int geoSurf = properties( target )->get( Fn::Property::SURFACE ).toInt();
+    int geoGlyph = properties( target )->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
+    int geoCol = properties( target )->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
+    int glyphstyle = properties( target )->get( Fn::Property::GLYPHSTYLE ).toInt();
      
-    float threshold = m_properties["maingl"]->get( Fn::Property::THRESHOLD ).toFloat();
-    float minlength = m_properties["maingl"]->get( Fn::Property::MINLENGTH ).toFloat();
+    float threshold = properties( target )->get( Fn::Property::THRESHOLD ).toFloat();
+    float minlength = properties( target )->get( Fn::Property::MINLENGTH ).toFloat();
     
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
-     glPointSize( m_properties["maingl"]->get( Fn::Property::PRIMSIZE ).toFloat() );
+    glPointSize( properties( target )->get( Fn::Property::PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 
@@ -156,19 +161,19 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     prevThresh = threshold;
     prevMinlength = minlength;
 
-    if ( m_properties["maingl"]->get( Fn::Property::DRAW_GLYPHS ).toBool() )
+    if ( properties( target )->get( Fn::Property::DRAW_GLYPHS ).toBool() )
     {
         if ( glyphstyle == 0 )
         {
-            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
         if ( glyphstyle == 1 )
         {
-            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
         if ( glyphstyle == 2 )
         {
-            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
     }
 
