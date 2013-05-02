@@ -43,6 +43,17 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, true );
+
+    /*m_properties["maingl2"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
+    m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
+    { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl2"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
+    m_properties["maingl2"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
+    m_properties["maingl2"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
+    m_properties["maingl2"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
+    m_properties["maingl2"]->set( Fn::Property::DRAW_SURFACE, true, true );
+    m_properties["maingl2"]->set( Fn::Property::DRAW_GLYPHS, true, true );*/
+    m_properties.remove("maingl2");
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -95,6 +106,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         return;
     }
+
     if ( properties( target )->get( Fn::Property::DRAW_SURFACE ).toBool() )
     {
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
@@ -176,7 +188,6 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
     }
-
 }
 
 void DatasetGlyphset::makeCons()

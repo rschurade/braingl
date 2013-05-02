@@ -33,11 +33,12 @@ void DatasetSurfaceset::addMesh( TriangleMesh2* tm, QString displayString )
 void DatasetSurfaceset::setProperties()
 {
     m_properties["maingl"]->set( Fn::Property::SURFACE, m_displayList, 0, true );
+    //m_properties["maingl2"]->set( Fn::Property::SURFACE, m_displayList, 0, true );
 }
 
-TriangleMesh2* DatasetSurfaceset::getMesh()
+TriangleMesh2* DatasetSurfaceset::getMesh( QString target )
 {
-    int n = m_properties["maingl"]->get( Fn::Property::SURFACE ).toInt();
+    int n = properties( target )->get( Fn::Property::SURFACE ).toInt();
     return m_mesh[n];
 }
 
@@ -49,11 +50,11 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
     }
     if ( m_renderer == 0 )
     {
-        m_renderer = new MeshRenderer( getMesh() );
+        m_renderer = new MeshRenderer( getMesh( target ) );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
-    m_renderer->setMesh( getMesh() );
+    m_renderer->setMesh( getMesh( target ) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
@@ -77,7 +78,7 @@ void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )
             color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
         }
 
-        QVector<int> picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
+        QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
 
         if ( picked.size() > 0 )
         {
