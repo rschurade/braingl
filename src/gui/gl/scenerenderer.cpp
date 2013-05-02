@@ -29,7 +29,8 @@
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-SceneRenderer::SceneRenderer( QItemSelectionModel* roiSelectionModel ) :
+SceneRenderer::SceneRenderer( QString renderTarget, QItemSelectionModel* roiSelectionModel ) :
+    m_renderTarget( renderTarget ),
     m_roiSelectionModel( roiSelectionModel ),
     vboIds( new GLuint[ 2 ] ),
     skipDraw( false ),
@@ -139,7 +140,7 @@ void SceneRenderer::resizeGL( int width, int height )
     m_ratio = static_cast<float>( width )/ static_cast<float>(height);
     glViewport( 0, 0, width, height );
 
-    GLFunctions::initFBO( width, height );
+    initFBO( width, height );
 
     calcMVPMatrix();
 }
@@ -218,19 +219,19 @@ void SceneRenderer::renderScene()
     glClearDepth( 1 );
     //glDisable( GL_BLEND );
 
-    GLuint tex = GLFunctions::getTexture( "D0" );
+    GLuint tex = getTexture( "D0" );
     glActiveTexture( GL_TEXTURE9 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "D1" );
+    tex = getTexture( "D1" );
     glActiveTexture( GL_TEXTURE10 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "D2" );
+    tex = getTexture( "D2" );
     glActiveTexture( GL_TEXTURE11 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "PICK" );
+    tex = getTexture( "PICK" );
     glActiveTexture( GL_TEXTURE12 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
@@ -243,10 +244,10 @@ void SceneRenderer::renderScene()
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    GLFunctions::clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
-    GLFunctions::clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );
-    GLFunctions::clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
-    GLFunctions::setRenderTargets( "C0", "D0" );
+    clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
+    clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );
+    clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    setRenderTargets( "C0", "D0" );
     renderScenePart( 1, "C0", "D0" );
 
     //***************************************************************************************************
@@ -254,8 +255,8 @@ void SceneRenderer::renderScene()
     // Pass 2
     //
     //***************************************************************************************************/
-    GLFunctions::clearTexture( "C1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    GLFunctions::clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "C1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
     renderScenePart( 2, "C1", "D1" );
 
@@ -264,8 +265,8 @@ void SceneRenderer::renderScene()
     // Pass 3
     //
     //***************************************************************************************************/
-    GLFunctions::clearTexture( "C2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    GLFunctions::clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "C2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
     renderScenePart( 3, "C2", "D2" );
 
@@ -275,8 +276,8 @@ void SceneRenderer::renderScene()
     //
     //***************************************************************************************************/
 
-    GLFunctions::clearTexture( "C3", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    GLFunctions::clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "C3", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
 
     renderScenePart( 4, "C3", "D1" );
@@ -287,10 +288,10 @@ void SceneRenderer::renderScene()
     //
     //***************************************************************************************************/
     m_renderMode = 3;
-    GLFunctions::clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    GLFunctions::setRenderTarget( "D2" );
+    clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    setRenderTarget( "D2" );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderDatasets();
     renderRois();
 
@@ -300,9 +301,9 @@ void SceneRenderer::renderScene()
 void SceneRenderer::renderScenePart( int renderMode, QString target0, QString target1 )
 {
     m_renderMode = renderMode;
-    GLFunctions::setRenderTargets( target0, target1 );
+    setRenderTargets( target0, target1 );
 
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderDatasets();
     renderRois();
 
@@ -317,27 +318,27 @@ void SceneRenderer::renderMerge()
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
 
-    GLuint tex = GLFunctions::getTexture( "C0" );
+    GLuint tex = getTexture( "C0" );
     glActiveTexture( GL_TEXTURE5 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "C1" );
+    tex = getTexture( "C1" );
     glActiveTexture( GL_TEXTURE6 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "C2" );
+    tex = getTexture( "C2" );
     glActiveTexture( GL_TEXTURE7 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "C3" );
+    tex = getTexture( "C3" );
     glActiveTexture( GL_TEXTURE8 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "D0" );
+    tex = getTexture( "D0" );
     glActiveTexture( GL_TEXTURE9 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = GLFunctions::getTexture( "D2" );
+    tex = getTexture( "D2" );
     glActiveTexture( GL_TEXTURE11 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
@@ -382,10 +383,10 @@ QImage* SceneRenderer::screenshot()
     int tmpHeight = m_height;
     resizeGL( size, size );
     renderScene();
-    GLFunctions::setRenderTarget( "SCREENSHOT" );
+    setRenderTarget( "SCREENSHOT" );
     renderMerge();
 
-    QImage* out = GLFunctions::getOffscreenTexture( m_width, m_height );
+    QImage* out = getOffscreenTexture( m_width, m_height );
 
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     resizeGL( tmpWidth, tmpHeight );
@@ -399,12 +400,8 @@ void SceneRenderer::renderDatasets()
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
-        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
-        {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-        }
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     }
 }
 
@@ -481,7 +478,7 @@ void SceneRenderer::renderPick()
 {
     // render
     m_renderMode = 0;
-    GLFunctions::setRenderTarget( "C0" );
+    setRenderTarget( "C0" );
 
     glEnable( GL_DEPTH_TEST );
     /* clear the frame buffer */
@@ -489,7 +486,7 @@ void SceneRenderer::renderPick()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     //render_picking_scene();
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderRois();
     renderDatasets();
 }
@@ -498,7 +495,7 @@ void SceneRenderer::rightMouseDown( int x, int y )
 {
     m_rightMouseDown = QVector2D( x, y );
     // get id
-    m_picked = GLFunctions::get_object_id( x, y, m_width, m_height );
+    m_picked = get_object_id( x, y, m_width, m_height );
 
     renderPick();
     QVector3D pickPos = mapMouse2World( x, y );
@@ -681,4 +678,238 @@ QVector3D SceneRenderer::mapMouse2World( float x, float y )
 
     QVector3D v( posX, posY, posZ );
     return v;
+}
+
+void SceneRenderer::generate_pixel_buffer_objects( int width, int height )
+{
+    /* generate the first pixel buffer objects */
+    glGenBuffers( 1, &pbo_a );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, pbo_a );
+    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
+    /* to avoid weird behaviour the first frame the data is loaded */
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* generate the second pixel buffer objects */
+    glGenBuffers( 1, &pbo_b );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, pbo_b );
+    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* unbind */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+}
+
+GLuint SceneRenderer::get_object_id( int x, int y, int width, int height )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+    glReadBuffer( GL_COLOR_ATTACHMENT2 );
+
+    static int frame_event = 0;
+    int read_pbo, map_pbo;
+    uint object_id;
+
+    uint red, green, blue, pixel_index;
+    GLubyte* ptr;
+
+    generate_pixel_buffer_objects( width, height );
+    /* switch between pixel buffer objects */
+    if (frame_event == 0)
+    {
+        frame_event = 1;
+        read_pbo = pbo_a;
+        map_pbo = pbo_b;
+    }
+    else {
+        frame_event = 0;
+        read_pbo = pbo_b;
+        map_pbo = pbo_a;
+
+    }
+    /* read one pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* map the other pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* get the mouse coordinates */
+    /* OpenGL has the {0,0} at the down-left corner of the screen */
+    y = height - y;
+    object_id = -1;
+
+    if ( x >= 0 && x < width && y >= 0 && y < height )
+    {
+        pixel_index = ( x + y * width ) * 4;
+        blue = ptr[pixel_index];
+        green = ptr[pixel_index + 1];
+        red = ptr[pixel_index + 2];
+        //alpha = ptr[pixel_index + 3];
+        //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
+        object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
+        //qDebug() << "output" << red << green << blue << alpha;
+    }
+    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+
+    glDeleteBuffers( 1, &pbo_a );
+    glDeleteBuffers( 1, &pbo_b );
+
+    return object_id;
+}
+
+QImage* SceneRenderer::getOffscreenTexture( int width, int height )
+{
+    static int frame_event = 0;
+    int read_pbo, map_pbo;
+
+    uint red, green, blue, alpha, pixel_index;
+    GLubyte* ptr;
+
+    generate_pixel_buffer_objects( width, height );
+    /* switch between pixel buffer objects */
+    if (frame_event == 0)
+    {
+        frame_event = 1;
+        read_pbo = pbo_a;
+        map_pbo = pbo_a;
+    }
+    else {
+        frame_event = 0;
+        map_pbo = pbo_a;
+        read_pbo = pbo_b;
+    }
+    /* read one pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    /* map the other pixel buffer */
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* get the mouse coordinates */
+    /* OpenGL has the {0,0} at the down-left corner of the screen */
+
+    QImage* image = new QImage( width, height, QImage::Format_RGB32 );
+    QColor c;
+    for ( int x = 0; x < width; ++x )
+    {
+        for ( int y = 0; y < height; ++y )
+        {
+            pixel_index = ( x + y * width ) * 4;
+            blue = ptr[pixel_index];
+            green = ptr[pixel_index + 1];
+            red = ptr[pixel_index + 2];
+            alpha = ptr[pixel_index + 3];
+
+            c = QColor( red, green, blue, alpha );
+            image->setPixel( x, ( height - y )-1, c.rgba() );
+        }
+    }
+
+    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+
+    glDeleteBuffers( 1, &pbo_a );
+    glDeleteBuffers( 1, &pbo_b );
+
+    return image;
+}
+
+void SceneRenderer::initFBO( int width, int height )
+{
+    if ( textures.size() > 0 )
+    {
+        foreach ( GLuint tex, textures )
+        {
+            glDeleteTextures( 1, &tex );
+        }
+        glDeleteFramebuffers( 1, &FBO );
+        glDeleteRenderbuffers( 1, &RBO );
+
+    }
+
+    textures[ "C0" ] = createTexture( width, height );
+    textures[ "C1" ] = createTexture( width, height );
+    textures[ "C2" ] = createTexture( width, height );
+    textures[ "C3" ] = createTexture( width, height );
+    textures[ "D0" ] = createTexture( width, height );
+    textures[ "D1" ] = createTexture( width, height );
+    textures[ "D2" ] = createTexture( width, height );
+    textures[ "PICK" ] = createTexture( width, height );
+    textures[ "SCREENSHOT" ] = createTexture( width, height );
+
+    /* create a framebuffer object */
+    glGenFramebuffers( 1, &FBO );
+    /* attach the texture and the render buffer to the frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+
+    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers( 3,  attachments );
+
+    /* create a renderbuffer object for the depth buffer */
+    glGenRenderbuffers( 1, &RBO );
+    /* bind the texture */
+    glBindRenderbuffer( GL_RENDERBUFFER, RBO );
+    /* create the render buffer in the GPU */
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
+
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["C0"], 0 );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO );
+    /* check the frame buffer */
+    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+    {
+        /* handle an error : frame buffer incomplete */
+        qDebug() << "frame buffer incomplete";
+    }
+
+    /* unbind the render buffer */
+    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+GLuint SceneRenderer::createTexture( int width, int height )
+{
+    /* generate a texture id */
+    GLuint ptex;
+    glGenTextures( 1, &ptex );
+    /* bind the texture */
+    glBindTexture( GL_TEXTURE_2D, ptex );
+    /* set texture parameters */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    /* create the texture in the GPU */
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+    /* unbind the texture */
+    glBindTexture( GL_TEXTURE_2D, 0 );
+
+    return ptex;
+}
+
+void SceneRenderer::setRenderTarget( QString target )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[target], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, textures["PICK"], 0 );
+}
+
+void SceneRenderer::setRenderTargets( QString target0, QString target1 )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[target0], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, textures[target1], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, textures["PICK"], 0 );
+}
+
+void SceneRenderer::clearTexture( QString target, float r, float g, float b, float a )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[target], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, 0, 0 );
+    glClearColor( r, g, b, a );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+GLuint SceneRenderer::getTexture( QString name )
+{
+    return textures[name];
 }

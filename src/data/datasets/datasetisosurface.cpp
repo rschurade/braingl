@@ -38,6 +38,18 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"]->set( Fn::Property::NAME, QString( "isosurface" ) );
     m_properties["maingl"]->set( Fn::Property::ISO_VALUE, 80.0f, ds->properties( "maingl" )->get( Fn::Property::MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::MAX ).toFloat(), true );
 
+    m_properties["maingl2"]->set( Fn::Property::NX, ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() );
+    m_properties["maingl2"]->set( Fn::Property::NY, ds->properties( "maingl" )->get( Fn::Property::NY ).toInt() );
+    m_properties["maingl2"]->set( Fn::Property::NZ, ds->properties( "maingl" )->get( Fn::Property::NZ ).toInt() );
+    m_properties["maingl2"]->set( Fn::Property::DX, ds->properties( "maingl" )->get( Fn::Property::DX ).toFloat() );
+    m_properties["maingl2"]->set( Fn::Property::DY, ds->properties( "maingl" )->get( Fn::Property::DY ).toFloat() );
+    m_properties["maingl2"]->set( Fn::Property::DZ, ds->properties( "maingl" )->get( Fn::Property::DZ ).toFloat() );
+
+    m_properties["maingl2"]->set( Fn::Property::DIM, 0 );
+    m_properties["maingl2"]->set( Fn::Property::CREATED_BY, (int)Fn::Algo::ISOSURFACE );
+    m_properties["maingl2"]->set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
+    m_properties["maingl2"]->set( Fn::Property::NAME, QString( "isosurface" ) );
+
     m_nX = m_properties["maingl"]->get( Fn::Property::NX ).toInt() - 1;
     m_nY = m_properties["maingl"]->get( Fn::Property::NY ).toInt() - 1;
     m_nZ = m_properties["maingl"]->get( Fn::Property::NZ ).toInt() - 1;
@@ -123,8 +135,12 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     m_trivecTriangles.clear();
 }
 
-void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( m_mesh[0] );
@@ -132,7 +148,7 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->init();
     }
 
-    m_isoLevel = m_properties["maingl"]->get( Fn::Property::ISO_VALUE ).toFloat();
+    m_isoLevel = properties( "maingl" )->get( Fn::Property::ISO_VALUE ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh[0];
@@ -142,5 +158,5 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->setMesh( m_mesh[0] );
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
