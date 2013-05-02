@@ -88,7 +88,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->bind();
 
     GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ) );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );

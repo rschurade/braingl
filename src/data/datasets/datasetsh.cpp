@@ -109,21 +109,25 @@ void DatasetSH::flipX()
     m_data = newData;
 }
 
-void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( &m_data, m_properties["maingl"]->get( Fn::Property::NX ).toInt(),
-                                              m_properties["maingl"]->get( Fn::Property::NY ).toInt(),
-                                              m_properties["maingl"]->get( Fn::Property::NZ ).toInt(),
-                                              m_properties["maingl"]->get( Fn::Property::DX ).toFloat(),
-                                              m_properties["maingl"]->get( Fn::Property::DY ).toFloat(),
-                                              m_properties["maingl"]->get( Fn::Property::DZ ).toFloat() );
+        m_renderer = new SHRenderer( &m_data, properties( target )->get( Fn::Property::NX ).toInt(),
+                                              properties( target )->get( Fn::Property::NY ).toInt(),
+                                              properties( target )->get( Fn::Property::NZ ).toInt(),
+                                              properties( target )->get( Fn::Property::DX ).toFloat(),
+                                              properties( target )->get( Fn::Property::DY ).toFloat(),
+                                              properties( target )->get( Fn::Property::DZ ).toFloat() );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
 QString DatasetSH::getValueAsString( int x, int y, int z )

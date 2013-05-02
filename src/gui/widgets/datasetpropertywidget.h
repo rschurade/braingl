@@ -8,6 +8,7 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
+#include <QString>
 #include <QTabWidget>
 #include <QWidget>
 
@@ -20,12 +21,14 @@ class DatasetPropertyWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    DatasetPropertyWidget( QWidget* parent = 0 );
+    DatasetPropertyWidget( QString target, QWidget* parent = 0 );
     virtual ~DatasetPropertyWidget();
 
     void setSelectionModel( QItemSelectionModel* selectionModel );
 
 private:
+    QString m_target;
+
     DatasetPropertyView* m_propertyView;
 
     QVBoxLayout* m_layout1;

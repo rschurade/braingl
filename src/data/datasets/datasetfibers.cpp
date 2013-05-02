@@ -150,8 +150,12 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
     if ( m_selector == 0 )
     {
         m_selector = new FiberSelector();
@@ -159,31 +163,31 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         connect( m_selector, SIGNAL( changed() ), Models::d(), SLOT( submit() ) );
     }
 
-    if ( m_properties["maingl"]->get( Fn::Property::FIBER_RENDERMODE).toInt() == 0 )
+    if ( properties( target )->get( Fn::Property::FIBER_RENDERMODE).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new FiberRenderer( m_selector, m_fibs, m_data[m_properties["maingl"]->get( Fn::Property::DATAMODE).toInt()] );
+            m_renderer = new FiberRenderer( m_selector, m_fibs, m_data[properties( target )->get( Fn::Property::DATAMODE).toInt()] );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
-            m_renderer->colorChanged( m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>() );
-            connect( m_properties["maingl"]->getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
+            m_renderer->colorChanged( properties( target )->get( Fn::Property::COLOR ).value<QColor>() );
+            connect( properties( target )->getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_renderer, SLOT( colorChanged( QColor ) ) );
         }
 
-        m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+        m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-    else if ( m_properties["maingl"]->get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
+    else if ( properties( target )->get( Fn::Property::FIBER_RENDERMODE).toInt() == 1 )
     {
         if ( m_tubeRenderer == 0 )
         {
-            m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_data[m_properties["maingl"]->get( Fn::Property::DATAMODE).toInt()] );
+            m_tubeRenderer = new TubeRenderer( m_selector, m_fibs, m_data[properties( target )->get( Fn::Property::DATAMODE).toInt()] );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
-            m_tubeRenderer->colorChanged( m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>() );
-            connect( m_properties["maingl"]->getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
+            m_tubeRenderer->colorChanged( properties( target )->get( Fn::Property::COLOR ).value<QColor>() );
+            connect( properties( target )->getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), m_tubeRenderer, SLOT( colorChanged( QColor ) ) );
         }
 
-        m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+        m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
 }
 

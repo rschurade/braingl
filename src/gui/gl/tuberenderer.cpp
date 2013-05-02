@@ -65,7 +65,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->bind();
 
     GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ) );
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "tube" ), "maingl" );
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );

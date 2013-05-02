@@ -58,6 +58,7 @@ private:
     QMainWindow* m_centralWidget;
 
     GLWidget* mainGLWidget;
+    GLWidget* mainGLWidget2;
     DatasetListWidget* m_datasetWidget;
     ROIWidget* m_roiWidget;
     ShaderEditWidget* m_shaderEditWidget;

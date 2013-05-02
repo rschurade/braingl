@@ -426,7 +426,7 @@ void CombinedNavRenderer::setupTextures()
 void CombinedNavRenderer::setShaderVars()
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program );
+    GLFunctions::setShaderVarsSlice( program, "maingl" );
 }
 
 void CombinedNavRenderer::draw()

@@ -24,8 +24,9 @@
 
 #include <QtGui>
 
-DatasetPropertyWidget::DatasetPropertyWidget( QWidget* parent ) :
-    QTabWidget( parent )
+DatasetPropertyWidget::DatasetPropertyWidget( QString target, QWidget* parent ) :
+    QTabWidget( parent ),
+    m_target( target )
 {
     m_propertyView = new DatasetPropertyView( this );
     m_propertyView->setModel( Models::d() );
@@ -77,10 +78,6 @@ void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionMod
 
 void DatasetPropertyWidget::updateWidgetVisibility()
 {
-    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
-    Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    QList<Fn::Property>visible = ds->properties()->getVisible();
-
     for ( int i = 0; i < m_visibleWidgets1.size(); ++i )
     {
         m_visibleWidgets1[i]->hide();
@@ -107,6 +104,23 @@ void DatasetPropertyWidget::updateWidgetVisibility()
 
     repaint();
 
+    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
+    Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
+
+    QList<Fn::Property>visible;
+    if ( m_target == "maingl" )
+    {
+        visible = ds->properties( m_target )->getVisible();
+    }
+    else if ( ds->properties( m_target ) != ds->properties( "maingl" ) )
+    {
+        visible = ds->properties( m_target )->getVisible();
+    }
+    else
+    {
+        return;
+    }
+
     for ( int i = 0; i < visible.size(); ++i )
     {
         switch ( visible[i] )
@@ -121,25 +135,25 @@ void DatasetPropertyWidget::updateWidgetVisibility()
                     cmapSel->insertItem( k, ColormapFunctions::get( k ).getName() );
 
                 }
-                int selectedCmap = ds->properties()->get( Fn::Property::COLORMAP ).toInt();
+                int selectedCmap = ds->properties( m_target )->get( Fn::Property::COLORMAP ).toInt();
                 cmapSel->setCurrentIndex( selectedCmap );
                 m_layout2->addWidget( cmapSel );
                 connect( cmapSel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( colormapSelectionChanged( int) ) );
 
-                float min = ds->properties()->get( Fn::Property::MIN ).toFloat();
-                float max = ds->properties()->get( Fn::Property::MAX ).toFloat();
+                float min = ds->properties( m_target )->get( Fn::Property::MIN ).toFloat();
+                float max = ds->properties( m_target )->get( Fn::Property::MAX ).toFloat();
                 ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 14, min, max );
                 m_layout2->addWidget( cmapWidget );
                 m_visibleWidgets2.push_back( cmapWidget );
-                cmapWidget->setMin( ds->properties()->get( Fn::Property::SELECTED_MIN ).toFloat() );
-                cmapWidget->setMax( ds->properties()->get( Fn::Property::SELECTED_MAX ).toFloat() );
-                cmapWidget->setLowerThreshold( ds->properties()->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
-                cmapWidget->setUpperThreshold( ds->properties()->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
+                cmapWidget->setMin( ds->properties( m_target )->get( Fn::Property::SELECTED_MIN ).toFloat() );
+                cmapWidget->setMax( ds->properties( m_target )->get( Fn::Property::SELECTED_MAX ).toFloat() );
+                cmapWidget->setLowerThreshold( ds->properties( m_target )->get( Fn::Property::LOWER_THRESHOLD ).toFloat() );
+                cmapWidget->setUpperThreshold( ds->properties( m_target )->get( Fn::Property::UPPER_THRESHOLD ).toFloat() );
                 cmapWidget->setColormap( selectedCmap );
-                connect( ds->properties()->getWidget( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
-                connect( ds->properties()->getWidget( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
-                connect( ds->properties()->getWidget( Fn::Property::LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
-                connect( ds->properties()->getWidget( Fn::Property::UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
                 connect( cmapSel, SIGNAL( currentIndexChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
                 break;
             }
@@ -150,9 +164,9 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             case Fn::Property::COLORMAP_DY:
             case Fn::Property::COLORMAP_TEXT_SIZE:
             {
-                m_layout2->addWidget( ds->properties()->getWidget( visible[i] ) );
-                ds->properties()->getWidget( visible[i] )->show();
-                m_visibleWidgets2.push_back( ds->properties()->getWidget( visible[i] ) );
+                m_layout2->addWidget( ds->properties( m_target )->getWidget( visible[i] ) );
+                ds->properties( m_target )->getWidget( visible[i] )->show();
+                m_visibleWidgets2.push_back( ds->properties( m_target )->getWidget( visible[i] ) );
                 break;
             }
 
@@ -161,17 +175,17 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             case Fn::Property::PAINTCOLOR:
             case Fn::Property::PAINTVALUE:
             {
-                m_layout3->addWidget( ds->properties()->getWidget( visible[i] ) );
-                ds->properties()->getWidget( visible[i] )->show();
-                m_visibleWidgets3.push_back( ds->properties()->getWidget( visible[i] ) );
+                m_layout3->addWidget( ds->properties( m_target )->getWidget( visible[i] ) );
+                ds->properties( m_target )->getWidget( visible[i] )->show();
+                m_visibleWidgets3.push_back( ds->properties( m_target )->getWidget( visible[i] ) );
                 break;
             }
 
             default:
             {
-                m_layout1->addWidget( ds->properties()->getWidget( visible[i] ) );
-                ds->properties()->getWidget( visible[i] )->show();
-                m_visibleWidgets1.push_back( ds->properties()->getWidget( visible[i] ) );
+                m_layout1->addWidget( ds->properties( m_target )->getWidget( visible[i] ) );
+                ds->properties( m_target )->getWidget( visible[i] )->show();
+                m_visibleWidgets1.push_back( ds->properties( m_target )->getWidget( visible[i] ) );
                 break;
             }
         }
@@ -186,8 +200,8 @@ void DatasetPropertyWidget::colormapSelectionChanged( int id )
 {
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    ds->properties()->set( Fn::Property::COLORMAP, id );
-    ds->properties()->slotPropChanged();
+    ds->properties( m_target )->set( Fn::Property::COLORMAP, id );
+    ds->properties( m_target )->slotPropChanged();
 }
 
 void DatasetPropertyWidget::update()

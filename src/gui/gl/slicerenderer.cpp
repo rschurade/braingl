@@ -135,15 +135,15 @@ void SliceRenderer::setupTextures()
     GLFunctions::setupTextures();
 }
 
-void SliceRenderer::setShaderVars()
+void SliceRenderer::setShaderVars( QString target )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program );
+    GLFunctions::setShaderVarsSlice( program, target );
 }
 
-void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode )
+void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target )
 {
-    float alpha = GLFunctions::sliceAlpha;
+    float alpha = GLFunctions::sliceAlpha[target];
 
     switch ( renderMode )
     {
@@ -196,28 +196,28 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     {
         float blue =  (float)(( 1 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
-        drawAxial();
+        drawAxial( target );
     }
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_CORONAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 2 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
-        drawCoronal();
+        drawCoronal( target );
     }
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 3 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
-        drawSagittal();
+        drawSagittal( target );
     }
 }
 
-void SliceRenderer::drawAxial()
+void SliceRenderer::drawAxial( QString target )
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( target );
 
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
@@ -226,12 +226,12 @@ void SliceRenderer::drawAxial()
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void SliceRenderer::drawCoronal()
+void SliceRenderer::drawCoronal( QString target )
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-    setShaderVars();
+    setShaderVars( target );
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
@@ -239,12 +239,12 @@ void SliceRenderer::drawCoronal()
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void SliceRenderer::drawSagittal()
+void SliceRenderer::drawSagittal( QString target )
 {
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
-    setShaderVars();
+    setShaderVars( target );
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
