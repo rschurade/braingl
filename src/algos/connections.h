@@ -10,6 +10,8 @@
 
 #include "edge.h"
 
+#include "../data/datasets/datasetfibers.h"
+
 #include <QString>
 #include <QList>
 #include <QVector3D>
@@ -35,6 +37,8 @@ public:
     void writeBinaryVTK(QString name);
     void writeSegments();
     QString name();
+
+    QList<Dataset*> createDatasetFibers();
 
     double c_thr, bell;
     int start_i, numcycles, smooth;

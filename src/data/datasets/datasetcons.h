@@ -27,8 +27,8 @@ public:
     Connections* getCons();
     float* getVectors();
 
-private:
     Connections* cons;
+private:
     VectorGlyphRenderer* m_vrenderer;
     float* vectorArray;
     int consNumber;

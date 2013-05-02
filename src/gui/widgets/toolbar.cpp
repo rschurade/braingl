@@ -229,7 +229,8 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::BUNDLE:
             qDebug() << "BUNDLING...";
             ((DatasetCons*)ds)->getCons()->fullAttract();
-            ((DatasetCons*)ds)->getCons()->writeBinaryVTK();
+            //((DatasetCons*)ds)->getCons()->writeBinaryVTK();
+            l = ((DatasetCons*)ds)->cons->createDatasetFibers();
             break;
         case Fn::Algo::MAKECONS:
             qDebug() << "Making new connections...";
