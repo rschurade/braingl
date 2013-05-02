@@ -15,11 +15,22 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
         m_colormapRenderer( 0 )
 {
+    PropertyGroup* props = new PropertyGroup();
+    props->set( Fn::Property::ACTIVE, true, true );
+    props->set( Fn::Property::RENDER_TARGET, "maingl2" );
+    m_properties.insert( "maingl2", props );
+
     m_properties["maingl"]->set( Fn::Property::INTERPOLATION, false, true );
     m_properties["maingl"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
     m_properties["maingl"]->set( Fn::Property::COLORMAP, 0, true );
     m_properties["maingl"]->set( Fn::Property::DIM, 1 );
     m_properties["maingl"]->set( Fn::Property::HAS_TEXTURE, true );
+
+    m_properties["maingl2"]->set( Fn::Property::INTERPOLATION, false, true );
+    m_properties["maingl2"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP, 0, true );
+    m_properties["maingl2"]->set( Fn::Property::DIM, 1 );
+    m_properties["maingl2"]->set( Fn::Property::HAS_TEXTURE, true );
 
     examineDataset();
 
@@ -29,6 +40,13 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DX, 400, 1, 2000, true );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, true );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, true );
+
+    m_properties["maingl2"]->set( Fn::Property::RENDER_COLORMAP, false, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_X, 50, 1, 2000, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_Y, 50, 1, 2000, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_DX, 400, 1, 2000, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, true );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, true );
 }
 
 DatasetScalar::~DatasetScalar()
@@ -77,6 +95,25 @@ void DatasetScalar::examineDataset()
     connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
               m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
 
+    m_properties["maingl2"]->set( Fn::Property::SIZE, static_cast<int>( size * sizeof(float) ) );
+    m_properties["maingl2"]->set( Fn::Property::MIN, min );
+    m_properties["maingl2"]->set( Fn::Property::MAX, max );
+    m_properties["maingl2"]->set( Fn::Property::SELECTED_MIN, min, min, max, true );
+    m_properties["maingl2"]->set( Fn::Property::SELECTED_MAX, max, min, max, true );
+    m_properties["maingl2"]->set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
+    m_properties["maingl2"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
+
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties["maingl2"]->getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties["maingl2"]->getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+              m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+              m_properties["maingl2"]->getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
+
+
     if ( m_qform.Determinant() < 0.0 && m_qform( 1, 1 ) < 0 )
     {
         qDebug() << m_properties["maingl"]->get( Fn::Property::NAME ).toString() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
@@ -91,11 +128,8 @@ void DatasetScalar::examineDataset()
         }
     }
 
-
-
     m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
     m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 1, 1, 5, true );
-    //m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
     m_properties["maingl"]->set( Fn::Property::PAINTVALUE, min, min, max - 1.0, true );
 }
 
@@ -165,28 +199,32 @@ void DatasetScalar::flipX()
     m_data = newData;
 }
 
-void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( m_properties["maingl"]->get( Fn::Property::RENDER_COLORMAP ).toBool() )
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
+    if ( properties( target )->get( Fn::Property::RENDER_COLORMAP ).toBool() )
     {
         if ( !m_colormapRenderer )
         {
             m_colormapRenderer = new ColormapRenderer();
             m_colormapRenderer->init();
         }
-        m_colormapRenderer->setColormap( m_properties["maingl"]->get( Fn::Property::COLORMAP ).toInt() );
-        m_colormapRenderer->setX( m_properties["maingl"]->get( Fn::Property::COLORMAP_X ).toFloat() );
-        m_colormapRenderer->setY( m_properties["maingl"]->get( Fn::Property::COLORMAP_Y ).toFloat() );
-        m_colormapRenderer->setDX( m_properties["maingl"]->get( Fn::Property::COLORMAP_DX ).toFloat() );
-        m_colormapRenderer->setDY( m_properties["maingl"]->get( Fn::Property::COLORMAP_DY ).toFloat() );
-        m_colormapRenderer->setTextSize( m_properties["maingl"]->get( Fn::Property::COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setColormap( properties( target )->get( Fn::Property::COLORMAP ).toInt() );
+        m_colormapRenderer->setX( properties( target )->get( Fn::Property::COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( properties( target )->get( Fn::Property::COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( properties( target )->get( Fn::Property::COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( properties( target )->get( Fn::Property::COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::COLORMAP_TEXT_SIZE ).toFloat() );
 
-        m_colormapRenderer->setMin( m_properties["maingl"]->get( Fn::Property::MIN).toFloat() );
-        m_colormapRenderer->setMax( m_properties["maingl"]->get( Fn::Property::MAX).toFloat() );
-        m_colormapRenderer->setSelectedMin( m_properties["maingl"]->get( Fn::Property::SELECTED_MIN).toFloat() );
-        m_colormapRenderer->setSelectedMax( m_properties["maingl"]->get( Fn::Property::SELECTED_MAX).toFloat() );
-        m_colormapRenderer->setLowerThreshold( m_properties["maingl"]->get( Fn::Property::LOWER_THRESHOLD).toFloat() );
-        m_colormapRenderer->setUpperThreshold( m_properties["maingl"]->get( Fn::Property::UPPER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::MIN).toFloat() );
+        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::MAX).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::SELECTED_MIN).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::SELECTED_MAX).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::LOWER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::UPPER_THRESHOLD).toFloat() );
 
         m_colormapRenderer->draw( width, height, renderMode );
     }
@@ -255,5 +293,6 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos )
 
        glDeleteTextures( 1, &m_textureGLuint );
        m_textureGLuint = 0;
+       Models::d()->submit();
    }
 }

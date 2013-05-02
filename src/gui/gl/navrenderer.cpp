@@ -119,7 +119,7 @@ void NavRenderer::setupTextures()
 void NavRenderer::setShaderVars()
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program );
+    GLFunctions::setShaderVarsSlice( program, "maingl" );
 }
 
 void NavRenderer::mouseWheel( int step )

@@ -24,7 +24,7 @@ public:
     void setProperties();
 
     TriangleMesh2* getMesh();
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     void mousePick( int pickId, QVector3D pos );
 
 protected:

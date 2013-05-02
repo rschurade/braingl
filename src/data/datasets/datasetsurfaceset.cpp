@@ -41,8 +41,12 @@ TriangleMesh2* DatasetSurfaceset::getMesh()
     return m_mesh[n];
 }
 
-void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( getMesh() );
@@ -50,7 +54,7 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
         m_renderer->init();
     }
     m_renderer->setMesh( getMesh() );
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
 void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )

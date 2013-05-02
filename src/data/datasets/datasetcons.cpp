@@ -46,8 +46,13 @@ DatasetCons::~DatasetCons()
 {
 }
 
-void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
+void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    {
+        return;
+    }
+
     //TODO: setup vector renderer...if ( m_vrenderer == 0 )
     {
         m_vrenderer = new VectorGlyphRenderer();
@@ -55,7 +60,7 @@ void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
         m_vrenderer->initGeometry( getVectors(), consNumber );
     }
     qDebug() << "con draw";
-    m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties["maingl"] );
+    m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
 QString DatasetCons::getValueAsString()

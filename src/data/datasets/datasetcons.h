@@ -21,7 +21,7 @@ public:
     DatasetCons( QString filename );
     DatasetCons( Connections* cons );
     virtual ~DatasetCons();
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString();
 
     Connections* getCons();

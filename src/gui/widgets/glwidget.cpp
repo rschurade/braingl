@@ -12,10 +12,20 @@
 
 #include <QtGui>
 
-GLWidget::GLWidget( QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-        QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
+GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
+    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
 {
-    m_sceneRenderer = new SceneRenderer( roiSelectionModel );
+    m_sceneRenderer = new SceneRenderer( name, roiSelectionModel );
+
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
+}
+
+GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
+        QGLWidget( parent, shareWidget )
+{
+    m_sceneRenderer = new SceneRenderer( name, roiSelectionModel );
 
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );

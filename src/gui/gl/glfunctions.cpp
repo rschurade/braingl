@@ -11,6 +11,10 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 
+#include "../../data/datasets/dataset.h"
+#include "../../data/vptr.h"
+
+
 #include "shaperenderer.h"
 #include "../text/textrenderer.h"
 
@@ -33,7 +37,7 @@ ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
-float GLFunctions::sliceAlpha = 1.0;
+QHash<QString,float> GLFunctions::sliceAlpha;;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
@@ -46,10 +50,10 @@ int GLFunctions::getPickIndex()
     return GLFunctions::pickIndex++;
 }
 
-void GLFunctions::setupTextures()
+void GLFunctions::setupTextures( QString target )
 {
     QAbstractItemModel* model = Models::d();
-    QList< int > tl = getTextureIndexes();
+    QList< int > tl = getTextureIndexes( target );
     QModelIndex index;
     int texIndex = 4;
     switch ( tl.size() )
@@ -306,7 +310,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     return program;
 }
 
-void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program )
+void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QString target )
 {
     program->bind();
     // Offset for position
@@ -325,9 +329,9 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program )
     program->enableAttributeArray( texcoordLocation );
     glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
-    setTextureUniforms( program );
+    setTextureUniforms( program, target );
 }
-void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
+void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target )
 {
     program->setUniformValue( "texture0", 0 );
     program->setUniformValue( "texture1", 1 );
@@ -341,7 +345,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
     program->setUniformValue( "u_texActive3", false );
     program->setUniformValue( "u_texActive4", false );
 
-    QList< int > tl = getTextureIndexes();
+    QList< int > tl = getTextureIndexes( target );
     QAbstractItemModel* model = Models::d();
     QModelIndex index;
     int texIndex = 4;
@@ -352,113 +356,83 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
         case 5:
         {
             texIndex = 4;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MIN );
-            texMin = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MAX );
-            texMax = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold4", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold4", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MIN );
-            program->setUniformValue( "u_selectedMin4", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MAX );
-            program->setUniformValue( "u_selectedMax4", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
-            program->setUniformValue( "u_colormap4", model->data( index, Qt::DisplayRole ).toInt() );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            program->setUniformValue( "u_alpha4", model->data( index, Qt::DisplayRole ).toFloat() );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            PropertyGroup* props = ds->properties( target );
+            texMin = props->get( Fn::Property::MIN ).toFloat();
+            texMax = props->get( Fn::Property::MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold4", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold4", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin4", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax4", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_colormap4", props->get( Fn::Property::COLORMAP ).toInt() );
+            program->setUniformValue( "u_alpha4", props->get( Fn::Property::ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive4", true );
         }
             /* no break */
         case 4:
         {
             texIndex = 3;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MIN );
-            texMin = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MAX );
-            texMax = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold3", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold3", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MIN );
-            program->setUniformValue( "u_selectedMin3", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MAX );
-            program->setUniformValue( "u_selectedMax3", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
-            program->setUniformValue( "u_colormap3", model->data( index, Qt::DisplayRole ).toInt() );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            program->setUniformValue( "u_alpha3", model->data( index, Qt::DisplayRole ).toFloat() );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            PropertyGroup* props = ds->properties( target );
+            texMin = props->get( Fn::Property::MIN ).toFloat();
+            texMax = props->get( Fn::Property::MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold3", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold3", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin3", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax3", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_colormap3", props->get( Fn::Property::COLORMAP ).toInt() );
+            program->setUniformValue( "u_alpha3", props->get( Fn::Property::ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive3", true );
         }
             /* no break */
         case 3:
         {
             texIndex = 2;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MIN );
-            texMin = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MAX );
-            texMax = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold2", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold2", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MIN );
-            program->setUniformValue( "u_selectedMin2", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MAX );
-            program->setUniformValue( "u_selectedMax2", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
-            program->setUniformValue( "u_colormap2", model->data( index, Qt::DisplayRole ).toInt() );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            program->setUniformValue( "u_alpha2", model->data( index, Qt::DisplayRole ).toFloat() );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            PropertyGroup* props = ds->properties( target );
+            texMin = props->get( Fn::Property::MIN ).toFloat();
+            texMax = props->get( Fn::Property::MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold2", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold2", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin2", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax2", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_colormap2", props->get( Fn::Property::COLORMAP ).toInt() );
+            program->setUniformValue( "u_alpha2", props->get( Fn::Property::ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive2", true );
         }
             /* no break */
         case 2:
         {
             texIndex = 1;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MIN );
-            texMin = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MAX );
-            texMax = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold1", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold1", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MIN );
-            program->setUniformValue( "u_selectedMin1", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MAX );
-            program->setUniformValue( "u_selectedMax1", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
-            program->setUniformValue( "u_colormap1", model->data( index, Qt::DisplayRole ).toInt() );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            program->setUniformValue( "u_alpha1", model->data( index, Qt::DisplayRole ).toFloat() );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            PropertyGroup* props = ds->properties( target );
+            texMin = props->get( Fn::Property::MIN ).toFloat();
+            texMax = props->get( Fn::Property::MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold1", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold1", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin1", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax1", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_colormap1", props->get( Fn::Property::COLORMAP ).toInt() );
+            program->setUniformValue( "u_alpha1", props->get( Fn::Property::ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive1", true );
+
         }
             /* no break */
         case 1:
         {
             texIndex = 0;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MIN );
-            texMin = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::MAX );
-            texMax = model->data( index, Qt::DisplayRole ).toFloat();
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::LOWER_THRESHOLD );
-            program->setUniformValue( "u_lowerThreshold0", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::UPPER_THRESHOLD );
-            program->setUniformValue( "u_upperThreshold0", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MIN );
-            program->setUniformValue( "u_selectedMin0", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::SELECTED_MAX );
-            program->setUniformValue( "u_selectedMax0", ( model->data( index, Qt::DisplayRole ).toFloat() - texMin ) / ( texMax - texMin ) );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::COLORMAP );
-            program->setUniformValue( "u_colormap0", model->data( index, Qt::DisplayRole ).toInt() );
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::ALPHA );
-            GLFunctions::sliceAlpha = model->data( index, Qt::DisplayRole ).toFloat();
-            program->setUniformValue( "u_alpha0", GLFunctions::sliceAlpha );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            PropertyGroup* props = ds->properties( target );
+            texMin = props->get( Fn::Property::MIN ).toFloat();
+            texMax = props->get( Fn::Property::MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold0", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold0", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin0", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax0", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_colormap0", props->get( Fn::Property::COLORMAP ).toInt() );
+            program->setUniformValue( "u_alpha0", props->get( Fn::Property::ALPHA ).toFloat() );
+            GLFunctions::sliceAlpha[target] = props->get( Fn::Property::ALPHA ).toFloat();
             program->setUniformValue( "u_texActive0", true );
-
         }
             break;
         default:
@@ -466,7 +440,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program )
     }
 }
 
-QList< int > GLFunctions::getTextureIndexes()
+QList< int > GLFunctions::getTextureIndexes( QString target )
 {
     QList< int > tl;
     QAbstractItemModel* model = Models::d();
@@ -474,10 +448,11 @@ QList< int > GLFunctions::getTextureIndexes()
     int allocatedTextureCount = 0;
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = model->index( i, 1 );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        PropertyGroup* props = ds->properties( target );
+        bool active = props->get( Fn::Property::ACTIVE ).toBool();
+        bool isTex = props->get( Fn::Property::HAS_TEXTURE ).toBool();
 
-        bool active = model->data( model->index( i,  (int)Fn::Property::ACTIVE ), Qt::DisplayRole ).toBool();
-        bool isTex = model->data( model->index( i,  (int)Fn::Property::HAS_TEXTURE ), Qt::DisplayRole ).toBool();
         if ( active && isTex )
         {
             tl.push_back( i );
@@ -521,249 +496,6 @@ void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                  QColor color, int pickID, int width, int height, int renderMode )
 {
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
-}
-
-GLuint GLFunctions::pbo_a = 0;
-GLuint GLFunctions::pbo_b = 0;
-
-void GLFunctions::generate_pixel_buffer_objects( int width, int height )
-{
-    /* generate the first pixel buffer objects */
-    glGenBuffers( 1, &GLFunctions::pbo_a );
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_a );
-    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
-    /* to avoid weird behaviour the first frame the data is loaded */
-    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* generate the second pixel buffer objects */
-    glGenBuffers( 1, &GLFunctions::pbo_b );
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, GLFunctions::pbo_b );
-    glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
-    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* unbind */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
-}
-
-uint GLFunctions::get_object_id( int x, int y, int width, int height )
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
-    glReadBuffer( GL_COLOR_ATTACHMENT2 );
-
-    static int frame_event = 0;
-    int read_pbo, map_pbo;
-    uint object_id;
-
-    uint red, green, blue, pixel_index;
-    GLubyte* ptr;
-
-    GLFunctions::generate_pixel_buffer_objects( width, height );
-    /* switch between pixel buffer objects */
-    if (frame_event == 0)
-    {
-        frame_event = 1;
-        read_pbo = GLFunctions::pbo_a;
-        map_pbo = GLFunctions::pbo_b;
-    }
-    else {
-        frame_event = 0;
-        read_pbo = GLFunctions::pbo_b;
-        map_pbo = GLFunctions::pbo_a;
-
-    }
-    /* read one pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
-    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* map the other pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
-    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
-    /* get the mouse coordinates */
-    /* OpenGL has the {0,0} at the down-left corner of the screen */
-    y = height - y;
-    object_id = -1;
-
-    if ( x >= 0 && x < width && y >= 0 && y < height )
-    {
-        pixel_index = ( x + y * width ) * 4;
-        blue = ptr[pixel_index];
-        green = ptr[pixel_index + 1];
-        red = ptr[pixel_index + 2];
-        //alpha = ptr[pixel_index + 3];
-        //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
-        object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
-        //qDebug() << "output" << red << green << blue << alpha;
-    }
-    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
-
-    glDeleteBuffers( 1, &GLFunctions::pbo_a );
-    glDeleteBuffers( 1, &GLFunctions::pbo_b );
-
-    return object_id;
-}
-
-QImage* GLFunctions::getOffscreenTexture( int width, int height )
-{
-    static int frame_event = 0;
-    int read_pbo, map_pbo;
-
-    uint red, green, blue, alpha, pixel_index;
-    GLubyte* ptr;
-
-    GLFunctions::generate_pixel_buffer_objects( width, height );
-    /* switch between pixel buffer objects */
-    if (frame_event == 0)
-    {
-        frame_event = 1;
-        read_pbo = GLFunctions::pbo_a;
-        map_pbo = GLFunctions::pbo_a;
-    }
-    else {
-        frame_event = 0;
-        map_pbo = GLFunctions::pbo_a;
-        read_pbo = GLFunctions::pbo_b;
-    }
-    /* read one pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
-    glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* map the other pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
-    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
-    /* get the mouse coordinates */
-    /* OpenGL has the {0,0} at the down-left corner of the screen */
-
-    QImage* image = new QImage( width, height, QImage::Format_RGB32 );
-    QColor c;
-    for ( int x = 0; x < width; ++x )
-    {
-        for ( int y = 0; y < height; ++y )
-        {
-            pixel_index = ( x + y * width ) * 4;
-            blue = ptr[pixel_index];
-            green = ptr[pixel_index + 1];
-            red = ptr[pixel_index + 2];
-            alpha = ptr[pixel_index + 3];
-
-            c = QColor( red, green, blue, alpha );
-            image->setPixel( x, ( height - y )-1, c.rgba() );
-        }
-    }
-
-    glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
-
-    glDeleteBuffers( 1, &GLFunctions::pbo_a );
-    glDeleteBuffers( 1, &GLFunctions::pbo_b );
-
-    return image;
-}
-
-
-QHash< QString, GLuint > GLFunctions::textures;
-GLuint GLFunctions::RBO = 0;
-GLuint GLFunctions::FBO = 0;
-
-
-void GLFunctions::initFBO( int width, int height )
-{
-    if ( GLFunctions::textures.size() > 0 )
-    {
-        foreach ( GLuint tex, GLFunctions::textures )
-        {
-            glDeleteTextures( 1, &tex );
-        }
-        glDeleteFramebuffers( 1, &GLFunctions::FBO );
-        glDeleteRenderbuffers( 1, &GLFunctions::RBO );
-
-    }
-
-    GLFunctions::textures[ "C0" ] = createTexture( width, height );
-    GLFunctions::textures[ "C1" ] = createTexture( width, height );
-    GLFunctions::textures[ "C2" ] = createTexture( width, height );
-    GLFunctions::textures[ "C3" ] = createTexture( width, height );
-    GLFunctions::textures[ "D0" ] = createTexture( width, height );
-    GLFunctions::textures[ "D1" ] = createTexture( width, height );
-    GLFunctions::textures[ "D2" ] = createTexture( width, height );
-    GLFunctions::textures[ "PICK" ] = createTexture( width, height );
-    GLFunctions::textures[ "SCREENSHOT" ] = createTexture( width, height );
-
-    /* create a framebuffer object */
-    glGenFramebuffers( 1, &GLFunctions::FBO );
-    /* attach the texture and the render buffer to the frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
-
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers( 3,  attachments );
-
-    /* create a renderbuffer object for the depth buffer */
-    glGenRenderbuffers( 1, &GLFunctions::RBO );
-    /* bind the texture */
-    glBindRenderbuffer( GL_RENDERBUFFER, GLFunctions::RBO );
-    /* create the render buffer in the GPU */
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
-
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures["C0"], 0 );
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, GLFunctions::RBO );
-    /* check the frame buffer */
-    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-    {
-        /* handle an error : frame buffer incomplete */
-        qDebug() << "frame buffer incomplete";
-    }
-
-    /* unbind the render buffer */
-    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
-    /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-}
-
-GLuint GLFunctions::createTexture( int width, int height )
-{
-    /* generate a texture id */
-    GLuint ptex;
-    glGenTextures( 1, &ptex );
-    /* bind the texture */
-    glBindTexture( GL_TEXTURE_2D, ptex );
-    /* set texture parameters */
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    /* create the texture in the GPU */
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
-    /* unbind the texture */
-    glBindTexture( GL_TEXTURE_2D, 0 );
-
-    return ptex;
-}
-
-void GLFunctions::setRenderTarget( QString target )
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target], 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, GLFunctions::textures["PICK"], 0 );
-}
-
-void GLFunctions::setRenderTargets( QString target0, QString target1 )
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target0], 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, GLFunctions::textures[target1], 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, GLFunctions::textures["PICK"], 0 );
-}
-
-void GLFunctions::clearTexture( QString target, float r, float g, float b, float a )
-{
-    glBindFramebuffer( GL_FRAMEBUFFER, GLFunctions::FBO );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GLFunctions::textures[target], 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0 );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, 0, 0 );
-    glClearColor( r, g, b, a );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-}
-
-GLuint GLFunctions::getTexture( QString name )
-{
-    return GLFunctions::textures[name];
 }
 
 void GLFunctions::getAndPrintGLError( QString prefix )
