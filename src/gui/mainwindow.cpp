@@ -559,6 +559,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSP2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
+    dockDSP2->hide();
 
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
     FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
@@ -587,6 +588,7 @@ void MainWindow::createDockWindows()
 
     tabifyDockWidget( dockGP, dockDSP );
     tabifyDockWidget( dockGP, dockCE );
+    tabifyDockWidget( dockGP, dockDSP2 );
 
     // GL Widgets
 
@@ -640,6 +642,7 @@ void MainWindow::createDockWindows()
     dockNav2->hide();
     dockNav3->hide();
     dockNav4->hide();
+    dockMainGL2->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
@@ -650,6 +653,7 @@ void MainWindow::createDockWindows()
 
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
+    m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
 }
 
 void MainWindow::slotToggleAxialSlice()
