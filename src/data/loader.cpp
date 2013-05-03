@@ -1257,7 +1257,7 @@ bool Loader::loadGlyphset()
     //TODO: Will windows have a problem with this?
     QString trunk = QFileInfo( glyphsetname ).path();
 
-    //glyphsetfile has three lines: 1: nifti (skip), 2: surfaceset, 3: connectivity matrix
+    //glyphsetfile has three lines: 1: nifti (skip), 2: surfaceset(s), 3: connectivity matrix
 
     //1: TODO: skip nifti for now
     QString gnl = gts.readLine();
@@ -1265,7 +1265,9 @@ bool Loader::loadGlyphset()
 
     //2: load surfaceset
     gnl = gts.readLine();
-    QString datasetName = gnl;
+    QStringList datasetNames = gnl.split( " " );
+    bool two = ( datasetNames.length() > 1 );
+    QString datasetName = datasetNames.at( 0 );
 
     gnl = gts.readLine();
     QStringList sl2 = gnl.split( " " );
@@ -1274,7 +1276,16 @@ bool Loader::loadGlyphset()
     float mt = sl2.at( 1 ).toFloat();
 
     DatasetGlyphset* dataset = new DatasetGlyphset( datasetName, mt );
+
     qDebug() << "loading glyph set: " << datasetName;
+    if (two)
+    {
+        qDebug() << "...and loading glyph set: " << datasetNames.at( 1 );
+        if (datasetNames.length() > 2)
+        {
+            qDebug() << "only two hemispheres supported";
+        }
+    }
 
     QFile setfile( trunk + QDir::separator() + datasetName );
     if ( !setfile.open( QIODevice::ReadOnly ) )
@@ -1283,10 +1294,42 @@ bool Loader::loadGlyphset()
     }
     QTextStream ts( &setfile );
     QString nl;
+
+    QString onl;
+    QTextStream* ots;
+    QVector<QString> others;
+    if (two)
+    {
+        QFile othersetfile( trunk + QDir::separator() + datasetNames.at( 1 ) );
+        if ( !othersetfile.open( QIODevice::ReadOnly ) )
+        {
+            qDebug( "second set file unreadable" );
+        }
+        ots = new QTextStream( &othersetfile );
+        qDebug() << "ots initialized";
+        while ( !ots->atEnd() )
+        {
+            onl = ots->readLine();
+            others.push_back(onl);
+        }
+
+    }
+
+    int k = 0;
     while ( !ts.atEnd() )
     {
         nl = ts.readLine();
-        qDebug() << nl;
+        qDebug() << "!" << nl;
+        if (two)
+        {
+            qDebug() << "bla";
+            onl = others.at(k);
+            qDebug() << onl;
+            k++;
+        }
+
+        qDebug() << "?";
+
         //For commenting out stuff in the setfiles
         if ( !nl.startsWith( "#" ) )
         {
@@ -1311,13 +1354,49 @@ bool Loader::loadGlyphset()
             if ( sl.length() > 3 )
                 z = sl.at( 3 ).toFloat();
             QVector3D s( x, y, z );
-
             QVector<float> points = lf.getPoints();
             QVector<int> triangles = lf.getTriangles();
             int numPoints = points.size() / 3;
             int numTriangles = triangles.size() / 3;
 
-            TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
+            int onumPoints = 0;
+            int onumTriangles = 0;
+            QVector<float> opoints;
+            QVector<int> otriangles;
+            QVector3D* os = new QVector3D(0,0,0);
+            if (two)
+            {
+                QStringList osl;
+                osl = onl.split( " " );
+                QString ofullname = trunk + QDir::separator() + osl.at( 0 );
+
+                LoaderFreesurfer olf;
+
+                if ( !olf.loadASC( ofullname ) )
+                {
+                    qDebug() << "unable to load: " << ofullname;
+                    return false;
+                }
+                float ox = 0;
+                float oy = 0;
+                float oz = 0;
+
+                if ( osl.length() > 1 )
+                    ox = osl.at( 1 ).toFloat();
+                if ( osl.length() > 2 )
+                    oy = osl.at( 2 ).toFloat();
+                if ( osl.length() > 3 )
+                    oz = osl.at( 3 ).toFloat();
+
+                os = new QVector3D( ox, oy, oz );
+                opoints = olf.getPoints();
+                otriangles = olf.getTriangles();
+                onumPoints = opoints.size() / 3;
+                onumTriangles = otriangles.size() / 3;
+            }
+
+            TriangleMesh2* mesh = new TriangleMesh2( numPoints + onumPoints, numTriangles + onumTriangles );
+
             for ( int i = 0; i < numPoints; ++i )
             {
                 mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
@@ -1327,6 +1406,21 @@ bool Loader::loadGlyphset()
                 //TODO: Check orientation change (0,2,1)...
                 mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
             }
+
+            if (two)
+            {
+                for ( int i = 0; i < onumPoints; ++i )
+
+                {
+                    mesh->addVertex( opoints[i * 3] + os->x(), opoints[i * 3 + 1] + os->y(), opoints[i * 3 + 2] + os->z() );
+                }
+                for ( int i = 0; i < onumTriangles; ++i )
+                {
+                    //TODO: Check orientation change (0,2,1)...
+                    mesh->addTriangle( otriangles[i * 3]+onumPoints, otriangles[i * 3 + 2]+onumPoints, otriangles[i * 3 + 1]+onumPoints );
+                }
+            }
+
             mesh->finalize();
 
             dataset->addMesh( mesh, sl.at( 0 ) );
