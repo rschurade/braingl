@@ -133,7 +133,9 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                     || ( prevGlyphstyle != glyphstyle ) ) )
     {
         if ( m_prenderer )
+        {
             delete m_prenderer;
+        }
         m_prenderer = new PointGlyphRenderer();
         m_prenderer->init();
         makeCons();
@@ -144,7 +146,9 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             && ( m_vrenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol ) || ( prevGlyphstyle != glyphstyle ) ) )
     {
         if ( m_vrenderer )
+        {
             delete m_vrenderer;
+        }
         m_vrenderer = new VectorGlyphRenderer();
         m_vrenderer->init();
         //TODO: vector fields:
@@ -157,7 +161,9 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                     || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) ) )
     {
         if ( m_pierenderer )
+        {
             delete m_pierenderer;
+        }
         m_pierenderer = new PieGlyphRenderer();
         m_pierenderer->init();
         makePies();
