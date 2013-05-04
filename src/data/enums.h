@@ -160,7 +160,10 @@ namespace Fn
         DRAW_GLYPHS,
         SURFACE_GLYPH_GEOMETRY,
         SURFACE_GLYPH_COLOR,
-        RENDER_TARGET
+        RENDER_TARGET,
+        GLYPH_ROT_X,
+        GLYPH_ROT_Y,
+        GLYPH_ROT_Z
     };
 
     struct Prop2String
@@ -248,6 +251,9 @@ namespace Fn
                 case Property::SURFACE_GLYPH_GEOMETRY: return QString( "glyph geometry" ); break;
                 case Property::SURFACE_GLYPH_COLOR: return QString( "glyph color" ); break;
                 case Property::RENDER_TARGET: return QString( "internal: render target" ); break;
+                case Property::GLYPH_ROT_X: return QString( "glyph x rotation" ); break;
+                case Property::GLYPH_ROT_Y: return QString( "glyph y rotation" ); break;
+                case Property::GLYPH_ROT_Z: return QString( "glyph z rotation" ); break;
             }
             return QString( "property not defined" );
         }

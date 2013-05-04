@@ -7,6 +7,7 @@ uniform float threshold;
 uniform float radius;
 uniform float minlength;
 uniform float u_scale;
+uniform mat4 rot_matrix;
 
 in vec3 a_to;
 in float a_flag;
@@ -25,8 +26,9 @@ void main()
         v_discard = 1.0;
     }
 
-    if ( a_flag > 0.0 ) {
-	   v_position = mvp_matrix * vec4( a_position + radius*(dg), 1.0 );
+    if ( a_flag > 0.0 ) {  
+       vec4 p = vec4( a_position, 0.0) + rot_matrix * vec4((radius*dg), 1.0 );
+	   v_position = mvp_matrix * p;
 	} else {
 	   v_position = mvp_matrix * vec4( a_to, 1.0 );
 	}

@@ -50,6 +50,16 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
+    //Rotation of the individual glyphs:
+    float rotx = props->get( Fn::Property::GLYPH_ROT_X ).toFloat();
+    QMatrix4x4 rotMatrix;
+    rotMatrix.rotate( rotx, 1, 0, 0 );
+    float roty = props->get( Fn::Property::GLYPH_ROT_Y ).toFloat();
+    rotMatrix.rotate( roty, 0, 1, 0 );
+    float rotz = props->get( Fn::Property::GLYPH_ROT_Z ).toFloat();
+    rotMatrix.rotate( rotz, 0, 0, 1 );
+    program->setUniformValue( "rot_matrix", rotMatrix );
+
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
