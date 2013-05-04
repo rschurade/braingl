@@ -43,6 +43,9 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, true );
     m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, true );
 
     /*m_properties["maingl2"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
     m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
@@ -125,6 +128,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
     glPointSize( properties( target )->get( Fn::Property::PRIMSIZE ).toFloat() );
+    glLineWidth( properties( target )->get( Fn::Property::PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 

@@ -11,12 +11,10 @@
 
 #include <QtOpenGL/QGLShaderProgram>
 
+#include "qmatrix4x4.h"
+
 PointGlyphRenderer::PointGlyphRenderer() :
-        ObjectRenderer(),
-        vboIds( new GLuint[1] ),
-        ps( new float[1] ),
-        np( 1 ),
-        ao( 13 )
+        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 13 )
 {
 
 }
@@ -46,9 +44,18 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     program->bind();
 
     // Set modelview-projection matrix
-
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    //Rotation of the individual glyphs:
+    float rotx = props->get( Fn::Property::GLYPH_ROT_X ).toFloat();
+    QMatrix4x4 rotMatrix;
+    rotMatrix.rotate( rotx, 1, 0, 0 );
+    float roty = props->get( Fn::Property::GLYPH_ROT_Y ).toFloat();
+    rotMatrix.rotate( roty, 0, 1, 0 );
+    float rotz = props->get( Fn::Property::GLYPH_ROT_Z ).toFloat();
+    rotMatrix.rotate( rotz, 0, 0, 1 );
+    program->setUniformValue( "rot_matrix", rotMatrix );
 
     float alpha = props->get( Fn::Property::ALPHA ).toFloat();
     program->setUniformValue( "u_alpha", alpha );
@@ -59,16 +66,18 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    float scale = (mv_matrix*QVector4D(1,0,0,1)).length();
+    float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
-    setShaderVars(props);
+    setShaderVars( props );
 
-    glEnable(GL_BLEND);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_POINT_SMOOTH);
+    glEnable( GL_BLEND );
+    glShadeModel( GL_SMOOTH );
+    glEnable( GL_POINT_SMOOTH );
+
+
 
     glDrawArrays( GL_POINTS, 0, np );
 
@@ -80,16 +89,15 @@ void PointGlyphRenderer::setupTextures()
 
 }
 
-
-void PointGlyphRenderer::setShaderVars(PropertyGroup* props)
+void PointGlyphRenderer::setShaderVars( PropertyGroup* props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "points" );
 
     program->bind();
 
-    program->setUniformValue("threshold",props->get(Fn::Property::THRESHOLD).toFloat());
-    program->setUniformValue("radius",props->get(Fn::Property::GLYPHRADIUS).toFloat());
-    program->setUniformValue("minlength",props->get(Fn::Property::MINLENGTH).toFloat());
+    program->setUniformValue( "threshold", props->get( Fn::Property::THRESHOLD ).toFloat() );
+    program->setUniformValue( "radius", props->get( Fn::Property::GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "minlength", props->get( Fn::Property::MINLENGTH ).toFloat() );
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
@@ -128,7 +136,7 @@ void PointGlyphRenderer::initGeometry( float* points, int number )
 
     qDebug() << np * ao * sizeof(GLfloat);
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
     //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
-    glBufferData( GL_ARRAY_BUFFER,  np * ao * sizeof(GLfloat), ps , GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, np * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
 }
