@@ -37,7 +37,7 @@ ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 4;
-QHash<QString,float> GLFunctions::sliceAlpha;;
+QHash<QString,float> GLFunctions::sliceAlpha;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
@@ -346,7 +346,6 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
     program->setUniformValue( "u_texActive4", false );
 
     QList< int > tl = getTextureIndexes( target );
-    QAbstractItemModel* model = Models::d();
     QModelIndex index;
     int texIndex = 4;
     float texMin = 0;
