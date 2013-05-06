@@ -24,26 +24,23 @@ class QItemSelectionModel;
 class SceneRenderer
 {
 public:
-	SceneRenderer( QString name, QItemSelectionModel* roiSelectionModel );
+	SceneRenderer( QString name );
 	virtual ~SceneRenderer();
 
 	void resizeGL( int width, int height );
 
 	void initGL();
-	void draw();
+	void draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix );
 	void renderMerge();
 	QImage* screenshot();
 
-	void leftMouseDown( int x, int y );
-	void leftMouseDrag( int x, int y );
-	void middleMouseDown( int x, int y );
-	void middleMouseDrag( int x, int y );
-	void rightMouseDown( int x, int y );
-	void rightMouseDrag( int x, int y );
-	void mouseWheel( int step );
-	void setView( Fn::Orient view );
+    QVector3D mapMouse2World( int x, int y, int z );
+    QVector2D mapWorld2Mouse( float x, float y, float z );
+    QVector3D mapMouse2World( float x, float y );
+    uint get_object_id( int x, int y, int width, int height );
+    QImage* getOffscreenTexture( int width, int height );
 
-	void calcMVPMatrix();
+    void renderPick();
 
 private:
 	void renderScene();
@@ -52,16 +49,7 @@ private:
 	void renderDatasets();
 	void renderRois();
 
-	void renderPick();
-
-	QVector3D mapMouse2World( int x, int y, int z );
-	QVector2D mapWorld2Mouse( float x, float y, float z );
-	QVector3D mapMouse2World( float x, float y );
-
     void generate_pixel_buffer_objects( int width, int height );
-    uint get_object_id( int x, int y, int width, int height );
-    QImage* getOffscreenTexture( int width, int height );
-
 	void initFBO( int width, int height );
     GLuint createTexture( int width, int height );
     void setRenderTarget( QString target );
@@ -69,37 +57,18 @@ private:
     GLuint getTexture( QString name );
     void clearTexture( QString name, float r, float g, float b, float a );
 
-	ArcBall* m_arcBall;
 	SliceRenderer* m_sliceRenderer;
 
 	QString m_renderTarget;
 
-	QItemSelectionModel* m_roiSelectionModel;
-
 	GLuint *vboIds;
-
-	bool skipDraw;
-
-	int m_boundingbox;
-
-	float m_nx;
-	float m_ny;
-	float m_nz;
 
 	int m_width;
 	int m_height;
 	int m_renderMode;
-	float m_ratio;
 
 	QMatrix4x4 m_mvMatrix;
 	QMatrix4x4 m_pMatrix;
-
-	int m_picked;
-	QVector2D m_rightMouseDown;
-	QVector2D m_pickOld;
-	int m_sliceXPosAtPick;
-	int m_sliceYPosAtPick;
-	int m_sliceZPosAtPick;
 
     GLuint pbo_a;
     GLuint pbo_b;

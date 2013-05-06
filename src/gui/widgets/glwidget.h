@@ -16,6 +16,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
+class ArcBall;
 class SceneRenderer;
 class QItemSelectionModel;
 
@@ -35,7 +36,33 @@ public:
     QImage* screenshot();
 
 private:
+    QItemSelectionModel* m_roiSelectionModel;
+
+    ArcBall* m_arcBall;
     SceneRenderer* m_sceneRenderer;
+
+    QMatrix4x4 m_mvMatrix;
+    QMatrix4x4 m_pMatrix;
+
+    float m_nx;
+    float m_ny;
+    float m_nz;
+
+    int m_picked;
+    QVector2D m_rightMouseDown;
+    QVector2D m_pickOld;
+    int m_sliceXPosAtPick;
+    int m_sliceYPosAtPick;
+    int m_sliceZPosAtPick;
+    bool skipDraw;
+
+    int m_width;
+    int m_height;
+
+    void calcMVPMatrix();
+
+    void rightMouseDown( int x, int y );
+    void rightMouseDrag( int x, int y );
 
 protected:
     void initializeGL();
