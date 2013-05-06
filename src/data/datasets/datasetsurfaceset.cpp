@@ -92,6 +92,7 @@ void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )
                 }
             }
             m_renderer->endUpdateColor();
+            Models::d()->submit();
         }
     }
 }
