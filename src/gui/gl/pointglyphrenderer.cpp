@@ -33,11 +33,23 @@ void PointGlyphRenderer::init()
 
 void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    // todo: joachim
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    float alpha = props->get( Fn::Property::GLYPH_ALPHA ).toFloat();
+
+    if ( renderMode == 1 ) // we are drawing opaque objects
     {
-        // obviously not opaque
-        return;
+        if ( alpha < 1.0 )
+        {
+            // obviously not opaque
+            return;
+        }
+    }
+    else // we are drawing tranparent objects
+    {
+        if ( !(alpha < 1.0 ) )
+        {
+            // not transparent
+            return;
+        }
     }
 
     QGLShaderProgram* program = GLFunctions::getShader( "points" );
@@ -57,8 +69,8 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     rotMatrix.rotate( rotz, 0, 0, 1 );
     program->setUniformValue( "rot_matrix", rotMatrix );
 
-    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
-    program->setUniformValue( "u_alpha", alpha );
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_beta", alpha ); //shader uses vec4...
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );

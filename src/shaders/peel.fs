@@ -96,3 +96,69 @@ void writePeel( vec3 color )
         }
     }
 }
+
+void writePeel( vec4 color )
+{
+    // opaque
+    vec4 c = encode( 1.0 - gl_FragCoord.z );
+    float z = decode(c);
+    float zmin;
+    float zmax;
+    if ( u_renderMode == 1 || u_renderMode == 0 )
+    { 
+        fragColor = color;
+        fragDepth = c;
+        pickColor = u_pickColor;
+    }
+    else
+    {
+        vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
+        z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
+        zmin = decode( texture2D( D0, loc ) );
+        if ( u_renderMode == 2 )
+        {
+            //first creation of D1
+            if ( z > zmin ) 
+            {
+                fragColor = color;
+                fragDepth = c;
+                pickColor = u_pickColor;
+            } 
+            else 
+            {
+                discard;
+            }
+            
+        }
+        else if ( u_renderMode == 3 )
+        {
+            zmax = decode( texture2D( D1, loc ) );
+            if ( zmin < z && z < zmax )
+            {
+                fragColor = color;
+                fragDepth = c;
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+        else if ( u_renderMode == 4 )
+        {
+            zmax = decode( texture2D( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                fragColor = color;
+                fragDepth = c;
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+    }
+}

@@ -163,7 +163,8 @@ namespace Fn
         RENDER_TARGET,
         GLYPH_ROT_X,
         GLYPH_ROT_Y,
-        GLYPH_ROT_Z
+        GLYPH_ROT_Z,
+        GLYPH_ALPHA
     };
 
     struct Prop2String
@@ -254,6 +255,7 @@ namespace Fn
                 case Property::GLYPH_ROT_X: return QString( "glyph x rotation" ); break;
                 case Property::GLYPH_ROT_Y: return QString( "glyph y rotation" ); break;
                 case Property::GLYPH_ROT_Z: return QString( "glyph z rotation" ); break;
+                case Property::GLYPH_ALPHA: return QString( "glyph alpha" ); break;
             }
             return QString( "property not defined" );
         }

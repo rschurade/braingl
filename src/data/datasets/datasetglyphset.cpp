@@ -46,6 +46,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, true );
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, true );
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, true );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, true );
 
     /*m_properties["maingl2"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
     m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
