@@ -11,5 +11,5 @@ void main()
     {
         discard;
     }
-    writePeel( frontColor.rgb );
+    writePeel( frontColor );
 }
