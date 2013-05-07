@@ -8,7 +8,8 @@
 #include "datasetcons.h"
 
 DatasetCons::DatasetCons( QString fileName ) :
-        Dataset( fileName, Fn::DatasetType::CONS ), vectorArray( NULL )
+    Dataset( fileName, Fn::DatasetType::CONS ),
+    vectorArray( NULL )
 {
     cons = new Connections( fileName );
     consNumber = cons->edges.length();
@@ -26,7 +27,9 @@ DatasetCons::DatasetCons( QString fileName ) :
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :
-        Dataset( QString( "new" ), Fn::DatasetType::CONS ), vectorArray( NULL ), cons( cons )
+    Dataset( QString( "new" ), Fn::DatasetType::CONS ),
+    cons( cons ),
+    vectorArray( NULL )
 {
     consNumber = cons->edges.length();
 

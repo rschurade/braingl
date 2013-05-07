@@ -166,7 +166,7 @@ void Connections::attract()
 {
 
     //for all edges...
-#pragma omp parallel for
+//#pragma omp parallel for
     for ( int ie = 0; ie < edges.size(); ++ie )
     {
         Edge* e = edges.at( ie );
@@ -247,7 +247,7 @@ void Connections::calcComps()
     qDebug() << "calcComps, edges.size: " << edges.size();
     comps = new float[edges.size() * edges.size()];
 
-#pragma omp parallel for num_threads (7)
+//#pragma omp parallel for num_threads (7)
     for ( int i = 0; i < edges.length(); i++ )
     {
         qDebug() << i;
