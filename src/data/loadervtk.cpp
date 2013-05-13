@@ -564,8 +564,6 @@ bool LoaderVTK::loadPrimitivesBinary()
     int* rawPrimitiveData = reinterpret_cast<int*>( primitiveField );
     switchByteOrderOfArray< int >( rawPrimitiveData, m_primitiveSize );
 
-
-
     m_primitives.resize( m_primitiveSize );
 
     for ( int k = 0; k < m_primitiveSize; ++k )
