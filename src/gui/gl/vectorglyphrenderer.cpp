@@ -12,11 +12,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 VectorGlyphRenderer::VectorGlyphRenderer() :
-        ObjectRenderer(),
-        vboIds( new GLuint[1] ),
-        ps( new float[1] ),
-        np( 1 ),
-        ao( 14 )
+        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 14 )
 {
 
 }
@@ -35,11 +31,23 @@ void VectorGlyphRenderer::init()
 
 void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    // todo joachim
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    float alpha = props->get( Fn::Property::GLYPH_ALPHA ).toFloat();
+
+    if ( renderMode == 1 ) // we are drawing opaque objects
     {
-        // obviously not opaque
-        return;
+        if ( alpha < 1.0 )
+        {
+            // obviously not opaque
+            return;
+        }
+    }
+    else // we are drawing tranparent objects
+    {
+        if ( !( alpha < 1.0 ) )
+        {
+            // not transparent
+            return;
+        }
     }
 
     QGLShaderProgram* program = GLFunctions::getShader( "vectors" );
@@ -60,8 +68,8 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     rotMatrix.rotate( rotz, 0, 0, 1 );
     program->setUniformValue( "rot_matrix", rotMatrix );
 
-    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
-    program->setUniformValue( "u_alpha", alpha );
+    program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_beta", alpha ); //shader uses vec4...
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );
@@ -89,16 +97,15 @@ void VectorGlyphRenderer::setupTextures()
 
 }
 
-
-void VectorGlyphRenderer::setShaderVars(PropertyGroup* props)
+void VectorGlyphRenderer::setShaderVars( PropertyGroup* props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "vectors" );
 
     program->bind();
 
-    program->setUniformValue("threshold",props->get(Fn::Property::THRESHOLD).toFloat());
-    program->setUniformValue("radius",props->get(Fn::Property::GLYPHRADIUS).toFloat());
-    program->setUniformValue("minlength",props->get(Fn::Property::MINLENGTH).toFloat());
+    program->setUniformValue( "threshold", props->get( Fn::Property::THRESHOLD ).toFloat() );
+    program->setUniformValue( "radius", props->get( Fn::Property::GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "minlength", props->get( Fn::Property::MINLENGTH ).toFloat() );
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
@@ -143,7 +150,7 @@ void VectorGlyphRenderer::initGeometry( float* points, int number )
 
     qDebug() << np * 2 * ao * sizeof(GLfloat);
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
     //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
-    glBufferData( GL_ARRAY_BUFFER,  np  * 2 * ao * sizeof(GLfloat), ps , GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, np * 2 * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
 }
