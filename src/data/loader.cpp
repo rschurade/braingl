@@ -18,6 +18,7 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetsurfaceset.h"
 #include "datasets/datasetglyphset.h"
+#include "datasets/datasetcons.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -93,6 +94,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".glyphset" ) )
     {
         return loadGlyphset();
+    }
+
+    if ( m_fileName.path().endsWith( ".cons" ) )
+    {
+        return loadCons();
     }
 
     return false;
@@ -1438,5 +1444,13 @@ bool Loader::loadGlyphset()
 
     m_dataset.push_back( dataset );
 
+    return true;
+}
+
+bool Loader::loadCons()
+{
+    QString filename = m_fileName.path();
+    DatasetCons* dataset = new DatasetCons( filename );
+    m_dataset.push_back(dataset);
     return true;
 }
