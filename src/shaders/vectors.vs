@@ -8,6 +8,7 @@ uniform float radius;
 uniform float minlength;
 uniform float u_scale;
 uniform mat4 rot_matrix;
+uniform float u_beta;
 
 in vec3 a_to;
 in float a_flag;
@@ -19,7 +20,7 @@ out float v_discard;
 void main()
 {
     vec3 d = abs( normalize( dc ) );
-    frontColor =  vec4(d, 1.0 );
+    frontColor =  vec4(d, pow( a_value, 10*(1-u_beta) ) );
     if ( threshold < a_value && length( a_position-a_to ) > minlength) {
         v_discard = 0.0;
     } else {
