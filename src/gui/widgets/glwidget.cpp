@@ -267,9 +267,9 @@ void GLWidget::rightMouseDown( int x, int y )
     {
         QModelIndex mi = Models::r()->index( 0, (int)Fn::ROI::PICK_ID );
         QModelIndexList l = ( Models::r()->match( mi, Qt::DisplayRole, m_picked ) );
+        m_roiSelectionModel->clear();
         if ( l.size() > 0 )
         {
-            m_roiSelectionModel->clear();
             m_roiSelectionModel->select( l.first(), QItemSelectionModel::Select );
         }
     }
