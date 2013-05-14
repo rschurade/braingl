@@ -25,6 +25,7 @@
 #include "widgets/statusbar.h"
 #include "widgets/shadereditwidget.h"
 #include "widgets/colormapeditwidget.h"
+#include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
@@ -354,6 +355,11 @@ void MainWindow::about()
 
 void MainWindow::createActions()
 {
+    newAct = new QAction( QIcon( ":/icons/new.png" ), tr( "&New..." ), this );
+    newAct->setShortcuts( QKeySequence::New );
+    newAct->setStatusTip( tr( "New Dataset" ) );
+    connect( newAct, SIGNAL( triggered() ), this, SLOT( slotNew() ) );
+
     openAct = new QAction( QIcon( ":/icons/open.png" ), tr( "&Open..." ), this );
     openAct->setShortcuts( QKeySequence::Open );
     openAct->setStatusTip( tr( "Load Dataset" ) );
@@ -488,6 +494,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar( tr( "File" ) );
+    fileToolBar->addAction( newAct );
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
     //fileToolBar->addAction( printAct );
@@ -761,4 +768,10 @@ void MainWindow::slotDilbert()
     widget->setLayout( vLayout );
     widget->show();
 #endif
+}
+
+void MainWindow::slotNew()
+{
+    NewDatasetWidget* ndw = new NewDatasetWidget( this );
+    ndw->show();
 }

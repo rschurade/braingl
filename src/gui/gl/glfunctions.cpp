@@ -36,7 +36,7 @@ TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 
 bool GLFunctions::shadersLoaded = false;
-unsigned int GLFunctions::pickIndex = 4;
+unsigned int GLFunctions::pickIndex = 100;
 QHash<QString,float> GLFunctions::sliceAlpha;
 
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;

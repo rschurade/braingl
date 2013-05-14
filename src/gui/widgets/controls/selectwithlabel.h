@@ -25,14 +25,15 @@ public:
     void insertItem( int index, QString label );
     void setCurrentIndex( int index );
     int getCurrentIndex();
-    void addItem (const QString  &text   , const QVariant  &userData=QVariant() );
+    void addItem (const QString &text, const QVariant &userData=QVariant() );
+    QString getSelectedItemString();
+    QVariant getSelectedItemData();
 
 private:
     QLabel* m_label;
     QComboBox* m_comboBox;
 
     int m_id;
-    int m_currentIndex;
 
 signals:
     void currentIndexChanged( int, int );

@@ -79,7 +79,7 @@ private:
     QAction *separatorAct;
     QString curFile;
 
-    QAction* newLetterAct;
+    QAction* newAct;
     QAction* openAct;
     QAction* saveAct;
     QAction* printAct;
@@ -110,6 +110,7 @@ private:
     static int screenshotNumber;
 
 private slots:
+    void slotNew();
     void open();
     void openRecentFile();
     void save();
