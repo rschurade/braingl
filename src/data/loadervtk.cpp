@@ -28,6 +28,17 @@ LoaderVTK::LoaderVTK( QString fn ) :
 
 LoaderVTK::~LoaderVTK()
 {
+    m_points.clear();
+    m_primitives.clear();
+    m_pointData.clear();
+    m_dataNames.clear();
+    m_pointColors.clear();
+
+    m_points.squeeze();
+    m_primitives.squeeze();
+    m_pointData.squeeze();
+    m_dataNames.squeeze();
+    m_pointColors.squeeze();
 }
 
 QString LoaderVTK::getStatus()
