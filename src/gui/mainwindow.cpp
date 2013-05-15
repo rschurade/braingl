@@ -66,6 +66,9 @@ MainWindow::MainWindow( bool debug ) :
 
     setWindowTitle( tr( "brainGL" ) );
 
+    QIcon logo( ":/logo_blue_orange_64.png" );
+    setWindowIcon( logo );
+
     setUnifiedTitleAndToolBarOnMac( true );
 
 	loadSettings();
