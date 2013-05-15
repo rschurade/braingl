@@ -1055,7 +1055,7 @@ bool Loader::loadVTK()
         mesh->finalize();
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
         m_dataset.push_back( dataset );
-
+        delete lv;
         return true;
     }
 
@@ -1139,7 +1139,7 @@ bool Loader::loadVTK()
             DatasetFibers* dataset = new DatasetFibers( fn, fibs );
             m_dataset.push_back( dataset );
         }
-
+        delete lv;
         return true;
     }
 
