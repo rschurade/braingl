@@ -467,6 +467,8 @@ bool LoaderVTK::loadBinary()
         return false;
     }
     m_hasPointColors = loadPointColorsBinary();
+
+    delete[] m_binaryFile;
     return true;
 }
 
@@ -514,7 +516,7 @@ bool LoaderVTK::loadPointsBinary()
         m_points[k] = rawPointData[k];
     }
 
-    delete rawPointData;
+    delete[] rawPointData;
 
     return true;
 }
@@ -582,7 +584,7 @@ bool LoaderVTK::loadPrimitivesBinary()
         m_primitives[k] = rawPrimitiveData[k];
     }
 
-    delete rawPrimitiveData;
+    delete[] rawPrimitiveData;
 
     return true;
 }
@@ -618,7 +620,7 @@ bool LoaderVTK::loadPointColorsBinary()
         m_pointColors[k] = rawColorData[k];
     }
 
-    delete rawColorData;
+    delete[] rawColorData;
 
     return true;
 }

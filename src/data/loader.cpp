@@ -33,6 +33,7 @@ Loader::Loader() :
 
 Loader::~Loader()
 {
+    m_dataset.clear();
 }
 
 void Loader::setFilename( QDir fn )
