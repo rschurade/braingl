@@ -24,6 +24,8 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode ) = 0;
 
+    static int m_count;
+
 protected:
     ROIPropertyGroup m_properties;
 };

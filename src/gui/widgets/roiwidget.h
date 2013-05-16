@@ -16,6 +16,7 @@ class QPushButton;
 class QItemSelection;
 class QItemSelectionModel;
 class ROITreeView;
+class ROIArea;
 
 class ROIWidget : public QFrame
 {
@@ -38,6 +39,7 @@ private:
 
 public slots:
     void addBox();
+    void addROIArea( ROIArea* roi );
     void deleteItem();
     void treeClicked();
     void itemSelectionChanged( const QItemSelection &selected );

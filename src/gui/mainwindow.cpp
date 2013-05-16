@@ -547,7 +547,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
     dockCE->hide();
 
-	ROIWidget* m_roiWidget = new ROIWidget( this );
+	m_roiWidget = new ROIWidget( this );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
     addDockWidget( Qt::RightDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
@@ -775,6 +775,6 @@ void MainWindow::slotDilbert()
 
 void MainWindow::slotNew()
 {
-    NewDatasetWidget* ndw = new NewDatasetWidget( this );
+    NewDatasetWidget* ndw = new NewDatasetWidget( m_roiWidget, this );
     ndw->show();
 }

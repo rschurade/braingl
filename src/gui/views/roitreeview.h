@@ -11,6 +11,8 @@
 #include <QMouseEvent>
 #include <QTreeView>
 
+class ROIArea;
+
 class ROITreeView : public QTreeView
 {
     Q_OBJECT
@@ -20,6 +22,7 @@ public:
     virtual ~ROITreeView();
 
     void addBox();
+    void addROIArea( ROIArea* roi );
 
 private:
     virtual void mousePressEvent( QMouseEvent *event );

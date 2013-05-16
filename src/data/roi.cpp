@@ -7,6 +7,8 @@
 
 #include "roi.h"
 
+int ROI::m_count = 0;
+
 ROI::ROI( QString name )
 {
     m_properties.set( Fn::ROI::NAME, name, true );

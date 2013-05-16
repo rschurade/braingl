@@ -20,7 +20,6 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
 
-    static int m_count;
 private:
 
 private slots:

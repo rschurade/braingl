@@ -351,7 +351,29 @@ namespace Fn
 
     enum class ROI : int
     {
-        NAME, X, Y, Z, DX, DY, DZ, NEG, TYPE, ACTIVE, COLOR, ALPHA, RENDER, SHAPE, STICK_TO_CROSSHAIR, ID, PICK_ID, UPDATED, POINTER
+        NAME,
+        X,
+        Y,
+        Z,
+        NX,
+        NY,
+        NZ,
+        DX,
+        DY,
+        DZ,
+        NEG,
+        TYPE,
+        ACTIVE,
+        COLOR,
+        ALPHA,
+        RENDER,
+        SHAPE,
+        STICK_TO_CROSSHAIR,
+        ID,
+        PICK_ID,
+        UPDATED,
+        THRESHOLD,
+        POINTER
     };
 
     struct ROI2String
@@ -364,6 +386,9 @@ namespace Fn
                 case ROI::X: return QString( "x" ); break;
                 case ROI::Y: return QString( "y" ); break;
                 case ROI::Z: return QString( "z" ); break;
+                case ROI::NX: return QString( "nx" ); break;
+                case ROI::NY: return QString( "ny" ); break;
+                case ROI::NZ: return QString( "nz" ); break;
                 case ROI::DX: return QString( "dx" ); break;
                 case ROI::DY: return QString( "dy" ); break;
                 case ROI::DZ: return QString( "dz" ); break;
@@ -378,6 +403,7 @@ namespace Fn
                 case ROI::ID: return QString( "id" ); break;
                 case ROI::PICK_ID: return QString( "pick id" ); break;
                 case ROI::UPDATED: return QString( "updated" ); break;
+                case ROI::THRESHOLD: return QString( "threshold" ); break;
                 case ROI::POINTER: return QString( "pointer" ); break;
             }
             return QString( "property not defined" );

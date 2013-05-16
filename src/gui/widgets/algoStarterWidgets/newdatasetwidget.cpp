@@ -10,8 +10,11 @@
 #include "../controls/sliderwitheditint.h"
 #include "../controls/selectwithlabel.h"
 
+#include "../roiwidget.h"
+
 #include "../../../data/models.h"
 #include "../../../data/vptr.h"
+#include "../../../data/roiarea.h"
 
 #include "../../../data/datasets/dataset.h"
 #include "../../../data/datasets/datasetscalar.h"
@@ -19,7 +22,8 @@
 #include <QPushButton>
 #include <QProgressBar>
 
-NewDatasetWidget::NewDatasetWidget( QWidget* parent )
+NewDatasetWidget::NewDatasetWidget( ROIWidget* roiWidget, QWidget* parent ) :
+    m_roiWidget( roiWidget )
 {
     m_layout = new QVBoxLayout();
 
@@ -45,8 +49,12 @@ NewDatasetWidget::NewDatasetWidget( QWidget* parent )
     m_sourceSelect->hide();
 
     QHBoxLayout* hLayout = new QHBoxLayout();
-    m_startButton = new QPushButton( tr("Create") );
-    connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
+    m_createDatasetButton = new QPushButton( tr("Create dataset") );
+    connect( m_createDatasetButton, SIGNAL( clicked() ), this, SLOT( createDataset() ) );
+
+    m_createROIButton = new QPushButton( tr("Create roi") );
+    connect( m_createROIButton, SIGNAL( clicked() ), this, SLOT( createROI() ) );
+    m_createROIButton->hide();
 
     m_nX = new SliderWithEditInt( QString("nx") );
     m_nX->setMin( 1 );
@@ -84,9 +92,9 @@ NewDatasetWidget::NewDatasetWidget( QWidget* parent )
     m_dZ->setValue( 1.0f );
     m_layout->addWidget( m_dZ );
 
-
     hLayout->addStretch();
-    hLayout->addWidget( m_startButton );
+    hLayout->addWidget( m_createROIButton );
+    hLayout->addWidget( m_createDatasetButton );
 
     m_layout->addLayout( hLayout );
 
@@ -101,7 +109,7 @@ NewDatasetWidget::~NewDatasetWidget()
 {
 }
 
-void NewDatasetWidget::start()
+void NewDatasetWidget::createDataset()
 {
     switch( m_modeSelect->getCurrentIndex() )
     {
@@ -164,6 +172,22 @@ void NewDatasetWidget::start()
     this->hide();
 }
 
+void NewDatasetWidget::createROI()
+{
+    DatasetScalar* ds = static_cast<DatasetScalar*>( VPtr<Dataset>::asPtr( m_sourceSelect->getSelectedItemData() ) );
+
+    QVector<float>* data = ds->getData();
+    QVector<float> out( data->size() );
+
+    copyWithRois( ds, out );
+
+    ROIArea* roiOut = new ROIArea( out, ds->getHeader() );
+
+    m_roiWidget->addROIArea( roiOut );
+
+    this->hide();
+}
+
 void NewDatasetWidget::modeChanged( int mode )
 {
     switch ( mode )
@@ -176,6 +200,7 @@ void NewDatasetWidget::modeChanged( int mode )
             m_dX->show();
             m_dY->show();
             m_dZ->show();
+            m_createROIButton->hide();
             break;
         case 1:
         case 2:
@@ -186,6 +211,7 @@ void NewDatasetWidget::modeChanged( int mode )
             m_dX->hide();
             m_dY->hide();
             m_dZ->hide();
+            m_createROIButton->show();
 
     }
 }
@@ -225,6 +251,11 @@ void NewDatasetWidget::copyWithRois( DatasetScalar* source, QVector<float> &targ
 
 void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, QVector<float> &target )
 {
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() > 1 )
+    {
+        return;
+    }
+
     QVector<float>* s = source->getData();
 
     int ds_nx = source->properties()->get( Fn::Property::NX ).toInt();

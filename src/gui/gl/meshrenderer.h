@@ -12,6 +12,7 @@
 
 class TriangleMesh2;
 class PropertyGroup;
+class ROIPropertyGroup;
 
 class MeshRenderer  : public ObjectRenderer
 {
@@ -22,6 +23,7 @@ public:
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, ROIPropertyGroup &props );
 
     void setMesh( TriangleMesh2* mesh );
 

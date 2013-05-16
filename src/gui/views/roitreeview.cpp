@@ -7,6 +7,12 @@
 
 #include "roitreeview.h"
 
+#include "../../data/roiarea.h"
+#include "../../data/roibox.h"
+#include "../../data/vptr.h"
+
+#include "../gl/glfunctions.h"
+
 #include <QDebug>
 
 ROITreeView::ROITreeView( QWidget* parent ) :
@@ -20,6 +26,8 @@ ROITreeView::~ROITreeView()
 
 void ROITreeView::addBox()
 {
+    GLFunctions::roi = new ROIBox();
+
     if ( selectionModel()->hasSelection() )
     {
         model()->insertRows( 0, 0, selectionModel()->selectedIndexes().first() );
@@ -31,6 +39,23 @@ void ROITreeView::addBox()
         model()->insertRows( 0, 0, QModelIndex() );
     }
 }
+
+void ROITreeView::addROIArea( ROIArea* roi )
+{
+    GLFunctions::roi = roi;
+
+    if ( selectionModel()->hasSelection() )
+    {
+        model()->insertRows( 0, 0, selectionModel()->selectedIndexes().first() );
+        expand( selectionModel()->selectedRows().at( 0 ) );
+    }
+    else
+    {
+        // nothing selected, inserting top box
+        model()->insertRows( 0, 0, QModelIndex() );
+    }
+}
+
 
 void ROITreeView::mousePressEvent(QMouseEvent *event)
 {
