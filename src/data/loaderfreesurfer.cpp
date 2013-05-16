@@ -13,7 +13,6 @@
 
 LoaderFreesurfer::LoaderFreesurfer()
 {
-    // TODO Auto-generated constructor stub
 
 }
 

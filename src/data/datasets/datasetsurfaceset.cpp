@@ -15,7 +15,6 @@
 DatasetSurfaceset::DatasetSurfaceset( QDir fn, Fn::DatasetType type ) :
         DatasetMesh( fn, type )
 {
-    // TODO Auto-generated constructor stub
 
 }
 

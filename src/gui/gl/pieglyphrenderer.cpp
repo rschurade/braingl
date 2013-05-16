@@ -27,11 +27,23 @@ PieGlyphRenderer::~PieGlyphRenderer()
 
 void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    // todo joachim
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    float alpha = props->get( Fn::Property::GLYPH_ALPHA ).toFloat();
+
+    if ( renderMode == 1 ) // we are drawing opaque objects
     {
-        // obviously not opaque
-        return;
+        if ( alpha < 1.0 )
+        {
+            // obviously not opaque
+            return;
+        }
+    }
+    else // we are drawing tranparent objects
+    {
+        if ( !( alpha < 1.0 ) )
+        {
+            // not transparent
+            return;
+        }
     }
 
     QGLShaderProgram* program = GLFunctions::getShader( "pies" );
@@ -43,7 +55,6 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     program->setUniformValue( "p_matrix", p_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
-    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
@@ -62,7 +73,6 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     glShadeModel( GL_FLAT );
 
     int start = 0;
-    qDebug() << "n: " << n;
     for ( int i = 0; i < n; i++ )
     {
         int number = m_numbers->at( i );
