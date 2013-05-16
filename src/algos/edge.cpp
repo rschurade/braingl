@@ -9,7 +9,6 @@
 
 Edge::Edge()
 {
-    // TODO Auto-generated constructor stub
 
 }
 
