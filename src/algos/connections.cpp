@@ -79,7 +79,6 @@ Connections::Connections( QString nname, QString ename )
 
 Connections::Connections( QString fib )
 {
-    //TODO: Das hier so umbiegen, dass ich Gabys Daten laden kann...
     params();
     prefix = fib;
     QFile n( fib );

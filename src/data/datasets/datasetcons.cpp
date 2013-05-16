@@ -9,6 +9,7 @@
 
 DatasetCons::DatasetCons( QString fileName ) :
     Dataset( fileName, Fn::DatasetType::CONS ),
+    m_vrenderer( NULL ),
     vectorArray( NULL )
 {
     cons = new Connections( fileName );
@@ -56,7 +57,8 @@ void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
         return;
     }
 
-    //TODO: setup vector renderer...if ( m_vrenderer == 0 )
+    //TODO: setup vector renderer...
+    if ( m_vrenderer == NULL )
     {
         m_vrenderer = new VectorGlyphRenderer();
         m_vrenderer->init();
