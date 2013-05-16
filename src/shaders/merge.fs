@@ -1,9 +1,10 @@
 #version 330
 
-uniform sampler2D C0; // TEXTURE2 - opaque color map (minormode 4)
-uniform sampler2D C1; // TEXTURE6 - color map for transparency render 1 (minormode 9)
-uniform sampler2D C2; // TEXTURE7 - color map for transparency render 2 (minormode 10)
-uniform sampler2D C3; // TEXTURE8 - color map for transparency render 3 (minormode 11)
+uniform sampler2D C0; // TEXTURE2 - opaque color map
+uniform sampler2D C1; // TEXTURE6
+uniform sampler2D C2; // TEXTURE7
+uniform sampler2D C3; // TEXTURE8
+uniform sampler2D C4; // TEXTURE9
 
 in vec3 v_texcoord;
 
@@ -16,13 +17,15 @@ void main(void) {
     vec4 c1 = texture2D( C1, v_texcoord.xy );
     vec4 c2 = texture2D( C2, v_texcoord.xy );
     vec4 c3 = texture2D( C3, v_texcoord.xy );
-    vec4 c4 = texture2D( D2, v_texcoord.xy );
+    vec4 c4 = texture2D( C4, v_texcoord.xy );
+    vec4 c5 = texture2D( D1, v_texcoord.xy );
 
     vec3 mcolor = c1.rgb*c1.a + 
-                 (1.0-c1.a)*(c2.rgb*c2.a +
-                 (1.0-c2.a)*(c3.rgb*c3.a +
-                 (1.0-c3.a)*(c4.rgb*c4.a + 
-                 (1.0-c4.a)*c0.rgb)));
+                 (1.0-c1.a) * (c2.rgb*c2.a +
+                 (1.0-c2.a) * (c3.rgb*c3.a +
+                 (1.0-c3.a) * (c4.rgb*c4.a + 
+                 (1.0-c4.a) * (c5.rgb*c5.a +
+                 (1.0-c5.a) * c0.rgb))));
          
     //vec4 d0 = texture2D( D0, v_texcoord.xy );
     //fragColor = vec4 ( d0.rgb, 1.0 );
