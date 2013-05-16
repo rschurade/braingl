@@ -60,7 +60,7 @@ private slots:
     void roiInserted( const QModelIndex &parent, int start, int end );
     void roiDeleted( const QModelIndex &parent, int start, int end );
 
-    void updateBox( int branch, int pos );
+    void updateROI( int branch, int pos );
     void boxTest( QVector<bool>& workfield, int left, int right, int axis );
     void sphereTest( QVector<bool>& workfield );
 

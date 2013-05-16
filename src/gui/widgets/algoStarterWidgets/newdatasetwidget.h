@@ -20,22 +20,26 @@ class DatasetScalar;
 class SelectWithLabel;
 class SliderWithEdit;
 class SliderWithEditInt;
+class ROIWidget;
 
 class NewDatasetWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    NewDatasetWidget( QWidget* parent = 0 );
+    NewDatasetWidget( ROIWidget* roiWidget, QWidget* parent = 0 );
     virtual ~NewDatasetWidget();
 
 
 private:
     QModelIndex createIndex( int branch, int pos, int column );
 
+    ROIWidget* m_roiWidget;
+
     QVBoxLayout* m_layout;
 
-    QPushButton* m_startButton;
+    QPushButton* m_createDatasetButton;
+    QPushButton* m_createROIButton;
 
     SelectWithLabel* m_modeSelect;
     SelectWithLabel* m_sourceSelect;
@@ -48,7 +52,8 @@ private:
     SliderWithEdit* m_dZ;
 
 private slots:
-    void start();
+    void createDataset();
+    void createROI();
     void modeChanged( int mode );
 
     void copyWithRois( DatasetScalar* source, QVector<float> &target );

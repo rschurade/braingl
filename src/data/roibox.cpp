@@ -12,10 +12,8 @@
 
 #include <QAbstractItemModel>
 
-int ROIBox::m_count = 0;
-
 ROIBox::ROIBox() :
-    ROI( QString("new roi") + QString::number( m_count++ ) )
+    ROI( QString("new roi") + QString::number( ROI::m_count++ ) )
 {
     float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
     float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();

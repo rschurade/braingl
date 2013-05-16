@@ -10,6 +10,7 @@
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
 #include "../../data/models.h"
+#include "../../data/roi.h"
 
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
@@ -44,6 +45,7 @@ QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 QVector< QString > GLFunctions::m_shaderNames;
 
+ROI* GLFunctions::roi = 0;
 
 int GLFunctions::getPickIndex()
 {

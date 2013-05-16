@@ -11,6 +11,8 @@
 #include "roibox.h"
 #include "vptr.h"
 
+#include "../gui/gl/glfunctions.h"
+
 #include <QDebug>
 
 ROIModel::ROIModel() :
@@ -154,6 +156,22 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         }
         case Qt::DisplayRole:
         {
+            if ( index.column() == (int)Fn::ROI::POINTER )
+            {
+                if ( index.internalId() == -1 )
+                {
+                    m_rois[index.row()][0] = value;
+                }
+                else
+                {
+                    qDebug() << index.internalId() << index.row()+1;
+                    m_rois[index.internalId()][index.row()+1] = value;
+                }
+
+                emit( dataChanged( QModelIndex(), QModelIndex() ) );
+                return true;
+            }
+
             if ( index.column() == (int)Fn::ROI::UPDATED )
             {
                 emit( dataChanged( QModelIndex(), QModelIndex() ) );
@@ -198,7 +216,8 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     ROI* newROI;
     if ( count == 0 )
     {
-        newROI = new ROIBox();
+        //newROI = new ROIBox();
+        newROI = GLFunctions::roi;
     }
     else
     {

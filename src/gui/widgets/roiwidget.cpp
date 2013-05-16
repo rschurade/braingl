@@ -70,6 +70,12 @@ void ROIWidget::addBox()
     m_treeView->addBox();
 }
 
+void ROIWidget::addROIArea( ROIArea* roi )
+{
+    m_treeView->addROIArea( roi );
+}
+
+
 void ROIWidget::treeClicked()
 {
 }

@@ -19,6 +19,7 @@
 class QGLShaderProgram;
 class ShapeRenderer;
 class TextRenderer;
+class ROI;
 
 struct VertexData
 {
@@ -67,6 +68,8 @@ public:
 
     static int idealThreadCount;
     static QHash<QString, float> sliceAlpha;
+
+    static ROI* roi;
 
 private:
     GLFunctions() {};

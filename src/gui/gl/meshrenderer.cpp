@@ -11,6 +11,7 @@
 #include "../../data/enums.h"
 #include "../../data/mesh/trianglemesh2.h"
 #include "../../data/properties/propertygroup.h"
+#include "../../data/properties/roipropertygroup.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
@@ -145,6 +146,86 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
+
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, ROIPropertyGroup &props )
+{
+    float alpha = props.get( Fn::ROI::ALPHA ).toFloat();
+    m_renderMode = renderMode;
+
+    switch ( renderMode )
+    {
+        case 0:
+            break;
+        case 1:
+        {
+            if ( alpha < 1.0 ) // obviously not opaque
+            {
+                return;
+            }
+            break;
+        }
+        default:
+        {
+            if ( alpha == 1.0  ) // not transparent
+            {
+                return;
+            }
+            break;
+        }
+    }
+
+    m_colorMode = 0;
+    m_color = props.get( Fn::ROI::COLOR ).value<QColor>();
+
+    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
+
+    program->bind();
+
+    GLFunctions::setupTextures();
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    program->setUniformValue( "u_colorMode", m_colorMode );
+    program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
+
+    program->setUniformValue( "u_alpha", alpha );
+    program->setUniformValue( "u_renderMode", renderMode );
+    program->setUniformValue( "u_canvasSize", width, height );
+    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "D1", 10 );
+    program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
+
+    float pAlpha =  1.0;
+    float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
+    float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
+    float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
+    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
+
+    if ( m_dirty )
+    {
+        initGeometry();
+    }
+
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    setShaderVars();
+
+    glEnable(GL_CULL_FACE);
+    glCullFace( GL_BACK );
+    glFrontFace( GL_CW );
+
+    glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+
+    glDisable(GL_CULL_FACE);
+
+    glShadeModel( GL_SMOOTH );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
+
 
 void MeshRenderer::setupTextures()
 {

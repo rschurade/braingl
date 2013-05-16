@@ -9,6 +9,9 @@
 
 #include "../models.h"
 #include "../enums.h"
+#include "../vptr.h"
+#include "../roi.h"
+#include "../roiarea.h"
 
 #include <QDebug>
 
@@ -81,7 +84,7 @@ void FiberSelector::updatePresentRois()
         newBranch.push_back( newLeaf );
         m_branchfields.push_back( newLeaf );
         m_bitfields.push_back( newBranch );
-        updateBox( m_bitfields.size() - 1, 0 );
+        updateROI( m_bitfields.size() - 1, 0 );
 
         int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
 
@@ -90,7 +93,7 @@ void FiberSelector::updatePresentRois()
             // inserted child roi
             QVector<bool>newLeaf( m_numLines );
             m_bitfields[i].push_back( newLeaf );
-            updateBox( i, k + 1 );
+            updateROI( i, k + 1 );
         }
     }
 }
@@ -112,7 +115,7 @@ void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &b
         branch = topLeft.internalId();
         pos = topLeft.row() + 1;
     }
-    updateBox( branch, pos );
+    updateROI( branch, pos );
 
 }
 
@@ -127,14 +130,14 @@ void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
         newBranch.push_back( newLeaf );
         m_branchfields.push_back( newLeaf );
         m_bitfields.push_back( newBranch );
-        updateBox( m_bitfields.size() - 1, 0 );
+        updateROI( m_bitfields.size() - 1, 0 );
     }
     else
     {
         // inserted child roi
         QVector<bool>newLeaf( m_numLines );
         m_bitfields[parent.row()].push_back( newLeaf );
-        updateBox( parent.row(), m_bitfields[parent.row()].size() - 1 );
+        updateROI( parent.row(), m_bitfields[parent.row()].size() - 1 );
     }
 }
 
@@ -170,32 +173,73 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
     return Models::r()->index( row, column, parent );
 }
 
-void FiberSelector::updateBox( int branch, int pos )
+void FiberSelector::updateROI( int branch, int pos )
 {
     if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
     {
-        m_x = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
-        m_y = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
-        m_z = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
-        m_dx = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
-        m_dy = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
-        m_dz = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
-        m_boxMin[0] = m_x - m_dx;
-        m_boxMax[0] = m_x + m_dx;
-        m_boxMin[1] = m_y - m_dy;
-        m_boxMax[1] = m_y + m_dy;
-        m_boxMin[2] = m_z - m_dz;
-        m_boxMax[2] = m_z + m_dz;
-
-        for ( int i = 0; i < m_numLines; ++i )
+        if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() == 2 )
         {
-            m_bitfields[branch][pos][i] = false;
+            ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
+            float threshold = roi->properties()->get( Fn::ROI::THRESHOLD ).toFloat();
+            QVector<float>* data = roi->data();
+            int nx = roi->properties()->get( Fn::ROI::NX ).toInt();
+            int ny = roi->properties()->get( Fn::ROI::NY ).toInt();
+            int nz = roi->properties()->get( Fn::ROI::NZ ).toInt();
+            float dx = roi->properties()->get( Fn::ROI::DX ).toFloat();
+            float dy = roi->properties()->get( Fn::ROI::DY ).toFloat();
+            float dz = roi->properties()->get( Fn::ROI::DZ ).toFloat();
+            for ( int i = 0; i < m_numLines; ++i )
+            {
+                m_bitfields[branch][pos][i] = false;
+            }
+            for ( int i = 0; i < m_kdVerts.size() / 3; ++i )
+            {
+                float x = m_kdVerts[i*3];
+                float y = m_kdVerts[i*3+1];
+                float z = m_kdVerts[i*3+2];
+
+                int px = x / dx;
+                int py = y / dy;
+                int pz = z / dz;
+
+                px = qMax( 0, qMin( px, nx - 1) );
+                py = qMax( 0, qMin( py, ny - 1) );
+                pz = qMax( 0, qMin( pz, nz - 1) );
+
+                int id = px + py * nx + pz * nx * ny;
+
+                if( data->at( id) - threshold > 0 )
+                {
+                    m_bitfields[branch][pos][m_reverseIndexes[ i ]] = true;
+                }
+            }
         }
-        boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
-
-        if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() == 0 )
+        else
         {
-            sphereTest( m_bitfields[branch][pos] );
+            m_x = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
+            m_y = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
+            m_z = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
+            m_dx = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
+            m_dy = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
+            m_dz = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
+            m_boxMin[0] = m_x - m_dx;
+            m_boxMax[0] = m_x + m_dx;
+            m_boxMin[1] = m_y - m_dy;
+            m_boxMax[1] = m_y + m_dy;
+            m_boxMin[2] = m_z - m_dz;
+            m_boxMax[2] = m_z + m_dz;
+
+            for ( int i = 0; i < m_numLines; ++i )
+            {
+                m_bitfields[branch][pos][i] = false;
+            }
+
+            boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
+
+            if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() == 0 )
+            {
+                sphereTest( m_bitfields[branch][pos] );
+            }
         }
     }
     else
