@@ -218,7 +218,6 @@ void SceneRenderer::renderScene()
     clearTexture( "C3", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
-
     renderScenePart( 4, "C3", "D1" );
 
     //***************************************************************************************************
@@ -226,9 +225,17 @@ void SceneRenderer::renderScene()
     // Pass 5
     //
     //***************************************************************************************************/
-    m_renderMode = 3;
+
+    clearTexture( "C4", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    setRenderTarget( "D2" );
+    renderScenePart( 3, "C4", "D2" );
+
+    m_renderMode = 3;
+    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    setRenderTarget( "D1" );
+
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable( GL_BLEND );
 
     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderDatasets();
@@ -273,12 +280,12 @@ void SceneRenderer::renderMerge()
     glActiveTexture( GL_TEXTURE8 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = getTexture( "D0" );
+    tex = getTexture( "C4" );
     glActiveTexture( GL_TEXTURE9 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
-    tex = getTexture( "D2" );
-    glActiveTexture( GL_TEXTURE11 );
+    tex = getTexture( "D1" );
+    glActiveTexture( GL_TEXTURE10 );
     glBindTexture( GL_TEXTURE_2D, tex );
 
     QGLShaderProgram* program = GLFunctions::getShader( "merge" );
@@ -303,9 +310,8 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C1", 6 );
     program->setUniformValue( "C2", 7 );
     program->setUniformValue( "C3", 8 );
-    program->setUniformValue( "D0", 9 );
+    program->setUniformValue( "C4", 9 );
     program->setUniformValue( "D1", 10 );
-    program->setUniformValue( "D2", 11 );
 
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
@@ -578,6 +584,7 @@ void SceneRenderer::initFBO( int width, int height )
     textures[ "C1" ] = createTexture( width, height );
     textures[ "C2" ] = createTexture( width, height );
     textures[ "C3" ] = createTexture( width, height );
+    textures[ "C4" ] = createTexture( width, height );
     textures[ "D0" ] = createTexture( width, height );
     textures[ "D1" ] = createTexture( width, height );
     textures[ "D2" ] = createTexture( width, height );
