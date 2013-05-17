@@ -233,8 +233,8 @@ void SceneRenderer::renderScene()
     clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     renderScenePart( 3, "C4", "D2" );
 
-    clearTexture( "C5", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
+    clearTexture( "C5", 0.0, 0.0, 0.0, 0.0 );
+    clearTexture( "D1", 0.0, 0.0, 0.0, 0.0 );
     renderScenePart( 5, "C5", "D1" );
 
 
