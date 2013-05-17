@@ -84,6 +84,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
+    program->setUniformValue( "C5", 13 );
 
     glLineWidth( props->get( Fn::Property::FIBER_THICKNESS ).toFloat() );
 

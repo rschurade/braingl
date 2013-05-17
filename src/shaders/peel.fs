@@ -8,6 +8,7 @@ uniform sampler2D D0; // TEXTURE3 - opaque depth map (uMinorMode 5)
 uniform sampler2D D1; // TEXTURE4 - 1st of two ping-pong depth maps (uMinorMode 6)
 uniform sampler2D D2; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 7); also used for C4
 uniform sampler2D P0; // TEXTURE5 - 2nd of two ping-pong depth maps (uMinorMode 7); also used for C4
+uniform sampler2D C5; // 
 
 in vec4 v_position;
 
@@ -94,6 +95,26 @@ void writePeel( vec3 color )
                 discard;
             }
         }
+        else if ( u_renderMode == 5 )
+        {
+            zmax = decode( texture2D( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                vec4 accuColor = texture2D( C5, loc );
+                
+                fragColor = vec4( accuColor.r + color.r * u_alpha, accuColor.g + color.g * u_alpha, accuColor.b + color.b * u_alpha, accuColor.a + u_alpha );
+                float count = decode( texture2D( D1, loc ) );
+                count += 1.0;
+                fragDepth = encode( count );
+                
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
     }
 }
 
@@ -152,6 +173,26 @@ void writePeel( vec4 color )
             {
                 fragColor = color;
                 fragDepth = c;
+                vec4 pc = texture2D( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+        else if ( u_renderMode == 5 )
+        {
+            zmax = decode( texture2D( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                vec4 accuColor = texture2D( C5, loc );
+                
+                fragColor = vec4( accuColor.r + color.r * color.a, accuColor.g + color.g * color.a, accuColor.b + color.b * color.a, accuColor.a + color.a );
+                float count = decode( texture2D( D1, loc ) );
+                count += 1.0;
+                fragDepth = encode( count );
+                
                 vec4 pc = texture2D( P0, loc );
                 pickColor = pc;
             } 
