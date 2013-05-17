@@ -18,7 +18,19 @@ void main(void) {
     vec4 c2 = texture2D( C2, v_texcoord.xy );
     vec4 c3 = texture2D( C3, v_texcoord.xy );
     vec4 c4 = texture2D( C4, v_texcoord.xy );
-    vec4 c5 = texture2D( D1, v_texcoord.xy );
+    vec4 c5o = texture2D( C5, v_texcoord.xy );
+
+float d = decode( texture2D( D1, v_texcoord.xy ) );
+vec4 c5;
+if ( d > 0 )
+{
+    float sumA = c5o.a / d;
+    c5 = c5o / sumA;
+}
+else
+{
+   c5 = c5o;
+}
 
     vec3 mcolor = c1.rgb*c1.a + 
                  (1.0-c1.a) * (c2.rgb*c2.a +
@@ -27,8 +39,5 @@ void main(void) {
                  (1.0-c4.a) * (c5.rgb*c5.a +
                  (1.0-c5.a) * c0.rgb))));
          
-    //vec4 d0 = texture2D( D0, v_texcoord.xy );
-    //fragColor = vec4 ( d0.rgb, 1.0 );
-    
     fragColor = vec4 (mcolor, 1.0);
 }
