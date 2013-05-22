@@ -11,6 +11,8 @@
 #include "../../gui/gl/vectorglyphrenderer.h"
 #include "../../gui/gl/pieglyphrenderer.h"
 
+#include "../../gui/gl/meshrenderer.h"
+
 #include <qstring.h>
 
 #ifndef DATASETGLYPHSET_H_
@@ -36,6 +38,9 @@ public:
 
     void makePies();
     QList<Dataset*> createConnections();
+
+    void loadRGB();
+    void saveRGB();
 
 private:
     float minthresh;

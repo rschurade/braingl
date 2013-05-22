@@ -53,6 +53,8 @@ private:
     FNAction* m_cutSelectedFibersAction;
     FNAction* m_bundleAction;
     FNAction* m_makeConsAction;
+    FNAction* m_saveRGBAction;
+    FNAction* m_loadRGBAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
