@@ -6,6 +6,8 @@ uniform sampler2D C2; // TEXTURE7
 uniform sampler2D C3; // TEXTURE8
 uniform sampler2D C4; // TEXTURE9
 
+uniform bool transparency_new;
+
 in vec3 v_texcoord;
 
 #include peel_fs
@@ -25,7 +27,11 @@ vec4 c5;
 if ( d > 0 )
 {
     float sumA = c5o.a / d;
-    c5 = c5o / sumA;
+    c5 = c5o;
+    if (!transparency_new)
+    {
+       c5.a = c5o.a / ( sumA / 2 );
+    }
 }
 else
 {

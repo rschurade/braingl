@@ -299,7 +299,8 @@ namespace Fn
         BBX,
         BBY,
         VIEW,
-        SCREENSHOT_QUALITY
+        SCREENSHOT_QUALITY,
+        TRANSPARENCY
     };
 
     struct Global2String
@@ -336,6 +337,7 @@ namespace Fn
                 case Global::CROSSHAIR_COLOR: return QString( "crosshair color" ); break;
                 case Global::SHOW_NAV_SLIDERS: return QString( "show nav sliders" ); break;
                 case Global::SCREENSHOT_QUALITY: return QString( "screenshot quality" ); break;
+                case Global::TRANSPARENCY: return QString( "transparency mode" ); break;
                 case Global::OBJECT: return QString( "" ); break;
                 // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Global::ZOOM: return QString( "" ); break;
