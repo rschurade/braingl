@@ -30,15 +30,15 @@
 #endif
 
 SceneRenderer::SceneRenderer( QString renderTarget ) :
-    m_renderTarget( renderTarget ),
-    vboIds( new GLuint[ 2 ] ),
-    m_width( 1 ),
-    m_height( 1 ),
-    m_renderMode( 0 ),
-    pbo_a( 0 ),
-    pbo_b( 0 ),
-    RBO( 0 ),
-    FBO( 0 )
+                m_renderTarget( renderTarget ),
+                vboIds( new GLuint[2] ),
+                m_width( 1 ),
+                m_height( 1 ),
+                m_renderMode( 0 ),
+                pbo_a( 0 ),
+                pbo_b( 0 ),
+                RBO( 0 ),
+                FBO( 0 )
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( Models::g() );
@@ -72,8 +72,8 @@ void SceneRenderer::initGL()
     const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
 
     GLint major, minor;
-    glGetIntegerv(GL_MAJOR_VERSION, &major);
-    glGetIntegerv(GL_MINOR_VERSION, &minor);
+    glGetIntegerv( GL_MAJOR_VERSION, &major );
+    glGetIntegerv( GL_MINOR_VERSION, &minor );
 
     qDebug() << "GL Vendor :" << QString( (char*) vendor );
     qDebug() << "GL Renderer :" << QString( (char*) renderer );
@@ -83,7 +83,7 @@ void SceneRenderer::initGL()
 
     GLFunctions::loadShaders();
 
-    QColor color = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glEnable( GL_DEPTH_TEST );
@@ -93,7 +93,7 @@ void SceneRenderer::initGL()
     glEnable( GL_LIGHT0 );
     glEnable( GL_MULTISAMPLE );
 
-    static GLfloat lightPosition[ 4 ] =
+    static GLfloat lightPosition[4] =
     { 0.5, 5.0, -3000.0, 1.0 };
     glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
@@ -101,24 +101,24 @@ void SceneRenderer::initGL()
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
+    Models::g()->setData( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
+    Models::g()->setData( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 
     VertexData vertices[] =
 
     {
-        { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( 1.0,  -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( 1.0,  1.0,  0 ), QVector3D( 1.0, 1.0, 0.0 ) },
-        { QVector3D( -1.0, 1.0,  0 ), QVector3D( 0.0, 1.0, 0.0 ) }
-    };
+    { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+    { QVector3D( 1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
+    { QVector3D( 1.0, 1.0, 0 ), QVector3D( 1.0, 1.0, 0.0 ) },
+    { QVector3D( -1.0, 1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) } };
     glGenBuffers( 2, vboIds );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
 
-    GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
+    GLushort indices[] =
+    { 0, 1, 2, 0, 2, 3 };
     // Transfer index data to VBO 0
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[1] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 }
 
@@ -150,8 +150,10 @@ void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 
 void SceneRenderer::renderScene()
 {
-    GLFunctions::getAndPrintGLError( "before render scene");
-    QColor bgColor = Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    GLFunctions::getAndPrintGLError( "before render scene" );
+    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+
+    int transparency = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
 
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
@@ -233,10 +235,19 @@ void SceneRenderer::renderScene()
     clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     renderScenePart( 3, "C4", "D2" );
 
+    if ( transparency == 1 )
+    {
+        glDisable( GL_DEPTH_TEST );
+    }
+
     clearTexture( "C5", 0.0, 0.0, 0.0, 0.0 );
     clearTexture( "D1", 0.0, 0.0, 0.0, 0.0 );
     renderScenePart( 5, "C5", "D1" );
 
+    if ( transparency == 1 )
+    {
+        glEnable( GL_DEPTH_TEST );
+    }
 
 //    m_renderMode = 3;
 //    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
@@ -266,8 +277,8 @@ void SceneRenderer::renderMerge()
     m_renderMode = 0;
 
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[1] );
 
     GLuint tex = getTexture( "C0" );
     glActiveTexture( GL_TEXTURE5 );
@@ -315,6 +326,10 @@ void SceneRenderer::renderMerge()
     program->enableAttributeArray( texcoordLocation );
     glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
+    int transparency = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
+
+    program->setUniformValue("transparency_new", transparency == 1 );
+
     program->setUniformValue( "C0", 5 );
     program->setUniformValue( "C1", 6 );
     program->setUniformValue( "C2", 7 );
@@ -328,12 +343,12 @@ void SceneRenderer::renderMerge()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    GLFunctions::getAndPrintGLError( "after render scene");
+    GLFunctions::getAndPrintGLError( "after render scene" );
 }
 
 QImage* SceneRenderer::screenshot()
 {
-    int size = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int size = Models::g()->data( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
     int tmpWidth = m_width;
     int tmpHeight = m_height;
     resizeGL( size, size );
@@ -355,34 +370,34 @@ void SceneRenderer::renderDatasets()
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
         ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     }
 }
 
 void SceneRenderer::renderRois()
 {
-   int countTopBoxes = Models::r()->rowCount();
-   for ( int i = 0; i < countTopBoxes; ++i )
-   {
-       ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
-       if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
-       {
-           roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+    int countTopBoxes = Models::r()->rowCount();
+    for ( int i = 0; i < countTopBoxes; ++i )
+    {
+        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int) Fn::ROI::POINTER ), Qt::DisplayRole ) );
+        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+        {
+            roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
 
-           QModelIndex mi = Models::r()->index( i, 0 );
-           int countBoxes = Models::r()->rowCount(  mi );
+            QModelIndex mi = Models::r()->index( i, 0 );
+            int countBoxes = Models::r()->rowCount( mi );
 
-           for ( int k = 0; k < countBoxes; ++k )
-           {
-               roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int)Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
-               if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
-               {
-                   roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
-               }
-           }
-       }
-   }
+            for ( int k = 0; k < countBoxes; ++k )
+            {
+                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int) Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
+                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+                {
+                    roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
+                }
+            }
+        }
+    }
 }
 
 void SceneRenderer::renderPick()
@@ -438,7 +453,7 @@ QVector3D SceneRenderer::mapMouse2World( float x, float y )
     winY = (float) viewport[3] - (float) y;
 
     GLfloat z;
-    glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)&z);
+    glReadPixels( winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, (void*) &z );
 
     GLdouble posX, posY, posZ;
     gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
@@ -455,8 +470,7 @@ void SceneRenderer::generate_pixel_buffer_objects( int width, int height )
     glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
     /* to avoid weird behaviour the first frame the data is loaded */
     glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* generate the second pixel buffer objects */
-    glGenBuffers( 1, &pbo_b );
+    /* generate the second pixel buffer objects */glGenBuffers( 1, &pbo_b );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, pbo_b );
     glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
     glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
@@ -478,24 +492,23 @@ GLuint SceneRenderer::get_object_id( int x, int y, int width, int height )
 
     generate_pixel_buffer_objects( width, height );
     /* switch between pixel buffer objects */
-    if (frame_event == 0)
+    if ( frame_event == 0 )
     {
         frame_event = 1;
         read_pbo = pbo_a;
         map_pbo = pbo_b;
     }
-    else {
+    else
+    {
         frame_event = 0;
         read_pbo = pbo_b;
         map_pbo = pbo_a;
 
     }
-    /* read one pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    /* read one pixel buffer */glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo );
     glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* map the other pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
-    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* map the other pixel buffer */glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*) glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
     /* get the mouse coordinates */
     /* OpenGL has the {0,0} at the down-left corner of the screen */
     y = height - y;
@@ -531,23 +544,22 @@ QImage* SceneRenderer::getOffscreenTexture( int width, int height )
 
     generate_pixel_buffer_objects( width, height );
     /* switch between pixel buffer objects */
-    if (frame_event == 0)
+    if ( frame_event == 0 )
     {
         frame_event = 1;
         read_pbo = pbo_a;
         map_pbo = pbo_a;
     }
-    else {
+    else
+    {
         frame_event = 0;
         map_pbo = pbo_a;
         read_pbo = pbo_b;
     }
-    /* read one pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo ) ;
+    /* read one pixel buffer */glBindBuffer( GL_PIXEL_PACK_BUFFER, read_pbo );
     glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
-    /* map the other pixel buffer */
-    glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
-    ptr = (GLubyte*)glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
+    /* map the other pixel buffer */glBindBuffer( GL_PIXEL_PACK_BUFFER, map_pbo );
+    ptr = (GLubyte*) glMapBuffer( GL_PIXEL_PACK_BUFFER, GL_READ_WRITE );
     /* get the mouse coordinates */
     /* OpenGL has the {0,0} at the down-left corner of the screen */
 
@@ -564,7 +576,7 @@ QImage* SceneRenderer::getOffscreenTexture( int width, int height )
             alpha = ptr[pixel_index + 3];
 
             c = QColor( red, green, blue, alpha );
-            image->setPixel( x, ( height - y )-1, c.rgba() );
+            image->setPixel( x, ( height - y ) - 1, c.rgba() );
         }
     }
 
@@ -581,55 +593,55 @@ void SceneRenderer::initFBO( int width, int height )
 {
     if ( textures.size() > 0 )
     {
-        foreach ( GLuint tex, textures )
-        {
-            glDeleteTextures( 1, &tex );
-        }
-        glDeleteFramebuffers( 1, &FBO );
-        glDeleteRenderbuffers( 1, &RBO );
-
+        foreach ( GLuint tex, textures ){
+        glDeleteTextures( 1, &tex );
     }
+    glDeleteFramebuffers( 1, &FBO );
+    glDeleteRenderbuffers( 1, &RBO );
 
-    textures[ "C0" ] = createTexture( width, height );
-    textures[ "C1" ] = createTexture( width, height );
-    textures[ "C2" ] = createTexture( width, height );
-    textures[ "C3" ] = createTexture( width, height );
-    textures[ "C4" ] = createTexture( width, height );
-    textures[ "C5" ] = createTexture( width, height );
-    textures[ "D0" ] = createTexture( width, height );
-    textures[ "D1" ] = createTexture( width, height );
-    textures[ "D2" ] = createTexture( width, height );
-    textures[ "PICK" ] = createTexture( width, height );
-    textures[ "SCREENSHOT" ] = createTexture( width, height );
+}
 
-    /* create a framebuffer object */
-    glGenFramebuffers( 1, &FBO );
-    /* attach the texture and the render buffer to the frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+textures[ "C0" ] = createTexture( width, height );
+textures[ "C1" ] = createTexture( width, height );
+textures[ "C2" ] = createTexture( width, height );
+textures[ "C3" ] = createTexture( width, height );
+textures[ "C4" ] = createTexture( width, height );
+textures[ "C5" ] = createTexture( width, height );
+textures[ "D0" ] = createTexture( width, height );
+textures[ "D1" ] = createTexture( width, height );
+textures[ "D2" ] = createTexture( width, height );
+textures[ "PICK" ] = createTexture( width, height );
+textures[ "SCREENSHOT" ] = createTexture( width, height );
 
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers( 3,  attachments );
+/* create a framebuffer object */
+glGenFramebuffers( 1, &FBO );
+/* attach the texture and the render buffer to the frame buffer */
+glBindFramebuffer( GL_FRAMEBUFFER, FBO );
 
-    /* create a renderbuffer object for the depth buffer */
-    glGenRenderbuffers( 1, &RBO );
-    /* bind the texture */
-    glBindRenderbuffer( GL_RENDERBUFFER, RBO );
-    /* create the render buffer in the GPU */
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
+GLuint attachments[3] =
+{   GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+glDrawBuffers( 3, attachments );
 
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["C0"], 0 );
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO );
-    /* check the frame buffer */
-    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-    {
-        /* handle an error : frame buffer incomplete */
-        qDebug() << "frame buffer incomplete";
-    }
+/* create a renderbuffer object for the depth buffer */
+glGenRenderbuffers( 1, &RBO );
+/* bind the texture */
+glBindRenderbuffer( GL_RENDERBUFFER, RBO );
+/* create the render buffer in the GPU */
+glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
 
-    /* unbind the render buffer */
-    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
-    /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["C0"], 0 );
+glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO );
+/* check the frame buffer */
+if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+{
+    /* handle an error : frame buffer incomplete */
+    qDebug() << "frame buffer incomplete";
+}
+
+/* unbind the render buffer */
+glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+/* return to the default frame buffer */
+glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 GLuint SceneRenderer::createTexture( int width, int height )

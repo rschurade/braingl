@@ -48,6 +48,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Global::SHOW_NAV_SLIDERS, true, true );
     m_properties->set( Fn::Global::SCREENSHOT_QUALITY, 1, 1, 5, true );
     m_properties->set( Fn::Global::SCREENSHOT_PATH, QDir(""), true );
+    m_properties->set( Fn::Global::TRANSPARENCY, {"classic", "new"}, 0, true );
     connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
 }
 
