@@ -13,6 +13,8 @@
 #include "../../algos/connection.h"
 #include "../../algos/connections.h"
 
+#include "../models.h"
+
 #include "qfile.h"
 
 #include "qmath.h"
@@ -524,3 +526,36 @@ void DatasetGlyphset::setProperties()
     m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, true );
 }
 
+void DatasetGlyphset::saveRGB()
+{
+    QFile file("test.rgb");
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    float* c = m_mesh.at(prevGeo)->getVertexColors();
+    for (int i = 0; i < m_mesh.at(prevGeo)->numVerts(); i++)
+    {
+        out << c[i*4] << " " << c[i*4+1] << " " << c[i*4+2] << endl;
+    }
+    file.close();
+}
+
+void DatasetGlyphset::loadRGB()
+{
+    QFile file("test.rgb");
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    m_renderer->beginUpdateColor();
+
+    for (int i = 0; i < m_mesh.at(prevGeo)->numVerts(); i++)
+    {
+        float r, g, b;
+        in >> r >> g >> b;for ( int i2 = 0; i2 < m_mesh.size(); i2++ )
+        {
+            m_renderer->updateColor( i, r, g, b, 1.0 );
+            m_mesh.at(i2)->setVertexColor( i, r, g, b, 1.0 );
+        }
+    }
+    m_renderer->endUpdateColor();
+    file.close();
+    Models::d()->submit();
+}

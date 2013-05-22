@@ -58,7 +58,9 @@ namespace Fn
         CUT_SELECTED_FIBERS,
         CREATE_NEW_DATASET,
         MAKECONS,
-        BUNDLE
+        BUNDLE,
+        SAVERGB,
+        LOADRGB
     };
 
     enum class Orient : int

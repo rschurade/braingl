@@ -126,6 +126,14 @@ void ToolBar::createActions()
     m_makeConsAction->setStatusTip( tr( "create new connections for bundling from thresholded connectivity" ) );
     connect( m_makeConsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_saveRGBAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Save surface colors as RGB" ), this, Fn::Algo::SAVERGB );
+    m_saveRGBAction->setStatusTip( tr( "saves the current colors of the surface in a RGB file" ) );
+    connect( m_saveRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_loadRGBAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Load surface colors from RGB" ), this, Fn::Algo::LOADRGB );
+    m_loadRGBAction->setStatusTip( tr( "loads colors from a RGB file on the surface" ) );
+    connect( m_loadRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -236,6 +244,12 @@ void ToolBar::slot( Fn::Algo algo )
             qDebug() << "Making new connections...";
             l = ((DatasetGlyphset*)ds)->createConnections();
             break;
+        case Fn::Algo::SAVERGB:
+            ((DatasetGlyphset*)ds)->saveRGB();
+            break;
+        case Fn::Algo::LOADRGB:
+            ((DatasetGlyphset*)ds)->loadRGB();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -301,6 +315,8 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::GLYPHSET:
         {
             this->addAction( m_makeConsAction );
+            this->addAction( m_saveRGBAction );
+            this->addAction( m_loadRGBAction );
             break;
         }
         case Fn::DatasetType::CONS:
