@@ -328,7 +328,7 @@ void SceneRenderer::renderMerge()
 
     int transparency = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
 
-    program->setUniformValue("transparency_new", transparency == 1 );
+    program->setUniformValue( "transparency_new", transparency == 1 );
 
     program->setUniformValue( "C0", 5 );
     program->setUniformValue( "C1", 6 );
@@ -351,7 +351,7 @@ QImage* SceneRenderer::screenshot()
     int size = Models::g()->data( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
     int tmpWidth = m_width;
     int tmpHeight = m_height;
-    resizeGL( size, size );
+    resizeGL( size, qRound( size * (double) m_height / (double) m_width ) );
     renderScene();
     setRenderTarget( "SCREENSHOT" );
     renderMerge();
