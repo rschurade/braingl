@@ -41,6 +41,7 @@ public:
 
     void loadRGB();
     void saveRGB();
+    void save1Ds();
 
 private:
     float minthresh;
@@ -60,6 +61,8 @@ private:
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle;
     float prevThresh, prevMinlength;
+
+    QString m_colors_name;
 };
 
 #endif /* DATASETGLYPHSET_H_ */

@@ -29,6 +29,11 @@
 	<file>icons/iso_surface.png</file>
 	<file>icons/droidsansmono256.png</file>
 	<file>icons/logo_blue_orange_64.png</file>
+	<file>icons/open_rgb.png</file>
+	<file>icons/save_rgb.png</file>
+	<file>icons/save_1D.png</file>
+	<file>icons/bundle.png</file>
+	<file>icons/new_cons.png</file>
 	<file>shaders/colormapbar.vs</file>
     <file>shaders/colormapbar.fs</file>
     <file>shaders/colormapscale.vs</file>
