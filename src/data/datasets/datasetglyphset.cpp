@@ -16,6 +16,7 @@
 #include "../models.h"
 
 #include "qfile.h"
+#include "qfiledialog.h"
 
 #include "qmath.h"
 
@@ -32,7 +33,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
                 prevThresh( -1 ),
-                prevMinlength( -1 )
+                prevMinlength( -1 ),
+                m_colors_name( "" )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -51,15 +53,15 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, true );
 
     /*m_properties["maingl2"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
-    { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl2"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
-    m_properties["maingl2"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::DRAW_SURFACE, true, true );
-    m_properties["maingl2"]->set( Fn::Property::DRAW_GLYPHS, true, true );*/
-    m_properties.remove("maingl2");
+     m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
+     { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
+     m_properties["maingl2"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
+     m_properties["maingl2"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
+     m_properties["maingl2"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
+     m_properties["maingl2"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
+     m_properties["maingl2"]->set( Fn::Property::DRAW_SURFACE, true, true );
+     m_properties["maingl2"]->set( Fn::Property::DRAW_GLYPHS, true, true );*/
+    m_properties.remove( "maingl2" );
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -122,10 +124,10 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     int geoGlyph = properties( target )->get( Fn::Property::SURFACE_GLYPH_GEOMETRY ).toInt();
     int geoCol = properties( target )->get( Fn::Property::SURFACE_GLYPH_COLOR ).toInt();
     int glyphstyle = properties( target )->get( Fn::Property::GLYPHSTYLE ).toInt();
-     
+
     float threshold = properties( target )->get( Fn::Property::THRESHOLD ).toFloat();
     float minlength = properties( target )->get( Fn::Property::MINLENGTH ).toFloat();
-    
+
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
@@ -388,17 +390,17 @@ void DatasetGlyphset::makePies()
     qDebug() << "threshold: " << threshold;
 
     /*if ( pieArrays )
-    {
-        for ( int i = 0; i < pieArrays->size(); ++i )
-        {
-            if ( pieArrays->at( i ) != NULL )
-                delete[] (float*) pieArrays->at( i );
-        }
-        delete pieArrays;
-        pieArrays = NULL;
-        delete numbers;
-        numbers = NULL;
-    }*/
+     {
+     for ( int i = 0; i < pieArrays->size(); ++i )
+     {
+     if ( pieArrays->at( i ) != NULL )
+     delete[] (float*) pieArrays->at( i );
+     }
+     delete pieArrays;
+     pieArrays = NULL;
+     delete numbers;
+     numbers = NULL;
+     }*/
 
     qDebug() << "calcPies after deletion";
 
@@ -528,34 +530,70 @@ void DatasetGlyphset::setProperties()
 
 void DatasetGlyphset::saveRGB()
 {
-    QFile file("test.rgb");
-    file.open(QIODevice::WriteOnly);
-    QTextStream out(&file);
-    float* c = m_mesh.at(prevGeo)->getVertexColors();
-    for (int i = 0; i < m_mesh.at(prevGeo)->numVerts(); i++)
+    if ( m_colors_name == "" )
     {
-        out << c[i*4] << " " << c[i*4+1] << " " << c[i*4+2] << endl;
+        m_colors_name = QFileDialog::getSaveFileName( NULL, "save RGB file" );
+    }
+    else
+    {
+        m_colors_name = QFileDialog::getSaveFileName( NULL, "save RGB file", m_colors_name );
+    }
+    QFile file( m_colors_name );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        return;
+    }
+    QTextStream out( &file );
+    float* c = m_mesh.at( prevGeo )->getVertexColors();
+    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+    {
+        out << c[i * 4] << " " << c[i * 4 + 1] << " " << c[i * 4 + 2] << endl;
     }
     file.close();
 }
 
 void DatasetGlyphset::loadRGB()
 {
-    QFile file("test.rgb");
-    file.open(QIODevice::ReadOnly);
-    QTextStream in(&file);
+    m_colors_name = QFileDialog::getOpenFileName( NULL, "load RGB file", m_colors_name );
+    QFile file( m_colors_name );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return;
+    }
+    QTextStream in( &file );
     m_renderer->beginUpdateColor();
 
-    for (int i = 0; i < m_mesh.at(prevGeo)->numVerts(); i++)
+    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
     {
         float r, g, b;
-        in >> r >> g >> b;for ( int i2 = 0; i2 < m_mesh.size(); i2++ )
+        in >> r >> g >> b;
+        for ( int i2 = 0; i2 < m_mesh.size(); i2++ )
         {
             m_renderer->updateColor( i, r, g, b, 1.0 );
-            m_mesh.at(i2)->setVertexColor( i, r, g, b, 1.0 );
+            m_mesh.at( i2 )->setVertexColor( i, r, g, b, 1.0 );
         }
     }
     m_renderer->endUpdateColor();
     file.close();
     Models::d()->submit();
+}
+
+void DatasetGlyphset::save1Ds()
+{
+    QFile file( QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".1D.roi" ) );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        return;
+    }
+    QTextStream out( &file );
+    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+    {
+        QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
+        QColor erasecolor = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
+        if ( vcolor != erasecolor )
+        {
+            out << i << " 1" << endl;
+        }
+    }
+    file.close();
 }

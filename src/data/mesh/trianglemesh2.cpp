@@ -121,6 +121,15 @@ void TriangleMesh2::setVertexColor( int id, float r, float g, float b, float a )
     m_vertexColors[ id * 4 + 3 ] = a;
 }
 
+QColor TriangleMesh2::getVertexColor( int id )
+{
+    float r = m_vertexColors[ id * 4     ];
+    float g = m_vertexColors[ id * 4 + 1 ];
+    float b = m_vertexColors[ id * 4 + 2 ];
+    float a = m_vertexColors[ id * 4 + 3 ];
+    return QColor::fromRgbF(r,g,b,a);
+}
+
 void TriangleMesh2::setVertexData( int id, float value )
 {
     m_vertices[ id * m_bufferSize + 7 ] = value;

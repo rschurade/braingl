@@ -34,6 +34,7 @@ public:
     void finalize();
 
     float* getVertices();
+    QColor getVertexColor(int i);
     float* getVertexColors();
     int* getIndexes();
 

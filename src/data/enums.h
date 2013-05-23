@@ -60,7 +60,8 @@ namespace Fn
         MAKECONS,
         BUNDLE,
         SAVERGB,
-        LOADRGB
+        LOADRGB,
+        SAVE1D
     };
 
     enum class Orient : int
