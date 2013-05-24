@@ -12,7 +12,11 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 PieGlyphRenderer::PieGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), pies( new float[1] ), np( 1 )
+        ObjectRenderer(),
+        vboIds( new GLuint[1] ),
+        pies( new float[1] ),
+        np( 1 ),
+        m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -62,6 +66,12 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
+
+    float pAlpha =  1.0;
+    float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
+    float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
+    float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
+    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
 
     float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
