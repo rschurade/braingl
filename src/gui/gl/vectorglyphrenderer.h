@@ -35,6 +35,7 @@ private:
     float* ps;
     int np;
     int ao;
+    int m_pickId;
 };
 
 #endif /* VECTORGLYPHRENDERER_H_ */

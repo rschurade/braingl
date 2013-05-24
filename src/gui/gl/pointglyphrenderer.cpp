@@ -14,7 +14,12 @@
 #include "qmatrix4x4.h"
 
 PointGlyphRenderer::PointGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 13 )
+        ObjectRenderer(),
+        vboIds( new GLuint[1] ),
+        ps( new float[1] ),
+        np( 1 ),
+        ao( 13 ),
+        m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -45,7 +50,7 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     }
     else // we are drawing tranparent objects
     {
-        if ( !(alpha < 1.0 ) )
+        if ( !( alpha < 1.0 ) )
         {
             // not transparent
             return;
@@ -81,6 +86,12 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
 
+    float pAlpha =  1.0;
+    float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
+    float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
+    float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
+    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
+
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
     setShaderVars( props );
@@ -88,8 +99,6 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
-
-
 
     glDrawArrays( GL_POINTS, 0, np );
 

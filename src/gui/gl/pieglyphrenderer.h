@@ -36,6 +36,7 @@ private:
     int np;
     int ao;
     int n;
+    int m_pickId;
 };
 
 #endif /* PIEGLYPHRENDERER_H_ */
