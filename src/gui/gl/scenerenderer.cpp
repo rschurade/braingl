@@ -153,7 +153,7 @@ void SceneRenderer::renderScene()
     GLFunctions::getAndPrintGLError( "before render scene" );
     QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
 
-    int transparency = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
+    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
 
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
@@ -235,7 +235,7 @@ void SceneRenderer::renderScene()
     clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     renderScenePart( 3, "C4", "D2" );
 
-    if ( transparency == 1 )
+    if ( transparencyMode == 1 )
     {
         glDisable( GL_DEPTH_TEST );
     }
@@ -244,18 +244,10 @@ void SceneRenderer::renderScene()
     clearTexture( "D1", 0.0, 0.0, 0.0, 0.0 );
     renderScenePart( 5, "C5", "D1" );
 
-    if ( transparency == 1 )
+    if ( transparencyMode == 1 )
     {
         glEnable( GL_DEPTH_TEST );
     }
-
-//    m_renderMode = 3;
-//    clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
-//    setRenderTarget( "D1" );
-//
-//     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
-//    renderDatasets();
-//    renderRois();
 
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
@@ -326,9 +318,9 @@ void SceneRenderer::renderMerge()
     program->enableAttributeArray( texcoordLocation );
     glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
-    int transparency = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
+    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
 
-    program->setUniformValue( "transparency_new", transparency == 1 );
+    program->setUniformValue( "transparency_new", transparencyMode == 1 );
 
     program->setUniformValue( "C0", 5 );
     program->setUniformValue( "C1", 6 );
