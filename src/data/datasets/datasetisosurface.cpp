@@ -36,7 +36,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"]->set( Fn::Property::CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"]->set( Fn::Property::TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
     m_properties["maingl"]->set( Fn::Property::NAME, QString( "isosurface" ) );
-    m_properties["maingl"]->set( Fn::Property::ISO_VALUE, 80.0f, ds->properties( "maingl" )->get( Fn::Property::MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::MAX ).toFloat(), true );
+    m_properties["maingl"]->set( Fn::Property::ISO_VALUE, 80.0f, ds->properties( "maingl" )->get( Fn::Property::MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::MAX ).toFloat(), "general" );
 
     m_properties["maingl2"]->set( Fn::Property::NX, ds->properties( "maingl" )->get( Fn::Property::NX ).toInt() );
     m_properties["maingl2"]->set( Fn::Property::NY, ds->properties( "maingl" )->get( Fn::Property::NY ).toInt() );

@@ -7,7 +7,8 @@
 #include "property.h"
 
 Property::Property( QString name ) :
-    m_name( name )
+    m_name( name ),
+    m_propertyTab( "none" )
 {
 }
 
@@ -20,3 +21,12 @@ QString Property::getName()
     return m_name;
 }
 
+void Property::setPropertyTab( QString tab )
+{
+    m_propertyTab = tab;
+}
+
+QString Property::getPropertyTab()
+{
+    return m_propertyTab;
+}

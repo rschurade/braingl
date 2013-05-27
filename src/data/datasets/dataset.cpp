@@ -14,7 +14,7 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     props->set( Fn::Property::ACTIVE, true );
     props->set( Fn::Property::FILENAME, fileName.path() );
     props->set( Fn::Property::TYPE, (int)type );
-    props->set( Fn::Property::NAME, fileName.path().split( "/" ).last(), true );
+    props->set( Fn::Property::NAME, fileName.path().split( "/" ).last(), "general" );
     props->set( Fn::Property::SIZE, -1 );
     props->set( Fn::Property::CREATED_BY, (int)Fn::Algo::NONE );
 
@@ -22,6 +22,14 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     props->set( Fn::Property::RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
+
+    PropertyGroup* props2 = new PropertyGroup();
+    // add standard properties
+    props2->set( Fn::Property::ACTIVE, true, "general" );
+    props2->set( Fn::Property::FILENAME, fileName.path() );
+    props2->set( Fn::Property::TYPE, (int)type );
+    props2->set( Fn::Property::RENDER_TARGET, "maingl2" );
+    m_properties.insert( "maingl2", props2 );
 }
 
 Dataset::~Dataset()

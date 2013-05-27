@@ -34,28 +34,28 @@ public:
     bool contains( Fn::Property name ) const;
     QVariant get( Fn::Property name ) const;
 
-    bool set( Fn::Property name, bool value, bool visible = false );
-    bool set( Fn::Property name, int value, bool visible = false );
-    bool set( Fn::Property name, int value, int min, int max, bool visible = false );
-    bool set( Fn::Property name, float value, bool visible = false );
-    bool set( Fn::Property name, float value, float min, float max, bool visible = false );
-    bool set( Fn::Property name, QString value, bool visible = false );
-    bool set( Fn::Property name, const char* value, bool visible = false );
     bool set( Fn::Property name, QVariant value );
-    bool set( Fn::Property name, QColor value, bool visible = false );
-    bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, bool visible = false );
-    bool set( Fn::Property name, QVector<QString> options, int value = 0, bool visible = false );
+    bool set2( Fn::Property name, QVariant value );
+    bool set( Fn::Property name, bool value, QString tab = "none" );
+    bool set( Fn::Property name, int value, QString tab = "none" );
+    bool set( Fn::Property name, int value, int min, int max, QString tab = "none" );
+    bool set( Fn::Property name, float value, QString tab = "none" );
+    bool set( Fn::Property name, float value, float min, float max, QString tab = "none" );
+    bool set( Fn::Property name, QString value, QString tab = "none" );
+    bool set( Fn::Property name, const char* value, QString tab = "none" );
+    bool set( Fn::Property name, QColor value, QString tab = "none" );
+    bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
+    bool set( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
 
     int size() const;
 
-    QList<Fn::Property> getVisible();
     QWidget* getWidget( Fn::Property name );
 
     Property* getProperty( Fn::Property name );
+    Property* getNthProperty( int n );
 
 private:
-    QHash<int, Property*> m_properties;
-    QList<Fn::Property>m_visible;
+    QVector<QPair<Fn::Property, Property*> >m_properties;
 
 public slots:
     void slotPropChanged();
