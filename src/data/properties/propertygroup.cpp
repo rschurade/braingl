@@ -190,6 +190,7 @@ bool PropertyGroup::set( Fn::Property name, QColor value, QString tab )
     else
     {
         PropertyColor* prop = new PropertyColor( Fn::Prop2String::s( (Fn::Property)name ), value );
+        prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
     }
