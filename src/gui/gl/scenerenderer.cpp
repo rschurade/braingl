@@ -346,6 +346,9 @@ QImage* SceneRenderer::screenshot()
     resizeGL( size, qRound( size * (double) m_height / (double) m_width ) );
     renderScene();
     setRenderTarget( "SCREENSHOT" );
+    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     renderMerge();
 
     QImage* out = getOffscreenTexture( m_width, m_height );
