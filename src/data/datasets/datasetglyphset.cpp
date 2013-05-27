@@ -60,8 +60,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
      m_properties["maingl2"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
      m_properties["maingl2"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, true );
      m_properties["maingl2"]->set( Fn::Property::DRAW_SURFACE, true, true );
-     m_properties["maingl2"]->set( Fn::Property::DRAW_GLYPHS, true, true );*/
-    m_properties.remove( "maingl2" );
+     m_properties["maingl2"]->set( Fn::Property::DRAW_GLYPHS, true, true );
+     m_properties.remove( "maingl2" );*/
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -110,6 +110,8 @@ void DatasetGlyphset::setMinthresh( float mt )
 
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    target = "maingl";
+
     if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
     {
         return;
