@@ -18,233 +18,226 @@ PropertyGroup::~PropertyGroup()
 
 bool PropertyGroup::contains( Fn::Property name ) const
 {
-    return m_properties.contains( (int)name );
+    for ( int i = 0; i < m_properties.size(); ++i )
+    {
+        if ( m_properties[i].first == name )
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 QVariant PropertyGroup::get( Fn::Property name ) const
 {
-    if ( m_properties.contains( (int)name ) )
+    for ( int i = 0; i < m_properties.size(); ++i )
     {
-        return m_properties[(int)name]->getValue();
+        if ( m_properties[i].first == name )
+        {
+            return m_properties[i].second->getValue();
+        }
     }
-    else
-    {
-        return QVariant();
-//        qDebug() << "*** ERROR *** GET" << m_properties[int::NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
-//        exit( 0 );
-    }
+    return QVariant();
 }
 
 bool PropertyGroup::set( Fn::Property name, QVariant value )
 {
-    if ( m_properties.contains( (int)name ) )
+    for ( int i = 0; i < m_properties.size(); ++i )
     {
-        m_properties[(int)name]->setValue( value );
-        return true;
+        if ( m_properties[i].first == name )
+        {
+            m_properties[i].second->setValue( value );
+            return true;
+        }
     }
-    else
-    {
-        //qDebug() << "*** ERROR *** SET" << m_properties[int::NAME]->getValue().toString() << Property::getNameAsString( name ) << name << "doesnt exist";
-        exit( 0 );
-        return false;
-    }
+
+    qDebug() << "*** ERROR *** SET" << "property doesnt exist";
+    exit( 0 );
+    return false;
 }
 
-bool PropertyGroup::set( Fn::Property name, bool value, bool visible )
+bool PropertyGroup::set2( Fn::Property name, QVariant value )
 {
-    if ( m_properties.contains( (int)name ) )
+    for ( int i = 0; i < m_properties.size(); ++i )
     {
-        m_properties[(int)name]->setValue( value );
+        if ( m_properties[i].first == name )
+        {
+            m_properties[i].second->setValue( value );
+            return true;
+        }
+    }
+
+    qDebug() << "*** ERROR *** SET" << "property doesnt exist";
+    exit( 0 );
+    return false;
+}
+
+bool PropertyGroup::set( Fn::Property name, bool value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set2( name, value );
     }
     else
     {
         PropertyBool* prop = new PropertyBool( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, int value, bool visible )
+bool PropertyGroup::set( Fn::Property name, int value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, int value, int min, int max, bool visible )
+bool PropertyGroup::set( Fn::Property name, int value, int min, int max, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
         return false;
     }
     else
     {
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, float value, bool visible )
+bool PropertyGroup::set( Fn::Property name, float value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, float value, float min, float max, bool visible )
+bool PropertyGroup::set( Fn::Property name, float value, float min, float max, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
         return false;
     }
     PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
-    m_properties[(int)name] = prop;
+    prop->setPropertyTab( tab );
+    m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
     connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-    if ( visible )
-    {
-        m_visible.append( name );
-    }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, QString value, bool visible )
+bool PropertyGroup::set( Fn::Property name, QString value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, const char* value, bool visible )
+bool PropertyGroup::set( Fn::Property name, const char* value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( QString( value ) );
+        set2( name, QString( value ) );
     }
     else
     {
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), QString( value ) );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, QColor value, bool visible )
+bool PropertyGroup::set( Fn::Property name, QColor value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertyColor* prop = new PropertyColor( Fn::Prop2String::s( (Fn::Property)name ), value );
-        m_properties[(int)name] = prop;
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, std::initializer_list<QString>options, int value, bool visible )
+bool PropertyGroup::set( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
 }
 
-bool PropertyGroup::set( Fn::Property name, QVector<QString> options, int value, bool visible )
+bool PropertyGroup::set( Fn::Property name, QVector<QString> options, int value, QString tab )
 {
-    if ( m_properties.contains( (int)name ) )
+    if ( contains( name ) )
     {
-        m_properties[(int)name]->setValue( value );
+        set2( name, value );
     }
     else
     {
         PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
-        m_properties[(int)name] = prop;
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
-        if ( visible )
-        {
-            m_visible.append( name );
-        }
     }
     return true;
-}
-
-QList<Fn::Property> PropertyGroup::getVisible()
-{
-    return m_visible;
 }
 
 QWidget* PropertyGroup::getWidget( Fn::Property name )
 {
-    return m_properties[(int)name]->getWidget();
+    for ( int i = 0; i < m_properties.size(); ++i )
+    {
+        if ( m_properties[i].first == name )
+        {
+            return m_properties[i].second->getWidget();
+        }
+    }
+    return 0;
 }
 
 void PropertyGroup::slotPropChanged()
@@ -259,12 +252,21 @@ int PropertyGroup::size() const
 
 Property* PropertyGroup::getProperty( Fn::Property name )
 {
-    if ( m_properties.contains( (int)name ) )
+    for ( int i = 0; i < m_properties.size(); ++i )
     {
-        return m_properties[(int)name];
+        if ( m_properties[i].first == name )
+        {
+            return m_properties[i].second;
+        }
     }
-    else
+    return 0;
+}
+
+Property* PropertyGroup::getNthProperty( int n )
+{
+    if ( n < 0 || n >= m_properties.size() )
     {
         return 0;
     }
+    return m_properties[n].second;
 }

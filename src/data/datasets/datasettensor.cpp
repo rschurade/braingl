@@ -20,15 +20,15 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_rendererEV( 0 ),
     m_renderGlpyhs( false )
 {
-    m_properties["maingl"]->set( Fn::Property::FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
-    m_properties["maingl"]->set( Fn::Property::EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
-    m_properties["maingl"]->set( Fn::Property::GAMMA, 0.1f, 0.0f, 10.0f, true );
-    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -1.0f, 1.0f, true );
-    m_properties["maingl"]->set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, true );
-    m_properties["maingl"]->set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, true );
+    m_properties["maingl"]->set( Fn::Property::FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
+    m_properties["maingl"]->set( Fn::Property::GAMMA, 0.1f, 0.0f, 10.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -1.0f, 1.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, "general" );
 
     examineDataset();
 }
@@ -53,15 +53,15 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nift
     }
 
     m_properties["maingl"]->set( Fn::Property::CREATED_BY, (int)Fn::Algo::TENSORFIT );
-    m_properties["maingl"]->set( Fn::Property::FA_THRESHOLD, 0.01f, 0.0f, 1.0f, true );
-    m_properties["maingl"]->set( Fn::Property::EV_THRESHOLD, 10.0f, 0.0f, 10.f, true );
-    m_properties["maingl"]->set( Fn::Property::GAMMA, 0.1f, 0.0f, 10.0f, true );
-    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, true );
-    m_properties["maingl"]->set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, true );
-    m_properties["maingl"]->set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, true );
+    m_properties["maingl"]->set( Fn::Property::FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
+    m_properties["maingl"]->set( Fn::Property::GAMMA, 0.1f, 0.0f, 10.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -0.5f, 0.5f, "general" );
+    m_properties["maingl"]->set( Fn::Property::SCALING, 0.5f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::TENSOR_RENDERMODE, 0, 0, 3, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, "general" );
 
     examineDataset();
 }

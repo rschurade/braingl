@@ -14,16 +14,16 @@ DatasetBingham::DatasetBingham( QDir filename, QVector<QVector<float> > data, ni
     m_data( data ),
     m_renderer( 0 )
 {
-    m_properties["maingl"]->set( Fn::Property::SCALING, 1.0f, 0.1f, 2.0f, true );
-    m_properties["maingl"]->set( Fn::Property::OFFSET, 0, -1, 1, true );
+    m_properties["maingl"]->set( Fn::Property::SCALING, 1.0f, 0.1f, 2.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::OFFSET, 0, -1, 1, "general" );
     m_properties["maingl"]->set( Fn::Property::ORDER, 4 );
-    m_properties["maingl"]->set( Fn::Property::LOD, 2, 0, 4, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_FIRST, true, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_SECOND, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_THIRD, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, true );
-    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, true );
+    m_properties["maingl"]->set( Fn::Property::LOD, 2, 0, 4, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_FIRST, true, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_SECOND, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_THIRD, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, "general" );
 
     examineDataset();
 }

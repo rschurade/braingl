@@ -27,11 +27,11 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
 
     m_properties["maingl"]->set( Fn::Property::NUM_POINTS, numPoints );
     m_properties["maingl"]->set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties["maingl"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
-    m_properties["maingl"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, true );
-    m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
-    m_properties["maingl"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
+    m_properties["maingl"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), "color" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, "color" );
+    m_properties["maingl"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP, 1 );
     m_properties["maingl"]->set( Fn::Property::MIN, 0.0f );
     m_properties["maingl"]->set( Fn::Property::MAX, 1.0f );
@@ -39,12 +39,12 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f );
     m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::NX, 800, 0, 1600, true );
-    m_properties["maingl"]->set( Fn::Property::NY, 1000, 0, 2000, true );
-    m_properties["maingl"]->set( Fn::Property::NZ, 800, 0, 1600, true );
+    m_properties["maingl"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::NX, 800, 0, 1600, "special" );
+    m_properties["maingl"]->set( Fn::Property::NY, 1000, 0, 2000, "special" );
+    m_properties["maingl"]->set( Fn::Property::NZ, 800, 0, 1600, "special" );
 
     QVector<QVector<float> >data0;
     data0.reserve( fibs.size() );
@@ -56,18 +56,13 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_dataNames.push_back( "no data" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::COLOR ), SIGNAL( colorChanged( QColor ) ), this, SLOT( colorChanged() ) );
 
-    PropertyGroup* props = new PropertyGroup();
-    props->set( Fn::Property::ACTIVE, true, true );
-    props->set( Fn::Property::RENDER_TARGET, "maingl2" );
-    m_properties.insert( "maingl2", props );
-
     m_properties["maingl2"]->set( Fn::Property::NUM_POINTS, numPoints );
     m_properties["maingl2"]->set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties["maingl2"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
-    m_properties["maingl2"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, true );
+    m_properties["maingl2"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl2"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
     //m_properties["maingl2"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
-    m_properties["maingl2"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
-    m_properties["maingl2"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
+    m_properties["maingl2"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, "general" );
+    m_properties["maingl2"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
     m_properties["maingl2"]->set( Fn::Property::COLORMAP, 1 );
     m_properties["maingl2"]->set( Fn::Property::MIN, 0.0f );
     m_properties["maingl2"]->set( Fn::Property::MAX, 1.0f );
@@ -75,12 +70,12 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_properties["maingl2"]->set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f );
     m_properties["maingl2"]->set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties["maingl2"]->set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-    m_properties["maingl2"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl2"]->set( Fn::Property::NX, 800, 0, 1600, true );
-    m_properties["maingl2"]->set( Fn::Property::NY, 1000, 0, 2000, true );
-    m_properties["maingl2"]->set( Fn::Property::NZ, 800, 0, 1600, true );
+    m_properties["maingl2"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl2"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl2"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl2"]->set( Fn::Property::NX, 800, 0, 1600, "special" );
+    m_properties["maingl2"]->set( Fn::Property::NY, 1000, 0, 2000, "special" );
+    m_properties["maingl2"]->set( Fn::Property::NZ, 800, 0, 1600, "special" );
 }
 
 DatasetFibers::DatasetFibers( QDir filename,
@@ -107,25 +102,25 @@ DatasetFibers::DatasetFibers( QDir filename,
 
     m_properties["maingl"]->set( Fn::Property::NUM_POINTS, numPoints );
     m_properties["maingl"]->set( Fn::Property::NUM_LINES, fibs.size() );
-    m_properties["maingl"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, true );
-    m_properties["maingl"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, true );
-    m_properties["maingl"]->set( Fn::Property::DATAMODE, dataNames, 0, true );
-    m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), true );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, true );
-    m_properties["maingl"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, true );
-    m_properties["maingl"]->set( Fn::Property::COLORMAP, 1, true );
+    m_properties["maingl"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::DATAMODE, dataNames, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, "general" );
+    m_properties["maingl"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::COLORMAP, 1, "color" );
     m_properties["maingl"]->set( Fn::Property::MIN, 0.0f );
     m_properties["maingl"]->set( Fn::Property::MAX, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f, true );
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f, true );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
     m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
     m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, true );
-    m_properties["maingl"]->set( Fn::Property::NX, 800, 0, 1600, true );
-    m_properties["maingl"]->set( Fn::Property::NY, 1000, 0, 2000, true );
-    m_properties["maingl"]->set( Fn::Property::NZ, 800, 0, 1600, true );
+    m_properties["maingl"]->set( Fn::Property::DX, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::DY, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::DZ, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->set( Fn::Property::NX, 800, 0, 1600, "special" );
+    m_properties["maingl"]->set( Fn::Property::NY, 1000, 0, 2000, "special" );
+    m_properties["maingl"]->set( Fn::Property::NZ, 800, 0, 1600, "special" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
               m_properties["maingl"]->getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );

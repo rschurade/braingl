@@ -17,9 +17,9 @@ DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float
     m_bvals( bvals ),
     m_bvecs( bvecs )
 {
-    m_properties["maingl"]->set( Fn::Property::COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, true );
-    m_properties["maingl"]->set( Fn::Property::INTERPOLATION, false, true );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
+    m_properties["maingl"]->set( Fn::Property::COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
+    m_properties["maingl"]->set( Fn::Property::INTERPOLATION, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, "general" );
 
     examineDataset();
 
@@ -114,13 +114,13 @@ void DatasetDWI::examineDataset()
         m_properties["maingl"]->set( Fn::Property::MIN, min );
         m_properties["maingl"]->set( Fn::Property::MAX, max );
     }
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, min, min, max, true );
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, max, min, max, true );
-    m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, true );
-    m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max, true );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max, "general" );
+    m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max, "general" );
 
 
-    m_properties["maingl"]->set( Fn::Property::SELECTED_TEXTURE, 0, 0, dim - 1, true );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_TEXTURE ), SIGNAL( valueChanged() ), this, SLOT( selectTexture() ) );
 }
 

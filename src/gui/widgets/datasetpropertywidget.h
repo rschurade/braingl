@@ -31,17 +31,6 @@ private:
 
     DatasetPropertyView* m_propertyView;
 
-    QVBoxLayout* m_layout1;
-    QVBoxLayout* m_layout2;
-    QVBoxLayout* m_layout3;
-    QList<QWidget*>m_visibleWidgets1;
-    QList<QWidget*>m_visibleWidgets2;
-    QList<QWidget*>m_visibleWidgets3;
-
-    QWidget* m_propWidget;
-    QWidget* m_colormapWidget;
-    QWidget* m_paintWidget;
-
 public slots:
     void updateWidgetVisibility();
     void colormapSelectionChanged( int id );

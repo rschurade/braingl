@@ -10,20 +10,29 @@
 #include "../../gui/gl/evrenderer.h"
 
 Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* header ) :
-        DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ), m_data( data ), m_renderer( 0 )
+    DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ),
+    m_data( data ),
+    m_renderer( 0 )
 {
     m_properties["maingl"]->set( Fn::Property::COLORMAP, -1 );
-    m_properties["maingl"]->set( Fn::Property::INTERPOLATION, false, true );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, true );
+    m_properties["maingl"]->set( Fn::Property::INTERPOLATION, false, "general" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, "general" );
     m_properties["maingl"]->set( Fn::Property::DIM, 3 );
-
-    m_properties["maingl"]->set( Fn::Property::RENDER_SLICE, 1, 1, 3, true );
-    m_properties["maingl"]->set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, true );
-    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -0.5, 0.5, true );
-
-    m_properties["maingl"]->set(Fn::Property::RENDER_VECTORS_STICKS, false, true );
-
+    m_properties["maingl"]->set( Fn::Property::RENDER_SLICE, 1, 1, 3, "general" );
+    m_properties["maingl"]->set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::OFFSET, 0.0f, -0.5, 0.5, "general" );
+    m_properties["maingl"]->set(Fn::Property::RENDER_VECTORS_STICKS, false, "general" );
     m_properties["maingl"]->set( Fn::Property::HAS_TEXTURE, true );
+
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP, -1 );
+    m_properties["maingl2"]->set( Fn::Property::INTERPOLATION, false, "general" );
+    m_properties["maingl2"]->set( Fn::Property::ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl2"]->set( Fn::Property::DIM, 3 );
+    m_properties["maingl2"]->set( Fn::Property::RENDER_SLICE, 1, 1, 3, "general" );
+    m_properties["maingl2"]->set( Fn::Property::SCALING, 1.0f, 0.0f, 2.0f, "general" );
+    m_properties["maingl2"]->set( Fn::Property::OFFSET, 0.0f, -0.5, 0.5, "general" );
+    m_properties["maingl2"]->set(Fn::Property::RENDER_VECTORS_STICKS, false, "general" );
+    m_properties["maingl2"]->set( Fn::Property::HAS_TEXTURE, true );
 
     examineDataset();
 }
@@ -66,9 +75,9 @@ void Dataset3D::examineDataset()
         flipX();
     }
 
-    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, true );
-    m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, true );
-    m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), true );
+    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
 }
 
