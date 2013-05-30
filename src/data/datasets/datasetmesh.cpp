@@ -19,7 +19,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     m_properties["maingl"]->set( Fn::Property::COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP, 1, "general" );
     m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 255, 255 ), "general" );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, "general" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.01f, 1.f, "general" );
 
     m_properties["maingl"]->set( Fn::Property::RENDER_COLORMAP, false, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_X, 50, 1, 2000, "colormap" );

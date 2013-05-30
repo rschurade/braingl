@@ -30,7 +30,7 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_properties["maingl"]->set( Fn::Property::FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
     m_properties["maingl"]->set( Fn::Property::COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
     m_properties["maingl"]->set( Fn::Property::COLOR, QColor( 255, 0, 0 ), "color" );
-    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.f, 1.f, "color" );
+    m_properties["maingl"]->set( Fn::Property::ALPHA, 1.f, 0.01f, 1.f, "color" );
     m_properties["maingl"]->set( Fn::Property::FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP, 1 );
     m_properties["maingl"]->set( Fn::Property::MIN, 0.0f );
