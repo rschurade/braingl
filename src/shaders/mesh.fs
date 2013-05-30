@@ -15,9 +15,9 @@ void main()
        
     if ( u_colorMode == 0 )
     {
-        if ( test1 < 0.4 )
+        if ( test1 > -0.5 && test1 < 0.4 )
         {
-            color = vec3( 1.0, 0.0, 0.0 );
+            color = vec3( u_color * abs( test1) );
         }
         else
         {
