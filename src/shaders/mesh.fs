@@ -11,10 +11,18 @@ in float v_value;
 void main()
 {
     vec3 color = light( u_color ).rgb;
-    
+    float test1 = dot( v_lightDir.xyz, v_normal.xyz );
+       
     if ( u_colorMode == 0 )
     {
-        color = light( u_color ).rgb;
+        if ( test1 < 0.4 )
+        {
+            color = vec3( 1.0, 0.0, 0.0 );
+        }
+        else
+        {
+            color = light( u_color ).rgb;
+        }
     }
     else if ( u_colorMode == 1 )
     {
