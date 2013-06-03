@@ -68,11 +68,12 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL( int width, int height );
-    void mousePressEvent( QMouseEvent *event );
-    void mouseReleaseEvent( QMouseEvent *event );
-    void mouseMoveEvent( QMouseEvent *event );
-    void enterEvent( QEvent *event );
-    void wheelEvent( QWheelEvent *event );
+    void mousePressEvent( QMouseEvent* event );
+    void mouseReleaseEvent( QMouseEvent* event );
+    void mouseMoveEvent( QMouseEvent* event );
+    void enterEvent( QEvent* event );
+    void wheelEvent( QWheelEvent* event );
+    void keyPressEvent( QKeyEvent* event );
 
 public slots:
     void update();

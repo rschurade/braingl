@@ -159,6 +159,7 @@ void GLWidget::calcMVPMatrix()
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
+    setFocus();
     if ( event->buttons() & Qt::LeftButton )
     {
         m_arcBall->click( event->x(), event->y() );
@@ -382,4 +383,39 @@ void GLWidget::rightMouseDrag( int x, int y )
             break;
         }
     }
+}
+
+void GLWidget::keyPressEvent( QKeyEvent* event )
+{
+    int x = this->size().width() / 2;
+    int y = this->size().height() / 2;
+    switch( event->key() )
+    {
+        case Qt::Key_Left :
+        {
+            m_arcBall->click( x, y );
+            m_arcBall->drag( x - 20, y );
+            break;
+        }
+        case Qt::Key_Right:
+        {
+            m_arcBall->click( x, y );
+            m_arcBall->drag( x + 20, y );
+            break;
+        }
+        case Qt::Key_Up :
+        {
+            m_arcBall->click( x, y );
+            m_arcBall->drag( x, y - 20 );
+            break;
+        }
+        case Qt::Key_Down:
+        {
+            m_arcBall->click( x, y );
+            m_arcBall->drag( x, y + 20 );
+            break;
+        }
+    }
+    calcMVPMatrix();
+    updateGL();
 }
