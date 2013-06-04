@@ -28,6 +28,8 @@ public:
 
     QItemSelectionModel* selectionModel();
 
+    void keyPressEvent( QKeyEvent* event );
+
 private:
     ROITreeView* m_treeView;
 
