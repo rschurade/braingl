@@ -57,41 +57,42 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
-void DatasetSurfaceset::mousePick( int pickId, QVector3D pos )
+void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers  )
 {
-    if ( pickId == 0 )
+    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
+    if ( pickId == 0 || paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return;
     }
 
-    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
-    if ( paintMode != 0 )
+    QColor color;
+    if ( ( modifiers & Qt::ControlModifier ) && !( modifiers & Qt::ShiftModifier ) )
     {
-        QColor color;
-        if ( paintMode == 1 )
-        {
-            color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
-        }
-        else if ( paintMode == 2 )
-        {
-            color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
-        }
+        color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
+    }
+    else if ( ( modifiers & Qt::ControlModifier ) && ( modifiers & Qt::ShiftModifier ) )
+    {
+        color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
+    }
+    else
+    {
+        return;
+    }
 
-        QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
+    QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
 
-        if ( picked.size() > 0 )
+    if ( picked.size() > 0 )
+    {
+        m_renderer->beginUpdateColor();
+        for ( int i = 0; i < picked.size(); ++i )
         {
-            m_renderer->beginUpdateColor();
-            for ( int i = 0; i < picked.size(); ++i )
+            m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+            for ( int m = 0; m < m_mesh.size(); m++ )
             {
-                m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-                for ( int m = 0; m < m_mesh.size(); m++ )
-                {
-                    m_mesh[m]->setVertexColor( picked[i], color );
-                }
+                m_mesh[m]->setVertexColor( picked[i], color );
             }
-            m_renderer->endUpdateColor();
-            Models::d()->submit();
         }
+        m_renderer->endUpdateColor();
+        Models::d()->submit();
     }
 }
