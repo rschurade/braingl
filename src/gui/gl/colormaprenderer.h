@@ -36,6 +36,7 @@ private:
     float m_dx;
     float m_dy;
     int m_textSize;
+    QColor m_textColor;
 
     int m_colormap;
     float m_min;
@@ -52,6 +53,7 @@ public slots:
     void setDX( float dx );
     void setDY( float dy );
     void setTextSize( int size );
+    void setTextColor( QColor color );
 
     void setColormap( int value );
     void setMin( float value );
