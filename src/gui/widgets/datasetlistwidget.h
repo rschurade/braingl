@@ -38,11 +38,12 @@ private:
 
 	int m_selected;
 
-private slots:
+public slots:
 	void moveItemUp();
 	void moveItemDown();
 	void deleteItem();
 	void itemSelectionChanged( const QItemSelection &selected );
+	void slotKeyPressed( int key, Qt::KeyboardModifiers mods );
 
 signals:
 	void moveSelectedItemUp( int row );

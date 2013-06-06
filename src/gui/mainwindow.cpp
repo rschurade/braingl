@@ -668,6 +668,8 @@ void MainWindow::createDockWindows()
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
+
+    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
 }
 
 void MainWindow::slotToggleAxialSlice()

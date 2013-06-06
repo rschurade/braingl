@@ -431,6 +431,8 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
     }
     calcMVPMatrix();
     updateGL();
+
+    emit signalKeyPressed( event->key(), event->modifiers() );
 }
 
 void GLWidget::visibilityChanged( bool visible )

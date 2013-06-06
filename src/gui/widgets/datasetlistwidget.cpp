@@ -8,7 +8,10 @@
 
 #include "../views/datasetlistview.h"
 
+#include "../../data/enums.h"
 #include "../../data/models.h"
+#include "../../data/vptr.h"
+#include "../../data/datasets/dataset.h"
 
 #include <QtGui>
 
@@ -167,4 +170,30 @@ void DatasetListWidget::deleteItem()
 int DatasetListWidget::getSelected()
 {
     return m_selected;
+}
+
+void DatasetListWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
+{
+    if ( m_selected != -1 )
+    {
+        QModelIndex index = m_listView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
+        Dataset* ds = VPtr<Dataset>::asPtr( m_listView->model()->data( index, Qt::DisplayRole ) );
+
+
+        switch ( key )
+        {
+            case 65:
+            {
+                bool active = ds->properties()->get( Fn::Property::ACTIVE ).toBool();
+                ds->properties()->set( Fn::Property::ACTIVE, !active );
+                break;
+            }
+            case 80:
+            {
+                int paintMode = ds->properties()->get( Fn::Property::PAINTMODE ).toInt();
+                ds->properties()->set( Fn::Property::PAINTMODE, 1 - paintMode );
+                break;
+            }
+        }
+    }
 }

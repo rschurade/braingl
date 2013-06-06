@@ -18,6 +18,8 @@ public:
 	DatasetListView( QWidget  *parent=0 );
 	virtual ~DatasetListView();
 
+	QModelIndex getSelectedIndex( int column );
+
 private slots:
 	void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 	void rowsInserted (const QModelIndex &parent, int start, int end );
