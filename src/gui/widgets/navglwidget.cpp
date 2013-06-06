@@ -119,6 +119,10 @@ void NavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 
 void NavGLWidget::update()
 {
+    if ( !m_visible )
+    {
+        return;
+    }
     updateGL();
 }
 

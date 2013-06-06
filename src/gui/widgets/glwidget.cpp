@@ -21,6 +21,7 @@
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
     QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
     m_roiSelectionModel( roiSelectionModel ),
+    m_visible( false ),
     m_nx( 160 ),
     m_ny( 200 ),
     m_nz( 160 ),
@@ -46,6 +47,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( parent, shareWidget ),
     m_roiSelectionModel( roiSelectionModel ),
+    m_visible( false ),
     m_nx( 160 ),
     m_ny( 200 ),
     m_nz( 160 ),
@@ -216,6 +218,10 @@ void GLWidget::wheelEvent( QWheelEvent *event )
 
 void GLWidget::update()
 {
+    if ( !m_visible )
+    {
+        return;
+    }
     calcMVPMatrix();
     updateGL();
 }
@@ -418,4 +424,9 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
     }
     calcMVPMatrix();
     updateGL();
+}
+
+void GLWidget::visibilityChanged( bool visible )
+{
+    m_visible = visible;
 }

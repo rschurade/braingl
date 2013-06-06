@@ -15,6 +15,7 @@
 #include "../widgets/controls/colormapwidget.h"
 
 #include "../gl/colormapfunctions.h"
+#include "../gl/glfunctions.h"
 
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
@@ -131,6 +132,9 @@ void DatasetPropertyWidget::colormapSelectionChanged( int id )
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
     ds->properties( m_target )->set( Fn::Property::COLORMAP, id );
     ds->properties( m_target )->slotPropChanged();
+
+    GLFunctions::reloadShaders();
+    Models::g()->submit();
 }
 
 void DatasetPropertyWidget::update()

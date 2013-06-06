@@ -28,13 +28,14 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
 
     examineDataset();
 
-    m_properties["maingl"]->set( Fn::Property::COLORMAP, 0, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::COLORMAP, 0, "general" );
     m_properties["maingl"]->set( Fn::Property::RENDER_COLORMAP, false, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_X, 50, 1, 2000, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_Y, 50, 1, 2000, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DX, 400, 1, 2000, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::IS_ATLAS, false, "colormap" );
 
     m_properties["maingl2"]->set( Fn::Property::RENDER_COLORMAP, false, "colormap" );
     m_properties["maingl2"]->set( Fn::Property::COLORMAP_X, 50, 1, 2000, "colormap" );
@@ -196,7 +197,7 @@ void DatasetScalar::flipX()
 
 void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() || renderMode != 1 )
     {
         return;
     }

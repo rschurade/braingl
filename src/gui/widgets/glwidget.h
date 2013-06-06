@@ -44,6 +44,8 @@ private:
     QMatrix4x4 m_mvMatrix;
     QMatrix4x4 m_pMatrix;
 
+    bool m_visible;
+
     float m_nx;
     float m_ny;
     float m_nz;
@@ -77,6 +79,7 @@ protected:
 
 public slots:
     void update();
+    void visibilityChanged( bool visible );
 
 signals:
 

@@ -26,6 +26,7 @@ public:
 
 public slots:
     void update();
+    void visibilityChanged( bool visible );
 
 signals:
 
@@ -39,6 +40,7 @@ protected:
 
 private:
     SingleSHRenderer* m_renderer;
+    bool m_visible;
 };
 
 #endif /* SINGLESHWIDGET_H_ */
