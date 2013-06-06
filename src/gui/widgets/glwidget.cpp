@@ -402,31 +402,83 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
 {
     int x = this->size().width() / 2;
     int y = this->size().height() / 2;
-    switch( event->key() )
+
+    if ( event->modifiers() & Qt::ShiftModifier )
     {
-        case Qt::Key_Left :
+        int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
+        int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
+        int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+
+        int m_nx = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
+        int m_ny = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
+        int m_nz = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+        switch( event->key() )
         {
-            m_arcBall->click( x, y );
-            m_arcBall->drag( x - 20, y );
-            break;
+            case Qt::Key_Left :
+            {
+                m_x = qMax( 0, m_x -1 );
+                break;
+            }
+            case Qt::Key_Right:
+            {
+                m_x = qMin( m_nx, m_x +1 );
+                break;
+            }
+            case Qt::Key_Down :
+            {
+                m_y = qMax( 0, m_y -1 );
+                break;
+            }
+            case Qt::Key_Up:
+            {
+                m_y = qMin( m_ny, m_y +1 );
+                break;
+            }
+            case Qt::Key_PageDown:
+            {
+                m_z = qMax( 0, m_z -1 );
+                break;
+            }
+            case Qt::Key_PageUp:
+            {
+                m_z = qMin( m_nz, m_z +1 );
+                break;
+            }
         }
-        case Qt::Key_Right:
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), m_x );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), m_y );
+        Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), m_z );
+
+        Models::g()->submit();
+    }
+    else
+    {
+        switch( event->key() )
         {
-            m_arcBall->click( x, y );
-            m_arcBall->drag( x + 20, y );
-            break;
-        }
-        case Qt::Key_Up :
-        {
-            m_arcBall->click( x, y );
-            m_arcBall->drag( x, y - 20 );
-            break;
-        }
-        case Qt::Key_Down:
-        {
-            m_arcBall->click( x, y );
-            m_arcBall->drag( x, y + 20 );
-            break;
+            case Qt::Key_Left :
+            {
+                m_arcBall->click( x, y );
+                m_arcBall->drag( x - 20, y );
+                break;
+            }
+            case Qt::Key_Right:
+            {
+                m_arcBall->click( x, y );
+                m_arcBall->drag( x + 20, y );
+                break;
+            }
+            case Qt::Key_Up :
+            {
+                m_arcBall->click( x, y );
+                m_arcBall->drag( x, y - 20 );
+                break;
+            }
+            case Qt::Key_Down:
+            {
+                m_arcBall->click( x, y );
+                m_arcBall->drag( x, y + 20 );
+                break;
+            }
         }
     }
     calcMVPMatrix();

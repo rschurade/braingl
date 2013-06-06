@@ -179,7 +179,6 @@ void DatasetListWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
         QModelIndex index = m_listView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
         Dataset* ds = VPtr<Dataset>::asPtr( m_listView->model()->data( index, Qt::DisplayRole ) );
 
-
         switch ( key )
         {
             case 65:
