@@ -353,9 +353,8 @@ void MainWindow::undo()
 
 void MainWindow::about()
 {
-    QMessageBox::about( this, tr( "About Fibernavigator 2" ),
-            tr( "The <b>Fibernavigator 2</b> will be the replacement "
-                    "of Fibernavigator and so much more." ) );
+    QMessageBox::about( this, tr( "About brainGL" ),
+            tr( "<b>brainGL</b> exploring and visualizing anatomical and functional connectivity in the brain." ) );
 }
 
 void MainWindow::createActions()
@@ -744,7 +743,7 @@ void MainWindow::resetSettings()
 {
     QMessageBox msgBox;
     msgBox.setText("Reset settings.");
-    msgBox.setInformativeText("This will shut down fibernavigator 2. Continue?");
+    msgBox.setInformativeText("This will shut down brainGL. Continue?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Yes);
     int ret = msgBox.exec();
