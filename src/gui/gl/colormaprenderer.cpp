@@ -142,7 +142,7 @@ void ColormapRenderer::setShaderVars()
 
 void ColormapRenderer::draw( int width, int height, int renderMode )
 {
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    if ( renderMode == 1 ) // we are drawing opaque objects
     {
         return;
     }
