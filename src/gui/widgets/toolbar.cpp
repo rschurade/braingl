@@ -275,7 +275,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_isosurfaceAct );
             this->addAction( m_distanceMapAct );
-            this->addAction( m_createNewAct );
+            //this->addAction( m_createNewAct );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:
