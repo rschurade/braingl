@@ -11,5 +11,5 @@ void main()
     
     color.a = 1.0 - color.r;
     
-	writePeel( color.rgb );
+	writePeel( color );
 }

@@ -29,7 +29,7 @@ public:
 
 private:
     GLuint *vboIds;
-    GLuint m_fontTextureGLuint;
+    GLuint *m_fontTextureGLuint;
     QHash<QChar, int >m_characterPositions;
 
     float m_textSizeX;

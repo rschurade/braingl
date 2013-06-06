@@ -15,6 +15,7 @@
 
 TextRenderer::TextRenderer() :
     vboIds( new GLuint[ 1 ] ),
+    m_fontTextureGLuint( new GLuint[ 1 ] ),
     m_textSizeX( 0.1 ),
     m_textSizeY( 0.1 )
 {
@@ -42,8 +43,8 @@ void TextRenderer::createFontTexture()
     QImage texImage( ":/icons/droidsansmono256.png", "PNG" );
     QImage GL_formatted_image = QGLWidget::convertToGLFormat(texImage);
 
-    glGenTextures( 1, &m_fontTextureGLuint );
-    glBindTexture( GL_TEXTURE_2D, m_fontTextureGLuint );
+    glGenTextures( 1, &m_fontTextureGLuint[0] );
+    glBindTexture( GL_TEXTURE_2D, m_fontTextureGLuint[0] );
 
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texImage.width(), texImage.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image.bits() );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -53,8 +54,8 @@ void TextRenderer::createFontTexture()
 void TextRenderer::renderText( QString text, int x, int y, int width, int height, int renderMode )
 {
     //qDebug() << text << x << y;
-    glActiveTexture( GL_TEXTURE0 );
-    glBindTexture( GL_TEXTURE_2D, m_fontTextureGLuint );
+    glActiveTexture( GL_TEXTURE13 );
+    glBindTexture( GL_TEXTURE_2D, m_fontTextureGLuint[0] );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
 
@@ -80,9 +81,11 @@ void TextRenderer::renderText( QString text, int x, int y, int width, int height
     program->setUniformValue( "u_alpha", 1.0f );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
+    program->setUniformValue( "fontTex", 13 );
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
+    program->setUniformValue( "P0", 12 );
 
     for ( int i = 0; i < text.size(); ++i )
     {
@@ -98,7 +101,7 @@ void TextRenderer::renderText( QString text, int x, int y, int width, int height
 
 void TextRenderer::initGeometry()
 {
-    float z = -0.52;
+    float z = -0.3;
     float vertices[] =
     {
         0.0f, 0.0f, z,
