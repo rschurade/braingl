@@ -27,7 +27,7 @@ public:
 
     QVector<QVector3D>* getData();
 
-    void mousePick( int pickId, QVector3D pos );
+    void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers );
 
 private:
     void examineDataset();

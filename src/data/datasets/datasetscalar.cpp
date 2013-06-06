@@ -35,6 +35,7 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DX, 400, 1, 2000, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
     m_properties["maingl"]->set( Fn::Property::IS_ATLAS, false, "colormap" );
 
     m_properties["maingl2"]->set( Fn::Property::RENDER_COLORMAP, false, "colormap" );
@@ -43,6 +44,7 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
     m_properties["maingl2"]->set( Fn::Property::COLORMAP_DX, 400, 1, 2000, "colormap" );
     m_properties["maingl2"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl2"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl2"]->set( Fn::Property::COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
 }
 
 DatasetScalar::~DatasetScalar()
@@ -124,7 +126,7 @@ void DatasetScalar::examineDataset()
         }
     }
 
-    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 1, 1, 5, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTVALUE, min, min, max - 1.0, "paint" );
 }
@@ -214,6 +216,7 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         m_colormapRenderer->setDX( properties( target )->get( Fn::Property::COLORMAP_DX ).toFloat() );
         m_colormapRenderer->setDY( properties( target )->get( Fn::Property::COLORMAP_DY ).toFloat() );
         m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( properties( target )->get( Fn::Property::COLORMAP_TEXT_COLOR ).value<QColor>() );
 
         m_colormapRenderer->setMin( properties( target )->get( Fn::Property::MIN).toFloat() );
         m_colormapRenderer->setMax( properties( target )->get( Fn::Property::MAX).toFloat() );
@@ -240,9 +243,10 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
     return QString::number( data );
 }
 
-void DatasetScalar::mousePick( int pickId, QVector3D pos )
+void DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
 {
-    if ( pickId == 0 )
+    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
+    if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return;
     }
@@ -251,44 +255,30 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos )
     float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
     float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
 
-   int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
-   if (  paintMode != 0 )
-   {
-       QColor color;
-       if ( paintMode == 1 )
-       {
-           color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
-       }
-       else if ( paintMode == 2 )
-       {
-           color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
-       }
+    float paintValue = m_properties["maingl"]->get( Fn::Property::PAINTVALUE ).toFloat();
+    m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
 
-       float paintValue = m_properties["maingl"]->get( Fn::Property::PAINTVALUE ).toFloat();
-       m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
+    int brushSize = m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toInt();
 
-       int brushSize = m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toInt();
-
-       for ( int i = 0; i < brushSize; ++i )
+    for ( int i = 0; i < brushSize; ++i )
+    {
+       for ( int j = 0; j < brushSize; ++j )
        {
-           for ( int j = 0; j < brushSize; ++j )
+           for ( int k = 0; k < brushSize; ++k )
            {
-               for ( int k = 0; k < brushSize; ++k )
-               {
-                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
-               }
+               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
            }
        }
+    }
 
-       glDeleteTextures( 1, &m_textureGLuint );
-       m_textureGLuint = 0;
-       Models::d()->submit();
-   }
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+    Models::d()->submit();
 }

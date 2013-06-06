@@ -173,7 +173,7 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
     }
     if ( event->buttons() & Qt::RightButton )
     {
-        rightMouseDown( event->x(), event->y() );
+        rightMouseDown( event );
     }
     calcMVPMatrix();
     updateGL();
@@ -191,7 +191,7 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
     }
     if ( event->buttons() & Qt::RightButton )
     {
-        rightMouseDrag( event->x(), event->y() );
+        rightMouseDrag( event );
     }
     calcMVPMatrix();
     updateGL();
@@ -247,8 +247,10 @@ QImage* GLWidget::screenshot()
     return m_sceneRenderer->screenshot();
 }
 
-void GLWidget::rightMouseDown( int x, int y )
+void GLWidget::rightMouseDown( QMouseEvent* event )
 {
+    int x = event->x();
+    int y = event->y();
     m_rightMouseDown = QVector2D( x, y );
     // get id
     m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
@@ -266,7 +268,7 @@ void GLWidget::rightMouseDown( int x, int y )
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->mousePick( m_picked, pickPos );
+            ds->mousePick( m_picked, pickPos, event->modifiers() );
         }
     }
 
@@ -289,8 +291,11 @@ void GLWidget::rightMouseDown( int x, int y )
     m_rightMouseDown = QVector2D( x, y );
 }
 
-void GLWidget::rightMouseDrag( int x, int y )
+void GLWidget::rightMouseDrag( QMouseEvent* event )
 {
+    int x = event->x();
+    int y = event->y();
+
     QVector3D vs = m_sceneRenderer->mapMouse2World( x, y, 0 );
     QVector3D vs2 = m_sceneRenderer->mapMouse2World( m_pickOld.x(), m_pickOld.y(), 0 );
     QVector3D dir = vs - vs2;
@@ -314,79 +319,81 @@ void GLWidget::rightMouseDrag( int x, int y )
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->mousePick( m_picked, pickPos );
+            ds->mousePick( m_picked, pickPos, event->modifiers() );
         }
     }
 
-
-    switch ( m_picked )
+    if ( !(event->modifiers() & Qt::ControlModifier) )
     {
-        case 0:
-            break;
-        case 1:
+        switch ( m_picked )
         {
-            QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z );
-            QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z + 1.0 );
-            QVector2D v3 = v1 - v2;
-            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
-            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
-            int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
-            if ( m_z != newSlice )
+            case 0:
+                break;
+            case 1:
             {
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
-                skipDraw = true;
-                Models::g()->submit();
+                QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z );
+                QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z + 1.0 );
+                QVector2D v3 = v1 - v2;
+                float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+                float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+                int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
+                if ( m_z != newSlice )
+                {
+                    Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+                    skipDraw = true;
+                    Models::g()->submit();
+                }
+                break;
             }
-            break;
-        }
-        case 2:
-        {
-            QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y, m_nz / 2 );
-            QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y + 1.0, m_nz / 2 );
-            QVector2D v3 = v1 - v2;
-            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
-            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
-            int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
-            if ( m_y != newSlice )
+            case 2:
             {
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
-                skipDraw = true;
-                Models::g()->submit();
+                QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y, m_nz / 2 );
+                QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y + 1.0, m_nz / 2 );
+                QVector2D v3 = v1 - v2;
+                float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+                float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+                int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
+                if ( m_y != newSlice )
+                {
+                    Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+                    skipDraw = true;
+                    Models::g()->submit();
+                }
+                break;
             }
-            break;
-        }
-        case 3:
-        {
-            QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_x, m_ny / 2, m_nz / 2 );
-            QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_x + 1.0, m_ny / 2, m_nz / 2 );
-            QVector2D v3 = v1 - v2;
-            float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
-            float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
-            int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
-            if ( m_x != newSlice )
+            case 3:
             {
-                Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
-                skipDraw = true;
-                Models::g()->submit();
+                QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_x, m_ny / 2, m_nz / 2 );
+                QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_x + 1.0, m_ny / 2, m_nz / 2 );
+                QVector2D v3 = v1 - v2;
+                float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
+                float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
+                int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
+                if ( m_x != newSlice )
+                {
+                    Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
+                    skipDraw = true;
+                    Models::g()->submit();
+                }
+                break;
             }
-            break;
-        }
-        default:
-        {
-            if ( m_roiSelectionModel->hasSelection() )
+            default:
             {
-                QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
-                float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
-                float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
-                float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
+                if ( m_roiSelectionModel->hasSelection() )
+                {
+                    QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
+                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
+                    float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
+                    float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
+                    float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
 
-                roi->properties()->set( Fn::ROI::X, newx );
-                roi->properties()->set( Fn::ROI::Y, newy );
-                roi->properties()->set( Fn::ROI::Z, newz );
-                roi->properties()->slotPropChanged();
+                    roi->properties()->set( Fn::ROI::X, newx );
+                    roi->properties()->set( Fn::ROI::Y, newy );
+                    roi->properties()->set( Fn::ROI::Z, newz );
+                    roi->properties()->slotPropChanged();
+                }
+                break;
             }
-            break;
         }
     }
 }

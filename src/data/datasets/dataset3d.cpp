@@ -75,7 +75,7 @@ void Dataset3D::examineDataset()
         flipX();
     }
 
-    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
@@ -192,64 +192,52 @@ QString Dataset3D::getValueAsString( int x, int y, int z )
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }
 
-void Dataset3D::mousePick( int pickId, QVector3D pos )
+void Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers modifiers )
 {
-    if ( pickId == 0 )
+    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
+    if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
+    {
+        return;
+    }
+
+   QColor paintColorC = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
+   QVector3D paintValue;
+   int type = m_properties["maingl"]->get( Fn::Property::DATATYPE ).toInt();
+   if ( type == DT_UNSIGNED_CHAR )
    {
-       return;
+       paintValue = QVector3D( paintColorC.red(), paintColorC.green(), paintColorC.blue() );
+   }
+   else
+   {
+       paintValue = QVector3D( paintColorC.redF(), paintColorC.greenF(), paintColorC.blueF() );
    }
 
-   int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
-   if (  paintMode != 0 )
+   m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
+
+   int brushSize = m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toInt();
+
+   for ( int i = 0; i < brushSize; ++i )
    {
-       QColor color;
-       if ( paintMode == 1 )
+       for ( int j = 0; j < brushSize; ++j )
        {
-           color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
-       }
-       else if ( paintMode == 2 )
-       {
-           color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
-       }
-
-       QColor paintColorC = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
-       QVector3D paintValue;
-       int type = m_properties["maingl"]->get( Fn::Property::DATATYPE ).toInt();
-       if ( type == DT_UNSIGNED_CHAR )
-       {
-           paintValue = QVector3D( paintColorC.red(), paintColorC.green(), paintColorC.blue() );
-       }
-       else
-       {
-           paintValue = QVector3D( paintColorC.redF(), paintColorC.greenF(), paintColorC.blueF() );
-       }
-
-       m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
-
-       int brushSize = m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toInt();
-
-       for ( int i = 0; i < brushSize; ++i )
-       {
-           for ( int j = 0; j < brushSize; ++j )
+           for ( int k = 0; k < brushSize; ++k )
            {
-               for ( int k = 0; k < brushSize; ++k )
-               {
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() + k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() - k ) ] = paintValue;
-                   m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() + k ) ] = paintValue;
-               }
+               m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() - k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() + k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() - k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() + k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() - k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() + k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() - k ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() + k ) ] = paintValue;
            }
        }
-
-       glDeleteTextures( 1, &m_textureGLuint );
-       m_textureGLuint = 0;
    }
+
+   glDeleteTextures( 1, &m_textureGLuint );
+   m_textureGLuint = 0;
 }
+
 
 QString Dataset3D::getColormapShader( int num )
 {
