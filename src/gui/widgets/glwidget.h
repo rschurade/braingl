@@ -63,8 +63,8 @@ private:
 
     void calcMVPMatrix();
 
-    void rightMouseDown( int x, int y );
-    void rightMouseDrag( int x, int y );
+    void rightMouseDown( QMouseEvent* event );
+    void rightMouseDrag( QMouseEvent* event );
 
 protected:
     void initializeGL();

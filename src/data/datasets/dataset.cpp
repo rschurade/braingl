@@ -68,7 +68,7 @@ void Dataset::createTexture()
     // do nothing here
 }
 
-void Dataset::mousePick( int pickId, QVector3D pos )
+void Dataset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
 {
     // do nothing here
 }

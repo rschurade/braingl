@@ -28,7 +28,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
@@ -92,7 +92,7 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     m_properties["maingl"]->set( Fn::Property::COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->set( Fn::Property::COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint", "erase" }, 0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
     m_properties["maingl"]->set( Fn::Property::PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
@@ -165,40 +165,41 @@ QString DatasetMesh::getValueAsString( int x, int y, int z )
     return QString( "" );
 }
 
-void DatasetMesh::mousePick( int pickId, QVector3D pos )
+void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
 {
-    if ( pickId == 0 )
-   {
-       return;
-   }
+    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
+    if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
+    {
+        return;
+    }
 
-   int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
-   if (  paintMode != 0 )
-   {
-       QColor color;
-       if ( paintMode == 1 )
-       {
-           color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
-       }
-       else if ( paintMode == 2 )
-       {
-           color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
-       }
+    QColor color;
+    if ( ( modifiers & Qt::ControlModifier ) && !( modifiers & Qt::ShiftModifier ) )
+    {
+        color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
+    }
+    else if ( ( modifiers & Qt::ControlModifier ) && ( modifiers & Qt::ShiftModifier ) )
+    {
+        color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
+    }
+    else
+    {
+        return;
+    }
 
-       QVector<int>picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
+    QVector<int> picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
 
-       if ( picked.size() > 0 )
-       {
-           m_renderer->beginUpdateColor();
-           for ( int i = 0; i < picked.size(); ++i )
-           {
-               m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-               m_mesh[0]->setVertexColor( picked[i], color );
-           }
-           m_renderer->endUpdateColor();
-           Models::d()->submit();
-       }
-   }
+    if ( picked.size() > 0 )
+    {
+        m_renderer->beginUpdateColor();
+        for ( int i = 0; i < picked.size(); ++i )
+        {
+            m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+            m_mesh[0]->setVertexColor( picked[i], color );
+        }
+        m_renderer->endUpdateColor();
+        Models::d()->submit();
+    }
 }
 
 void DatasetMesh::paintModeChanged( int mode )
