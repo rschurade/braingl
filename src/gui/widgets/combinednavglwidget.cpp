@@ -79,6 +79,10 @@ void CombinedNavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 
 void CombinedNavGLWidget::update()
 {
+    if ( !m_visible )
+    {
+        return;
+    }
     updateGL();
 }
 

@@ -167,7 +167,8 @@ namespace Fn
         GLYPH_ROT_X,
         GLYPH_ROT_Y,
         GLYPH_ROT_Z,
-        GLYPH_ALPHA
+        GLYPH_ALPHA,
+        IS_ATLAS
     };
 
     struct Prop2String
@@ -259,6 +260,7 @@ namespace Fn
                 case Property::GLYPH_ROT_Y: return QString( "glyph y rotation" ); break;
                 case Property::GLYPH_ROT_Z: return QString( "glyph z rotation" ); break;
                 case Property::GLYPH_ALPHA: return QString( "glyph alpha" ); break;
+                case Property::IS_ATLAS: return QString( "is atlas" ); break;
             }
             return QString( "property not defined" );
         }

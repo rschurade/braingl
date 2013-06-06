@@ -72,3 +72,15 @@ void Dataset::mousePick( int pickId, QVector3D pos )
 {
     // do nothing here
 }
+
+QString Dataset::getColormapShader( int num )
+{
+    QString code( "" );
+
+    code += "vec4 colormap" + QString::number( num ) + "( vec4 color, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
+    code += "{ \n";
+    code += "    return vec4( 0.0 ); \n";
+    code += "} \n";
+
+    return code;
+}

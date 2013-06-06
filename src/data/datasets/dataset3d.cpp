@@ -250,3 +250,15 @@ void Dataset3D::mousePick( int pickId, QVector3D pos )
        m_textureGLuint = 0;
    }
 }
+
+QString Dataset3D::getColormapShader( int num )
+{
+        QString code( "" );
+
+        code += "vec4 colormap" + QString::number( num ) + "( vec4 inColor, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
+        code += "{ \n";
+        code += "    return vec4( inColor.rgb, 0.0 ); \n";
+        code += "} \n";
+
+        return code;
+}

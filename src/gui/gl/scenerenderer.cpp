@@ -30,15 +30,15 @@
 #endif
 
 SceneRenderer::SceneRenderer( QString renderTarget ) :
-                m_renderTarget( renderTarget ),
-                vboIds( new GLuint[2] ),
-                m_width( 1 ),
-                m_height( 1 ),
-                m_renderMode( 0 ),
-                pbo_a( 0 ),
-                pbo_b( 0 ),
-                RBO( 0 ),
-                FBO( 0 )
+    m_renderTarget( renderTarget ),
+    vboIds( new GLuint[2] ),
+    m_width( 1 ),
+    m_height( 1 ),
+    m_renderMode( 0 ),
+    pbo_a( 0 ),
+    pbo_b( 0 ),
+    RBO( 0 ),
+    FBO( 0 )
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( Models::g() );
@@ -53,35 +53,39 @@ SceneRenderer::~SceneRenderer()
 
 void SceneRenderer::initGL()
 {
-    qDebug() << "gl init main widget";
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
+    qDebug() << "gl init " + m_renderTarget;
+
+    if ( m_renderTarget == "maingl" )
     {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
+        GLenum errorCode = glewInit();
+        if ( GLEW_OK != errorCode )
+        {
+            qDebug() << "Problem: glewInit failed, something is seriously wrong.";
+            qDebug() << glewGetErrorString( errorCode );
+            exit( false );
+        }
+        else
+        {
+            qDebug() << "OpenGL initialized.";
+        }
+
+        const GLubyte *renderer = glGetString( GL_RENDERER );
+        const GLubyte *vendor = glGetString( GL_VENDOR );
+        const GLubyte *version = glGetString( GL_VERSION );
+        const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+        GLint major, minor;
+        glGetIntegerv( GL_MAJOR_VERSION, &major );
+        glGetIntegerv( GL_MINOR_VERSION, &minor );
+
+        qDebug() << "GL Vendor :" << QString( (char*) vendor );
+        qDebug() << "GL Renderer :" << QString( (char*) renderer );
+        qDebug() << "GL Version (string) :" << QString( (char*) version );
+        qDebug() << "GL Version (integer) :" << major << "." << minor;
+        qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
+
+        GLFunctions::loadShaders();
     }
-    else
-    {
-        qDebug() << "OpenGL initialized.";
-    }
-
-    const GLubyte *renderer = glGetString( GL_RENDERER );
-    const GLubyte *vendor = glGetString( GL_VENDOR );
-    const GLubyte *version = glGetString( GL_VERSION );
-    const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
-
-    GLint major, minor;
-    glGetIntegerv( GL_MAJOR_VERSION, &major );
-    glGetIntegerv( GL_MINOR_VERSION, &minor );
-
-    qDebug() << "GL Vendor :" << QString( (char*) vendor );
-    qDebug() << "GL Renderer :" << QString( (char*) renderer );
-    qDebug() << "GL Version (string) :" << QString( (char*) version );
-    qDebug() << "GL Version (integer) :" << major << "." << minor;
-    qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
-
-    GLFunctions::loadShaders();
 
     QColor color = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
@@ -257,7 +261,9 @@ void SceneRenderer::renderScenePart( int renderMode, QString target0, QString ta
     m_renderMode = renderMode;
     setRenderTargets( target0, target1 );
 
+    GLFunctions::getAndPrintGLError( m_renderTarget + "---" );
     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
     renderDatasets();
     renderRois();
 
@@ -335,7 +341,7 @@ void SceneRenderer::renderMerge()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    GLFunctions::getAndPrintGLError( "after render scene" );
+    GLFunctions::getAndPrintGLError( m_renderTarget + "after render scene" );
 }
 
 QImage* SceneRenderer::screenshot()

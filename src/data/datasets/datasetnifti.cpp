@@ -6,6 +6,8 @@
  */
 #include "datasetnifti.h"
 
+#include "../../gui/gl/colormapfunctions.h"
+
 #include <QDebug>
 
 DatasetNifti::DatasetNifti( QDir filename, Fn::DatasetType type, nifti_image* header ) :
@@ -176,4 +178,127 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
     pz = qMax( 0, qMin( pz, nz - 1) );
 
     return px + py * nx + pz * nx * ny;
+}
+
+QString DatasetNifti::getColormapShader( int num )
+{
+    if ( m_properties["maingl"]->get( Fn::Property::IS_ATLAS ).toBool() )
+    {
+        QString code( "" );
+        code += "bool isBitSet( in float value, in float bitpos )\n";
+        code += "{\n";
+        code += "return ( abs( mod( floor( value / pow( 2.0, bitpos ) ), 2.0 ) - 1.0 ) ) < 0.001;\n";
+        code += "}\n";
+
+        code += "vec4 colormap" + QString::number( num ) + "( vec4 inColor, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
+        code += "{ \n";
+        code += "    float value = unpackFloat( inColor );\n";
+
+        code += "float val = floor( value * 255.0 );\n";
+        code += "float r = 0.0;\n";
+        code += "float g = 0.0;\n";
+        code += "float b = 0.0;\n";
+        code += "float mult = 1.0;\n";
+
+        code += "if( val == 0.0 )\n";
+        code += "{\n";
+        code += "return vec4( vec3( 0.0 ), 1.0 );\n";
+        code += "}\n";
+
+        code += "if( isBitSet( val, 0.0 ) )\n";
+        code += "{\n";
+        code += "b = 1.0;\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 1.0 ) )\n";
+        code += "{\n";
+        code += "g = 1.0;\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 2.0 ) )\n";
+        code += "{\n";
+        code += "r = 1.0;\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 3.0 ) )\n";
+        code += "{\n";
+        code += "mult -= 0.15;\n";
+        code += "if( r < 1.0 && g < 1.0 && b < 1.0 )\n";
+        code += "{\n";
+        code += "r = 1.0;\n";
+        code += "g = 1.0;\n";
+        code += "}\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 4.0 ) )\n";
+        code += "{\n";
+        code += "mult -= 0.15;\n";
+        code += "    if( r < 1.0 && g < 1.0 && b < 1.0 )\n";
+        code += "{\n";
+        code += "b = 1.0;\n";
+        code += "g = 1.0;\n";
+        code += "}\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 5.0 ) )\n";
+        code += "{\n";
+        code += "mult -= 0.15;\n";
+        code += "if( r < 1.0 && g < 1.0 && b < 1.0 )\n";
+        code += "{\n";
+        code += "r = 1.0;\n";
+        code += "b = 1.0;\n";
+        code += "}\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 6.0 ) )\n";
+        code += "{\n";
+        code += "mult -= 0.15;\n";
+        code += "if( r < 1.0 && g < 1.0 && b < 1.0 )\n";
+        code += "{\n";
+        code += "g = 1.0;\n";
+        code += "}\n";
+        code += "}\n";
+        code += "if( isBitSet( val, 7.0 ) )\n";
+        code += "{\n";
+        code += "mult -= 0.15;\n";
+        code += "if( r < 1.0 && g < 1.0 && b < 1.0 )\n";
+        code += "{\n";
+        code += "r = 1.0;\n";
+        code += "}\n";
+        code += "}\n";
+
+        code += "r *= mult;\n";
+        code += "g *= mult;\n";
+        code += "b *= mult;\n";
+
+        code += "clamp( r, 0.0, 1.0 );\n";
+        code += "clamp( g, 0.0, 1.0 );\n";
+        code += "clamp( b, 0.0, 1.0 );\n";
+
+        code += "return vec4( r, g, b, 1.0 );\n";
+        code += "}\n";
+        return code;
+
+    }
+    else
+    {
+        int colormap = m_properties["maingl"]->get( Fn::Property::COLORMAP ).toInt();
+
+        QString code( "" );
+
+        code += "vec4 colormap" + QString::number( num ) + "( vec4 inColor, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
+        code += "{ \n";
+        code += "    float value = unpackFloat( inColor );\n";
+        code += "    vec3 color = vec3(0.0); \n";
+        code += "    if ( value < lowerThreshold ) \n";
+        code += "    { \n";
+        code += "        return vec4( 0.0 ); \n";
+        code += "    } \n";
+        code += "    if ( value > upperThreshold ) \n";
+        code += "    { \n";
+        code += "        return vec4( 0.0 ); \n";
+        code += "    } \n";
+        code += "    value = ( value - selectedMin ) / ( selectedMax - selectedMin ); \n";
+        code += "\n";
+        code += ColormapFunctions::get( colormap ).getCode();
+        code += "\n";
+        code += "    return vec4( color, 0.0 ); \n";
+        code += "} \n";
+
+        return code;
+    }
 }

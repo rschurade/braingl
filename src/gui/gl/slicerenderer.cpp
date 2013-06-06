@@ -167,9 +167,11 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
         }
     }
 
+    if ( !GLFunctions::setupTextures() )
+    {
+        return;
+    }
     //qDebug() << "main gl draw, renderMode:" << renderMode;
-    setupTextures();
-
     glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
@@ -191,7 +193,6 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     float red =   0.0f;
 
     initGeometry();
-
     if ( model()->data( model()->index( (int)Fn::Global::SHOW_AXIAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 1 ) & 0xFF) / 255.f;
@@ -217,6 +218,7 @@ void SliceRenderer::drawAxial( QString target )
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+
     setShaderVars( target );
 
     // Draw cube geometry using indices from VBO 0

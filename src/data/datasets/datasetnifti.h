@@ -27,6 +27,7 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
+    virtual QString getColormapShader( int num );
 
     static QString getNiftiDataType( const int type );
 

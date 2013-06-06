@@ -13,7 +13,8 @@
 #include <QtGui>
 
 SingleSHWidget::SingleSHWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget )
+    QGLWidget( parent, shareWidget ),
+    m_visible( false )
 {
     m_renderer = new SingleSHRenderer();
     m_renderer->setModel( Models::d() );
@@ -76,5 +77,14 @@ void SingleSHWidget::mouseReleaseEvent( QMouseEvent *event )
 
 void SingleSHWidget::update()
 {
+    if ( !m_visible )
+    {
+        return;
+    }
     updateGL();
+}
+
+void SingleSHWidget::visibilityChanged( bool visible )
+{
+    m_visible = visible;
 }

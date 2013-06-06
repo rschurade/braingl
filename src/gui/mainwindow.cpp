@@ -250,6 +250,8 @@ void MainWindow::load( QString fileName )
             Models::g()->setData( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
 
             setCurrentFile(fileName);
+
+            GLFunctions::reloadShaders();
         }
     }
 }
@@ -608,6 +610,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget, SLOT( update() ) );
+    connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
 
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
     FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );
@@ -615,6 +618,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockMainGL2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget2, SLOT( update() ) );
+    connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
@@ -622,7 +626,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav1, SLOT( update() ) );
-    connect( dockNav1, SIGNAL( visibilityChanged( bool) ), nav1, SLOT( setWidgetVisible( bool) ) );
+    connect( dockNav1, SIGNAL( visibilityChanged( bool ) ), nav1, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
     FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
@@ -630,7 +634,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
-    connect( dockNav2, SIGNAL( visibilityChanged( bool) ), nav2, SLOT( setWidgetVisible( bool) ) );
+    connect( dockNav2, SIGNAL( visibilityChanged( bool ) ), nav2, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
     FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
@@ -638,7 +642,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav3, SLOT( update() ) );
-    connect( dockNav3, SIGNAL( visibilityChanged( bool) ), nav3, SLOT( setWidgetVisible( bool ) ) );
+    connect( dockNav3, SIGNAL( visibilityChanged( bool ) ), nav3, SLOT( setWidgetVisible( bool ) ) );
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
@@ -646,7 +650,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav4, SLOT( update() ) );
-    connect( dockNav4, SIGNAL( visibilityChanged( bool) ), nav4, SLOT( setWidgetVisible( bool ) ) );
+    connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
     dockNav1->hide();
     dockNav2->hide();
@@ -659,6 +663,7 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
+    connect( dockSSHW, SIGNAL( visibilityChanged( bool ) ), sshw, SLOT( visibilityChanged( bool ) ) );
     dockSSHW->hide();
 
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
