@@ -112,6 +112,7 @@ namespace Fn
         COLORMAP_DX,
         COLORMAP_DY,
         COLORMAP_TEXT_SIZE,
+        COLORMAP_TEXT_COLOR,
         INTERPOLATION,
         ALPHA,
         ACTIVE,
@@ -204,6 +205,7 @@ namespace Fn
                 case Property::COLORMAP_DX: return QString( "colormap x size" ); break;
                 case Property::COLORMAP_DY: return QString( "colormap y size" ); break;
                 case Property::COLORMAP_TEXT_SIZE: return QString( "colormap text size" ); break;
+                case Property::COLORMAP_TEXT_COLOR: return QString( "colormap text color" ); break;
                 case Property::INTERPOLATION: return QString( "interpolation" ); break;
                 case Property::ALPHA: return QString( "alpha" ); break;
                 case Property::ACTIVE: return QString( "active" ); break;

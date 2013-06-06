@@ -76,7 +76,8 @@ void TextRenderer::renderText( QString text, int x, int y, int width, int height
     program->setUniformValue( "u_scaleX", 1.0f );
     program->setUniformValue( "u_scaleY", 1.0f );
     program->setUniformValue( "u_sizeX", m_textSizeX  / (float)width );
-    program->setUniformValue( "u_sizeY", m_textSizeY  / (float)height);
+    program->setUniformValue( "u_sizeY", m_textSizeY  / (float)height );
+    program->setUniformValue( "u_textColor", m_textColor.redF(), m_textColor.greenF(), m_textColor.blueF() );
 
     program->setUniformValue( "u_alpha", 1.0f );
     program->setUniformValue( "u_renderMode", renderMode );

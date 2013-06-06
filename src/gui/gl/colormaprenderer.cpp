@@ -208,7 +208,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
         float yOffset = m_dy +  ( (float)m_textSize / 2 ) / (float)height * (float)height ;
 
 
-        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, QColor( 0,0,0 ), renderMode );
+        GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, m_textColor, renderMode );
     }
 
 }
@@ -267,4 +267,9 @@ void ColormapRenderer::setUpperThreshold( float value )
 void ColormapRenderer::setTextSize( int size )
 {
     m_textSize = size;
+}
+
+void ColormapRenderer::setTextColor( QColor color )
+{
+    m_textColor = color;
 }
