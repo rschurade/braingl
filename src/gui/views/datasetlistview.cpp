@@ -26,3 +26,16 @@ void DatasetListView::rowsInserted (const QModelIndex &parent, int start, int en
     selectionModel()->clear();
     selectionModel()->select( model()->index( start, 0, parent ), QItemSelectionModel::Select );
 }
+
+QModelIndex DatasetListView::getSelectedIndex( int column )
+{
+
+    if ( this->selectedIndexes().size() > 0 )
+    {
+        int sel = -1;
+        sel = this->selectedIndexes().first().row();
+        QModelIndex index = model()->index( sel, column );
+        return index;
+    }
+    return QModelIndex();
+}

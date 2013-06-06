@@ -82,7 +82,7 @@ public slots:
     void visibilityChanged( bool visible );
 
 signals:
-
+    void signalKeyPressed( int key, Qt::KeyboardModifiers mods );
 };
 
 #endif
