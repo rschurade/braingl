@@ -122,6 +122,7 @@ void NewDatasetWidget::createDataset()
             float dy = m_dY->getValue();
             float dz = m_dZ->getValue();
             QVector<float> data( nx * ny * nz );
+            data[0] = 255;
             int dims[8] = { 3, nx, ny, nz, 1, 1, 1 };
             nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
             header->dx = dx;

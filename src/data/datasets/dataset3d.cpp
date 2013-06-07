@@ -212,26 +212,30 @@ void Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers mod
        paintValue = QVector3D( paintColorC.redF(), paintColorC.greenF(), paintColorC.blueF() );
    }
 
+   float dx = m_properties["maingl"]->get( Fn::Property::DX ).toFloat();
+   float dy = m_properties["maingl"]->get( Fn::Property::DY ).toFloat();
+   float dz = m_properties["maingl"]->get( Fn::Property::DZ ).toFloat();
+
    m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
 
    int brushSize = m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toInt();
 
    for ( int i = 0; i < brushSize; ++i )
    {
-       for ( int j = 0; j < brushSize; ++j )
-       {
-           for ( int k = 0; k < brushSize; ++k )
-           {
-               m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() - k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i, pos.y() - j, pos.z() + k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() - k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i, pos.y() + j, pos.z() + k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() - k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i, pos.y() - j, pos.z() + k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() - k ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i, pos.y() + j, pos.z() + k ) ] = paintValue;
-           }
-       }
+      for ( int j = 0; j < brushSize; ++j )
+      {
+          for ( int k = 0; k < brushSize; ++k )
+          {
+              m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
+              m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
+          }
+      }
    }
 
    glDeleteTextures( 1, &m_textureGLuint );

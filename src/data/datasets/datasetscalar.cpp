@@ -251,9 +251,9 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
         return;
     }
 
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = m_properties["maingl"]->get( Fn::Property::DX ).toFloat();
+    float dy = m_properties["maingl"]->get( Fn::Property::DY ).toFloat();
+    float dz = m_properties["maingl"]->get( Fn::Property::DZ ).toFloat();
 
     float paintValue = m_properties["maingl"]->get( Fn::Property::PAINTVALUE ).toFloat();
     m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
