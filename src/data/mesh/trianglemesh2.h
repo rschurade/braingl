@@ -44,7 +44,7 @@ public:
     int bufferSize();
 
     QVector<int> pick( QVector3D pos, float radius );
-
+    int closestVertexIndex( QVector3D pos );
 
 
 private:
