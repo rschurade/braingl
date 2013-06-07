@@ -106,12 +106,12 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
         max = qMax( max, value );
     }
 */
-    m_properties["maingl"]->set( Fn::Property::MIN, min );
-    m_properties["maingl"]->set( Fn::Property::MAX, max );
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, min, min, max );
-    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, max, min, max );
-    m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max );
-    m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max );
+//    m_properties["maingl"]->set( Fn::Property::MIN, min );
+//    m_properties["maingl"]->set( Fn::Property::MAX, max );
+//    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, min, min, max );
+//    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, max, min, max );
+//    m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, min + (max-min)/1000., min, max );
+//    m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::PAINTMODE ), SIGNAL( valueChanged( int ) ), this, SLOT( paintModeChanged( int ) ) );
 
