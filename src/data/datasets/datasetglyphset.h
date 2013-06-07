@@ -42,6 +42,7 @@ public:
     void loadRGB();
     void saveRGB();
     void save1Ds();
+    void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers );
 
 private:
     float minthresh;
