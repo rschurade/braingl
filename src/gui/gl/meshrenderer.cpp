@@ -86,12 +86,6 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     setRenderParams( props );
 
-    //TODO: Think about the right solution:
-    m_lowerThreshold = 0.0;
-    m_upperThreshold = 1.0;
-    m_selectedMin = 0.0;
-    m_selectedMax = 1.0;
-
     QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
     program->bind();

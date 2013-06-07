@@ -52,6 +52,26 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "general" );
 
+    float min = -1.0;
+    float max = 1.0;
+
+    m_properties["maingl"]->set( Fn::Property::MIN, min );
+    m_properties["maingl"]->set( Fn::Property::MAX, max );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MIN, min, min, max, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::SELECTED_MAX, max, min, max, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "colormap" );
+    m_properties["maingl"]->set( Fn::Property::UPPER_THRESHOLD, max, min, max, "colormap" );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MAX ), SLOT( setMin( float ) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::SELECTED_MIN ), SLOT( setMax( float ) ) );
+
     /*m_properties["maingl2"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, true );
      m_properties["maingl2"]->set( Fn::Property::GLYPHSTYLE,
      { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
