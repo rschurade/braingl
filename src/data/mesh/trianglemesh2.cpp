@@ -132,12 +132,12 @@ QColor TriangleMesh2::getVertexColor( int id )
 
 void TriangleMesh2::setVertexData( int id, float value )
 {
-    m_vertices[ id * m_bufferSize + 7 ] = value;
+    m_vertices[ id * m_bufferSize + 6 ] = value;
 }
 
 float TriangleMesh2::getVertexData( int id )
 {
-    return m_vertices[ id * m_bufferSize + 7 ];
+    return m_vertices[ id * m_bufferSize + 6 ];
 }
 
 float* TriangleMesh2::getVertices()
@@ -242,3 +242,18 @@ QVector<int> TriangleMesh2::pick( QVector3D pos, float radius )
     return result;
 }
 
+int TriangleMesh2::closestVertexIndex( QVector3D pos )
+{
+    int closest = -1;
+    double minRadius = 10000000;
+    for ( int i = 0; i < m_numVerts; ++i )
+    {
+        float d = ( QVector3D( m_vertices[i * m_bufferSize], m_vertices[i * m_bufferSize + 1], m_vertices[i * m_bufferSize + 2] ) - pos ).lengthSquared();
+        if ( d < minRadius )
+        {
+            minRadius = d;
+            closest = i;
+        }
+    }
+    return closest;
+}
