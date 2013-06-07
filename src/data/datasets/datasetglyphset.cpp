@@ -45,7 +45,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
     m_properties["maingl"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, "general");
+    m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, "general" );
     m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, "general" );
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "general" );
@@ -598,4 +598,19 @@ void DatasetGlyphset::save1Ds()
         }
     }
     file.close();
+}
+
+void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
+{
+
+    int picked = getMesh( "maingl" )->closestVertexIndex( pos );
+
+    DatasetSurfaceset::mousePick( pickId, pos, modifiers );
+    for ( int i = 0; i < n; ++i )
+    {
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, conn[picked][i] );
+        }
+    }
 }
