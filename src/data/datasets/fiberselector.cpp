@@ -175,9 +175,10 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
 
 void FiberSelector::updateROI( int branch, int pos )
 {
+	int shape = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt();
     if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
     {
-        if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() == 2 )
+        if ( shape == 10 )
         {
             ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::POINTER ), Qt::DisplayRole ) );
             float threshold = roi->properties()->get( Fn::ROI::THRESHOLD ).toFloat();
@@ -236,7 +237,7 @@ void FiberSelector::updateROI( int branch, int pos )
 
             boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
 
-            if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() == 0 )
+            if ( shape == 0 || shape == 1 )
             {
                 sphereTest( m_bitfields[branch][pos] );
             }

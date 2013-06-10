@@ -35,7 +35,7 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
     m_properties.set( Fn::ROI::ALPHA, 0.4f, 0.f, 1.f, true );
     m_properties.set( Fn::ROI::ID, m_count );
     m_properties.set( Fn::ROI::PICK_ID, 0 );
-    m_properties.set( Fn::ROI::SHAPE, 2 );
+    m_properties.set( Fn::ROI::SHAPE, 10 );
     m_properties.set( Fn::ROI::THRESHOLD, m_max / 100.f, 0.0f, m_max, true );
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
