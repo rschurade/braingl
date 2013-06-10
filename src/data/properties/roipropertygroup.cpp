@@ -237,3 +237,12 @@ int ROIPropertyGroup::size() const
 {
     return m_properties.size();
 }
+
+Property* ROIPropertyGroup::getProperty( Fn::ROI name )
+{
+    if ( m_properties.contains( (int)name ) )
+    {
+        return m_properties[(int)name];
+    }
+    return 0;
+}

@@ -29,7 +29,7 @@ ROIBox::ROIBox() :
 
     m_properties.set( Fn::ROI::RENDER, true, true );
     m_properties.set( Fn::ROI::NEG, false, true );
-    m_properties.set( Fn::ROI::SHAPE, { "sphere", "box" }, 0, true );
+    m_properties.set( Fn::ROI::SHAPE, { "ellipsoid", "sphere", "cube", "box" }, 0, true );
     m_properties.set( Fn::ROI::X, x, 0., xMax, true );
     m_properties.set( Fn::ROI::Y, y, 0., yMax, true );
     m_properties.set( Fn::ROI::Z, z, 0., zMax, true );
@@ -46,6 +46,7 @@ ROIBox::ROIBox() :
     m_properties.set( Fn::ROI::PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
+    connect( m_properties.getProperty( Fn::ROI::DX ), SIGNAL( valueChanged( float ) ), this, SLOT( dxChanged( float ) ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
@@ -87,7 +88,29 @@ void ROIBox::propChanged()
         m_properties.set( Fn::ROI::X, x );
         m_properties.set( Fn::ROI::Y, y );
         m_properties.set( Fn::ROI::Z, z );
+    }
+    int shape = m_properties.get( Fn::ROI::SHAPE ).toInt();
 
+    if ( shape == 1 || shape == 2 )
+    {
+        m_properties.getWidget( Fn::ROI::DY )->hide();
+        m_properties.getWidget( Fn::ROI::DZ )->hide();
+    }
+
+    if ( shape == 0 || shape == 3 )
+    {
+        m_properties.getWidget( Fn::ROI::DY )->show();
+        m_properties.getWidget( Fn::ROI::DZ )->show();
+    }
+}
+
+void ROIBox::dxChanged( float value )
+{
+    int shape = m_properties.get( Fn::ROI::SHAPE ).toInt();
+    if ( shape == 1 || shape == 2 )
+    {
+        m_properties.set( Fn::ROI::DY, value );
+        m_properties.set( Fn::ROI::DZ, value );
     }
 }
 
@@ -105,7 +128,7 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heigh
 
     if ( m_properties.get( Fn::ROI::RENDER).toBool() )
     {
-        if ( m_properties.get( Fn::ROI::SHAPE ).toInt() == 0 )
+        if ( m_properties.get( Fn::ROI::SHAPE ).toInt() == 0 || m_properties.get( Fn::ROI::SHAPE ).toInt() == 1 )
         {
             GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
         }
