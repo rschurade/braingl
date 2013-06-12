@@ -137,7 +137,20 @@ DatasetFibers::DatasetFibers( QDir filename,
 
 DatasetFibers::~DatasetFibers()
 {
+    m_properties["maingl"]->set( Fn::Property::ACTIVE, false );
+    m_properties["maingl2"]->set( Fn::Property::ACTIVE, false );
     m_fibs.clear();
+    m_fibs.squeeze();
+    if ( m_renderer != 0 )
+    {
+        delete m_renderer;
+        m_renderer = 0;
+    }
+    if ( m_tubeRenderer != 0 )
+    {
+        delete m_tubeRenderer;
+        m_tubeRenderer = 0;
+    }
 }
 
 QVector< QVector< float > > DatasetFibers::getFibs()

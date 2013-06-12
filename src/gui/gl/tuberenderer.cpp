@@ -31,8 +31,9 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >
 
 TubeRenderer::~TubeRenderer()
 {
-    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
-    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
+    //TODO this is a temporary fix for the crash happening after this buffer delete
+    // depending on the size of the fiber dataset this creates a big memory leak
+//    glDeleteBuffers( 2, vboIds );
 }
 
 void TubeRenderer::init()
