@@ -17,7 +17,7 @@ DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* he
     m_properties["maingl"]->set( Fn::Property::MINMAX_SCALING, false, "general" );
     m_properties["maingl"]->set( Fn::Property::SCALING, 1.0f, 0.1f, 2.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::HIDE_NEGATIVE_LOBES, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::LOD, 0, 0, 5., "general" );
+    m_properties["maingl"]->set( Fn::Property::LOD, 0, 0, 4, "general" );
     m_properties["maingl"]->set( Fn::Property::RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"]->set( Fn::Property::RENDER_CORONAL, false, "general" );
     m_properties["maingl"]->set( Fn::Property::RENDER_AXIAL, true, "general" );

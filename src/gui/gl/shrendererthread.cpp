@@ -69,175 +69,183 @@ void SHRendererThread::run()
 
     int numThreads = GLFunctions::idealThreadCount;
     QMatrix4x4 mvp = m_pMatrix * m_mvMatrix;
-    if ( ( m_orient & 1 ) == 1 )
+
+    try
     {
-        int glyphs = m_nx * m_ny;
-        m_verts->reserve( numVerts * glyphs * 7 );
-        QVector4D pos( 0, 0, z, 1.0 );
-        for( int yy = m_id; yy < m_ny; yy += numThreads )
+        if ( ( m_orient & 1 ) == 1 )
         {
-            for ( int xx = 0; xx < m_nx; ++xx )
+            int glyphs = m_nx * m_ny;
+            m_verts->reserve( numVerts * glyphs * 7 );
+            QVector4D pos( 0, 0, z, 1.0 );
+            for( int yy = m_id; yy < m_ny; yy += numThreads )
             {
-                ColumnVector dv = m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny );
-                if ( ( fabs( dv(1) ) > 0.0001 ) )
+                for ( int xx = 0; xx < m_nx; ++xx )
                 {
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locY = yy * m_dy + m_dy / 2;
-
-                    pos.setX( locX );
-                    pos.setY( locY );
-                    QVector4D test = mvp * pos;
-
-                    if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
+                    ColumnVector dv = m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny );
+                    if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        ColumnVector r = base * dv;
+                        float locX = xx * m_dx + m_dx / 2;
+                        float locY = yy * m_dy + m_dy / 2;
 
-                        if ( m_scaling )
+                        pos.setX( locX );
+                        pos.setY( locY );
+                        QVector4D test = mvp * pos;
+
+                        if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
-                            float max = 0;
-                            float min = std::numeric_limits<float>::max();
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            ColumnVector r = base * dv;
+
+                            if ( m_scaling )
                             {
-                                max = qMax( max, (float)r(i+1) );
-                                min = qMin( min, (float)r(i+1) );
+                                float max = 0;
+                                float min = std::numeric_limits<float>::max();
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    max = qMax( max, (float)r(i+1) );
+                                    min = qMin( min, (float)r(i+1) );
+                                }
+
+
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    r(i+1) = r(i+1) / max * 0.8;
+                                }
                             }
 
-
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            for ( int i = 0; i < numVerts; ++i )
                             {
-                                r(i+1) = r(i+1) / max * 0.8;
+                                m_verts->push_back( (*vertices)( i+1, 1 ) );
+                                m_verts->push_back( (*vertices)( i+1, 2 ) );
+                                m_verts->push_back( (*vertices)( i+1, 3 ) );
+                                m_verts->push_back( locX );
+                                m_verts->push_back( locY );
+                                m_verts->push_back( z );
+                                m_verts->push_back( r(i + 1) );
                             }
-                        }
-
-                        for ( int i = 0; i < numVerts; ++i )
-                        {
-                            m_verts->push_back( (*vertices)( i+1, 1 ) );
-                            m_verts->push_back( (*vertices)( i+1, 2 ) );
-                            m_verts->push_back( (*vertices)( i+1, 3 ) );
-                            m_verts->push_back( locX );
-                            m_verts->push_back( locY );
-                            m_verts->push_back( z );
-                            m_verts->push_back( r(i + 1) );
                         }
                     }
                 }
             }
         }
-    }
-    if ( ( m_orient & 2 ) == 2 )
-    {
-        int glyphs = m_nx * m_nz;
-        m_verts->reserve( numVerts * glyphs * 7 );
-        QVector4D pos( 0, y, 0, 1.0 );
-        for( int zz = m_id; zz < m_nz; zz += numThreads )
+        if ( ( m_orient & 2 ) == 2 )
         {
-            for ( int xx = 0; xx < m_nx; ++xx )
+            int glyphs = m_nx * m_nz;
+            m_verts->reserve( numVerts * glyphs * 7 );
+            QVector4D pos( 0, y, 0, 1.0 );
+            for( int zz = m_id; zz < m_nz; zz += numThreads )
             {
-                ColumnVector dv = m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny );
-                if ( ( fabs( dv(1) ) > 0.0001 ) )
+                for ( int xx = 0; xx < m_nx; ++xx )
                 {
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locZ = zz * m_dz + m_dz / 2;
-
-                    pos.setX( locX );
-                    pos.setZ( locZ );
-                    QVector4D test = mvp * pos;
-
-                    if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
+                    ColumnVector dv = m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny );
+                    if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        ColumnVector r = base * dv;
+                        float locX = xx * m_dx + m_dx / 2;
+                        float locZ = zz * m_dz + m_dz / 2;
 
-                        if ( m_scaling )
+                        pos.setX( locX );
+                        pos.setZ( locZ );
+                        QVector4D test = mvp * pos;
+
+                        if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
-                            float max = 0;
-                            float min = std::numeric_limits<float>::max();
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            ColumnVector r = base * dv;
+
+                            if ( m_scaling )
                             {
-                                max = qMax( max, (float)r(i+1) );
-                                min = qMin( min, (float)r(i+1) );
+                                float max = 0;
+                                float min = std::numeric_limits<float>::max();
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    max = qMax( max, (float)r(i+1) );
+                                    min = qMin( min, (float)r(i+1) );
+                                }
+
+
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    r(i+1) = r(i+1) / max * 0.8;
+                                }
                             }
 
 
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            for ( int i = 0; i < numVerts; ++i )
                             {
-                                r(i+1) = r(i+1) / max * 0.8;
+                                m_verts->push_back( (*vertices)( i+1, 1 ) );
+                                m_verts->push_back( (*vertices)( i+1, 2 ) );
+                                m_verts->push_back( (*vertices)( i+1, 3 ) );
+                                m_verts->push_back( locX );
+                                m_verts->push_back( y );
+                                m_verts->push_back( locZ );
+                                m_verts->push_back( r(i + 1) );
                             }
-                        }
-
-
-                        for ( int i = 0; i < numVerts; ++i )
-                        {
-                            m_verts->push_back( (*vertices)( i+1, 1 ) );
-                            m_verts->push_back( (*vertices)( i+1, 2 ) );
-                            m_verts->push_back( (*vertices)( i+1, 3 ) );
-                            m_verts->push_back( locX );
-                            m_verts->push_back( y );
-                            m_verts->push_back( locZ );
-                            m_verts->push_back( r(i + 1) );
                         }
                     }
                 }
             }
         }
-    }
-    if ( ( m_orient & 4 ) == 4 )
-    {
-        int glyphs = m_ny * m_nz;
-        m_verts->reserve( numVerts * glyphs * 7 );
-
-        QVector4D pos( x, 0, 0, 1.0 );
-        for( int yy = m_id; yy < m_ny; yy += numThreads )
+        if ( ( m_orient & 4 ) == 4 )
         {
-            for ( int zz = 0; zz < m_nz; ++zz )
+            int glyphs = m_ny * m_nz;
+            m_verts->reserve( numVerts * glyphs * 7 );
+
+            QVector4D pos( x, 0, 0, 1.0 );
+            for( int yy = m_id; yy < m_ny; yy += numThreads )
             {
-                ColumnVector dv = m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny );
-                if ( ( fabs( dv(1) ) > 0.0001 ) )
+                for ( int zz = 0; zz < m_nz; ++zz )
                 {
-                    float locY = yy * m_dy + m_dy / 2;
-                    float locZ = zz * m_dz + m_dz / 2;
-
-                    pos.setY( locY );
-                    pos.setZ( locZ );
-                    QVector4D test = mvp * pos;
-
-                    if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
+                    ColumnVector dv = m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny );
+                    if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        ColumnVector r = base * dv;
+                        float locY = yy * m_dy + m_dy / 2;
+                        float locZ = zz * m_dz + m_dz / 2;
 
-                        if ( m_scaling )
+                        pos.setY( locY );
+                        pos.setZ( locZ );
+                        QVector4D test = mvp * pos;
+
+                        if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
-                            float max = 0;
-                            float min = std::numeric_limits<float>::max();
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            ColumnVector r = base * dv;
+
+                            if ( m_scaling )
                             {
-                                max = qMax( max, (float)r(i+1) );
-                                min = qMin( min, (float)r(i+1) );
+                                float max = 0;
+                                float min = std::numeric_limits<float>::max();
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    max = qMax( max, (float)r(i+1) );
+                                    min = qMin( min, (float)r(i+1) );
+                                }
+
+
+                                for ( int i = 0; i < r.Nrows(); ++i )
+                                {
+                                    r(i+1) = r(i+1) / max * 0.8;
+                                }
                             }
 
-
-                            for ( int i = 0; i < r.Nrows(); ++i )
+                            for ( int i = 0; i < numVerts; ++i )
                             {
-                                r(i+1) = r(i+1) / max * 0.8;
+                                m_verts->push_back( (*vertices)( i+1, 1 ) );
+                                m_verts->push_back( (*vertices)( i+1, 2 ) );
+                                m_verts->push_back( (*vertices)( i+1, 3 ) );
+                                m_verts->push_back( x );
+                                m_verts->push_back( locY );
+                                m_verts->push_back( locZ );
+                                m_verts->push_back( r(i + 1) );
                             }
-                        }
-
-                        for ( int i = 0; i < numVerts; ++i )
-                        {
-                            m_verts->push_back( (*vertices)( i+1, 1 ) );
-                            m_verts->push_back( (*vertices)( i+1, 2 ) );
-                            m_verts->push_back( (*vertices)( i+1, 3 ) );
-                            m_verts->push_back( x );
-                            m_verts->push_back( locY );
-                            m_verts->push_back( locZ );
-                            m_verts->push_back( r(i + 1) );
                         }
                     }
                 }
             }
         }
+        else
+        {
+            return;
+        }
     }
-    else
+    catch (std::bad_alloc& ba)
     {
-        return;
+        qDebug() << "bad alloc sh renderer thread";
     }
 }
