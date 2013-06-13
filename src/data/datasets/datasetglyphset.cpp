@@ -40,17 +40,17 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
 
     m_properties["maingl"]->set( Fn::Property::THRESHOLD, 0.0f, minthresh, 1.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::GLYPHSTYLE,
-    { "points", "vectors", "pies" }, 0, "general" ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "general" );
-    m_properties["maingl"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, "general" );
+    { "points", "vectors", "pies" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl"]->set( Fn::Property::GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
     m_properties["maingl"]->set( Fn::Property::MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::DRAW_SURFACE, true, "general" );
     m_properties["maingl"]->set( Fn::Property::DRAW_GLYPHS, true, "general" );
-    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
 
     float min = -1.0;
     float max = 1.0;
@@ -546,8 +546,8 @@ QList<Dataset*> DatasetGlyphset::createConnections()
 void DatasetGlyphset::setProperties()
 {
     DatasetSurfaceset::setProperties();
-    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_GEOMETRY, m_displayList, 0, "general" );
-    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, "general" );
+    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_GEOMETRY, m_displayList, 0, "glyphs" );
+    m_properties["maingl"]->set( Fn::Property::SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
 }
 
 void DatasetGlyphset::saveRGB()
