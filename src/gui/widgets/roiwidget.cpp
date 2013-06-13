@@ -117,7 +117,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
 
     ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( index, Qt::DisplayRole ) );
     int type = roi->properties()->get( Fn::ROI::SHAPE ).toInt();
-    if ( type == 0 )
+    if ( type < 10 )
     {
         float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
         float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
