@@ -192,37 +192,40 @@ void SHRenderer::initGeometry()
     for ( int i = 0; i < numThreads; ++i )
     {
         verts += *( threads[i]->getVerts() );
-    }
-
-    for ( int i = 0; i < numThreads; ++i )
-    {
         delete threads[i];
     }
 
-    int numBalls = verts.size() / ( numVerts * 7 );
-
-    m_tris1 = numTris * numBalls * 3;
-
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
-
-    const int* faces = tess::faces( lod );
-    std::vector<int>indexes;
-    indexes.reserve( m_tris1 );
-
-    for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
+    try
     {
-        for ( int i = 0; i < numTris; ++i )
+
+        int numBalls = verts.size() / ( numVerts * 7 );
+
+        m_tris1 = numTris * numBalls * 3;
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+
+        const int* faces = tess::faces( lod );
+        std::vector<int>indexes;
+        indexes.reserve( m_tris1 );
+
+        for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
         {
-            indexes.push_back( faces[i*3] + numVerts * currentBall );
-            indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-            indexes.push_back( faces[i*3+2] + numVerts * currentBall );
+            for ( int i = 0; i < numTris; ++i )
+            {
+                indexes.push_back( faces[i*3] + numVerts * currentBall );
+                indexes.push_back( faces[i*3+1] + numVerts * currentBall );
+                indexes.push_back( faces[i*3+2] + numVerts * currentBall );
+            }
         }
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
     }
-
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-
+    catch (std::bad_alloc& ba)
+    {
+        qDebug() << "bad alloc sh renderer";
+    }
 }
 
 void SHRenderer::setRenderParams( PropertyGroup* props )
