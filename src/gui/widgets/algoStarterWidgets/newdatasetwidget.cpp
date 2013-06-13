@@ -252,7 +252,7 @@ void NewDatasetWidget::copyWithRois( DatasetScalar* source, QVector<float> &targ
 
 void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, QVector<float> &target )
 {
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() > 1 )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() > 4 )
     {
         return;
     }
