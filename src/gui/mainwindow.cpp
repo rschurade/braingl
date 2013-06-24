@@ -89,15 +89,15 @@ void MainWindow::saveSettings()
     settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
 
     settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
-    settings.setValue( Fn::Global2String::s( Fn::Global::LAST_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::SCREENSHOT_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_COMBINED, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV1, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV2, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Global::BACKGROUND_COLOR_NAV3, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Global::CROSSHAIR_COLOR, 0 ) ) );
-    settings.setValue( Fn::Global2String::s( Fn::Global::SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Global::SHOW_NAV_SLIDERS, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_LAST_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV1, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -135,22 +135,22 @@ void MainWindow::loadSettings()
             lockDockTitlesAct->activate( QAction::Trigger );
         }
     }
-    loadSetting( settings, Fn::Global::LAST_PATH );
-    loadSetting( settings, Fn::Global::SCREENSHOT_PATH );
-    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_MAIN );
-    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_COMBINED );
-    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV1 );
-    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV2 );
-    loadSetting( settings, Fn::Global::BACKGROUND_COLOR_NAV3 );
-    loadSetting( settings, Fn::Global::CROSSHAIR_COLOR );
-    loadSetting( settings, Fn::Global::SHOW_NAV_SLIDERS );
+    loadSetting( settings, Fn::Property::G_LAST_PATH );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PATH );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_COMBINED );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV1 );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV2 );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV3 );
+    loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
+    loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
 }
 
-void MainWindow::loadSetting( QSettings &settings, Fn::Global setting )
+void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
 {
-    if ( settings.contains( Fn::Global2String::s( setting) ) )
+    if ( settings.contains( Fn::Prop2String::s( setting) ) )
     {
-        QVariant s = settings.value( Fn::Global2String::s( setting ) );
+        QVariant s = settings.value( Fn::Prop2String::s( setting ) );
         Models::g()->setData( Models::g()->index( (int)setting, 0 ), s );
     }
 }
@@ -214,7 +214,7 @@ void MainWindow::print()
 
 void MainWindow::open()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn );
     for ( int i = 0; i < fileNames.size(); ++i )
     {
@@ -242,12 +242,12 @@ void MainWindow::load( QString fileName )
         {
             for ( int k = 0; k < loader.getNumDatasets(); ++k )
             {
-                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
             }
             QFileInfo fi( fileName );
             QDir dir = fi.absoluteDir();
             QString lastPath = dir.absolutePath();
-            Models::g()->setData( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
 
             setCurrentFile(fileName);
 
@@ -305,7 +305,7 @@ QString MainWindow::strippedName( const QString &fullFileName )
 
 void MainWindow::save()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ) ).toString();
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
     if ( !fileName.isEmpty() )
@@ -323,7 +323,7 @@ void MainWindow::save()
             {
                 case QMessageBox::Save :
                 {
-                    Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
+                    Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
                     Writer writer( ds, fileName );
                     writer.save();
                     break;
@@ -334,7 +334,7 @@ void MainWindow::save()
         }
         else
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::DATASET_POINTER) ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
             Writer writer( ds, fileName );
             writer.save();
         }
@@ -342,7 +342,7 @@ void MainWindow::save()
         QFileInfo fi( fileName );
         dir = fi.absoluteDir();
         QString lastPath = dir.absolutePath();
-        Models::g()->setData( Models::g()->index( (int)Fn::Global::LAST_PATH, 0 ), lastPath );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
     }
 }
 
@@ -674,34 +674,34 @@ void MainWindow::createDockWindows()
 
 void MainWindow::slotToggleAxialSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
 }
 
 void  MainWindow::slotStandardAxialView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::AXIAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::AXIAL );
     mainGLWidget->setView( Fn::Orient::AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::CORONAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::CORONAL );
     mainGLWidget->setView( Fn::Orient::CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
     mainGLWidget->setView( Fn::Orient::SAGITTAL );
 }
 
@@ -716,13 +716,13 @@ void MainWindow::slotToggleShaderEdit()
 
 void MainWindow::slotRenderCrosshairs( bool value )
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::RENDER_CROSSHAIRS, 0 ), value );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ), value );
 }
 
 void MainWindow::screenshot()
 {
     QImage* image = mainGLWidget->screenshot();
-    QString path = Models::g()->data( Models::g()->index( (int)Fn::Global::SCREENSHOT_PATH, 0 ) ).toString();
+    QString path = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ).toString();
     if ( !path.endsWith( '/') )
     {
         path += '/';

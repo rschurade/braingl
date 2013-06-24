@@ -91,26 +91,26 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     {
         case Qt::CheckStateRole:
         {
-            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::ACTIVE );
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::R_ACTIVE );
             break;
         }
         case Qt::BackgroundColorRole:
         {
-            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::ROI::COLOR );
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::R_COLOR );
             break;
         }
         case Qt::DisplayRole:
         {
-            switch ( (Fn::ROI)index.column() )
+            switch ( (Fn::Property)index.column() )
             {
-                case Fn::ROI::POINTER:
+                case Fn::Property::R_POINTER:
                 {
                     return roi;
                     break;
                 }
                 default:
                 {
-                    return VPtr<ROI>::asPtr( roi )->properties()->get( (Fn::ROI)index.column() );
+                    return VPtr<ROI>::asPtr( roi )->properties()->get( (Fn::Property)index.column() );
                     break;
                 }
             }
@@ -130,7 +130,7 @@ QVariant ROIModel::headerData( int section, Qt::Orientation orientation, int rol
         {
             if ( orientation == Qt::Horizontal )
             {
-                return QString( Fn::ROI2String::s( (Fn::ROI)section ) );
+                return QString( Fn::Prop2String::s( (Fn::Property)section ) );
             }
             break;
         }
@@ -146,17 +146,17 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::Property::R_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::Property::R_ACTIVE ).toBool() );
             }
             else
             {
-                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( Fn::ROI::ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->get( Fn::ROI::ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( Fn::Property::R_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->get( Fn::Property::R_ACTIVE ).toBool() );
             }
             break;
         }
         case Qt::DisplayRole:
         {
-            if ( index.column() == (int)Fn::ROI::POINTER )
+            if ( index.column() == (int)Fn::Property::R_POINTER )
             {
                 if ( index.internalId() == -1 )
                 {
@@ -172,18 +172,18 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
                 return true;
             }
 
-            if ( index.column() == (int)Fn::ROI::UPDATED )
+            if ( index.column() == (int)Fn::Property::R_UPDATED )
             {
                 emit( dataChanged( QModelIndex(), QModelIndex() ) );
                 return true;
             }
             if ( index.internalId() == -1 )
             {
-                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( (Fn::ROI)index.column(), value );
+                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( (Fn::Property)index.column(), value );
             }
             else
             {
-                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( (Fn::ROI)index.column(), value );
+                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( (Fn::Property)index.column(), value );
             }
             break;
         }
@@ -232,7 +232,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         {
             // child box selected
             beginInsertRows( parent.parent(), m_rois[parent.parent().row()].size(), m_rois[parent.parent().row()].size() );
-            newROI->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_rois[parent.parent().row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            newROI->properties()->set( Fn::Property::R_COLOR, VPtr<ROI>::asPtr( m_rois[parent.parent().row()][0] )->properties()->get( Fn::Property::R_COLOR ) );
             m_rois[parent.parent().row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
@@ -240,7 +240,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         {
             // top box selected
             beginInsertRows( parent, m_rois[parent.row()].size(), m_rois[parent.row()].size() );
-            newROI->properties()->set( Fn::ROI::COLOR, VPtr<ROI>::asPtr( m_rois[parent.row()][0] )->properties()->get( Fn::ROI::COLOR ) );
+            newROI->properties()->set( Fn::Property::R_COLOR, VPtr<ROI>::asPtr( m_rois[parent.row()][0] )->properties()->get( Fn::Property::R_COLOR ) );
             m_rois[parent.row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
@@ -287,7 +287,7 @@ void ROIModel::propChanged( int value )
     {
         for ( int k = 0; k < m_rois[i].size(); ++k )
         {
-            if ( value == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::ROI::ID ).toInt() )
+            if ( value == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::R_ID ).toInt() )
             {
                 found = true;
                 kk = k;
@@ -324,15 +324,15 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
         {
             for ( int k = 0; k < m_rois[i].size(); ++k )
             {
-                if ( value.toInt() == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::ROI::PICK_ID ).toInt() )
+                if ( value.toInt() == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::R_PICK_ID ).toInt() )
                 {
                     if ( k == 0 )
                     {
-                        l.push_back( createIndex( i, (int)Fn::ROI::PICK_ID, -1 ) );
+                        l.push_back( createIndex( i, (int)Fn::Property::R_PICK_ID, -1 ) );
                     }
                     else
                     {
-                        l.push_back( createIndex( k-1, (int)Fn::ROI::PICK_ID, i ) );
+                        l.push_back( createIndex( k-1, (int)Fn::Property::R_PICK_ID, i ) );
                     }
                 }
             }

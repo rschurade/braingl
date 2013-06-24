@@ -54,23 +54,23 @@ void SliceRenderer::init()
 
 void SliceRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat();
-    m_y = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat();
-    m_z = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat();
+    m_x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    m_y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    m_z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
     int xi = m_x;
     int yi = m_y;
     int zi = m_z;
 
-    m_nx = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
-    m_ny = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
-    m_nz = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+    m_nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
+    m_ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
+    m_nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
     int xbi = m_nx;
     int ybi = m_ny;
     int zbi = m_nz;
 
-    m_dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    m_dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    m_dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    m_dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    m_dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
     float x = m_x * m_dx + m_dx / 2.0;
     float y = m_y * m_dy + m_dy / 2.0;
@@ -193,19 +193,19 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     float red =   0.0f;
 
     initGeometry();
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_AXIAL, 0 ) ).toBool() )
+    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 1 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawAxial( target );
     }
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_CORONAL, 0 ) ).toBool() )
+    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 2 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawCoronal( target );
     }
-    if ( model()->data( model()->index( (int)Fn::Global::SHOW_SAGITTAL, 0 ) ).toBool() )
+    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ) ).toBool() )
     {
         float blue =  (float)(( 3 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );

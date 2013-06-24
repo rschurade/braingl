@@ -10,12 +10,12 @@
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
-#include "../../data/properties/globalpropertygroup.h"
+#include "../../data/properties/propertygroup.h"
 
 #include <QtGui>
 
 GlobalPropertyWidget::GlobalPropertyWidget( QWidget* parent ) :
-    QWidget( parent )
+    QTabWidget( parent )
 {
     m_propertyView = new GlobalPropertyView( this );
     m_layout = new QVBoxLayout();
@@ -35,15 +35,50 @@ void GlobalPropertyWidget::setModel( QAbstractItemModel* model )
     m_propertyView->setModel( model );
     m_propertyView->init();
 
-    GlobalPropertyGroup* props = VPtr<GlobalPropertyGroup>::asPtr( model->data( model->index( (int)Fn::Global::OBJECT, 0 ) ) );
-    QList<Fn::Global>visible = props->getVisible();
+    PropertyGroup* props = VPtr<PropertyGroup>::asPtr( model->data( model->index( (int)Fn::Property::G_OBJECT, 0 ) ) );
 
-    for ( int i = 0; i < visible.size(); ++i )
+    // clear tabs
+    while ( count() > 0 )
     {
-        m_layout->addWidget( props->getWidget( visible[i] ) );
-        props->getWidget( visible[i] )->show();
+        removeTab( 0 );
     }
-    m_layout->addStretch();
+    repaint();
+    // get properties
+
+    QHash<QString, QVBoxLayout*>tabs;
+
+    for ( int i = 0; i < props->size(); ++i )
+    {
+        // check tab
+        QString tab = props->getNthProperty( i )->getPropertyTab();
+        if ( tab == "none" )
+        {
+            continue;
+        }
+        //create tab if not exists
+        if ( !tabs.contains( tab ) )
+        {
+            QVBoxLayout* layout = new QVBoxLayout();
+            layout->setContentsMargins( 1, 1, 1, 1 );
+            layout->setSpacing( 1 );
+
+            QWidget* widget = new QWidget;
+            widget->setLayout( layout );
+            widget->setContentsMargins( 0, 0, 0, 0 );
+
+            addTab( widget, tab );
+            tabs[tab] = layout;
+        }
+        tabs[tab]->addWidget( props->getNthProperty( i )->getWidget() );
+    }
+
+    QHashIterator<QString, QVBoxLayout*> ti( tabs );
+    while ( ti.hasNext() )
+    {
+        ti.next();
+        ti.value()->addStretch();
+    }
+
 }
 
 void GlobalPropertyWidget::sliderChanged( int value, int id )

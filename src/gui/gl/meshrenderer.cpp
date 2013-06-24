@@ -11,7 +11,6 @@
 #include "../../data/enums.h"
 #include "../../data/mesh/trianglemesh2.h"
 #include "../../data/properties/propertygroup.h"
-#include "../../data/properties/roipropertygroup.h"
 
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
@@ -59,7 +58,7 @@ void MeshRenderer::init()
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
 
-    float alpha = props->get( Fn::Property::ALPHA ).toFloat();
+    float alpha = props->get( Fn::Property::D_ALPHA ).toFloat();
     m_renderMode = renderMode;
 
     switch ( renderMode )
@@ -104,12 +103,12 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
     program->setUniformValue( "u_upperThreshold", m_upperThreshold );
 
-    float nx = model()->data( model()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
-    float ny = model()->data( model()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
-    float nz = model()->data( model()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
-    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
+    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
+    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
@@ -149,9 +148,9 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, ROIPropertyGroup &props )
+void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup &props )
 {
-    float alpha = props.get( Fn::ROI::ALPHA ).toFloat();
+    float alpha = props.get( Fn::Property::R_ALPHA ).toFloat();
     m_renderMode = renderMode;
 
     switch ( renderMode )
@@ -177,7 +176,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     }
 
     m_colorMode = 0;
-    m_color = props.get( Fn::ROI::COLOR ).value<QColor>();
+    m_color = props.get( Fn::Property::R_COLOR ).value<QColor>();
 
     QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
@@ -285,13 +284,13 @@ void MeshRenderer::initGeometry()
 
 void MeshRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_colorMode = props->get( Fn::Property::COLORMODE ).toInt();
-    m_colormap = props->get( Fn::Property::COLORMAP ).toInt();
-    m_selectedMin = props->get( Fn::Property::SELECTED_MIN ).toFloat();
-    m_selectedMax = props->get( Fn::Property::SELECTED_MAX ).toFloat();
-    m_lowerThreshold = props->get( Fn::Property::LOWER_THRESHOLD ).toFloat();
-    m_upperThreshold = props->get( Fn::Property::UPPER_THRESHOLD ).toFloat();
-    m_color = props->get( Fn::Property::COLOR ).value<QColor>();
+    m_colorMode = props->get( Fn::Property::D_COLORMODE ).toInt();
+    m_colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
+    m_selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    m_selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
 void MeshRenderer::beginUpdateColor()

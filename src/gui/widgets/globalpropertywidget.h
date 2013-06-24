@@ -9,6 +9,7 @@
 #define GLOBALPROPERTYWIDGET_H_
 
 #include <QWidget>
+#include <QTabWidget>
 
 class GlobalPropertyView;
 class QAbstractItemModel;
@@ -16,7 +17,7 @@ class QItemSelectionModel;
 class QVBoxLayout;
 class SliderWithEditInt;
 
-class GlobalPropertyWidget : public QWidget
+class GlobalPropertyWidget : public QTabWidget
 {
     Q_OBJECT
 

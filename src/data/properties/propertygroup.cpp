@@ -197,6 +197,22 @@ bool PropertyGroup::set( Fn::Property name, QColor value, QString tab )
     return true;
 }
 
+bool PropertyGroup::set( Fn::Property name, QDir value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set2( name, value.absolutePath() );
+    }
+    else
+    {
+        PropertyPath* prop = new PropertyPath( Fn::Prop2String::s( name ), value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
 bool PropertyGroup::set( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
 {
     if ( contains( name ) )
@@ -270,4 +286,44 @@ Property* PropertyGroup::getNthProperty( int n )
         return 0;
     }
     return m_properties[n].second;
+}
+
+bool PropertyGroup::setMin( Fn::Property name, float value )
+{
+    if ( contains( name ) )
+    {
+        ( (PropertyFloat*)( getProperty( name ) ) )->setMin( value );
+        return true;
+    }
+    return false;
+}
+
+bool PropertyGroup::setMax( Fn::Property name, float value )
+{
+    if ( contains( name ) )
+    {
+        ( (PropertyFloat*)( getProperty( name ) ) )->setMax( value );
+        return true;
+    }
+    return false;
+}
+
+bool PropertyGroup::setMin( Fn::Property name, int value )
+{
+    if ( contains( name ) )
+    {
+        ( (PropertyFloat*)( getProperty( name ) ) )->setMin( value );
+        return true;
+    }
+    return false;
+}
+
+bool PropertyGroup::setMax( Fn::Property name, int value )
+{
+    if ( contains( name ) )
+    {
+        ( (PropertyFloat*)( getProperty( name ) ) )->setMax( value );
+        return true;
+    }
+    return false;
 }

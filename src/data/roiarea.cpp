@@ -29,25 +29,25 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
         m_max = qMax( m_max, data[i] );
     }
 
-    m_properties.set( Fn::ROI::RENDER, true, true );
-    m_properties.set( Fn::ROI::NEG, false, true );
-    m_properties.set( Fn::ROI::COLOR, QColor( 255, 0, 0 ), true );
-    m_properties.set( Fn::ROI::ALPHA, 0.4f, 0.f, 1.f, true );
-    m_properties.set( Fn::ROI::ID, m_count );
-    m_properties.set( Fn::ROI::PICK_ID, 0 );
-    m_properties.set( Fn::ROI::SHAPE, 10 );
-    m_properties.set( Fn::ROI::THRESHOLD, m_max / 100.f, 0.0f, m_max, true );
+    m_properties.set( Fn::Property::R_RENDER, true, "general" );
+    m_properties.set( Fn::Property::R_NEG, false, "general" );
+    m_properties.set( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties.set( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
+    m_properties.set( Fn::Property::R_ID, m_count );
+    m_properties.set( Fn::Property::R_PICK_ID, 0 );
+    m_properties.set( Fn::Property::R_SHAPE, 10 );
+    m_properties.set( Fn::Property::R_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
 
-    m_properties.set( Fn::ROI::NX, m_header->nx );
-    m_properties.set( Fn::ROI::NY, m_header->ny );
-    m_properties.set( Fn::ROI::NZ, m_header->nz );
-    m_properties.set( Fn::ROI::DX, m_header->dx );
-    m_properties.set( Fn::ROI::DY, m_header->dy );
-    m_properties.set( Fn::ROI::DZ, m_header->dz );
+    m_properties.set( Fn::Property::R_NX, m_header->nx );
+    m_properties.set( Fn::Property::R_NY, m_header->ny );
+    m_properties.set( Fn::Property::R_NZ, m_header->nz );
+    m_properties.set( Fn::Property::R_DX, m_header->dx );
+    m_properties.set( Fn::Property::R_DY, m_header->dy );
+    m_properties.set( Fn::Property::R_DZ, m_header->dz );
 
-    m_properties.set( Fn::ROI::PICK_ID, (int)GLFunctions::getPickIndex() );
+    m_properties.set( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
@@ -91,7 +91,7 @@ void ROIArea::globalChanged()
 
 void ROIArea::propChanged()
 {
-    m_properties.set( Fn::ROI::UPDATED, true );
+    m_properties.set( Fn::Property::R_UPDATED, true );
 }
 
 void ROIArea::generateSurface()
@@ -159,7 +159,7 @@ void ROIArea::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heig
         m_renderer->init();
     }
 
-    m_isoLevel = m_properties.get( Fn::ROI::THRESHOLD ).toFloat();
+    m_isoLevel = m_properties.get( Fn::Property::R_THRESHOLD ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh;

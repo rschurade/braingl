@@ -138,21 +138,21 @@ void BinghamRenderer::setShaderVars()
 
 void BinghamRenderer::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
     zi = qMax( 0, qMin( zi, m_nz - 1) );
 
-    float zoom = model()->data( model()->index( (int)Fn::Global::ZOOM, 0 ) ).toFloat();
-    float moveX = model()->data( model()->index( (int)Fn::Global::MOVEX, 0 ) ).toFloat();
-    float moveY = model()->data( model()->index( (int)Fn::Global::MOVEY, 0 ) ).toFloat();
+    float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+    float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
+    float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
 
 
     int renderPeaks = (int)m_render1 * 1 + (int)m_render2 * 2 + (int)m_render3 * 4;
@@ -235,17 +235,17 @@ void BinghamRenderer::initGeometry()
 
 void BinghamRenderer::setRenderParams( PropertyGroup* props )
 {
-    int slice = (int)props->get( Fn::Property::RENDER_AXIAL ).toBool() +
-                    (int)props->get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
-                    (int)props->get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+    int slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+                    (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+                    (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
-    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
+    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_orient = slice;
-    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
-    m_lodAdjust = props->get( Fn::Property::LOD ).toInt();
-    m_minMaxScaling = props->get( Fn::Property::MINMAX_SCALING ).toBool();
-    m_order = props->get( Fn::Property::ORDER ).toInt();
-    m_render1 = props->get( Fn::Property::RENDER_FIRST ).toBool();
-    m_render2 = props->get( Fn::Property::RENDER_SECOND ).toBool();
-    m_render3 = props->get( Fn::Property::RENDER_THIRD ).toBool();
+    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_lodAdjust = props->get( Fn::Property::D_LOD ).toInt();
+    m_minMaxScaling = props->get( Fn::Property::D_MINMAX_SCALING ).toBool();
+    m_order = props->get( Fn::Property::D_ORDER ).toInt();
+    m_render1 = props->get( Fn::Property::D_RENDER_FIRST ).toBool();
+    m_render2 = props->get( Fn::Property::D_RENDER_SECOND ).toBool();
+    m_render3 = props->get( Fn::Property::D_RENDER_THIRD ).toBool();
 }

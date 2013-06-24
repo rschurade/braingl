@@ -21,7 +21,7 @@
 #include <QtGui>
 
 ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
-    QWidget( parent )
+    QTabWidget( parent )
 {
     m_propertyView = new ROIPropertyView( this );
 
@@ -53,27 +53,50 @@ void ROIPropertyWidget::setSelectionModel( QItemSelectionModel* selectionModel )
 
 void ROIPropertyWidget::updateWidgetVisibility()
 {
-    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::ROI::POINTER );
-
-    ROI* roi = VPtr<ROI>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    QList<Fn::ROI>visible = roi->properties()->getVisible();
-
-    for ( int i = 0; i < m_visibleWidgets.size(); ++i )
+    // clear tabs
+    while ( count() > 0 )
     {
-        m_visibleWidgets[i]->hide();
-        m_layout->removeWidget( m_visibleWidgets[i] );
+        removeTab( 0 );
     }
-    m_layout->removeItem( m_layout->itemAt( 0 ) );
-    m_visibleWidgets.clear();
     repaint();
+    // get properties
+    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::R_POINTER );
+    ROI* roi = VPtr<ROI>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
 
-    for ( int i = 0; i < visible.size(); ++i )
+    PropertyGroup* props = roi->properties();
+    QHash<QString, QVBoxLayout*>tabs;
+
+    for ( int i = 0; i < props->size(); ++i )
     {
-        m_layout->addWidget( roi->properties()->getWidget( visible[i] ) );
-        roi->properties()->getWidget( visible[i] )->show();
-        m_visibleWidgets.push_back( roi->properties()->getWidget( visible[i] ) );
+        // check tab
+        QString tab = props->getNthProperty( i )->getPropertyTab();
+        if ( tab == "none" )
+        {
+            continue;
+        }
+        //create tab if not exists
+        if ( !tabs.contains( tab ) )
+        {
+            QVBoxLayout* layout = new QVBoxLayout();
+            layout->setContentsMargins( 1, 1, 1, 1 );
+            layout->setSpacing( 1 );
+
+            QWidget* widget = new QWidget;
+            widget->setLayout( layout );
+            widget->setContentsMargins( 0, 0, 0, 0 );
+
+            addTab( widget, tab );
+            tabs[tab] = layout;
+        }
+        tabs[tab]->addWidget( props->getNthProperty( i )->getWidget() );
     }
-    m_layout->addStretch();
+
+    QHashIterator<QString, QVBoxLayout*> ti( tabs );
+    while ( ti.hasNext() )
+    {
+        ti.next();
+        ti.value()->addStretch();
+    }
 }
 
 void ROIPropertyWidget::clearWidget()

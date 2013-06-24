@@ -15,40 +15,40 @@
 
 GlobalPropertyModel::GlobalPropertyModel()
 {
-    m_properties = new GlobalPropertyGroup();
-    m_properties->set( Fn::Global::AXIAL, 0, 0, 0, true );
-    m_properties->set( Fn::Global::CORONAL, 0, 0, 0, true );
-    m_properties->set( Fn::Global::SAGITTAL, 0, 0, 0, true );
-    m_properties->set( Fn::Global::MAX_AXIAL, 1 );
-    m_properties->set( Fn::Global::MAX_CORONAL, 1 );
-    m_properties->set( Fn::Global::MAX_SAGITTAL, 1 );
-    m_properties->set( Fn::Global::SLICE_DX, 1.0f );
-    m_properties->set( Fn::Global::SLICE_DY, 1.0f );
-    m_properties->set( Fn::Global::SLICE_DZ, 1.0f );
-    m_properties->set( Fn::Global::LAST_PATH, QString("") );
-    m_properties->set( Fn::Global::SHOW_AXIAL, true );
-    m_properties->set( Fn::Global::SHOW_CORONAL, true );
-    m_properties->set( Fn::Global::SHOW_SAGITTAL, true );
-    m_properties->set( Fn::Global::CORONAL_AXIAL, 0 );
-    m_properties->set( Fn::Global::SAGITTAL_AXIAL, 0 );
-    m_properties->set( Fn::Global::SAGITTAL_CORONAL, 0 );
-    m_properties->set( Fn::Global::ZOOM, 1.0f );
-    m_properties->set( Fn::Global::MOVEX, 0 );
-    m_properties->set( Fn::Global::MOVEY, 0 );
-    m_properties->set( Fn::Global::BBX, 0 );
-    m_properties->set( Fn::Global::BBY, 0 );
-    m_properties->set( Fn::Global::VIEW, 0 );
-    m_properties->set( Fn::Global::BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), true );
-    m_properties->set( Fn::Global::BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), true );
-    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), true );
-    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), true );
-    m_properties->set( Fn::Global::BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), true );
-    m_properties->set( Fn::Global::RENDER_CROSSHAIRS, true, true );
-    m_properties->set( Fn::Global::CROSSHAIR_COLOR, QColor( 255, 0, 0 ), true );
-    m_properties->set( Fn::Global::SHOW_NAV_SLIDERS, true, true );
-    m_properties->set( Fn::Global::SCREENSHOT_QUALITY, 1, 1, 5, true );
-    m_properties->set( Fn::Global::SCREENSHOT_PATH, QDir(""), true );
-    m_properties->set( Fn::Global::TRANSPARENCY, {"classic", "new"}, 0, true );
+    m_properties = new PropertyGroup();
+    m_properties->set( Fn::Property::G_AXIAL, 0, 0, 0, "general" );
+    m_properties->set( Fn::Property::G_CORONAL, 0, 0, 0, "general" );
+    m_properties->set( Fn::Property::G_SAGITTAL, 0, 0, 0, "general" );
+    m_properties->set( Fn::Property::G_MAX_AXIAL, 1 );
+    m_properties->set( Fn::Property::G_MAX_CORONAL, 1 );
+    m_properties->set( Fn::Property::G_MAX_SAGITTAL, 1 );
+    m_properties->set( Fn::Property::G_SLICE_DX, 1.0f );
+    m_properties->set( Fn::Property::G_SLICE_DY, 1.0f );
+    m_properties->set( Fn::Property::G_SLICE_DZ, 1.0f );
+    m_properties->set( Fn::Property::G_LAST_PATH, QString("") );
+    m_properties->set( Fn::Property::G_SHOW_AXIAL, true );
+    m_properties->set( Fn::Property::G_SHOW_CORONAL, true );
+    m_properties->set( Fn::Property::G_SHOW_SAGITTAL, true );
+    m_properties->set( Fn::Property::G_CORONAL_AXIAL, 0 );
+    m_properties->set( Fn::Property::G_SAGITTAL_AXIAL, 0 );
+    m_properties->set( Fn::Property::G_SAGITTAL_CORONAL, 0 );
+    m_properties->set( Fn::Property::G_ZOOM, 1.0f );
+    m_properties->set( Fn::Property::G_MOVEX, 0 );
+    m_properties->set( Fn::Property::G_MOVEY, 0 );
+    m_properties->set( Fn::Property::G_BBX, 0 );
+    m_properties->set( Fn::Property::G_BBY, 0 );
+    m_properties->set( Fn::Property::G_VIEW, 0 );
+    m_properties->set( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
+    m_properties->set( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "general" );
+    m_properties->set( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "general" );
+    m_properties->set( Fn::Property::G_BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), "general" );
+    m_properties->set( Fn::Property::G_BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), "general" );
+    m_properties->set( Fn::Property::G_RENDER_CROSSHAIRS, true, "general" );
+    m_properties->set( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties->set( Fn::Property::G_SHOW_NAV_SLIDERS, true, "general" );
+    m_properties->set( Fn::Property::G_SCREENSHOT_QUALITY, 1, 1, 5, "general" );
+    m_properties->set( Fn::Property::G_SCREENSHOT_PATH, QDir(""), "general" );
+    m_properties->set( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );
     connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
 }
 
@@ -68,13 +68,13 @@ int GlobalPropertyModel::columnCount( const QModelIndex &parent ) const
 
 QVariant GlobalPropertyModel::data( const QModelIndex &index, int role ) const
 {
-    if ( index.row() == (int)Fn::Global::OBJECT )
+    if ( index.row() == (int)Fn::Property::G_OBJECT )
     {
-        return VPtr<GlobalPropertyGroup>::asQVariant( m_properties );
+        return VPtr<PropertyGroup>::asQVariant( m_properties );
     }
     else
     {
-        return m_properties->get( (Fn::Global)index.row() );
+        return m_properties->get( (Fn::Property)index.row() );
     }
 }
 
@@ -84,7 +84,7 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
     {
         if ( orientation == Qt::Vertical )
         {
-            return QString( Fn::Global2String::s( (Fn::Global)section ) );
+            return QString( Fn::Prop2String::s( (Fn::Property)section ) );
         }
 
     }
@@ -93,11 +93,11 @@ QVariant GlobalPropertyModel::headerData( int section, Qt::Orientation orientati
 
 QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    if ( m_properties->contains( (Fn::Global)row ) )
+    if ( m_properties->contains( (Fn::Property)row ) )
     {
         return createIndex( row, 0, 0 );
     }
-    else if ( row == (int)Fn::Global::OBJECT )
+    else if ( row == (int)Fn::Property::G_OBJECT )
     {
         return createIndex( row, 0, 0 );
     }
@@ -111,22 +111,22 @@ QModelIndex GlobalPropertyModel::parent( const QModelIndex & index ) const
 
 bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
-    switch( (Fn::Global)index.row() )
+    switch( (Fn::Property)index.row() )
     {
-        case Fn::Global::CORONAL_AXIAL:
-            m_properties->set( Fn::Global::CORONAL, value.toPoint().x() );
-            m_properties->set( Fn::Global::AXIAL, value.toPoint().y() );
+        case Fn::Property::G_CORONAL_AXIAL:
+            m_properties->set( Fn::Property::G_CORONAL, value.toPoint().x() );
+            m_properties->set( Fn::Property::G_AXIAL, value.toPoint().y() );
             break;
-        case Fn::Global::SAGITTAL_AXIAL:
-            m_properties->set( Fn::Global::SAGITTAL, value.toPoint().x() );
-            m_properties->set( Fn::Global::AXIAL, value.toPoint().y() );
+        case Fn::Property::G_SAGITTAL_AXIAL:
+            m_properties->set( Fn::Property::G_SAGITTAL, value.toPoint().x() );
+            m_properties->set( Fn::Property::G_AXIAL, value.toPoint().y() );
             break;
-        case Fn::Global::SAGITTAL_CORONAL:
-            m_properties->set( Fn::Global::SAGITTAL, value.toPoint().x() );
-            m_properties->set( Fn::Global::CORONAL, value.toPoint().y() );
+        case Fn::Property::G_SAGITTAL_CORONAL:
+            m_properties->set( Fn::Property::G_SAGITTAL, value.toPoint().x() );
+            m_properties->set( Fn::Property::G_CORONAL, value.toPoint().y() );
             break;
         default:
-            m_properties->set( (Fn::Global)index.row(), value );
+            m_properties->set( (Fn::Property)index.row(), value );
             break;
     }
 
@@ -135,9 +135,9 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
 
 bool GlobalPropertyModel::submit()
 {
-    m_properties->setMax( Fn::Global::AXIAL, m_properties->get( Fn::Global::MAX_AXIAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Global::CORONAL, m_properties->get( Fn::Global::MAX_CORONAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Global::SAGITTAL, m_properties->get( Fn::Global::MAX_SAGITTAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_AXIAL, m_properties->get( Fn::Property::G_MAX_AXIAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_CORONAL, m_properties->get( Fn::Property::G_MAX_CORONAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_SAGITTAL, m_properties->get( Fn::Property::G_MAX_SAGITTAL ).toInt() - 1 );
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }

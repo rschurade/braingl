@@ -143,13 +143,13 @@ void TensorRenderer::setShaderVars()
 
 void TensorRenderer::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
@@ -559,14 +559,14 @@ void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos
 void TensorRenderer::setRenderParams( PropertyGroup* props )
 {
     int slice = 0;
-    slice = (int)props->get( Fn::Property::RENDER_AXIAL ).toBool() +
-            (int)props->get( Fn::Property::RENDER_CORONAL ).toBool() * 2 +
-            (int)props->get( Fn::Property::RENDER_SAGITTAL ).toBool() * 4;
+    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
-    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
-    m_faThreshold = props->get( Fn::Property::FA_THRESHOLD ).toFloat();
-    m_evThreshold = props->get( Fn::Property::EV_THRESHOLD ).toFloat();
-    m_gamma = props->get( Fn::Property::GAMMA ).toFloat();
+    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
+    m_faThreshold = props->get( Fn::Property::D_FA_THRESHOLD ).toFloat();
+    m_evThreshold = props->get( Fn::Property::D_EV_THRESHOLD ).toFloat();
+    m_gamma = props->get( Fn::Property::D_GAMMA ).toFloat();
     m_orient = slice;
-    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
+    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
 }
