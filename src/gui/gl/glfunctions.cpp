@@ -69,7 +69,7 @@ bool GLFunctions::setupTextures( QString target )
         case 5:
         {
             texIndex = 4;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::TEXTURE_GLUINT );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
@@ -80,7 +80,7 @@ bool GLFunctions::setupTextures( QString target )
         case 4:
         {
             texIndex = 3;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::TEXTURE_GLUINT );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
@@ -91,7 +91,7 @@ bool GLFunctions::setupTextures( QString target )
         case 3:
         {
             texIndex = 2;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::TEXTURE_GLUINT );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
@@ -102,7 +102,7 @@ bool GLFunctions::setupTextures( QString target )
         case 2:
         {
             texIndex = 1;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::TEXTURE_GLUINT );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
@@ -113,7 +113,7 @@ bool GLFunctions::setupTextures( QString target )
         case 1:
         {
             texIndex = 0;
-            index = model->index( tl.at( texIndex ),  (int)Fn::Property::TEXTURE_GLUINT );
+            index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE0 );
@@ -130,7 +130,7 @@ bool GLFunctions::setupTextures( QString target )
 void GLFunctions::setTexInterpolation( int row )
 {
     QAbstractItemModel* model = Models::d();
-    QModelIndex index = model->index( row,  (int)Fn::Property::INTERPOLATION );
+    QModelIndex index = model->index( row,  (int)Fn::Property::D_INTERPOLATION );
     bool interpolation = model->data( index, Qt::DisplayRole ).toBool();
     if ( interpolation )
     {
@@ -268,7 +268,7 @@ QString GLFunctions::getNthColormapShader( QList< int > tl, int num )
 {
     if ( tl.size() > num )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( num ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( num ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         return ds->getColormapShader( num );
     }
     else
@@ -425,60 +425,60 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         case 5:
         {
             texIndex = 4;
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
-            texMin = props->get( Fn::Property::MIN ).toFloat();
-            texMax = props->get( Fn::Property::MAX ).toFloat();
-            program->setUniformValue( "u_lowerThreshold4", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_upperThreshold4", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMin4", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMax4", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_alpha4", props->get( Fn::Property::ALPHA ).toFloat() );
+            texMin = props->get( Fn::Property::D_MIN ).toFloat();
+            texMax = props->get( Fn::Property::D_MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold4", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold4", ( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin4", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax4", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_alpha4", props->get( Fn::Property::D_ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive4", true );
         }
             /* no break */
         case 4:
         {
             texIndex = 3;
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
-            texMin = props->get( Fn::Property::MIN ).toFloat();
-            texMax = props->get( Fn::Property::MAX ).toFloat();
-            program->setUniformValue( "u_lowerThreshold3", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_upperThreshold3", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMin3", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMax3", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_alpha3", props->get( Fn::Property::ALPHA ).toFloat() );
+            texMin = props->get( Fn::Property::D_MIN ).toFloat();
+            texMax = props->get( Fn::Property::D_MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold3", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold3", ( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin3", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax3", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_alpha3", props->get( Fn::Property::D_ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive3", true );
         }
             /* no break */
         case 3:
         {
             texIndex = 2;
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
-            texMin = props->get( Fn::Property::MIN ).toFloat();
-            texMax = props->get( Fn::Property::MAX ).toFloat();
-            program->setUniformValue( "u_lowerThreshold2", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_upperThreshold2", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMin2", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMax2", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_alpha2", props->get( Fn::Property::ALPHA ).toFloat() );
+            texMin = props->get( Fn::Property::D_MIN ).toFloat();
+            texMax = props->get( Fn::Property::D_MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold2", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold2", ( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin2", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax2", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_alpha2", props->get( Fn::Property::D_ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive2", true );
         }
             /* no break */
         case 2:
         {
             texIndex = 1;
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
-            texMin = props->get( Fn::Property::MIN ).toFloat();
-            texMax = props->get( Fn::Property::MAX ).toFloat();
-            program->setUniformValue( "u_lowerThreshold1", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_upperThreshold1", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMin1", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMax1", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_alpha1", props->get( Fn::Property::ALPHA ).toFloat() );
+            texMin = props->get( Fn::Property::D_MIN ).toFloat();
+            texMax = props->get( Fn::Property::D_MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold1", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold1", ( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin1", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax1", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_alpha1", props->get( Fn::Property::D_ALPHA ).toFloat() );
             program->setUniformValue( "u_texActive1", true );
 
         }
@@ -486,16 +486,16 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         case 1:
         {
             texIndex = 0;
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
-            texMin = props->get( Fn::Property::MIN ).toFloat();
-            texMax = props->get( Fn::Property::MAX ).toFloat();
-            program->setUniformValue( "u_lowerThreshold0", ( props->get( Fn::Property::LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_upperThreshold0", ( props->get( Fn::Property::UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMin0", ( props->get( Fn::Property::SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_selectedMax0", ( props->get( Fn::Property::SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
-            program->setUniformValue( "u_alpha0", props->get( Fn::Property::ALPHA ).toFloat() );
-            GLFunctions::sliceAlpha[target] = props->get( Fn::Property::ALPHA ).toFloat();
+            texMin = props->get( Fn::Property::D_MIN ).toFloat();
+            texMax = props->get( Fn::Property::D_MAX ).toFloat();
+            program->setUniformValue( "u_lowerThreshold0", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_upperThreshold0", ( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMin0", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_selectedMax0", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+            program->setUniformValue( "u_alpha0", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            GLFunctions::sliceAlpha[target] = props->get( Fn::Property::D_ALPHA ).toFloat();
             program->setUniformValue( "u_texActive0", true );
         }
             break;
@@ -513,10 +513,10 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
     int allocatedTextureCount = 0;
     for ( int i = 0; i < countDatasets; ++i )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         PropertyGroup* props = ds->properties( target );
-        bool active = props->get( Fn::Property::ACTIVE ).toBool();
-        bool isTex = props->get( Fn::Property::HAS_TEXTURE ).toBool();
+        bool active = props->get( Fn::Property::D_ACTIVE ).toBool();
+        bool isTex = props->get( Fn::Property::D_HAS_TEXTURE ).toBool();
 
         if ( active && isTex )
         {

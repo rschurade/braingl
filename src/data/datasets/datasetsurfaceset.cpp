@@ -31,19 +31,19 @@ void DatasetSurfaceset::addMesh( TriangleMesh2* tm, QString displayString )
 
 void DatasetSurfaceset::setProperties()
 {
-    m_properties["maingl"]->set( Fn::Property::SURFACE, m_displayList, 0, "general" );
-    //m_properties["maingl2"]->set( Fn::Property::SURFACE, m_displayList, 0, true );
+    m_properties["maingl"]->set( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    //m_properties["maingl2"]->set( Fn::Property::D_SURFACE, m_displayList, 0, true );
 }
 
 TriangleMesh2* DatasetSurfaceset::getMesh( QString target )
 {
-    int n = properties( target )->get( Fn::Property::SURFACE ).toInt();
+    int n = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
     return m_mesh[n];
 }
 
 void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -59,7 +59,7 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
 
 void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
 {
-    int paintMode = m_properties["maingl"]->get( Fn::Property::PAINTMODE ).toInt();
+    int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 || paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return;
@@ -68,18 +68,18 @@ void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifi
     QColor color;
     if ( ( modifiers & Qt::ControlModifier ) && !( modifiers & Qt::ShiftModifier ) )
     {
-        color = m_properties["maingl"]->get( Fn::Property::PAINTCOLOR ).value<QColor>();
+        color = m_properties["maingl"]->get( Fn::Property::D_PAINTCOLOR ).value<QColor>();
     }
     else if ( ( modifiers & Qt::ControlModifier ) && ( modifiers & Qt::ShiftModifier ) )
     {
-        color = m_properties["maingl"]->get( Fn::Property::COLOR ).value<QColor>();
+        color = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
     }
     else
     {
         return;
     }
 
-    QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::PAINTSIZE ).toFloat() );
+    QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     if ( picked.size() > 0 )
     {

@@ -46,12 +46,12 @@ void TrackWithCrossings::setDatasets( DatasetScalar* mask, DatasetTensor* ds1, D
     m_ds2 = ds2;
     m_ds3 = ds3;
 
-    m_nx = ds1->properties( "maingl" )->get( Fn::Property::NX ).toInt();
-    m_ny = ds1->properties( "maingl" )->get( Fn::Property::NY ).toInt();
-    m_nz = ds1->properties( "maingl" )->get( Fn::Property::NZ ).toInt();
-    m_dx = ds1->properties( "maingl" )->get( Fn::Property::DX ).toFloat();
-    m_dy = ds1->properties( "maingl" )->get( Fn::Property::DY ).toFloat();
-    m_dz = ds1->properties( "maingl" )->get( Fn::Property::DZ ).toFloat();
+    m_nx = ds1->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
+    m_ny = ds1->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
+    m_nz = ds1->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    m_dx = ds1->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat();
+    m_dy = ds1->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat();
+    m_dz = ds1->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat();
 
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );
     maxStepsInVoxel = ( (int) ( m_diag / m_stepSize ) + 1 ) * 2;

@@ -176,21 +176,21 @@ void DatasetListWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
 {
     if ( m_selected != -1 )
     {
-        QModelIndex index = m_listView->getSelectedIndex( (int)Fn::Property::DATASET_POINTER );
+        QModelIndex index = m_listView->getSelectedIndex( (int)Fn::Property::D_DATASET_POINTER );
         Dataset* ds = VPtr<Dataset>::asPtr( m_listView->model()->data( index, Qt::DisplayRole ) );
 
         switch ( key )
         {
             case 65:
             {
-                bool active = ds->properties()->get( Fn::Property::ACTIVE ).toBool();
-                ds->properties()->set( Fn::Property::ACTIVE, !active );
+                bool active = ds->properties()->get( Fn::Property::D_ACTIVE ).toBool();
+                ds->properties()->set( Fn::Property::D_ACTIVE, !active );
                 break;
             }
             case 80:
             {
-                int paintMode = ds->properties()->get( Fn::Property::PAINTMODE ).toInt();
-                ds->properties()->set( Fn::Property::PAINTMODE, 1 - paintMode );
+                int paintMode = ds->properties()->get( Fn::Property::D_PAINTMODE ).toInt();
+                ds->properties()->set( Fn::Property::D_PAINTMODE, 1 - paintMode );
                 break;
             }
         }

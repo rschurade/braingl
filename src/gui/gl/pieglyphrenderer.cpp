@@ -31,7 +31,7 @@ PieGlyphRenderer::~PieGlyphRenderer()
 
 void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    float alpha = props->get( Fn::Property::GLYPH_ALPHA ).toFloat();
+    float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
     if ( renderMode == 1 ) // we are drawing opaque objects
     {
@@ -113,10 +113,10 @@ void PieGlyphRenderer::setShaderVars( PropertyGroup* props )
 
     program->bind();
 
-    program->setUniformValue( "threshold", props->get( Fn::Property::THRESHOLD ).toFloat() );
-    program->setUniformValue( "minlength", props->get( Fn::Property::MINLENGTH ).toFloat() );
-    program->setUniformValue( "radius", props->get( Fn::Property::GLYPHRADIUS ).toFloat() );
-    program->setUniformValue( "normalization", props->get( Fn::Property::NORMALIZATION ).toFloat() );
+    program->setUniformValue( "threshold", props->get( Fn::Property::D_THRESHOLD ).toFloat() );
+    program->setUniformValue( "minlength", props->get( Fn::Property::D_MINLENGTH ).toFloat() );
+    program->setUniformValue( "radius", props->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "normalization", props->get( Fn::Property::D_NORMALIZATION ).toFloat() );
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     intptr_t offset = 0;

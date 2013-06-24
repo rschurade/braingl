@@ -64,14 +64,14 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
     }
 
     DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "QBall" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::QBALL );
-    out->properties( "maingl" )->set( Fn::Property::LOD, 2 );
-    out->properties( "maingl" )->set( Fn::Property::ORDER, order );
-    out->properties( "maingl" )->set( Fn::Property::RENDER_SLICE, 1 );
-    out->properties( "maingl" )->set( Fn::Property::SCALING, 1.0f );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
-    out->properties( "maingl" )->set( Fn::Property::MINMAX_SCALING, true );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "QBall" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::QBALL );
+    out->properties( "maingl" )->set( Fn::Property::D_LOD, 2 );
+    out->properties( "maingl" )->set( Fn::Property::D_ORDER, order );
+    out->properties( "maingl" )->set( Fn::Property::D_RENDER_SLICE, 1 );
+    out->properties( "maingl" )->set( Fn::Property::D_SCALING, 1.0f );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_MINMAX_SCALING, true );
 
     qDebug() << "finished calculating qBall";
 
@@ -86,17 +86,17 @@ QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
     QBall::sharpQBall( dynamic_cast<DatasetDWI*>( ds ), order, qBallVector );
     qDebug() << "create dataset";
 
-    QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->properties( "maingl" )->get( Fn::Property::NAME ).toString() );
+    QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() );
 
     DatasetSH* out = new DatasetSH( QDir( name ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, name );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::QBALL );
-    out->properties( "maingl" )->set( Fn::Property::LOD, 2 );
-    out->properties( "maingl" )->set( Fn::Property::ORDER, order );
-    out->properties( "maingl" )->set( Fn::Property::RENDER_SLICE, 1 );
-    out->properties( "maingl" )->set( Fn::Property::SCALING, 1.0f );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
-    out->properties( "maingl" )->set( Fn::Property::MINMAX_SCALING, true );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, name );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::QBALL );
+    out->properties( "maingl" )->set( Fn::Property::D_LOD, 2 );
+    out->properties( "maingl" )->set( Fn::Property::D_ORDER, order );
+    out->properties( "maingl" )->set( Fn::Property::D_RENDER_SLICE, 1 );
+    out->properties( "maingl" )->set( Fn::Property::D_SCALING, 1.0f );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_MINMAX_SCALING, true );
 
     qDebug() << "finished calculating qBall";
 
@@ -115,10 +115,10 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
     QVector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
-    DatasetTensor* out = new DatasetTensor( QDir( ds->properties( "maingl" )->get( Fn::Property::FILENAME ).toString() ), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "Tensor" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::TENSORFIT );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    DatasetTensor* out = new DatasetTensor( QDir( ds->properties( "maingl" )->get( Fn::Property::D_FILENAME ).toString() ), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "Tensor" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::TENSORFIT );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
@@ -139,9 +139,9 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
     FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "FA" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::FA );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "FA" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::FA );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
@@ -172,14 +172,14 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
     FMath::evecs( tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
     Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "evec 1" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "evec 1" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out2->properties( "maingl" )->set( Fn::Property::NAME, "eval 1" );
-    out2->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
-    out2->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
+    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
@@ -195,9 +195,9 @@ QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
     FMath::fa( *tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "FA" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::FA );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "FA" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::FA );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
@@ -222,14 +222,14 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
     FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
     Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
-    out->properties( "maingl" )->set( Fn::Property::NAME, "evec 1" );
-    out->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
-    out->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out->properties( "maingl" )->set( Fn::Property::D_NAME, "evec 1" );
+    out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+    out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
-    out2->properties( "maingl" )->set( Fn::Property::NAME, "eval 1" );
-    out2->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::EV );
-    out2->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
+    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
@@ -246,9 +246,9 @@ QList<Dataset*> DWIAlgos::fitBingham( Dataset* ds )
     QList<Dataset*> l= Bingham::calc_bingham( dynamic_cast<DatasetSH*>( ds ), depth, neighbourhood, n_peaks );
     if ( l.size() > 0 )
     {
-        l[0]->properties( "maingl" )->set( Fn::Property::NAME, "bingham" );
-        l[0]->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::BINGHAM );
-        l[0]->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+        l[0]->properties( "maingl" )->set( Fn::Property::D_NAME, "bingham" );
+        l[0]->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::BINGHAM );
+        l[0]->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
         //l[0]->properties( "maingl" )->set( "active", false );
     }
     return l;
@@ -271,9 +271,9 @@ QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
     QList<Dataset*> l= Bingham::bingham2Tensor( dynamic_cast<DatasetBingham*>( ds ) );
     for ( int i = 0; i < l.size(); ++i )
     {
-        l[i]->properties( "maingl" )->set( Fn::Property::NAME, "DWI FROM BINGHAM " + QString::number( i ) );
-        l[i]->properties( "maingl" )->set( Fn::Property::CREATED_BY, (int)Fn::Algo::BINGHAM_2_TENSOR );
-        l[i]->properties( "maingl" )->set( Fn::Property::DATATYPE, DT_FLOAT );
+        l[i]->properties( "maingl" )->set( Fn::Property::D_NAME, "DWI FROM BINGHAM " + QString::number( i ) );
+        l[i]->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::BINGHAM_2_TENSOR );
+        l[i]->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
     }
     return l;
 }

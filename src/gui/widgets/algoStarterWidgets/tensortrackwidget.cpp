@@ -31,9 +31,9 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget
     sel->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( dsl[k]->properties()->get( Fn::Property::TYPE ).toInt() == FNDT_NIFTI_SCALAR )
+        if ( dsl[k]->properties()->get( Fn::Property::D_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            sel->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::NAME ).toString() );
+            sel->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::D_NAME ).toString() );
         }
     }
     m_layout->addWidget( sel );
@@ -42,9 +42,9 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget
     sel2->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( dsl[k]->properties()->get( Fn::Property::TYPE ).toInt() == FNDT_NIFTI_SCALAR )
+        if ( dsl[k]->properties()->get( Fn::Property::D_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
         {
-            sel2->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::NAME ).toString() );
+            sel2->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::D_NAME ).toString() );
         }
     }
     m_layout->addWidget( sel2 );
@@ -89,7 +89,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget
     connect( smoothness, SIGNAL( valueChanged( float, int) ), m_tracker, SLOT( setSmoothness( float, int) ) );
 
 
-    int numVoxels = ds->properties()->get( Fn::Property::NX ).toInt() * ds->properties()->get( Fn::Property::NY ).toInt() * ds->properties()->get( Fn::Property::NZ ).toInt();
+    int numVoxels = ds->properties()->get( Fn::Property::D_NX ).toInt() * ds->properties()->get( Fn::Property::D_NY ).toInt() * ds->properties()->get( Fn::Property::D_NZ ).toInt();
 
 
     m_progressBar = new QProgressBar( this );
