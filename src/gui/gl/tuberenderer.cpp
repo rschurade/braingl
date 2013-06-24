@@ -45,7 +45,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 {
     float alpha = props->get( Fn::Property::D_ALPHA ).toFloat();
 
-    if ( renderMode == 1 ) // we are drawing opaque objects
+    if ( renderMode == 0 ) // picking
+    {
+        return;
+    }
+    else if ( renderMode == 1 ) // we are drawing opaque objects
     {
         if ( alpha < 1.0 )
         {
