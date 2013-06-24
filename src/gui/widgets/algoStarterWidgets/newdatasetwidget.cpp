@@ -37,12 +37,12 @@ NewDatasetWidget::NewDatasetWidget( ROIWidget* roiWidget, QWidget* parent ) :
 
     m_sourceSelect = new SelectWithLabel( QString( "source dataset" ), 1 );
 
-    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::DATASET_LIST ), Qt::DisplayRole ).toList();
+    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
         {
-            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::NAME ).toString(), dsl[k] );
+            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), dsl[k] );
         }
     }
     m_layout->addWidget( m_sourceSelect );
@@ -130,7 +130,7 @@ void NewDatasetWidget::createDataset()
             header->dz = dz;
             DatasetScalar* out = new DatasetScalar( QDir( "new dataset" ), data, header );
 
-            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::NEW_DATASET );
+            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
             Models::d()->setData( index, VPtr<Dataset>::asQVariant( out ), Qt::DisplayRole );
             break;
         }
@@ -148,7 +148,7 @@ void NewDatasetWidget::createDataset()
 
             DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, ds->getHeader() );
 
-            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::NEW_DATASET );
+            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
             Models::d()->setData( index, VPtr<Dataset>::asQVariant( dsOut ), Qt::DisplayRole );
 
             break;
@@ -164,7 +164,7 @@ void NewDatasetWidget::createDataset()
 
             DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, ds->getHeader() );
 
-            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::NEW_DATASET );
+            QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
             Models::d()->setData( index, VPtr<Dataset>::asQVariant( dsOut ), Qt::DisplayRole );
 
             break;
@@ -252,29 +252,29 @@ void NewDatasetWidget::copyWithRois( DatasetScalar* source, QVector<float> &targ
 
 void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, QVector<float> &target )
 {
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::SHAPE ), Qt::DisplayRole ).toInt() > 4 )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt() > 4 )
     {
         return;
     }
 
     QVector<float>* s = source->getData();
 
-    int ds_nx = source->properties()->get( Fn::Property::NX ).toInt();
-    int ds_ny = source->properties()->get( Fn::Property::NY ).toInt();
-    int ds_nz = source->properties()->get( Fn::Property::NZ ).toInt();
-    float ds_dx = source->properties()->get( Fn::Property::DX ).toFloat();
-    float ds_dy = source->properties()->get( Fn::Property::DY ).toFloat();
-    float ds_dz = source->properties()->get( Fn::Property::DZ ).toFloat();
+    int ds_nx = source->properties()->get( Fn::Property::D_NX ).toInt();
+    int ds_ny = source->properties()->get( Fn::Property::D_NY ).toInt();
+    int ds_nz = source->properties()->get( Fn::Property::D_NZ ).toInt();
+    float ds_dx = source->properties()->get( Fn::Property::D_DX ).toFloat();
+    float ds_dy = source->properties()->get( Fn::Property::D_DY ).toFloat();
+    float ds_dz = source->properties()->get( Fn::Property::D_DZ ).toFloat();
 
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::ACTIVE ), Qt::DisplayRole ).toBool() )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
 
-        float x = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::X ), Qt::DisplayRole ).toFloat();
-        float y = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Y ), Qt::DisplayRole ).toFloat();
-        float z = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::Z ), Qt::DisplayRole ).toFloat();
-        float dx = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DX ), Qt::DisplayRole ).toFloat() / 2;
-        float dy = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DY ), Qt::DisplayRole ).toFloat() / 2;
-        float dz = Models::r()->data( createIndex( branch, pos, (int)Fn::ROI::DZ ), Qt::DisplayRole ).toFloat() / 2;
+        float x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
+        float y = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
+        float z = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
+        float dx = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DX ), Qt::DisplayRole ).toFloat() / 2;
+        float dy = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DY ), Qt::DisplayRole ).toFloat() / 2;
+        float dz = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DZ ), Qt::DisplayRole ).toFloat() / 2;
         float xMin = x - dx;
         float xMax = x + dx;
         float yMin = y - dy;

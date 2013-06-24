@@ -16,15 +16,15 @@ DatasetCons::DatasetCons( QString fileName ) :
     consNumber = cons->edges.length();
 
     // add standard properties
-    m_properties["maingl"]->set( Fn::Property::ACTIVE, true );
-    m_properties["maingl"]->set( Fn::Property::SIZE, -1 );
-    m_properties["maingl"]->set( Fn::Property::CREATED_BY, (int) Fn::Algo::NONE );
+    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, true );
+    m_properties["maingl"]->set( Fn::Property::D_SIZE, -1 );
+    m_properties["maingl"]->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
 
-    m_properties["maingl"]->set( Fn::Property::HAS_TEXTURE, false );
+    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->set( Fn::Property::THRESHOLD, 0.5f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::GLYPHRADIUS, 1.0f );
+    //m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
+    m_properties["maingl"]->set( Fn::Property::D_GLYPHRADIUS, 1.0f );
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :
@@ -35,15 +35,15 @@ DatasetCons::DatasetCons( Connections* cons ) :
     consNumber = cons->edges.length();
 
     // add standard properties
-    m_properties["maingl"]->set( Fn::Property::ACTIVE, true );
-    m_properties["maingl"]->set( Fn::Property::SIZE, -1 );
-    m_properties["maingl"]->set( Fn::Property::CREATED_BY, (int) Fn::Algo::NONE );
+    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, true );
+    m_properties["maingl"]->set( Fn::Property::D_SIZE, -1 );
+    m_properties["maingl"]->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
 
-    m_properties["maingl"]->set( Fn::Property::HAS_TEXTURE, false );
+    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->set( Fn::Property::THRESHOLD, 0.5f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::GLYPHRADIUS, 1.0f );
+    //m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
+    m_properties["maingl"]->set( Fn::Property::D_GLYPHRADIUS, 1.0f );
 }
 
 DatasetCons::~DatasetCons()
@@ -52,7 +52,7 @@ DatasetCons::~DatasetCons()
 
 void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::ACTIVE ).toBool() )
+    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }

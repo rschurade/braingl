@@ -36,7 +36,7 @@ void VectorGlyphRenderer::init()
 
 void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    float alpha = props->get( Fn::Property::GLYPH_ALPHA ).toFloat();
+    float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
     if ( renderMode == 1 ) // we are drawing opaque objects
     {
@@ -64,12 +64,12 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
     //Rotation of the individual glyphs:
-    float rotx = props->get( Fn::Property::GLYPH_ROT_X ).toFloat();
+    float rotx = props->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
     QMatrix4x4 rotMatrix;
     rotMatrix.rotate( rotx, 1, 0, 0 );
-    float roty = props->get( Fn::Property::GLYPH_ROT_Y ).toFloat();
+    float roty = props->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
     rotMatrix.rotate( roty, 0, 1, 0 );
-    float rotz = props->get( Fn::Property::GLYPH_ROT_Z ).toFloat();
+    float rotz = props->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
     rotMatrix.rotate( rotz, 0, 0, 1 );
     program->setUniformValue( "rot_matrix", rotMatrix );
 
@@ -114,9 +114,9 @@ void VectorGlyphRenderer::setShaderVars( PropertyGroup* props )
 
     program->bind();
 
-    program->setUniformValue( "threshold", props->get( Fn::Property::THRESHOLD ).toFloat() );
-    program->setUniformValue( "radius", props->get( Fn::Property::GLYPHRADIUS ).toFloat() );
-    program->setUniformValue( "minlength", props->get( Fn::Property::MINLENGTH ).toFloat() );
+    program->setUniformValue( "threshold", props->get( Fn::Property::D_THRESHOLD ).toFloat() );
+    program->setUniformValue( "radius", props->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "minlength", props->get( Fn::Property::D_MINLENGTH ).toFloat() );
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data

@@ -67,7 +67,7 @@ void ToolBarView::selectionChanged( const QItemSelection &selected, const QItemS
     if ( selected.indexes().size() > 0 )
     {
         m_selected = selected.indexes().first().row();
-        QModelIndex index = model()->index( m_selected, (int)Fn::Property::TYPE );
+        QModelIndex index = model()->index( m_selected, (int)Fn::Property::D_TYPE );
         int type = model()->data( index, Qt::DisplayRole ).toInt();
 
         emit( sigSelectionChanged( type ) );

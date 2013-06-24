@@ -22,10 +22,10 @@ DatasetNifti::~DatasetNifti()
 
 void DatasetNifti::parseNiftiHeader()
 {
-    m_properties["maingl"]->set( Fn::Property::DIM, m_header->ndim );
-    m_properties["maingl"]->set( Fn::Property::NX, m_header->nx );
-    m_properties["maingl"]->set( Fn::Property::NY, m_header->ny );
-    m_properties["maingl"]->set( Fn::Property::NZ, m_header->nz );
+    m_properties["maingl"]->set( Fn::Property::D_DIM, m_header->ndim );
+    m_properties["maingl"]->set( Fn::Property::D_NX, m_header->nx );
+    m_properties["maingl"]->set( Fn::Property::D_NY, m_header->ny );
+    m_properties["maingl"]->set( Fn::Property::D_NZ, m_header->nz );
 
 //    m_properties["maingl"]->set( Fn::Property::NT, m_header->nt );
 //    m_properties["maingl"]->set( Fn::Property::NU, m_header->nu );
@@ -34,10 +34,10 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->set("dim", m_header->dim );
 //    m_properties["maingl"]->set( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
 //    m_properties["maingl"]->set( Fn::Property::NBYPER, m_header->nbyper );
-    m_properties["maingl"]->set( Fn::Property::DATATYPE, m_header->datatype );
-    m_properties["maingl"]->set( Fn::Property::DX, m_header->dx );
-    m_properties["maingl"]->set( Fn::Property::DY, m_header->dy );
-    m_properties["maingl"]->set( Fn::Property::DZ, m_header->dz );
+    m_properties["maingl"]->set( Fn::Property::D_DATATYPE, m_header->datatype );
+    m_properties["maingl"]->set( Fn::Property::D_DX, m_header->dx );
+    m_properties["maingl"]->set( Fn::Property::D_DY, m_header->dy );
+    m_properties["maingl"]->set( Fn::Property::D_DZ, m_header->dz );
 //    m_properties["maingl"]->set( Fn::Property::DT, m_header->dt );
 //    m_properties["maingl"]->set( Fn::Property::DU, m_header->du );
 //    m_properties["maingl"]->set( Fn::Property::DV, m_header->dv );
@@ -161,13 +161,13 @@ QString DatasetNifti::getNiftiDataType( const int type )
 
 int DatasetNifti::getIdFromPos( float x, float y, float z )
 {
-    float dx = m_properties["maingl"]->get( Fn::Property::DX ).toFloat();
-    float dy = m_properties["maingl"]->get( Fn::Property::DY ).toFloat();
-    float dz = m_properties["maingl"]->get( Fn::Property::DZ ).toFloat();
+    float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
 
-    int nx = m_properties["maingl"]->get( Fn::Property::NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::NZ ).toInt();
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
 
     int px = x / dx;
     int py = y / dy;
@@ -182,7 +182,7 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
 
 QString DatasetNifti::getColormapShader( int num )
 {
-    if ( m_properties["maingl"]->get( Fn::Property::IS_ATLAS ).toBool() )
+    if ( m_properties["maingl"]->get( Fn::Property::D_IS_ATLAS ).toBool() )
     {
         QString code( "" );
         code += "bool isBitSet( in float value, in float bitpos )\n";
@@ -276,7 +276,7 @@ QString DatasetNifti::getColormapShader( int num )
     }
     else
     {
-        int colormap = m_properties["maingl"]->get( Fn::Property::COLORMAP ).toInt();
+        int colormap = m_properties["maingl"]->get( Fn::Property::D_COLORMAP ).toInt();
 
         QString code( "" );
 

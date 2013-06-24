@@ -38,9 +38,9 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     bool *srcpix;
     double g, *array;
 
-    nx = ds->properties( "maingl" )->get( Fn::Property::NX ).toInt();
-    ny = ds->properties( "maingl" )->get( Fn::Property::NY ).toInt();
-    nz = ds->properties( "maingl" )->get( Fn::Property::NZ ).toInt();
+    nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
+    ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
+    nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
 
     npixels = qMax( nz, ny );
     array = new double[npixels];
@@ -322,7 +322,7 @@ QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
     QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
     QVector<float> out( data->size() );
 
-    float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" )->get( Fn::Property::MAX ).toFloat();
+    float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
     out[0] = max;
 
 
