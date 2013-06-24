@@ -312,7 +312,7 @@ bool PropertyGroup::setMin( Fn::Property name, int value )
 {
     if ( contains( name ) )
     {
-        ( (PropertyFloat*)( getProperty( name ) ) )->setMin( value );
+        ( (PropertyInt*)( getProperty( name ) ) )->setMin( value );
         return true;
     }
     return false;
@@ -322,7 +322,7 @@ bool PropertyGroup::setMax( Fn::Property name, int value )
 {
     if ( contains( name ) )
     {
-        ( (PropertyFloat*)( getProperty( name ) ) )->setMax( value );
+        ( (PropertyInt*)( getProperty( name ) ) )->setMax( value );
         return true;
     }
     return false;
