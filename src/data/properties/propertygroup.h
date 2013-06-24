@@ -13,6 +13,7 @@
 #include "propertycolor.h"
 #include "propertyint.h"
 #include "propertyfloat.h"
+#include "propertypath.h"
 #include "propertystring.h"
 #include "propertyselection.h"
 
@@ -44,8 +45,14 @@ public:
     bool set( Fn::Property name, QString value, QString tab = "none" );
     bool set( Fn::Property name, const char* value, QString tab = "none" );
     bool set( Fn::Property name, QColor value, QString tab = "none" );
+    bool set( Fn::Property name, QDir value, QString tab = "none" );
     bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
     bool set( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+
+    bool setMin( Fn::Property name,  float value );
+    bool setMax( Fn::Property name,  float value );
+    bool setMin( Fn::Property name,  int value );
+    bool setMax( Fn::Property name,  int value );
 
     int size() const;
 

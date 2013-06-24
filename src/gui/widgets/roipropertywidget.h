@@ -9,13 +9,14 @@
 #define ROIPROPERTYWIDGET_H_
 
 #include <QWidget>
+#include <QTabWidget>
 
 class ROIPropertyView;
 class QAbstractItemModel;
 class QItemSelectionModel;
 class QVBoxLayout;
 
-class ROIPropertyWidget : public QWidget
+class ROIPropertyWidget : public QTabWidget
 {
     Q_OBJECT
 

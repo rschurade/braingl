@@ -136,13 +136,13 @@ void TensorRendererEV::setShaderVars()
 
 void TensorRendererEV::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
@@ -254,10 +254,10 @@ void TensorRendererEV::addGlyph( std::vector<float>* verts, float xPos, float yP
 
 void TensorRendererEV::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
-    m_faThreshold = props->get( Fn::Property::FA_THRESHOLD ).toFloat();
-    m_evThreshold = props->get( Fn::Property::EV_THRESHOLD ).toFloat();
-    m_orient = props->get( Fn::Property::RENDER_SLICE ).toInt();
-    m_offset = props->get( Fn::Property::OFFSET ).toFloat();
-    m_evSelect = props->get( Fn::Property::TENSOR_RENDERMODE ).toInt();
+    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
+    m_faThreshold = props->get( Fn::Property::D_FA_THRESHOLD ).toFloat();
+    m_evThreshold = props->get( Fn::Property::D_EV_THRESHOLD ).toFloat();
+    m_orient = props->get( Fn::Property::D_RENDER_SLICE ).toInt();
+    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_evSelect = props->get( Fn::Property::D_TENSOR_RENDERMODE ).toInt();
 }

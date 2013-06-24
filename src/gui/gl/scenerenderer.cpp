@@ -87,7 +87,7 @@ void SceneRenderer::initGL()
         GLFunctions::loadShaders();
     }
 
-    QColor color = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glEnable( GL_DEPTH_TEST );
@@ -105,8 +105,8 @@ void SceneRenderer::initGL()
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
-    Models::g()->setData( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax );
-    Models::g()->setData( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ), textureSizeMax );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 
     VertexData vertices[] =
 
@@ -155,9 +155,9 @@ void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 void SceneRenderer::renderScene()
 {
     GLFunctions::getAndPrintGLError( "before render scene" );
-    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
 
-    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
+    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Property::G_TRANSPARENCY, 0 ) ).value<int>();
 
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
@@ -324,7 +324,7 @@ void SceneRenderer::renderMerge()
     program->enableAttributeArray( texcoordLocation );
     glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
-    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Global::TRANSPARENCY, 0 ) ).value<int>();
+    int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Property::G_TRANSPARENCY, 0 ) ).value<int>();
 
     program->setUniformValue( "transparency_new", transparencyMode == 1 );
 
@@ -346,13 +346,13 @@ void SceneRenderer::renderMerge()
 
 QImage* SceneRenderer::screenshot()
 {
-    int size = Models::g()->data( Models::g()->index( (int) Fn::Global::SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int size = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ).toInt();
     int tmpWidth = m_width;
     int tmpHeight = m_height;
     resizeGL( size, qRound( size * (double) m_height / (double) m_width ) );
     renderScene();
     setRenderTarget( "SCREENSHOT" );
-    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Global::BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     renderMerge();
@@ -371,7 +371,7 @@ void SceneRenderer::renderDatasets()
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         ds->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     }
 }
@@ -381,8 +381,8 @@ void SceneRenderer::renderRois()
     int countTopBoxes = Models::r()->rowCount();
     for ( int i = 0; i < countTopBoxes; ++i )
     {
-        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int) Fn::ROI::POINTER ), Qt::DisplayRole ) );
-        if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int) Fn::Property::R_POINTER ), Qt::DisplayRole ) );
+        if ( roi->properties()->get( Fn::Property::R_ACTIVE ).toBool() )
         {
             roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
 
@@ -391,8 +391,8 @@ void SceneRenderer::renderRois()
 
             for ( int k = 0; k < countBoxes; ++k )
             {
-                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int) Fn::ROI::POINTER, mi ), Qt::DisplayRole ) );
-                if ( roi->properties()->get( Fn::ROI::ACTIVE ).toBool() )
+                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int) Fn::Property::R_POINTER, mi ), Qt::DisplayRole ) );
+                if ( roi->properties()->get( Fn::Property::R_ACTIVE ).toBool() )
                 {
                     roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
                 }

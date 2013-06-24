@@ -127,21 +127,21 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_dx = m_dataset->properties()->get( Fn::Property::DX ).toFloat();
-    m_dy = m_dataset->properties()->get( Fn::Property::DY ).toFloat();
-    m_dz = m_dataset->properties()->get( Fn::Property::DZ ).toFloat();
+    m_dx = m_dataset->properties()->get( Fn::Property::D_DX ).toFloat();
+    m_dy = m_dataset->properties()->get( Fn::Property::D_DY ).toFloat();
+    m_dz = m_dataset->properties()->get( Fn::Property::D_DZ ).toFloat();
 
-    m_nx = m_dataset->properties()->get( Fn::Property::NX ).toInt();
-    m_ny = m_dataset->properties()->get( Fn::Property::NY ).toInt();
-    m_nz = m_dataset->properties()->get( Fn::Property::NZ ).toInt();
+    m_nx = m_dataset->properties()->get( Fn::Property::D_NX ).toInt();
+    m_ny = m_dataset->properties()->get( Fn::Property::D_NY ).toInt();
+    m_nz = m_dataset->properties()->get( Fn::Property::D_NZ ).toInt();
 
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    int xi = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
@@ -156,7 +156,7 @@ void SingleSHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int order = m_dataset->properties()->get( Fn::Property::ORDER ).toInt();
+    int order = m_dataset->properties()->get( Fn::Property::D_ORDER ).toInt();
 
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
@@ -261,10 +261,10 @@ void SingleSHRenderer::draw()
     int countDatasets = model()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = model()->index( i, (int)Fn::Property::ACTIVE );
+        QModelIndex index = model()->index( i, (int)Fn::Property::D_ACTIVE );
         if ( model()->data( index, Qt::DisplayRole ).toBool() )
         {
-            index = model()->index( i, (int)Fn::Property::TYPE );
+            index = model()->index( i, (int)Fn::Property::D_TYPE );
             if ( model()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
             {
                 rl.push_back( i );
@@ -275,7 +275,7 @@ void SingleSHRenderer::draw()
 
     if ( rl.size() > 0 )
     {
-        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         initGeometry();
     }
     else
@@ -290,7 +290,7 @@ void SingleSHRenderer::draw()
         GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
         GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_arcBall->getMVMat().inverted() );
 
-        bool hnl = m_dataset->properties()->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
+        bool hnl = m_dataset->properties()->get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
         GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", hnl );
         GLFunctions::getShader( "qball" )->setUniformValue( "u_renderMode", 0 );
 

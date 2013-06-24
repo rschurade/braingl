@@ -11,15 +11,15 @@ int ROI::m_count = 0;
 
 ROI::ROI( QString name )
 {
-    m_properties.set( Fn::ROI::NAME, name, true );
-    m_properties.set( Fn::ROI::ACTIVE, true, true );
+    m_properties.set( Fn::Property::D_NAME, name, "general" );
+    m_properties.set( Fn::Property::D_ACTIVE, true, "general" );
 }
 
 ROI::~ROI()
 {
 }
 
-ROIPropertyGroup* ROI::properties()
+PropertyGroup* ROI::properties()
 {
     return &m_properties;
 }

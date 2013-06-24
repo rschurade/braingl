@@ -45,7 +45,7 @@ private:
 
     void saveSettings();
     void loadSettings();
-    void loadSetting( QSettings &settings, Fn::Global setting );
+    void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps();
 
 

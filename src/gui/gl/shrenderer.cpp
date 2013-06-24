@@ -133,21 +133,21 @@ void SHRenderer::setShaderVars()
 
 void SHRenderer::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Global::CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Global::AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
     yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
     zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
-    float zoom = model()->data( model()->index( (int)Fn::Global::ZOOM, 0 ) ).toFloat();
-    float moveX = model()->data( model()->index( (int)Fn::Global::MOVEX, 0 ) ).toFloat();
-    float moveY = model()->data( model()->index( (int)Fn::Global::MOVEY, 0 ) ).toFloat();
+    float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+    float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
+    float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
 
     int lod = m_lodAdjust;
 
@@ -230,23 +230,23 @@ void SHRenderer::initGeometry()
 
 void SHRenderer::setRenderParams( PropertyGroup* props )
 {
-    m_scaling = props->get( Fn::Property::SCALING ).toFloat();
-    m_offset = props->get( Fn::Property::OFFSET ).toInt();
-    m_lodAdjust = props->get( Fn::Property::LOD ).toInt();
-    m_minMaxScaling = props->get( Fn::Property::MINMAX_SCALING ).toBool();
-    m_hideNegativeLobes = props->get( Fn::Property::HIDE_NEGATIVE_LOBES ).toBool();
-    m_order = props->get( Fn::Property::ORDER ).toInt();
+    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
+    m_offset = props->get( Fn::Property::D_OFFSET ).toInt();
+    m_lodAdjust = props->get( Fn::Property::D_LOD ).toInt();
+    m_minMaxScaling = props->get( Fn::Property::D_MINMAX_SCALING ).toBool();
+    m_hideNegativeLobes = props->get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
+    m_order = props->get( Fn::Property::D_ORDER ).toInt();
 
     m_orient = 0;
-    if ( props->get( Fn::Property::RENDER_AXIAL ).toBool() )
+    if ( props->get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
         m_orient = 1;
     }
-    if ( props->get( Fn::Property::RENDER_CORONAL ).toBool() )
+    if ( props->get( Fn::Property::D_RENDER_CORONAL ).toBool() )
     {
         m_orient += 2;
     }
-    if ( props->get( Fn::Property::RENDER_SAGITTAL ).toBool() )
+    if ( props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
     {
         m_orient += 4;
     }

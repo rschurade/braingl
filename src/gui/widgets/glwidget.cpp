@@ -115,12 +115,12 @@ void GLWidget::resizeGL( int width, int height )
 
 void GLWidget::calcMVPMatrix()
 {
-    m_nx = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toFloat();
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Global::SLICE_DZ, 0 ) ).toFloat();
+    m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
@@ -151,11 +151,11 @@ void GLWidget::calcMVPMatrix()
 
     m_mvMatrix = m_arcBall->getMVMat();
 
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::ZOOM, 0 ), m_arcBall->getZoom() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEX, 0 ), m_arcBall->getMoveX() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::MOVEY, 0 ), m_arcBall->getMoveY() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::BBX, 0 ), bbx );
-    Models::g()->setData( Models::g()->index( (int)Fn::Global::BBY, 0 ), bby );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), m_arcBall->getZoom() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_arcBall->getMoveX() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_arcBall->getMoveY() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_BBX, 0 ), bbx );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_BBY, 0 ), bby );
 }
 
 
@@ -232,11 +232,11 @@ void GLWidget::setView( Fn::Orient view )
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->properties()->set( Fn::Property::RENDER_SLICE, (int)view );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+            ds->properties()->set( Fn::Property::D_RENDER_SLICE, (int)view );
         }
     }
     update();
@@ -264,17 +264,17 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->mousePick( m_picked, pickPos, event->modifiers() );
         }
     }
 
     if ( Models::r()->rowCount() > 0 )
     {
-        QModelIndex mi = Models::r()->index( 0, (int)Fn::ROI::PICK_ID );
+        QModelIndex mi = Models::r()->index( 0, (int)Fn::Property::R_PICK_ID );
         QModelIndexList l = ( Models::r()->match( mi, Qt::DisplayRole, m_picked ) );
         m_roiSelectionModel->clear();
         if ( l.size() > 0 )
@@ -283,9 +283,9 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
         }
     }
 
-    m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+    m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
+    m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
@@ -302,9 +302,9 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
 
     m_pickOld = QVector2D( x, y );
 
-    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
+    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
     float slowDown = 4.0f * m_arcBall->getZoom();
 
     m_sceneRenderer->renderPick();
@@ -315,10 +315,10 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::ACTIVE );
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->mousePick( m_picked, pickPos, event->modifiers() );
         }
     }
@@ -339,7 +339,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
                 if ( m_z != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -355,7 +355,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
                 if ( m_y != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -371,7 +371,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
                 if ( m_x != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -382,14 +382,14 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 if ( m_roiSelectionModel->hasSelection() )
                 {
                     QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::ROI::POINTER, mi.parent() ), Qt::DisplayRole ) );
-                    float newx = roi->properties()->get( Fn::ROI::X ).toFloat() + dir.x();
-                    float newy = roi->properties()->get( Fn::ROI::Y ).toFloat() + dir.y();
-                    float newz = roi->properties()->get( Fn::ROI::Z ).toFloat() + dir.z();
+                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::R_POINTER, mi.parent() ), Qt::DisplayRole ) );
+                    float newx = roi->properties()->get( Fn::Property::R_X ).toFloat() + dir.x();
+                    float newy = roi->properties()->get( Fn::Property::R_Y ).toFloat() + dir.y();
+                    float newz = roi->properties()->get( Fn::Property::R_Z ).toFloat() + dir.z();
 
-                    roi->properties()->set( Fn::ROI::X, newx );
-                    roi->properties()->set( Fn::ROI::Y, newy );
-                    roi->properties()->set( Fn::ROI::Z, newz );
+                    roi->properties()->set( Fn::Property::R_X, newx );
+                    roi->properties()->set( Fn::Property::R_Y, newy );
+                    roi->properties()->set( Fn::Property::R_Z, newz );
                     roi->properties()->slotPropChanged();
                 }
                 break;
@@ -405,13 +405,13 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
 
     if ( event->modifiers() & Qt::ShiftModifier )
     {
-        int m_x = Models::g()->data( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ) ).toInt();
-        int m_y = Models::g()->data( Models::g()->index( (int)Fn::Global::CORONAL, 0 ) ).toInt();
-        int m_z = Models::g()->data( Models::g()->index( (int)Fn::Global::AXIAL, 0 ) ).toInt();
+        int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+        int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
+        int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
 
-        int m_nx = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_SAGITTAL, 0 ) ).toInt();
-        int m_ny = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_CORONAL, 0 ) ).toInt();
-        int m_nz = Models::g()->data( Models::g()->index( (int)Fn::Global::MAX_AXIAL, 0 ) ).toInt();
+        int m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
+        int m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
+        int m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
         switch( event->key() )
         {
             case Qt::Key_Left :
@@ -445,9 +445,9 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 break;
             }
         }
-        Models::g()->setData( Models::g()->index( (int)Fn::Global::SAGITTAL, 0 ), m_x );
-        Models::g()->setData( Models::g()->index( (int)Fn::Global::CORONAL, 0 ), m_y );
-        Models::g()->setData( Models::g()->index( (int)Fn::Global::AXIAL, 0 ), m_z );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), m_x );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), m_y );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), m_z );
 
         Models::g()->submit();
     }
