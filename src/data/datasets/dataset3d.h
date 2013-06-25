@@ -17,6 +17,8 @@ class EVRenderer;
 
 class Dataset3D: public DatasetNifti
 {
+    Q_OBJECT
+
 public:
     Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* header );
     virtual ~Dataset3D();
@@ -38,6 +40,9 @@ private:
     QVector<QVector3D> m_data;
 
     EVRenderer* m_renderer;
+
+private slots:
+    void switchRenderSticks();
 };
 
 #endif /* DATASET3D_H_ */
