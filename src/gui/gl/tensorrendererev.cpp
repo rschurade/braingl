@@ -51,13 +51,13 @@ void TensorRendererEV::init()
 
 void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    setRenderParams( props );
+
+    if ( ( renderMode != 1 ) || ( renderMode == 0 ) ||  ( m_orient == 0 ) ) // we are drawing opaque objects
     {
         // obviously not opaque
         return;
     }
-
-    setRenderParams( props );
 
     QGLShaderProgram* program = GLFunctions::getShader( "tensorev" );
 
@@ -164,7 +164,7 @@ void TensorRendererEV::initGeometry()
 
     m_quads = 0;
 
-    if ( m_orient == 1 )
+    if ( ( m_orient & 1 ) == 1 )
     {
         for( int yy = 0; yy < m_ny; ++yy )
         {
@@ -180,7 +180,7 @@ void TensorRendererEV::initGeometry()
             }
         }
     }
-    else if ( m_orient == 2 )
+    if ( ( m_orient & 2 ) == 2 )
     {
         for( int xx = 0; xx < m_nx; ++xx )
         {
@@ -196,7 +196,7 @@ void TensorRendererEV::initGeometry()
             }
         }
     }
-    else if ( m_orient == 3 )
+    if ( ( m_orient & 4 ) == 4 )
     {
         for( int yy = 0; yy < m_ny; ++yy )
         {
@@ -210,10 +210,6 @@ void TensorRendererEV::initGeometry()
                 m_quads += 2;
             }
         }
-    }
-    else
-    {
-        return;
     }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -254,10 +250,15 @@ void TensorRendererEV::addGlyph( std::vector<float>* verts, float xPos, float yP
 
 void TensorRendererEV::setRenderParams( PropertyGroup* props )
 {
+    int slice = 0;
+    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+
     m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_faThreshold = props->get( Fn::Property::D_FA_THRESHOLD ).toFloat();
     m_evThreshold = props->get( Fn::Property::D_EV_THRESHOLD ).toFloat();
-    m_orient = props->get( Fn::Property::D_RENDER_SLICE ).toInt();
+    m_orient = slice;
     m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
     m_evSelect = props->get( Fn::Property::D_TENSOR_RENDERMODE ).toInt();
 }
