@@ -25,7 +25,7 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_properties["maingl"]->set( Fn::Property::D_GAMMA, 0.1f, 0.0f, 10.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::D_OFFSET, 0.0f, -1.0f, 1.0f, "general" );
     m_properties["maingl"]->set( Fn::Property::D_SCALING, 0.5f, 0.0f, 2.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_TENSOR_RENDERMODE, 0, 0, 3, "general" );
+    m_properties["maingl"]->set( Fn::Property::D_TENSOR_RENDERMODE, { "superquadric", "1st ev", "2nd ev", "3rd ev" }, 0, "general" );
     m_properties["maingl"]->set( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"]->set( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"]->set( Fn::Property::D_RENDER_AXIAL, true, "general" );
