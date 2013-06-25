@@ -49,10 +49,10 @@ public:
     bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
     bool set( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
 
-    bool setMin( Fn::Property name,  float value );
-    bool setMax( Fn::Property name,  float value );
-    bool setMin( Fn::Property name,  int value );
-    bool setMax( Fn::Property name,  int value );
+    bool setMinF( Fn::Property name,  float value );
+    bool setMaxF( Fn::Property name,  float value );
+    bool setMinI( Fn::Property name,  int value );
+    bool setMaxI( Fn::Property name,  int value );
 
     int size() const;
 

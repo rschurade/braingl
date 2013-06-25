@@ -288,7 +288,7 @@ Property* PropertyGroup::getNthProperty( int n )
     return m_properties[n].second;
 }
 
-bool PropertyGroup::setMin( Fn::Property name, float value )
+bool PropertyGroup::setMinF( Fn::Property name, float value )
 {
     if ( contains( name ) )
     {
@@ -298,7 +298,7 @@ bool PropertyGroup::setMin( Fn::Property name, float value )
     return false;
 }
 
-bool PropertyGroup::setMax( Fn::Property name, float value )
+bool PropertyGroup::setMaxF( Fn::Property name, float value )
 {
     if ( contains( name ) )
     {
@@ -308,7 +308,7 @@ bool PropertyGroup::setMax( Fn::Property name, float value )
     return false;
 }
 
-bool PropertyGroup::setMin( Fn::Property name, int value )
+bool PropertyGroup::setMinI( Fn::Property name, int value )
 {
     if ( contains( name ) )
     {
@@ -318,7 +318,7 @@ bool PropertyGroup::setMin( Fn::Property name, int value )
     return false;
 }
 
-bool PropertyGroup::setMax( Fn::Property name, int value )
+bool PropertyGroup::setMaxI( Fn::Property name, int value )
 {
     if ( contains( name ) )
     {
