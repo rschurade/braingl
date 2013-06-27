@@ -209,7 +209,6 @@ namespace Fn
         G_SCREENSHOT_QUALITY,
         G_TRANSPARENCY,
         // ROI Properties
-        R_NAME,
         R_X,
         R_Y,
         R_Z,
@@ -221,7 +220,6 @@ namespace Fn
         R_DZ,
         R_NEG,
         R_TYPE,
-        R_ACTIVE,
         R_COLOR,
         R_ALPHA,
         R_RENDER,
@@ -363,7 +361,6 @@ namespace Fn
                 case Property::G_BBY: return QString( "" ); break;
                 case Property::G_VIEW: return QString( "" ); break;
                 // ROI Properties
-                case Property::R_NAME: return QString( "name" ); break;
                 case Property::R_X: return QString( "x" ); break;
                 case Property::R_Y: return QString( "y" ); break;
                 case Property::R_Z: return QString( "z" ); break;
@@ -375,7 +372,6 @@ namespace Fn
                 case Property::R_DZ: return QString( "dz" ); break;
                 case Property::R_NEG: return QString( "negate" ); break;
                 case Property::R_TYPE: return QString( "type" ); break;
-                case Property::R_ACTIVE: return QString( "active" ); break;
                 case Property::R_COLOR: return QString( "color" ); break;
                 case Property::R_ALPHA: return QString( "alpha" ); break;
                 case Property::R_RENDER: return QString( "render" ); break;

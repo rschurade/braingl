@@ -176,7 +176,7 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
 void FiberSelector::updateROI( int branch, int pos )
 {
 	int shape = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt();
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_ACTIVE ), Qt::DisplayRole ).toBool() )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
         if ( shape == 10 )
         {
@@ -341,7 +341,7 @@ void FiberSelector::updateBranch( int branch )
 
     while ( current < m_bitfields[branch].size() )
     {
-        if ( Models::r()->data( createIndex( branch, current, (int)Fn::Property::R_ACTIVE ), Qt::DisplayRole ).toBool() )
+        if ( Models::r()->data( createIndex( branch, current, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
         {
             bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::R_NEG ), Qt::DisplayRole ).toBool();
             if ( neg )
@@ -380,7 +380,7 @@ void FiberSelector::updateRoot()
 
         for ( int i = 0; i < m_branchfields.size(); ++i )
         {
-            if ( Models::r()->data( createIndex( i, 0, (int)Fn::Property::R_ACTIVE ), Qt::DisplayRole ).toBool() )
+            if ( Models::r()->data( createIndex( i, 0, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
             {
                 for ( int k = 0; k < m_numLines; ++k )
                 {

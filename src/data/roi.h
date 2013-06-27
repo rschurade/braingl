@@ -16,6 +16,8 @@
 
 class ROI : public QObject
 {
+    Q_OBJECT
+
 public:
     ROI( QString name );
     virtual ~ROI();
@@ -28,6 +30,12 @@ public:
 
 protected:
     PropertyGroup m_properties;
+
+private slots:
+    void slotPropChanged();
+
+signals:
+    void signalPropChanged( int id );
 };
 
 #endif /* ROI_H_ */
