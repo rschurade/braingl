@@ -22,9 +22,10 @@
 
 #include <qcoreapplication.h>
 
-DatasetGlyphset::DatasetGlyphset( QDir filename, float mt ) :
+DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 DatasetSurfaceset( filename, Fn::DatasetType::GLYPHSET ),
                 minthresh( mt ),
+                maxthresh( maxt ),
                 m_prenderer( NULL ),
                 m_vrenderer( NULL ),
                 m_pierenderer( NULL ),
@@ -229,7 +230,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
 void DatasetGlyphset::makeCons()
 {
-    qDebug() << "making consArray: " << minthresh;
+    qDebug() << "making consArray: " << minthresh << " maxthresh: " << maxthresh;
     //if (consArray) delete[] consArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -248,8 +249,11 @@ void DatasetGlyphset::makeCons()
     {
         for ( int j = 0; j < n; ++j )
         {
-            if ( conn[i][j] > minthresh )
+            float v = conn[i][j];
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            {
                 ++consNumber;
+            }
         }
     }
     qDebug() << consNumber << " connections above threshold";
@@ -261,7 +265,7 @@ void DatasetGlyphset::makeCons()
         for ( int j = 0; j < n; ++j )
         {
             float v = conn[i][j];
-            if ( v > minthresh )
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
             {
 
                 int triangleshift = 7; //TODO: Why 7?
@@ -320,8 +324,11 @@ void DatasetGlyphset::makeVecs()
     {
         for ( int j = 0; j < n; ++j )
         {
-            if ( conn[i][j] > minthresh )
+            float v = conn[i][j];
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            {
                 ++vecsNumber;
+            }
         }
     }
     qDebug() << vecsNumber << " connections above threshold";
@@ -333,7 +340,7 @@ void DatasetGlyphset::makeVecs()
         for ( int j = 0; j < n; ++j )
         {
             float v = conn[i][j];
-            if ( v > minthresh )
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
             {
 
                 int triangleshift = 7; //TODO: Why 7?
@@ -449,7 +456,8 @@ void DatasetGlyphset::makePies()
 
         for ( int j = 0; j < n; ++j )
         {
-            if ( conn[i][j] > threshold )
+            float v = conn[i][j];
+            if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
             {
                 int triangleshift = 7; //TODO: Why 7?
 
@@ -512,6 +520,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     n = m_mesh.at( geo )->numVerts();
     float* nodes = m_mesh.at( geo )->getVertices();
 
+    //TODO: think about upper threshold...
     float thresh = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     Connections* cons = new Connections();
@@ -598,6 +607,38 @@ void DatasetGlyphset::loadRGB()
     m_renderer->endUpdateColor();
     file.close();
     Models::d()->submit();
+}
+
+void DatasetGlyphset::loadROI( QString filename )
+{
+    qDebug() << "loading roi: " << filename;
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        qDebug() << "something went wrong opening ROI file: " << filename;
+        return;
+    }
+    QTextStream in( &file );
+    QVector<int> ids;
+    while ( !in.atEnd() )
+    {
+        QString line = in.readLine();
+        qDebug() << line << " " << ids.size();
+        QStringList sl = line.split( " " );
+        ids.append(sl.at(0).toInt());
+    }
+
+    qDebug() << "m_mesh.size(): " << m_mesh.size();
+    roi = new bool[m_mesh.at( 0 )->numVerts()];
+    for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+    {
+        roi[i] = false;
+        if ( ids.contains( i ) )
+        {
+            roi[i] = true;
+        }
+    }
+    file.close();
 }
 
 void DatasetGlyphset::save1Ds()

@@ -21,7 +21,7 @@
 class DatasetGlyphset: public DatasetSurfaceset
 {
 public:
-    DatasetGlyphset( QDir filename, float mt );
+    DatasetGlyphset( QDir filename, float mt, float maxt );
     virtual ~DatasetGlyphset();
     void readConnectivity( QString filename );
     void setMinthresh( float mt );
@@ -42,10 +42,13 @@ public:
     void loadRGB();
     void saveRGB();
     void save1Ds();
+    void loadROI( QString filename );
     void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers );
 
 private:
     float minthresh;
+    float maxthresh;
+    bool* roi;
     float** conn; //square connectivity matrix
 
     int n;  //number of vertices, has to match size of matrix
