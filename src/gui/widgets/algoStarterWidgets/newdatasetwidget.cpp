@@ -266,7 +266,7 @@ void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, QVector
     float ds_dy = source->properties()->get( Fn::Property::D_DY ).toFloat();
     float ds_dz = source->properties()->get( Fn::Property::D_DZ ).toFloat();
 
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_ACTIVE ), Qt::DisplayRole ).toBool() )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
 
         float x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
