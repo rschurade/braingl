@@ -1281,8 +1281,13 @@ bool Loader::loadGlyphset()
 
     QString connectivityName = trunk + QDir::separator() + sl2.at(0);
     float mt = sl2.at( 1 ).toFloat();
+    float maxt = 1.0;
+    if (sl2.length() > 2)
+    {
+        maxt = sl2.at( 2 ).toFloat();
+    }
 
-    DatasetGlyphset* dataset = new DatasetGlyphset( datasetName, mt );
+    DatasetGlyphset* dataset = new DatasetGlyphset( datasetName, mt, maxt );
 
     qDebug() << "loading glyph set: " << datasetName;
     if (two)
@@ -1440,6 +1445,13 @@ bool Loader::loadGlyphset()
 
     //TODO: init conn.-crap...
     //dataset->setMinthresh( mt );
+
+    //fourth thing on the line: name of roi...
+    if (sl2.length() > 3)
+    {
+        QString roiname = sl2.at( 3 );
+        dataset->loadROI(roiname);
+    }
 
     dataset->setProperties();
 
