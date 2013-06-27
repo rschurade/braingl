@@ -67,7 +67,6 @@ private:
     QVector<IsoSurfaceThread*> m_threads;
 
 private slots:
-    void propChanged();
     void globalChanged();
 };
 

@@ -39,13 +39,10 @@ ROIBox::ROIBox() :
     m_properties.set( Fn::Property::R_TYPE, (int)Fn::ROIType::Box );
     m_properties.set( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
     m_properties.set( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
-    m_properties.set( Fn::Property::R_ID, m_count );
-    m_properties.set( Fn::Property::R_PICK_ID, 0 );
     m_properties.set( Fn::Property::R_STICK_TO_CROSSHAIR, false, "general" );
-
     m_properties.set( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
-    connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
+    connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     connect( m_properties.getProperty( Fn::Property::R_DX ), SIGNAL( valueChanged( float ) ), this, SLOT( dxChanged( float ) ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
@@ -116,15 +113,15 @@ void ROIBox::dxChanged( float value )
 
 void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
 {
-        float x = m_properties.get( Fn::Property::R_X ).toFloat();
-        float y = m_properties.get( Fn::Property::R_Y ).toFloat();
-        float z = m_properties.get( Fn::Property::R_Z ).toFloat();
-        float dx = m_properties.get( Fn::Property::R_DX ).toFloat();
-        float dy = m_properties.get( Fn::Property::R_DY ).toFloat();
-        float dz = m_properties.get( Fn::Property::R_DZ ).toFloat();
-        QColor color = m_properties.get( Fn::Property::R_COLOR ).value<QColor>();
-        color.setAlphaF( m_properties.get( Fn::Property::R_ALPHA ).toFloat() );
-        int pickID = m_properties.get( Fn::Property::R_PICK_ID ).toInt();
+    float x = m_properties.get( Fn::Property::R_X ).toFloat();
+    float y = m_properties.get( Fn::Property::R_Y ).toFloat();
+    float z = m_properties.get( Fn::Property::R_Z ).toFloat();
+    float dx = m_properties.get( Fn::Property::R_DX ).toFloat();
+    float dy = m_properties.get( Fn::Property::R_DY ).toFloat();
+    float dz = m_properties.get( Fn::Property::R_DZ ).toFloat();
+    QColor color = m_properties.get( Fn::Property::R_COLOR ).value<QColor>();
+    color.setAlphaF( m_properties.get( Fn::Property::R_ALPHA ).toFloat() );
+    int pickID = m_properties.get( Fn::Property::R_PICK_ID ).toInt();
 
     if ( m_properties.get( Fn::Property::R_RENDER).toBool() )
     {

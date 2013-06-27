@@ -33,7 +33,6 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
     m_properties.set( Fn::Property::R_NEG, false, "general" );
     m_properties.set( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
     m_properties.set( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
-    m_properties.set( Fn::Property::R_ID, m_count );
     m_properties.set( Fn::Property::R_PICK_ID, 0 );
     m_properties.set( Fn::Property::R_SHAPE, 10 );
     m_properties.set( Fn::Property::R_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
@@ -49,7 +48,6 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
 
     m_properties.set( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
-    connect( &m_properties, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged() ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 
     m_nX = m_header->nx - 1;
@@ -87,11 +85,6 @@ QVector<float>* ROIArea::data()
 
 void ROIArea::globalChanged()
 {
-}
-
-void ROIArea::propChanged()
-{
-    m_properties.set( Fn::Property::R_UPDATED, true );
 }
 
 void ROIArea::generateSurface()

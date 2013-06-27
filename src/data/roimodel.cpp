@@ -91,7 +91,7 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     {
         case Qt::CheckStateRole:
         {
-            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::R_ACTIVE );
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::D_ACTIVE );
             break;
         }
         case Qt::BackgroundColorRole:
@@ -146,11 +146,11 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.internalId() == -1 )
             {
-                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::Property::R_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::Property::R_ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::Property::D_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::Property::D_ACTIVE ).toBool() );
             }
             else
             {
-                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( Fn::Property::R_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->get( Fn::Property::R_ACTIVE ).toBool() );
+                VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->set( Fn::Property::D_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.internalId()][index.row()+1] )->properties()->get( Fn::Property::D_ACTIVE ).toBool() );
             }
             break;
         }
@@ -223,7 +223,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
     {
         return false;
     }
-    connect( newROI->properties(), SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
+    connect( newROI, SIGNAL( signalPropChanged( int ) ), this, SLOT( propChanged( int ) ) );
 
     if ( parent.isValid() )
     {
