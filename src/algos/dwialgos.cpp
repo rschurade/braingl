@@ -176,14 +176,14 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
     out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
-    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
-    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
-    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
+//    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+//    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
+//    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+//    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
 
     QList<Dataset*> l;
     l.push_back( out );
-    l.push_back( out2 );
+//    l.push_back( out2 );
     return l;
 }
 

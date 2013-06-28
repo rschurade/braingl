@@ -32,6 +32,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Property::G_CORONAL_AXIAL, 0 );
     m_properties->set( Fn::Property::G_SAGITTAL_AXIAL, 0 );
     m_properties->set( Fn::Property::G_SAGITTAL_CORONAL, 0 );
+    m_properties->set( Fn::Property::G_NEED_SHADER_UPDATE, false );
     m_properties->set( Fn::Property::G_ZOOM, 1.0f );
     m_properties->set( Fn::Property::G_MOVEX, 0 );
     m_properties->set( Fn::Property::G_MOVEY, 0 );

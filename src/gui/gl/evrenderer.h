@@ -32,9 +32,9 @@ protected:
     void addGlyph( std::vector<float> &verts, float xPos, float yPos, float zPos, QVector3D data );
 
 private:
-    int m_quads;
+    int m_vertCount;
 
-    GLuint *vboIds;
+    GLuint vbo;
 
     QVector<QVector3D>* m_data;
 

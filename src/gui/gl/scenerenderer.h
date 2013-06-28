@@ -61,7 +61,7 @@ private:
 
 	QString m_renderTarget;
 
-	GLuint *vboIds;
+	GLuint vbo;
 
 	int m_width;
 	int m_height;

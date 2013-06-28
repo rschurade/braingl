@@ -49,6 +49,8 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
 
 DatasetScalar::~DatasetScalar()
 {
+    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
+    delete m_colormapRenderer;
     m_data.clear();
     glDeleteTextures( 1, &m_textureGLuint );
 }

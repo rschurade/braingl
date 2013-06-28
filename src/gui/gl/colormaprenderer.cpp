@@ -28,6 +28,7 @@ ColormapRenderer::ColormapRenderer() :
 
 ColormapRenderer::~ColormapRenderer()
 {
+    glDeleteBuffers( 2, &( vboIds[ 0 ] ) );
 }
 
 void ColormapRenderer::init()

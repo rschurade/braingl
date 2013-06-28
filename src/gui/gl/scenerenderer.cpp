@@ -31,7 +31,7 @@
 
 SceneRenderer::SceneRenderer( QString renderTarget ) :
     m_renderTarget( renderTarget ),
-    vboIds( new GLuint[2] ),
+    vbo( 0 ),
     m_width( 1 ),
     m_height( 1 ),
     m_renderMode( 0 ),
@@ -109,21 +109,15 @@ void SceneRenderer::initGL()
     Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 
     VertexData vertices[] =
-
     {
-    { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-    { QVector3D( 1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
-    { QVector3D( 1.0, 1.0, 0 ), QVector3D( 1.0, 1.0, 0.0 ) },
-    { QVector3D( -1.0, 1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) } };
-    glGenBuffers( 2, vboIds );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
+        { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
+        { QVector3D( 1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
+        { QVector3D( 1.0, 1.0, 0 ), QVector3D( 1.0, 1.0, 0.0 ) },
+        { QVector3D( -1.0, 1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) }
+    };
+    glGenBuffers( 1, &vbo );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo);
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
-
-    GLushort indices[] =
-    { 0, 1, 2, 0, 2, 3 };
-    // Transfer index data to VBO 0
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[1] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -138,6 +132,12 @@ void SceneRenderer::resizeGL( int width, int height )
 
 void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 {
+    if ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_NEED_SHADER_UPDATE, 0 ) ).toBool() )
+    {
+        GLFunctions::reloadShaders();
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), false );
+    }
+
     m_mvMatrix = mvMatrix;
     m_pMatrix = pMatrix;
 
@@ -275,8 +275,7 @@ void SceneRenderer::renderMerge()
     m_renderMode = 0;
 
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[1] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
 
     GLuint tex = getTexture( "C0" );
     glActiveTexture( GL_TEXTURE5 );
@@ -336,9 +335,8 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C5", 10 );
     program->setUniformValue( "D1", 11 );
 
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+    glDrawArrays( GL_QUADS, 0, 4 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     GLFunctions::getAndPrintGLError( m_renderTarget + "after render scene" );

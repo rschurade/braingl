@@ -22,8 +22,8 @@
 
 EVRenderer::EVRenderer( QVector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),
-    m_quads( 0 ),
-    vboIds( new GLuint[ 1 ] ),
+    m_vertCount( 0 ),
+    vbo( 0 ),
     m_data( data ),
     m_nx( nx ),
     m_ny( ny ),
@@ -35,16 +35,17 @@ EVRenderer::EVRenderer( QVector<QVector3D>* data, int nx, int ny, int nz, float 
     m_orient( 0 ),
     m_offset( 0.0 )
 {
+    init();
 }
 
 EVRenderer::~EVRenderer()
 {
-    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    //glDeleteBuffers( 1, &vbo );
 }
 
 void EVRenderer::init()
 {
-    glGenBuffers( 1, vboIds );
+    glGenBuffers( 1, &vbo );
 }
 
 void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -82,13 +83,13 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     initGeometry();
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars();
 
     GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-    glDrawArrays( GL_LINES, 0, m_quads );
+    glDrawArrays( GL_LINES, 0, m_vertCount );
 
     GLenum error;
     int i = 0;
@@ -155,7 +156,7 @@ void EVRenderer::initGeometry()
     float y = (float)yi * m_dy + m_dy / 2.;
     float z = (float)zi * m_dz + m_dz / 2.;
 
-    m_quads = 0;
+    m_vertCount = 0;
 
     if ( ( m_orient & 1 ) == 1 )
     {
@@ -169,7 +170,7 @@ void EVRenderer::initGeometry()
                 float locY = yy * m_dy + m_dy / 2;
 
                 addGlyph( verts, locX, locY, z - m_offset * m_dz , vec );
-                m_quads += 2;
+                m_vertCount += 2;
             }
         }
     }
@@ -185,7 +186,7 @@ void EVRenderer::initGeometry()
                 float locZ = zz * m_dz + m_dz / 2;
 
                 addGlyph( verts, locX, y + m_offset * m_dy, locZ, vec );
-                m_quads += 2;
+                m_vertCount += 2;
             }
         }
     }
@@ -200,13 +201,16 @@ void EVRenderer::initGeometry()
                 float locZ = zz * m_dz + m_dz / 2;
 
                 addGlyph( verts, x + m_offset * m_dx, locY, locZ, vec );
-                m_quads += 2;
+                m_vertCount += 2;
             }
         }
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    glDeleteBuffers( 1, &vbo );
+    glGenBuffers( 1, &vbo );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
 }
 
 void EVRenderer::addGlyph( std::vector<float> &verts, float xPos, float yPos, float zPos, QVector3D vector )
