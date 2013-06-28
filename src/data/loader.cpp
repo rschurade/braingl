@@ -1449,7 +1449,7 @@ bool Loader::loadGlyphset()
     //fourth thing on the line: name of roi...
     if (sl2.length() > 3)
     {
-        QString roiname = sl2.at( 3 );
+        QString roiname = trunk + QDir::separator() +sl2.at( 3 );
         dataset->loadROI(roiname);
     }
 
