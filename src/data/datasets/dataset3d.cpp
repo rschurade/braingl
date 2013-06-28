@@ -46,8 +46,11 @@ Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* heade
 Dataset3D::~Dataset3D()
 {
     m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
-    delete m_renderer;
+    glDeleteTextures( 1, &m_textureGLuint );
     m_data.clear();
+    m_data.squeeze();
+
+    delete m_renderer;
 }
 
 void Dataset3D::examineDataset()
@@ -164,6 +167,7 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
     {
         return;
     }
+
     if ( m_renderer == 0 )
     {
         m_renderer = new EVRenderer( &m_data, properties( target )->get( Fn::Property::D_NX ).toInt(),
@@ -173,9 +177,7 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
                                               properties( target )->get( Fn::Property::D_DY ).toFloat(),
                                               properties( target )->get( Fn::Property::D_DZ ).toFloat() );
         m_renderer->setModel( Models::g() );
-        m_renderer->init();
     }
-
 
     if ( properties( target )->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() )
     {

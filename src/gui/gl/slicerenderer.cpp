@@ -15,7 +15,9 @@
 
 SliceRenderer::SliceRenderer() :
     ObjectRenderer(),
-    vboIds( new GLuint[ 4 ] ),
+    vbo0( 0 ),
+    vbo1( 0 ),
+    vbo2( 0 ),
     m_x( 0. ),
     m_y( 0. ),
     m_z( 0. ),
@@ -36,18 +38,16 @@ SliceRenderer::SliceRenderer() :
 
 SliceRenderer::~SliceRenderer()
 {
-    glDeleteBuffers( 4, vboIds );
-    delete[] vboIds;
+    glDeleteBuffers( 1, &vbo0 );
+    glDeleteBuffers( 1, &vbo1 );
+    glDeleteBuffers( 1, &vbo2 );
 }
 
 void SliceRenderer::init()
 {
-    glGenBuffers( 4, vboIds );
-
-    GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
-    // Transfer index data to VBO 0
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+    glGenBuffers( 1, &vbo0 );
+    glGenBuffers( 1, &vbo1 );
+    glGenBuffers( 1, &vbo2 );
 
     initGeometry();
 }
@@ -89,7 +89,7 @@ void SliceRenderer::initGeometry()
             { QVector3D( 0.0, yb,  z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
         };
         // Transfer vertex data to VBO 1
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesAxial, GL_STATIC_DRAW );
     }
 
@@ -104,7 +104,7 @@ void SliceRenderer::initGeometry()
         };
 
         // Transfer vertex data to VBO 2
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCoronal, GL_STATIC_DRAW );
     }
 
@@ -118,7 +118,7 @@ void SliceRenderer::initGeometry()
             { QVector3D( x, 0.0, zb  ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 1.0 ) }
         };
         // Transfer vertex data to VBO 3
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+        glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesSagittal, GL_STATIC_DRAW );
     }
 
@@ -216,40 +216,34 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 void SliceRenderer::drawAxial( QString target )
 {
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
 
     setShaderVars( target );
 
     // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+    glDrawArrays( GL_QUADS, 0, 4 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SliceRenderer::drawCoronal( QString target )
 {
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
     setShaderVars( target );
-    // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+    // Draw cube geometry using indices from VBO 1
+    glDrawArrays( GL_QUADS, 0, 4 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SliceRenderer::drawSagittal( QString target )
 {
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
     setShaderVars( target );
-    // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
+    // Draw cube geometry using indices from VBO 2
+    glDrawArrays( GL_QUADS, 0, 4 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

@@ -33,7 +33,9 @@ private:
 	void drawCoronal( QString target );
 	void drawSagittal( QString target );
 
-	GLuint *vboIds;
+	GLuint vbo0;
+	GLuint vbo1;
+	GLuint vbo2;
 
 	float m_x;
 	float m_y;
