@@ -199,6 +199,7 @@ namespace Fn
         G_CROSSHAIR_COLOR,
         G_SHOW_NAV_SLIDERS,
         G_OBJECT,
+        G_NEED_SHADER_UPDATE,
         // settings that need a datastore signal to update widgets need to be inserted above this line
         G_ZOOM,
         G_MOVEX,
@@ -353,6 +354,7 @@ namespace Fn
                 case Property::G_SCREENSHOT_QUALITY: return QString( "screenshot quality" ); break;
                 case Property::G_TRANSPARENCY: return QString( "transparency mode" ); break;
                 case Property::G_OBJECT: return QString( "" ); break;
+                case Property::G_NEED_SHADER_UPDATE: return QString( "" ); break;
                 // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;

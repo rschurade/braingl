@@ -258,6 +258,7 @@ void DataStore::deleteItem( int row )
         endResetModel();
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
         delete toDelete;
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
         updateGlobals( row );
     }
 }
