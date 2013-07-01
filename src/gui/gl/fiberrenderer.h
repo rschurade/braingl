@@ -41,7 +41,7 @@ private:
     QModelIndex createIndex( int branch, int pos, int column );
 
     FiberSelector* m_selector;
-    GLuint *vboIds;
+    GLuint vbo;
 
     QVector< QVector< float > > m_data;
     QVector< QVector< float > > m_extraData;

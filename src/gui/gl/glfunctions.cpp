@@ -563,14 +563,16 @@ void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
-void GLFunctions::getAndPrintGLError( QString prefix )
+bool GLFunctions::getAndPrintGLError( QString prefix )
 {
     GLenum errCode;
     const GLubyte *errString;
-
+    bool isError = false;
     while ( ( errCode = glGetError() ) != GL_NO_ERROR )
     {
         errString = gluErrorString( errCode );
         qDebug() << "OpenGL Error:" << prefix << QString( (char*) errString );
+        isError = true;
     }
+    return isError;
 }

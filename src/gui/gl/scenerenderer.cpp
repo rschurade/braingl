@@ -118,6 +118,7 @@ void SceneRenderer::initGL()
     glGenBuffers( 1, &vbo );
     glBindBuffer( GL_ARRAY_BUFFER, vbo);
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -189,6 +190,7 @@ void SceneRenderer::renderScene()
     // Pass 1 - draw opaque objects
     //
     //***************************************************************************************************/
+    GLFunctions::getAndPrintGLError( "before pass 1" );
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -197,27 +199,30 @@ void SceneRenderer::renderScene()
     clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     setRenderTargets( "C0", "D0" );
     renderScenePart( 1, "C0", "D0" );
+    GLFunctions::getAndPrintGLError( "after pass 1" );
 
     //***************************************************************************************************
     //
     // Pass 2
     //
     //***************************************************************************************************/
+
     clearTexture( "C1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
     renderScenePart( 2, "C1", "D1" );
-
+    GLFunctions::getAndPrintGLError( "after pass 2" );
     //***************************************************************************************************
     //
     // Pass 3
     //
     //***************************************************************************************************/
+
     clearTexture( "C2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     clearTexture( "D2", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
     renderScenePart( 3, "C2", "D2" );
-
+    GLFunctions::getAndPrintGLError( "after pass 3" );
     //***************************************************************************************************
     //
     // Pass 4
@@ -228,7 +233,7 @@ void SceneRenderer::renderScene()
     clearTexture( "D1", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
 
     renderScenePart( 4, "C3", "D1" );
-
+    GLFunctions::getAndPrintGLError( "after pass 4" );
     //***************************************************************************************************
     //
     // Pass 5
@@ -247,7 +252,7 @@ void SceneRenderer::renderScene()
     clearTexture( "C5", 0.0, 0.0, 0.0, 0.0 );
     clearTexture( "D1", 0.0, 0.0, 0.0, 0.0 );
     renderScenePart( 5, "C5", "D1" );
-
+    GLFunctions::getAndPrintGLError( "after pass 5" );
     if ( transparencyMode == 1 )
     {
         glEnable( GL_DEPTH_TEST );
@@ -258,12 +263,13 @@ void SceneRenderer::renderScene()
 
 void SceneRenderer::renderScenePart( int renderMode, QString target0, QString target1 )
 {
+    GLFunctions::getAndPrintGLError( m_renderTarget + "###" );
     m_renderMode = renderMode;
     setRenderTargets( target0, target1 );
 
     GLFunctions::getAndPrintGLError( m_renderTarget + "---" );
     m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
-    GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
+    //GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
     renderDatasets();
     renderRois();
 
@@ -470,6 +476,7 @@ void SceneRenderer::generate_pixel_buffer_objects( int width, int height )
     glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
     /* to avoid weird behaviour the first frame the data is loaded */
     glReadPixels( 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
     /* generate the second pixel buffer objects */glGenBuffers( 1, &pbo_b );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, pbo_b );
     glBufferData( GL_PIXEL_PACK_BUFFER, width * height * 4, NULL, GL_STREAM_READ );
@@ -527,6 +534,7 @@ GLuint SceneRenderer::get_object_id( int x, int y, int width, int height )
     }
     glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     glDeleteBuffers( 1, &pbo_a );
     glDeleteBuffers( 1, &pbo_b );
@@ -593,55 +601,55 @@ void SceneRenderer::initFBO( int width, int height )
 {
     if ( textures.size() > 0 )
     {
-        foreach ( GLuint tex, textures ){
-        glDeleteTextures( 1, &tex );
+        foreach ( GLuint tex, textures )
+        {
+            glDeleteTextures( 1, &tex );
+        }
+        glDeleteFramebuffers( 1, &FBO );
+        glDeleteRenderbuffers( 1, &RBO );
+
     }
-    glDeleteFramebuffers( 1, &FBO );
-    glDeleteRenderbuffers( 1, &RBO );
 
-}
+    textures[ "C0" ] = createTexture( width, height );
+    textures[ "C1" ] = createTexture( width, height );
+    textures[ "C2" ] = createTexture( width, height );
+    textures[ "C3" ] = createTexture( width, height );
+    textures[ "C4" ] = createTexture( width, height );
+    textures[ "C5" ] = createTexture( width, height );
+    textures[ "D0" ] = createTexture( width, height );
+    textures[ "D1" ] = createTexture( width, height );
+    textures[ "D2" ] = createTexture( width, height );
+    textures[ "PICK" ] = createTexture( width, height );
+    textures[ "SCREENSHOT" ] = createTexture( width, height );
 
-textures[ "C0" ] = createTexture( width, height );
-textures[ "C1" ] = createTexture( width, height );
-textures[ "C2" ] = createTexture( width, height );
-textures[ "C3" ] = createTexture( width, height );
-textures[ "C4" ] = createTexture( width, height );
-textures[ "C5" ] = createTexture( width, height );
-textures[ "D0" ] = createTexture( width, height );
-textures[ "D1" ] = createTexture( width, height );
-textures[ "D2" ] = createTexture( width, height );
-textures[ "PICK" ] = createTexture( width, height );
-textures[ "SCREENSHOT" ] = createTexture( width, height );
+    /* create a framebuffer object */
+    glGenFramebuffers( 1, &FBO );
+    /* attach the texture and the render buffer to the frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, FBO );
 
-/* create a framebuffer object */
-glGenFramebuffers( 1, &FBO );
-/* attach the texture and the render buffer to the frame buffer */
-glBindFramebuffer( GL_FRAMEBUFFER, FBO );
+    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers( 3, attachments );
 
-GLuint attachments[3] =
-{   GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
-glDrawBuffers( 3, attachments );
+    /* create a renderbuffer object for the depth buffer */
+    glGenRenderbuffers( 1, &RBO );
+    /* bind the texture */
+    glBindRenderbuffer( GL_RENDERBUFFER, RBO );
+    /* create the render buffer in the GPU */
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
 
-/* create a renderbuffer object for the depth buffer */
-glGenRenderbuffers( 1, &RBO );
-/* bind the texture */
-glBindRenderbuffer( GL_RENDERBUFFER, RBO );
-/* create the render buffer in the GPU */
-glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["C0"], 0 );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO );
+    /* check the frame buffer */
+    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+    {
+        /* handle an error : frame buffer incomplete */
+        qDebug() << "frame buffer incomplete";
+    }
 
-glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["C0"], 0 );
-glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO );
-/* check the frame buffer */
-if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-{
-    /* handle an error : frame buffer incomplete */
-    qDebug() << "frame buffer incomplete";
-}
-
-/* unbind the render buffer */
-glBindRenderbuffer( GL_RENDERBUFFER, 0 );
-/* return to the default frame buffer */
-glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    /* unbind the render buffer */
+    glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+    /* return to the default frame buffer */
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 GLuint SceneRenderer::createTexture( int width, int height )

@@ -249,17 +249,24 @@ void DataStore::deleteItem( int row )
 {
     if ( row >= 0 && row < m_datasetList.size() )
     {
-        beginRemoveRows( index( row, 0 ), row, row );
         Dataset* toDelete = VPtr<Dataset>::asPtr( m_datasetList.at( row ) );
+        toDelete->properties( "maingl" )->set( Fn::Property::D_ACTIVE, false );
+        toDelete->properties( "maingl2" )->set( Fn::Property::D_ACTIVE, false );
+
+        beginRemoveRows( index( row, 0 ), row, row );
         m_datasetList.removeAt( row );
         endRemoveRows();
+
         beginResetModel();
         reset();
         endResetModel();
-        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
-        delete toDelete;
+
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
+        emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
+
+        delete toDelete;
         updateGlobals( row );
+
     }
 }
 

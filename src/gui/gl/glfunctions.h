@@ -64,7 +64,7 @@ public:
                                float x, float y, float z, float dx, float dy, float dz,
                                QColor color, int pickID, int width, int height, int renderMode );
 
-    static void getAndPrintGLError( QString prefix = "" );
+    static bool getAndPrintGLError( QString prefix = "" );
 
     static int idealThreadCount;
     static QHash<QString, float> sliceAlpha;
