@@ -131,6 +131,7 @@ void DatasetScalar::examineDataset()
     m_properties["maingl"]->set( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->set( Fn::Property::D_PAINTSIZE, 1, 1, 5, "paint" );
     m_properties["maingl"]->set( Fn::Property::D_PAINTVALUE, min, min, max - 1.0, "paint" );
+    m_properties["maingl"]->set( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
 }
 
 void DatasetScalar::createTexture()
@@ -157,7 +158,6 @@ void DatasetScalar::createTexture()
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
     {
-        //unsigned int tmp = (double)i / (double)(nx * ny * nz) * 256 * 256 * 256 * 256;
         unsigned int tmp = ( ( m_data[i] - min ) / ( max - min ) ) * 256 * 256 * 256 * 256;
         tmpData[4 * i + 3 ] = (tmp / (256 * 256 * 256)) % 256;
         tmpData[4 * i + 2 ] = (tmp / (256 * 256)) % 256;
@@ -262,25 +262,38 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
 
     int brushSize = m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toInt();
 
+    float idx, jdy, kdz;
+
     for ( int i = 0; i < brushSize; ++i )
     {
+       idx = i * dx;
        for ( int j = 0; j < brushSize; ++j )
        {
+           jdy = j * dy;
            for ( int k = 0; k < brushSize; ++k )
            {
-               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() - i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() - k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() - j * dy, pos.z() + k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() - k * dz ) ] = paintValue;
-               m_data[ getIdFromPos( pos.x() + i * dx, pos.y() + j * dy, pos.z() + k * dz ) ] = paintValue;
+               kdz = k * dz;
+               m_data[ getIdFromPos( pos.x() - idx, pos.y() - jdy, pos.z() - kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - idx, pos.y() - jdy, pos.z() + kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - idx, pos.y() + jdy, pos.z() - kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() - idx, pos.y() + jdy, pos.z() + kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + idx, pos.y() - jdy, pos.z() - kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + idx, pos.y() - jdy, pos.z() + kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + idx, pos.y() + jdy, pos.z() - kdz ) ] = paintValue;
+               m_data[ getIdFromPos( pos.x() + idx, pos.y() + jdy, pos.z() + kdz ) ] = paintValue;
            }
        }
     }
 
     glDeleteTextures( 1, &m_textureGLuint );
     m_textureGLuint = 0;
+
+    if ( m_properties["maingl"]->get( Fn::Property::D_PAINT_LINK_CURSOR ).toBool() )
+    {
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), pos.x() / dx );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), pos.y() / dy );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), pos.z() / dz );
+    }
+
     Models::d()->submit();
 }

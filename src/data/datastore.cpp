@@ -133,6 +133,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     {
         Dataset* ds = VPtr<Dataset>::asPtr( m_datasetList.at( index.row() ) );
         ds->properties( "maingl" )->set( Fn::Property::D_ACTIVE, !ds->properties( "maingl" )->get( Fn::Property::D_ACTIVE ).toBool() );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
         emit( dataChanged( index, index ) );
     }
 
