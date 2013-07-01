@@ -120,9 +120,9 @@ void Dataset3D::createTexture()
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        data[i * 3] = fabs( m_data[i].x() ) / div;
-        data[i * 3 + 1] = fabs( m_data[i].y() ) / div;
-        data[i * 3 + 2] = fabs( m_data[i].z() ) / div;
+        data[i * 3] = qMin( 1.0, fabs( m_data[i].x() ) / div );
+        data[i * 3 + 1] = qMin( 1.0, fabs( m_data[i].y() ) / div );
+        data[i * 3 + 2] = qMin( 1.0, fabs( m_data[i].z() ) / div );
     }
     glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
 

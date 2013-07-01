@@ -170,9 +170,9 @@ void TensorRenderer::initGeometry()
 
     ColumnVector newVert( 3 );
 
-    float x = (float)xi * m_dx + m_dx;
-    float y = (float)yi * m_dy + m_dy;
-    float z = (float)zi * m_dz + m_dz;
+    float x = (float)xi * m_dx + m_dx / 2;
+    float y = (float)yi * m_dy + m_dy / 2;
+    float z = (float)zi * m_dz + m_dz / 2;
 
     m_quads = 0;
 
