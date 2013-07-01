@@ -202,8 +202,13 @@ void SHRenderer::initGeometry()
 
         m_tris1 = numTris * numBalls * 3;
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+        glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+        glDeleteBuffers(1, &( vboIds[ 1 ] ) );
+        glGenBuffers( 2, vboIds );
+
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+        glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
         const int* faces = tess::faces( lod );
         std::vector<int>indexes;
@@ -221,6 +226,7 @@ void SHRenderer::initGeometry()
 
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
     catch (std::bad_alloc& ba)
     {

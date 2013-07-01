@@ -200,13 +200,9 @@ namespace Fn
         G_SHOW_NAV_SLIDERS,
         G_OBJECT,
         G_NEED_SHADER_UPDATE,
-        // settings that need a datastore signal to update widgets need to be inserted above this line
         G_ZOOM,
         G_MOVEX,
         G_MOVEY,
-        G_BBX,
-        G_BBY,
-        G_VIEW,
         G_SCREENSHOT_QUALITY,
         G_TRANSPARENCY,
         // ROI Properties
@@ -359,9 +355,6 @@ namespace Fn
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;
                 case Property::G_MOVEY: return QString( "" ); break;
-                case Property::G_BBX: return QString( "" ); break;
-                case Property::G_BBY: return QString( "" ); break;
-                case Property::G_VIEW: return QString( "" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
                 case Property::R_Y: return QString( "y" ); break;

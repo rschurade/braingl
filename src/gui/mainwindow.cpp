@@ -689,19 +689,16 @@ void MainWindow::slotToggleSagittalSlice()
 
 void  MainWindow::slotStandardAxialView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::AXIAL );
     mainGLWidget->setView( Fn::Orient::AXIAL );
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::CORONAL );
     mainGLWidget->setView( Fn::Orient::CORONAL );
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_VIEW, 0 ), (int)Fn::Orient::SAGITTAL );
     mainGLWidget->setView( Fn::Orient::SAGITTAL );
 }
 

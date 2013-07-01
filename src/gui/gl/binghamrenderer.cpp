@@ -210,6 +210,10 @@ void BinghamRenderer::initGeometry()
     int numBalls = verts.size() / ( numVerts * 7 );
     m_tris1 = numTris * numBalls * 3;
 
+    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 1 ] ) );
+    glGenBuffers( 2, vboIds );
+
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );

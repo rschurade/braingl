@@ -143,19 +143,14 @@ void GLWidget::calcMVPMatrix()
 
     float halfBB = boundingbox / 2.0;
 
-    float bbx = boundingbox;
-    float bby = boundingbox;
-
     float ratio = static_cast<float>( m_width )/ static_cast<float>( m_height );
     if ( ratio >= 1.0 )
     {
         m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -3000, 3000 );
-        bbx = boundingbox * ratio;
     }
     else
     {
         m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
-        bby = boundingbox / ratio;
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
@@ -163,8 +158,6 @@ void GLWidget::calcMVPMatrix()
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), m_arcBall->getZoom() );
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_arcBall->getMoveX() );
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_arcBall->getMoveY() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_BBX, 0 ), bbx );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_BBY, 0 ), bby );
 }
 
 
