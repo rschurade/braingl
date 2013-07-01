@@ -36,9 +36,6 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->set( Fn::Property::G_ZOOM, 1.0f );
     m_properties->set( Fn::Property::G_MOVEX, 0 );
     m_properties->set( Fn::Property::G_MOVEY, 0 );
-    m_properties->set( Fn::Property::G_BBX, 0 );
-    m_properties->set( Fn::Property::G_BBY, 0 );
-    m_properties->set( Fn::Property::G_VIEW, 0 );
     m_properties->set( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
     m_properties->set( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "general" );
     m_properties->set( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "general" );
