@@ -151,6 +151,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
                 connect( VPtr<Dataset>::asPtr( value )->properties( "maingl2" ), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
             }
 
+            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
             updateGlobals( m_datasetList.size() - 1 );
             emit( dataChanged( index, index ) );
             return true;
