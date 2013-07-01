@@ -171,19 +171,28 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 
     FMath::evecs( tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
+    QVector<float> fa;
+    FMath::fa( tensors, fa );
+
+    for ( int i = 0; i < evec1.size(); ++i )
+    {
+        evec2[i] = evec1[i] * fa[i] * 1.5;
+    }
+
+    QList<Dataset*> l;
+
     Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
     out->properties( "maingl" )->set( Fn::Property::D_NAME, "evec 1" );
     out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
-
-//    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
-//    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
-//    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
-//    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
-
-    QList<Dataset*> l;
     l.push_back( out );
-//    l.push_back( out2 );
+
+    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "fa rgb" );
+    out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
+    out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
+    l.push_back( out2 );
+
     return l;
 }
 
@@ -221,19 +230,28 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
 
     FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
+    QVector<float> fa;
+    FMath::fa( *tensors, fa );
+
+    for ( int i = 0; i < evec1.size(); ++i )
+    {
+        evec2[i] = evec1[i] * fa[i] * 1.5;
+    }
+
+    QList<Dataset*> l;
+
     Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
     out->properties( "maingl" )->set( Fn::Property::D_NAME, "evec 1" );
     out->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
+    l.push_back( out );
 
-    DatasetScalar* out2 = new DatasetScalar( QDir( "eval1.nii.gz" ), eval1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
-    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "eval 1" );
+    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    out2->properties( "maingl" )->set( Fn::Property::D_NAME, "fa rgb" );
     out2->properties( "maingl" )->set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out2->properties( "maingl" )->set( Fn::Property::D_DATATYPE, DT_FLOAT );
-
-    QList<Dataset*> l;
-    l.push_back( out );
     l.push_back( out2 );
+
     return l;
 }
 
