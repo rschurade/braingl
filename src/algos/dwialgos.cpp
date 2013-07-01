@@ -235,7 +235,7 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
 
     for ( int i = 0; i < evec1.size(); ++i )
     {
-        evec2[i] = evec1[i] * fa[i] * 1.5;
+        evec2[i] = evec1[i] * fa[i] * 1.5f;
     }
 
     QList<Dataset*> l;
