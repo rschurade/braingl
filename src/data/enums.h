@@ -145,6 +145,7 @@ namespace Fn
         D_PAINTSIZE,
         D_PAINTCOLOR,
         D_PAINTVALUE,
+        D_PAINT_LINK_CURSOR,
         D_FIBER_RENDERMODE,
         D_FIBER_THICKNESS,
         D_HAS_TEXTURE,
@@ -295,6 +296,7 @@ namespace Fn
                 case Property::D_PAINTSIZE: return QString( "brush size" ); break;
                 case Property::D_PAINTCOLOR: return QString( "paint color" ); break;
                 case Property::D_PAINTVALUE: return QString( "paint value" ); break;
+                case Property::D_PAINT_LINK_CURSOR: return QString( "link cursor" ); break;
                 case Property::D_FIBER_RENDERMODE: return QString( "fiber render mode" ); break;
                 case Property::D_FIBER_THICKNESS: return QString( "fiber thickness" ); break;
                 case Property::D_HAS_TEXTURE: return QString( "has frame" ); break;
