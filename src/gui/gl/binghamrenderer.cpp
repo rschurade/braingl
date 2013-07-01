@@ -31,7 +31,7 @@
 BinghamRenderer::BinghamRenderer( QVector<QVector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris1( 0 ),
-    vboIds( new GLuint[ 6 ] ),
+    vboIds( new GLuint[ 2 ] ),
     m_data( data ),
     m_nx( m_nx ),
     m_ny( m_ny ),
@@ -210,8 +210,9 @@ void BinghamRenderer::initGeometry()
     int numBalls = verts.size() / ( numVerts * 7 );
     m_tris1 = numTris * numBalls * 3;
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
     verts.clear();
 
     const int* faces = tess::faces( lod );
@@ -230,6 +231,7 @@ void BinghamRenderer::initGeometry()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     indexes.clear();
 }
 

@@ -91,6 +91,7 @@ void SliceRenderer::initGeometry()
         // Transfer vertex data to VBO 1
         glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesAxial, GL_STATIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
     if ( yi != m_yOld || ybi != m_ybOld )
@@ -106,6 +107,7 @@ void SliceRenderer::initGeometry()
         // Transfer vertex data to VBO 2
         glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCoronal, GL_STATIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
     if ( xi != m_xOld  || xbi != m_xbOld )
@@ -120,6 +122,7 @@ void SliceRenderer::initGeometry()
         // Transfer vertex data to VBO 3
         glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
         glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesSagittal, GL_STATIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
     m_xOld = xi;

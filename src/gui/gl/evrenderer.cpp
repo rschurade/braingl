@@ -40,7 +40,7 @@ EVRenderer::EVRenderer( QVector<QVector3D>* data, int nx, int ny, int nz, float 
 
 EVRenderer::~EVRenderer()
 {
-    //glDeleteBuffers( 1, &vbo );
+    glDeleteBuffers( 1, &vbo );
 }
 
 void EVRenderer::init()
@@ -86,18 +86,11 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars();
 
-    GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-
     glDrawArrays( GL_LINES, 0, m_vertCount );
 
-    GLenum error;
-    int i = 0;
-    while ((error = glGetError()) != GL_NO_ERROR) {
-        qDebug() << "render ev lines: opengl error" << error;
-        i++;
-    }
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
 }
 
 void EVRenderer::setupTextures()
@@ -211,6 +204,7 @@ void EVRenderer::initGeometry()
 
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void EVRenderer::addGlyph( std::vector<float> &verts, float xPos, float yPos, float zPos, QVector3D vector )

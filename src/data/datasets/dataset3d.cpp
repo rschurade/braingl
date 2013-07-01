@@ -266,4 +266,5 @@ QString Dataset3D::getColormapShader( int num )
 void Dataset3D::switchRenderSticks()
 {
     m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
+    Models::d()->submit();
 }

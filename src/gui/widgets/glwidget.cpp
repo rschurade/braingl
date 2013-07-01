@@ -95,7 +95,10 @@ void GLWidget::paintGL()
 {
     if ( !skipDraw )
     {
-        m_sceneRenderer->draw( m_mvMatrix, m_pMatrix );
+        if ( m_visible )
+        {
+            m_sceneRenderer->draw( m_mvMatrix, m_pMatrix );
+        }
     }
     else
     {
@@ -110,7 +113,13 @@ void GLWidget::resizeGL( int width, int height )
     m_width = width;
     m_height = height;
 
+    update();
+}
+
+void GLWidget::update()
+{
     calcMVPMatrix();
+    updateGL();
 }
 
 void GLWidget::calcMVPMatrix()
@@ -175,8 +184,7 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
     {
         rightMouseDown( event );
     }
-    calcMVPMatrix();
-    updateGL();
+    update();
 }
 
 void GLWidget::mouseMoveEvent( QMouseEvent *event )
@@ -193,18 +201,17 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
     {
         rightMouseDrag( event );
     }
-    calcMVPMatrix();
-    updateGL();
+    update();
 }
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
-    updateGL();
+    update();
 }
 
 void GLWidget::enterEvent( QEvent *event )
 {
-    updateGL();
+    update();
 }
 
 void GLWidget::wheelEvent( QWheelEvent *event )
@@ -212,18 +219,7 @@ void GLWidget::wheelEvent( QWheelEvent *event )
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
     m_arcBall->mouseWheel( numSteps );
-    calcMVPMatrix();
-    updateGL();
-}
-
-void GLWidget::update()
-{
-    if ( !m_visible )
-    {
-        return;
-    }
-    calcMVPMatrix();
-    updateGL();
+    update();
 }
 
 void GLWidget::setView( Fn::Orient view )
@@ -481,8 +477,7 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
             }
         }
     }
-    calcMVPMatrix();
-    updateGL();
+    update();
 
     emit signalKeyPressed( event->key(), event->modifiers() );
 }

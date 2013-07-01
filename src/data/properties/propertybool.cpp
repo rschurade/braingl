@@ -8,6 +8,8 @@
 
 #include "../../gui/widgets/controls/checkboxwithlabel.h"
 
+#include <QDebug>
+
 PropertyBool::PropertyBool( QString name, bool value ) :
     Property( name ),
     m_value( value )
@@ -40,6 +42,9 @@ void PropertyBool::setValue( QVariant value )
 void PropertyBool::widgetChanged( int value, int id )
 {
     m_value = value;
-    emit( valueChanged() );
-    emit( valueChanged( value ) );
+    if ( m_widget->isVisible() )
+    {
+        emit( valueChanged() );
+        emit( valueChanged( value ) );
+    }
 }

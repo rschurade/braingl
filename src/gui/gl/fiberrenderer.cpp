@@ -20,7 +20,7 @@
 FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
     ObjectRenderer(),
     m_selector( selector ),
-    vboIds( new GLuint[ 2 ] ),
+    vbo( 0 ),
     m_data( data ),
     m_extraData( extraData ),
     m_numLines( data.size() ),
@@ -34,12 +34,12 @@ FiberRenderer::~FiberRenderer()
 {
     //TODO this is a temporary fix for the crash happening after this buffer delete
     // depending on the size of the fiber dataset this creates a big memory leak
-//    glDeleteBuffers( 2, vboIds );
+    glDeleteBuffers( 1, &vbo );
 }
 
 void FiberRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 1, &vbo );
 }
 
 void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -78,8 +78,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     initGeometry();
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars( props );
 
     program->setUniformValue( "u_alpha", alpha );
@@ -119,7 +118,6 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
         }
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
@@ -210,8 +208,9 @@ void FiberRenderer::initGeometry()
         delete threads[i];
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     m_pointsPerLine.resize( m_data.size() );
     m_startIndexes.resize( m_data.size() );
