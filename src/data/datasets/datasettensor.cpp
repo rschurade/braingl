@@ -248,32 +248,9 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
 QString DatasetTensor::getValueAsString( int x, int y, int z )
 {
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    x *= dx;
-    y *= dy;
-    z *= dz;
-
-    Matrix data = m_data.at( getIdFromPos( x, y, z ) );
+    Matrix data = m_data.at( getId( x, y, z ) );
 
     QString out( "" );
-
-    int idx = ( dx * 1000 );
-    int idx2 = ( m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat() * 1000 );
-
-    if ( idx != idx2 )
-    {
-        out += " [";
-        out += QString::number( (int)( x / m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat() ) );
-        out += ",";
-        out += QString::number( (int)( y / m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat() ) );
-        out += ",";
-        out += QString::number( (int)( z / m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat() ) );
-        out += "] ";
-    }
-
 
     out += QString::number( data( 1, 1 ) ) + ", " + QString::number( data( 2, 2 ) ) + ", " + QString::number( data( 3, 3 ) ) + ", "
             + QString::number( data( 1, 2 ) ) + ", " + QString::number( data( 1, 3 ) ) + ", " + QString::number( data( 2, 3 ) );

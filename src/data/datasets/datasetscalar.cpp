@@ -236,15 +236,7 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
 QString DatasetScalar::getValueAsString( int x, int y, int z )
 {
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    x *= dx;
-    y *= dy;
-    z *= dz;
-
-    float data = m_data[ getIdFromPos( x, y, z ) ];
+    float data = m_data[ getId( x, y, z ) ];
     return QString::number( data );
 }
 
