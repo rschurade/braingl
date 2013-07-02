@@ -76,7 +76,10 @@ void DatasetScalar::examineDataset()
         min = qMin( min, m_data[i] );
         max = qMax( max, m_data[i] );
     }
-    max += 1.0f;
+    if ( m_properties["maingl"]->get( Fn::Property::D_DATATYPE ).toInt() == 2 )
+    {
+        max += 1.0f;
+    }
     m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
     m_properties["maingl"]->set( Fn::Property::D_MIN, min );
     m_properties["maingl"]->set( Fn::Property::D_MAX, max );
