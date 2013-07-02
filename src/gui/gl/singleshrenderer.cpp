@@ -83,7 +83,7 @@ void SingleSHRenderer::resizeGL( int width, int height )
     m_height = height;
 
     m_arcBall->set_win_size( width, height );
-
+    glViewport( 0, 0, m_width, m_height );
     calcMVPMatrix();
 }
 
@@ -101,7 +101,6 @@ void SingleSHRenderer::leftMouseDrag( int x, int y )
 
 void SingleSHRenderer::calcMVPMatrix()
 {
-    glViewport( 0, 0, m_width, m_height );
     m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
 
     m_arcBall->setRotCenter( 1., 1., 1. );
@@ -220,10 +219,11 @@ void SingleSHRenderer::initGeometry()
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SingleSHRenderer::setupTextures()
