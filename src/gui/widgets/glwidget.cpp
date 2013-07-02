@@ -118,6 +118,7 @@ void GLWidget::resizeGL( int width, int height )
 
 void GLWidget::update()
 {
+    glViewport( 0, 0, m_width, m_height );
     calcMVPMatrix();
     updateGL();
 }

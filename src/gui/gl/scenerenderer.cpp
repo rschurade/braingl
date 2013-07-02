@@ -126,7 +126,7 @@ void SceneRenderer::resizeGL( int width, int height )
     m_width = width;
     m_height = height;
 
-    glViewport( 0, 0, width, height );
+    glViewport( 0, 0, m_width, m_height );
 
     initFBO( width, height );
 }
