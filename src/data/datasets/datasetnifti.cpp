@@ -180,6 +180,19 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
     return px + py * nx + pz * nx * ny;
 }
 
+int DatasetNifti::getId( int x, int y, int z )
+{
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+
+    int px = qMax( 0, qMin( x, nx - 1) );
+    int py = qMax( 0, qMin( y, ny - 1) );
+    int pz = qMax( 0, qMin( z, nz - 1) );
+
+    return px + py * nx + pz * nx * ny;
+}
+
 QString DatasetNifti::getColormapShader( int num )
 {
     if ( m_properties["maingl"]->get( Fn::Property::D_IS_ATLAS ).toBool() )
