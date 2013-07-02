@@ -92,15 +92,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
 QString DatasetBingham::getValueAsString( int x, int y, int z )
 {
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    x *= dx;
-    y *= dy;
-    z *= dz;
-
-    QVector<float> data = m_data[ getIdFromPos( x, y, z ) ];
+    QVector<float> data = m_data[ getId( x, y, z ) ];
     return QString::number( data[0] ) + ", " + QString::number( data[1] ) + ", " + QString::number( data[2] ) + ", " + QString::number( data[3] ) +
      ", " + QString::number( data[4] ) + ", " + QString::number( data[5] ) + ", " + QString::number( data[6] ) + ", " + QString::number( data[7] ) +
      ", " + QString::number( data[8] );
