@@ -641,6 +641,15 @@ void DatasetGlyphset::loadROI( QString filename )
     file.close();
 }
 
+void DatasetGlyphset::initROI()
+{
+    roi = new bool[m_mesh.at( 0 )->numVerts()];
+    for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+    {
+        roi[i] = true;
+    }
+}
+
 void DatasetGlyphset::save1Ds()
 {
     QFile file( QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".1D.roi" ) );
