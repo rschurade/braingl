@@ -32,6 +32,7 @@ public:
     static QString getNiftiDataType( const int type );
 
     int getIdFromPos( float x, float y, float z );
+    int getId( int x, int y, int z );
 
 protected:
     virtual void createTexture() = 0;
