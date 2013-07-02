@@ -1450,7 +1450,11 @@ bool Loader::loadGlyphset()
     if (sl2.length() > 3)
     {
         QString roiname = trunk + QDir::separator() +sl2.at( 3 );
+        qDebug() << "loading ROI: " << roiname;
         dataset->loadROI(roiname);
+    } else {
+        qDebug() << "no ROI defined...";
+        dataset->initROI();
     }
 
     dataset->setProperties();
