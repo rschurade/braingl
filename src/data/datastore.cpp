@@ -231,6 +231,7 @@ void DataStore::moveItemUp( int row )
         m_datasetList.swap( row, row - 1 );
         endMoveRows();
         updateGlobals( row - 1 );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }
@@ -243,6 +244,7 @@ void DataStore::moveItemDown( int row )
         m_datasetList.swap( row, row + 1 );
         endMoveRows();
         updateGlobals( row );
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
         emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     }
 }

@@ -675,16 +675,19 @@ void MainWindow::createDockWindows()
 void MainWindow::slotToggleAxialSlice()
 {
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
+    Models::g()->submit();
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
+    Models::g()->submit();
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
+    Models::g()->submit();
 }
 
 void  MainWindow::slotStandardAxialView()
