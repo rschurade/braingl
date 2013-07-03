@@ -683,4 +683,5 @@ void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
             m_mesh[m]->setVertexData( i, conn[picked][i] );
         }
     }
+    Models::d()->submit();
 }
