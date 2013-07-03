@@ -47,6 +47,8 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_properties["maingl"]->set( Fn::Property::D_NZ, 800, 0, 1600, "special" );
 
     QVector<QVector<float> >data0;
+    QVector<float>min0;
+    QVector<float>max0;
     data0.reserve( fibs.size() );
     for ( int i = 0; i < fibs.size(); ++i )
     {
@@ -182,6 +184,49 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
         }
         return out;
     }
+}
+
+QVector< QVector< QVector< float > > > DatasetFibers::getSelectedData()
+{
+    if ( m_renderer == 0 )
+    {
+        return m_data;
+    }
+    else
+    {
+        QVector<bool>*selected = m_selector->getSelection();
+        QVector< QVector<QVector<float> > >out;
+
+        for ( int k = 0; k < m_data.size(); ++k )
+        {
+            QVector<QVector<float> > data = m_data[k];
+            QVector<QVector<float> > dataOut;
+            for ( int i = 0; i < selected->size(); ++i )
+            {
+                if ( selected->at( i ) )
+                {
+                    dataOut.push_back( data[i] );
+                }
+            }
+            out.push_back( dataOut );
+        }
+        return out;
+    }
+}
+
+QVector<float> DatasetFibers::getDataMins()
+{
+    return m_dataMins;
+}
+
+QVector<float> DatasetFibers::getDataMaxes()
+{
+    return m_dataMaxes;
+}
+
+QVector<QString> DatasetFibers::getDataNames()
+{
+    return m_dataNames;
 }
 
 void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
