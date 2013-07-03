@@ -57,7 +57,7 @@ void DatasetSurfaceset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
-void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
+void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 || paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
@@ -79,7 +79,7 @@ void DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifi
         return;
     }
 
-    QVector<int> picked = getMesh( "maingl" )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
+    QVector<int> picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     if ( picked.size() > 0 )
     {

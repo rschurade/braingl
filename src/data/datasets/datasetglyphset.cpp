@@ -696,12 +696,12 @@ void DatasetGlyphset::save1Ds()
     file.close();
 }
 
-void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
+void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 
-    int picked = getMesh( "maingl" )->closestVertexIndex( pos );
+    int picked = getMesh( target )->closestVertexIndex( pos );
 
-    DatasetSurfaceset::mousePick( pickId, pos, modifiers );
+    DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
     for ( int i = 0; i < n; ++i )
     {
         for ( int m = 0; m < m_mesh.size(); m++ )

@@ -239,6 +239,11 @@ QImage* GLWidget::screenshot()
 
 void GLWidget::rightMouseDown( QMouseEvent* event )
 {
+
+    //qDebug() << "Object name:" << m_sceneRenderer->getRenderTarget();
+
+    QString target = m_sceneRenderer->getRenderTarget();
+
     int x = event->x();
     int y = event->y();
     m_rightMouseDown = QVector2D( x, y );
@@ -258,7 +263,7 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->mousePick( m_picked, pickPos, event->modifiers() );
+            ds->mousePick( m_picked, pickPos, event->modifiers(), target );
         }
     }
 
@@ -285,6 +290,8 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
 
 void GLWidget::rightMouseDrag( QMouseEvent* event )
 {
+    QString target = m_sceneRenderer->getRenderTarget();
+
     int x = event->x();
     int y = event->y();
 
@@ -311,7 +318,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->mousePick( m_picked, pickPos, event->modifiers() );
+            ds->mousePick( m_picked, pickPos, event->modifiers(), target );
         }
         skipDraw = true;
         Models::g()->submit();
