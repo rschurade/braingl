@@ -106,10 +106,14 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             cmapWidget->setLowerThreshold( ds->properties( m_target )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
             cmapWidget->setUpperThreshold( ds->properties( m_target )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
             cmapWidget->setColormap( selectedCmap );
-            connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
-            connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
-            connect( ds->properties( m_target )->getWidget( Fn::Property::D_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
-            connect( ds->properties( m_target )->getWidget( Fn::Property::D_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+
+            if ( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MIN ) )
+            {
+                connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::D_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+                connect( ds->properties( m_target )->getWidget( Fn::Property::D_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+            }
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
         }
         else
