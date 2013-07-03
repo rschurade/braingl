@@ -279,6 +279,8 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
+    skipDraw = true;
+    Models::g()->submit();
 }
 
 void GLWidget::rightMouseDrag( QMouseEvent* event )
@@ -311,6 +313,8 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->mousePick( m_picked, pickPos, event->modifiers() );
         }
+        skipDraw = true;
+        Models::g()->submit();
     }
 
     if ( !(event->modifiers() & Qt::ControlModifier) )
