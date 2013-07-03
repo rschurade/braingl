@@ -198,7 +198,6 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
             m_mesh[0]->setVertexColor( picked[i], color );
         }
         m_renderer->endUpdateColor();
-        Models::d()->submit();
     }
 }
 
