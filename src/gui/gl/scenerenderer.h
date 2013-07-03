@@ -42,6 +42,8 @@ public:
 
     void renderPick();
 
+    QString getRenderTarget();
+
 private:
 	void renderScene();
 	void renderScenePart( int renderMode, QString target0, QString target1 );

@@ -423,6 +423,11 @@ void SceneRenderer::renderPick()
     renderDatasets();
 }
 
+QString SceneRenderer::getRenderTarget()
+{
+    return m_renderTarget;
+}
+
 QVector3D SceneRenderer::mapMouse2World( int x, int y, int z )
 {
     GLint viewport[4];

@@ -165,7 +165,7 @@ QString DatasetMesh::getValueAsString( int x, int y, int z )
     return QString( "" );
 }
 
-void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers )
+void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
