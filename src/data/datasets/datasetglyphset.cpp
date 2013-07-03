@@ -26,6 +26,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 DatasetSurfaceset( filename, Fn::DatasetType::GLYPHSET ),
                 minthresh( mt ),
                 maxthresh( maxt ),
+                conn( NULL ),
                 m_prenderer( NULL ),
                 m_vrenderer( NULL ),
                 m_pierenderer( NULL ),
@@ -68,26 +69,56 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
             m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( float ) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( float ) ) );
+    m_properties["maingl2"]->set( Fn::Property::D_THRESHOLD, 0.0f, minthresh, 1.0f, "general" );
+    //m_properties["maingl2"]->set( Fn::Property::D_GLYPHSTYLE, { "points", "vectors", "pies" }, 0, true );
+    m_properties["maingl2"]->set( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl2"]->set( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl2"]->set( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
+    m_properties["maingl2"]->set( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
+    m_properties["maingl2"]->set( Fn::Property::D_DRAW_SURFACE, true, "general" );
+    m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
+    //m_properties.remove( "maingl2" );
 
-    /*m_properties["maingl2"]->set( Fn::Property::D_THRESHOLD, 0.0f, minthresh, 1.0f, true );
-     m_properties["maingl2"]->set( Fn::Property::D_GLYPHSTYLE,
-     { "points", "vectors", "pies" }, 0, true ); //0 = points, 1 = vectors, 2 = pies
-     m_properties["maingl2"]->set( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, true );
-     m_properties["maingl2"]->set( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, true );
-     m_properties["maingl2"]->set( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, true );
-     m_properties["maingl2"]->set( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, true );
-     m_properties["maingl2"]->set( Fn::Property::D_DRAW_SURFACE, true, true );
-     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, true, true );
-     m_properties.remove( "maingl2" );*/
+    m_properties["maingl2"]->set( Fn::Property::D_MIN, min );
+    m_properties["maingl2"]->set( Fn::Property::D_MAX, max );
+    m_properties["maingl2"]->set( Fn::Property::D_SELECTED_MIN, min, min, max, "colormap" );
+    m_properties["maingl2"]->set( Fn::Property::D_SELECTED_MAX, max, min, max, "colormap" );
+    m_properties["maingl2"]->set( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "colormap" );
+    m_properties["maingl2"]->set( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "colormap" );
+
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( float ) ) );
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( float ) ) );
+
 }
 
 DatasetGlyphset::~DatasetGlyphset()
 {
-    // TODO Auto-generated destructor stub
+    if ( m_prenderer )
+    {
+        delete m_prenderer;
+        m_prenderer = NULL;
+    }
+    if ( m_vrenderer )
+    {
+        delete m_vrenderer;
+        m_vrenderer = NULL;
+    }
+    if ( m_pierenderer )
+    {
+        delete m_pierenderer;
+        m_pierenderer = NULL;
+    }
+    if ( conn )
+    {
+        for ( int i = 0; i < n; i++ )
+        {
+            delete[] conn[i];
+        }
+        delete[] conn;
+        conn = NULL;
+    }
 }
 
 void DatasetGlyphset::readConnectivity( QString filename )
@@ -131,8 +162,6 @@ void DatasetGlyphset::setMinthresh( float mt )
 
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    target = "maingl";
-
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
@@ -143,20 +172,20 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
-    int geoSurf = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
-    int geoGlyph = properties( target )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
-    int geoCol = properties( target )->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
-    int glyphstyle = properties( target )->get( Fn::Property::D_GLYPHSTYLE ).toInt();
+    int geoSurf = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
+    int geoCol = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
+    int glyphstyle = properties( "maingl" )->get( Fn::Property::D_GLYPHSTYLE ).toInt();
 
-    float threshold = properties( target )->get( Fn::Property::D_THRESHOLD ).toFloat();
-    float minlength = properties( target )->get( Fn::Property::D_MINLENGTH ).toFloat();
+    float threshold = properties( "maingl" )->get( Fn::Property::D_THRESHOLD ).toFloat();
+    float minlength = properties( "maingl" )->get( Fn::Property::D_MINLENGTH ).toFloat();
 
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
-    glPointSize( properties( target )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
-    glLineWidth( properties( target )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glPointSize( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glLineWidth( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 
@@ -211,20 +240,17 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     prevThresh = threshold;
     prevMinlength = minlength;
 
-    if ( properties( target )->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    if ( glyphstyle == 0 )
     {
-        if ( glyphstyle == 0 )
-        {
-            m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
-        }
-        if ( glyphstyle == 1 )
-        {
-            m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
-        }
-        if ( glyphstyle == 2 )
-        {
-            m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
-        }
+        m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
+    if ( glyphstyle == 1 )
+    {
+        m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
+    if ( glyphstyle == 2 )
+    {
+        m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
 }
 
@@ -625,7 +651,7 @@ void DatasetGlyphset::loadROI( QString filename )
         QString line = in.readLine();
         qDebug() << line << " " << ids.size();
         QStringList sl = line.split( " " );
-        ids.append(sl.at(0).toInt());
+        ids.append( sl.at( 0 ).toInt() );
     }
 
     qDebug() << "m_mesh.size(): " << m_mesh.size();
