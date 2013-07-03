@@ -12,12 +12,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 VectorGlyphRenderer::VectorGlyphRenderer() :
-        ObjectRenderer(),
-        vboIds( new GLuint[1] ),
-        ps( new float[1] ),
-        np( 1 ),
-        ao( 14 ),
-        m_pickId( GLFunctions::getPickIndex() )
+        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 14 ), m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -82,11 +77,11 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    float pAlpha =  1.0;
+    float pAlpha = 1.0;
     float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
     float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
     float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
-    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
+    program->setUniformValue( "u_pickColor", red, green, blue, pAlpha );
 
     float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
@@ -98,7 +93,10 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
 
-    glDrawArrays( GL_LINES, 0, np * 2 );
+    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    {
+        glDrawArrays( GL_LINES, 0, np * 2 );
+    }
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

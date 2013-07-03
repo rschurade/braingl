@@ -32,7 +32,7 @@ void DatasetSurfaceset::addMesh( TriangleMesh2* tm, QString displayString )
 void DatasetSurfaceset::setProperties()
 {
     m_properties["maingl"]->set( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
-    //m_properties["maingl2"]->set( Fn::Property::D_SURFACE, m_displayList, 0, true );
+    m_properties["maingl2"]->set( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 }
 
 TriangleMesh2* DatasetSurfaceset::getMesh( QString target )
