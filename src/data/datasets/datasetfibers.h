@@ -36,6 +36,12 @@ public:
     QVector< QVector< float > > getFibs();
     QVector< QVector< QVector< float > > >getData();
     QVector< QVector< float > > getSelectedFibs();
+    QVector<QString>getDataNames();
+    QVector< QVector< QVector< float > > > getSelectedData();
+    QVector<float> getDataMins();
+    QVector<float> getDataMaxes();
+
+
 
 protected:
     void createTexture() {};
