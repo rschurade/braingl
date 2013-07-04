@@ -571,12 +571,12 @@ void DatasetGlyphset::makePies()
 
 QList<Dataset*> DatasetGlyphset::createConnections()
 {
+    float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     n = m_mesh.at( geo )->numVerts();
     float* nodes = m_mesh.at( geo )->getVertices();
 
-    //TODO: think about upper threshold...
-    float thresh = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
+    //TODO: think about making upper threshold interactive...
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     Connections* cons = new Connections();
     for ( int i = 0; i < n; ++i )
@@ -584,7 +584,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
         for ( int j = i + 1; j < n; ++j )
         {
             float v = conn[i][j];
-            if ( v > thresh )
+            if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
             {
                 int triangleshift = 7; //TODO: Why 7?
 

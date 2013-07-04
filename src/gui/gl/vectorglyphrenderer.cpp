@@ -33,6 +33,8 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
 {
     float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
+    qDebug() << "vectorrenderer draw: " << np;
+
     if ( renderMode == 1 ) // we are drawing opaque objects
     {
         if ( alpha < 1.0 )
