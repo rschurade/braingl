@@ -1062,84 +1062,10 @@ bool Loader::loadVTK()
 
     if ( lv->getPrimitiveType() == 2 )
     {
-        QVector<float> points = lv->getPoints();
-        QVector<int> lines = lv->getPrimitives();
-        int numLines = lv->getNumPrimitives();
 
-        qDebug() << points.size() << lines.size() << numLines;
+        DatasetFibers* dataset = new DatasetFibers( fn, lv );
+        m_dataset.push_back( dataset );
 
-        QVector<QVector<float> > fibs;
-
-        int lc = 0;
-        int pc = 0;
-        for ( int i = 0; i < numLines; ++i )
-        {
-            QVector<float> fib;
-            int lineSize = lines[lc];
-
-            for ( int k = 0; k < lineSize * 3; ++k )
-            {
-                fib.push_back( points[pc++] );
-            }
-            lc += lineSize + 1;
-            fibs.push_back( fib );
-        }
-
-        QVector<QVector<float> > pointData = lv->getPointData();
-        QVector<QVector<QVector<float> > > data;
-        QVector<QString> dataNames = lv->getDataNames();
-
-        qDebug() << pointData.size() << "point data fields found";
-
-        if ( pointData.size() > 0 )
-        {
-            QVector<float> mins;
-            QVector<float> maxes;
-            for ( int curField = 0; curField < pointData.size(); ++curField )
-            {
-                QVector<float> field = pointData[curField];
-                float min = std::numeric_limits<float>::max();
-                float max = std::numeric_limits<float>::min();
-
-                for ( int i = 0; i < field.size(); ++i )
-                {
-                    float value = field[i];
-                    min = qMin( min, value );
-                    max = qMax( max, value );
-                }
-                mins.push_back( min );
-                maxes.push_back( max );
-            }
-            for ( int curField = 0; curField < pointData.size(); ++curField )
-            {
-                QVector<float> field = pointData[curField];
-
-                QVector<QVector<float> > dataField;
-
-                int lc = 0;
-                int pc = 0;
-                for ( int i = 0; i < numLines; ++i )
-                {
-                    QVector<float> fib;
-                    int lineSize = lines[lc];
-                    for ( int k = 0; k < lineSize; ++k )
-                    {
-                        fib.push_back( field[pc++] );
-                    }
-                    lc += lineSize + 1;
-                    dataField.push_back( fib );
-                }
-
-                data.push_back( dataField );
-            }
-            DatasetFibers* dataset = new DatasetFibers( fn, fibs, data, dataNames, mins, maxes );
-            m_dataset.push_back( dataset );
-        }
-        else
-        {
-            DatasetFibers* dataset = new DatasetFibers( fn, fibs );
-            m_dataset.push_back( dataset );
-        }
         delete lv;
         return true;
     }

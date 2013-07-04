@@ -428,7 +428,6 @@ void Writer::saveFibs( QString filename )
     out.write( reinterpret_cast< char* >( rawPointData ), sizeof( float ) * numPoints * 3 );
     out << lineDelimiter;
 
-
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
     out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
     out << lineDelimiter;
