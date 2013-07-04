@@ -21,7 +21,9 @@ LoaderVTK::LoaderVTK( QString fn ) :
     m_numPrimitives( 0 ),
     m_primitiveSize( 0 ),
     m_binFileSize( 0 ),
+    m_bufferPointer( 0 ),
     m_hasPointData( false ),
+    m_hasPrimitiveData( false ),
     m_hasPointColors( false )
 {
 }
@@ -31,13 +33,13 @@ LoaderVTK::~LoaderVTK()
     m_points.clear();
     m_primitives.clear();
     m_pointData.clear();
-    m_dataNames.clear();
+    m_pointDataNames.clear();
     m_pointColors.clear();
 
     m_points.squeeze();
     m_primitives.squeeze();
     m_pointData.squeeze();
-    m_dataNames.squeeze();
+    m_pointDataNames.squeeze();
     m_pointColors.squeeze();
 }
 
@@ -72,9 +74,9 @@ QVector<float> LoaderVTK::getPointColors()
 }
 
 
-QVector<QString>LoaderVTK::getDataNames()
+QVector<QString>LoaderVTK::getPointDataNames()
 {
-    return m_dataNames;
+    return m_pointDataNames;
 }
 
 int LoaderVTK::getNumPoints()
@@ -368,7 +370,7 @@ bool LoaderVTK::loadPointDataAscii()
 
             if ( numEntries == m_numPoints )
             {
-                m_dataNames.push_back( tokens[0] );
+                m_pointDataNames.push_back( tokens[0] );
 
                 QVector<float> data;
                 while( !in.atEnd() )
@@ -447,6 +449,18 @@ bool LoaderVTK::loadPointColorsAscii()
     return true;
 }
 
+QString LoaderVTK::readLineBinary()
+{
+    QString out;
+
+    while( m_binaryFile[ m_bufferPointer ] != '\n' )
+    {
+        out += m_binaryFile[ m_bufferPointer++ ];
+    }
+    m_bufferPointer++;
+    return out;
+}
+
 bool LoaderVTK::loadBinary()
 {
     QDataStream in( m_file );
@@ -456,50 +470,72 @@ bool LoaderVTK::loadBinary()
     m_file->seek( 0 );
     int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
 
-    qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
+    //qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
 
-    if ( !loadPointsBinary() )
+    for( int i = 0; i < 4; ++i )
     {
-        return false;
+        readLineBinary();
     }
-    if ( !loadPrimitivesBinary() )
-    {
-        return false;
-    }
-    m_hasPointColors = loadPointColorsBinary();
 
-    delete[] m_binaryFile;
+    QString fieldHeader;
+    QStringList tokens;
+
+    while ( m_bufferPointer < m_binFileSize )
+    {
+        fieldHeader = readLineBinary();
+        //qDebug() << fieldHeader;
+        tokens = fieldHeader.split( " ", QString::SkipEmptyParts );
+
+        if ( tokens[0] == "POINTS" )
+        {
+            if ( !copyPoints( tokens ) )
+            {
+                return false;
+            }
+        }
+        if ( tokens[0] == "LINES" )
+        {
+            m_primitiveType = 2;
+            if ( !copyPrimitives( tokens ) )
+            {
+                return false;
+            }
+        }
+        if ( tokens[0] == "POLYGONS" )
+        {
+            m_primitiveType = 1;
+            if ( !copyPrimitives( tokens ) )
+            {
+                return false;
+            }
+        }
+        if ( tokens[0] == "CELL_DATA" )
+        {
+            copyPrimitiveData( tokens );
+        }
+        if ( tokens[0] == "POINT_DATA" )
+        {
+            copyPointData( tokens );
+        }
+    }
+
     return true;
 }
 
-bool LoaderVTK::loadPointsBinary()
+bool LoaderVTK::copyPoints( QStringList tokens )
 {
-    int pos = searchBinaryFile( "POINTS" );
-    QString line;
-    QStringList tokens;
-    if ( pos != -1 )
+    if ( ( tokens.size() == 3 ) && tokens[0] == "POINTS" && tokens[2] == "float" )
     {
-        line = getStringFromBinaryFile( pos );
-        tokens = line.split( " ", QString::SkipEmptyParts );
-        if ( ( tokens.size() == 3 ) && line.startsWith( "POINTS") && line.endsWith( "float") )
-        {
-            m_numPoints = tokens[1].toInt();
-        }
-        else
-        {
-            m_status = "*ERROR* unexpected field in points declaration " + m_filename;
-            return false;
-        }
+        m_numPoints = tokens[1].toInt();
     }
     else
     {
-        m_status = "*ERROR* while searching for point declaration, unexpected EOF in file " + m_filename;
+        m_status = "*ERROR* unexpected field in points declaration " + m_filename;
         return false;
     }
-
     char* pointField = new char[m_numPoints * sizeof( float ) * 3];
 
-    int begin = pos + line.size() + 1;
+    int begin = m_bufferPointer;
     int end = begin + m_numPoints * sizeof( float ) * 3;
     int i, j;
     for ( i = begin, j = 0; i < end; ++i, ++j )
@@ -518,40 +554,13 @@ bool LoaderVTK::loadPointsBinary()
 
     delete[] rawPointData;
 
+    m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
+
     return true;
 }
 
-bool LoaderVTK::loadPrimitivesBinary()
+bool LoaderVTK::copyPrimitives( QStringList tokens )
 {
-    QString line;
-    QStringList tokens;
-
-    int pos = searchBinaryFile( "POLYGONS" );
-
-    if ( pos != -1 )
-    {
-        m_primitiveType = 1;
-    }
-    else
-    {
-        pos = searchBinaryFile( "LINES" );
-
-        if ( pos != -1 )
-        {
-            m_primitiveType = 2;
-        }
-    }
-
-    if ( m_primitiveType == 0 )
-    {
-        m_status = "*ERROR* while searching for primitive declaration, unexpected EOF in file " + m_filename;
-        return false;
-    }
-
-    line = getStringFromBinaryFile( pos );
-
-    tokens = line.split( " ", QString::SkipEmptyParts );
-
     if ( tokens.size() == 3 )
     {
         m_numPrimitives = tokens[1].toInt();
@@ -565,7 +574,7 @@ bool LoaderVTK::loadPrimitivesBinary()
 
     char* primitiveField = new char[ m_primitiveSize * sizeof( int ) ];
 
-    int begin = pos + line.size() + 1;
+    int begin = m_bufferPointer;
     int end = begin + m_primitiveSize * sizeof( int );
 
     int i, j;
@@ -586,84 +595,164 @@ bool LoaderVTK::loadPrimitivesBinary()
 
     delete[] rawPrimitiveData;
 
-    return true;
-}
-
-bool LoaderVTK::loadPointColorsBinary()
-{
-    QString line;
-    QStringList tokens;
-
-    int pos = searchBinaryFile( "POINT_DATA" );
-    line = getStringFromBinaryFile( pos );
-    pos = pos + line.size() + 1;
-    line = getStringFromBinaryFile( pos );
-
-    char* colorField = new char[ m_numPoints * sizeof( int ) * 3];
-
-    int begin = pos + line.size() + 1;
-    int end = begin + ( m_numPoints * sizeof( int ) * 3 );
-
-    int i, j;
-    for ( i = begin, j = 0; i < end; ++i, ++j )
-    {
-        colorField[j] = m_binaryFile[i];
-    }
-
-    float* rawColorData = reinterpret_cast<float*>( colorField );
-    switchByteOrderOfArray< float >( rawColorData, m_numPoints * 3 );
-
-    m_pointColors.resize( m_numPoints * 3 );
-
-    for ( int k = 0; k < m_numPoints*3; ++k )
-    {
-        m_pointColors[k] = rawColorData[k];
-    }
-
-    delete[] rawColorData;
+    m_bufferPointer += m_primitiveSize * sizeof( int ) + 1;
 
     return true;
+
 }
 
-int LoaderVTK::searchBinaryFile( QString string )
+bool LoaderVTK::copyPrimitiveData( QStringList tokens )
 {
-    char first = string.at( 0 ).toLatin1();
-    int found = -1;
-    for ( int i = 0; i < m_binFileSize; ++i )
+    if ( m_numPrimitives != tokens[1].toInt() )
     {
-        if ( m_binaryFile[i] == first )
+        m_status = "*ERROR* cell data size doesn't match num primitives " + m_filename;
+    }
+    QString line = readLineBinary();
+    //qDebug() << line;
+    QStringList toks = line.split( " ", QString::SkipEmptyParts );
+    if ( toks.size() == 3 && toks[0] == "FIELD" && toks[1] == "FieldData" )
+    {
+        int numFields = toks[2].toInt();
+        for ( int i = 0; i < numFields; ++i )
         {
-            if ( testPos( i, string ) )
+            line = readLineBinary();
+            //qDebug() << line;
+            toks = line.split( " ", QString::SkipEmptyParts );
+
+            if ( toks.size() == 4 && toks[1].toInt() == 1 && toks[2].toInt() == m_numPrimitives && toks[3] == "float" )
             {
-                found = i;
-                break;
+                m_primitiveDataNames.push_back( toks[0] );
+
+                char* field = new char[m_numPrimitives * sizeof( float )];
+
+                int begin = m_bufferPointer;
+                int end = begin + m_numPrimitives * sizeof( float );
+                int i, j;
+                for ( i = begin, j = 0; i < end; ++i, ++j )
+                {
+                    field[j] = m_binaryFile[i];
+                }
+
+                float* rawData = reinterpret_cast<float*>( field );
+                switchByteOrderOfArray< float >( rawData, m_numPrimitives );
+
+                QVector<float>dataField;
+                dataField.resize( m_numPrimitives );
+
+                for ( int k = 0; k < dataField.size(); ++k )
+                {
+                    dataField[k] = rawData[k];
+                }
+                delete[] rawData;
+                m_primitiveData.push_back( dataField );
+
+                m_bufferPointer += m_numPrimitives * sizeof( float ) + 1;
+            }
+            else
+            {
+                m_status = "*ERROR* unexpected field in cell data definition " + m_filename;
+                return false;
             }
         }
     }
-    return found;
+    else
+    {
+        m_status != "*ERROR* unexpected field in cell data fields definition " + m_filename;
+        return false;
+    }
+    m_hasPrimitiveData = true;
+    return true;
 }
 
-bool LoaderVTK::testPos( int pos, QString string )
+bool LoaderVTK::copyPointData( QStringList tokens )
 {
-    bool match = true;
-    for ( int i = 0; i < string.size(); ++i )
+    if ( m_numPoints != tokens[1].toInt() )
     {
-        if ( m_binaryFile[pos + i] != string.at( i ).toLatin1() )
+        m_status != "*ERROR* point data size doesn't match num points " + m_filename;
+    }
+    QString line = readLineBinary();
+    //qDebug() << line;
+    QStringList toks = line.split( " ", QString::SkipEmptyParts );
+    if ( toks.size() == 3 && toks[0] == "FIELD" && toks[1] == "FieldData" )
+    {
+        int numFields = toks[2].toInt();
+        for ( int i = 0; i < numFields; ++i )
         {
-            match = false;
-            break;
+            line = readLineBinary();
+            //qDebug() << line;
+            toks = line.split( " ", QString::SkipEmptyParts );
+
+            if ( toks.size() == 4 && toks[1].toInt() == 1 && toks[2].toInt() == m_numPoints && toks[3] == "float" )
+            {
+                m_pointDataNames.push_back( toks[0] );
+
+                char* field = new char[m_numPoints * sizeof( float )];
+
+                int begin = m_bufferPointer;
+                int end = begin + m_numPoints * sizeof( float );
+                int i, j;
+                for ( i = begin, j = 0; i < end; ++i, ++j )
+                {
+                    field[j] = m_binaryFile[i];
+                }
+
+                float* rawData = reinterpret_cast<float*>( field );
+                switchByteOrderOfArray< float >( rawData, m_numPoints );
+
+                QVector<float>dataField;
+                dataField.resize( m_numPoints );
+
+                for ( int k = 0; k < dataField.size(); ++k )
+                {
+                    dataField[k] = rawData[k];
+                }
+                delete[] rawData;
+                m_pointData.push_back( dataField );
+
+                m_bufferPointer += m_numPoints * sizeof( float ) + 1;
+            }
+            else
+            {
+                m_status = "*ERROR* unexpected field in point data definition " + m_filename;
+                return false;
+            }
+            m_hasPointData = true;
         }
     }
-    return match;
-}
-
-QString LoaderVTK::getStringFromBinaryFile( int pos )
-{
-    QString out;
-    int i = 0;
-    while( m_binaryFile[ pos + i ] != '\n' )
+    else if ( toks.size() == 3 && toks[0] == "NORMALS" && toks[1] == "Normals" && toks[2] == "float" )
     {
-        out += m_binaryFile[ pos + i++ ];
+        m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
     }
-    return out;
+    else if ( toks.size() == 3 && toks[0] == "COLOR_SCALARS" && toks[1] == "Colors" && toks[2].toInt() == 3 )
+    {
+        char* pointField = new char[m_numPoints * sizeof( float ) * 3];
+
+        int begin = m_bufferPointer;
+        int end = begin + m_numPoints * sizeof( float ) * 3;
+        int i, j;
+        for ( i = begin, j = 0; i < end; ++i, ++j )
+        {
+            pointField[j] = m_binaryFile[i];
+        }
+
+        float* rawPointData = reinterpret_cast<float*>( pointField );
+        switchByteOrderOfArray< float >( rawPointData, m_numPoints * 3 );
+
+        m_pointColors.resize( m_numPoints * 3 );
+        for ( int k = 0; k < m_points.size(); ++k )
+        {
+            m_pointColors[k] = rawPointData[k];
+        }
+
+        delete[] rawPointData;
+
+        m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
+        m_hasPointColors = true;
+    }
+    else
+    {
+        m_status != "*ERROR* unexpected field in point data fields definition " + m_filename;
+        return false;
+    }
+    return true;
 }

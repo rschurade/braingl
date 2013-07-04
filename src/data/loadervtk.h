@@ -26,7 +26,7 @@ public:
     QVector<int>getPrimitives();
     QVector<QVector<float> >getPointData();
     QVector<float> getPointColors();
-    QVector<QString>getDataNames();
+    QVector<QString>getPointDataNames();
 
     int getNumPoints();
     int getNumPrimitives();
@@ -43,14 +43,16 @@ private:
     bool loadPointColorsAscii();
 
     bool loadBinary();
-    bool loadPointsBinary();
-    bool loadPrimitivesBinary();
-    bool loadPointColorsBinary();
+    /////////////////////////////////////////////////////////
+    bool copyPoints( QStringList tokens );
+    bool copyPrimitives( QStringList tokens );
+    bool copyPointData( QStringList tokens );
+    bool copyPrimitiveData( QStringList tokens );
+    bool copyNormals( QStringList tokens );
 
-    int searchBinaryFile( QString string );
-    bool testPos( int pos, QString string );
-    QString getStringFromBinaryFile( int pos );
+    ///////////////////////////////////////////////////////////
 
+    QString readLineBinary();
     QString readLine( QDataStream& in );
 
     QString m_filename;
@@ -66,14 +68,18 @@ private:
     QStringList m_header;
     char* m_binaryFile;
     int m_binFileSize;
+    int m_bufferPointer;
 
     bool m_hasPointData;
+    bool m_hasPrimitiveData;
     bool m_hasPointColors;
 
     QVector<float>m_points;
     QVector<int>m_primitives;
     QVector<QVector<float> >m_pointData;
-    QVector<QString>m_dataNames;
+    QVector<QString>m_pointDataNames;
+    QVector<QVector<float> >m_primitiveData;
+    QVector<QString>m_primitiveDataNames;
     QVector<float>m_pointColors;
 
     template< class T > T switchByteOrder( const T value )

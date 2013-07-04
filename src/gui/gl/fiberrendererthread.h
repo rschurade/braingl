@@ -15,7 +15,7 @@
 class FiberRendererThread : public QThread
 {
 public:
-    FiberRendererThread( QVector< QVector< float > >& data, QVector< QVector< float > >& extraData, int id );
+    FiberRendererThread( QVector< QVector< float > >* data, int id );
     virtual ~FiberRendererThread();
 
     QVector<float>* getVerts();
@@ -23,8 +23,7 @@ public:
 private:
     void run();
 
-    QVector< QVector< float > > m_data;
-    QVector< QVector< float > > m_extraData;
+    QVector< QVector< float > >* m_data;
     int m_id;
 
     QVector<float>* m_verts;

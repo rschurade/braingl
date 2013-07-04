@@ -17,13 +17,14 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
+FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData )  :
     ObjectRenderer(),
     m_selector( selector ),
     vbo( 0 ),
+    dataVbo( 0 ),
     m_data( data ),
     m_extraData( extraData ),
-    m_numLines( data.size() ),
+    m_numLines( data->size() ),
     m_numPoints( 0 ),
     m_isInitialized( false )
 {
@@ -32,14 +33,14 @@ FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float >
 
 FiberRenderer::~FiberRenderer()
 {
-    //TODO this is a temporary fix for the crash happening after this buffer delete
-    // depending on the size of the fiber dataset this creates a big memory leak
     glDeleteBuffers( 1, &vbo );
+    glDeleteBuffers( 1, &dataVbo );
 }
 
 void FiberRenderer::init()
 {
     glGenBuffers( 1, &vbo );
+    glGenBuffers( 1, &dataVbo );
 }
 
 void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -81,6 +82,12 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars( props );
 
+    glBindBuffer( GL_ARRAY_BUFFER, dataVbo );
+    int extraLocation = program->attributeLocation( "a_extra" );
+    program->enableAttributeArray( extraLocation );
+    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
+
+
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
@@ -96,7 +103,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     if ( props->get( Fn::Property::D_COLORMODE ).toInt() != 2 )
     {
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( int i = 0; i < m_data->size(); ++i )
         {
             if ( selected->at( i ) )
             {
@@ -106,13 +113,13 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     }
     else
     {
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( int i = 0; i < m_data->size(); ++i )
         {
             if ( selected->at( i ) )
             {
                 program->setUniformValue( "u_color", m_colorField[i].redF(),
-                                                                                 m_colorField[i].greenF(),
-                                                                                 m_colorField[i].blueF(), 1.0 );
+                                                       m_colorField[i].greenF(),
+                                                       m_colorField[i].blueF(), 1.0 );
                 glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
             }
         }
@@ -136,22 +143,17 @@ void FiberRenderer::setShaderVars( PropertyGroup* props )
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
-
-    offset += sizeof(float) * 3;
-    int extraLocation = program->attributeLocation( "a_extra" );
-    program->enableAttributeArray( extraLocation );
-    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (const void *) offset );
 
     program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
@@ -181,7 +183,7 @@ void FiberRenderer::initGeometry()
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new FiberRendererThread( m_data, m_extraData, i ) );
+        threads.push_back( new FiberRendererThread( m_data, i ) );
     }
 
     // run threads
@@ -208,23 +210,26 @@ void FiberRenderer::initGeometry()
         delete threads[i];
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    m_pointsPerLine.resize( m_data.size() );
-    m_startIndexes.resize( m_data.size() );
+    m_pointsPerLine.resize( m_data->size() );
+    m_startIndexes.resize( m_data->size() );
 
     int currentStart = 0;
-    for ( int i = 0; i < m_data.size(); ++i )
+    for ( int i = 0; i < m_data->size(); ++i )
     {
-        m_pointsPerLine[i] = m_data[i].size() / 3;
+        m_pointsPerLine[i] = m_data->at( i ).size() / 3;
         m_startIndexes[i] = currentStart;
         currentStart += m_pointsPerLine[i];
     }
+
+    updateExtraData( m_extraData );
+
     qDebug() << "create fiber vbo's done";
 
-    m_numPoints = verts.size() / 10;
+    m_numPoints = verts.size() / 9;
 
     m_isInitialized = true;
 }
@@ -241,4 +246,23 @@ void FiberRenderer::colorChanged( QColor color )
     }
 }
 
+void FiberRenderer::updateExtraData( QVector< QVector< float > >* extraData )
+{
+    m_extraData = extraData;
+    QVector<float>data;
+    for ( int i = 0; i < extraData->size(); ++i )
+    {
+        QVector<float>fib = extraData->at(i);
+        for ( int k = 0; k < fib.size(); ++k )
+        {
+            data.push_back( fib[k]);
+        }
+    }
 
+    glDeleteBuffers( 1, &dataVbo );
+    glGenBuffers( 1, &dataVbo );
+
+    glBindBuffer( GL_ARRAY_BUFFER, dataVbo );
+    glBufferData( GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
