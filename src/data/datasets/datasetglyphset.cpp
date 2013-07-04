@@ -178,28 +178,28 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     //TODO: Little brains...
     /*if ( ( target == "maingl2" ) && ( pickedID > 1 ) )
-    {
-        float* nodes = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertices();
-        int triangleshift = 7; //TODO: Why 7?
-        for ( int i = 0; i < picked.size(); ++i )
-        {
-            MeshRenderer* m_renderer = new MeshRenderer( getMesh( target ) );
+     {
+     float* nodes = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertices();
+     int triangleshift = 7; //TODO: Why 7?
+     for ( int i = 0; i < picked.size(); ++i )
+     {
+     MeshRenderer* m_renderer = new MeshRenderer( getMesh( target ) );
 
-            m_renderer->setModel( Models::g() );
-            m_renderer->init();
-            QMatrix4x4 sc;
-            int j = picked[i];
-            for ( int p = 0; p < n; ++p )
-            {
-                getMesh( target )->setVertexData( p, conn[j][p] );
-            }
-            QVector3D f = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
-            sc.translate( f );
-            sc.scale( 0.01 );
-            m_renderer->draw( pMatrix, mvMatrix * sc, width, height, renderMode, properties( target ) );
-            delete m_renderer;
-        }
-    }*/
+     m_renderer->setModel( Models::g() );
+     m_renderer->init();
+     QMatrix4x4 sc;
+     int j = picked[i];
+     for ( int p = 0; p < n; ++p )
+     {
+     getMesh( target )->setVertexData( p, conn[j][p] );
+     }
+     QVector3D f = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+     sc.translate( f );
+     sc.scale( 0.01 );
+     m_renderer->draw( pMatrix, mvMatrix * sc, width, height, renderMode, properties( target ) );
+     delete m_renderer;
+     }
+     }*/
 
     int geoSurf = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -705,24 +705,47 @@ void DatasetGlyphset::initROI()
     }
 }
 
+inline uint qHash( const QColor color )
+{
+    return color.red() + color.green() + color.blue();
+}
+
 void DatasetGlyphset::save1Ds()
 {
-    QFile file( QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".1D.roi" ) );
-    if ( !file.open( QIODevice::WriteOnly ) )
-    {
-        return;
-    }
-    QTextStream out( &file );
+    QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".col_" );
+
+    QSet<QColor>* colors = new QSet<QColor>();
     for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
     {
         QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
         QColor erasecolor = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
         if ( vcolor != erasecolor )
         {
-            out << i << " 1" << endl;
+            colors->insert( vcolor );
         }
     }
-    file.close();
+    qDebug() << "writing: " << colors->size() << " 1D-files...";
+    QList<QColor> color_list = colors->toList();
+    for ( int fn = 0; fn < color_list.size(); ++fn )
+    {
+        QColor c = color_list.at(fn);
+        QFile file( filename+QString::number(c.red())+"_"+QString::number(c.green())+"_"+QString::number(c.blue()) + ".1D.roi" );
+        if ( !file.open( QIODevice::WriteOnly ) )
+        {
+            qDebug() << "file open failed: " << filename;
+            return;
+        }
+        QTextStream out( &file );
+        for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+        {
+            QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
+            if ( vcolor == c )
+            {
+                out << i << " " << fn+1 << endl;
+            }
+        }
+        file.close();
+    }
 }
 
 void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
