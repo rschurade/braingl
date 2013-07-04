@@ -192,6 +192,11 @@ QVector< QVector< QVector< float > > > DatasetFibers::getData()
     return m_data;
 }
 
+QVector< QVector< float > > DatasetFibers::getData( int id )
+{
+    return m_data[id];
+}
+
 QVector< QVector< float > > DatasetFibers::getSelectedFibs()
 {
     if ( m_renderer == 0 )
