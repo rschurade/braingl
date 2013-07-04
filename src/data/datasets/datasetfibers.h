@@ -15,6 +15,7 @@
 class FiberRenderer;
 class TubeRenderer;
 class FiberSelector;
+class LoaderVTK;
 
 class DatasetFibers: public Dataset
 {
@@ -28,6 +29,9 @@ public:
                      QVector<QString> dataNames,
                      QVector< float > mins,
                      QVector<float> maxes );
+
+    DatasetFibers( QDir filename, LoaderVTK* lv );
+
     virtual ~DatasetFibers();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
@@ -35,6 +39,7 @@ public:
 
     QVector< QVector< float > > getFibs();
     QVector< QVector< QVector< float > > >getData();
+    QVector< QVector< float > > getData( int id );
     QVector< QVector< float > > getSelectedFibs();
     QVector<QString>getDataNames();
     QVector< QVector< QVector< float > > > getSelectedData();
@@ -47,6 +52,8 @@ protected:
     void createTexture() {};
 
 private:
+    void createProps();
+    void copyFromLoader( LoaderVTK* lv );
     QVector< QVector< float > > m_fibs;
     QVector< QVector< QVector< float > > >m_data;
     QVector<QString>m_dataNames;

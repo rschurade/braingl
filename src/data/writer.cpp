@@ -394,8 +394,8 @@ void Writer::saveFibs( QString filename )
     }
 
 
-    unsigned int *rawLineData = new unsigned int[numPoints + numLines];
-    float *rawPointData = new float[numPoints * 3];
+    unsigned int *linesOut = new unsigned int[numPoints + numLines];
+    float *pointsOut = new float[numPoints * 3];
 
     unsigned int pntPosOffset = 0;
     unsigned int lnsPosOffset = 0;
@@ -403,18 +403,18 @@ void Writer::saveFibs( QString filename )
     for( int i = 0; i < fibs.size(); ++i )
     {
         QVector<float>fib = fibs[i];
-        rawLineData[lnsPosOffset++] = static_cast< unsigned int >( fib.size()/3 );
+        linesOut[lnsPosOffset++] = static_cast< unsigned int >( fib.size()/3 );
         for( int j = 0; j < fib.size()/3; ++j )
         {
-            rawLineData[lnsPosOffset++] = static_cast< unsigned int >( pntPosOffset / 3 );
-            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3] );
-            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+1] );
-            rawPointData[pntPosOffset++] = static_cast< float >( fib[j*3+2] );
+            linesOut[lnsPosOffset++] = static_cast< unsigned int >( pntPosOffset / 3 );
+            pointsOut[pntPosOffset++] = static_cast< float >( fib[j*3] );
+            pointsOut[pntPosOffset++] = static_cast< float >( fib[j*3+1] );
+            pointsOut[pntPosOffset++] = static_cast< float >( fib[j*3+2] );
         }
     }
 
-    switchByteOrderOfArray< float >( rawPointData, numPoints * 3 );
-    switchByteOrderOfArray< unsigned int >( rawLineData, numLines + numPoints );
+    switchByteOrderOfArray< float >( pointsOut, numPoints * 3 );
+    switchByteOrderOfArray< unsigned int >( linesOut, numLines + numPoints );
 
     // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
     char lineDelimiter = '\n';
@@ -425,13 +425,41 @@ void Writer::saveFibs( QString filename )
     out << "DATASET POLYDATA" << lineDelimiter;
 
     out << "POINTS " << numPoints << " float" << lineDelimiter;
-    out.write( reinterpret_cast< char* >( rawPointData ), sizeof( float ) * numPoints * 3 );
+    out.write( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
     out << lineDelimiter;
-
 
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
-    out.write( reinterpret_cast< char* >( rawLineData ), sizeof( unsigned int ) * ( numPoints + numLines ) );
+    out.write( reinterpret_cast< char* >( linesOut ), sizeof( unsigned int ) * ( numPoints + numLines ) );
     out << lineDelimiter;
+
+    QVector< QString >dataNames = dynamic_cast<DatasetFibers*>( m_dataset )->getDataNames();
+
+    if ( dataNames[0] != "no data" )
+    {
+        out << "POINT_DATA " << numPoints << lineDelimiter;
+        out << "FIELD FieldData " << dataNames.size() << lineDelimiter;
+
+        for ( int i = 0; i < dataNames.size(); ++i )
+        {
+            out << dataNames[i].toStdString() << " 1 " << numPoints << " float" << lineDelimiter;
+            float *dataOut = new float[numPoints];
+            QVector<QVector<float> >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData( i );
+            pntPosOffset = 0;
+            for ( int k = 0; k < data.size(); ++k )
+            {
+                QVector<float>df = data[k];
+                for ( int l = 0; l < df.size(); ++l )
+                {
+                    dataOut[pntPosOffset++] = df[l];
+                }
+            }
+            switchByteOrderOfArray< float >( dataOut, numPoints );
+            out.write( reinterpret_cast< char* >( dataOut ), sizeof( float ) * numPoints );
+            out << lineDelimiter;
+        }
+    }
+
+
     out.close();
 }
 

@@ -16,13 +16,13 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >& data, QVector< QVector< float > >& extraData )  :
+TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData )  :
     ObjectRenderer(),
     m_selector( selector ),
-    vboIds( new GLuint[ 2 ] ),
+    vboIds( new GLuint[ 3 ] ),
     m_data( data ),
     m_extraData( extraData ),
-    m_numLines( data.size() ),
+    m_numLines( data->size() ),
     m_numPoints( 0 ),
     m_isInitialized( false )
 {
@@ -31,14 +31,12 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >
 
 TubeRenderer::~TubeRenderer()
 {
-    //TODO this is a temporary fix for the crash happening after this buffer delete
-    // depending on the size of the fiber dataset this creates a big memory leak
-//    glDeleteBuffers( 2, vboIds );
+    glDeleteBuffers( 3, vboIds );
 }
 
 void TubeRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 3, vboIds );
 }
 
 void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -85,6 +83,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars( props );
 
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[2] );
+    int extraLocation = program->attributeLocation( "a_extra" );
+    program->enableAttributeArray( extraLocation );
+    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
+
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
@@ -96,7 +99,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     QVector<bool>*selected = m_selector->getSelection();
     if ( props->get( Fn::Property::D_COLORMODE ).toInt() != 2 )
     {
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( int i = 0; i < m_data->size(); ++i )
         {
             if ( selected->at( i ) )
             {
@@ -106,7 +109,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     }
     else
     {
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( int i = 0; i < m_data->size(); ++i )
         {
             if ( selected->at( i ) )
             {
@@ -139,27 +142,22 @@ void TubeRenderer::setShaderVars( PropertyGroup* props )
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     offset += sizeof(float) * 3;
-    int extraLocation = program->attributeLocation( "a_extra" );
-    program->enableAttributeArray( extraLocation );
-    glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
-
-    offset += sizeof(float);
     int dirLocation = program->attributeLocation( "a_direction" );
     program->enableAttributeArray( dirLocation );
-    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 11, (const void *) offset );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 
     program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
@@ -177,14 +175,14 @@ void TubeRenderer::initGeometry()
     {
         return;
     }
-    qDebug() << "create fiber vbo's...";
+    qDebug() << "create tube vbo's...";
     int numThreads = GLFunctions::idealThreadCount;
 
     QVector<TubeRendererThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new TubeRendererThread( m_data, m_extraData, i ) );
+        threads.push_back( new TubeRendererThread( m_data, i ) );
     }
 
     // run threads
@@ -211,20 +209,24 @@ void TubeRenderer::initGeometry()
         delete threads[i];
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    m_pointsPerLine.resize( m_data.size() );
-    m_startIndexes.resize( m_data.size() );
+    m_pointsPerLine.resize( m_data->size() );
+    m_startIndexes.resize( m_data->size() );
 
     int currentStart = 0;
-    for ( int i = 0; i < m_data.size(); ++i )
+    for ( int i = 0; i < m_data->size(); ++i )
     {
-        m_pointsPerLine[i] = m_data[i].size() / 3;
+        m_pointsPerLine[i] = m_data->at( i ).size() / 3;
         m_startIndexes[i] = currentStart;
         currentStart += m_pointsPerLine[i];
     }
-    qDebug() << "create fiber vbo's done";
+
+    updateExtraData( m_extraData );
+
+    qDebug() << "create tube vbo's done";
 
     m_numPoints = verts.size() / 10;
 
@@ -243,4 +245,24 @@ void TubeRenderer::colorChanged( QColor color )
     }
 }
 
+void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
+{
+    m_extraData = extraData;
+    QVector<float>data;
+    for ( int i = 0; i < extraData->size(); ++i )
+    {
+        QVector<float>fib = extraData->at(i);
+        for ( int k = 0; k < fib.size(); ++k )
+        {
+            data.push_back( fib[k]);
+            data.push_back( fib[k]);
+        }
+    }
 
+    glDeleteBuffers( 1, &vboIds[2] );
+    glGenBuffers( 1, &vboIds[2] );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[2] );
+    glBufferData( GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
