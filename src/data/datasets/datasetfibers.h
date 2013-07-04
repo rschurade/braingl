@@ -39,6 +39,7 @@ public:
 
     QVector< QVector< float > > getFibs();
     QVector< QVector< QVector< float > > >getData();
+    QVector< QVector< float > > getData( int id );
     QVector< QVector< float > > getSelectedFibs();
     QVector<QString>getDataNames();
     QVector< QVector< QVector< float > > > getSelectedData();
