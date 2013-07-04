@@ -68,6 +68,8 @@ private:
     float prevThresh, prevMinlength;
 
     QString m_colors_name;
+    int pickedID;
+    QVector<int> picked;
 };
 
 #endif /* DATASETGLYPHSET_H_ */

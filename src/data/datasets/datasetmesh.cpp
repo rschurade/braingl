@@ -29,7 +29,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     m_properties["maingl"]->set( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
     m_properties["maingl"]->set( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->set( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
+    m_properties["maingl"]->set( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"]->set( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
     float min = 0; //std::numeric_limits<float>::max();
@@ -93,7 +93,7 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     m_properties["maingl"]->set( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
     m_properties["maingl"]->set( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->set( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
+    m_properties["maingl"]->set( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"]->set( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
     float min = 0; //std::numeric_limits<float>::max();

@@ -10,6 +10,8 @@
 
 #include "../mesh/trianglemesh2.h"
 
+#include "../../gui/gl/meshrenderer.h"
+
 #include "../../algos/connection.h"
 #include "../../algos/connections.h"
 
@@ -36,7 +38,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 prevGlyphstyle( -1 ),
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
-                m_colors_name( "" )
+                m_colors_name( "" ),
+                pickedID( -1 )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -115,6 +118,7 @@ DatasetGlyphset::~DatasetGlyphset()
         for ( int i = 0; i < n; i++ )
         {
             delete[] conn[i];
+            conn[i] = NULL;
         }
         delete[] conn;
         conn = NULL;
@@ -171,6 +175,31 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
+
+    //TODO: Little brains...
+    /*if ( ( target == "maingl2" ) && ( pickedID > 1 ) )
+    {
+        float* nodes = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertices();
+        int triangleshift = 7; //TODO: Why 7?
+        for ( int i = 0; i < picked.size(); ++i )
+        {
+            MeshRenderer* m_renderer = new MeshRenderer( getMesh( target ) );
+
+            m_renderer->setModel( Models::g() );
+            m_renderer->init();
+            QMatrix4x4 sc;
+            int j = picked[i];
+            for ( int p = 0; p < n; ++p )
+            {
+                getMesh( target )->setVertexData( p, conn[j][p] );
+            }
+            QVector3D f = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+            sc.translate( f );
+            sc.scale( 0.01 );
+            m_renderer->draw( pMatrix, mvMatrix * sc, width, height, renderMode, properties( target ) );
+            delete m_renderer;
+        }
+    }*/
 
     int geoSurf = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -699,14 +728,17 @@ void DatasetGlyphset::save1Ds()
 void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 
-    int picked = getMesh( target )->closestVertexIndex( pos );
+    //TODO: Extra property for radius...
+    picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
+
+    pickedID = getMesh( target )->closestVertexIndex( pos );
 
     DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
     for ( int i = 0; i < n; ++i )
     {
         for ( int m = 0; m < m_mesh.size(); m++ )
         {
-            m_mesh[m]->setVertexData( i, conn[picked][i] );
+            m_mesh[m]->setVertexData( i, conn[pickedID][i] );
         }
     }
     Models::d()->submit();
