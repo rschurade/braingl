@@ -38,7 +38,7 @@ public:
     virtual QString getValueAsString( int x, int y, int z );
     virtual QString getColormapShader( int num );
 
-    virtual void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
 protected:
     virtual void createTexture();
