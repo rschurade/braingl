@@ -68,9 +68,10 @@ void Dataset::createTexture()
     // do nothing here
 }
 
-void Dataset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool Dataset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     // do nothing here
+    return false;
 }
 
 QString Dataset::getColormapShader( int num )

@@ -312,14 +312,19 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
+    bool updateRequired = false;
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->mousePick( m_picked, pickPos, event->modifiers(), target );
+            updateRequired |= ds->mousePick( m_picked, pickPos, event->modifiers(), target );
         }
+    }
+
+    if ( updateRequired )
+    {
         skipDraw = true;
         Models::g()->submit();
     }

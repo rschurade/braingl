@@ -761,7 +761,7 @@ void DatasetGlyphset::save1Ds()
     }
 }
 
-void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 
     //TODO: Extra property for radius...
@@ -780,5 +780,5 @@ void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
             }
         }
     }
-    Models::d()->submit();
+    return true;
 }
