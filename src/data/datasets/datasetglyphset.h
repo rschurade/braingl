@@ -46,6 +46,7 @@ public:
     void loadROI( QString filename );
     void initROI();
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    void avgCon();
 
 private:
     float minthresh;
