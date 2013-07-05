@@ -761,7 +761,7 @@ void DatasetGlyphset::save1Ds()
     }
 }
 
-void DatasetGlyphset::load1D()
+bool DatasetGlyphset::load1D()
 {
     QString filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
     QFile file( filename );
@@ -780,11 +780,10 @@ void DatasetGlyphset::load1D()
             m_mesh[m]->setVertexData( i, v );
         }
     }
-    file.close();
-    Models::d()->submit();
+    return true;
 }
 
-void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 
     //TODO: Extra property for radius...
@@ -803,5 +802,5 @@ void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
             }
         }
     }
-    Models::d()->submit();
+    return true;
 }

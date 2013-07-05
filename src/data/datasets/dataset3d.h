@@ -29,7 +29,7 @@ public:
 
     QVector<QVector3D>* getData();
 
-    void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
 private:
     void examineDataset();

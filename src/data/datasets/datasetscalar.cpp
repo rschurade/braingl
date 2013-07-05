@@ -240,12 +240,12 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
     return QString::number( data );
 }
 
-void DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
-        return;
+        return false;
     }
 
     float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
@@ -286,5 +286,5 @@ void DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), pos.z() / dz );
     }
 
-    Models::d()->submit();
+    return true;
 }

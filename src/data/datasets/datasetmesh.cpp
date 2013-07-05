@@ -165,12 +165,12 @@ QString DatasetMesh::getValueAsString( int x, int y, int z )
     return QString( "" );
 }
 
-void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
-        return;
+        return false;
     }
 
     QColor color;
@@ -184,7 +184,7 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
     }
     else
     {
-        return;
+        return false;
     }
 
     QVector<int> picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
@@ -198,7 +198,9 @@ void DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
             m_mesh[0]->setVertexColor( picked[i], color );
         }
         m_renderer->endUpdateColor();
+        return true;
     }
+    return false;
 }
 
 void DatasetMesh::paintModeChanged( int mode )
