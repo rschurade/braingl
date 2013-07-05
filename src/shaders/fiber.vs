@@ -12,7 +12,7 @@ void main()
 	
 	if ( u_colorMode == 0 )
 	{
-	   frontColor = a_color;
+	   frontColor = u_globalColor;
 	}
 	else if ( u_colorMode == 1 )
 	{

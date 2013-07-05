@@ -427,10 +427,12 @@ void Writer::saveFibs( QString filename )
     out << "POINTS " << numPoints << " float" << lineDelimiter;
     out.write( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
     out << lineDelimiter;
+    delete[] pointsOut;
 
     out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
     out.write( reinterpret_cast< char* >( linesOut ), sizeof( unsigned int ) * ( numPoints + numLines ) );
     out << lineDelimiter;
+    delete[] linesOut;
 
     QVector< QString >dataNames = dynamic_cast<DatasetFibers*>( m_dataset )->getDataNames();
 
@@ -456,6 +458,8 @@ void Writer::saveFibs( QString filename )
             switchByteOrderOfArray< float >( dataOut, numPoints );
             out.write( reinterpret_cast< char* >( dataOut ), sizeof( float ) * numPoints );
             out << lineDelimiter;
+
+            delete[] dataOut;
         }
     }
 

@@ -17,11 +17,15 @@ TubeRendererThread::TubeRendererThread( QVector< QVector< float > >* data, int i
     m_id( id )
 {
     m_verts = new QVector<float>();
+    m_globalColors = new QVector<QVector3D>();
 }
 
 TubeRendererThread::~TubeRendererThread()
 {
     m_verts->clear();
+    m_globalColors->clear();
+    m_verts->squeeze();
+    m_globalColors->squeeze();
 }
 
 QVector<float>* TubeRendererThread::getVerts()
@@ -29,6 +33,10 @@ QVector<float>* TubeRendererThread::getVerts()
     return m_verts;
 }
 
+QVector<QVector3D>* TubeRendererThread::getGlobalColors()
+{
+    return m_globalColors;
+}
 
 void TubeRendererThread::run()
 {
@@ -61,6 +69,7 @@ void TubeRendererThread::run()
 
         QVector3D globalColor( fabs( lineStart.x() - lineEnd.x() ), fabs( lineStart.y() - lineEnd.y() ), fabs( lineStart.z() - lineEnd.z() ) );
         globalColor.normalize();
+        m_globalColors->push_back( globalColor );
 
         // push back the first vertex, done seperately because of nomal calculation
         QVector3D localColor( fib[0] - fib[3], fib[1] - fib[4], fib[2] - fib[5] );
@@ -72,9 +81,6 @@ void TubeRendererThread::run()
         m_verts->push_back( localColor.x() );
         m_verts->push_back( localColor.y() );
         m_verts->push_back( localColor.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
         m_verts->push_back( 1.0 );
 
         m_verts->push_back( fib[0] );
@@ -83,9 +89,6 @@ void TubeRendererThread::run()
         m_verts->push_back( localColor.x() );
         m_verts->push_back( localColor.y() );
         m_verts->push_back( localColor.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
         m_verts->push_back( -1.0 );
 
         for ( int k = 1; k < fib.size() / 3 - 1; ++k )
@@ -99,9 +102,6 @@ void TubeRendererThread::run()
             m_verts->push_back( localColor.x() );
             m_verts->push_back( localColor.y() );
             m_verts->push_back( localColor.z() );
-            m_verts->push_back( globalColor.x() );
-            m_verts->push_back( globalColor.y() );
-            m_verts->push_back( globalColor.z() );
             m_verts->push_back( 1.0 );
 
             m_verts->push_back( fib[k*3] );
@@ -110,9 +110,6 @@ void TubeRendererThread::run()
             m_verts->push_back( localColor.x() );
             m_verts->push_back( localColor.y() );
             m_verts->push_back( localColor.z() );
-            m_verts->push_back( globalColor.x() );
-            m_verts->push_back( globalColor.y() );
-            m_verts->push_back( globalColor.z() );
             m_verts->push_back( -1.0 );
         }
 
@@ -125,9 +122,6 @@ void TubeRendererThread::run()
         m_verts->push_back( localColor2.x() );
         m_verts->push_back( localColor2.y() );
         m_verts->push_back( localColor2.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
         m_verts->push_back( 1.0 );
 
         m_verts->push_back( fib[numFloats-3] );
@@ -136,9 +130,6 @@ void TubeRendererThread::run()
         m_verts->push_back( localColor2.x() );
         m_verts->push_back( localColor2.y() );
         m_verts->push_back( localColor2.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
         m_verts->push_back( -1.0 );
     }
 }

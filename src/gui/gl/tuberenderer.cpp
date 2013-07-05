@@ -97,27 +97,17 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "P0", 12 );
 
     QVector<bool>*selected = m_selector->getSelection();
-    if ( props->get( Fn::Property::D_COLORMODE ).toInt() != 2 )
+    for ( int i = 0; i < m_data->size(); ++i )
     {
-        for ( int i = 0; i < m_data->size(); ++i )
+        if ( selected->at( i ) )
         {
-            if ( selected->at( i ) )
-            {
-                glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
-            }
-        }
-    }
-    else
-    {
-        for ( int i = 0; i < m_data->size(); ++i )
-        {
-            if ( selected->at( i ) )
-            {
-                program->setUniformValue( "u_color", m_colorField[i].redF(),
-                                                                                m_colorField[i].greenF(),
-                                                                                m_colorField[i].blueF(), 1.0 );
-                glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
-            }
+            program->setUniformValue( "u_color", m_colorField[i].redF(),
+                                                   m_colorField[i].greenF(),
+                                                   m_colorField[i].blueF(), 1.0 );
+            program->setUniformValue( "u_globalColor", m_globalColorField[i].x(),
+                                                         m_globalColorField[i].y(),
+                                                         m_globalColorField[i].z(), 1.0 );
+            glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
         }
     }
 
@@ -139,25 +129,21 @@ void TubeRenderer::setShaderVars( PropertyGroup* props )
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
+    int numFloats = 7;
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
-
-    offset += sizeof(float) * 3;
-    int colorLocation = program->attributeLocation( "a_color" );
-    program->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
 
     offset += sizeof(float) * 3;
     int dirLocation = program->attributeLocation( "a_direction" );
     program->enableAttributeArray( dirLocation );
-    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
+    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
 
     program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
@@ -199,9 +185,11 @@ void TubeRenderer::initGeometry()
 
     QVector<float> verts;
     // combine verts from all threads
+    m_globalColorField.clear();
     for ( int i = 0; i < numThreads; ++i )
     {
         verts += *( threads[i]->getVerts() );
+        m_globalColorField += *( threads[i]->getGlobalColors() );
     }
 
     for ( int i = 0; i < numThreads; ++i )
@@ -228,7 +216,7 @@ void TubeRenderer::initGeometry()
 
     qDebug() << "create tube vbo's done";
 
-    m_numPoints = verts.size() / 10;
+    m_numPoints = verts.size() / 7;
 
     m_isInitialized = true;
 }

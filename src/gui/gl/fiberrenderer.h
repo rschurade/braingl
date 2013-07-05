@@ -58,6 +58,7 @@ private:
     bool m_isInitialized;
 
     QVector<QColor>m_colorField;
+    QVector<QVector3D>m_globalColorField;
 
 public slots:
     void colorChanged( QColor color );

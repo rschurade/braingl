@@ -17,11 +17,15 @@ FiberRendererThread::FiberRendererThread( QVector< QVector< float > >* data, int
     m_id( id )
 {
     m_verts = new QVector<float>();
+    m_globalColors = new QVector<QVector3D>;
 }
 
 FiberRendererThread::~FiberRendererThread()
 {
     m_verts->clear();
+    m_globalColors->clear();
+    m_verts->squeeze();
+    m_globalColors->squeeze();
 }
 
 QVector<float>* FiberRendererThread::getVerts()
@@ -29,6 +33,10 @@ QVector<float>* FiberRendererThread::getVerts()
     return m_verts;
 }
 
+QVector<QVector3D>* FiberRendererThread::getGlobalColors()
+{
+    return m_globalColors;
+}
 
 void FiberRendererThread::run()
 {
@@ -59,8 +67,9 @@ void FiberRendererThread::run()
         QVector3D lineStart( fib[0], fib[1], fib[2] );
         QVector3D lineEnd( fib[numFloats-3], fib[numFloats-2], fib[numFloats-1] );
 
-        QVector3D globalColor( fabs( lineStart.x() - lineEnd.x() ), fabs( lineStart.y() - lineEnd.y() ), fabs( lineStart.z() - lineEnd.z() ) );
-        globalColor.normalize();
+        QVector3D gc( fabs( lineStart.x() - lineEnd.x() ), fabs( lineStart.y() - lineEnd.y() ), fabs( lineStart.z() - lineEnd.z() ) );
+        gc.normalize();
+        m_globalColors->push_back( gc );
 
         // push back the first vertex, done seperately because of nomal calculation
         m_verts->push_back( fib[0] );
@@ -73,9 +82,6 @@ void FiberRendererThread::run()
         m_verts->push_back( localColor.x() );
         m_verts->push_back( localColor.y() );
         m_verts->push_back( localColor.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
 
         for ( int k = 1; k < fib.size() / 3 - 1; ++k )
         {
@@ -90,9 +96,6 @@ void FiberRendererThread::run()
             m_verts->push_back( localColor.y() );
             m_verts->push_back( localColor.z() );
 
-            m_verts->push_back( globalColor.x() );
-            m_verts->push_back( globalColor.y() );
-            m_verts->push_back( globalColor.z() );
         }
 
         // push back the last vertex, done seperately because of nomal calculation
@@ -106,8 +109,5 @@ void FiberRendererThread::run()
         m_verts->push_back( localColor2.x() );
         m_verts->push_back( localColor2.y() );
         m_verts->push_back( localColor2.z() );
-        m_verts->push_back( globalColor.x() );
-        m_verts->push_back( globalColor.y() );
-        m_verts->push_back( globalColor.z() );
     }
 }
