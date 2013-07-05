@@ -674,23 +674,45 @@ void DatasetGlyphset::loadROI( QString filename )
         return;
     }
     QTextStream in( &file );
-    QVector<int> ids;
-    while ( !in.atEnd() )
-    {
-        QString line = in.readLine();
-        qDebug() << line << " " << ids.size();
-        QStringList sl = line.split( " " );
-        ids.append( sl.at( 0 ).toInt() );
-    }
-
     qDebug() << "m_mesh.size(): " << m_mesh.size();
     roi = new bool[m_mesh.at( 0 )->numVerts()];
-    for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+
+    if ( filename.endsWith( ".1D" ) )
     {
-        roi[i] = false;
-        if ( ids.contains( i ) )
+        //List of as many values as mesh nodes
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
-            roi[i] = true;
+            float v;
+            in >> v;
+            if ( v > 0.5 )
+            {
+                roi[i] = true;
+            }
+            else
+            {
+                roi[i] = false;
+            }
+        }
+    }
+    else
+    {
+        //File with node ids
+        QVector<int> ids;
+        while ( !in.atEnd() )
+        {
+            QString line = in.readLine();
+            qDebug() << line << " " << ids.size();
+            QStringList sl = line.split( " " );
+            ids.append( sl.at( 0 ).toInt() );
+        }
+
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            roi[i] = false;
+            if ( ids.contains( i ) )
+            {
+                roi[i] = true;
+            }
         }
     }
     file.close();
@@ -803,4 +825,32 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
         }
     }
     return true;
+}
+
+void DatasetGlyphset::avgCon()
+{
+    for ( int i = 0; i < n; ++i )
+    {
+        double v = 0;
+        int nroi = 0;
+        for ( int r = 0; r < n; ++r )
+        {
+            if ( roi[r] )
+            {
+                if ( r == i )
+                {
+                    v += 1;
+                }
+                else
+                {
+                    v += conn[r][i];
+                }
+                ++nroi;
+            }
+        }
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, v / (double) nroi );
+        }
+    }
 }
