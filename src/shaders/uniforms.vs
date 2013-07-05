@@ -24,6 +24,7 @@ uniform mat4 mv_matrixInvert;
 
 uniform int u_colorMode;
 uniform vec4 u_color;
+uniform vec4 u_globalColor;
 
 uniform vec3 u_dims;
 

@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QVector>
+#include <QVector3D>
 
 class TubeRendererThread : public QThread
 {
@@ -19,6 +20,7 @@ public:
     virtual ~TubeRendererThread();
 
     QVector<float>* getVerts();
+    QVector<QVector3D>* getGlobalColors();
 
 private:
     void run();
@@ -27,6 +29,7 @@ private:
     int m_id;
 
     QVector<float>* m_verts;
+    QVector<QVector3D>* m_globalColors;
 
 };
 
