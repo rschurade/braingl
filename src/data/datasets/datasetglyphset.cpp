@@ -767,7 +767,7 @@ bool DatasetGlyphset::load1D()
     QFile file( filename );
     if ( !file.open( QIODevice::ReadOnly ) )
     {
-        return;
+        return false;
     }
     QTextStream in( &file );
 
