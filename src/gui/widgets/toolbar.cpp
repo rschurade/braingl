@@ -138,6 +138,10 @@ void ToolBar::createActions()
     m_save1DsAction->setStatusTip( tr( "Save all painted nodes to 1D (SUMA-readable) file" ) );
     connect( m_save1DsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_load1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Load 1D values file" ), this, Fn::Algo::LOAD1D );
+    m_load1DAction->setStatusTip( tr( "Load a list of values and put them in the value buffer of the surfaces" ) );
+    connect( m_load1DAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -257,6 +261,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::SAVE1D:
             ((DatasetGlyphset*)ds)->save1Ds();
             break;
+        case Fn::Algo::LOAD1D:
+            ((DatasetGlyphset*)ds)->load1D();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -325,6 +332,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_saveRGBAction );
             this->addAction( m_loadRGBAction );
             this->addAction( m_save1DsAction );
+            this->addAction( m_load1DAction );
             break;
         }
         case Fn::DatasetType::CONS:

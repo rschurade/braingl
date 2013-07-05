@@ -761,6 +761,29 @@ void DatasetGlyphset::save1Ds()
     }
 }
 
+void DatasetGlyphset::load1D()
+{
+    QString filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return;
+    }
+    QTextStream in( &file );
+
+    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+    {
+        float v;
+        in >> v;
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, v );
+        }
+    }
+    file.close();
+    Models::d()->submit();
+}
+
 void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 

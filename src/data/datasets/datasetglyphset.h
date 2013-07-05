@@ -42,6 +42,7 @@ public:
     void loadRGB();
     void saveRGB();
     void save1Ds();
+    void load1D();
     void loadROI( QString filename );
     void initROI();
     void mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );

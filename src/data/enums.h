@@ -61,7 +61,8 @@ namespace Fn
         BUNDLE,
         SAVERGB,
         LOADRGB,
-        SAVE1D
+        SAVE1D,
+        LOAD1D
     };
 
     enum class Orient : int
