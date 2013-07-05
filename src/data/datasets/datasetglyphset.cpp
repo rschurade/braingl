@@ -724,27 +724,40 @@ void DatasetGlyphset::save1Ds()
             colors->insert( vcolor );
         }
     }
-    qDebug() << "writing: " << colors->size() << " 1D-files...";
+    qDebug() << "writing: " << colors->size() << " pairs of 1D-files...";
     QList<QColor> color_list = colors->toList();
     for ( int fn = 0; fn < color_list.size(); ++fn )
     {
-        QColor c = color_list.at(fn);
-        QFile file( filename+QString::number(c.red())+"_"+QString::number(c.green())+"_"+QString::number(c.blue()) + ".1D.roi" );
+        QColor c = color_list.at( fn );
+        QFile file( filename + QString::number( c.red() ) + "_" + QString::number( c.green() ) + "_" + QString::number( c.blue() ) + ".1D.roi" );
+        QFile file2( filename + QString::number( c.red() ) + "_" + QString::number( c.green() ) + "_" + QString::number( c.blue() ) + ".1D" );
         if ( !file.open( QIODevice::WriteOnly ) )
         {
             qDebug() << "file open failed: " << filename;
             return;
         }
+        if ( !file2.open( QIODevice::WriteOnly ) )
+        {
+            qDebug() << "file open failed: " << filename;
+            return;
+        }
         QTextStream out( &file );
+        QTextStream out2( &file2 );
         for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
         {
             QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
             if ( vcolor == c )
             {
-                out << i << " " << fn+1 << endl;
+                out << i << " " << fn + 1 << endl;
+                out2 << 1.0 << endl;
+            }
+            else
+            {
+                out2 << 0.0 << endl;
             }
         }
         file.close();
+        file2.close();
     }
 }
 
@@ -759,9 +772,12 @@ void DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
     DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
     for ( int i = 0; i < n; ++i )
     {
-        for ( int m = 0; m < m_mesh.size(); m++ )
+        if ( pickedID != -1 )
         {
-            m_mesh[m]->setVertexData( i, conn[pickedID][i] );
+            for ( int m = 0; m < m_mesh.size(); m++ )
+            {
+                m_mesh[m]->setVertexData( i, conn[pickedID][i] );
+            }
         }
     }
     Models::d()->submit();
