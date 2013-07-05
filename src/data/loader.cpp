@@ -1260,13 +1260,10 @@ bool Loader::loadGlyphset()
         qDebug() << "!" << nl;
         if (two)
         {
-            qDebug() << "bla";
             onl = others.at(k);
             qDebug() << onl;
             k++;
         }
-
-        qDebug() << "?";
 
         //For commenting out stuff in the setfiles
         if ( !nl.startsWith( "#" ) )
