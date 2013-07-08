@@ -63,7 +63,8 @@ namespace Fn
         LOADRGB,
         SAVE1D,
         LOAD1D,
-        AVG_CON
+        AVG_CON,
+        AVG_CON_RZ
     };
 
     enum class Orient : int
