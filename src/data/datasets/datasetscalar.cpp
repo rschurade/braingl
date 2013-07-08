@@ -76,16 +76,13 @@ void DatasetScalar::examineDataset()
         min = qMin( min, m_data[i] );
         max = qMax( max, m_data[i] );
     }
-    if ( m_properties["maingl"]->get( Fn::Property::D_DATATYPE ).toInt() == 2 )
-    {
-        max += 1.0f;
-    }
+
     m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
     m_properties["maingl"]->set( Fn::Property::D_MIN, min );
     m_properties["maingl"]->set( Fn::Property::D_MAX, max );
     m_properties["maingl"]->set( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
     m_properties["maingl"]->set( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max, "general" );
+    m_properties["maingl"]->set( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/100., min, max, "general" );
     m_properties["maingl"]->set( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
@@ -157,6 +154,7 @@ void DatasetScalar::createTexture()
 
     float min = m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat();
     float max = m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat();
+    max = max + ( (max-min)/100. );
 
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
     for ( int i = 0; i < nx * ny * nz; ++i )
