@@ -57,6 +57,11 @@ void noOutput(QtMsgType type, const char *msg) {}
 
 int main( int argc, char *argv[] )
 {
+    qDebug() << "brainGL development version";
+    qDebug() << "(c) 2012, 2013 Ralph Schurade, Joachim Boetgger";
+    qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
+
+
     QApplication app( argc, argv );
 
     QCoreApplication::setOrganizationDomain( "braingl.de" );
@@ -68,7 +73,6 @@ int main( int argc, char *argv[] )
 
     QStringList args = app.arguments();
 
-    qInstallMsgHandler( noOutput );
     bool debug = false;
     bool resetSettings = false;
     for ( int i = 1; i < args.size(); ++i )
@@ -90,7 +94,17 @@ int main( int argc, char *argv[] )
             // reset saved settings
             resetSettings = true;
         }
+        if ( args.at( i ) == "-h" )
+        {
+            qDebug() << "Command line options:";
+            qDebug() << "-h : displays this message";
+            qDebug() << "-v : toggles verbose mode, warning this will spam your console with messages";
+            qDebug() << "-l : logs debug messages to text file";
+            qDebug() << "---";
+
+        }
     }
+    qInstallMsgHandler( noOutput );
     out = new QTextStream( stdout );
     qInstallMsgHandler( logOutput );
 
