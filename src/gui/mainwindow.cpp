@@ -41,7 +41,7 @@
 
 int MainWindow::screenshotNumber = 0;
 
-MainWindow::MainWindow( bool debug ) :
+MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	QMainWindow(),
     m_debug( debug )
 {
@@ -51,7 +51,7 @@ MainWindow::MainWindow( bool debug ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	loadColormaps();
+	loadColormaps( resetSettings );
 
     createActions();
     createMenus();
@@ -71,7 +71,10 @@ MainWindow::MainWindow( bool debug ) :
 
     setUnifiedTitleAndToolBarOnMac( true );
 
-	loadSettings();
+    if ( !resetSettings )
+    {
+        loadSettings();
+    }
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -155,10 +158,10 @@ void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
     }
 }
 
-void MainWindow::loadColormaps()
+void MainWindow::loadColormaps( bool resetSettings )
 {
     QSettings settings;
-    if ( settings.contains( "colormaps" ) )
+    if ( settings.contains( "colormaps" ) && !resetSettings )
     {
         qDebug() << "restore colormaps";
         QByteArray ar = settings.value( "colormaps" ).toByteArray();

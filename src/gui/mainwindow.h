@@ -31,7 +31,7 @@ class MainWindow: public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow( bool debug = false );
+    MainWindow( bool debug = false, bool resetSettings = false );
 
     void closeEvent( QCloseEvent *event );
     void load( QString fileName );
@@ -46,7 +46,7 @@ private:
     void saveSettings();
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
-    void loadColormaps();
+    void loadColormaps( bool resetSettings );
 
 
     void setCurrentFile( const QString &fileName );
