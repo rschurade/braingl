@@ -146,6 +146,10 @@ void ToolBar::createActions()
     m_avgConAction->setStatusTip( tr( "Calculate average connectivity between ROI in glyphset and put them in the value buffer of the surfaces" ) );
     connect( m_avgConAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_avgConRZAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Calculate average connectivity map with r-to-z transfrom" ), this, Fn::Algo::AVG_CON_RZ );
+    m_avgConRZAction->setStatusTip( tr( "Calculate average connectivity between r-to-z transformed values, result is transfromed back z-to-r" ) );
+    connect( m_avgConRZAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -271,6 +275,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::AVG_CON:
             ((DatasetGlyphset*)ds)->avgCon();
             break;
+        case Fn::Algo::AVG_CON_RZ:
+            ((DatasetGlyphset*)ds)->avgConRtoZ();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -341,6 +348,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_save1DsAction );
             this->addAction( m_load1DAction );
             this->addAction( m_avgConAction );
+            this->addAction( m_avgConRZAction );
             break;
         }
         case Fn::DatasetType::CONS:
