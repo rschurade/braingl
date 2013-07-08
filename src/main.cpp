@@ -70,6 +70,7 @@ int main( int argc, char *argv[] )
 
     qInstallMsgHandler( noOutput );
     bool debug = false;
+    bool resetSettings = false;
     for ( int i = 1; i < args.size(); ++i )
     {
         if ( args.at( i ) == "-v" )
@@ -84,6 +85,11 @@ int main( int argc, char *argv[] )
         {
             logToFile = true;
         }
+        if ( args.at( i ) == "-r" )
+        {
+            // reset saved settings
+            resetSettings = true;
+        }
     }
     out = new QTextStream( stdout );
     qInstallMsgHandler( logOutput );
@@ -94,7 +100,7 @@ int main( int argc, char *argv[] )
 
     Models::init();
 
-    MainWindow mainWin( debug );
+    MainWindow mainWin( debug, resetSettings );
     mainWin.show();
 
     for ( int i = 1; i < args.size(); ++i )
