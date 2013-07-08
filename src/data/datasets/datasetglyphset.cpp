@@ -853,4 +853,37 @@ void DatasetGlyphset::avgCon()
             m_mesh[m]->setVertexData( i, v / (double) nroi );
         }
     }
+    Models::g()->submit();
+}
+
+void DatasetGlyphset::avgConRtoZ()
+{
+    for ( int i = 0; i < n; ++i )
+    {
+        double v = 0;
+        int nroi = 0;
+        for ( int r = 0; r < n; ++r )
+        {
+            if ( roi[r] )
+            {
+                if ( r == i )
+                {
+                    //v += 1;
+                }
+                else
+                {
+                    double v1 = conn[r][i];
+                    double z = 0.5*qLn((1+v1)/(1-v1));
+                    v += z;
+                }
+                ++nroi;
+            }
+        }
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            double v1 = v / (double) nroi;
+            m_mesh[m]->setVertexData( i, (qExp(2*v1)-1)/(qExp(2*v1)+1) );
+        }
+    }
+    Models::g()->submit();
 }

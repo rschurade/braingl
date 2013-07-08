@@ -58,6 +58,7 @@ private:
     FNAction* m_save1DsAction;
     FNAction* m_load1DAction;
     FNAction* m_avgConAction;
+    FNAction* m_avgConRZAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
