@@ -100,6 +100,7 @@ int main( int argc, char *argv[] )
             qDebug() << "-h : displays this message";
             qDebug() << "-v : toggles verbose mode, warning this will spam your console with messages";
             qDebug() << "-l : logs debug messages to text file";
+            qDebug() << "-r : resets saved settings";
             qDebug() << "---";
 
         }
