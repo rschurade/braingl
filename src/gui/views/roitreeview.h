@@ -27,9 +27,13 @@ public:
 private:
     virtual void mousePressEvent( QMouseEvent *event );
 
+    QModelIndex m_draggedIndex;
+
 private slots:
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
     void rowsInserted (const QModelIndex &parent, int start, int end );
+    void startDrag ( Qt::DropActions supportedActions );
+    void dropEvent ( QDropEvent * event );
 
 signals:
     void itemSelectionChanged( const QItemSelection &selected );
