@@ -328,11 +328,11 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
                 {
                     if ( k == 0 )
                     {
-                        l.push_back( createIndex( i, (int)Fn::Property::R_PICK_ID, -1 ) );
+                        l.push_back( createIndex( i, 0, -1 ) );
                     }
                     else
                     {
-                        l.push_back( createIndex( k-1, (int)Fn::Property::R_PICK_ID, i ) );
+                        l.push_back( createIndex( k-1, 0, i ) );
                     }
                 }
             }
