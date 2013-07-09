@@ -201,7 +201,18 @@ Qt::ItemFlags ROIModel::flags( const QModelIndex& index ) const
         return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled ;
     }
 
-    Qt::ItemFlags defaultFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    Qt::ItemFlags defaultFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
+    if ( index.parent().isValid() )
+    {
+        defaultFlags |= Qt::ItemIsDragEnabled;
+    }
+    else
+    {
+        if ( m_rois.size() > index.row() && m_rois[index.row()].size() == 1 )
+        {
+            defaultFlags |= Qt::ItemIsDragEnabled;
+        }
+    }
 
     if ( index.column() == 0 )
     {
