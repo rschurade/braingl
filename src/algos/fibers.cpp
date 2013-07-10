@@ -164,7 +164,7 @@ Dataset3D* Fibers::tractColor()
     m_blockSize = m_nx * m_ny * m_nz;
     QVector<QVector3D> data( m_blockSize );
     QVector<int> count( m_blockSize, 0 );
-    QVector< QVector< float > > fibs = m_dataset->getFibs();
+    QVector< QVector< float > > fibs = m_dataset->getSelectedFibs();
     float x, y, z;
     QSet<int> visited;
     int id = 0;
