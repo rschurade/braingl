@@ -31,8 +31,8 @@ public:
     static ColumnVector cprod( const ColumnVector& v1, const ColumnVector& v2 );
 
     static void evd3x3( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals );
-    static void evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vecs, ColumnVector& vals );
-
+//    void evd3x3_2( const ColumnVector &d, ColumnVector &val, QVector<ColumnVector> &vec );
+    static void evd3x3_2( Matrix &A, ColumnVector &val, QVector<ColumnVector> &vec );
 
     static ColumnVector cart2sphere( const ColumnVector& input );
     static ColumnVector sphere2cart( const ColumnVector& input );

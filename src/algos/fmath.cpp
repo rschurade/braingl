@@ -725,6 +725,7 @@ void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<
                                                QVector<QVector3D>& evec2, QVector<float>& eval2,
                                                QVector<QVector3D>& evec3, QVector<float>& eval3 )
 {
+#if 1
     int blockSize = tensors.size();
 
     evec1.resize( blockSize );
@@ -832,6 +833,48 @@ void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<
         evec3[i].setY( ev3_y );
         evec3[i].setZ( ev3_z );
     }
+#else
+    int blockSize = tensors.size();
+
+    evec1.resize( blockSize );
+    evec2.resize( blockSize );
+    evec3.resize( blockSize );
+    eval1.resize( blockSize );
+    eval2.resize( blockSize );
+    eval3.resize( blockSize );
+
+    QVector<ColumnVector> vecs;
+    ColumnVector vals( 3 );
+
+    Matrix V(3,3);
+    DiagonalMatrix D(3);
+
+    for ( int i = 0; i < blockSize; ++i )
+    {
+        //FMath::evd3x3_2( tensors[i], vals, vecs );
+        try
+        {
+        EigenValues( tensors[i], D, V );
+        }
+        catch ( ... )
+        {
+            qDebug() << i;
+        }
+
+        evec1[i].setX( V( 1,1 ) );
+        evec1[i].setY( V( 1,2 ) );
+        evec1[i].setZ( V( 1,3 ) );
+        evec2[i].setX( V( 2,1 ) );
+        evec2[i].setY( V( 2,2 ) );
+        evec2[i].setZ( V( 2,3 ) );
+        evec3[i].setX( V( 3,1 ) );
+        evec3[i].setY( V( 3,2 ) );
+        evec3[i].setZ( V( 3,3 ) );
+        eval1[i] = D( 1 );
+        eval2[i] = D( 2 );
+        eval3[i] = D( 3 );
+    }
+#endif
 }
 
 Matrix FMath::expT( Matrix& t )
@@ -942,26 +985,19 @@ Matrix FMath::expT( Matrix& t )
 
     return expM;
 }
-//void evd3x3_2( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals );
-void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector& val )
+
+void FMath::evd3x3_2( Matrix &A, ColumnVector &val, QVector<ColumnVector> &vec )
 {
-    if ( d.Nrows() != 6 )
-        throw std::invalid_argument( "Tensor (6-component vector) expected!" );
 
     // calculate the eigenvalues:
     val = ColumnVector( 3 );
+    vec.clear();
     vec.reserve( 3 );
     std::vector<int> index( 3 );
 
     ColumnVector e( 3 );
     // Create work variables:
-    Matrix A( 3, 3 ), Q( 3, 3 );
-    A( 1, 1 ) = d( 1 );
-    A( 2, 1 ) = A( 1, 2 ) = d( 2 );
-    A( 3, 1 ) = A( 1, 3 ) = d( 3 );
-    A( 2, 2 ) = d( 4 );
-    A( 3, 2 ) = A( 2, 3 ) = d( 5 );
-    A( 3, 3 ) = d( 6 );
+    Matrix Q( 3, 3 );
 
     double m, c1, c0;
 
@@ -987,7 +1023,8 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
     phi = ( 1.0 / 3.0 ) * atan2( sqrt( fabs( phi ) ), q );
 
     c = sqrt_p * cos( phi );
-    s = ( 1.0 / sqrt( 3.0 ) ) * sqrt_p * sin( phi );
+    double M_SQRT3 = 1.7320508075689;
+    s = ( 1.0 / M_SQRT3 ) * sqrt_p * sin( phi );
 
     e( 2 ) = ( 1.0 / 3.0 ) * ( m - c );
     e( 3 ) = e( 2 ) + s;
@@ -995,44 +1032,25 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
     e( 2 ) -= s;
 
     if ( e( 1 ) > e( 2 ) )
-    {
         if ( e( 1 ) > e( 3 ) )
-        {
             if ( e( 2 ) > e( 3 ) )
-            {
-                index = { 0,1,2};
-            }
-            else
-            {
-                index = {0,2,1};
-            }
-        }
-        else
-        {
-            index = { 2,0,1};
-        }
-    }
-    else
-    {
-        if( e(2) > e(3) )
-        {
-            if( e(1) > e(3) )
-            {
-                index = {   1,0,2};
-            }
-            else
-            {
-                index = {   1,2,0};
-            }
-        }
-        else
-        {
-            index = {2,1,0};
-        }
-    }
+                index =
+                {   0,1,2};
+                else index =
+                {   0,2,1};
+                else index =
+                {   2,0,1};
+                else
+                if( e(2) > e(3) )
+                if( e(1) > e(3) ) index =
+                {   1,0,2};
+                else index =
+                {   1,2,0};
+                else index =
+                {   2,1,0};
 
-    for ( unsigned long i( 1 ); i < 4; ++i )
-        val( i ) = e( index[i-1]+1 );
+    for ( unsigned long i( 0 ); i < 3; i++ )
+        val( i + 1 ) = e( index[i] + 1 );
 
     double wmax = ( fabs( val( 1 ) ) > fabs( val( 3 ) ) ) ? val( 1 ) : val( 3 );
     double thresh = ( 8.0 * DBL_EPSILON * wmax ) * ( 8.0 * DBL_EPSILON * wmax );
@@ -1089,8 +1107,8 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
     else                      // This is the standard branch
     {
         norm = sqrt( 1.0 / norm );
-        for ( j = 1; j < 4; ++j )
-            Q( j, 1 ) = Q( j, 1 ) * norm;
+        for ( j = 0; j < 3; j++ )
+            Q( j + 1, 1 ) = Q( j + 1, 1 ) * norm;
     }
 
     // Prepare calculation of second eigenvector
@@ -1101,8 +1119,8 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
         //   v(1) = (A - w(1)).e1 x (A - w(1)).e2
         A( 1, 1 ) += t;
         A( 2, 2 ) += t;
-        Q( 1, 2 ) = Q( 1, 2 ) + A( 1, 3 ) * val( 1 );
-        Q( 2, 2 ) = Q( 2, 2 ) + A( 2, 3 ) * val( 1 );
+        Q( 1, 2 ) = Q( 1, 2 ) + A( 1, 3 ) * val( 2 );
+        Q( 2, 2 ) = Q( 2, 2 ) + A( 2, 3 ) * val( 2 );
         Q( 3, 2 ) = A( 1, 1 ) * A( 2, 2 ) - Q( 3, 2 );
         norm = Q( 1, 2 ) * Q( 1, 2 ) + Q( 2, 2 ) * Q( 2, 2 ) + Q( 3, 2 ) * Q( 3, 2 );
         n0 = n0tmp + A( 1, 1 ) * A( 1, 1 );
@@ -1140,8 +1158,8 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
         else
         {
             norm = sqrt( 1.0 / norm );
-            for ( j = 1; j < 4; ++j )
-                Q( j, 2 ) = Q( j, 2 ) * norm;
+            for ( j = 0; j < 3; j++ )
+                Q( j + 1, 2 ) = Q( j + 1, 2 ) * norm;
         }
     }
     else
@@ -1156,34 +1174,34 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
         A( 3, 2 ) = A( 2, 3 );
         A( 1, 1 ) += val( 1 );
         A( 2, 2 ) += val( 1 );
-        for ( i = 1; i < 4; ++i )
+        for ( i = 0; i < 3; i++ )
         {
-            A( i, i ) -= val( 2 );
-            n0 = A( 1, i ) * A( 1, i ) + A( 2, i ) * A( 2, i ) + A( 3, i ) * A( 3, i );
+            A( i + 1, i + 1 ) -= val( 2 );
+            n0 = A( 1, i + 1 ) * A( 1, i + 1 ) + A( 2, i + 1 ) * A( 2, i + 1 ) + A( 3, i + 1 ) * A( 3, i + 1 );
             if ( n0 > thresh )
             {
-                Q( 1, 2 ) = Q( 2, 1 ) * A( 3, i ) - Q( 3, 1 ) * A( 2, i );
-                Q( 2, 2 ) = Q( 3, 1 ) * A( 1, i ) - Q( 1, 1 ) * A( 3, i );
-                Q( 3, 2 ) = Q( 1, 1 ) * A( 2, i ) - Q( 2, 1 ) * A( 1, i );
+                Q( 1, 2 ) = Q( 2, 1 ) * A( 3, i + 1 ) - Q( 3, 1 ) * A( 2, i + 1 );
+                Q( 2, 2 ) = Q( 3, 1 ) * A( 1, i + 1 ) - Q( 1, 1 ) * A( 3, i + 1 );
+                Q( 3, 2 ) = Q( 1, 1 ) * A( 2, i + 1 ) - Q( 2, 1 ) * A( 1, i + 1 );
                 norm = Q( 1, 2 ) * Q( 1, 2 ) + Q( 2, 2 ) * Q( 2, 2 ) + Q( 3, 2 ) * Q( 3, 2 );
                 if ( norm > 256.0 * DBL_EPSILON * 256.0 * DBL_EPSILON * n0 ) // Accept cross product only if the angle between
                 {                                         // the two vectors was not too small
                     norm = sqrt( 1.0 / norm );
-                    for ( j = 1; j < 4; ++j )
-                        Q( j, 2 ) = Q( j, 2 ) * norm;
+                    for ( j = 0; j < 3; j++ )
+                        Q( j + 1, 2 ) = Q( j + 1, 2 ) * norm;
                     break;
                 }
             }
         }
 
-        if ( i == 4 )    // This means that any vector orthogonal to v(0) is an EV.
+        if ( i == 3 )    // This means that any vector orthogonal to v(0) is an EV.
         {
-            for ( j = 1; j < 4; ++j )
-                if ( Q( j, 1 ) != 0.0 )                                   // Find nonzero element of v(0) ...
+            for ( j = 0; j < 3; j++ )
+                if ( Q( j + 1, 1 ) != 0.0 )                                   // Find nonzero element of v(0) ...
                 {                                                     // ... and swap it with the next one
-                    norm = 1.0 / sqrt( Q( j, 1 ) * Q( j, 1 ) + Q( ( j + 2 ) % 3 + 1, 1 ) * Q( ( j + 1 ) % 3 + 1, 1 ) );
-                    Q( j, 2 ) = Q( ( j + 1 ) % 3 + 1, 1 ) * norm;
-                    Q( ( j + 1 ) % 3 + 1, 2 ) = -Q( j, 1 ) * norm;
+                    norm = 1.0 / sqrt( Q( j + 1, 1 ) * Q( j + 1, 1 ) + Q( ( j + 1 ) % 3 + 1, 1 ) * Q( ( j + 1 ) % 3 + 1, 1 ) );
+                    Q( j + 1, 2 ) = Q( ( j + 1 ) % 3 + 1, 2 ) * norm;
+                    Q( ( j + 1 ) % 3 + 1, 2 ) = -Q( j + 1, 1 ) * norm;
                     Q( ( j + 2 ) % 3 + 1, 2 ) = 0.0;
                     break;
                 }
@@ -1196,14 +1214,13 @@ void FMath::evd3x3_2( ColumnVector &d, QVector<ColumnVector>& vec, ColumnVector&
     Q( 2, 3 ) = Q( 3, 1 ) * Q( 1, 2 ) - Q( 1, 1 ) * Q( 3, 2 );
     Q( 3, 3 ) = Q( 1, 1 ) * Q( 2, 2 ) - Q( 2, 1 ) * Q( 1, 2 );
 
-    vec.clear();
-    for ( int ii( 1 ); ii < 4; ++ii )
+    for ( unsigned long ii( 0 ); ii < 3; ii++ )
     {
         ColumnVector tmp( 3 );
 
-        tmp( 1 ) = Q( 1, ii );
-        tmp( 2 ) = Q( 2, ii );
-        tmp( 3 ) = Q( 3, ii );
+        tmp( 1 ) = Q( 1, ii + 1 );
+        tmp( 2 ) = Q( 2, ii + 1 );
+        tmp( 3 ) = Q( 3, ii + 1 );
 
         vec.push_back( tmp );
     }

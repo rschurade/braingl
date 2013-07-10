@@ -134,7 +134,7 @@ DatasetScalar* Fibers::tractDensity()
     m_dz = 1.0;
     m_blockSize = m_nx * m_ny * m_nz;
     QVector<float> data( m_blockSize, 0 );
-    QVector< QVector< float > > fibs = m_dataset->getFibs();
+    QVector< QVector< float > > fibs = m_dataset->getSelectedFibs();
     int x, y, z;
     for ( int i = 0; i < fibs.size(); ++i )
     {

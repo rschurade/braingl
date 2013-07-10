@@ -118,6 +118,7 @@ TensorTrackWidget::~TensorTrackWidget()
 QList<Dataset*> TensorTrackWidget::getFibs()
 {
     QList<Dataset*> l;
+
     QVector< QVector<QVector<float> > >data;
     data.push_back( m_tracker->getExtras() );
     QVector<QString>names;
