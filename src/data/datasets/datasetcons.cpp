@@ -33,6 +33,7 @@ DatasetCons::DatasetCons( QString fileName ) :
 DatasetCons::DatasetCons( Connections* cons ) :
     Dataset( QString( "new" ), Fn::DatasetType::CONS ),
     cons( cons ),
+    m_vrenderer( NULL ),
     vectorArray( NULL )
 {
     consNumber = cons->edges.length();
@@ -49,7 +50,6 @@ DatasetCons::DatasetCons( Connections* cons ) :
     m_properties["maingl"]->set( Fn::Property::D_GLYPHRADIUS, 1.0f );
 
     m_properties["maingl"]->set( Fn::Property::D_DRAW_GLYPHS, true );
-
 
 }
 
@@ -71,7 +71,6 @@ void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
         m_vrenderer->init();
         m_vrenderer->initGeometry( getVectors(), consNumber );
     }
-    qDebug() << "con draw: " << consNumber << target;
     m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
