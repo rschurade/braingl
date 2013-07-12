@@ -35,6 +35,8 @@ public:
     void setView( Fn::Orient view );
     QImage* screenshot();
 
+    ArcBall* getArcBall();
+
 private:
     QItemSelectionModel* m_roiSelectionModel;
 

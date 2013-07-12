@@ -11,9 +11,9 @@ int ROI::m_count = 0;
 
 ROI::ROI( QString name )
 {
-    m_properties.set( Fn::Property::D_NAME, name, "general" );
-    m_properties.set( Fn::Property::D_ACTIVE, true, "general" );
-    m_properties.set( Fn::Property::R_ID, m_count );
+    m_properties.create( Fn::Property::D_NAME, name, "general" );
+    m_properties.create( Fn::Property::D_ACTIVE, true, "general" );
+    m_properties.create( Fn::Property::R_ID, m_count );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( slotPropChanged() ) );
 }

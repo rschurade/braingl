@@ -12,15 +12,15 @@
 DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
-    m_properties["maingl"]->set( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
-    //m_properties["maingl"]->set( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, true );
-    m_properties["maingl"]->set( Fn::Property::D_MINMAX_SCALING, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_HIDE_NEGATIVE_LOBES, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_LOD, 0, 0, 4, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
+    //m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, true );
+    m_properties["maingl"]->create( Fn::Property::D_MINMAX_SCALING, false, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_HIDE_NEGATIVE_LOBES, false, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_LOD, 0, 0, 4, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
 }
@@ -38,16 +38,16 @@ void DatasetSH::examineDataset()
     int size = nx * ny * nz;
     int dim = m_data.at( 0 ).Nrows();
 
-    m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( dim * size * sizeof(float) ) );
+    m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( dim * size * sizeof(float) ) );
 
-    m_properties["maingl"]->set( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
-    m_properties["maingl"]->set( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
+    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
+    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
 
-    m_properties["maingl"]->set( Fn::Property::D_LOD, 2 );
-    m_properties["maingl"]->set( Fn::Property::D_ORDER, 0 );
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_SLICE, 1 );
-    m_properties["maingl"]->set( Fn::Property::D_SCALING, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::D_DIM, dim );
+    m_properties["maingl"]->create( Fn::Property::D_LOD, 2 );
+    m_properties["maingl"]->create( Fn::Property::D_ORDER, 0 );
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_SLICE, 1 );
+    m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f );
+    m_properties["maingl"]->create( Fn::Property::D_DIM, dim );
 
     if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
     {
@@ -68,8 +68,8 @@ void DatasetSH::examineDataset()
         }
     }
 
-    m_properties["maingl"]->set( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->set( Fn::Property::D_MAX, max );
+    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
+    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
 }
 
 void DatasetSH::createTexture()

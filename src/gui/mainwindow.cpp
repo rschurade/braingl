@@ -27,6 +27,7 @@
 #include "widgets/colormapeditwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
+#include "gl/arcball.h"
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
 
@@ -211,10 +212,6 @@ void MainWindow::loadColormaps( bool resetSettings )
     }
 }
 
-void MainWindow::print()
-{
-}
-
 void MainWindow::open()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
@@ -239,22 +236,29 @@ void MainWindow::load( QString fileName )
 {
     if ( !fileName.isEmpty() )
     {
-        Loader loader;
-        loader.setFilename( QDir( fileName ) );
-        if ( loader.load() )
+        if ( fileName.endsWith( "scn" ) )
         {
-            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            loadScene( fileName );
+        }
+        else
+        {
+            Loader loader;
+            loader.setFilename( QDir( fileName ) );
+            if ( loader.load() )
             {
-                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                for ( int k = 0; k < loader.getNumDatasets(); ++k )
+                {
+                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                }
+                QFileInfo fi( fileName );
+                QDir dir = fi.absoluteDir();
+                QString lastPath = dir.absolutePath();
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+
+                setCurrentFile(fileName);
+
+                GLFunctions::reloadShaders();
             }
-            QFileInfo fi( fileName );
-            QDir dir = fi.absoluteDir();
-            QString lastPath = dir.absolutePath();
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
-
-            setCurrentFile(fileName);
-
-            GLFunctions::reloadShaders();
         }
     }
 }
@@ -348,9 +352,120 @@ void MainWindow::save()
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
     }
 }
-
-void MainWindow::undo()
+//TODO
+void MainWindow::saveScene()
 {
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
+    saveScene( fileName );
+}
+
+void MainWindow::loadScene()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
+
+    loadScene( fileName );
+}
+
+void MainWindow::saveScene( QString fileName )
+{
+    QSettings settings( fileName, QSettings::IniFormat );
+    //qDebug() << settings.status();
+
+    settings.setValue( "appName", "braingl" );
+    settings.setValue( "version", "0.7.0" );
+
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SAGITTAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CORONAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_AXIAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_AXIAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_CORONAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_SAGITTAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV1, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_RENDER_CROSSHAIRS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_TRANSPARENCY, 0 ) ) );
+
+    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
+
+    int countDatasets = Models::d()->rowCount();
+    settings.setValue( "countDatasets", countDatasets );
+
+    QList<QVariant> fileNames;
+
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
+        fileNames.push_back( fn );
+        QList<QVariant>state = ds->properties()->getState();
+        settings.setValue( fn.toString() + "state", state );
+    }
+    settings.setValue( "fileNames", fileNames );
+
+
+    settings.sync();
+
+}
+
+void MainWindow::loadScene( QString fileName )
+{
+    QSettings settings( fileName, QSettings::IniFormat );
+    //qDebug() << settings.status();
+
+    QList<QVariant> files = settings.value( "fileNames" ).toList();
+
+    for ( int i = 0; i < files.size(); ++i )
+    {
+        load( files[i].toString() );
+    }
+
+    int countDatasets = Models::d()->rowCount();
+
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
+
+        if ( settings.contains( fn.toString() + "state" ) )
+        {
+            ds->properties()->setState( settings.value( fn.toString() + "state" ).toList() );
+        }
+    }
+
+    GLFunctions::reloadShaders();
+
+    loadSetting( settings, Fn::Property::G_SAGITTAL );
+    loadSetting( settings, Fn::Property::G_CORONAL );
+    loadSetting( settings, Fn::Property::G_AXIAL );
+    loadSetting( settings, Fn::Property::G_SHOW_AXIAL );
+    loadSetting( settings, Fn::Property::G_SHOW_CORONAL );
+    loadSetting( settings, Fn::Property::G_SHOW_SAGITTAL );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_COMBINED );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV1 );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV2 );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV3 );
+    loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS );
+    loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
+    loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_QUALITY );
+    loadSetting( settings, Fn::Property::G_TRANSPARENCY );
+
+    if ( settings.contains( "arcball_maingl" ) )
+    {
+        mainGLWidget->getArcBall()->setState( settings.value( "arcball_maingl" ).toList() );
+    }
+
+    Models::g()->submit();
+
 }
 
 
@@ -377,15 +492,18 @@ void MainWindow::createActions()
     saveAct->setStatusTip( tr( "Save the current form letter" ) );
     connect( saveAct, SIGNAL(triggered()), this, SLOT(save()) );
 
-    printAct = new QAction( QIcon( ":/icons/print.png" ), tr( "&Print..." ), this );
-    printAct->setShortcuts( QKeySequence::Print );
-    printAct->setStatusTip( tr( "Print the current form letter" ) );
-    connect( printAct, SIGNAL(triggered()), this, SLOT(print()) );
-
     quitAct = new QAction( tr( "&Quit" ), this );
     quitAct->setShortcuts( QKeySequence::Quit );
     quitAct->setStatusTip( tr( "Quit the application" ) );
     connect( quitAct, SIGNAL(triggered()), this, SLOT(close()) );
+
+    saveSceneAct = new QAction( tr( "Save Scene" ), this );
+    saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
+    connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
+
+    loadSceneAct = new QAction( tr( "Load Scene" ), this );
+    loadSceneAct->setStatusTip( tr( "Load the current scene" ) );
+    connect( loadSceneAct, SIGNAL(triggered()), this, SLOT(loadScene()) );
 
     screenshotAct = new QAction( tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
@@ -399,10 +517,6 @@ void MainWindow::createActions()
     aboutAct = new QAction( tr( "&About" ), this );
     aboutAct->setStatusTip( tr( "Show the application's About box" ) );
     connect( aboutAct, SIGNAL(triggered()), this, SLOT(about()) );
-
-    aboutQtAct = new QAction( tr( "About &Qt" ), this );
-    aboutQtAct->setStatusTip( tr( "Show the Qt library's About box" ) );
-    connect( aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()) );
 
     showAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Show Axial Slice" ), this );
     showAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
@@ -469,7 +583,10 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu( tr( "&File" ) );
     fileMenu->addAction( openAct );
     fileMenu->addAction( saveAct );
-    fileMenu->addAction( printAct );
+    separatorAct = fileMenu->addSeparator();
+    fileMenu->addAction( saveSceneAct );
+    fileMenu->addAction( loadSceneAct );
+    //fileMenu->addAction( printAct );
     separatorAct = fileMenu->addSeparator();
 
     for ( int i = 0; i < MaxRecentFiles; ++i )
@@ -495,7 +612,6 @@ void MainWindow::createMenus()
     helpMenu->addAction( dilbertAct );
 #endif
     helpMenu->addAction( aboutAct );
-    helpMenu->addAction( aboutQtAct );
 }
 
 void MainWindow::createToolBars()

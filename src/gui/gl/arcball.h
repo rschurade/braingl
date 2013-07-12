@@ -38,6 +38,9 @@ public:
     float getMoveX();
     float getMoveY();
 
+    QList<QVariant>getState();
+    void setState( QList<QVariant> state );
+
 private:
     QVector3D map_sphere( int x, int y );
 

@@ -84,6 +84,11 @@ QSize GLWidget::sizeHint() const
     return QSize( 400, 400 );
 }
 
+ArcBall* GLWidget::getArcBall()
+{
+    return m_arcBall;
+}
+
 void GLWidget::initializeGL()
 {
     m_sceneRenderer->initGL();

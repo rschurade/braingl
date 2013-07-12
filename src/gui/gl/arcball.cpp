@@ -203,3 +203,35 @@ float ArcBall::getMoveY()
 {
     return m_moveY;
 }
+
+QList<QVariant> ArcBall::getState()
+{
+    QList<QVariant> state;
+    state.push_back( m_currentRot );
+    state.push_back( m_lastRot );
+    state.push_back( m_moveX );
+    state.push_back( m_moveY );
+    state.push_back( m_oldMoveX );
+    state.push_back( m_oldMoveY );
+    state.push_back( m_midClickX );
+    state.push_back( m_midClickY );
+    state.push_back( m_zoom );
+    state.push_back( m_rotCenter );
+    state.push_back( q_current_rotation );
+    return state;
+}
+
+void ArcBall::setState( QList<QVariant> state )
+{
+    m_currentRot = state[0].value<QMatrix4x4>();
+    m_lastRot = state[1].value<QMatrix4x4>();
+    m_moveX = state[2].toInt();
+    m_moveY = state[3].toInt();
+    m_oldMoveX = state[4].toInt();
+    m_oldMoveY = state[5].toInt();
+    m_midClickX = state[6].toInt();
+    m_midClickY = state[7].toInt();
+    m_zoom = state[8].toFloat();
+    m_rotCenter = state[9].value<QVector3D>();
+    q_current_rotation = state[10].value<QQuaternion>();
+}
