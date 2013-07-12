@@ -468,7 +468,7 @@ bool LoaderVTK::loadBinary()
 
     m_binaryFile = new char[ m_binFileSize ];
     m_file->seek( 0 );
-    int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
+    //int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
 
     //qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
 
@@ -480,42 +480,64 @@ bool LoaderVTK::loadBinary()
     QString fieldHeader;
     QStringList tokens;
 
+    bool pointsLoaded = false;
+    bool primitivesLoaded = false;
+
     while ( m_bufferPointer < m_binFileSize )
     {
         fieldHeader = readLineBinary();
-        //qDebug() << fieldHeader;
+        qDebug() << fieldHeader;
         tokens = fieldHeader.split( " ", QString::SkipEmptyParts );
 
         if ( tokens[0] == "POINTS" )
         {
             if ( !copyPoints( tokens ) )
             {
+                m_status = "*ERROR* while loading POINTS in file" + m_filename;
                 return false;
             }
+            pointsLoaded = true;
         }
         if ( tokens[0] == "LINES" )
         {
             m_primitiveType = 2;
             if ( !copyPrimitives( tokens ) )
             {
+                m_status = "*ERROR* while loading PRIMITIVES in file" + m_filename;
                 return false;
             }
+            primitivesLoaded = true;
         }
         if ( tokens[0] == "POLYGONS" )
         {
             m_primitiveType = 1;
             if ( !copyPrimitives( tokens ) )
             {
+                m_status = "*ERROR* while loading PRIMITIVES in file" + m_filename;
                 return false;
             }
+            primitivesLoaded = true;
         }
         if ( tokens[0] == "CELL_DATA" )
         {
-            copyPrimitiveData( tokens );
+            if ( !copyPrimitiveData( tokens ) )
+            {
+                if ( pointsLoaded && primitivesLoaded )
+                {
+                    // error in cell data but since we already have points and primitves we continue anyway
+                    return true;
+                }
+                return false;
+            }
         }
         if ( tokens[0] == "POINT_DATA" )
         {
-            copyPointData( tokens );
+            if ( !copyPointData( tokens ) )
+            {
+                // error in point data but since we already have points and primitves we continue anyway
+                return true;
+            }
+            return false;
         }
     }
 
@@ -657,7 +679,7 @@ bool LoaderVTK::copyPrimitiveData( QStringList tokens )
     }
     else
     {
-        m_status != "*ERROR* unexpected field in cell data fields definition " + m_filename;
+        m_status = "*ERROR* unexpected field in cell data fields definition " + m_filename;
         return false;
     }
     m_hasPrimitiveData = true;
@@ -751,7 +773,7 @@ bool LoaderVTK::copyPointData( QStringList tokens )
     }
     else
     {
-        m_status != "*ERROR* unexpected field in point data fields definition " + m_filename;
+        m_status = "*ERROR* unexpected field in point data fields definition " + m_filename;
         return false;
     }
     return true;
