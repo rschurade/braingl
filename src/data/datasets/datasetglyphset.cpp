@@ -603,7 +603,10 @@ QList<Dataset*> DatasetGlyphset::createConnections()
         }
     }
     QList<Dataset*> l;
-    l.push_back( new DatasetCons( cons ) );
+    if ( cons->edges.size() > 0 )
+    {
+        l.push_back( new DatasetCons( cons ) );
+    }
     return l;
 }
 
@@ -873,7 +876,7 @@ void DatasetGlyphset::avgConRtoZ()
                 else
                 {
                     double v1 = conn[r][i];
-                    double z = 0.5*qLn((1+v1)/(1-v1));
+                    double z = 0.5 * qLn( ( 1 + v1 ) / ( 1 - v1 ) );
                     v += z;
                 }
                 ++nroi;
@@ -882,7 +885,7 @@ void DatasetGlyphset::avgConRtoZ()
         for ( int m = 0; m < m_mesh.size(); m++ )
         {
             double v1 = v / (double) nroi;
-            m_mesh[m]->setVertexData( i, (qExp(2*v1)-1)/(qExp(2*v1)+1) );
+            m_mesh[m]->setVertexData( i, ( qExp( 2 * v1 ) - 1 ) / ( qExp( 2 * v1 ) + 1 ) );
         }
     }
     Models::g()->submit();
