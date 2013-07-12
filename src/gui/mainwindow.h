@@ -13,6 +13,9 @@
 #include <QMainWindow>
 #include <QSettings>
 
+#include <QTcpServer>
+#include <QTcpSocket>
+
 class QAction;
 class QListView;
 class QMenu;
@@ -111,6 +114,8 @@ private:
 
     static int screenshotNumber;
 
+    QTcpServer* tcpServer;
+
 private slots:
     void slotNew();
     void open();
@@ -134,6 +139,7 @@ private slots:
     void slotDilbert();
 
     void slotRenderCrosshairs( bool value );
+    void receiveTCP();
 };
 
 #endif
