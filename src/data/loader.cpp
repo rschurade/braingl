@@ -1213,7 +1213,7 @@ bool Loader::loadGlyphset()
         maxt = sl2.at( 2 ).toFloat();
     }
 
-    DatasetGlyphset* dataset = new DatasetGlyphset( datasetName, mt, maxt );
+    DatasetGlyphset* dataset = new DatasetGlyphset( glyphsetname, mt, maxt );
 
     qDebug() << "loading glyph set: " << datasetName;
     if (two)
