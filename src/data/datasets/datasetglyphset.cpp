@@ -94,6 +94,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
             m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( float ) ) );
 
+    qDebug() << "branch test";
+
 }
 
 DatasetGlyphset::~DatasetGlyphset()
