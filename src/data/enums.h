@@ -342,9 +342,9 @@ namespace Fn
                 case Property::G_SAGITTAL_CORONAL: return QString( "" ); break;
                 case Property::G_LAST_PATH: return QString( "" ); break;
                 case Property::G_SCREENSHOT_PATH: return QString( "screenshot dir" ); break;
-                case Property::G_SHOW_SAGITTAL: return QString( "" ); break;
-                case Property::G_SHOW_CORONAL: return QString( "" ); break;
-                case Property::G_SHOW_AXIAL: return QString( "" ); break;
+                case Property::G_SHOW_SAGITTAL: return QString( "show sagittal" ); break;
+                case Property::G_SHOW_CORONAL: return QString( "show coronal" ); break;
+                case Property::G_SHOW_AXIAL: return QString( "show axial" ); break;
                 case Property::G_BACKGROUND_COLOR_MAIN: return QString( "background color main" ); break;
                 case Property::G_BACKGROUND_COLOR_COMBINED: return QString( "background color combined" ); break;
                 case Property::G_BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
