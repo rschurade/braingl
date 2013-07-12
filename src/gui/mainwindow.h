@@ -36,6 +36,9 @@ public:
     void closeEvent( QCloseEvent *event );
     void load( QString fileName );
 
+    void saveScene( QString fileName );
+    void loadScene( QString fileName );
+
 private:
     void createActions();
     void createMenus();
@@ -47,7 +50,6 @@ private:
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
-
 
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();
@@ -82,8 +84,9 @@ private:
     QAction* newAct;
     QAction* openAct;
     QAction* saveAct;
-    QAction* printAct;
     QAction* quitAct;
+    QAction* loadSceneAct;
+    QAction* saveSceneAct;
 
     QAction* lockDockTitlesAct;
     QAction* renderCrosshairsAct;
@@ -95,7 +98,6 @@ private:
     QAction* screenshotAct;
     QAction* resetSettingsAct;
     QAction* aboutAct;
-    QAction* aboutQtAct;
 
     QAction* toggleShaderEditAct;
 
@@ -114,8 +116,8 @@ private slots:
     void open();
     void openRecentFile();
     void save();
-    void print();
-    void undo();
+    void loadScene();
+    void saveScene();
     void about();
     void screenshot();
     void resetSettings();

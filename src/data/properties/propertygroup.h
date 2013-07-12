@@ -35,19 +35,27 @@ public:
     bool contains( Fn::Property name ) const;
     QVariant get( Fn::Property name ) const;
 
+    bool create( Fn::Property name, bool value, QString tab = "none" );
+    bool create( Fn::Property name, int value, QString tab = "none" );
+    bool create( Fn::Property name, int value, int min, int max, QString tab = "none" );
+    bool create( Fn::Property name, float value, QString tab = "none" );
+    bool create( Fn::Property name, float value, float min, float max, QString tab = "none" );
+    bool create( Fn::Property name, QString value, QString tab = "none" );
+    bool create( Fn::Property name, const char* value, QString tab = "none" );
+    bool create( Fn::Property name, QColor value, QString tab = "none" );
+    bool create( Fn::Property name, QDir value, QString tab = "none" );
+    bool create( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
+    bool create( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+
     bool set( Fn::Property name, QVariant value );
     bool set2( Fn::Property name, QVariant value );
-    bool set( Fn::Property name, bool value, QString tab = "none" );
-    bool set( Fn::Property name, int value, QString tab = "none" );
-    bool set( Fn::Property name, int value, int min, int max, QString tab = "none" );
-    bool set( Fn::Property name, float value, QString tab = "none" );
-    bool set( Fn::Property name, float value, float min, float max, QString tab = "none" );
-    bool set( Fn::Property name, QString value, QString tab = "none" );
-    bool set( Fn::Property name, const char* value, QString tab = "none" );
-    bool set( Fn::Property name, QColor value, QString tab = "none" );
-    bool set( Fn::Property name, QDir value, QString tab = "none" );
-    bool set( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
-    bool set( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+    bool set( Fn::Property name, bool value );
+    bool set( Fn::Property name, int value );
+    bool set( Fn::Property name, float value );
+    bool set( Fn::Property name, QString value );
+    bool set( Fn::Property name, const char* value );
+    bool set( Fn::Property name, QColor value );
+    bool set( Fn::Property name, QDir value );
 
     bool setMinF( Fn::Property name,  float value );
     bool setMaxF( Fn::Property name,  float value );
@@ -60,6 +68,9 @@ public:
 
     Property* getProperty( Fn::Property name );
     Property* getNthProperty( int n );
+
+    QList<QVariant>getState();
+    void setState( QList<QVariant> state );
 
 private:
     QVector<QPair<Fn::Property, Property*> >m_properties;

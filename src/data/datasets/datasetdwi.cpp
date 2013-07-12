@@ -17,13 +17,13 @@ DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float
     m_bvals( bvals ),
     m_bvecs( bvecs )
 {
-    m_properties["maingl"]->set( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
-    m_properties["maingl"]->set( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
+    m_properties["maingl"]->create( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
 
     examineDataset();
 
-    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, true );
 }
 
 DatasetDWI::~DatasetDWI()
@@ -63,7 +63,7 @@ void DatasetDWI::examineDataset()
 
 
     int dim = m_data.at( 0 ).Nrows();
-    m_properties["maingl"]->set( Fn::Property::D_DIM, dim );
+    m_properties["maingl"]->create( Fn::Property::D_DIM, dim );
     int size = nx * ny * nz * dim;
 
     float min = 0;
@@ -71,15 +71,15 @@ void DatasetDWI::examineDataset()
 
     if ( datatype == DT_UNSIGNED_CHAR )
     {
-        m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
-        m_properties["maingl"]->set( Fn::Property::D_MIN, 0 );
-        m_properties["maingl"]->set( Fn::Property::D_MAX, 255 );    }
+        m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
+        m_properties["maingl"]->create( Fn::Property::D_MIN, 0 );
+        m_properties["maingl"]->create( Fn::Property::D_MAX, 255 );    }
         min = 0;
         max = 255;
 
     if ( datatype == DT_SIGNED_SHORT )
     {
-        m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(signed short) ) );
+        m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(signed short) ) );
 
         max = -32767;
         min = 32768;
@@ -92,13 +92,13 @@ void DatasetDWI::examineDataset()
                 max = qMax( max, (float)( m_data[i]( k ) ) );
             }
         }
-        m_properties["maingl"]->set( Fn::Property::D_MIN, min );
-        m_properties["maingl"]->set( Fn::Property::D_MAX, max );
+        m_properties["maingl"]->create( Fn::Property::D_MIN, min );
+        m_properties["maingl"]->create( Fn::Property::D_MAX, max );
     }
 
     if ( datatype == DT_FLOAT )
     {
-        m_properties["maingl"]->set( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
+        m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
 
         max = -32767;
         min = 32768;
@@ -111,16 +111,16 @@ void DatasetDWI::examineDataset()
                 max = qMax( max, (float)( m_data[i]( k ) ) );
             }
         }
-        m_properties["maingl"]->set( Fn::Property::D_MIN, min );
-        m_properties["maingl"]->set( Fn::Property::D_MAX, max );
+        m_properties["maingl"]->create( Fn::Property::D_MIN, min );
+        m_properties["maingl"]->create( Fn::Property::D_MAX, max );
     }
-    m_properties["maingl"]->set( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max, "general" );
-    m_properties["maingl"]->set( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
 
-    m_properties["maingl"]->set( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged() ), this, SLOT( selectTexture() ) );
 }
 

@@ -29,24 +29,24 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
         m_max = qMax( m_max, data[i] );
     }
 
-    m_properties.set( Fn::Property::R_RENDER, true, "general" );
-    m_properties.set( Fn::Property::R_NEG, false, "general" );
-    m_properties.set( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
-    m_properties.set( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
-    m_properties.set( Fn::Property::R_PICK_ID, 0 );
-    m_properties.set( Fn::Property::R_SHAPE, 10 );
-    m_properties.set( Fn::Property::R_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
+    m_properties.create( Fn::Property::R_RENDER, true, "general" );
+    m_properties.create( Fn::Property::R_NEG, false, "general" );
+    m_properties.create( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties.create( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
+    m_properties.create( Fn::Property::R_PICK_ID, 0 );
+    m_properties.create( Fn::Property::R_SHAPE, 10 );
+    m_properties.create( Fn::Property::R_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
 
-    m_properties.set( Fn::Property::R_NX, m_header->nx );
-    m_properties.set( Fn::Property::R_NY, m_header->ny );
-    m_properties.set( Fn::Property::R_NZ, m_header->nz );
-    m_properties.set( Fn::Property::R_DX, m_header->dx );
-    m_properties.set( Fn::Property::R_DY, m_header->dy );
-    m_properties.set( Fn::Property::R_DZ, m_header->dz );
+    m_properties.create( Fn::Property::R_NX, m_header->nx );
+    m_properties.create( Fn::Property::R_NY, m_header->ny );
+    m_properties.create( Fn::Property::R_NZ, m_header->nz );
+    m_properties.create( Fn::Property::R_DX, m_header->dx );
+    m_properties.create( Fn::Property::R_DY, m_header->dy );
+    m_properties.create( Fn::Property::R_DZ, m_header->dz );
 
-    m_properties.set( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
+    m_properties.create( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 

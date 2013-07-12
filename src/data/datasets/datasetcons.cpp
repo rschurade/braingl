@@ -16,17 +16,17 @@ DatasetCons::DatasetCons( QString fileName ) :
     consNumber = cons->edges.length();
 
     // add standard properties
-    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, true );
-    m_properties["maingl"]->set( Fn::Property::D_SIZE, -1 );
-    m_properties["maingl"]->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
+    m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
+    m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
+    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
 
-    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, false );
+    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::D_GLYPHRADIUS, 1.0f );
+    //m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
 
-    m_properties["maingl"]->set( Fn::Property::D_DRAW_GLYPHS, true );
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
 
 }
 
@@ -38,17 +38,17 @@ DatasetCons::DatasetCons( Connections* cons ) :
     consNumber = cons->edges.length();
 
     // add standard properties
-    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, true );
-    m_properties["maingl"]->set( Fn::Property::D_SIZE, -1 );
-    m_properties["maingl"]->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
+    m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
+    m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
+    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
 
-    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, false );
+    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
-    m_properties["maingl"]->set( Fn::Property::D_GLYPHRADIUS, 1.0f );
+    //m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
 
-    m_properties["maingl"]->set( Fn::Property::D_DRAW_GLYPHS, true );
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
 
 
 }
