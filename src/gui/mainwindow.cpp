@@ -36,6 +36,8 @@
 #include "../data/vptr.h"
 #include "../data/enums.h"
 #include "../data/models.h"
+#include "../data/roi.h"
+#include "../data/roibox.h"
 
 #include <QtGui>
 #include <QWebView>
@@ -376,6 +378,11 @@ void MainWindow::saveScene( QString fileName )
     settings.setValue( "appName", "braingl" );
     settings.setValue( "version", "0.7.0" );
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  save global settings
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SAGITTAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_CORONAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_AXIAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ) );
@@ -392,9 +399,13 @@ void MainWindow::saveScene( QString fileName )
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_TRANSPARENCY, 0 ) ) );
-
     settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  save loaded datasets
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     int countDatasets = Models::d()->rowCount();
     settings.setValue( "countDatasets", countDatasets );
 
@@ -406,13 +417,59 @@ void MainWindow::saveScene( QString fileName )
         QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
         fileNames.push_back( fn );
         QList<QVariant>state = ds->properties()->getState();
-        settings.setValue( fn.toString() + "state", state );
+        settings.setValue( "file_" + QString::number( i ) + "_state", state );
     }
     settings.setValue( "fileNames", fileNames );
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  save loaded rois
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    int numBranches = Models::r()->rowCount( QModelIndex() );
+    QList<QVariant> roiStates;
+
+    for ( int i = 0; i < numBranches; ++i )
+    {
+        int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
+
+        QList<QVariant>branch;
+        for ( int k = 0; k < leafCount+1; ++k )
+        {
+            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
+
+            QList<QVariant>state = roi->properties()->getState();
+            if ( roi->properties()->get( Fn::Property::R_SHAPE).toInt() != 10 )
+            {
+                branch.push_back( state );
+            }
+
+            //settings.setValue( "roi" + QString::number( i ) + "_" + QString::number( k ) + "state", state );
+        }
+        if ( branch.size() > 0 )
+        {
+            roiStates.push_back( branch );
+        }
+    }
+    settings.setValue(  "roiStates", roiStates );
 
     settings.sync();
+}
 
+QModelIndex MainWindow::createIndex( int branch, int pos, int column )
+{
+    int row;
+    QModelIndex parent;
+    if ( pos == 0 )
+    {
+        row = branch;
+    }
+    else
+    {
+        row = pos - 1;
+        parent = Models::r()->index( branch, 0 );
+    }
+    return Models::r()->index( row, column, parent );
 }
 
 void MainWindow::loadScene( QString fileName )
@@ -434,13 +491,40 @@ void MainWindow::loadScene( QString fileName )
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
 
-        if ( settings.contains( fn.toString() + "state" ) )
+        if ( settings.contains( "file_" + QString::number( i ) + "_state" ) )
         {
-            ds->properties()->setState( settings.value( fn.toString() + "state" ).toList() );
+            ds->properties()->setState( settings.value( "file_" + QString::number( i ) + "_state" ).toList() );
         }
     }
 
     GLFunctions::reloadShaders();
+
+    int numBranches = Models::r()->rowCount( QModelIndex() );
+
+    QList<QVariant> rois = settings.value( "roiStates" ).toList();
+    for ( int i = 0; i < rois.size(); ++i )
+    {
+        QList<QVariant>branch = rois[i].toList();
+
+        QList<QVariant>roiState = branch[0].toList();
+        GLFunctions::roi = new ROIBox();
+        GLFunctions::roi->properties()->setState( roiState );
+
+        Models::r()->insertRows( 0, 0, QModelIndex() );
+
+        if ( branch.size() > 1 )
+        {
+            for ( int k = 1; k < branch.size(); ++k )
+            {
+                QList<QVariant>roiState = branch[k].toList();
+                GLFunctions::roi = new ROIBox();
+                GLFunctions::roi->properties()->setState( roiState );
+                Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
+            }
+        }
+    }
+
+
 
     loadSetting( settings, Fn::Property::G_SAGITTAL );
     loadSetting( settings, Fn::Property::G_CORONAL );

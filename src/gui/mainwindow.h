@@ -12,6 +12,7 @@
 
 #include <QMainWindow>
 #include <QSettings>
+#include <QAbstractItemModel>
 
 class QAction;
 class QListView;
@@ -47,6 +48,7 @@ private:
     void createDockWindows();
 
     void saveSettings();
+    QModelIndex createIndex( int branch, int pos, int column );
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
