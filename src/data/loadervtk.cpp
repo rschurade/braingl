@@ -468,9 +468,9 @@ bool LoaderVTK::loadBinary()
 
     m_binaryFile = new char[ m_binFileSize ];
     m_file->seek( 0 );
-    //int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
 
-    //qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
+    int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
+    qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
 
     for( int i = 0; i < 4; ++i )
     {
@@ -534,14 +534,22 @@ bool LoaderVTK::loadBinary()
         {
             if ( !copyPointData( tokens ) )
             {
-                // error in point data but since we already have points and primitves we continue anyway
-                return true;
+                if ( pointsLoaded && primitivesLoaded )
+                {
+                    // error in cell data but since we already have points and primitves we continue anyway
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
     }
 
-    return true;
+    if ( pointsLoaded && primitivesLoaded )
+    {
+        return true;
+    }
+    m_status = "*ERROR* " + m_filename;
+    return false;
 }
 
 bool LoaderVTK::copyPoints( QStringList tokens )
