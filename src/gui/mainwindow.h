@@ -115,6 +115,7 @@ private:
     static int screenshotNumber;
 
     QTcpServer* tcpServer;
+    QTcpSocket* clientConnection;
 
 private slots:
     void slotNew();
@@ -140,6 +141,7 @@ private slots:
 
     void slotRenderCrosshairs( bool value );
     void receiveTCP();
+    void readTCP();
 };
 
 #endif

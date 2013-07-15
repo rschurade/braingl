@@ -76,7 +76,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     }
 
     tcpServer = new QTcpServer();
-    if ( !tcpServer->listen(QHostAddress("127.0.0.1"), 12345) )
+    if ( !tcpServer->listen( QHostAddress( "127.0.0.1" ), 12345 ) )
     {
         qDebug() << "Unable to start the server: " << tcpServer->errorString();
         tcpServer->close();
@@ -87,11 +87,26 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 
 void MainWindow::receiveTCP()
 {
-   qDebug() << "something received!";
+    qDebug() << "something received!";
 
-    QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
+    clientConnection = tcpServer->nextPendingConnection();
     connect( clientConnection, SIGNAL(disconnected()), clientConnection, SLOT(deleteLater()) );
-    qDebug() << clientConnection->readAll();
+    connect( clientConnection, SIGNAL(readyRead()), this, SLOT(readTCP()) );
+}
+
+void MainWindow::readTCP()
+{
+    QString stuff = clientConnection->readAll();
+    qDebug() << stuff;
+    QStringList sl = stuff.split( " " );
+    float x = sl.at(0).toFloat();
+    int countDatasets = Models::d()->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        ds->properties("maingl")->set(Fn::Property::D_NX, x);
+    }
+    Models::g()->submit();
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
