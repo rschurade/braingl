@@ -996,13 +996,18 @@ bool Loader::loadVTK()
 {
     QString fn = m_fileName.path();
 
+    qDebug() << "filename: " << fn;
+
     LoaderVTK* lv = new LoaderVTK( fn );
 
     if ( !lv->load() )
     {
+        qDebug() << "something went wrong";
         qDebug() << lv->getStatus();
         return false;
     }
+
+    qDebug() << "vtk loaded, status: " << lv->getStatus() << " primitive type: " << lv->getPrimitiveType();
 
     if ( lv->getPrimitiveType() == 1 )
     {
@@ -1062,7 +1067,7 @@ bool Loader::loadVTK()
 
     if ( lv->getPrimitiveType() == 2 )
     {
-
+qDebug() << "fibers";
         DatasetFibers* dataset = new DatasetFibers( fn, lv );
         m_dataset.push_back( dataset );
 

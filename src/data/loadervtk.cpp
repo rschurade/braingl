@@ -184,6 +184,8 @@ bool LoaderVTK::loadHeader()
 
     // skip line 1
 
+    qDebug() << m_header[2];
+
     if ( m_header[2] == "ASCII" )
     {
         m_type = 1;
@@ -463,14 +465,16 @@ QString LoaderVTK::readLineBinary()
 
 bool LoaderVTK::loadBinary()
 {
+    qDebug() << "loadBinary";
+
     QDataStream in( m_file );
     m_binFileSize = m_file->size();
 
     m_binaryFile = new char[ m_binFileSize ];
     m_file->seek( 0 );
-    //int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
+    int bytesRead = in.readRawData( m_binaryFile, m_binFileSize );
 
-    //qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
+    qDebug() << "read " << bytesRead << " bytes from binary file into buffer";
 
     for( int i = 0; i < 4; ++i )
     {
@@ -488,6 +492,8 @@ bool LoaderVTK::loadBinary()
         fieldHeader = readLineBinary();
         qDebug() << fieldHeader;
         tokens = fieldHeader.split( " ", QString::SkipEmptyParts );
+
+        qDebug() << tokens[0];
 
         if ( tokens[0] == "POINTS" )
         {
@@ -537,7 +543,7 @@ bool LoaderVTK::loadBinary()
                 // error in point data but since we already have points and primitves we continue anyway
                 return true;
             }
-            return false;
+            return true;
         }
     }
 
