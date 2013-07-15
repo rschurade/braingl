@@ -27,16 +27,24 @@ void main()
     else if ( u_colorMode == 1 )
     {
         vec4 tcol = texColor( v_texcoord );
-    
-        if ( !( tcol.r + tcol.g + tcol.b > 0.0 ) ) discard;
         
-        color = tcol.rgb;
+        color = light( tcol ).rgb;
+        
+        if ( length( color.rgb ) < 0.00001 )
+        {
+            color = light( u_color ).rgb;
+        }
     }
     else if ( u_colorMode == 3 )
     {
         vec4 mcol = vec4( 0.0, 0.0, 0.0, 1.0 );
         mcol = colormap( v_value, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, mcol );
         color = light( mcol ).rgb;
+        
+        if ( length( color.rgb ) < 0.00001 )
+        {
+            color = light( u_color ).rgb;
+        } 
     }
     else
     {
