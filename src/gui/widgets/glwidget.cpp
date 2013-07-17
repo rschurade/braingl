@@ -224,16 +224,6 @@ void GLWidget::wheelEvent( QWheelEvent *event )
 void GLWidget::setView( Fn::Orient view )
 {
     m_arcBall->setView( (int)view );
-    int countDatasets = Models::d()->rowCount();
-    for ( int i = 0; i < countDatasets; ++i )
-    {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
-        {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            ds->properties()->set( Fn::Property::D_RENDER_SLICE, (int)view );
-        }
-    }
     update();
 }
 
