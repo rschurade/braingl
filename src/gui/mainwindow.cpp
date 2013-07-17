@@ -99,12 +99,12 @@ void MainWindow::readTCP()
     QString stuff = clientConnection->readAll();
     qDebug() << stuff;
     QStringList sl = stuff.split( " " );
-    float x = sl.at(0).toFloat();
+    float x = sl.at( 0 ).toFloat();
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        ds->properties("maingl")->set(Fn::Property::D_NX, x);
+        ds->properties( "maingl" )->set( Fn::Property::D_NX, x );
     }
     Models::g()->submit();
 }
@@ -893,6 +893,9 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::screenshot()
 {
+    mainGLWidget->m_x_shift = 100;
+    mainGLWidget->update();
+
     QImage* image = mainGLWidget->screenshot();
     QString path = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_PATH, 0 ) ).toString();
     if ( !path.endsWith( '/' ) )
@@ -906,8 +909,19 @@ void MainWindow::screenshot()
         numberString = "0" + numberString;
     }
 
-    image->save( path + QString( "screenshot_" ) + numberString + QString( ".png" ), "PNG" );
+    image->save( path + QString( "screenshot_r_" ) + numberString + QString( ".png" ), "PNG" );
     delete image;
+
+    mainGLWidget->m_x_shift = -100;
+    mainGLWidget->update();
+
+    image = mainGLWidget->screenshot();
+    image->save( path + QString( "screenshot_l_" ) + numberString + QString( ".png" ), "PNG" );
+    delete image;
+
+    mainGLWidget->m_x_shift = 0;
+    mainGLWidget->update();
+
 }
 
 void MainWindow::resetSettings()

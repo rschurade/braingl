@@ -31,7 +31,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_sliceZPosAtPick( 0 ),
     skipDraw( false ),
     m_width( 0 ),
-    m_height( 0 )
+    m_height( 0 ),
+    m_x_shift( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_sceneRenderer = new SceneRenderer( name );
@@ -150,14 +151,20 @@ void GLWidget::calcMVPMatrix()
     float halfBB = boundingbox / 2.0;
 
     float ratio = static_cast<float>( m_width )/ static_cast<float>( m_height );
-    if ( ratio >= 1.0 )
+
+    /*if ( ratio >= 1.0 )
     {
-        m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -3000, 3000 );
+        m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -halfBB, halfBB );
     }
     else
     {
-        m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
-    }
+        m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -halfBB, halfBB );
+    }*/
+
+    m_pMatrix.perspective(45.0, ratio, 100, 10000);
+    m_pMatrix.translate(m_x_shift,0.0,-1000.0);
+
+    qDebug() << m_pMatrix;
 
     m_mvMatrix = m_arcBall->getMVMat();
 
