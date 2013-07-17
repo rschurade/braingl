@@ -20,7 +20,7 @@ bool PropertyGroup::create( Fn::Property name, bool value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -36,7 +36,7 @@ bool PropertyGroup::create( Fn::Property name, int value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -68,7 +68,7 @@ bool PropertyGroup::create( Fn::Property name, float value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -97,7 +97,7 @@ bool PropertyGroup::create( Fn::Property name, QString value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -113,7 +113,7 @@ bool PropertyGroup::create( Fn::Property name, const char* value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, QString( value ) );
+        set( name, QString( value ) );
     }
     else
     {
@@ -129,7 +129,7 @@ bool PropertyGroup::create( Fn::Property name, QColor value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -145,7 +145,7 @@ bool PropertyGroup::create( Fn::Property name, QDir value, QString tab )
 {
     if ( contains( name ) )
     {
-        set2( name, value.absolutePath() );
+        set( name, value.absolutePath() );
     }
     else
     {
@@ -161,7 +161,7 @@ bool PropertyGroup::create( Fn::Property name, std::initializer_list<QString>opt
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -177,7 +177,7 @@ bool PropertyGroup::create( Fn::Property name, QVector<QString> options, int val
 {
     if ( contains( name ) )
     {
-        set2( name, value );
+        set( name, value );
     }
     else
     {
@@ -227,92 +227,6 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
 
     qDebug() << "*** ERROR *** SET" << "property doesnt exist";
     exit( 0 );
-    return false;
-}
-
-bool PropertyGroup::set2( Fn::Property name, QVariant value )
-{
-    for ( int i = 0; i < m_properties.size(); ++i )
-    {
-        if ( m_properties[i].first == name )
-        {
-            m_properties[i].second->setValue( value );
-            return true;
-        }
-    }
-
-    qDebug() << "*** ERROR *** SET" << "property doesnt exist";
-    exit( 0 );
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, bool value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, int value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, float value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, QString value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, const char* value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, QString( value ) );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, QColor value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::set( Fn::Property name, QDir value )
-{
-    if ( contains( name ) )
-    {
-        set2( name, value.absolutePath() );
-        return true;
-    }
     return false;
 }
 
