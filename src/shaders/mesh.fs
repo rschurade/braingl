@@ -15,14 +15,7 @@ void main()
        
     if ( u_colorMode == 0 )
     {
-        if ( test1 > -0.3 && test1 < 0.3 )
-        {
-            color = vec3( 0.0 );
-        }
-        else
-        {
-            color = light( u_color ).rgb;
-        }
+        color = light( u_color ).rgb;
     }
     else if ( u_colorMode == 1 )
     {
