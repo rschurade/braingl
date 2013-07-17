@@ -147,16 +147,21 @@ void GLWidget::calcMVPMatrix()
     // Reset projection
     m_pMatrix.setToIdentity();
 
-    float halfBB = boundingbox / 2.0;
+    float zoom  = m_arcBall->getZoom();
+    float moveX = m_arcBall->getMoveX();
+    float moveY = m_arcBall->getMoveY();
+
+
+    float halfBB = boundingbox / 2.0 / zoom;
 
     float ratio = static_cast<float>( m_width )/ static_cast<float>( m_height );
     if ( ratio >= 1.0 )
     {
-        m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -3000, 3000 );
+        m_pMatrix.ortho( -halfBB * ratio + moveX, halfBB * ratio + moveX, -halfBB - moveY, halfBB - moveY, -3000, 3000 );
     }
     else
     {
-        m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
+        m_pMatrix.ortho( -halfBB + moveX, halfBB + moveX, -halfBB / ratio - moveY, halfBB / ratio - moveY, -3000, 3000 );
     }
 
     m_mvMatrix = m_arcBall->getMVMat();
