@@ -37,6 +37,8 @@ public:
 
     ArcBall* getArcBall();
 
+    float m_x_shift;
+
 private:
     QItemSelectionModel* m_roiSelectionModel;
 
