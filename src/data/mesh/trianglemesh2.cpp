@@ -155,6 +155,15 @@ int* TriangleMesh2::getIndexes()
     return m_triangles.data();
 }
 
+
+QVector3D TriangleMesh2::getVertex(int id)
+{
+    float x = m_vertices[id * m_bufferSize];
+    float y = m_vertices[id * m_bufferSize + 1];
+    float z = m_vertices[id * m_bufferSize + 2];
+    return QVector3D(x,y,z);
+}
+
 void TriangleMesh2::calcTriNormals()
 {
     // run threads

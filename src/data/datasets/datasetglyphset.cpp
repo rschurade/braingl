@@ -11,6 +11,7 @@
 #include "../mesh/trianglemesh2.h"
 
 #include "../../gui/gl/meshrenderer.h"
+#include "../../gui/gl/glfunctions.h"
 
 #include "../../algos/connection.h"
 #include "../../algos/connections.h"
@@ -280,6 +281,17 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     if ( glyphstyle == 2 )
     {
         m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
+    if ( pickedID > -1 )
+    {
+        float sx, sy, sz;
+        QVector3D sel = getMesh(target)->getVertex( pickedID );
+        sx = sel.x();
+        sy = sel.y();
+        sz = sel.z();
+        QColor color = QColor( 200.0, 0.0, 200.0);
+        color.setAlphaF(0.8);
+        GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, 5.0, 5.0, 5.0, color, 0, width, height, renderMode );
     }
 }
 

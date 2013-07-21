@@ -45,7 +45,7 @@ public:
 
     QVector<int> pick( QVector3D pos, float radius );
     int closestVertexIndex( QVector3D pos );
-
+    QVector3D getVertex(int id);
 
 private:
     void calcTriNormals();
