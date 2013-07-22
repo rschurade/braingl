@@ -114,10 +114,14 @@ bool Loader::loadNifti()
         hdrPath.replace( hdrPath.size() - 3, 3, "hdr" );
     }
 
+    qDebug() << "loading: " << hdrPath;
+
     if ( !loadNiftiHeader( hdrPath ) )
     {
         return false;
     }
+
+    qDebug() << "m_header->dim[4]:" << m_header->dim[4];
 
     if ( m_header->dim[4] == 1 || m_header->dim[4] == 0 )
     {
@@ -271,7 +275,11 @@ bool Loader::loadNiftiVector3D( QString fileName )
 
     size_t blockSize = m_header->dim[1] * m_header->dim[2] * m_header->dim[3];
 
+    qDebug() << "blockSize: " << blockSize;
+
     QVector<QVector3D> data( blockSize );
+
+    qDebug() << "vector allocated";
 
     switch ( m_header->datatype )
     {
