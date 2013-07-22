@@ -39,6 +39,7 @@
 
 #include <QtGui>
 #include <QWebView>
+#include <QDesktopWidget>
 
 int MainWindow::screenshotNumber = 0;
 
@@ -83,6 +84,12 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     }
 
     connect( tcpServer, SIGNAL(newConnection()), this, SLOT(receiveTCP()) );
+
+    qDebug() << "screens count: " << QApplication::desktop()->screenCount();
+    for ( int screen = 0; screen < QApplication::desktop()->screenCount(); ++screen )
+    {
+        qDebug() << QApplication::desktop()->screenGeometry( screen );
+    }
 }
 
 void MainWindow::receiveTCP()
