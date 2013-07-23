@@ -9,6 +9,7 @@
 #include "../views/toolbarview.h"
 #include "../widgets/algoStarterWidgets/tensortrackwidget.h"
 #include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
+#include "../widgets/algoStarterWidgets/sdwidget.h"
 
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
@@ -76,6 +77,10 @@ void ToolBar::createActions()
     m_tensorAct = new FNAction( QIcon( ":/icons/fittensor.png" ), tr( "Tensor fit" ), this, Fn::Algo::TENSORFIT );
     m_tensorAct->setStatusTip( tr( "tensor fit" ) );
     connect( m_tensorAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_sDAct = new FNAction( QIcon( ":/icons/sd.png" ), tr( "Spherical deconvolution" ), this, Fn::Algo::SD );
+    m_sDAct->setStatusTip( tr( "spherical deconvolution" ) );
+    connect( m_sDAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_faAct = new FNAction( QIcon( ":/icons/calcfa.png" ), tr( "Calc FA" ), this, Fn::Algo::FA );
     m_faAct->setStatusTip( tr( "calc FA" ) );
@@ -173,6 +178,15 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::TENSORFIT:
             l = DWIAlgos::tensorFit( ds );
             break;
+        case Fn::Algo::SD:
+        {
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+            m_sdw = new SDWidget( ds, dsList, this->parentWidget() );
+            connect( m_sdw, SIGNAL( finished() ), this, SLOT( sdFinished() ) );
+            m_sdw->show();
+            break;
+        }
         case Fn::Algo::FA:
             if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
@@ -319,6 +333,7 @@ void ToolBar::slotSelectionChanged( int type )
         }
         case Fn::DatasetType::NIFTI_DWI:
         {
+            //this->addAction( m_sDAct );
             this->addAction( m_qball4Act );
             this->addAction( m_qball6Act );
             this->addAction( m_qball8Act );
@@ -387,4 +402,17 @@ void ToolBar::crossingTrackFinished()
     }
     m_ctw->hide();
     destroy( m_ctw );
+}
+
+void ToolBar::sdFinished()
+{
+    qDebug() << "toolbar sd finished";
+//    QList<Dataset*>l = m_sdw->getResult();
+//    for ( int i = 0; i < l.size(); ++i )
+//    {
+//        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
+//        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
+//    }
+    m_sdw->hide();
+    destroy( m_sdw );
 }
