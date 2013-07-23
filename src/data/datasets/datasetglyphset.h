@@ -37,6 +37,8 @@ public:
     int vecsNumber;
 
     void makePies();
+    void makeDiffPoints();
+
     QList<Dataset*> createConnections();
 
     void loadRGB();

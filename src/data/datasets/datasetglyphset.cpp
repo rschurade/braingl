@@ -46,7 +46,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
 
     m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, minthresh, 1.0f, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
-    { "points", "vectors", "pies" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
@@ -142,7 +142,6 @@ void DatasetGlyphset::readConnectivity( QString filename )
     }
 
     QDataStream ins( &f );
-    //TODO: What's up with the byte order? Do we have to offer an option for that?
     ins.setByteOrder( QDataStream::LittleEndian );
     ins.setFloatingPointPrecision( QDataStream::SinglePrecision );
     qDebug() << "reading binary connectivity between " << n << " nodes...";
@@ -180,8 +179,6 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     //TODO: Little brains...
     /*if ( ( target == "maingl2" ) && ( pickedID > 1 ) )
      {
-     float* nodes = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertices();
-     int triangleshift = 7; //TODO: Why 7?
      for ( int i = 0; i < picked.size(); ++i )
      {
      MeshRenderer* m_renderer = new MeshRenderer( getMesh( target ) );
@@ -194,7 +191,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
      {
      getMesh( target )->setVertexData( p, conn[j][p] );
      }
-     QVector3D f = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+     QVector3D f = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex(j);
      sc.translate( f );
      sc.scale( 0.01 );
      m_renderer->draw( pMatrix, mvMatrix * sc, width, height, renderMode, properties( target ) );
@@ -242,7 +239,6 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         }
         m_vrenderer = new VectorGlyphRenderer();
         m_vrenderer->init();
-        //TODO: vector fields:
         makeVecs();
         m_vrenderer->initGeometry( vecsArray, vecsNumber );
     }
@@ -259,6 +255,20 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_pierenderer->init();
         makePies();
         m_pierenderer->initGeometry( pieArrays, numbers );
+    }
+
+    if ( ( glyphstyle == 3 )
+            && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
+                    || ( prevGlyphstyle != glyphstyle ) ) )
+    {
+        if ( m_prenderer )
+        {
+            delete m_prenderer;
+        }
+        m_prenderer = new PointGlyphRenderer();
+        m_prenderer->init();
+        makeDiffPoints();
+        m_prenderer->initGeometry( consArray, consNumber );
     }
 
     //TODO: Deal with multiple passes / switching btw. styles etc.:
@@ -282,15 +292,19 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         m_pierenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
+    if ( glyphstyle == 3 )
+    {
+        m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
     if ( pickedID > -1 )
     {
         float sx, sy, sz;
-        QVector3D sel = getMesh(target)->getVertex( pickedID );
+        QVector3D sel = getMesh( target )->getVertex( pickedID );
         sx = sel.x();
         sy = sel.y();
         sz = sel.z();
-        QColor color = QColor( 200.0, 0.0, 200.0);
-        color.setAlphaF(0.8);
+        QColor color = QColor( 200.0, 0.0, 200.0 );
+        color.setAlphaF( 0.8 );
         GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, 5.0, 5.0, 5.0, color, 0, width, height, renderMode );
     }
 }
@@ -302,10 +316,6 @@ void DatasetGlyphset::makeCons()
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
-
-    float* nodes = m_mesh.at( geo )->getVertices();
-    float* glyphnodes = m_mesh.at( glyph )->getVertices();
-    float* colornodes = m_mesh.at( col )->getVertices();
 
     n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << n;
@@ -334,18 +344,83 @@ void DatasetGlyphset::makeCons()
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
             {
+                QVector3D f = m_mesh.at( geo )->getVertex( i );
+                QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                int triangleshift = 7; //TODO: Why 7?
-
-                QVector3D f = QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
-                QVector3D t = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
-
-                QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
-                QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
+                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
                 QVector3D dg = tg - fg;
 
-                QVector3D fc = QVector3D( colornodes[i * triangleshift], colornodes[i * triangleshift + 1], colornodes[i * triangleshift + 2] );
-                QVector3D tc = QVector3D( colornodes[j * triangleshift], colornodes[j * triangleshift + 1], colornodes[j * triangleshift + 2] );
+                QVector3D fc = m_mesh.at( col )->getVertex( i );
+                QVector3D tc = m_mesh.at( col )->getVertex( j );
+                QVector3D dc = tc - fc;
+
+                consArray[offset * consNumber] = f.x();
+                consArray[offset * consNumber + 1] = f.y();
+                consArray[offset * consNumber + 2] = f.z();
+                consArray[offset * consNumber + 3] = v;
+                consArray[offset * consNumber + 4] = t.x();
+                consArray[offset * consNumber + 5] = t.y();
+                consArray[offset * consNumber + 6] = t.z();
+
+                consArray[offset * consNumber + 7] = dg.x();
+                consArray[offset * consNumber + 8] = dg.y();
+                consArray[offset * consNumber + 9] = dg.z();
+
+                consArray[offset * consNumber + 10] = dc.x();
+                consArray[offset * consNumber + 11] = dc.y();
+                consArray[offset * consNumber + 12] = dc.z();
+
+                ++consNumber;
+            }
+        }
+    }
+}
+
+void DatasetGlyphset::makeDiffPoints()
+{
+    qDebug() << "making consArray: " << minthresh << " maxthresh: " << maxthresh;
+    //if (consArray) delete[] consArray;
+    int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
+    int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
+    int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
+
+    n = m_mesh.at( geo )->numVerts();
+    qDebug() << "nodes: " << n;
+    consNumber = 0;
+    //count first, then create array...
+    //TODO: Parallelize, protect from renderthread interruptions?...
+    for ( int i = 0; i < n; ++i )
+    {
+        for ( int j = 0; j < n; ++j )
+        {
+            float v = conn[i][j];
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            {
+                ++consNumber;
+            }
+        }
+    }
+    qDebug() << consNumber << " connections above threshold";
+    int offset = 13;
+    consArray = new float[offset * consNumber];
+    consNumber = 0;
+    for ( int i = 0; i < n; ++i )
+    {
+        for ( int j = 0; j < n; ++j )
+        {
+            float v = conn[i][j];
+            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            {
+                QVector3D f = m_mesh.at( geo )->getVertex( i );
+                QVector3D t = m_mesh.at( geo )->getVertex( j );
+
+                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                QVector3D dg = tg - fg;
+
+                QVector3D fc = m_mesh.at( col )->getVertex( i );
+                QVector3D tc = m_mesh.at( col )->getVertex( j );
                 QVector3D dc = tc - fc;
 
                 consArray[offset * consNumber] = f.x();
@@ -378,10 +453,6 @@ void DatasetGlyphset::makeVecs()
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
-    float* nodes = m_mesh.at( geo )->getVertices();
-    float* glyphnodes = m_mesh.at( glyph )->getVertices();
-    float* colornodes = m_mesh.at( col )->getVertices();
-
     n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << n;
     vecsNumber = 0;
@@ -409,18 +480,15 @@ void DatasetGlyphset::makeVecs()
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
             {
+                QVector3D f = m_mesh.at( geo )->getVertex( i );
+                QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                int triangleshift = 7; //TODO: Why 7?
-
-                QVector3D f = QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
-                QVector3D t = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
-
-                QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
-                QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
+                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
                 QVector3D dg = tg - fg;
 
-                QVector3D fc = QVector3D( colornodes[i * triangleshift], colornodes[i * triangleshift + 1], colornodes[i * triangleshift + 2] );
-                QVector3D tc = QVector3D( colornodes[j * triangleshift], colornodes[j * triangleshift + 1], colornodes[j * triangleshift + 2] );
+                QVector3D fc = m_mesh.at( col )->getVertex( i );
+                QVector3D tc = m_mesh.at( col )->getVertex( j );
                 QVector3D dc = tc - fc;
 
                 vecsArray[offset * vecsNumber] = f.x();
@@ -501,12 +569,7 @@ void DatasetGlyphset::makePies()
     qDebug() << "calcPies after deletion";
 
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
-    //int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
-
-    float* nodes = m_mesh.at( geo )->getVertices();
-    //float* glyphnodes = m_mesh.at( glyph )->getVertices();
-    float* colornodes = m_mesh.at( col )->getVertices();
 
     n = m_mesh.at( geo )->numVerts();
     pieArrays = new QVector<float*>( n, NULL );
@@ -526,18 +589,12 @@ void DatasetGlyphset::makePies()
             float v = conn[i][j];
             if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
             {
-                int triangleshift = 7; //TODO: Why 7?
-
-                QVector3D f = QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
-                QVector3D t = QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
+                QVector3D f = m_mesh.at( geo )->getVertex( i );
+                QVector3D t = m_mesh.at( geo )->getVertex( j );
                 QVector3D gdiff = t - f;
 
-                //QVector3D fg = QVector3D( glyphnodes[i * triangleshift], glyphnodes[i * triangleshift + 1], glyphnodes[i * triangleshift + 2] );
-                //QVector3D tg = QVector3D( glyphnodes[j * triangleshift], glyphnodes[j * triangleshift + 1], glyphnodes[j * triangleshift + 2] );
-                //QVector3D dg = tg - fg;
-
-                QVector3D fc = QVector3D( colornodes[i * triangleshift], colornodes[i * triangleshift + 1], colornodes[i * triangleshift + 2] );
-                QVector3D tc = QVector3D( colornodes[j * triangleshift], colornodes[j * triangleshift + 1], colornodes[j * triangleshift + 2] );
+                QVector3D fc = m_mesh.at( col )->getVertex( i );
+                QVector3D tc = m_mesh.at( col )->getVertex( j );
                 QVector3D dc = tc - fc;
 
                 if ( gdiff.length() > minlength )
@@ -598,17 +655,15 @@ QList<Dataset*> DatasetGlyphset::createConnections()
             float v = conn[i][j];
             if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
             {
-                int triangleshift = 7; //TODO: Why 7?
+                QVector3D f = m_mesh.at( geo )->getVertex(i);
+                QVector3D t = m_mesh.at( geo )->getVertex(j);
 
-                QVector3D* f = new QVector3D( nodes[i * triangleshift], nodes[i * triangleshift + 1], nodes[i * triangleshift + 2] );
-                QVector3D* t = new QVector3D( nodes[j * triangleshift], nodes[j * triangleshift + 1], nodes[j * triangleshift + 2] );
-
-                Edge* aedge = new Edge( *f, *t );
+                Edge* aedge = new Edge( f, t );
 
                 if ( aedge->length() > minlength )
                 {
-                    cons->nodes << *f;
-                    cons->nodes << *t;
+                    cons->nodes << f;
+                    cons->nodes << t;
                     cons->edges << aedge;
                 }
             }
