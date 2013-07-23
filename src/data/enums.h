@@ -44,6 +44,7 @@ namespace Fn
         QBALL6,
         QBALL8,
         TENSORFIT,
+        SD,
         FA,
         EV,
         BINGHAM,
