@@ -405,41 +405,82 @@ void DatasetGlyphset::makeDiffPoints()
     int offset = 13;
     consArray = new float[offset * consNumber];
     consNumber = 0;
-    for ( int i = 0; i < n; ++i )
+    //TODO: ROIs?
+    //for each triangle
+    QVector<int> tris = m_mesh.at( geo )->getTriangles();
+    QVector<int> idPairs;
+    for ( int tri = 0; tri < tris.size(); tri += 3 )
     {
-        for ( int j = 0; j < n; ++j )
+        // all three edges
+        qDebug() << "tri: " << tri;
+        idPairs.append( tris.at( tri ) );
+        idPairs.append( tris.at( tri + 1 ) );
+
+        idPairs.append( tris.at( tri + 1 ) );
+        idPairs.append( tris.at( tri + 2 ) );
+
+        idPairs.append( tris.at( tri + 2 ) );
+        idPairs.append( tris.at( tri ) );
+    }
+    qDebug() << "idPairs done, size: " << idPairs.size();
+    for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
+    {
+        //get two point ids i1,i2
+
+        //qDebug() << "idpair: " << idpair;
+
+        int i1 = idPairs.at( idpair );
+        int i2 = idPairs.at( idpair + 1 );
+
+        //if triangle on one side...
+        //TODO: check while creating edgelist?
+        if ( i1 > i2 )
         {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+
+            //qDebug() << "point: " << i1 << " " << i2;
+            for ( int j = 0; j < n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
+                float v = qAbs( conn[i1][j] - conn[i2][j] );
+                //TODO: What treshold do we use?
+                if ( ( v > 0.2 ) && ( v < maxthresh ) )
+                {
+                    QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
-                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
-                QVector3D dg = tg - fg;
+                    QVector3D fg1 = m_mesh.at( glyph )->getVertex( i1 );
+                    QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                    QVector3D dg1 = tg - fg1;
 
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
+                    QVector3D fc1 = m_mesh.at( col )->getVertex( i1 );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc1 = tc - fc1;
 
-                consArray[offset * consNumber] = f.x();
-                consArray[offset * consNumber + 1] = f.y();
-                consArray[offset * consNumber + 2] = f.z();
-                consArray[offset * consNumber + 3] = v;
-                consArray[offset * consNumber + 4] = t.x();
-                consArray[offset * consNumber + 5] = t.y();
-                consArray[offset * consNumber + 6] = t.z();
+                    QVector3D f2 = m_mesh.at( geo )->getVertex( i2 );
 
-                consArray[offset * consNumber + 7] = dg.x();
-                consArray[offset * consNumber + 8] = dg.y();
-                consArray[offset * consNumber + 9] = dg.z();
+                    QVector3D fg2 = m_mesh.at( glyph )->getVertex( i2 );
+                    QVector3D dg2 = tg - fg2;
 
-                consArray[offset * consNumber + 10] = dc.x();
-                consArray[offset * consNumber + 11] = dc.y();
-                consArray[offset * consNumber + 12] = dc.z();
+                    QVector3D fc2 = m_mesh.at( col )->getVertex( i2 );
+                    QVector3D dc2 = tc - fc2;
 
-                ++consNumber;
+                    consArray[offset * consNumber] = ( f1.x() + f2.x() ) / 2.0;
+                    consArray[offset * consNumber + 1] = ( f1.y() + f2.y() ) / 2.0;
+                    consArray[offset * consNumber + 2] = ( f1.z() + f2.z() ) / 2.0;
+                    consArray[offset * consNumber + 3] = v;
+                    consArray[offset * consNumber + 4] = t.x();
+                    consArray[offset * consNumber + 5] = t.y();
+                    consArray[offset * consNumber + 6] = t.z();
+
+                    consArray[offset * consNumber + 7] = ( dg1.x() + dg2.x() ) / 2.0;
+                    consArray[offset * consNumber + 8] = ( dg1.y() + dg2.y() ) / 2.0;
+                    consArray[offset * consNumber + 9] = ( dg1.z() + dg2.z() ) / 2.0;
+
+                    consArray[offset * consNumber + 10] = ( dc1.x() + dc2.x() ) / 2.0;
+                    consArray[offset * consNumber + 11] = ( dc1.y() + dc2.y() ) / 2.0;
+                    consArray[offset * consNumber + 12] = ( dc1.z() + dc2.z() ) / 2.0;
+
+                    ++consNumber;
+                }
             }
         }
     }
@@ -448,7 +489,7 @@ void DatasetGlyphset::makeDiffPoints()
 void DatasetGlyphset::makeVecs()
 {
     qDebug() << "making vecsArray: " << minthresh;
-    //if (vecsArray) delete[] vecsArray;
+//if (vecsArray) delete[] vecsArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
@@ -456,8 +497,8 @@ void DatasetGlyphset::makeVecs()
     n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << n;
     vecsNumber = 0;
-    //count first, then create array...
-    //TODO: Parallelize, protect from renderthread interruptions?...
+//count first, then create array...
+//TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < n; ++i )
     {
         for ( int j = 0; j < n; ++j )
@@ -575,9 +616,9 @@ void DatasetGlyphset::makePies()
     pieArrays = new QVector<float*>( n, NULL );
     numbers = new QVector<int>( n );
 
-    //for all nodes in the current surface...
-    //count first and throw super-threshold connections in sortable list, then create arrays...
-    //TODO: Parallelize, protect from renderthread interruptions?...
+//for all nodes in the current surface...
+//count first and throw super-threshold connections in sortable list, then create arrays...
+//TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < n; ++i )
     {
         int count = 0;
@@ -643,9 +684,8 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     n = m_mesh.at( geo )->numVerts();
-    float* nodes = m_mesh.at( geo )->getVertices();
 
-    //TODO: think about making upper threshold interactive...
+//TODO: think about making upper threshold interactive...
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     Connections* cons = new Connections();
     for ( int i = 0; i < n; ++i )
@@ -655,8 +695,8 @@ QList<Dataset*> DatasetGlyphset::createConnections()
             float v = conn[i][j];
             if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex(i);
-                QVector3D t = m_mesh.at( geo )->getVertex(j);
+                QVector3D f = m_mesh.at( geo )->getVertex( i );
+                QVector3D t = m_mesh.at( geo )->getVertex( j );
 
                 Edge* aedge = new Edge( f, t );
 
@@ -878,7 +918,7 @@ bool DatasetGlyphset::load1D()
 bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
 
-    //TODO: Extra property for radius...
+//TODO: Extra property for radius...
     picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     pickedID = getMesh( target )->closestVertexIndex( pos );
