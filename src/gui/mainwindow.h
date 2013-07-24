@@ -126,6 +126,7 @@ private slots:
     void saveScene();
     void about();
     void screenshot();
+    void singleScreenshot();
     void resetSettings();
 
     void slotToggleAxialSlice();

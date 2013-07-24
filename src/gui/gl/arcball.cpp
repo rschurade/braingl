@@ -11,19 +11,19 @@
 #include <math.h>
 
 ArcBall::ArcBall( int width, int height ) :
-    Epsilon( 0.00001 ),
-    m_width( width ),
-    m_height( height ),
-    m_moveX( 0 ),
-    m_moveY( 0 ),
-    m_oldMoveX( 0 ),
-    m_oldMoveY( 0 ),
-    m_midClickX( 0 ),
-    m_midClickY( 0 ),
-    m_zoom( 1.0f )
+                Epsilon( 0.00001 ),
+                m_width( width ),
+                m_height( height ),
+                m_moveX( 0 ),
+                m_moveY( 0 ),
+                m_oldMoveX( 0 ),
+                m_oldMoveY( 0 ),
+                m_midClickX( 0 ),
+                m_midClickY( 0 ),
+                m_zoom( 1.0f )
 {
-    m_adjust_width  = 1.0 / ((width - 1.0) * 0.5);
-    m_adjust_height = 1.0 / ((height - 1.0) * 0.5);
+    m_adjust_width = 1.0 / ( ( width - 1.0 ) * 0.5 );
+    m_adjust_height = 1.0 / ( ( height - 1.0 ) * 0.5 );
 
     m_currentRot.setToIdentity();
     m_lastRot.setToIdentity();
@@ -60,9 +60,8 @@ QVector3D ArcBall::map_sphere( int x, int y )
     return bm;
 }
 
-
 /// sets the window size.
-void ArcBall::set_win_size( int width,  int height )
+void ArcBall::set_win_size( int width, int height )
 {
     m_width = width;
     m_height = height;
@@ -75,13 +74,14 @@ void ArcBall::set_win_size( int width,  int height )
 void ArcBall::drag( int x, int y )
 {
     QVector3D v_to = map_sphere( x, y );
-    QVector3D perp = QVector3D::crossProduct( v_from, v_to);
+    QVector3D perp = QVector3D::crossProduct( v_from, v_to );
 
     if ( perp.length() > Epsilon )
     {
         q_current_rotation.setX( perp.x() );
         q_current_rotation.setY( perp.y() );
-        q_current_rotation.setZ( perp.z() );;
+        q_current_rotation.setZ( perp.z() );
+        ;
         q_current_rotation.setScalar( ( v_from.x() * v_to.x() ) + ( v_from.y() * v_to.y() ) + ( v_from.z() * v_to.z() ) );
     }
     else
@@ -93,7 +93,15 @@ void ArcBall::drag( int x, int y )
     }
     m_currentRot.setToIdentity();
     m_currentRot.rotate( q_current_rotation );
-    m_currentRot = m_currentRot * m_lastRot ;
+    m_currentRot = m_currentRot * m_lastRot;
+}
+
+void ArcBall::rotateZ( float angle )
+{
+    m_lastRot = m_currentRot;
+    m_currentRot.setToIdentity();
+    m_currentRot.rotate( angle, 0, 0, 1 );
+    m_currentRot = m_lastRot * m_currentRot;
 }
 
 /// indicates the beginning of the dragging.
@@ -146,11 +154,11 @@ void ArcBall::setView( int view )
     m_currentRot.setToIdentity();
     m_lastRot.setToIdentity();
 
-    QQuaternion rotx( sqrt(0.5), 0, 0, sqrt(0.5) );
-    QQuaternion rot_x( -sqrt(0.5), 0, 0, sqrt(0.5) );
-    QQuaternion roty( 0, sqrt(0.5), 0, sqrt(0.5) );
-    QQuaternion rot_y( 0, -sqrt(0.5), 0, sqrt(0.5) );
-    QQuaternion rotz( 0, 0, sqrt(0.5), sqrt(0.5) );
+    QQuaternion rotx( sqrt( 0.5 ), 0, 0, sqrt( 0.5 ) );
+    QQuaternion rot_x( -sqrt( 0.5 ), 0, 0, sqrt( 0.5 ) );
+    QQuaternion roty( 0, sqrt( 0.5 ), 0, sqrt( 0.5 ) );
+    QQuaternion rot_y( 0, -sqrt( 0.5 ), 0, sqrt( 0.5 ) );
+    QQuaternion rotz( 0, 0, sqrt( 0.5 ), sqrt( 0.5 ) );
 
     if ( view == 2 )
     {
@@ -171,7 +179,7 @@ QMatrix4x4 ArcBall::getMVMat()
     QMatrix4x4 mv;
     mv.setToIdentity();
 
-    mv = m_currentRot * mv ;
+    mv = m_currentRot * mv;
 
     QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, 0 );
     QMatrix4x4 tmp;

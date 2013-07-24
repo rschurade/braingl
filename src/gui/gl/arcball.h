@@ -41,6 +41,8 @@ public:
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
 
+    void rotateZ(float angle);
+
 private:
     QVector3D map_sphere( int x, int y );
 
