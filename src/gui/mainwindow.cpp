@@ -40,6 +40,7 @@
 #include <QtGui>
 #include <QWebView>
 #include <QDesktopWidget>
+#include <qimage.h>
 
 int MainWindow::screenshotNumber = 0;
 
@@ -900,10 +901,19 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::screenshot()
 {
-    mainGLWidget->m_x_shift = 100;
+    for (int i = 0; i<360; ++i)
+    {
+        mainGLWidget->getArcBall()->rotateZ(1);
+        singleScreenshot();
+    }
+}
+
+void MainWindow::singleScreenshot()
+{
+    mainGLWidget->m_x_shift = 300;
     mainGLWidget->update();
 
-    QImage* image = mainGLWidget->screenshot();
+    QImage* imager = mainGLWidget->screenshot();
     QString path = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_PATH, 0 ) ).toString();
     if ( !path.endsWith( '/' ) )
     {
@@ -916,15 +926,25 @@ void MainWindow::screenshot()
         numberString = "0" + numberString;
     }
 
-    image->save( path + QString( "screenshot_r_" ) + numberString + QString( ".png" ), "PNG" );
-    delete image;
+    imager->save( path + QString( "screenshot_r_" ) + numberString + QString( ".png" ), "PNG" );
 
-    mainGLWidget->m_x_shift = -100;
+    mainGLWidget->m_x_shift = -300;
     mainGLWidget->update();
 
-    image = mainGLWidget->screenshot();
-    image->save( path + QString( "screenshot_l_" ) + numberString + QString( ".png" ), "PNG" );
-    delete image;
+    QImage* imagel = mainGLWidget->screenshot();
+    imagel->save( path + QString( "screenshot_l_" ) + numberString + QString( ".png" ), "PNG" );
+
+    QImage* images = new QImage(imager->width() + imagel->width(), imager->height(), imager->format());
+    QPainter painter;
+    painter.begin(images);
+    painter.drawImage(0, 0, *imager);
+    painter.drawImage(imager->width(), 0, *imagel);
+    painter.end();
+
+    images->save( path + QString( "screenshot_s_" ) + numberString + QString( ".png" ), "PNG" );
+
+    delete imagel;
+    delete imager;
 
     mainGLWidget->m_x_shift = 0;
     mainGLWidget->update();

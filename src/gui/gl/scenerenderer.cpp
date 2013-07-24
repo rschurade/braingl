@@ -350,10 +350,11 @@ void SceneRenderer::renderMerge()
 
 QImage* SceneRenderer::screenshot()
 {
-    int size = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ).toInt();
+    //int size = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int size = 1920;
     int tmpWidth = m_width;
     int tmpHeight = m_height;
-    resizeGL( size, qRound( size * (double) m_height / (double) m_width ) );
+    resizeGL( size, qRound( size * (double) 1080 / (double) 1920 ) );
     renderScene();
     setRenderTarget( "SCREENSHOT" );
     QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
