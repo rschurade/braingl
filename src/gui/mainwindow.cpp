@@ -910,7 +910,7 @@ void MainWindow::screenshot()
 
 void MainWindow::singleScreenshot()
 {
-    mainGLWidget->m_x_shift = 300;
+    mainGLWidget->m_x_shift = 30;
     mainGLWidget->update();
 
     QImage* imager = mainGLWidget->screenshot();
@@ -928,23 +928,34 @@ void MainWindow::singleScreenshot()
 
     imager->save( path + QString( "screenshot_r_" ) + numberString + QString( ".png" ), "PNG" );
 
-    mainGLWidget->m_x_shift = -300;
+    mainGLWidget->m_x_shift = -30;
     mainGLWidget->update();
 
     QImage* imagel = mainGLWidget->screenshot();
     imagel->save( path + QString( "screenshot_l_" ) + numberString + QString( ".png" ), "PNG" );
 
-    QImage* images = new QImage(imager->width() + imagel->width(), imager->height(), imager->format());
     QPainter painter;
-    painter.begin(images);
+
+    //parallel stereo
+    QImage* imagesce = new QImage(imager->width() + imagel->width(), imager->height(), imager->format());
+    painter.begin(imagesce);
     painter.drawImage(0, 0, *imager);
     painter.drawImage(imager->width(), 0, *imagel);
     painter.end();
+    imagesce->save( path + QString( "screenshot_spa_" ) + numberString + QString( ".png" ), "PNG" );
 
-    images->save( path + QString( "screenshot_s_" ) + numberString + QString( ".png" ), "PNG" );
+    //crosseyed stereo
+    QImage* imagespa = new QImage(imager->width() + imagel->width(), imager->height(), imager->format());
+    painter.begin(imagespa);
+    painter.drawImage(0, 0, *imagel);
+    painter.drawImage(imager->width(), 0, *imager);
+    painter.end();
+    imagespa->save( path + QString( "screenshot_sce_" ) + numberString + QString( ".png" ), "PNG" );
 
     delete imagel;
     delete imager;
+    delete imagespa;
+    delete imagesce;
 
     mainGLWidget->m_x_shift = 0;
     mainGLWidget->update();
