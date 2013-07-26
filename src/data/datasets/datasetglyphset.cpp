@@ -296,16 +296,32 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-    if ( pickedID > -1 )
+    if ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool() )
     {
-        float sx, sy, sz;
-        QVector3D sel = getMesh( target )->getVertex( pickedID );
-        sx = sel.x();
-        sy = sel.y();
-        sz = sel.z();
-        QColor color = QColor( 200.0, 0.0, 200.0 );
-        color.setAlphaF( 0.8 );
-        GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, 5.0, 5.0, 5.0, color, 0, width, height, renderMode );
+        if ( pickedID > -1 )
+        {
+            float sx, sy, sz;
+            QVector3D sel = getMesh( target )->getVertex( pickedID );
+            sx = sel.x();
+            sy = sel.y();
+            sz = sel.z();
+            QColor color = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
+            color.setAlphaF( 0.8 );
+
+            float s = 5.0;
+            float t = 0.5;
+
+            GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, s, s, s, color, 0, width, height, renderMode );
+
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx+s, sy, sz, s, t, t, QColor(255.0,0.0,0.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx-s, sy, sz, s, t, t, QColor(255.0,0.0,0.0), 0, width, height, renderMode );
+
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy+s, sz, t, s, t, QColor(0.0,255.0,0.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy-s, sz, t, s, t, QColor(0.0,255.0,0.0), 0, width, height, renderMode );
+
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz+s, t, t, s, QColor(0.0,0.0,255.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz-s, t, t, s, QColor(0.0,0.0,255.0), 0, width, height, renderMode );
+        }
     }
 }
 
