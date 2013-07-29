@@ -70,7 +70,13 @@ namespace Fn
 
     enum class Orient : int
     {
-        NONE, AXIAL, CORONAL, SAGITTAL
+        NONE,
+        AXIAL,
+        CORONAL,
+        SAGITTAL,
+        AXIAL2,
+        CORONAL2,
+        SAGITTAL2
     };
 
     enum class Position : int

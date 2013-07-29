@@ -136,7 +136,7 @@ void ArcBall::setRotCenter( float x, float y, float z )
     m_rotCenter = QVector3D( -x, -y, -z );
 }
 
-void ArcBall::setView( int view )
+void ArcBall::setView( Fn::Orient view )
 {
     m_zoom = 1.0;
     m_moveX = 0;
@@ -151,17 +151,34 @@ void ArcBall::setView( int view )
     QQuaternion roty( 0, sqrt(0.5), 0, sqrt(0.5) );
     QQuaternion rot_y( 0, -sqrt(0.5), 0, sqrt(0.5) );
     QQuaternion rotz( 0, 0, sqrt(0.5), sqrt(0.5) );
+    QQuaternion rot_z( 0, 0, -sqrt(0.5), sqrt(0.5) );
 
-    if ( view == 2 )
+    switch( view )
     {
-        m_currentRot.rotate( rotz );
-        m_currentRot.rotate( rotx );
-        m_currentRot.rotate( rotx );
-    }
-    if ( view == 3 )
-    {
-        m_currentRot.rotate( rot_x );
-        m_currentRot.rotate( rot_y );
+        case Fn::Orient::NONE:
+            break;
+        case Fn::Orient::AXIAL:
+            break;
+        case Fn::Orient::CORONAL:
+            m_currentRot.rotate( rotz );
+            m_currentRot.rotate( rotx );
+            m_currentRot.rotate( rotx );
+            break;
+        case Fn::Orient::SAGITTAL:
+            m_currentRot.rotate( rot_x );
+            m_currentRot.rotate( rot_y );
+            break;
+        case Fn::Orient::AXIAL2:
+            m_currentRot.rotate( rot_y );
+            m_currentRot.rotate( roty );
+            break;
+        case Fn::Orient::CORONAL2:
+            m_currentRot.rotate( rotz );
+            break;
+        case Fn::Orient::SAGITTAL2:
+            m_currentRot.rotate( rotx );
+            m_currentRot.rotate( roty );
+            break;
     }
 }
 

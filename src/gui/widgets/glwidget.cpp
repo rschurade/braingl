@@ -228,7 +228,7 @@ void GLWidget::wheelEvent( QWheelEvent *event )
 
 void GLWidget::setView( Fn::Orient view )
 {
-    m_arcBall->setView( (int)view );
+    m_arcBall->setView( view );
     update();
 }
 
