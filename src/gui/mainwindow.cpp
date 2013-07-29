@@ -896,17 +896,59 @@ void MainWindow::slotToggleSagittalSlice()
 
 void  MainWindow::slotStandardAxialView()
 {
-    mainGLWidget->setView( Fn::Orient::AXIAL );
+    Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
+    GLWidget* target = mainGLWidget;
+    if ( mods & Qt::ControlModifier )
+    {
+        target = mainGLWidget2;
+    }
+
+    if ( mods & Qt::ShiftModifier )
+    {
+        target->setView( Fn::Orient::AXIAL2 );
+    }
+    else
+    {
+        target->setView( Fn::Orient::AXIAL );
+    }
 }
 
 void  MainWindow::slotStandardCoronalView()
 {
-    mainGLWidget->setView( Fn::Orient::CORONAL );
+    Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
+    GLWidget* target = mainGLWidget;
+    if ( mods & Qt::ControlModifier )
+    {
+        target = mainGLWidget2;
+    }
+
+    if ( mods & Qt::ShiftModifier )
+    {
+        target->setView( Fn::Orient::CORONAL2 );
+    }
+    else
+    {
+        target->setView( Fn::Orient::CORONAL );
+    }
 }
 
 void  MainWindow::slotStandardSagittalView()
 {
-    mainGLWidget->setView( Fn::Orient::SAGITTAL );
+    Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
+    GLWidget* target = mainGLWidget;
+    if ( mods & Qt::ControlModifier )
+    {
+        target = mainGLWidget2;
+    }
+
+    if ( mods & Qt::ShiftModifier )
+    {
+        target->setView( Fn::Orient::SAGITTAL2 );
+    }
+    else
+    {
+        target->setView( Fn::Orient::SAGITTAL );
+    }
 }
 
 void MainWindow::slotToggleShaderEdit()

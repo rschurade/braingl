@@ -8,6 +8,8 @@
 #ifndef ARCBALL_H_
 #define ARCBALL_H_
 
+#include "../../data/enums.h"
+
 #include <QVector3D>
 #include <QQuaternion>
 #include <QMatrix4x4>
@@ -32,7 +34,7 @@ public:
 
     QMatrix4x4 getMVMat();
 
-    void setView( int view );
+    void setView( Fn::Orient view );
 
     float getZoom();
     float getMoveX();
