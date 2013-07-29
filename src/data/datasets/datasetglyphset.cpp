@@ -77,6 +77,9 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     m_properties.insert( "maingl2", props2 );
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
+
+    m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
+
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
