@@ -23,6 +23,10 @@ DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* he
     m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 DatasetSH::~DatasetSH()

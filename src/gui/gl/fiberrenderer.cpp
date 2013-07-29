@@ -224,14 +224,14 @@ void FiberRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void FiberRenderer::colorChanged( QColor color )
+void FiberRenderer::colorChanged( QVariant color )
 {
     QVector<bool>*selected = m_selector->getSelection();
     for ( int i = 0; i < m_numLines; ++i )
     {
         if ( selected->at( i ) )
         {
-            m_colorField.replace( i, color );
+            m_colorField.replace( i, color.value<QColor>() );
         }
     }
 }

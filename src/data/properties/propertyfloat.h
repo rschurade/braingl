@@ -24,32 +24,18 @@ public:
                      float max = std::numeric_limits<float>::max() );
     virtual ~PropertyFloat();
 
-    QWidget* getWidget();
 
-    QVariant getValue();
 
 private:
     int determineDigits();
-
-    float m_value;
-    float m_min;
-    float m_max;
-
-    SliderWithEdit* m_widget;
 
 public slots:
     void setValue( QVariant value );
     void setMin( QVariant min );
     void setMax( QVariant max );
-    void setMin( float min );
-    void setMax( float max );
 
 private slots:
     void widgetChanged( float value, int id );
-
-signals:
-    void valueChanged();
-    void valueChanged( float value );
 };
 
 #endif /* PROPERTYFLOAT_H_ */

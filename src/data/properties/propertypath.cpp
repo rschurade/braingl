@@ -10,43 +10,27 @@
 #include "../../gui/widgets/controls/pathwidgetwithlabel.h"
 
 PropertyPath::PropertyPath( QString name, QDir value ) :
-    Property( name ),
-    m_value( value )
+    Property( name, value.absolutePath() )
 {
-    m_widget = new PathWidgetWithLabel( m_name );
-    m_widget->setValue( value );
-    connect( m_widget, SIGNAL( valueChanged( QDir, int ) ), this, SLOT( widgetChanged( QDir, int ) ) );
+    PathWidgetWithLabel* widget = new PathWidgetWithLabel( m_name );
+    widget->setValue( value );
+    connect( widget, SIGNAL( valueChanged( QDir, int ) ), this, SLOT( widgetChanged( QDir, int ) ) );
+    m_widget = widget;
 }
 
 PropertyPath::~PropertyPath()
 {
 }
 
-QWidget* PropertyPath::getWidget()
-{
-    return m_widget;
-}
-
-QVariant PropertyPath::getValue()
-{
-    return m_value.absolutePath();
-}
-
 void PropertyPath::setValue( QVariant value )
 {
-    m_value = QDir( value.toString() );
-    m_widget->setValue( m_value );
-}
-
-void PropertyPath::setValue( QDir value )
-{
     m_value = value;
-    m_widget->setValue( m_value );
+    PathWidgetWithLabel* widget = dynamic_cast<PathWidgetWithLabel*>( m_widget );
+    widget->setValue( value.toString() );
 }
 
 void PropertyPath::widgetChanged( QDir value, int id )
 {
-    m_value = value;
-    emit( valueChanged() );
-    emit( pathChanged( m_value ) );
+    m_value = value.absolutePath();
+    emit( valueChanged( value.absolutePath() ) );
 }

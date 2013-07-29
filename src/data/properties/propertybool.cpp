@@ -11,32 +11,23 @@
 #include <QDebug>
 
 PropertyBool::PropertyBool( QString name, bool value ) :
-    Property( name ),
-    m_value( value )
+    Property( name, value )
 {
-    m_widget = new CheckboxWithLabel( m_name );
-    m_widget->setChecked( value );
-    connect( m_widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    CheckboxWithLabel* widget = new CheckboxWithLabel( m_name );
+    widget->setChecked( value );
+    connect( widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    m_widget = widget;
 }
 
 PropertyBool::~PropertyBool()
 {
 }
 
-QWidget* PropertyBool::getWidget()
-{
-    return m_widget;
-}
-
-QVariant PropertyBool::getValue()
-{
-    return m_value;
-}
 
 void PropertyBool::setValue( QVariant value )
 {
-    m_value = value.toBool();
-    m_widget->setChecked( m_value );
+    m_value = value;
+    ( ( CheckboxWithLabel* )m_widget )->setChecked( m_value.toBool() );
 }
 
 void PropertyBool::widgetChanged( int value, int id )
@@ -44,7 +35,6 @@ void PropertyBool::widgetChanged( int value, int id )
     m_value = value;
     if ( m_widget->isVisible() )
     {
-        emit( valueChanged() );
         emit( valueChanged( value ) );
     }
 }

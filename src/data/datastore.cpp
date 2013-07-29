@@ -145,12 +145,6 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
             beginInsertRows( QModelIndex(), m_datasetList.size(), m_datasetList.size() );
             m_datasetList.push_back( value );
             endInsertRows();
-            connect( VPtr<Dataset>::asPtr( value )->properties( "maingl" ), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
-
-            if ( VPtr<Dataset>::asPtr( value )->properties( "maingl2" )->get( Fn::Property::D_RENDER_TARGET).toString() == "maingl2" )
-            {
-                connect( VPtr<Dataset>::asPtr( value )->properties( "maingl2" ), SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
-            }
 
             Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
             updateGlobals( m_datasetList.size() - 1 );

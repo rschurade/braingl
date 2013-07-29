@@ -9,35 +9,25 @@
 #include "../../gui/widgets/controls/editwithlabel.h"
 
 PropertyString::PropertyString( QString name, QString value ) :
-    Property( name ),
-    m_value( value )
+    Property( name, value )
 {
-    m_widget = new EditWithLabel( m_name );
-    m_widget->setText( value );
-    connect( m_widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );
+    EditWithLabel* widget = new EditWithLabel( m_name );
+    widget->setText( value );
+    connect( widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );
+    m_widget = widget;
 }
 
 PropertyString::~PropertyString()
 {
 }
 
-QWidget* PropertyString::getWidget()
-{
-    return m_widget;
-}
-
-QVariant PropertyString::getValue()
-{
-    return m_value;
-}
-
 void PropertyString::setValue( QVariant value )
 {
-    m_value = value.toString();
+    m_value = value;
 }
 
 void PropertyString::widgetChanged( QString value, int id )
 {
     m_value = value;
-    emit( valueChanged() );
+    emit( valueChanged( value ) );
 }

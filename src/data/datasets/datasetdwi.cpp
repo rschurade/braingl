@@ -24,6 +24,10 @@ DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float
     examineDataset();
 
     m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, true );
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 DatasetDWI::~DatasetDWI()
@@ -121,7 +125,7 @@ void DatasetDWI::examineDataset()
 
 
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged() ), this, SLOT( selectTexture() ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectTexture() ) );
 }
 
 void DatasetDWI::createTexture()

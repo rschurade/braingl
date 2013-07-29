@@ -28,6 +28,9 @@ DatasetCons::DatasetCons( QString fileName ) :
 
     m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
 
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :

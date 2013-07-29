@@ -31,6 +31,10 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nifti_image* header ) :
@@ -64,6 +68,10 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nift
     m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 

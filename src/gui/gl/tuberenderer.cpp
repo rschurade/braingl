@@ -221,14 +221,14 @@ void TubeRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void TubeRenderer::colorChanged( QColor color )
+void TubeRenderer::colorChanged( QVariant color )
 {
     QVector<bool>*selected = m_selector->getSelection();
     for ( int i = 0; i < m_numLines; ++i )
     {
         if ( selected->at( i ) )
         {
-            m_colorField.replace( i, color );
+            m_colorField.replace( i, color.value<QColor>() );
         }
     }
 }

@@ -36,7 +36,7 @@ protected:
     MeshRenderer* m_renderer;
 
 private slots:
-    void paintModeChanged( int mode );
+    void paintModeChanged( QVariant mode );
 
 };
 

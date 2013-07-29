@@ -6,10 +6,59 @@
  */
 #include "propertygroup.h"
 
+#include "propertybool.h"
+#include "propertycolor.h"
+#include "propertyint.h"
+#include "propertyfloat.h"
+#include "propertypath.h"
+#include "propertystring.h"
+#include "propertyselection.h"
+
+#include "../models.h"
+
 #include <QDebug>
 
 PropertyGroup::PropertyGroup()
 {
+}
+
+PropertyGroup::PropertyGroup( PropertyGroup& pg )
+{
+    for ( int i = 0; i < pg.size(); ++i )
+    {
+        QPair<Fn::Property, Property*> pair = pg.getNthPropertyPair( i );
+        Property* prop = pair.second;
+
+        if ( dynamic_cast<PropertyBool*>( prop ) )
+        {
+            create( pair.first, prop->getValue().toBool(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyColor*>( prop ) )
+        {
+            create( pair.first, prop->getValue().value<QColor>(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyFloat*>( prop ) )
+        {
+            create( pair.first, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyInt*>( prop ) )
+        {
+            create( pair.first, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyPath*>( prop ) )
+        {
+            create( pair.first, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertySelection*>( prop ) )
+        {
+            PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
+            create( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyString*>( prop ) )
+        {
+            create( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+    }
 }
 
 PropertyGroup::~PropertyGroup()
@@ -27,7 +76,7 @@ bool PropertyGroup::create( Fn::Property name, bool value, QString tab )
         PropertyBool* prop = new PropertyBool( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -43,7 +92,7 @@ bool PropertyGroup::create( Fn::Property name, int value, QString tab )
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -59,7 +108,7 @@ bool PropertyGroup::create( Fn::Property name, int value, int min, int max, QStr
         PropertyInt* prop = new PropertyInt( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -75,7 +124,7 @@ bool PropertyGroup::create( Fn::Property name, float value, QString tab )
         PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -89,7 +138,7 @@ bool PropertyGroup::create( Fn::Property name, float value, float min, float max
     PropertyFloat* prop = new PropertyFloat( Fn::Prop2String::s( (Fn::Property)name ), value, min, max );
     prop->setPropertyTab( tab );
     m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-    connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+    connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     return true;
 }
 
@@ -104,7 +153,7 @@ bool PropertyGroup::create( Fn::Property name, QString value, QString tab )
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -120,7 +169,7 @@ bool PropertyGroup::create( Fn::Property name, const char* value, QString tab )
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), QString( value ) );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -136,7 +185,7 @@ bool PropertyGroup::create( Fn::Property name, QColor value, QString tab )
         PropertyColor* prop = new PropertyColor( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -152,7 +201,7 @@ bool PropertyGroup::create( Fn::Property name, QDir value, QString tab )
         PropertyPath* prop = new PropertyPath( Fn::Prop2String::s( name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -168,7 +217,7 @@ bool PropertyGroup::create( Fn::Property name, std::initializer_list<QString>opt
         PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -184,7 +233,7 @@ bool PropertyGroup::create( Fn::Property name, QVector<QString> options, int val
         PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
-        connect( prop, SIGNAL( valueChanged() ), this, SLOT( slotPropChanged() ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
     }
     return true;
 }
@@ -244,7 +293,7 @@ QWidget* PropertyGroup::getWidget( Fn::Property name )
 
 void PropertyGroup::slotPropChanged()
 {
-    emit( signalPropChanged() );
+    Models::d()->submit();
 }
 
 int PropertyGroup::size() const
@@ -268,9 +317,20 @@ Property* PropertyGroup::getNthProperty( int n )
 {
     if ( n < 0 || n >= m_properties.size() )
     {
-        return 0;
+        qDebug() << "***ERROR*** getNthProperty index out of range";
+        exit( 0 );
     }
     return m_properties[n].second;
+}
+
+QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n )
+{
+    if ( n < 0 || n >= m_properties.size() )
+    {
+        qDebug() << "***ERROR*** getNthPropertyPair index out of range";
+        exit( 0 );
+    }
+    return m_properties[n];
 }
 
 bool PropertyGroup::setMinF( Fn::Property name, float value )

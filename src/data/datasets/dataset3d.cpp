@@ -26,21 +26,13 @@ Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* heade
     m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, false, "general" );
     m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, true );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged() ), this, SLOT( switchRenderSticks() ) );
-
-    m_properties["maingl2"]->create( Fn::Property::D_COLORMAP, -1 );
-    m_properties["maingl2"]->create( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_DIM, 3 );
-    m_properties["maingl2"]->create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_RENDER_AXIAL, false, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_HAS_TEXTURE, true );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
 
     examineDataset();
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 Dataset3D::~Dataset3D()

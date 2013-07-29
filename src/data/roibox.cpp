@@ -11,6 +11,7 @@
 #include "../gui/gl/glfunctions.h"
 
 #include <QAbstractItemModel>
+#include <QWidget>
 
 ROIBox::ROIBox() :
     ROI( QString("new roi") + QString::number( ROI::m_count++ ) )
@@ -43,7 +44,7 @@ ROIBox::ROIBox() :
     m_properties.create( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
-    connect( m_properties.getProperty( Fn::Property::R_DX ), SIGNAL( valueChanged( float ) ), this, SLOT( dxChanged( float ) ) );
+    connect( m_properties.getProperty( Fn::Property::R_DX ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dxChanged( QVariant ) ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
@@ -101,13 +102,13 @@ void ROIBox::propChanged()
     }
 }
 
-void ROIBox::dxChanged( float value )
+void ROIBox::dxChanged( QVariant value )
 {
     int shape = m_properties.get( Fn::Property::R_SHAPE ).toInt();
     if ( shape == 1 || shape == 2 )
     {
-        m_properties.set( Fn::Property::R_DY, value );
-        m_properties.set( Fn::Property::R_DZ, value );
+        m_properties.set( Fn::Property::R_DY, value.toFloat() );
+        m_properties.set( Fn::Property::R_DZ, value.toFloat() );
     }
 }
 

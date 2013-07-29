@@ -23,24 +23,15 @@ public:
     PropertyString( QString name, QString value = ""  );
     virtual ~PropertyString();
 
-    QWidget* getWidget();
+private:
 
-    QVariant getValue();
-
+public slots:
     void setValue( QVariant value );
     void setMin( QVariant value ) {};
     void setMax( QVariant value ) {};
 
-private:
-    QString m_value;
-
-    EditWithLabel* m_widget;
-
 private slots:
     void widgetChanged( QString value, int id );
-
-signals:
-    void valueChanged();
 
 };
 

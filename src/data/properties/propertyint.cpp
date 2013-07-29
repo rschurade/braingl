@@ -11,68 +11,55 @@
 #include <QDebug>
 
 PropertyInt::PropertyInt( QString name, int value, int min, int max ) :
-    Property( name ),
-    m_value( value ),
-    m_min( min ),
-    m_max( max )
+    Property( name, value, min, max )
 {
-    m_widget = new SliderWithEditInt( m_name );
-    m_widget->setMin( min );
-    m_widget->setMax( max );
-    m_widget->setValue( value );
-    connect( m_widget, SIGNAL( valueChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    SliderWithEditInt* widget = new SliderWithEditInt( m_name );
+    widget->setMin( min );
+    widget->setMax( max );
+    widget->setValue( value );
+    connect( widget, SIGNAL( valueChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    m_widget = widget;
 }
 
 PropertyInt::~PropertyInt()
 {
 }
 
-QWidget* PropertyInt::getWidget()
-{
-    return m_widget;
-}
-
-QVariant PropertyInt::getValue()
-{
-    return m_value;
-}
-
 void PropertyInt::setValue( QVariant value )
 {
     m_value = value.toInt();
-    if ( m_value > m_max )
+    if ( m_value.toInt() > m_max.toInt() )
     {
         m_max = m_value;
-        m_widget->setMax( m_max );
+        ( ( SliderWithEditInt* )m_widget )->setMax( m_max.toInt() );
     }
-    m_widget->setValue( m_value );
+    ( ( SliderWithEditInt* )m_widget )->setValue( m_value.toInt() );
 }
 
 void PropertyInt::setMin( QVariant min )
 {
     m_min = min.toInt();
-    if ( m_value < m_min )
+    if ( m_value.toInt() < m_min.toInt() )
     {
         m_value = m_min;
     }
-    m_widget->setMin( m_min );
-    m_widget->setValue( m_value );
+    ( ( SliderWithEditInt* )m_widget )->setMin( m_min.toInt() );
+    ( ( SliderWithEditInt* )m_widget )->setValue( m_value.toInt() );
 }
 
 void PropertyInt::setMax( QVariant max )
 {
     m_max = max.toInt();
-    if ( m_value > m_max )
+    if ( m_value.toInt() > m_max.toInt() )
     {
         m_value = m_max;
     }
-    m_widget->setMax( m_max );
-    m_widget->setValue( m_value );
+    ( ( SliderWithEditInt* )m_widget )->setMax( m_max.toInt() );
+    ( ( SliderWithEditInt* )m_widget )->setValue( m_value.toInt() );
 }
 
 void PropertyInt::widgetChanged( int value, int id )
 {
     m_value = value;
-    emit( valueChanged() );
     emit( valueChanged( value ) );
 }

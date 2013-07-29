@@ -61,7 +61,7 @@ private:
     QVector<QVector3D>m_globalColorField;
 
 public slots:
-    void colorChanged( QColor color );
+    void colorChanged( QVariant color );
 
 private slots:
 };

@@ -7,8 +7,6 @@
 #ifndef PROPERTY_H_
 #define PROPERTY_H_
 
-#include "../enums.h"
-
 #include <QString>
 #include <QVariant>
 #include <QObject>
@@ -19,14 +17,21 @@ class QWidget;
 
 class Property : public QObject
 {
+    Q_OBJECT
+
 public:
-    Property( QString name );
+    Property( QString name, QVariant value, QVariant min = 0, QVariant max = 0 );
     virtual ~Property();
 
     QString getName();
 
-    virtual QWidget* getWidget() = 0;
-    virtual QVariant getValue() = 0;
+    virtual QWidget* getWidget();
+
+    QVariant getValue();
+    QVariant getMin();
+    QVariant getMax();
+
+
     virtual void setValue( QVariant value ) = 0;
     virtual void setMin( QVariant value ) = 0;
     virtual void setMax( QVariant value ) = 0;
@@ -35,10 +40,19 @@ public:
     QString getPropertyTab();
 
 protected:
+    QWidget* m_widget;
+
     QString m_name; // used for access
     QString m_propertyTab;
 
+    QVariant m_value;
+    QVariant m_min;
+    QVariant m_max;
+
 private:
+
+signals:
+    void valueChanged( QVariant );
 
 };
 

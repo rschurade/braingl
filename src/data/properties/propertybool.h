@@ -21,26 +21,15 @@ public:
     PropertyBool( QString name, bool value = false );
     virtual ~PropertyBool();
 
-    QWidget* getWidget();
+private:
 
-    QVariant getValue();
-
+public slots:
     void setValue( QVariant value );
     void setMin( QVariant value ) {};
     void setMax( QVariant value ) {};
 
-private:
-    int m_value;
-
-    CheckboxWithLabel* m_widget;
-
 private slots:
     void widgetChanged( int value, int id );
-
-signals:
-    void valueChanged();
-    void valueChanged( bool state );
-
 };
 
 #endif /* PROPERTYINT_H_ */

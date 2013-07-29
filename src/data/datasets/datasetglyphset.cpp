@@ -73,27 +73,14 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
             m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
 
-    m_properties["maingl2"]->create( Fn::Property::D_THRESHOLD, 0.0f, minthresh, 1.0f, "general" );
-    //m_properties["maingl2"]->create( Fn::Property::D_GLYPHSTYLE, { "points", "vectors", "pies" }, 0, true );
-    m_properties["maingl2"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
-    m_properties["maingl2"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
-    m_properties["maingl2"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
-    m_properties["maingl2"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_DRAW_GLYPHS, false );
-    //m_properties.remove( "maingl2" );
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
-    m_properties["maingl2"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl2"]->create( Fn::Property::D_MAX, max );
-    m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "colormap" );
-    m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "colormap" );
-    m_properties["maingl2"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "colormap" );
-    m_properties["maingl2"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "colormap" );
-
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( float ) ) );
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( float ) ) );
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
 }
 

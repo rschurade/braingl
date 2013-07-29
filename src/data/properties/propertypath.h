@@ -22,27 +22,15 @@ public:
     PropertyPath( QString name, QDir value );
     virtual ~PropertyPath();
 
-    QWidget* getWidget();
+private:
 
-    QVariant getValue();
-
+public slots:
     void setValue( QVariant value );
-    void setValue( QDir value );
     void setMin( QVariant value ) {};
     void setMax( QVariant value ) {};
 
-
-private:
-    QDir m_value;
-    PathWidgetWithLabel* m_widget;
-
-
 private slots:
     void widgetChanged( QDir value, int id );
-
-signals:
-    void valueChanged();
-    void pathChanged( QDir value );
 };
 
 #endif /* PROPERTYPATH_H_ */

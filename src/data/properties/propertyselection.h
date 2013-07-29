@@ -23,14 +23,9 @@ public:
     PropertySelection( QString name, QVector<QString> options, int value = 0 );
     virtual ~PropertySelection();
 
-    QWidget* getWidget();
-
-    QVariant getValue();
-
+    QVector<QString> getOptions();
 private:
-    int m_value;
-
-    SelectWithLabel* m_widget;
+    QVector<QString>m_options;
 
 public slots:
     void setValue( QVariant value );
@@ -39,10 +34,6 @@ public slots:
 
 private slots:
     void widgetChanged( int value );
-
-signals:
-    void valueChanged();
-    void valueChanged( int );
 };
 
 #endif /* PROPERTYSELECTION_H_ */

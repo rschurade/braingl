@@ -22,14 +22,6 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     props->create( Fn::Property::D_RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
-
-    PropertyGroup* props2 = new PropertyGroup();
-    // add standard properties
-    props2->create( Fn::Property::D_ACTIVE, true, "general" );
-    props2->create( Fn::Property::D_FILENAME, fileName.path() );
-    props2->create( Fn::Property::D_TYPE, (int)type );
-    props2->create( Fn::Property::D_RENDER_TARGET, "maingl2" );
-    m_properties.insert( "maingl2", props2 );
 }
 
 Dataset::~Dataset()

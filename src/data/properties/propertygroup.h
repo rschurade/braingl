@@ -8,19 +8,16 @@
 #ifndef PROPERTYGROUP_H_
 #define PROPERTYGROUP_H_
 
-#include "property.h"
-#include "propertybool.h"
-#include "propertycolor.h"
-#include "propertyint.h"
-#include "propertyfloat.h"
-#include "propertypath.h"
-#include "propertystring.h"
-#include "propertyselection.h"
+#include "../enums.h"
 
+#include "property.h"
+
+#include <QDir>
 #include <QColor>
 #include <QObject>
 #include <QString>
 #include <QVariant>
+#include <QVector>
 
 #include <initializer_list>
 
@@ -30,6 +27,7 @@ class PropertyGroup : public QObject
 
 public:
     PropertyGroup();
+    PropertyGroup( PropertyGroup& pg );
     virtual ~PropertyGroup();
 
     bool contains( Fn::Property name ) const;
@@ -59,6 +57,7 @@ public:
 
     Property* getProperty( Fn::Property name );
     Property* getNthProperty( int n );
+    QPair<Fn::Property, Property*>getNthPropertyPair( int n );
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
