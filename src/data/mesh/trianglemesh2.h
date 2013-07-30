@@ -18,6 +18,7 @@ class TriangleMesh2
 {
 public:
     TriangleMesh2( int numVerts, int numTris );
+    TriangleMesh2( TriangleMesh2* trim );
     virtual ~TriangleMesh2();
 
     void addVertex( int id, float x, float y, float z );

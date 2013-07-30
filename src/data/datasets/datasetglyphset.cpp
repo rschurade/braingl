@@ -40,7 +40,9 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
-                pickedID( -1 )
+                pickedID( -1 ),
+                littleBrains( QVector<MeshRenderer*>() ),
+                shifts( QVector<QMatrix4x4>() )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -76,7 +78,6 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
-
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
 
@@ -154,6 +155,35 @@ void DatasetGlyphset::setMinthresh( float mt )
     minthresh = mt;
 }
 
+void DatasetGlyphset::makeLittleBrains()
+{
+    for ( int i = 0; i < n; ++i )
+    {
+        if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() )
+        {
+            TriangleMesh2* mesh =  new TriangleMesh2( getMesh( "maingl2" ) );
+            MeshRenderer* m_renderer = new MeshRenderer( mesh );
+
+            m_renderer->setModel( Models::g() );
+            m_renderer->init();
+
+            littleBrains << m_renderer;
+
+            QMatrix4x4 sc;
+            for ( int p = 0; p < n; ++p )
+            {
+                mesh->setVertexData( p, conn[i][p] );
+            }
+            QVector3D f = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            sc.translate( f );
+            sc.scale( 0.02 );
+            shifts << sc;
+            //TODO: delete etc...;
+        }
+    }
+    Models::g()->submit();
+}
+
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
@@ -166,28 +196,13 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
-    //TODO: Little brains...
-    /*if ( ( target == "maingl2" ) && ( pickedID > 1 ) )
-     {
-     for ( int i = 0; i < picked.size(); ++i )
-     {
-     MeshRenderer* m_renderer = new MeshRenderer( getMesh( target ) );
-
-     m_renderer->setModel( Models::g() );
-     m_renderer->init();
-     QMatrix4x4 sc;
-     int j = picked[i];
-     for ( int p = 0; p < n; ++p )
-     {
-     getMesh( target )->setVertexData( p, conn[j][p] );
-     }
-     QVector3D f = m_mesh.at( properties( target )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex(j);
-     sc.translate( f );
-     sc.scale( 0.01 );
-     m_renderer->draw( pMatrix, mvMatrix * sc, width, height, renderMode, properties( target ) );
-     delete m_renderer;
-     }
-     }*/
+    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) )
+    {
+        for ( int i = 0; i < littleBrains.size(); ++i )
+        {
+            littleBrains[i]->draw( pMatrix, mvMatrix * shifts[i], width, height, renderMode, properties( target ) );
+        }
+    }
 
     int geoSurf = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -295,7 +310,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             sx = sel.x();
             sy = sel.y();
             sz = sel.z();
-            QColor color = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
+            QColor color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
             color.setAlphaF( 0.8 );
 
             float s = 5.0;
@@ -303,14 +318,14 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
             GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, s, s, s, color, 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx+s, sy, sz, s, t, t, QColor(255.0,0.0,0.0), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx-s, sy, sz, s, t, t, QColor(255.0,0.0,0.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx + s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx - s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy+s, sz, t, s, t, QColor(0.0,255.0,0.0), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy-s, sz, t, s, t, QColor(0.0,255.0,0.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy + s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy - s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz+s, t, t, s, QColor(0.0,0.0,255.0), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz-s, t, t, s, QColor(0.0,0.0,255.0), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz + s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
+            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz - s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
         }
     }
 }

@@ -38,6 +38,44 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
     }
 }
 
+TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
+            m_bufferSize( 7 ),
+            m_numVerts( trim->numVerts() ),
+            m_numTris( trim->numTris() ),
+            m_vertexInsertId( 0 ),
+            m_colorInsertId( 0 ),
+            m_triangleInsertId( 0 ),
+            m_ocTree( 0 )
+        {
+    m_vertices.resize( trim->numVerts() * m_bufferSize );
+    m_vertexColors.resize( trim->numVerts() * 4 );
+    m_vertIsInTriangle.resize( trim->numVerts() );
+    m_vertNeighbors.resize( trim->numVerts() );
+
+    m_triangles.resize( trim->numTris() * 3 );
+    m_triNormals.resize( trim->numTris() );
+
+    m_numThreads = GLFunctions::idealThreadCount;
+
+    // create threads
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        m_threads.push_back( new MeshThread( &m_vertices, &m_triangles, m_numTris, m_bufferSize, i ) );
+    }
+
+    for ( int i = 0; i < trim->numVerts(); ++i )
+    {
+        QVector3D v = trim->getVertex( i );
+        this->addVertex( i, v.x(), v.y(), v.z() );
+    }
+    QVector<int> tris = trim->getTriangles();
+    for ( int i = 0; i < trim->numTris(); ++i )
+    {
+        this->addTriangle( i, tris[i * 3], tris[i * 3 + 1], tris[i * 3 + 2] );
+    }
+    finalize();
+}
+
 TriangleMesh2::~TriangleMesh2()
 {
 }

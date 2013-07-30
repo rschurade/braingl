@@ -155,6 +155,10 @@ void ToolBar::createActions()
     m_avgConRZAction->setStatusTip( tr( "Calculate average connectivity between r-to-z transformed values, result is transfromed back z-to-r" ) );
     connect( m_avgConRZAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_littleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Create little brains" ), this, Fn::Algo::LITTLE_BRAINS );
+    m_littleBrainsAction->setStatusTip( tr( "Create little brains at all points painted (different from background color) in the current color layer" ) );
+    connect( m_littleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -292,6 +296,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::AVG_CON_RZ:
             ((DatasetGlyphset*)ds)->avgConRtoZ();
             break;
+        case Fn::Algo::LITTLE_BRAINS:
+            ((DatasetGlyphset*)ds)->makeLittleBrains();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -364,6 +371,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_load1DAction );
             this->addAction( m_avgConAction );
             this->addAction( m_avgConRZAction );
+            this->addAction( m_littleBrainsAction );
             break;
         }
         case Fn::DatasetType::CONS:
