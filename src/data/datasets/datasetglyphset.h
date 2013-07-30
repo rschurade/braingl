@@ -50,6 +50,7 @@ public:
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void avgCon();
     void avgConRtoZ();
+    void makeLittleBrains();
 
 private:
     float minthresh;
@@ -75,6 +76,8 @@ private:
     QString m_colors_name;
     int pickedID;
     QVector<int> picked;
+    QVector<MeshRenderer*> littleBrains;
+    QVector<QMatrix4x4> shifts;
 };
 
 #endif /* DATASETGLYPHSET_H_ */

@@ -65,7 +65,8 @@ namespace Fn
         SAVE1D,
         LOAD1D,
         AVG_CON,
-        AVG_CON_RZ
+        AVG_CON_RZ,
+        LITTLE_BRAINS
     };
 
     enum class Orient : int
