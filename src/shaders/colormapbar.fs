@@ -6,7 +6,6 @@
 
 void main( void )
 {
-    vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 );
     float value = 0.0;
     float min_ = 0.0;
     float max_ = 1.0;
@@ -31,5 +30,5 @@ void main( void )
 
     value = max( 0.0, min( 1.0, value ) );
     
-    writePeel( colormap( value, u_colormap, 0.0, 1.0, 0.0, 1.0, 1.0, color ).rgb );
+    writePeel( colormap( value, u_colormap, 0.0, 1.0, 0.0, 1.0 ).rgb );
 }

@@ -35,6 +35,7 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties["maingl2"]->getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
 
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
               m_properties["maingl2"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
@@ -188,6 +189,11 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     {
         return;
     }
+    if ( properties( target )->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+    {
+        target = "maingl";
+    }
+
     if ( properties( target )->get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
     {
         if ( !m_colormapRenderer )
