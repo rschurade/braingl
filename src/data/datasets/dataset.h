@@ -39,6 +39,7 @@ public:
     virtual QString getColormapShader( int num );
 
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    void copySettings( QString target );
 
 protected:
     virtual void createTexture();

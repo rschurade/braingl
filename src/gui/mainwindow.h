@@ -89,6 +89,7 @@ private:
     QAction* quitAct;
     QAction* loadSceneAct;
     QAction* saveSceneAct;
+    QAction* newMainGLAct;
 
     QAction* lockDockTitlesAct;
     QAction* renderCrosshairsAct;
@@ -112,6 +113,7 @@ private:
     QAction* dilbertAct;
 
     static int screenshotNumber;
+    static int countMainGL;
 
 private slots:
     void slotNew();
@@ -123,6 +125,7 @@ private slots:
     void about();
     void screenshot();
     void resetSettings();
+    void newMainGL();
 
     void slotToggleAxialSlice();
     void slotToggleCoronalSlice();

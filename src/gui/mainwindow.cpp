@@ -43,6 +43,7 @@
 #include <QWebView>
 
 int MainWindow::screenshotNumber = 0;
+int MainWindow::countMainGL = 2;
 
 MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	QMainWindow(),
@@ -602,6 +603,11 @@ void MainWindow::createActions()
     aboutAct->setStatusTip( tr( "Show the application's About box" ) );
     connect( aboutAct, SIGNAL(triggered()), this, SLOT(about()) );
 
+
+    newMainGLAct = new QAction( tr( "New 3D view" ), this );
+    newMainGLAct->setStatusTip( tr( "New 3D view" ) );
+    connect( newMainGLAct, SIGNAL(triggered()), this, SLOT( newMainGL() ) );
+
     showAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Show Axial Slice" ), this );
     showAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
     showAxialAct->setCheckable( true );
@@ -686,6 +692,8 @@ void MainWindow::createMenus()
     optionMenu->addAction( renderCrosshairsAct );
 
     viewMenu = menuBar()->addMenu( tr( "&View" ) );
+//    viewMenu->addAction( newMainGLAct );
+//    viewMenu->addSeparator();
 
     menuBar()->addSeparator();
 
@@ -762,7 +770,6 @@ void MainWindow::createDockWindows()
 	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
-    viewMenu->addAction( dockDSP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
 
@@ -770,7 +777,6 @@ void MainWindow::createDockWindows()
     FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties 2"), dsProperties2, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
     dsProperties2->setSelectionModel( m_datasetWidget->selectionModel() );
-    viewMenu->addAction( dockDSP2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
     dockDSP2->hide();
@@ -809,7 +815,6 @@ void MainWindow::createDockWindows()
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
-    viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
@@ -817,7 +822,6 @@ void MainWindow::createDockWindows()
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
     FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
-    viewMenu->addAction( dockMainGL2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
 
@@ -862,6 +866,12 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
     connect( dockSSHW, SIGNAL( visibilityChanged( bool ) ), sshw, SLOT( visibilityChanged( bool ) ) );
     dockSSHW->hide();
+
+    viewMenu->addSeparator();
+    viewMenu->addAction( dockMainGL->toggleViewAction() );
+    viewMenu->addAction( dockDSP->toggleViewAction() );
+    viewMenu->addAction( dockMainGL2->toggleViewAction() );
+    viewMenu->addAction( dockDSP2->toggleViewAction() );
 
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
@@ -1023,4 +1033,31 @@ void MainWindow::slotNew()
 {
     NewDatasetWidget* ndw = new NewDatasetWidget( m_roiWidget, this );
     ndw->show();
+}
+
+void MainWindow::newMainGL()
+{
+    MainWindow::countMainGL++;
+    GLWidget* glw = new GLWidget( "maingl" + QString::number( MainWindow::countMainGL ), m_roiWidget->selectionModel(), this, mainGLWidget );
+    FNDockWidget* dockGLW = new FNDockWidget( "main gl " + QString::number( MainWindow::countMainGL ), glw, this );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockGLW );
+    viewMenu->addAction( dockGLW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGLW, SLOT( toggleTitleWidget() ) );
+    connect( dockGLW, SIGNAL( visibilityChanged( bool ) ), glw, SLOT( visibilityChanged( bool ) ) );
+
+    int countDatasets = Models::d()->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        ds->copySettings( "maingl" + QString::number( MainWindow::countMainGL ) );
+    }
+
+
+    DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl" + QString::number( MainWindow::countMainGL ), this );
+    FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties " + QString::number( MainWindow::countMainGL ) ), dsProperties2, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
+    dsProperties2->setSelectionModel( m_datasetWidget->selectionModel() );
+    viewMenu->addAction( dockDSP2->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
+    dockDSP2->hide();
 }

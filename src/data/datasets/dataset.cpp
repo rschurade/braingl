@@ -78,3 +78,11 @@ QString Dataset::getColormapShader( int num )
 
     return code;
 }
+
+void Dataset::copySettings( QString target )
+{
+    PropertyGroup* props = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( target, props );
+    m_properties[target]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties[target]->getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
+}
