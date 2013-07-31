@@ -78,6 +78,14 @@ TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
 
 TriangleMesh2::~TriangleMesh2()
 {
+    m_vertices.clear();
+    m_vertexColors.clear();
+    m_vertIsInTriangle.clear();
+    m_vertNeighbors.clear();
+    m_triangles.clear();
+    m_triNormals.clear();
+    m_threads.clear();
+    m_toRemove.clear();
 }
 
 int TriangleMesh2::bufferSize()

@@ -58,7 +58,7 @@ private:
     bool* roi;
     float** conn; //square connectivity matrix
 
-    int n;  //number of vertices, has to match size of matrix
+    int m_n;  //number of vertices, has to match size of matrix
 
     float* consArray;
     float* vecsArray;
@@ -77,7 +77,7 @@ private:
     int pickedID;
     QVector<int> picked;
     QVector<MeshRenderer*> littleBrains;
-    QVector<QMatrix4x4> shifts;
+    QVector<QVector3D> shifts;
 };
 
 #endif /* DATASETGLYPHSET_H_ */
