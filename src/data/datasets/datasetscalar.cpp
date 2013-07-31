@@ -30,7 +30,7 @@ DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* h
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_IS_ATLAS, false, "colormap" );
+    //m_properties["maingl"]->create( Fn::Property::D_IS_ATLAS, false, "colormap" );
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
