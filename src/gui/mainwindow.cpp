@@ -811,7 +811,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     viewMenu->addAction( dockMainGL->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget, SLOT( update() ) );
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
 
@@ -820,7 +819,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
     viewMenu->addAction( dockMainGL2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), mainGLWidget2, SLOT( update() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
@@ -828,7 +826,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav1, SLOT( update() ) );
     connect( dockNav1, SIGNAL( visibilityChanged( bool ) ), nav1, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
@@ -836,7 +833,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav2, SLOT( update() ) );
     connect( dockNav2, SIGNAL( visibilityChanged( bool ) ), nav2, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
@@ -844,7 +840,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav3, SLOT( update() ) );
     connect( dockNav3, SIGNAL( visibilityChanged( bool ) ), nav3, SLOT( setWidgetVisible( bool ) ) );
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
@@ -852,7 +847,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
     viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), nav4, SLOT( update() ) );
     connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
     dockNav1->hide();
