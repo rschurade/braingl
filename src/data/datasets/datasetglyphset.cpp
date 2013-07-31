@@ -42,7 +42,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 m_colors_name( "" ),
                 pickedID( -1 ),
                 littleBrains( QVector<MeshRenderer*>() ),
-                shifts( QVector<QMatrix4x4>() )
+                shifts( QVector<QVector3D>() )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -107,7 +107,7 @@ DatasetGlyphset::~DatasetGlyphset()
     }
     if ( conn )
     {
-        for ( int i = 0; i < n; i++ )
+        for ( int i = 0; i < m_n; i++ )
         {
             delete[] conn[i];
             conn[i] = NULL;
@@ -124,22 +124,22 @@ void DatasetGlyphset::readConnectivity( QString filename )
         qDebug() << "binary connectivity unreadable: " << filename;
 
     //This assumes a square matrix of float32...
-    n = qSqrt( f.size() / 4 );
-    qDebug() << "connectivity matrix size: " << n;
-    conn = new float*[n];
-    for ( int i = 0; i < n; i++ )
+    m_n = qSqrt( f.size() / 4 );
+    qDebug() << "connectivity matrix size: " << m_n;
+    conn = new float*[m_n];
+    for ( int i = 0; i < m_n; i++ )
     {
-        conn[i] = new float[n];
+        conn[i] = new float[m_n];
     }
 
     QDataStream ins( &f );
     ins.setByteOrder( QDataStream::LittleEndian );
     ins.setFloatingPointPrecision( QDataStream::SinglePrecision );
-    qDebug() << "reading binary connectivity between " << n << " nodes...";
+    qDebug() << "reading binary connectivity between " << m_n << " nodes...";
 
-    for ( int i = 0; i < n; i++ )
+    for ( int i = 0; i < m_n; i++ )
     {
-        for ( int j = 0; j < n; j++ )
+        for ( int j = 0; j < m_n; j++ )
         {
             ins >> conn[i][j];
             //qDebug() << i << j << conn[i][j];
@@ -157,11 +157,18 @@ void DatasetGlyphset::setMinthresh( float mt )
 
 void DatasetGlyphset::makeLittleBrains()
 {
-    for ( int i = 0; i < n; ++i )
+
+    for (int i = 0; i<littleBrains.size(); ++i){
+        delete littleBrains[i];
+    }
+    littleBrains.clear();
+    shifts.clear();
+
+    for ( int i = 0; i < m_n; ++i )
     {
         if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() )
         {
-            TriangleMesh2* mesh =  new TriangleMesh2( getMesh( "maingl2" ) );
+            TriangleMesh2* mesh = new TriangleMesh2( getMesh( "maingl" ) );
             MeshRenderer* m_renderer = new MeshRenderer( mesh );
 
             m_renderer->setModel( Models::g() );
@@ -170,15 +177,12 @@ void DatasetGlyphset::makeLittleBrains()
             littleBrains << m_renderer;
 
             QMatrix4x4 sc;
-            for ( int p = 0; p < n; ++p )
+            for ( int p = 0; p < m_n; ++p )
             {
                 mesh->setVertexData( p, conn[i][p] );
             }
             QVector3D f = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
-            sc.translate( f );
-            sc.scale( 0.02 );
-            shifts << sc;
-            //TODO: delete etc...;
+            shifts << f;
         }
     }
     Models::g()->submit();
@@ -200,7 +204,24 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         for ( int i = 0; i < littleBrains.size(); ++i )
         {
-            littleBrains[i]->draw( pMatrix, mvMatrix * shifts[i], width, height, renderMode, properties( target ) );
+            QVector3D shift = shifts[i];
+            QMatrix4x4 toOrigin;
+            toOrigin.translate( shift );
+            toOrigin.scale( properties( "maingl2" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+            //Rotation of the individual glyphs:
+            float rotx = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+            QMatrix4x4 rotMatrix;
+            rotMatrix.rotate( rotx, 1, 0, 0 );
+            float roty = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+            rotMatrix.rotate( roty, 0, 1, 0 );
+            float rotz = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+            rotMatrix.rotate( rotz, 0, 0, 1 );
+            toOrigin *= rotMatrix;
+            toOrigin.translate( -shift );
+            QMatrix4x4 zshift;
+            //little brain node towards the camera from big brain node...
+            zshift.translate(0,0,2);
+            littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
         }
     }
 
@@ -338,14 +359,14 @@ void DatasetGlyphset::makeCons()
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
-    n = m_mesh.at( geo )->numVerts();
-    qDebug() << "nodes: " << n;
+    m_n = m_mesh.at( geo )->numVerts();
+    qDebug() << "nodes: " << m_n;
     consNumber = 0;
     //count first, then create array...
     //TODO: Parallelize, protect from renderthread interruptions?...
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
@@ -358,9 +379,9 @@ void DatasetGlyphset::makeCons()
     int offset = 13;
     consArray = new float[offset * consNumber];
     consNumber = 0;
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
@@ -406,14 +427,14 @@ void DatasetGlyphset::makeDiffPoints()
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
-    n = m_mesh.at( geo )->numVerts();
-    qDebug() << "nodes: " << n;
+    m_n = m_mesh.at( geo )->numVerts();
+    qDebug() << "nodes: " << m_n;
     consNumber = 0;
     //count first, then create array...
     //TODO: Parallelize, protect from renderthread interruptions?...
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
@@ -459,7 +480,7 @@ void DatasetGlyphset::makeDiffPoints()
         {
 
             //qDebug() << "point: " << i1 << " " << i2;
-            for ( int j = 0; j < n; ++j )
+            for ( int j = 0; j < m_n; ++j )
             {
                 float v = qAbs( conn[i1][j] - conn[i2][j] );
                 //TODO: What treshold do we use?
@@ -515,14 +536,14 @@ void DatasetGlyphset::makeVecs()
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
-    n = m_mesh.at( geo )->numVerts();
-    qDebug() << "nodes: " << n;
+    m_n = m_mesh.at( geo )->numVerts();
+    qDebug() << "nodes: " << m_n;
     vecsNumber = 0;
 //count first, then create array...
 //TODO: Parallelize, protect from renderthread interruptions?...
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
@@ -535,9 +556,9 @@ void DatasetGlyphset::makeVecs()
     int offset = 28;
     vecsArray = new float[offset * vecsNumber];
     vecsNumber = 0;
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
@@ -633,20 +654,20 @@ void DatasetGlyphset::makePies()
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
-    n = m_mesh.at( geo )->numVerts();
-    pieArrays = new QVector<float*>( n, NULL );
-    numbers = new QVector<int>( n );
+    m_n = m_mesh.at( geo )->numVerts();
+    pieArrays = new QVector<float*>( m_n, NULL );
+    numbers = new QVector<int>( m_n );
 
 //for all nodes in the current surface...
 //count first and throw super-threshold connections in sortable list, then create arrays...
 //TODO: Parallelize, protect from renderthread interruptions?...
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
         int count = 0;
 
         QList<Connection*> sortlist;
 
-        for ( int j = 0; j < n; ++j )
+        for ( int j = 0; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
@@ -704,14 +725,14 @@ QList<Dataset*> DatasetGlyphset::createConnections()
 {
     float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
-    n = m_mesh.at( geo )->numVerts();
+    m_n = m_mesh.at( geo )->numVerts();
 
 //TODO: think about making upper threshold interactive...
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     Connections* cons = new Connections();
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = i + 1; j < n; ++j )
+        for ( int j = i + 1; j < m_n; ++j )
         {
             float v = conn[i][j];
             if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
@@ -945,7 +966,7 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
     pickedID = getMesh( target )->closestVertexIndex( pos );
 
     DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
         if ( pickedID != -1 )
         {
@@ -960,11 +981,11 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
 
 void DatasetGlyphset::avgCon()
 {
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
         double v = 0;
         int nroi = 0;
-        for ( int r = 0; r < n; ++r )
+        for ( int r = 0; r < m_n; ++r )
         {
             if ( roi[r] )
             {
@@ -989,11 +1010,11 @@ void DatasetGlyphset::avgCon()
 
 void DatasetGlyphset::avgConRtoZ()
 {
-    for ( int i = 0; i < n; ++i )
+    for ( int i = 0; i < m_n; ++i )
     {
         double v = 0;
         int nroi = 0;
-        for ( int r = 0; r < n; ++r )
+        for ( int r = 0; r < m_n; ++r )
         {
             if ( roi[r] )
             {
