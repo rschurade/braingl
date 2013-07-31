@@ -231,16 +231,16 @@ void GLFunctions::updateColormapShader()
 
     int numColormaps = ColormapFunctions::size();
 
-    code += "vec4 colormap( float value, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax, float alpha, vec4 fragColor ) \n";
+    code += "vec4 colormap( float value, int cmap, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
     code += "{ \n";
     code += "    vec3 color = vec3(0.0); \n";
     code += "    if ( value < lowerThreshold ) \n";
     code += "    { \n";
-    code += "        return fragColor; \n";
+    code += "        return vec4( color, 1.0 ); \n";
     code += "    } \n";
     code += "    if ( value > upperThreshold ) \n";
     code += "    { \n";
-    code += "        return fragColor; \n";
+    code += "        return vec4( color, 1.0 ); \n";
     code += "    } \n";
     code += "    value = ( value - selectedMin ) / ( selectedMax - selectedMin ); \n";
     for ( int i = 0; i < numColormaps; ++i )
@@ -250,15 +250,15 @@ void GLFunctions::updateColormapShader()
         code += ColormapFunctions::get( i ).getCode();
         code += "    } \n";
     }
-    code += "    return vec4( mix( fragColor.rgb, color, alpha ), 1.0 ); \n";
+    code += "    return vec4( color, 1.0 ); \n";
     code += "} \n";
 
-    QList< int > tl = getTextureIndexes( "maingl" );
-    code += getNthColormapShader( tl, 4 );
-    code += getNthColormapShader( tl, 3 );
-    code += getNthColormapShader( tl, 2 );
-    code += getNthColormapShader( tl, 1 );
-    code += getNthColormapShader( tl, 0 );
+//    QList< int > tl = getTextureIndexes( "maingl" );
+//    code += getNthColormapShader( tl, 4 );
+//    code += getNthColormapShader( tl, 3 );
+//    code += getNthColormapShader( tl, 2 );
+//    code += getNthColormapShader( tl, 1 );
+//    code += getNthColormapShader( tl, 0 );
 
     GLFunctions::m_shaderIncludes[ "colormap_fs" ] = code;
     //qDebug() << code;
@@ -427,6 +427,11 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             texIndex = 4;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
+            if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+            {
+                props = ds->properties( "maingl" );
+            }
+
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold4", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -434,6 +439,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             program->setUniformValue( "u_selectedMin4", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_selectedMax4", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_alpha4", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            program->setUniformValue( "u_colormap4", props->get( Fn::Property::D_COLORMAP ).toInt() );
             program->setUniformValue( "u_texActive4", true );
         }
             /* no break */
@@ -442,6 +448,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             texIndex = 3;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
+            if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+            {
+                props = ds->properties( "maingl" );
+            }
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold3", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -449,6 +459,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             program->setUniformValue( "u_selectedMin3", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_selectedMax3", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_alpha3", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            program->setUniformValue( "u_colormap3", props->get( Fn::Property::D_COLORMAP ).toInt() );
             program->setUniformValue( "u_texActive3", true );
         }
             /* no break */
@@ -457,6 +468,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             texIndex = 2;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
+            if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+            {
+                props = ds->properties( "maingl" );
+            }
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold2", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -464,6 +479,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             program->setUniformValue( "u_selectedMin2", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_selectedMax2", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_alpha2", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            program->setUniformValue( "u_colormap2", props->get( Fn::Property::D_COLORMAP ).toInt() );
             program->setUniformValue( "u_texActive2", true );
         }
             /* no break */
@@ -472,6 +488,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             texIndex = 1;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
+            if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+            {
+                props = ds->properties( "maingl" );
+            }
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold1", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -479,6 +499,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             program->setUniformValue( "u_selectedMin1", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_selectedMax1", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_alpha1", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            program->setUniformValue( "u_colormap1", props->get( Fn::Property::D_COLORMAP ).toInt() );
             program->setUniformValue( "u_texActive1", true );
 
         }
@@ -488,6 +509,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             texIndex = 0;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             PropertyGroup* props = ds->properties( target );
+            if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
+            {
+                props = ds->properties( "maingl" );
+            }
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold0", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -495,6 +520,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             program->setUniformValue( "u_selectedMin0", ( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_selectedMax0", ( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
             program->setUniformValue( "u_alpha0", props->get( Fn::Property::D_ALPHA ).toFloat() );
+            program->setUniformValue( "u_colormap0", props->get( Fn::Property::D_COLORMAP ).toInt() );
             GLFunctions::sliceAlpha[target] = props->get( Fn::Property::D_ALPHA ).toFloat();
             program->setUniformValue( "u_texActive0", true );
         }

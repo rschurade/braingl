@@ -182,6 +182,7 @@ namespace Fn
         D_GLYPH_ROT_Z,
         D_GLYPH_ALPHA,
         D_IS_ATLAS,
+        D_LOCK_PROPS,
         // Global Settings
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
@@ -333,6 +334,7 @@ namespace Fn
                 case Property::D_GLYPH_ROT_Z: return QString( "glyph z rotation" ); break;
                 case Property::D_GLYPH_ALPHA: return QString( "glyph alpha" ); break;
                 case Property::D_IS_ATLAS: return QString( "is atlas" ); break;
+                case Property::D_LOCK_PROPS: return QString( "lock properties" ); break;
                 // Global Settings
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break; // Global Settings for rendering

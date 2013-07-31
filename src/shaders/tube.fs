@@ -19,7 +19,7 @@ void main()
     }
     else if ( u_colorMode == 4 )
     {
-        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, color );
+        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax );
  
     }
     else

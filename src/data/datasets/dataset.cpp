@@ -12,6 +12,7 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     PropertyGroup* props = new PropertyGroup();
     // add standard properties
     props->create( Fn::Property::D_ACTIVE, true );
+    props->create( Fn::Property::D_LOCK_PROPS, false );
     props->create( Fn::Property::D_FILENAME, fileName.path() );
     props->create( Fn::Property::D_TYPE, (int)type );
     props->create( Fn::Property::D_NAME, fileName.path().split( "/" ).last(), "general" );

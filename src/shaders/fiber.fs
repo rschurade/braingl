@@ -24,8 +24,7 @@ void main()
     }
     else if ( u_colorMode == 4 )
     {
-        vec4 mcolor = vec4( 0.0, 0.0, 0.0, 1.0 );
-        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax, 1.0, mcolor ).rgb;
+        color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax ).rgb;
     }
     else
     {
