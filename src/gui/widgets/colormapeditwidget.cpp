@@ -19,6 +19,7 @@
 
 #include "../../data/enums.h"
 #include "../../data/properties/property.h"
+#include "../../data/models.h"
 
 #include <QtGui>
 
@@ -274,7 +275,7 @@ void ColormapEditWidget::save()
     m_selected = ColormapFunctions::size() - 1;
     redrawWidget();
 
-    emit( signalUpdate() );
+    Models::g()->submit();
 }
 
 void ColormapEditWidget::update()
@@ -283,7 +284,7 @@ void ColormapEditWidget::update()
     ColormapFunctions::updateColormap( m_selected, m_colormap );
     GLFunctions::reloadShaders();
 
-    emit( signalUpdate() );
+    Models::g()->submit();
 }
 
 void ColormapEditWidget::selectionChanged( int id )
