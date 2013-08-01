@@ -205,7 +205,7 @@ Dataset3D* Fibers::tractColor()
 
         int numFloats = fib.size();
         QVector3D localColor2( fabs( fib[numFloats-6] - fib[numFloats-3] ), fabs( fib[numFloats-5] - fib[numFloats-2] ), fabs( fib[numFloats-4] - fib[numFloats-1] ) );
-        localColor.normalize();
+        localColor2.normalize();
 
         x = fib.at( numFloats - 3 );
         y = fib.at( numFloats - 2 );
@@ -214,7 +214,7 @@ Dataset3D* Fibers::tractColor()
         if ( !visited.contains( id) )
         {
             ++count[ id ];
-            data[ id ] += localColor;
+            data[ id ] += localColor2;
             visited.insert( id );
         }
     }
