@@ -80,6 +80,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl2"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
 
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
@@ -181,7 +182,7 @@ void DatasetGlyphset::makeLittleBrains()
             {
                 mesh->setVertexData( p, conn[i][p] );
             }
-            QVector3D f = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            QVector3D f = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
             shifts << f;
         }
     }
@@ -200,7 +201,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
-    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) )
+    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) && properties(target)->get(Fn::Property::D_LITTLE_BRAIN_VISIBILITY).toBool() )
     {
         for ( int i = 0; i < littleBrains.size(); ++i )
         {
