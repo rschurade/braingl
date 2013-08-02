@@ -30,6 +30,7 @@ public:
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
     TriangleMesh2* getMesh();
+    bool load1D(QString filename = "");
 
 protected:
     QVector<TriangleMesh2*> m_mesh;

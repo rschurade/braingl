@@ -42,6 +42,8 @@ public:
     void setState( QList<QVariant> state );
 
     void rotateZ(float angle);
+    void rotate( float angle, float x, float y, float z );
+    void translate( float x, float y, float z );
 
 private:
     QVector3D map_sphere( int x, int y );
@@ -58,8 +60,8 @@ private:
 
     QQuaternion q_current_rotation; // current rotation
 
-    QMatrix4x4 m_currentRot;               // current rotation matrix
-    QMatrix4x4 m_lastRot;               // current rotation matrix
+    QMatrix4x4 m_current;               // current rotation matrix
+    QMatrix4x4 m_last;               // current rotation matrix
 
     float m_moveX;
     float m_moveY;

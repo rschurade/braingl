@@ -11,12 +11,15 @@
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
 
+#include "qfile.h"
+#include "qfiledialog.h"
+
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
-    Dataset( fileName, Fn::DatasetType::MESH_BINARY ),
-    m_renderer( 0 )
+        Dataset( fileName, Fn::DatasetType::MESH_BINARY ), m_renderer( 0 )
 {
     m_mesh.push_back( mesh );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
@@ -28,30 +31,32 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE,
+    { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
-    float min = 0; //std::numeric_limits<float>::max();
-    float max = std::numeric_limits<float>::min();
-/*
-    for ( int i = 0; i < mesh->numVerts(); ++i )
-    {
-        float value = mesh->getVertexData( i );
-        min = qMin( min, value );
-        max = qMax( max, value );
-    }
-*/
-    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max );
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max );
+    float min = 0.0;
+    float max = 100.0;
+    /*
+     for ( int i = 0; i < mesh->numVerts(); ++i )
+     {
+     float value = mesh->getVertexData( i );
+     min = qMin( min, value );
+     max = qMax( max, value );
+     }
+     */
+    m_properties["maingl"]->create( Fn::Property::D_MIN, min , "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_MAX, max , "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max , "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max , "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max , "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max , "colormap" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( int ) ), this, SLOT( paintModeChanged( int ) ) );
 
-    m_properties["maingl2"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl2"]->create( Fn::Property::D_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl2"]->create( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl2"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl2"]->create( Fn::Property::D_ALPHA, 1.f, 0.f, 1.f, "general" );
@@ -67,20 +72,27 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     m_properties["maingl2"]->create( Fn::Property::D_MAX, max );
     m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MIN, min, min, max );
     m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MAX, max, min, max );
-    m_properties["maingl2"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max );
+    m_properties["maingl2"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max );
     m_properties["maingl2"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
+            m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
+
+    //load1D();
 }
 
 DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
-    Dataset( fileName, type ),
-    m_renderer( 0 )
+        Dataset( fileName, type ), m_renderer( 0 )
 {
     PropertyGroup* props = new PropertyGroup();
     props->create( Fn::Property::D_ACTIVE, true, "general" );
     props->create( Fn::Property::D_RENDER_TARGET, "maingl2" );
     m_properties.insert( "maingl2", props );
 
-    m_properties["maingl"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.f, 0.f, 1.f, "general" );
@@ -92,30 +104,31 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE,
+    { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
     float min = 0; //std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::min();
-/*
-    for ( int i = 0; i < mesh->numVerts(); ++i )
-    {
-        float value = mesh->getVertexData( i );
-        min = qMin( min, value );
-        max = qMax( max, value );
-    }
-*/
+    /*
+     for ( int i = 0; i < mesh->numVerts(); ++i )
+     {
+     float value = mesh->getVertexData( i );
+     min = qMin( min, value );
+     max = qMax( max, value );
+     }
+     */
 //    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
 //    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
 //    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max );
 //    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max );
 //    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max );
 //    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max );
-
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( int ) ), this, SLOT( paintModeChanged( int ) ) );
 
-    m_properties["maingl2"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl2"]->create( Fn::Property::D_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl2"]->create( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl2"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl2"]->create( Fn::Property::D_ALPHA, 1.f, 0.f, 1.f, "general" );
@@ -128,11 +141,11 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     m_properties["maingl2"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
     /*m_properties["maingl2"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl2"]->create( Fn::Property::D_MAX, max );
-    m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MIN, min, min, max );
-    m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MAX, max, min, max );
-    m_properties["maingl2"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max );
-    m_properties["maingl2"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max );*/
+     m_properties["maingl2"]->create( Fn::Property::D_MAX, max );
+     m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MIN, min, min, max );
+     m_properties["maingl2"]->create( Fn::Property::D_SELECTED_MAX, max, min, max );
+     m_properties["maingl2"]->create( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/1000., min, max );
+     m_properties["maingl2"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max );*/
 }
 DatasetMesh::~DatasetMesh()
 {
@@ -156,7 +169,6 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
         m_renderer->init();
     }
 
-
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
@@ -168,7 +180,7 @@ QString DatasetMesh::getValueAsString( int x, int y, int z )
 bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
-    if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
+    if ( pickId == 0 || paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return false;
     }
@@ -209,4 +221,27 @@ void DatasetMesh::paintModeChanged( int mode )
     {
         m_properties["maingl"]->set( Fn::Property::D_COLORMODE, 2 );
     }
+}
+
+bool DatasetMesh::load1D(QString filename)
+{
+    qDebug() << "loading 1D values: " << filename;
+    if (filename =="") filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return false;
+    }
+    QTextStream in( &file );
+
+    for ( int i = 0; i < getMesh()->numVerts(); i++ )
+    {
+        float v;
+        in >> v;
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, v );
+        }
+    }
+    return true;
 }

@@ -42,6 +42,8 @@
 #include <QDesktopWidget>
 #include <qimage.h>
 
+#include "../data/datasets/datasetmesh.h"
+
 int MainWindow::screenshotNumber = 0;
 
 MainWindow::MainWindow( bool debug, bool resetSettings ) :
@@ -901,9 +903,37 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::screenshot()
 {
-    for (int i = 0; i<360; ++i)
+    for ( int i = 0; i < 3; ++i )
     {
-        mainGLWidget->getArcBall()->rotateZ(1);
+        mainGLWidget->getArcBall()->rotateZ(1);  //Rotation
+        mainGLWidget->getArcBall()->rotate(1,0,1,0);  //Bspw: Rotation um y-Achse um ein Grad (Winkel (Schritt), x,y,z)
+        //mainGLWidget->getArcBall()->translate(0,0,100);  //Translation
+
+        //Wechseln von Daten, das klappt noch nicht so wies soll:
+        /*QString numberString = QString::number( i );
+        int nss = numberString.size();
+        for ( int i = 0; i < 3 - nss; ++i )
+        {
+            numberString = "0" + numberString;
+        }
+        QString volname = "/SCR/ars_movie/MEG/lh/" + numberString + ".mat.txt";
+        qDebug() << "loading: " << volname;
+
+        //load( volname );
+        //...
+        int countDatasets = Models::d()->rowCount();
+        for ( int i = 0; i < countDatasets; ++i )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr(
+                    Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::MESH_BINARY )
+            {
+                ( (DatasetMesh*) ds )->load1D( volname );
+            }
+        }
+
+        Models::g()->submit();*/  //Wechseln von Daten, das klappt noch nicht so wies soll, Ende
+
         singleScreenshot();
     }
 }

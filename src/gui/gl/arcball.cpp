@@ -25,8 +25,8 @@ ArcBall::ArcBall( int width, int height ) :
     m_adjust_width = 1.0 / ( ( width - 1.0 ) * 0.5 );
     m_adjust_height = 1.0 / ( ( height - 1.0 ) * 0.5 );
 
-    m_currentRot.setToIdentity();
-    m_lastRot.setToIdentity();
+    m_current.setToIdentity();
+    m_last.setToIdentity();
 }
 
 ArcBall::~ArcBall()
@@ -91,23 +91,39 @@ void ArcBall::drag( int x, int y )
         q_current_rotation.setZ( 0.0 );
         q_current_rotation.setScalar( 0.0 );
     }
-    m_currentRot.setToIdentity();
-    m_currentRot.rotate( q_current_rotation );
-    m_currentRot = m_currentRot * m_lastRot;
+    m_current.setToIdentity();
+    m_current.rotate( q_current_rotation );
+    m_current = m_current * m_last;
 }
 
 void ArcBall::rotateZ( float angle )
 {
-    m_lastRot = m_currentRot;
-    m_currentRot.setToIdentity();
-    m_currentRot.rotate( angle, 0, 0, 1 );
-    m_currentRot = m_lastRot * m_currentRot;
+    m_last = m_current;
+    m_current.setToIdentity();
+    m_current.rotate( angle, 0, 0, 1 );
+    m_current = m_last * m_current;
+}
+
+void ArcBall::rotate( float angle, float x, float y, float z )
+{
+    m_last = m_current;
+    m_current.setToIdentity();
+    m_current.rotate( angle, x, y, z );
+    m_current = m_last * m_current;
+}
+
+void ArcBall::translate( float x, float y, float z )
+{
+    m_last = m_current;
+    m_current.setToIdentity();
+    m_current.translate( x, y, z );
+    m_current = m_current * m_last;
 }
 
 /// indicates the beginning of the dragging.
 void ArcBall::click( int x, int y )
 {
-    m_lastRot = m_currentRot;
+    m_last = m_current;
     v_mouse_down.setX( x );
     v_mouse_down.setY( y );
     v_mouse_down.setZ( 0.0 );
@@ -151,8 +167,8 @@ void ArcBall::setView( int view )
     m_moveY = 0;
     m_oldMoveX = 0;
     m_oldMoveY = 0;
-    m_currentRot.setToIdentity();
-    m_lastRot.setToIdentity();
+    m_current.setToIdentity();
+    m_last.setToIdentity();
 
     QQuaternion rotx( sqrt( 0.5 ), 0, 0, sqrt( 0.5 ) );
     QQuaternion rot_x( -sqrt( 0.5 ), 0, 0, sqrt( 0.5 ) );
@@ -162,14 +178,14 @@ void ArcBall::setView( int view )
 
     if ( view == 2 )
     {
-        m_currentRot.rotate( rotz );
-        m_currentRot.rotate( rotx );
-        m_currentRot.rotate( rotx );
+        m_current.rotate( rotz );
+        m_current.rotate( rotx );
+        m_current.rotate( rotx );
     }
     if ( view == 3 )
     {
-        m_currentRot.rotate( rot_x );
-        m_currentRot.rotate( rot_y );
+        m_current.rotate( rot_x );
+        m_current.rotate( rot_y );
     }
 }
 
@@ -179,13 +195,13 @@ QMatrix4x4 ArcBall::getMVMat()
     QMatrix4x4 mv;
     mv.setToIdentity();
 
-    mv = m_currentRot * mv;
+    mv = m_current * mv;
 
     QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, 0 );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
-    tmp = tmp * m_currentRot;
+    tmp = tmp * m_current;
 
     mv = mv + tmp;
 
@@ -215,8 +231,8 @@ float ArcBall::getMoveY()
 QList<QVariant> ArcBall::getState()
 {
     QList<QVariant> state;
-    state.push_back( m_currentRot );
-    state.push_back( m_lastRot );
+    state.push_back( m_current );
+    state.push_back( m_last );
     state.push_back( m_moveX );
     state.push_back( m_moveY );
     state.push_back( m_oldMoveX );
@@ -231,8 +247,8 @@ QList<QVariant> ArcBall::getState()
 
 void ArcBall::setState( QList<QVariant> state )
 {
-    m_currentRot = state[0].value<QMatrix4x4>();
-    m_lastRot = state[1].value<QMatrix4x4>();
+    m_current = state[0].value<QMatrix4x4>();
+    m_last = state[1].value<QMatrix4x4>();
     m_moveX = state[2].toInt();
     m_moveY = state[3].toInt();
     m_oldMoveX = state[4].toInt();
