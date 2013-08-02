@@ -32,8 +32,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     skipDraw( false ),
     m_width( 0 ),
     m_height( 0 ),
-    m_x_shift( 0 ),
-    m_rotZ( 0 )
+    m_x_shift( 0 )//,
+    //m_rotZ( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_sceneRenderer = new SceneRenderer( name );
@@ -165,14 +165,14 @@ void GLWidget::calcMVPMatrix()
     //m_pMatrix.perspective(45.0, ratio, 100, 10000);
     //m_pMatrix.translate(m_x_shift,0.0,-1000.0);
 
-    m_pMatrix.frustum(-8000-m_x_shift,8000-m_x_shift,-1600,9000-1600,9000,30000);
+    m_pMatrix.frustum(-800-m_x_shift/10.0,800-m_x_shift/10.0,-160,900-160,900,30000);
     m_pMatrix.translate(m_x_shift,0.0,-20000.0);
 
     qDebug() << m_pMatrix;
 
     m_mvMatrix = m_arcBall->getMVMat();
 
-    m_mvMatrix.rotate(m_rotZ,0,0,1);
+    //m_mvMatrix.rotate(m_rotZ,0,0,1);
 
 
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), m_arcBall->getZoom() );
