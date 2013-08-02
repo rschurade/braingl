@@ -1111,7 +1111,7 @@ bool Loader::loadSet()
 {
     QString fn = m_fileName.path();
 
-    DatasetSurfaceset* dataset = new DatasetSurfaceset( fn );
+    DatasetSurfaceset* dataset = new DatasetSurfaceset( fn, Fn::DatasetType::SURFACESET );
 
     qDebug() << "loading surface set: " << fn;
 
