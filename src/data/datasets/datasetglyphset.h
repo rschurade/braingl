@@ -77,7 +77,8 @@ private:
     int pickedID;
     QVector<int> picked;
     QVector<MeshRenderer*> littleBrains;
-    QVector<QVector3D> shifts;
+    QVector<QVector3D> shifts1;
+    QVector<QVector3D> shifts2;
 };
 
 #endif /* DATASETGLYPHSET_H_ */
