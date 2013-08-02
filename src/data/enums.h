@@ -27,6 +27,7 @@ namespace Fn
         MESH_ISOSURFACE,
         FIBERS,
         GLYPHSET,
+        SURFACESET,
         CONS
     };
 
