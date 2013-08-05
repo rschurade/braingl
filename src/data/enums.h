@@ -27,6 +27,7 @@ namespace Fn
         MESH_ISOSURFACE,
         FIBERS,
         GLYPHSET,
+        SURFACESET,
         CONS
     };
 
@@ -181,6 +182,7 @@ namespace Fn
         D_GLYPH_ROT_Y,
         D_GLYPH_ROT_Z,
         D_GLYPH_ALPHA,
+        D_LITTLE_BRAIN_VISIBILITY,
         D_IS_ATLAS,
         D_LOCK_PROPS,
         // Global Settings
@@ -333,6 +335,7 @@ namespace Fn
                 case Property::D_GLYPH_ROT_Y: return QString( "glyph y rotation" ); break;
                 case Property::D_GLYPH_ROT_Z: return QString( "glyph z rotation" ); break;
                 case Property::D_GLYPH_ALPHA: return QString( "glyph alpha" ); break;
+                case Property::D_LITTLE_BRAIN_VISIBILITY: return QString( "visibility of little brain glyphs" ); break;
                 case Property::D_IS_ATLAS: return QString( "is atlas" ); break;
                 case Property::D_LOCK_PROPS: return QString( "lock properties" ); break;
                 // Global Settings

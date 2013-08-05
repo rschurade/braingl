@@ -285,13 +285,27 @@ void ToolBar::slot( Fn::Algo algo )
             ((DatasetGlyphset*)ds)->loadRGB();
             break;
         case Fn::Algo::SAVE1D:
-            ((DatasetGlyphset*)ds)->save1Ds();
+            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::SURFACESET )
+            {
+                ( (DatasetSurfaceset*) ds )->save1Ds();
+            }
+            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::GLYPHSET )
+            {
+                ( (DatasetGlyphset*) ds )->save1Ds();
+            }
             break;
         case Fn::Algo::LOAD1D:
-            ((DatasetGlyphset*)ds)->load1D();
+            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::SURFACESET )
+            {
+                ( (DatasetSurfaceset*) ds )->load1D();
+            }
+            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::GLYPHSET )
+            {
+                ( (DatasetGlyphset*) ds )->load1D();
+            }
             break;
         case Fn::Algo::AVG_CON:
-            ((DatasetGlyphset*)ds)->avgCon();
+            ( (DatasetGlyphset*)ds)->avgCon();
             break;
         case Fn::Algo::AVG_CON_RZ:
             ((DatasetGlyphset*)ds)->avgConRtoZ();
@@ -372,6 +386,12 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_avgConAction );
             this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
+            break;
+        }
+        case Fn::DatasetType::SURFACESET:
+        {
+            this->addAction( m_save1DsAction );
+            this->addAction( m_load1DAction );
             break;
         }
         case Fn::DatasetType::CONS:
