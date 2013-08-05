@@ -42,11 +42,12 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 m_colors_name( "" ),
                 pickedID( -1 ),
                 littleBrains( QVector<MeshRenderer*>() ),
-                shifts( QVector<QVector3D>() )
+                shifts1( QVector<QVector3D>() ),
+                shifts2( QVector<QVector3D>() )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, minthresh, 1.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
     { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
@@ -80,6 +81,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl2"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
 
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
@@ -158,11 +160,12 @@ void DatasetGlyphset::setMinthresh( float mt )
 void DatasetGlyphset::makeLittleBrains()
 {
 
-    for (int i = 0; i<littleBrains.size(); ++i){
+    for ( int i = 0; i < littleBrains.size(); ++i )
+    {
         delete littleBrains[i];
     }
     littleBrains.clear();
-    shifts.clear();
+    shifts1.clear();
 
     for ( int i = 0; i < m_n; ++i )
     {
@@ -181,8 +184,10 @@ void DatasetGlyphset::makeLittleBrains()
             {
                 mesh->setVertexData( p, conn[i][p] );
             }
-            QVector3D f = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
-            shifts << f;
+            QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            shifts1 << f1;
+            QVector3D f2 = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            shifts2 << f2;
         }
     }
     Models::g()->submit();
@@ -200,13 +205,14 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
-    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) )
+    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
         for ( int i = 0; i < littleBrains.size(); ++i )
         {
-            QVector3D shift = shifts[i];
+            QVector3D shift1 = shifts1[i];
+            QVector3D shift2 = shifts2[i];
             QMatrix4x4 toOrigin;
-            toOrigin.translate( shift );
+            toOrigin.translate( shift2 );
             toOrigin.scale( properties( "maingl2" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
             //Rotation of the individual glyphs:
             float rotx = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
@@ -217,10 +223,10 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             float rotz = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
             rotMatrix.rotate( rotz, 0, 0, 1 );
             toOrigin *= rotMatrix;
-            toOrigin.translate( -shift );
+            toOrigin.translate( -shift1 );
             QMatrix4x4 zshift;
             //little brain node towards the camera from big brain node...
-            zshift.translate(0,0,2);
+            zshift.translate( 0, 0, 2 );
             littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
         }
     }
@@ -421,7 +427,8 @@ void DatasetGlyphset::makeCons()
 
 void DatasetGlyphset::makeDiffPoints()
 {
-    qDebug() << "making consArray: " << minthresh << " maxthresh: " << maxthresh;
+    float diffMinThresh = minthresh / 3.0;
+    qDebug() << "making diffPoints: " << diffMinThresh << " maxthresh: " << maxthresh;
     //if (consArray) delete[] consArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -429,24 +436,7 @@ void DatasetGlyphset::makeDiffPoints()
 
     m_n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << m_n;
-    consNumber = 0;
-    //count first, then create array...
-    //TODO: Parallelize, protect from renderthread interruptions?...
-    for ( int i = 0; i < m_n; ++i )
-    {
-        for ( int j = 0; j < m_n; ++j )
-        {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
-            {
-                ++consNumber;
-            }
-        }
-    }
-    qDebug() << consNumber << " connections above threshold";
     int offset = 13;
-    consArray = new float[offset * consNumber];
-    consNumber = 0;
     //TODO: ROIs?
     //for each triangle
     QVector<int> tris = m_mesh.at( geo )->getTriangles();
@@ -454,7 +444,7 @@ void DatasetGlyphset::makeDiffPoints()
     for ( int tri = 0; tri < tris.size(); tri += 3 )
     {
         // all three edges
-        qDebug() << "tri: " << tri;
+        //qDebug() << "tri: " << tri;
         idPairs.append( tris.at( tri ) );
         idPairs.append( tris.at( tri + 1 ) );
 
@@ -465,6 +455,29 @@ void DatasetGlyphset::makeDiffPoints()
         idPairs.append( tris.at( tri ) );
     }
     qDebug() << "idPairs done, size: " << idPairs.size();
+    consNumber = 0;
+    for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
+    {
+        //get two point ids i1,i2
+        int i1 = idPairs.at( idpair );
+        int i2 = idPairs.at( idpair + 1 );
+        //if triangle on one side...
+        //TODO: check while creating edgelist?
+        if ( i1 > i2 )
+        {
+            for ( int j = 0; j < m_n; ++j )
+            {
+                float v = qAbs( conn[i1][j] - conn[i2][j] );
+                if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
+                {
+                    consNumber++;
+                }
+            }
+        }
+    }
+    consArray = new float[offset * consNumber];
+    qDebug() << "cons: " << consNumber;
+    consNumber = 0;
     for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
         //get two point ids i1,i2
@@ -484,7 +497,7 @@ void DatasetGlyphset::makeDiffPoints()
             {
                 float v = qAbs( conn[i1][j] - conn[i2][j] );
                 //TODO: What treshold do we use?
-                if ( ( v > 0.2 ) && ( v < maxthresh ) )
+                if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
                     QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -520,8 +533,7 @@ void DatasetGlyphset::makeDiffPoints()
                     consArray[offset * consNumber + 10] = ( dc1.x() + dc2.x() ) / 2.0;
                     consArray[offset * consNumber + 11] = ( dc1.y() + dc2.y() ) / 2.0;
                     consArray[offset * consNumber + 12] = ( dc1.z() + dc2.z() ) / 2.0;
-
-                    ++consNumber;
+                    consNumber++;
                 }
             }
         }

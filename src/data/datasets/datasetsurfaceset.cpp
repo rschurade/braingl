@@ -12,6 +12,9 @@
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
 
+#include "qfile.h"
+#include "qfiledialog.h"
+
 DatasetSurfaceset::DatasetSurfaceset( QDir fn, Fn::DatasetType type ) :
         DatasetMesh( fn, type )
 {
@@ -89,11 +92,70 @@ bool DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifi
             m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
             for ( int m = 0; m < m_mesh.size(); m++ )
             {
-                m_mesh[m]->setVertexColor( picked[i], color );
+                if ( paintMode == 1 ) //paint color
+                {
+                    m_mesh[m]->setVertexColor( picked[i], color );
+                }
+                else if ( paintMode == 2 ) //paint values
+                {
+                    float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    if ( value < 0.0 )
+                    {
+                        value = 0.0;
+                    }
+                    if ( value > 1.0 )
+                    {
+                        value = 1.0;
+                    }
+
+                    m_mesh[m]->setVertexData( picked[i],  value );
+                }
             }
         }
         m_renderer->endUpdateColor();
         return true;
     }
     return false;
+}
+
+void DatasetSurfaceset::save1Ds()
+{
+    QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", ".1D" );
+
+    QFile file( filename );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        qDebug() << "file open failed: " << filename;
+        return;
+    }
+    QTextStream out( &file );
+    for ( int i = 0; i < getMesh("maingl")->numVerts(); i++ )
+    {
+        float vcolor = getMesh("maingl")->getVertexData( i );
+
+        out << vcolor << endl;
+    }
+    file.close();
+}
+
+bool DatasetSurfaceset::load1D()
+{
+    QString filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return false;
+    }
+    QTextStream in( &file );
+
+    for ( int i = 0; i < getMesh("maingl")->numVerts(); i++ )
+    {
+        float v;
+        in >> v;
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, v );
+        }
+    }
+    return true;
 }
