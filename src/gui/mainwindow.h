@@ -115,6 +115,9 @@ private:
     static int screenshotNumber;
     static int countMainGL;
 
+public slots:
+    void screenshot();
+
 private slots:
     void slotNew();
     void open();
@@ -123,7 +126,6 @@ private slots:
     void loadScene();
     void saveScene();
     void about();
-    void screenshot();
     void resetSettings();
     void newMainGL();
 

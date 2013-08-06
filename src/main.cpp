@@ -13,6 +13,7 @@
 QTextStream *out = 0;
 bool logToFile = false;
 bool verbose = false;
+bool makeScreenshot = false;
 
 void logOutput( QtMsgType type, const char *msg )
 {
@@ -94,6 +95,11 @@ int main( int argc, char *argv[] )
             // reset saved settings
             resetSettings = true;
         }
+        if ( args.at( i ) == "-s" )
+        {
+            // reset saved settings
+            makeScreenshot = true;
+        }
         if ( args.at( i ) == "-h" )
         {
             qDebug() << "Command line options:";
@@ -121,6 +127,12 @@ int main( int argc, char *argv[] )
     for ( int i = 1; i < args.size(); ++i )
     {
         mainWin.load( args.at( i ) );
+    }
+
+    if ( makeScreenshot )
+    {
+        mainWin.screenshot();
+        exit( 0 );
     }
 
     return app.exec();
