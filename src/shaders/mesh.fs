@@ -30,7 +30,7 @@ void main()
     
         if ( !( tcol.r + tcol.g + tcol.b > 0.0 ) ) discard;
         
-        color = tcol.rgb;
+        color = light( tcol ).rgb;
     }
     else if ( u_colorMode == 3 )
     {

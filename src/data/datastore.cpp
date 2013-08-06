@@ -124,6 +124,12 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
 {
     //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
+    if ( index.column() == (int)Fn::Property::D_DELETE_LAST )
+    {
+        qDebug() << "test";
+        deleteItem( m_datasetList.size() - 1 );
+        return true;
+    }
     if ( index.column() != (int)Fn::Property::D_NEW_DATASET && !index.isValid() )
     {
         return false;

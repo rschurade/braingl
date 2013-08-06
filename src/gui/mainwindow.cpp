@@ -903,37 +903,44 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::screenshot()
 {
-    for ( int i = 0; i < 3; ++i )
+
+    // iterate over all datasets
+    // modify to count datasets
+    int frames = 3;
+    for ( int i = 0; i < frames; ++i )
     {
         mainGLWidget->getArcBall()->rotateZ(1);  //Rotation
         mainGLWidget->getArcBall()->rotate(1,0,1,0);  //Bspw: Rotation um y-Achse um ein Grad (Winkel (Schritt), x,y,z)
         //mainGLWidget->getArcBall()->translate(0,0,100);  //Translation
 
-        //Wechseln von Daten, das klappt noch nicht so wies soll:
-        /*QString numberString = QString::number( i );
+        // für simple rotation ohne datensatzwechsel replace #if 1 durch #if 0
+#if 1
+        // delete last dataset in list to preserve memory
+        Models::d()->setData( Models::d()->index( 0, (int)Fn::Property::D_DELETE_LAST ), true );
+
+        // create file name
+        QString numberString = QString::number( i );
         int nss = numberString.size();
-        for ( int i = 0; i < 3 - nss; ++i )
+        for ( int i = 0; i < 4 - nss; ++i )
         {
             numberString = "0" + numberString;
         }
-        QString volname = "/SCR/ars_movie/MEG/lh/" + numberString + ".mat.txt";
-        qDebug() << "loading: " << volname;
+        QString volname = "/scr/litauen1/ars_movie/chris_func_data/vol" + numberString + ".nii.gz";
+        //qDebug() << "loading: " << volname;
 
-        //load( volname );
+        load( volname );
         //...
         int countDatasets = Models::d()->rowCount();
-        for ( int i = 0; i < countDatasets; ++i )
-        {
-            Dataset* ds = VPtr<Dataset>::asPtr(
-                    Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::MESH_BINARY )
-            {
-                ( (DatasetMesh*) ds )->load1D( volname );
-            }
-        }
 
-        Models::g()->submit();*/  //Wechseln von Daten, das klappt noch nicht so wies soll, Ende
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( countDatasets-1, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        ds->properties()->set( Fn::Property::D_COLORMAP, 1 );
+        ds->properties()->set( Fn::Property::D_SELECTED_MIN, -77 );
+        ds->properties()->set( Fn::Property::D_INTERPOLATION, true );
 
+
+        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );
+        Models::g()->submit();  //Wechseln von Daten, das klappt noch nicht so wies soll, Ende
+#endif
         singleScreenshot();
     }
 }
