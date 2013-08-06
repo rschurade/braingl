@@ -117,6 +117,11 @@ private:
     QTcpServer* tcpServer;
     QTcpSocket* clientConnection;
 
+public slots:
+    void screenshot();
+    void singleScreenshot();
+
+
 private slots:
     void slotNew();
     void open();
@@ -125,8 +130,6 @@ private slots:
     void loadScene();
     void saveScene();
     void about();
-    void screenshot();
-    void singleScreenshot();
     void resetSettings();
 
     void slotToggleAxialSlice();
