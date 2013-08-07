@@ -666,6 +666,13 @@ void MainWindow::createActions()
         recentFileActs[ i ]->setVisible( false );
         connect( recentFileActs[ i ], SIGNAL(triggered()), this, SLOT(openRecentFile()) );
     }
+
+    continousRenderingAct = new QAction( QIcon( ":/icons/continous.png" ), tr( "Continous Rendering" ), this );
+    continousRenderingAct->setStatusTip( tr( "continous rendering, warning this might slow down your computer" ) );
+    continousRenderingAct->setCheckable( true );
+    continousRenderingAct->setChecked( false );
+    connect( continousRenderingAct, SIGNAL( toggled( bool ) ), this, SLOT( continousRendering() ) );
+
 }
 
 void MainWindow::createMenus()
@@ -712,6 +719,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( newAct );
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
+    fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
     {
@@ -1060,4 +1068,13 @@ void MainWindow::newMainGL()
     viewMenu->addAction( dockDSP2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
     dockDSP2->hide();
+}
+
+void MainWindow::continousRendering()
+{
+    if ( continousRenderingAct->isChecked() )
+    {
+        QTimer::singleShot( 40, this, SLOT( continousRendering() ) );
+        Models::g()->submit();
+    }
 }
