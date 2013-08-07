@@ -109,6 +109,7 @@ private:
     QAction* standardViewSagittalAct;
 
     QAction* newSelectionBoxAct;
+    QAction* continousRenderingAct;
 
     QAction* dilbertAct;
 
@@ -128,6 +129,7 @@ private slots:
     void about();
     void resetSettings();
     void newMainGL();
+    void continousRendering();
 
     void slotToggleAxialSlice();
     void slotToggleCoronalSlice();
