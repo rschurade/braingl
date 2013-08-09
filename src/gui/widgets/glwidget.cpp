@@ -420,7 +420,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                     roi->properties()->set( Fn::Property::R_X, newx );
                     roi->properties()->set( Fn::Property::R_Y, newy );
                     roi->properties()->set( Fn::Property::R_Z, newz );
-                    roi->properties()->slotPropChanged();
+                    roi->slotPropChanged();
                 }
                 break;
             }

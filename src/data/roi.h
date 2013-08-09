@@ -31,7 +31,7 @@ public:
 protected:
     PropertyGroup m_properties;
 
-private slots:
+public slots:
     void slotPropChanged();
 
 signals:
