@@ -27,7 +27,7 @@
 #include "widgets/colormapeditwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
-#include "gl/arcball.h"
+#include "gl/camerabase.h"
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
 
@@ -400,7 +400,7 @@ void MainWindow::saveScene( QString fileName )
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_TRANSPARENCY, 0 ) ) );
-    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
+    settings.setValue( "camera_maingl", mainGLWidget->getCameraInUse()->getState() );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -544,9 +544,9 @@ void MainWindow::loadScene( QString fileName )
     loadSetting( settings, Fn::Property::G_SCREENSHOT_QUALITY );
     loadSetting( settings, Fn::Property::G_TRANSPARENCY );
 
-    if ( settings.contains( "arcball_maingl" ) )
+    if ( settings.contains( "camera_maingl" ) )
     {
-        mainGLWidget->getArcBall()->setState( settings.value( "arcball_maingl" ).toList() );
+        mainGLWidget->getCameraInUse()->setState( settings.value( "camera_maingl" ).toList() );
     }
 
     Models::g()->submit();

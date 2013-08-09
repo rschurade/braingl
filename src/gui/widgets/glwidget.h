@@ -17,6 +17,8 @@
 #include <QtOpenGL/QGLWidget>
 
 class ArcBall;
+class Camera;
+class CameraBase;
 class SceneRenderer;
 class QItemSelectionModel;
 
@@ -35,12 +37,15 @@ public:
     void setView( Fn::Orient view );
     QImage* screenshot();
 
-    ArcBall* getArcBall();
+    CameraBase* getCameraInUse();
 
 private:
     QItemSelectionModel* m_roiSelectionModel;
 
+    CameraBase* m_cameraInUse;
     ArcBall* m_arcBall;
+    Camera* m_camera;
+
     SceneRenderer* m_sceneRenderer;
 
     QMatrix4x4 m_mvMatrix;

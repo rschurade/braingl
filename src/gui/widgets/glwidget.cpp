@@ -7,6 +7,8 @@
 
 #include "glwidget.h"
 #include "../gl/arcball.h"
+#include "../gl/camera.h"
+#include "../gl/camerabase.h"
 #include "../gl/glfunctions.h"
 
 #include "../../data/datastore.h"
@@ -34,6 +36,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_height( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
+    m_camera = new Camera( 400, 400 );
+    m_cameraInUse = m_arcBall;
     m_sceneRenderer = new SceneRenderer( name );
 
     m_pMatrix.setToIdentity();
@@ -60,6 +64,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_height( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
+    m_camera = new Camera( 400, 400 );
+    m_cameraInUse = m_arcBall;
     m_sceneRenderer = new SceneRenderer( name );
 
     m_pMatrix.setToIdentity();
@@ -84,9 +90,9 @@ QSize GLWidget::sizeHint() const
     return QSize( 400, 400 );
 }
 
-ArcBall* GLWidget::getArcBall()
+CameraBase* GLWidget::getCameraInUse()
 {
-    return m_arcBall;
+    return m_cameraInUse;
 }
 
 void GLWidget::initializeGL()
@@ -113,7 +119,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL( int width, int height )
 {
-    m_arcBall->set_win_size( width, height );
+    m_cameraInUse->set_win_size( width, height );
     m_sceneRenderer->resizeGL( width, height );
     m_width = width;
     m_height = height;
@@ -130,6 +136,17 @@ void GLWidget::update()
 
 void GLWidget::calcMVPMatrix()
 {
+    int cam = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_TYPE, 0 ) ).toInt();
+    int projection = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_PROJECTION, 0 ) ).toInt();
+    if (  cam == 0 )
+    {
+        m_cameraInUse = m_arcBall;
+    }
+    else
+    {
+        m_cameraInUse = m_camera;
+    }
+
     m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
     m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
     m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
@@ -147,24 +164,35 @@ void GLWidget::calcMVPMatrix()
     // Reset projection
     m_pMatrix.setToIdentity();
 
-    float zoom  = m_arcBall->getZoom();
+    float zoom  = m_cameraInUse->getZoom();
     float halfBB = boundingbox / 2.0 / zoom;
 
     float ratio = static_cast<float>( m_width )/ static_cast<float>( m_height );
-    if ( ratio >= 1.0 )
+    float near = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
+    float far = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
+
+    if ( projection == 0 )
     {
-        m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -3000, 3000 );
+        if ( ratio >= 1.0 )
+        {
+            m_pMatrix.ortho( -halfBB * ratio, halfBB * ratio, -halfBB, halfBB, -3000, 3000 );
+        }
+        else
+        {
+            m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
+        }
     }
     else
     {
-        m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
+        float angle = 90.0f / zoom;
+        m_pMatrix.perspective( angle, ratio, near, far );
     }
+    m_mvMatrix = m_cameraInUse->getMVMat();
 
-    m_mvMatrix = m_arcBall->getMVMat();
 
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), m_arcBall->getZoom() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_arcBall->getMoveX() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_arcBall->getMoveY() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_cameraInUse->getMoveX() );
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );
 }
 
 
@@ -173,12 +201,12 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
     setFocus();
     if ( event->buttons() & Qt::LeftButton )
     {
-        m_arcBall->click( event->x(), event->y() );
+        m_cameraInUse->click( event->x(), event->y() );
 
     }
     if ( event->buttons() & Qt::MiddleButton )
     {
-        m_arcBall->midClick( event->x(), event->y() );
+        m_cameraInUse->midClick( event->x(), event->y() );
     }
     if ( event->buttons() & Qt::RightButton )
     {
@@ -191,11 +219,11 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        m_arcBall->drag( event->x(), event->y() );
+        m_cameraInUse->drag( event->x(), event->y() );
     }
     if ( event->buttons() & Qt::MiddleButton )
     {
-        m_arcBall->midDrag( event->x(), event->y() );
+        m_cameraInUse->midDrag( event->x(), event->y() );
     }
     if ( event->buttons() & Qt::RightButton )
     {
@@ -218,13 +246,13 @@ void GLWidget::wheelEvent( QWheelEvent *event )
 {
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
-    m_arcBall->mouseWheel( numSteps );
+    m_cameraInUse->mouseWheel( numSteps );
     update();
 }
 
 void GLWidget::setView( Fn::Orient view )
 {
-    m_arcBall->setView( view );
+    m_cameraInUse->setView( view );
     update();
 }
 
@@ -300,7 +328,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
     int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
     int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
-    float slowDown = 4.0f * m_arcBall->getZoom();
+    float slowDown = 4.0f * m_cameraInUse->getZoom();
 
     m_sceneRenderer->renderPick();
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
@@ -455,31 +483,68 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
     }
     else
     {
-        switch( event->key() )
+        if ( dynamic_cast<Camera*>( m_cameraInUse) )
         {
-            case Qt::Key_Left :
+            switch( event->key() )
             {
-                m_arcBall->click( x, y );
-                m_arcBall->drag( x - 20, y );
-                break;
+                case 69:
+                case Qt::Key_Left :
+                    m_camera->strafeLeft();
+                    break;
+                case 81:
+                case Qt::Key_Right:
+                    m_camera->strafeRight();
+                    break;
+                case 87:
+                case Qt::Key_Up :
+                    m_camera->forward();
+                    break;
+                case 83:
+                case Qt::Key_Down:
+                    m_camera->backward();
+                    break;
+                case 68:
+                    m_camera->viewLeft();
+                    break;
+                case 65:
+                    m_camera->viewRight();
+                    break;
+                case 82:
+                    m_camera->up();
+                    break;
+                case 70:
+                    m_camera->down();
+                    break;
             }
-            case Qt::Key_Right:
+        }
+        else
+        {
+            switch( event->key() )
             {
-                m_arcBall->click( x, y );
-                m_arcBall->drag( x + 20, y );
-                break;
-            }
-            case Qt::Key_Up :
-            {
-                m_arcBall->click( x, y );
-                m_arcBall->drag( x, y - 20 );
-                break;
-            }
-            case Qt::Key_Down:
-            {
-                m_arcBall->click( x, y );
-                m_arcBall->drag( x, y + 20 );
-                break;
+                case Qt::Key_Left :
+                {
+                    m_cameraInUse->click( x, y );
+                    m_cameraInUse->drag( x - 20, y );
+                    break;
+                }
+                case Qt::Key_Right:
+                {
+                    m_cameraInUse->click( x, y );
+                    m_cameraInUse->drag( x + 20, y );
+                    break;
+                }
+                case Qt::Key_Up :
+                {
+                    m_cameraInUse->click( x, y );
+                    m_cameraInUse->drag( x, y - 20 );
+                    break;
+                }
+                case Qt::Key_Down:
+                {
+                    m_cameraInUse->click( x, y );
+                    m_cameraInUse->drag( x, y + 20 );
+                    break;
+                }
             }
         }
     }
