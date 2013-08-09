@@ -8,19 +8,13 @@
 #ifndef ARCBALL_H_
 #define ARCBALL_H_
 
-#include "../../data/enums.h"
+#include "camerabase.h"
 
-#include <QVector3D>
-#include <QQuaternion>
-#include <QMatrix4x4>
-
-class ArcBall
+class ArcBall : public CameraBase
 {
 public:
     ArcBall( int width, int height );
     virtual ~ArcBall();
-
-    void set_win_size( int width,  int height );
 
     void click( int x, int y );
     void drag( int x, int y );
@@ -36,7 +30,6 @@ public:
 
     void setView( Fn::Orient view );
 
-    float getZoom();
     float getMoveX();
     float getMoveY();
 
@@ -47,10 +40,6 @@ private:
     QVector3D map_sphere( int x, int y );
 
     float Epsilon;
-    int m_width;  // width of window
-    int m_height; // height of window
-    float m_adjust_width;
-    float m_adjust_height;
 
     QVector3D v_mouse_current;      // mouse position at the beginning of dragging
     QVector3D v_mouse_down;         // mouse position at the beginning of dragging
@@ -67,7 +56,6 @@ private:
     int m_oldMoveY;
     int m_midClickX;
     int m_midClickY;
-    float m_zoom;
 
     QVector3D m_rotCenter;
 };

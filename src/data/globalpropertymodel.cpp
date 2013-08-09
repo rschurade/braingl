@@ -36,6 +36,20 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_ZOOM, 1.0f );
     m_properties->create( Fn::Property::G_MOVEX, 0 );
     m_properties->create( Fn::Property::G_MOVEY, 0 );
+    m_properties->create( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_X, 0, -1000, 1000, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_Y, 0, -1000, 1000, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_Z, 40, -1000, 1000, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_LOOKAT_X, 80.0f, -1000.f, 1000.f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_LOOKAT_Y, 100.0f, -1000.f, 1000.f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_LOOKAT_Z, 80.0f, -1000.f, 1000.f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_UP_X, 0, -1, 1, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_UP_Y, 0, -1, 1, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_UP_Z, 1, -1, 1, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_NEAR, 2.0f, -500.0f, 100.0f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
+
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "general" );

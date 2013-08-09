@@ -181,12 +181,12 @@ void DatasetListWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
 
         switch ( key )
         {
-            case 65:
-            {
-                bool active = ds->properties()->get( Fn::Property::D_ACTIVE ).toBool();
-                ds->properties()->set( Fn::Property::D_ACTIVE, !active );
-                break;
-            }
+//            case 65:
+//            {
+//                bool active = ds->properties()->get( Fn::Property::D_ACTIVE ).toBool();
+//                ds->properties()->set( Fn::Property::D_ACTIVE, !active );
+//                break;
+//            }
             case 80:
             {
                 int paintMode = ds->properties()->get( Fn::Property::D_PAINTMODE ).toInt();

@@ -218,6 +218,19 @@ namespace Fn
         G_ZOOM,
         G_MOVEX,
         G_MOVEY,
+        G_CAMERA_TYPE,
+        G_CAMERA_PROJECTION,
+        G_CAMERA_POS_X,
+        G_CAMERA_POS_Y,
+        G_CAMERA_POS_Z,
+        G_CAMERA_LOOKAT_X,
+        G_CAMERA_LOOKAT_Y,
+        G_CAMERA_LOOKAT_Z,
+        G_CAMERA_UP_X,
+        G_CAMERA_UP_Y,
+        G_CAMERA_UP_Z,
+        G_CAMERA_NEAR,
+        G_CAMERA_FAR,
         G_SCREENSHOT_QUALITY,
         G_TRANSPARENCY,
         // ROI Properties
@@ -373,6 +386,19 @@ namespace Fn
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;
                 case Property::G_MOVEY: return QString( "" ); break;
+                case Property::G_CAMERA_TYPE: return QString( "camera type" ); break;
+                case Property::G_CAMERA_PROJECTION: return QString( "camera projection" ); break;
+                case Property::G_CAMERA_POS_X: return QString( "eye x" ); break;
+                case Property::G_CAMERA_POS_Y: return QString( "eye y" ); break;
+                case Property::G_CAMERA_POS_Z: return QString( "eye z" ); break;
+                case Property::G_CAMERA_LOOKAT_X: return QString( "look at x" ); break;
+                case Property::G_CAMERA_LOOKAT_Y: return QString( "look at y" ); break;
+                case Property::G_CAMERA_LOOKAT_Z: return QString( "look at z" ); break;
+                case Property::G_CAMERA_UP_X: return QString( "up x" ); break;
+                case Property::G_CAMERA_UP_Y: return QString( "up y" ); break;
+                case Property::G_CAMERA_UP_Z: return QString( "up z" ); break;
+                case Property::G_CAMERA_NEAR: return QString( "camera near" ); break;
+                case Property::G_CAMERA_FAR: return QString( "camera far" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
                 case Property::R_Y: return QString( "y" ); break;

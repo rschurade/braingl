@@ -11,19 +11,15 @@
 #include <math.h>
 
 ArcBall::ArcBall( int width, int height ) :
+    CameraBase( width, height ),
     Epsilon( 0.00001 ),
-    m_width( width ),
-    m_height( height ),
     m_moveX( 0 ),
     m_moveY( 0 ),
     m_oldMoveX( 0 ),
     m_oldMoveY( 0 ),
     m_midClickX( 0 ),
-    m_midClickY( 0 ),
-    m_zoom( 1.0f )
+    m_midClickY( 0 )
 {
-    m_adjust_width  = 1.0 / ((width - 1.0) * 0.5);
-    m_adjust_height = 1.0 / ((height - 1.0) * 0.5);
 
     m_currentRot.setToIdentity();
     m_lastRot.setToIdentity();
@@ -58,16 +54,6 @@ QVector3D ArcBall::map_sphere( int x, int y )
         bm.setZ( sqrt( 1.0 - length ) );
     }
     return bm;
-}
-
-
-/// sets the window size.
-void ArcBall::set_win_size( int width,  int height )
-{
-    m_width = width;
-    m_height = height;
-    m_adjust_width = 1.0 / ( ( width - 1.0 ) * 0.5 );
-    m_adjust_height = 1.0 / ( ( height - 1.0 ) * 0.5 );
 }
 
 /// sets the current position and calculates the current
@@ -190,7 +176,7 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = m_currentRot * mv ;
 
-    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, 0 );
+    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, -300 );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
@@ -198,17 +184,9 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = mv + tmp;
 
-    //QVector3D scale( m_zoom, m_zoom, m_zoom );
-    //mv.scale( scale );
-
     mv.translate( m_rotCenter );
 
     return mv;
-}
-
-float ArcBall::getZoom()
-{
-    return m_zoom;
 }
 
 float ArcBall::getMoveX()
