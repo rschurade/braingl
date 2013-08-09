@@ -39,6 +39,7 @@ private:
     bool loadNiftiTensor( QString fileName );
     bool loadNiftiQBall( QString fileName );
     bool loadNiftiBingham( QString fileName );
+    bool loadNiftiFMRI( QString fileName );
     bool loadNiftiDWI( QString fileName );
     bool loadNiftiDWI_FNAV2( QString fileName );
     QVector<float> loadBvals( QString fileName );
