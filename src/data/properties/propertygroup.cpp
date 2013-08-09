@@ -294,6 +294,7 @@ QWidget* PropertyGroup::getWidget( Fn::Property name )
 void PropertyGroup::slotPropChanged()
 {
     Models::d()->submit();
+    emit( signalPropChanged() );
 }
 
 int PropertyGroup::size() const
