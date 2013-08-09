@@ -11,7 +11,10 @@
 #include <QDebug>
 
 DatasetNifti::DatasetNifti( QDir filename, Fn::DatasetType type, nifti_image* header ) :
-        Dataset( filename, type ), m_header( header ), m_qform( 3, 3 ), m_sform( 3, 3 )
+    Dataset( filename, type ),
+    m_header( header ),
+    m_qform( 3, 3 ),
+    m_sform( 3, 3 )
 {
     parseNiftiHeader();
 }
@@ -22,7 +25,7 @@ DatasetNifti::~DatasetNifti()
 
 void DatasetNifti::parseNiftiHeader()
 {
-    m_properties["maingl"]->create( Fn::Property::D_DIM, m_header->ndim );
+    m_properties["maingl"]->create( Fn::Property::D_DIM, m_header->dim[4] );
     m_properties["maingl"]->create( Fn::Property::D_NX, m_header->nx );
     m_properties["maingl"]->create( Fn::Property::D_NY, m_header->ny );
     m_properties["maingl"]->create( Fn::Property::D_NZ, m_header->nz );

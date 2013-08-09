@@ -14,6 +14,7 @@
 #include "datasets/datasetdwi.h"
 #include "datasets/datasetmesh.h"
 #include "datasets/datasetfibers.h"
+#include "datasets/datasetfmri.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 #include "datasets/datasetsurfaceset.h"
@@ -143,6 +144,12 @@ bool Loader::loadNifti()
     {
         m_datasetType = Fn::DatasetType::NIFTI_SH;
         return loadNiftiQBall( fn );
+    }
+    else if ( m_header->dim[4] > 3 && m_header->datatype == 16 )
+    {
+        qDebug() << "fmri dataset found";
+        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
+        return loadNiftiFMRI( fn );
     }
     else if ( m_header->dim[4] > 3 )
     {
@@ -507,6 +514,43 @@ bool Loader::loadNiftiBingham( QString fileName )
             out->properties()->set( Fn::Property::D_RENDER_SLICE, 1 );
 
             m_dataset.push_back( out );
+
+            qDebug() << "end loading data";
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+bool Loader::loadNiftiFMRI( QString fileName )
+{
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    int blockSize = dimX * dimY * dimZ;
+    int dim = m_header->dim[4];
+    qDebug() << "num images:" << dim;
+
+
+    QVector<float> data( blockSize * dim );
+
+    qDebug() << "start loading data";
+    switch ( m_header->datatype )
+    {
+        case NIFTI_TYPE_FLOAT32:
+        {
+            float* inputData = reinterpret_cast<float*>( filedata->data );
+            for ( int i = 0; i < blockSize * dim; ++i )
+            {
+                data[i] = inputData[i];
+            }
+            nifti_image_free( filedata );
+
+            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+            DatasetFMRI* dataset = new DatasetFMRI( m_fileName.path(), data, dsHdr );
+            m_dataset.push_back( dataset );
 
             qDebug() << "end loading data";
             return true;

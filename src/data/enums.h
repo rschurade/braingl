@@ -19,6 +19,7 @@ namespace Fn
         NIFTI_VECTOR,
         NIFTI_TENSOR,
         NIFTI_SH,
+        NIFTI_FMRI,
         NIFTI_DWI,
         NIFTI_BINGHAM,
         NIFTI_ANY,
@@ -185,6 +186,8 @@ namespace Fn
         D_LITTLE_BRAIN_VISIBILITY,
         D_IS_ATLAS,
         D_LOCK_PROPS,
+        D_AUTOPLAY,
+        D_AUTOPLAY_INTERVAL,
         // Global Settings
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
@@ -351,6 +354,8 @@ namespace Fn
                 case Property::D_LITTLE_BRAIN_VISIBILITY: return QString( "visibility of little brain glyphs" ); break;
                 case Property::D_IS_ATLAS: return QString( "is atlas" ); break;
                 case Property::D_LOCK_PROPS: return QString( "lock properties" ); break;
+                case Property::D_AUTOPLAY: return QString( "auto play" ); break;
+                case Property::D_AUTOPLAY_INTERVAL: return QString( "auto play interval" ); break;
                 // Global Settings
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break; // Global Settings for rendering
