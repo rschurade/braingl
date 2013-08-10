@@ -16,7 +16,8 @@ Camera::Camera( int width, int height ) :
     m_up( 0, 1, 0 ),
     m_clickX( 0 ),
     m_clickY( 0 ),
-    m_lookAtTemp( 0, 0, 0)
+    m_lookAtTemp( 0, 0, 0),
+    m_keyboardStep( 5.0f )
 {
 }
 
@@ -70,13 +71,13 @@ void Camera::mouseWheel( float step )
 void Camera::viewUp()
 {
     getGlobals();
-    m_lookAt = m_lookAt + 10 * m_up;
+    m_lookAt = m_lookAt + m_keyboardStep * m_up;
     setGlobals();
 }
 void Camera::viewDown()
 {
     getGlobals();
-    m_lookAt = m_lookAt - 10 * m_up;
+    m_lookAt = m_lookAt - m_keyboardStep * m_up;
     setGlobals();
 }
 void Camera::viewLeft()
@@ -86,7 +87,7 @@ void Camera::viewLeft()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_lookAt = m_lookAt + 10 * dir;
+    m_lookAt = m_lookAt + m_keyboardStep * dir;
     setGlobals();
 }
 void Camera::viewRight()
@@ -96,7 +97,7 @@ void Camera::viewRight()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_lookAt = m_lookAt - 10 * dir;
+    m_lookAt = m_lookAt - m_keyboardStep * dir;
     setGlobals();
 
 }
@@ -106,8 +107,8 @@ void Camera::forward()
 
     QVector3D dir = m_lookAt - m_position;
     dir.normalize();
-    m_position = m_position + 10 * dir;
-    m_lookAt = m_lookAt + 10 * dir;
+    m_position = m_position + m_keyboardStep * dir;
+    m_lookAt = m_lookAt + m_keyboardStep * dir;
 
     setGlobals();
 }
@@ -117,8 +118,8 @@ void Camera::backward()
 
     QVector3D dir = m_lookAt - m_position;
     dir.normalize();
-    m_position = m_position - 10 * dir;
-    m_lookAt = m_lookAt - 10 * dir;
+    m_position = m_position - m_keyboardStep * dir;
+    m_lookAt = m_lookAt - m_keyboardStep * dir;
 
     setGlobals();
 }
@@ -126,14 +127,14 @@ void Camera::backward()
 void Camera::up()
 {
     getGlobals();
-    m_position = m_position + 10 * m_up;
+    m_position = m_position + m_keyboardStep * m_up;
     setGlobals();
 }
 
 void Camera::down()
 {
     getGlobals();
-    m_position = m_position - 10 * m_up;
+    m_position = m_position - m_keyboardStep * m_up;
     setGlobals();
 }
 
@@ -145,8 +146,8 @@ void Camera::strafeLeft()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_position = m_position + 10 * dir;
-    m_lookAt = m_lookAt + 10 * dir;
+    m_position = m_position + m_keyboardStep * dir;
+    m_lookAt = m_lookAt + m_keyboardStep * dir;
 
     setGlobals();
 }
@@ -157,8 +158,8 @@ void Camera::strafeRight()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_position = m_position - 10 * dir;
-    m_lookAt = m_lookAt - 10 * dir;
+    m_position = m_position - m_keyboardStep * dir;
+    m_lookAt = m_lookAt - m_keyboardStep * dir;
 
     setGlobals();
 }

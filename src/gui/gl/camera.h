@@ -61,6 +61,7 @@ private:
     int m_clickX;
     int m_clickY;
     QVector3D m_lookAtTemp;
+    float m_keyboardStep;
 };
 
 #endif /* CAMERA_H_ */
