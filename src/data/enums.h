@@ -234,6 +234,7 @@ namespace Fn
         G_CAMERA_UP_Z,
         G_CAMERA_NEAR,
         G_CAMERA_FAR,
+        G_CAMERA_ANGLE,
         G_SCREENSHOT_QUALITY,
         G_TRANSPARENCY,
         // ROI Properties
@@ -387,7 +388,6 @@ namespace Fn
                 case Property::G_TRANSPARENCY: return QString( "transparency mode" ); break;
                 case Property::G_OBJECT: return QString( "" ); break;
                 case Property::G_NEED_SHADER_UPDATE: return QString( "" ); break;
-                // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;
                 case Property::G_MOVEY: return QString( "" ); break;
@@ -404,6 +404,7 @@ namespace Fn
                 case Property::G_CAMERA_UP_Z: return QString( "up z" ); break;
                 case Property::G_CAMERA_NEAR: return QString( "camera near" ); break;
                 case Property::G_CAMERA_FAR: return QString( "camera far" ); break;
+                case Property::G_CAMERA_ANGLE: return QString( "camera angle" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
                 case Property::R_Y: return QString( "y" ); break;

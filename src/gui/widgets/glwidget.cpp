@@ -167,9 +167,7 @@ void GLWidget::calcMVPMatrix()
     float zoom  = m_cameraInUse->getZoom();
     float halfBB = boundingbox / 2.0 / zoom;
 
-    float ratio = static_cast<float>( m_width )/ static_cast<float>( m_height );
-    float near = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
-    float far = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
+    float ratio = static_cast<float>( m_width ) / static_cast<float>( m_height );
 
     if ( projection == 0 )
     {
@@ -184,8 +182,11 @@ void GLWidget::calcMVPMatrix()
     }
     else
     {
-        float angle = 90.0f / zoom;
-        m_pMatrix.perspective( angle, ratio, near, far );
+        float nearPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
+        float farPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
+        float angle = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_ANGLE, 0 ) ).toFloat();
+        angle /= zoom;
+        m_pMatrix.perspective( angle, ratio, nearPlane, farPlane );
     }
     m_mvMatrix = m_cameraInUse->getMVMat();
 
