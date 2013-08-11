@@ -97,6 +97,9 @@ void SliderWithEditInt2::setMax( int max )
 {
     m_slider->setMaximum( max );
     m_slider->repaint();
+
+    m_edit->setMaxLength( QString::number( max ).size() );
+    m_edit->setMaximumWidth( QString::number( max ).size() * 12 );
 }
 
 void SliderWithEditInt2::minusPressed()

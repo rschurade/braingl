@@ -38,6 +38,8 @@ public:
     QImage* screenshot();
 
     CameraBase* getCameraInUse();
+    ArcBall* getArcBall();
+    Camera* getCamera();
 
 private:
     QItemSelectionModel* m_roiSelectionModel;
