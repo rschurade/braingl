@@ -16,9 +16,6 @@ enum class ScriptCommand : int
     NONE,
     // 1 parameters
     DELAY,
-    SET_CAMERA_POSITION,
-    SET_CAMERA_LOOKAT,
-    SET_CAMERA_UP,
     // 2 parameters
     // 3 parameters
     SET_CAMERA,  // #1 position #2 lookat #3 up
@@ -27,7 +24,7 @@ enum class ScriptCommand : int
     // 5 parameters
 };
 
-#define NUM_SCRIPT_COMMANDS 7
+#define NUM_SCRIPT_COMMANDS 4
 
 struct Script2String
 {
@@ -39,9 +36,6 @@ struct Script2String
             case ScriptCommand::NONE: return QString( "none" ); break;
             // 1 parameters
             case ScriptCommand::DELAY: return QString( "delay" ); break;
-            case ScriptCommand::SET_CAMERA_POSITION: return QString( "set camera position" ); break;
-            case ScriptCommand::SET_CAMERA_LOOKAT: return QString( "set camera lookat" ); break;
-            case ScriptCommand::SET_CAMERA_UP: return QString( "set camera up" ); break;
             // 2 parameters
             // 3 parameters
             case ScriptCommand::SET_CAMERA: return QString( "set camera" ); break;

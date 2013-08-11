@@ -156,18 +156,6 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
-            case ScriptCommand::SET_CAMERA_POSITION:
-            case ScriptCommand::SET_CAMERA_LOOKAT:
-            case ScriptCommand::SET_CAMERA_UP:
-            {
-                QVector3D vec = command[1].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                emit( enable( false, i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
-                break;
-            }
             case ScriptCommand::SET_CAMERA:
             {
                 QVector3D vec = command[1].value<QVector3D>();
@@ -318,26 +306,6 @@ void ScriptWidget::run()
             delay += line[1].toInt();
             break;
         }
-        case ScriptCommand::SET_CAMERA_POSITION:
-        {
-            camera[0] = line[1];
-            m_glWidget->getCamera()->setState( camera );
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_LOOKAT:
-        {
-            camera[1] = line[2];
-            m_glWidget->getCamera()->setState( camera );
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_UP:
-        {
-            camera[2] = line[3];
-            m_glWidget->getCamera()->setState( camera );
-            break;
-        }
         case ScriptCommand::SET_CAMERA:
         {
             camera[0] = line[1];
@@ -435,32 +403,6 @@ void ScriptWidget::commandChanged( int line, int command )
             emit( editChanged( QString::number( 25 ), line * 10 + 1 ) );
             break;
         }
-        case ScriptCommand::SET_CAMERA_POSITION:
-        {
-            commandLine.push_back( camera[0] );
-            emit( enable( true, line * 10 + 1 ) );
-            QVector3D vec = camera[0].value<QVector3D>();
-            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), line * 10 + 1 ) );
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_LOOKAT:
-        {
-            commandLine.push_back( camera[1] );
-            emit( enable( true, line * 10 + 1 ) );
-            QVector3D vec = camera[1].value<QVector3D>();
-            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), line * 10 + 1 ) );
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_UP:
-        {
-            commandLine.push_back( camera[2] );
-            emit( enable( true, line * 10 + 1 ) );
-            QVector3D vec = camera[2].value<QVector3D>();
-            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), line * 10 + 1 ) );
-            break;
-        }
         case ScriptCommand::SET_CAMERA:
         {
             commandLine.push_back( camera[0] );
@@ -535,32 +477,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 1 )
             {
                 m_script[row].replace( column, text.toInt() );
-            }
-            break;
-        }
-        case ScriptCommand::SET_CAMERA_POSITION:
-        {
-            if ( column == 1 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
-            }
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_LOOKAT:
-        {
-            if ( column == 1 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
-            }
-            break;
-        }
-
-        case ScriptCommand::SET_CAMERA_UP:
-        {
-            if ( column == 1 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
             }
             break;
         }
