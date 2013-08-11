@@ -188,6 +188,12 @@ namespace Fn
         D_LOCK_PROPS,
         D_AUTOPLAY,
         D_AUTOPLAY_INTERVAL,
+        D_MESH_CUT_LOWER_X,
+        D_MESH_CUT_LOWER_Y,
+        D_MESH_CUT_LOWER_Z,
+        D_MESH_CUT_HIGHER_X,
+        D_MESH_CUT_HIGHER_Y,
+        D_MESH_CUT_HIGHER_Z,
         // Global Settings
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
@@ -357,6 +363,12 @@ namespace Fn
                 case Property::D_LOCK_PROPS: return QString( "lock properties" ); break;
                 case Property::D_AUTOPLAY: return QString( "auto play" ); break;
                 case Property::D_AUTOPLAY_INTERVAL: return QString( "auto play interval" ); break;
+                case Property::D_MESH_CUT_LOWER_X: return QString( "cut lower than x" ); break;
+                case Property::D_MESH_CUT_LOWER_Y: return QString( "cut lower than y" ); break;
+                case Property::D_MESH_CUT_LOWER_Z: return QString( "cut lower than z" ); break;
+                case Property::D_MESH_CUT_HIGHER_X: return QString( "cut higher than x" ); break;
+                case Property::D_MESH_CUT_HIGHER_Y: return QString( "cut higher than y" ); break;
+                case Property::D_MESH_CUT_HIGHER_Z: return QString( "cut higher than z" ); break;
                 // Global Settings
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break; // Global Settings for rendering

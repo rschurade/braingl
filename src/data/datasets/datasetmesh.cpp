@@ -59,6 +59,13 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Z, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_X, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Y, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Z, false, "special" );
+
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
@@ -118,6 +125,13 @@ DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
             m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
+
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Z, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_X, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Y, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Z, false, "special" );
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
