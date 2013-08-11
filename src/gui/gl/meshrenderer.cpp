@@ -106,9 +106,22 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
     float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
     float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
     float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
     float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
     float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+
+    program->setUniformValue( "u_x", sx * dx + dx / 2.0f );
+    program->setUniformValue( "u_y", sy * dy + dy / 2.0f );
+    program->setUniformValue( "u_z", sz * dz + dz / 2.0f );
+    program->setUniformValue( "u_cutLowerX", props->get( Fn::Property::D_MESH_CUT_LOWER_X ).toBool() );
+    program->setUniformValue( "u_cutLowerY", props->get( Fn::Property::D_MESH_CUT_LOWER_Y ).toBool() );
+    program->setUniformValue( "u_cutLowerZ", props->get( Fn::Property::D_MESH_CUT_LOWER_Z ).toBool() );
+    program->setUniformValue( "u_cutHigherX", props->get( Fn::Property::D_MESH_CUT_HIGHER_X ).toBool() );
+    program->setUniformValue( "u_cutHigherY", props->get( Fn::Property::D_MESH_CUT_HIGHER_Y ).toBool() );
+    program->setUniformValue( "u_cutHigherZ", props->get( Fn::Property::D_MESH_CUT_HIGHER_Z ).toBool() );
 
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );

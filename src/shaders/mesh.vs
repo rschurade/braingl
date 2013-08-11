@@ -4,6 +4,8 @@
 #include lighting_vs
 #include peel_vs
 
+out float v_discard;
+
 void main()
 {
 	v_normal = normalize( a_normal );
@@ -17,5 +19,56 @@ void main()
 	
 	v_position = mvp_matrix * vec4( a_position, 1.0 );
 	
+	v_discard = 0.0;
+	if ( u_cutLowerX && a_position.x < u_x )
+	{
+		if ( u_cutLowerY && a_position.y < u_y )
+		{
+			if ( u_cutLowerZ && a_position.z < u_z )
+			{
+				v_discard = 1.0;
+			}
+			if ( u_cutHigherZ && a_position.z > u_z )
+			{
+				v_discard = 1.0;
+			}
+		}
+		if ( u_cutHigherY && a_position.y > u_y )
+		{
+			if ( u_cutLowerZ && a_position.z < u_z )
+			{
+				v_discard = 1.0;
+			}
+			if ( u_cutHigherZ && a_position.z > u_z )
+			{
+				v_discard = 1.0;
+			}
+		}
+	}	
+	if ( u_cutHigherX && a_position.x > u_x )
+	{
+		if ( u_cutLowerY && a_position.y < u_y )
+		{
+			if ( u_cutLowerZ && a_position.z < u_z )
+			{
+				v_discard = 1.0;
+			}
+			if ( u_cutHigherZ && a_position.z > u_z )
+			{
+				v_discard = 1.0;
+			}
+		}
+		if ( u_cutHigherY && a_position.y > u_y )
+		{
+			if ( u_cutLowerZ && a_position.z < u_z )
+			{
+				v_discard = 1.0;
+			}
+			if ( u_cutHigherZ && a_position.z > u_z )
+			{
+				v_discard = 1.0;
+			}
+		}
+	}	
     gl_Position = v_position;
 }

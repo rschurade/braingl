@@ -7,9 +7,15 @@
 #include peel_fs
 
 in float v_value;
+in float v_discard;
 
 void main()
 {
+	if ( v_discard > 0.0 )
+	{
+		discard;
+	}
+
     vec3 color = light( u_color ).rgb;
     float test1 = dot( v_lightDir.xyz, v_normal.xyz );
        
