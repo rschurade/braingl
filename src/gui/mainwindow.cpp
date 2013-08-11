@@ -25,9 +25,12 @@
 #include "widgets/statusbar.h"
 #include "widgets/shadereditwidget.h"
 #include "widgets/colormapeditwidget.h"
+#include "widgets/scriptwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
 #include "gl/camerabase.h"
+#include "gl/arcball.h"
+#include "gl/camera.h"
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
 
@@ -400,7 +403,8 @@ void MainWindow::saveScene( QString fileName )
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_TRANSPARENCY, 0 ) ) );
-    settings.setValue( "camera_maingl", mainGLWidget->getCameraInUse()->getState() );
+    settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
+    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -546,8 +550,13 @@ void MainWindow::loadScene( QString fileName )
 
     if ( settings.contains( "camera_maingl" ) )
     {
-        mainGLWidget->getCameraInUse()->setState( settings.value( "camera_maingl" ).toList() );
+        mainGLWidget->getCamera()->setState( settings.value( "camera_maingl" ).toList() );
     }
+    if ( settings.contains( "arcball_maingl" ) )
+    {
+        mainGLWidget->getArcBall()->setState( settings.value( "arcball_maingl" ).toList() );
+    }
+
 
     Models::g()->submit();
 
@@ -814,6 +823,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
     dockDSI->hide();
 
+
     tabifyDockWidget( dockGP, dockDSP );
     tabifyDockWidget( dockGP, dockCE );
     tabifyDockWidget( dockGP, dockDSP2 );
@@ -826,6 +836,14 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
+
+    ScriptWidget* scriptWidget = new ScriptWidget( mainGLWidget, this );
+    FNDockWidget* dockSW = new FNDockWidget( "script", scriptWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockSW );
+    viewMenu->addAction( dockSW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
+    //dockSW->hide();
+    tabifyDockWidget( dockGP, dockSW );
 
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
     FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );

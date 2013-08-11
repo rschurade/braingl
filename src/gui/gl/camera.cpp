@@ -245,6 +245,7 @@ void Camera::setState( QList<QVariant> state )
     m_position = state[0].value<QVector3D>();
     m_lookAt = state[1].value<QVector3D>();
     m_up = state[2].value<QVector3D>();
+    setGlobals();
 }
 
 void Camera::getGlobals()

@@ -95,6 +95,16 @@ CameraBase* GLWidget::getCameraInUse()
     return m_cameraInUse;
 }
 
+ArcBall* GLWidget::getArcBall()
+{
+    return m_arcBall;
+}
+
+Camera* GLWidget::getCamera()
+{
+    return m_camera;
+}
+
 void GLWidget::initializeGL()
 {
     m_sceneRenderer->initGL();
