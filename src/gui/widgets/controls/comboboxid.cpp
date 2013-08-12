@@ -20,5 +20,5 @@ ComboBoxID::~ComboBoxID()
 
 void ComboBoxID::slotIndexChanged( int index )
 {
-    emit( currentIndexChanged( m_id, index ) );
+    emit( currentIndexChanged( m_id, index, itemData( index ).toInt() ) );
 }

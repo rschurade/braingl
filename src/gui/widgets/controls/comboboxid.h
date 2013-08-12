@@ -22,7 +22,7 @@ private:
     int m_id;
 
 signals:
-    void currentIndexChanged( int, int );
+    void currentIndexChanged( int, int, int );
 
 private slots:
     void slotIndexChanged( int index );

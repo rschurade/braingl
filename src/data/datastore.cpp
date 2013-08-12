@@ -126,6 +126,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
     //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
     if ( index.column() != (int)Fn::Property::D_NEW_DATASET && !index.isValid() )
     {
+        qDebug() << "index not valid";
         return false;
     }
 
@@ -158,6 +159,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         }
         return true;
     }
+    //qDebug() << "general failure";
     return false;
 }
 

@@ -842,6 +842,7 @@ void MainWindow::createDockWindows()
     addDockWidget( Qt::LeftDockWidgetArea, dockSW );
     viewMenu->addAction( dockSW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
+    connect( scriptWidget, SIGNAL( screenshot() ), this, SLOT( screenshot() ) );
     dockSW->hide();
     tabifyDockWidget( dockGP, dockSW );
 
