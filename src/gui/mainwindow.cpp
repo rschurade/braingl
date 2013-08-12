@@ -842,7 +842,7 @@ void MainWindow::createDockWindows()
     addDockWidget( Qt::LeftDockWidgetArea, dockSW );
     viewMenu->addAction( dockSW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
-    //dockSW->hide();
+    dockSW->hide();
     tabifyDockWidget( dockGP, dockSW );
 
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
