@@ -566,7 +566,7 @@ void ScriptWidget::run()
         case ScriptCommand::INCREMENT_GLOBAL:
         {
             m_lastGlobal = line[1].toInt();
-            m_stepSize = line[2].toInt();
+            m_stepSize = line[2].toFloat();
             m_targetStep = line[3].toInt();
             m_currentStep = 0;
             slotIncrementGlobal();
@@ -672,7 +672,7 @@ void ScriptWidget::slotIncrementGlobal()
         QTimer::singleShot( delay, this, SLOT( run() ) );
         return;
     }
-    int value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toInt();
+    float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat();
     value += m_stepSize;
     Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
 
@@ -834,7 +834,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             {
                 if ( m_script[row].at( 1 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
-                    m_script[row].replace( 2, text.toInt() );
+                    m_script[row].replace( 2, text );
                 }
             }
             break;
@@ -845,7 +845,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             {
                 if ( m_script[row].at( 1 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
-                    m_script[row].replace( column, text.toInt() );
+                    m_script[row].replace( column, text );
                 }
             }
             break;
