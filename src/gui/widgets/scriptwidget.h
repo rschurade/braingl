@@ -21,11 +21,12 @@ enum class ScriptCommand : int
     INCREMENT_GLOBAL,
     SET_PROPERTY,
     INCREMENT_PROPERTY,
-    SET_ARCBALL
+    SET_ARCBALL,
+    INTERPOLATE_ARCBALL
 
 };
 
-#define NUM_SCRIPT_COMMANDS 9
+#define NUM_SCRIPT_COMMANDS 10
 
 struct Script2String
 {
@@ -42,6 +43,7 @@ struct Script2String
             case ScriptCommand::SET_PROPERTY: return QString( "set property" ); break;
             case ScriptCommand::INCREMENT_PROPERTY: return QString( "increment property" ); break;
             case ScriptCommand::SET_ARCBALL: return QString( "set arcball" ); break;
+            case ScriptCommand::INTERPOLATE_ARCBALL: return QString( "interpolate arcball" ); break;
         }
         return QString( "command doesn't exist" );
     }
@@ -99,6 +101,9 @@ private:
     int m_lastDataset;
     int m_lastProperty;
 
+    QQuaternion m_currentRot;
+    QQuaternion m_targetRot;
+
 public slots:
 
 
@@ -112,6 +117,7 @@ private slots:
     void slotDelay();
     void slotIncrementGlobal();
     void slotIncrementProperty();
+    void slotInterpolateArcball();
 
     void copyCamera();
 

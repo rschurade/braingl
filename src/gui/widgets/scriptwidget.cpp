@@ -238,6 +238,17 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
+            case ScriptCommand::INTERPOLATE_ARCBALL:
+            {
+                addEdit( layout, i* 10 + 1, 5 );
+                QVector4D vec = command[1].value<QQuaternion>().toVector4D();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
+                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                emit( enable( false, i * 10 + 3 ) );
+                emit( enable( false, i * 10 + 4 ) );
+                emit( enable( false, i * 10 + 5 ) );
+                break;
+            }
         }
 
         layout->addStretch();
@@ -312,6 +323,13 @@ void ScriptWidget::commandChanged( int line, int command )
         {
             QQuaternion rot = m_glWidget->getArcBall()->getRotation();
             commandLine.push_back( rot );
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_ARCBALL:
+        {
+            QQuaternion rot = m_glWidget->getArcBall()->getRotation();
+            commandLine.push_back( rot );
+            commandLine.push_back( 25 );
             break;
         }
     }
@@ -591,6 +609,16 @@ void ScriptWidget::run()
             m_glWidget->getArcBall()->setRotation( rot );
             break;
         }
+        case ScriptCommand::INTERPOLATE_ARCBALL:
+        {
+            m_currentRot = m_glWidget->getArcBall()->getRotation();
+            m_targetRot = line[1].value<QQuaternion>();
+            m_interpolateSteps = line[2].toInt();
+            m_currentInterpolateStep = 0;
+            slotInterpolateArcball();
+            return;
+            break;
+        }
     }
     Models::g()->submit();
 
@@ -600,6 +628,35 @@ void ScriptWidget::run()
     }
 
     QTimer::singleShot( delay, this, SLOT( run() ) );
+}
+
+void ScriptWidget::slotInterpolateArcball()
+{
+    if ( !m_runScript )
+    {
+        return;
+    }
+
+    int delay = m_delay->getValue();
+    if ( ++m_currentInterpolateStep > m_interpolateSteps )
+    {
+        QTimer::singleShot( delay, this, SLOT( run() ) );
+        return;
+    }
+
+    float div = (float)m_currentInterpolateStep / (float)m_interpolateSteps;
+
+    QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
+    m_glWidget->getArcBall()->setRotation( rot );
+
+    Models::g()->submit();
+
+    if ( m_screenshotEach->checked() )
+    {
+        emit( screenshot() );
+    }
+
+    QTimer::singleShot( delay, this, SLOT( slotInterpolateArcball() ) );
 }
 
 void ScriptWidget::slotIncrementGlobal()
@@ -865,6 +922,39 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                         m_script[row].replace( column, QQuaternion( w, x, y, z ) );
                     }
                 }
+            }
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_ARCBALL:
+        {
+            if ( column == 1 )
+            {
+                QStringList parts = text.split( ",", QString::SkipEmptyParts );
+                if( parts.size() == 4 )
+                {
+                    bool ok = true;
+                    bool totalOk = true;
+                    float x = parts[0].toFloat( &ok );
+                    totalOk &= ok;
+                    float y = parts[1].toFloat( &ok );
+                    totalOk &= ok;
+                    float z = parts[2].toFloat( &ok );
+                    totalOk &= ok;
+                    float w = parts[2].toFloat( &ok );
+                    totalOk &= ok;
+                    if ( !totalOk )
+                    {
+                        m_script[row].replace( column, QQuaternion( 0, 0, 0, 0 ) );
+                    }
+                    else
+                    {
+                        m_script[row].replace( column, QQuaternion( w, x, y, z ) );
+                    }
+                }
+            }
+            if ( column == 2 )
+            {
+                m_script[row].replace( column, text.toInt() );
             }
             break;
         }
