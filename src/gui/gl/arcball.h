@@ -36,8 +36,12 @@ public:
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
 
+    QQuaternion getRotation();
+    void setRotation( QQuaternion quat );
+
 private:
     QVector3D map_sphere( int x, int y );
+    QQuaternion mat2quat( QMatrix4x4 &mat );
 
     float Epsilon;
 

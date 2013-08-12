@@ -8,6 +8,7 @@
 #include "scriptwidget.h"
 #include "glwidget.h"
 #include "../gl/camera.h"
+#include "../gl/arcball.h"
 
 #include "controls/comboboxid.h"
 #include "controls/lineeditid.h"
@@ -226,6 +227,17 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
+            case ScriptCommand::SET_ARCBALL:
+            {
+                addEdit( layout, i* 10 + 1, 5 );
+                QVector4D vec = command[1].value<QQuaternion>().toVector4D();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
+                emit( enable( false, i * 10 + 2 ) );
+                emit( enable( false, i * 10 + 3 ) );
+                emit( enable( false, i * 10 + 4 ) );
+                emit( enable( false, i * 10 + 5 ) );
+                break;
+            }
         }
 
         layout->addStretch();
@@ -234,6 +246,86 @@ QWidget* ScriptWidget::buildScriptLayout()
     m_scriptLayout->addStretch();
 
     return groupBox;
+}
+
+void ScriptWidget::commandChanged( int line, int command )
+{
+    line /= 10;
+    QList<QVariant> commandLine;
+    commandLine.push_back( command );
+
+    QList<QVariant> camera = m_glWidget->getCamera()->getState();
+
+    switch( (ScriptCommand)( command ) )
+    {
+        case ScriptCommand::NONE:
+            break;
+        case ScriptCommand::DELAY:
+        {
+            commandLine.push_back( 25 );
+            break;
+        }
+        case ScriptCommand::SET_CAMERA:
+        {
+            commandLine.push_back( camera[0] );
+            commandLine.push_back( camera[1] );
+            commandLine.push_back( camera[2] );
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_CAMERA:
+        {
+            commandLine.push_back( camera[0] );
+            commandLine.push_back( camera[1] );
+            commandLine.push_back( camera[2] );
+            commandLine.push_back( 25 );
+            break;
+        }
+        case ScriptCommand::SET_GLOBAL:
+        {
+            commandLine.push_back( m_lastGlobal );
+            commandLine.push_back( Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toInt() );
+            break;
+        }
+        case ScriptCommand::INCREMENT_GLOBAL:
+        {
+            commandLine.push_back( m_lastGlobal );
+            commandLine.push_back( 1 );
+            commandLine.push_back( 1 );
+            break;
+        }
+        case ScriptCommand::SET_PROPERTY:
+        {
+            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
+            commandLine.push_back( m_lastDataset );
+            commandLine.push_back( 1 );
+            break;
+        }
+        case ScriptCommand::INCREMENT_PROPERTY:
+        {
+            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
+            commandLine.push_back( m_lastDataset );
+            commandLine.push_back( 1 );
+            commandLine.push_back( 1 );
+            break;
+        }
+        case ScriptCommand::SET_ARCBALL:
+        {
+            QQuaternion rot = m_glWidget->getArcBall()->getRotation();
+            commandLine.push_back( rot );
+            break;
+        }
+    }
+    m_script[line] = commandLine;
+    if ( line == m_script.size() - 1 && command != 0 )
+    {
+        QList<QVariant> command;
+        command.push_back( (int)ScriptCommand::NONE );
+        m_script.push_back( command );
+    }
+
+    delete this->layout();
+    this->repaint();
+    initLayout();
 }
 
 void ScriptWidget::addEdit( QHBoxLayout* layout, int startId, int count  )
@@ -493,6 +585,12 @@ void ScriptWidget::run()
             return;
             break;
         }
+        case ScriptCommand::SET_ARCBALL:
+        {
+            QQuaternion rot  = line[1].value<QQuaternion>();
+            m_glWidget->getArcBall()->setRotation( rot );
+            break;
+        }
     }
     Models::g()->submit();
 
@@ -630,80 +728,6 @@ void ScriptWidget::interpolateCamera()
     QTimer::singleShot( delay, this, SLOT( interpolateCamera() ) );
 }
 
-void ScriptWidget::commandChanged( int line, int command )
-{
-    line /= 10;
-    QList<QVariant> commandLine;
-    commandLine.push_back( command );
-
-    QList<QVariant> camera = m_glWidget->getCamera()->getState();
-
-    switch( (ScriptCommand)( command ) )
-    {
-        case ScriptCommand::NONE:
-            break;
-        case ScriptCommand::DELAY:
-        {
-            commandLine.push_back( 25 );
-            break;
-        }
-        case ScriptCommand::SET_CAMERA:
-        {
-            commandLine.push_back( camera[0] );
-            commandLine.push_back( camera[1] );
-            commandLine.push_back( camera[2] );
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_CAMERA:
-        {
-            commandLine.push_back( camera[0] );
-            commandLine.push_back( camera[1] );
-            commandLine.push_back( camera[2] );
-            commandLine.push_back( 25 );
-            break;
-        }
-        case ScriptCommand::SET_GLOBAL:
-        {
-            commandLine.push_back( m_lastGlobal );
-            commandLine.push_back( Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toInt() );
-            break;
-        }
-        case ScriptCommand::INCREMENT_GLOBAL:
-        {
-            commandLine.push_back( m_lastGlobal );
-            commandLine.push_back( 1 );
-            commandLine.push_back( 1 );
-            break;
-        }
-        case ScriptCommand::SET_PROPERTY:
-        {
-            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
-            commandLine.push_back( m_lastDataset );
-            commandLine.push_back( 1 );
-            break;
-        }
-        case ScriptCommand::INCREMENT_PROPERTY:
-        {
-            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
-            commandLine.push_back( m_lastDataset );
-            commandLine.push_back( 1 );
-            commandLine.push_back( 1 );
-            break;
-        }
-    }
-    m_script[line] = commandLine;
-    if ( line == m_script.size() - 1 && command != 0 )
-    {
-        QList<QVariant> command;
-        command.push_back( (int)ScriptCommand::NONE );
-        m_script.push_back( command );
-    }
-
-    delete this->layout();
-    this->repaint();
-    initLayout();
-}
-
 void ScriptWidget::copyCamera()
 {
 
@@ -812,6 +836,35 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 4 )
             {
                 m_script[row].replace( column, text.toInt() );
+            }
+            break;
+        }
+        case ScriptCommand::SET_ARCBALL:
+        {
+            if ( column == 1 )
+            {
+                QStringList parts = text.split( ",", QString::SkipEmptyParts );
+                if( parts.size() == 4 )
+                {
+                    bool ok = true;
+                    bool totalOk = true;
+                    float x = parts[0].toFloat( &ok );
+                    totalOk &= ok;
+                    float y = parts[1].toFloat( &ok );
+                    totalOk &= ok;
+                    float z = parts[2].toFloat( &ok );
+                    totalOk &= ok;
+                    float w = parts[2].toFloat( &ok );
+                    totalOk &= ok;
+                    if ( !totalOk )
+                    {
+                        m_script[row].replace( column, QQuaternion( 0, 0, 0, 0 ) );
+                    }
+                    else
+                    {
+                        m_script[row].replace( column, QQuaternion( w, x, y, z ) );
+                    }
+                }
             }
             break;
         }

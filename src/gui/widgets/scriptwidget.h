@@ -20,11 +20,12 @@ enum class ScriptCommand : int
     SET_GLOBAL,
     INCREMENT_GLOBAL,
     SET_PROPERTY,
-    INCREMENT_PROPERTY
+    INCREMENT_PROPERTY,
+    SET_ARCBALL
 
 };
 
-#define NUM_SCRIPT_COMMANDS 8
+#define NUM_SCRIPT_COMMANDS 9
 
 struct Script2String
 {
@@ -40,7 +41,7 @@ struct Script2String
             case ScriptCommand::INCREMENT_GLOBAL: return QString( "increment global" ); break;
             case ScriptCommand::SET_PROPERTY: return QString( "set property" ); break;
             case ScriptCommand::INCREMENT_PROPERTY: return QString( "increment property" ); break;
-
+            case ScriptCommand::SET_ARCBALL: return QString( "set arcball" ); break;
         }
         return QString( "command doesn't exist" );
     }
