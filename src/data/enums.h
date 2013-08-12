@@ -194,6 +194,7 @@ namespace Fn
         D_MESH_CUT_HIGHER_X,
         D_MESH_CUT_HIGHER_Y,
         D_MESH_CUT_HIGHER_Z,
+        D_FIBER_GROW_LENGTH,
         // Global Settings
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
@@ -369,6 +370,7 @@ namespace Fn
                 case Property::D_MESH_CUT_HIGHER_X: return QString( "cut higher than x" ); break;
                 case Property::D_MESH_CUT_HIGHER_Y: return QString( "cut higher than y" ); break;
                 case Property::D_MESH_CUT_HIGHER_Z: return QString( "cut higher than z" ); break;
+                case Property::D_FIBER_GROW_LENGTH: return QString( "fiber growth" ); break;
                 // Global Settings
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break; // Global Settings for rendering
@@ -400,6 +402,7 @@ namespace Fn
                 case Property::G_TRANSPARENCY: return QString( "transparency mode" ); break;
                 case Property::G_OBJECT: return QString( "" ); break;
                 case Property::G_NEED_SHADER_UPDATE: return QString( "" ); break;
+                // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;
                 case Property::G_MOVEY: return QString( "" ); break;

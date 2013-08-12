@@ -11,11 +11,14 @@ out float v_sparam;
 out float v_tangent_dot_view;
 out float v_location;
 
+out float v_discard;
+
 void main()
 {
     v_position = mvp_matrix * vec4( a_position, 1.0 );
     
     v_normal = normalize( a_normal );
+    v_index = a_indexes;
 
     vec3 tangent = normalize( ( mv_matrixTI * vec4( v_normal, 1.0 ) ).xyz );
         
@@ -47,6 +50,14 @@ void main()
     {
        frontColor =  vec4( u_color.xyz, 1.0 );
     }
+    
+    v_discard = 0.0;
+    if ( a_position.x <= ( u_x - u_dx ) || a_position.x >= ( u_x + u_dx ) || 
+         a_position.y <= ( u_y - u_dy ) || a_position.y >= ( u_y + u_dy ) ||
+         a_position.z <= ( u_z - u_dz ) || a_position.z >= ( u_z + u_dz ) )
+    {
+        v_discard = 1.0;
+    } 
     
     v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
 }

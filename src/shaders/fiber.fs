@@ -6,9 +6,15 @@
 #include peel_fs
 
 in float v_discard;
+uniform float u_fibGrowth;
 
 void main()
 {
+    if ( v_index > u_fibGrowth )
+    {
+        discard;
+    }
+
     vec3 color = frontColor.rgb;
     if ( v_discard > 0.0 )
     {

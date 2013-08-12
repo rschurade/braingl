@@ -8,8 +8,17 @@
 in float v_sparam; // s parameter of texture [-1..1]
 in float v_tangent_dot_view;
 
+in float v_discard;
+uniform float u_fibGrowth;
+
+
 void main()
 {
+    if ( v_index > u_fibGrowth )
+    {
+        discard;
+    }
+
     vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 ); 
     if ( u_colorMode == 3 )
     {

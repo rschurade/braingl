@@ -35,12 +35,14 @@ FiberRenderer::~FiberRenderer()
 {
     glDeleteBuffers( 1, &vbo );
     glDeleteBuffers( 1, &dataVbo );
+    glDeleteBuffers( 1, &indexVbo );
 }
 
 void FiberRenderer::init()
 {
     glGenBuffers( 1, &vbo );
     glGenBuffers( 1, &dataVbo );
+    glGenBuffers( 1, &indexVbo );
 }
 
 void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -87,6 +89,10 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->enableAttributeArray( extraLocation );
     glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
 
+    glBindBuffer( GL_ARRAY_BUFFER, indexVbo );
+    int indexLocation = program->attributeLocation( "a_indexes" );
+    program->enableAttributeArray( indexLocation );
+    glVertexAttribPointer( indexLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
 
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
@@ -96,6 +102,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
     program->setUniformValue( "C5", 13 );
+    program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
 
     glLineWidth( props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
@@ -240,19 +247,29 @@ void FiberRenderer::updateExtraData( QVector< QVector< float > >* extraData )
 {
     m_extraData = extraData;
     QVector<float>data;
+    QVector<float>indexes;
     for ( int i = 0; i < extraData->size(); ++i )
     {
         QVector<float>fib = extraData->at(i);
         for ( int k = 0; k < fib.size(); ++k )
         {
-            data.push_back( fib[k]);
+            data.push_back( fib[k] );
+            indexes.push_back( k );
         }
     }
 
     glDeleteBuffers( 1, &dataVbo );
     glGenBuffers( 1, &dataVbo );
 
+    glDeleteBuffers( 1, &indexVbo );
+    glGenBuffers( 1, &indexVbo );
+
     glBindBuffer( GL_ARRAY_BUFFER, dataVbo );
     glBufferData( GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glBindBuffer( GL_ARRAY_BUFFER, indexVbo );
+    glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
 }

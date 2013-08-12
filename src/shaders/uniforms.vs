@@ -4,6 +4,7 @@ in vec3 a_normal;
 in vec4 a_color;
 
 in float a_extra;
+in float a_indexes;
 in float a_value;
 in float a_dir;
 in vec3 a_vec;
@@ -17,6 +18,7 @@ out vec3 v_normal;
 out float v_extra;
 out vec4 frontColor;
 out float v_value;
+out float v_index;
 
 uniform mat4 mv_matrixTI;
 uniform mat4 mvp_matrix;

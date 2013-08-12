@@ -19,7 +19,7 @@
 TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData )  :
     ObjectRenderer(),
     m_selector( selector ),
-    vboIds( new GLuint[ 3 ] ),
+    vboIds( new GLuint[ 4 ] ),
     m_data( data ),
     m_extraData( extraData ),
     m_numLines( data->size() ),
@@ -31,12 +31,12 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >
 
 TubeRenderer::~TubeRenderer()
 {
-    glDeleteBuffers( 3, vboIds );
+    glDeleteBuffers( 4, vboIds );
 }
 
 void TubeRenderer::init()
 {
-    glGenBuffers( 3, vboIds );
+    glGenBuffers( 4, vboIds );
 }
 
 void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -87,6 +87,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     int extraLocation = program->attributeLocation( "a_extra" );
     program->enableAttributeArray( extraLocation );
     glVertexAttribPointer( extraLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[3] );
+    int indexLocation = program->attributeLocation( "a_indexes" );
+    program->enableAttributeArray( indexLocation );
+    glVertexAttribPointer( indexLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0 );
 
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
@@ -145,6 +150,7 @@ void TubeRenderer::setShaderVars( PropertyGroup* props )
     program->enableAttributeArray( dirLocation );
     glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
 
+    program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
     program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
@@ -237,6 +243,7 @@ void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
 {
     m_extraData = extraData;
     QVector<float>data;
+    QVector<float>indexes;
     for ( int i = 0; i < extraData->size(); ++i )
     {
         QVector<float>fib = extraData->at(i);
@@ -244,6 +251,8 @@ void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
         {
             data.push_back( fib[k]);
             data.push_back( fib[k]);
+            indexes.push_back( k );
+            indexes.push_back( k );
         }
     }
 
@@ -252,5 +261,12 @@ void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[2] );
     glBufferData( GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glDeleteBuffers( 1, &vboIds[2] );
+    glGenBuffers( 1, &vboIds[2] );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[3] );
+    glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

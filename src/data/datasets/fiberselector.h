@@ -25,9 +25,9 @@ public:
     void init( QVector< QVector< float > >& data );
 
     QVector<bool>* getSelection();
+    QModelIndex createIndex( int branch, int pos, int column );
 
 private:
-    QModelIndex createIndex( int branch, int pos, int column );
     void updatePresentRois();
 
     int m_numLines;

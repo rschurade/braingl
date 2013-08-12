@@ -68,6 +68,7 @@ private:
 private slots:
     void colorChanged();
     void dataModeChanged();
+    void autoplay();
 };
 
 #endif /* DATASETFIBERS_H_ */

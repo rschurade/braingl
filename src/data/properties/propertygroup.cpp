@@ -274,7 +274,16 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
         }
     }
 
-    qDebug() << "*** ERROR *** SET" << "property doesnt exist";
+    QString propName("");
+    for ( int i = 0; i < m_properties.size(); ++i )
+    {
+        if ( m_properties[i].first == Fn::Property::D_NAME )
+        {
+            propName = m_properties[i].second->getValue().toString();
+        }
+    }
+
+    qDebug() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
     exit( 0 );
     return false;
 }
