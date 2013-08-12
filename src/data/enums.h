@@ -196,7 +196,7 @@ namespace Fn
         D_MESH_CUT_HIGHER_Z,
         D_FIBER_GROW_LENGTH,
         // Global Settings
-        G_FIRST, // insert all global properties after this one
+        G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
         // Global Settings for rendering
@@ -247,7 +247,7 @@ namespace Fn
         G_CROSSHAIR_COLOR,
         G_LAST, // insert all global properties before this one
         // ROI Properties
-        R_X,
+        R_X = 1000,
         R_Y,
         R_Z,
         R_NX,
