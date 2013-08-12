@@ -174,7 +174,7 @@ void GLWidget::calcMVPMatrix()
     // Reset projection
     m_pMatrix.setToIdentity();
 
-    float zoom = Models::g()->data( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+    float zoom  = m_cameraInUse->getZoom();
     float halfBB = boundingbox / 2.0 / zoom;
 
     float ratio = static_cast<float>( m_width ) / static_cast<float>( m_height );
@@ -255,21 +255,9 @@ void GLWidget::enterEvent( QEvent *event )
 
 void GLWidget::wheelEvent( QWheelEvent *event )
 {
-    float numDegrees = event->delta() / 8;
-    float numSteps = numDegrees / 15;
-
-    float zoom = Models::g()->data( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-
-    if ( zoom < 2.0f )
-    {
-        numSteps /= 2.0;
-    }
-    zoom += numSteps;
-
-    zoom = qMax( 1.0f, zoom );
-
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
-
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+    m_cameraInUse->mouseWheel( numSteps );
     update();
 }
 
@@ -351,8 +339,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
     int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
     int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
-    float zoom = Models::g()->data( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-    float slowDown = 4.0f * zoom;
+    float slowDown = 4.0f * m_cameraInUse->getZoom();
 
     m_sceneRenderer->renderPick();
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );

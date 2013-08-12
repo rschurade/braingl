@@ -25,6 +25,8 @@ public:
     void midClick( int x, int y );
     void midDrag( int x, int y );
 
+    void mouseWheel( float step );
+
     void setRotCenter( float x, float y, float z );
 
     QMatrix4x4 getMVMat();

@@ -396,9 +396,9 @@ namespace Fn
                 case Property::G_SCREENSHOT_QUALITY: return QString( "screenshot quality" ); break;
                 case Property::G_TRANSPARENCY: return QString( "transparency mode" ); break;
                 case Property::G_NEED_SHADER_UPDATE: return QString( "" ); break;
-                case Property::G_ZOOM: return QString( "zoom" ); break;
-                case Property::G_MOVEX: return QString( "move x" ); break;
-                case Property::G_MOVEY: return QString( "move y" ); break;
+                case Property::G_ZOOM: return QString( "" ); break;
+                case Property::G_MOVEX: return QString( "" ); break;
+                case Property::G_MOVEY: return QString( "" ); break;
                 case Property::G_CAMERA_TYPE: return QString( "camera type" ); break;
                 case Property::G_CAMERA_PROJECTION: return QString( "camera projection" ); break;
                 case Property::G_CAMERA_POS_X: return QString( "eye x" ); break;
