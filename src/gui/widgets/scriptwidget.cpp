@@ -158,6 +158,33 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
+            case ScriptCommand::SET_CAMERA:
+            {
+                addEdit( layout, i* 10 + 1, 5 );
+                QVector3D vec = command[1].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
+                vec = command[2].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
+                vec = command[3].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
+                emit( enable( false, i * 10 + 4 ) );
+                emit( enable( false, i * 10 + 5 ) );
+                break;
+            }
+            case ScriptCommand::INTERPOLATE_CAMERA:
+            {
+                addEdit( layout, i* 10 + 1, 5 );
+                QVector3D vec = command[1].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
+                vec = command[2].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
+                vec = command[3].value<QVector3D>();
+                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
+                int steps = command[4].toInt();
+                emit( editChanged( QString::number( steps ), i * 10 + 4 ) );
+                emit( enable( false, i * 10 + 5 ) );
+                break;
+            }
             case ScriptCommand::SET_GLOBAL:
             {
                 addGlobalSelect( layout, i, command[1].toInt() );
@@ -178,19 +205,7 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
-            case ScriptCommand::SET_CAMERA:
-            {
-                addEdit( layout, i* 10 + 1, 5 );
-                QVector3D vec = command[1].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = command[2].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = command[3].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
-                break;
-            }
+
             case ScriptCommand::SET_PROPERTY:
             {
                 addPropertySelect( layout, i, command[1].toInt(), command[2].toInt() );
@@ -208,20 +223,6 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( editChanged( command[2].toString(), i * 10 + 2 ) );
                 emit( editChanged( command[3].toString(), i * 10 + 3 ) );
                 emit( editChanged( command[4].toString(), i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
-                break;
-            }
-            case ScriptCommand::INTERPOLATE_CAMERA_TO:
-            {
-                addEdit( layout, i* 10 + 1, 5 );
-                QVector3D vec = command[1].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = command[2].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = command[3].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                int steps = command[4].toInt();
-                emit( editChanged( QString::number( steps ), i * 10 + 4 ) );
                 emit( enable( false, i * 10 + 5 ) );
                 break;
             }
@@ -426,6 +427,27 @@ void ScriptWidget::run()
             return;
             break;
         }
+        case ScriptCommand::SET_CAMERA:
+        {
+            camera[0] = line[1];
+            camera[1] = line[2];
+            camera[2] = line[3];
+            m_glWidget->getCamera()->setState( camera );
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_CAMERA:
+        {
+            m_currentCamera = camera;
+            m_interpolatedCamera.clear();
+            m_interpolatedCamera.push_back( line[1] );
+            m_interpolatedCamera.push_back( line[2] );
+            m_interpolatedCamera.push_back( line[3] );
+            m_interpolateSteps = line[4].toInt();
+            m_currentInterpolateStep = 0;
+            interpolateCamera();
+            return;
+            break;
+        }
         case ScriptCommand::SET_GLOBAL:
         {
             Models::g()->setData( Models::g()->index( line[1].toInt(), 0 ), line[2] );
@@ -439,14 +461,6 @@ void ScriptWidget::run()
             m_currentStep = 0;
             slotIncrementGlobal();
             return;
-            break;
-        }
-        case ScriptCommand::SET_CAMERA:
-        {
-            camera[0] = line[1];
-            camera[1] = line[2];
-            camera[2] = line[3];
-            m_glWidget->getCamera()->setState( camera );
             break;
         }
         case ScriptCommand::SET_PROPERTY:
@@ -476,19 +490,6 @@ void ScriptWidget::run()
             m_targetStep = line[4].toInt();
             m_currentStep = 0;
             slotIncrementProperty();
-            return;
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_CAMERA_TO:
-        {
-            m_currentCamera = camera;
-            m_interpolatedCamera.clear();
-            m_interpolatedCamera.push_back( line[1] );
-            m_interpolatedCamera.push_back( line[2] );
-            m_interpolatedCamera.push_back( line[3] );
-            m_interpolateSteps = line[4].toInt();
-            m_currentInterpolateStep = 0;
-            interpolateCamera();
             return;
             break;
         }
@@ -646,6 +647,21 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( 25 );
             break;
         }
+        case ScriptCommand::SET_CAMERA:
+        {
+            commandLine.push_back( camera[0] );
+            commandLine.push_back( camera[1] );
+            commandLine.push_back( camera[2] );
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_CAMERA:
+        {
+            commandLine.push_back( camera[0] );
+            commandLine.push_back( camera[1] );
+            commandLine.push_back( camera[2] );
+            commandLine.push_back( 25 );
+            break;
+        }
         case ScriptCommand::SET_GLOBAL:
         {
             commandLine.push_back( m_lastGlobal );
@@ -657,13 +673,6 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( m_lastGlobal );
             commandLine.push_back( 1 );
             commandLine.push_back( 1 );
-            break;
-        }
-        case ScriptCommand::SET_CAMERA:
-        {
-            commandLine.push_back( camera[0] );
-            commandLine.push_back( camera[1] );
-            commandLine.push_back( camera[2] );
             break;
         }
         case ScriptCommand::SET_PROPERTY:
@@ -679,14 +688,6 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( m_lastDataset );
             commandLine.push_back( 1 );
             commandLine.push_back( 1 );
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_CAMERA_TO:
-        {
-            commandLine.push_back( camera[0] );
-            commandLine.push_back( camera[1] );
-            commandLine.push_back( camera[2] );
-            commandLine.push_back( 25 );
             break;
         }
     }
@@ -726,6 +727,26 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             break;
         }
+        case ScriptCommand::SET_CAMERA:
+        {
+            if ( column > 0 && column < 4 )
+            {
+                m_script[row].replace( column, string2Vector3D( text ) );
+            }
+            break;
+        }
+        case ScriptCommand::INTERPOLATE_CAMERA:
+        {
+            if ( column > 0 && column < 4 )
+            {
+                m_script[row].replace( column, string2Vector3D( text ) );
+            }
+            if ( column == 4 )
+            {
+                m_script[row].replace( column, text.toInt() );
+            }
+            break;
+        }
         case ScriptCommand::SET_GLOBAL:
         {
             if ( column == 2 )
@@ -745,14 +766,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 {
                     m_script[row].replace( column, text.toInt() );
                 }
-            }
-            break;
-        }
-        case ScriptCommand::SET_CAMERA:
-        {
-            if ( column > 0 && column < 4 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
             }
             break;
         }
@@ -795,18 +808,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 3 )
             {
                 m_script[row].replace( column, text );
-            }
-            if ( column == 4 )
-            {
-                m_script[row].replace( column, text.toInt() );
-            }
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_CAMERA_TO:
-        {
-            if ( column > 0 && column < 4 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
             }
             if ( column == 4 )
             {
