@@ -196,6 +196,7 @@ namespace Fn
         D_MESH_CUT_HIGHER_Z,
         D_FIBER_GROW_LENGTH,
         // Global Settings
+        G_FIRST, // insert all global properties after this one
         G_LOCK_WIDGETS,
         G_RENDER_CROSSHAIRS,
         // Global Settings for rendering
@@ -211,20 +212,10 @@ namespace Fn
         G_CORONAL_AXIAL,
         G_SAGITTAL_AXIAL,
         G_SAGITTAL_CORONAL,
-        G_LAST_PATH,
-        G_SCREENSHOT_PATH,
         G_SHOW_SAGITTAL,
         G_SHOW_CORONAL,
         G_SHOW_AXIAL,
-        G_BACKGROUND_COLOR_MAIN,
-        G_BACKGROUND_COLOR_COMBINED,
-        G_BACKGROUND_COLOR_NAV1,
-        G_BACKGROUND_COLOR_NAV2,
-        G_BACKGROUND_COLOR_NAV3,
-        G_CROSSHAIR_COLOR,
         G_SHOW_NAV_SLIDERS,
-        G_OBJECT,
-        G_NEED_SHADER_UPDATE,
         G_ZOOM,
         G_MOVEX,
         G_MOVEY,
@@ -244,6 +235,17 @@ namespace Fn
         G_CAMERA_ANGLE,
         G_SCREENSHOT_QUALITY,
         G_TRANSPARENCY,
+        G_LAST_PATH,
+        G_SCREENSHOT_PATH,
+        G_OBJECT,
+        G_NEED_SHADER_UPDATE,
+        G_BACKGROUND_COLOR_MAIN,
+        G_BACKGROUND_COLOR_COMBINED,
+        G_BACKGROUND_COLOR_NAV1,
+        G_BACKGROUND_COLOR_NAV2,
+        G_BACKGROUND_COLOR_NAV3,
+        G_CROSSHAIR_COLOR,
+        G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X,
         R_Y,
@@ -372,6 +374,7 @@ namespace Fn
                 case Property::D_MESH_CUT_HIGHER_Z: return QString( "cut higher than z" ); break;
                 case Property::D_FIBER_GROW_LENGTH: return QString( "fiber growth" ); break;
                 // Global Settings
+                case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "render crosshairs" ); break; // Global Settings for rendering
                 case Property::G_SAGITTAL: return QString( "global sagittal" ); break;
@@ -386,23 +389,13 @@ namespace Fn
                 case Property::G_CORONAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_CORONAL: return QString( "" ); break;
-                case Property::G_LAST_PATH: return QString( "" ); break;
-                case Property::G_SCREENSHOT_PATH: return QString( "screenshot dir" ); break;
                 case Property::G_SHOW_SAGITTAL: return QString( "show sagittal" ); break;
                 case Property::G_SHOW_CORONAL: return QString( "show coronal" ); break;
                 case Property::G_SHOW_AXIAL: return QString( "show axial" ); break;
-                case Property::G_BACKGROUND_COLOR_MAIN: return QString( "background color main" ); break;
-                case Property::G_BACKGROUND_COLOR_COMBINED: return QString( "background color combined" ); break;
-                case Property::G_BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
-                case Property::G_BACKGROUND_COLOR_NAV2: return QString( "background color nav 2" ); break;
-                case Property::G_BACKGROUND_COLOR_NAV3: return QString( "background color nav 3" ); break;
-                case Property::G_CROSSHAIR_COLOR: return QString( "crosshair color" ); break;
                 case Property::G_SHOW_NAV_SLIDERS: return QString( "show nav sliders" ); break;
                 case Property::G_SCREENSHOT_QUALITY: return QString( "screenshot quality" ); break;
                 case Property::G_TRANSPARENCY: return QString( "transparency mode" ); break;
-                case Property::G_OBJECT: return QString( "" ); break;
                 case Property::G_NEED_SHADER_UPDATE: return QString( "" ); break;
-                // settings that need a datastore signal to update widgets need to be inserted above this line
                 case Property::G_ZOOM: return QString( "" ); break;
                 case Property::G_MOVEX: return QString( "" ); break;
                 case Property::G_MOVEY: return QString( "" ); break;
@@ -420,6 +413,16 @@ namespace Fn
                 case Property::G_CAMERA_NEAR: return QString( "camera near" ); break;
                 case Property::G_CAMERA_FAR: return QString( "camera far" ); break;
                 case Property::G_CAMERA_ANGLE: return QString( "camera angle" ); break;
+                case Property::G_OBJECT: return QString( "" ); break;
+                case Property::G_LAST_PATH: return QString( "" ); break;
+                case Property::G_SCREENSHOT_PATH: return QString( "screenshot dir" ); break;
+                case Property::G_BACKGROUND_COLOR_MAIN: return QString( "background color main" ); break;
+                case Property::G_BACKGROUND_COLOR_COMBINED: return QString( "background color combined" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV2: return QString( "background color nav 2" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV3: return QString( "background color nav 3" ); break;
+                case Property::G_CROSSHAIR_COLOR: return QString( "crosshair color" ); break;
+                case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
                 case Property::R_Y: return QString( "y" ); break;
