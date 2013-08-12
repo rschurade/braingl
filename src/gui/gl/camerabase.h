@@ -28,12 +28,15 @@ public:
     virtual void midClick( int x, int y ) = 0;
     virtual void midDrag( int x, int y ) = 0;
 
+    virtual void mouseWheel( float step ) = 0;
+
     virtual void setRotCenter( float x, float y, float z ) = 0;
 
     virtual QMatrix4x4 getMVMat() = 0;
 
     virtual void setView( Fn::Orient view ) = 0;
 
+    virtual float getZoom();
     virtual float getMoveX() = 0;
     virtual float getMoveY() = 0;
 
@@ -45,6 +48,7 @@ protected:
     int m_height; // height of window
     float m_adjust_width;
     float m_adjust_height;
+    float m_zoom;
 
 private:
 

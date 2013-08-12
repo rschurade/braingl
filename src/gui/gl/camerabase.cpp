@@ -9,7 +9,8 @@
 
 CameraBase::CameraBase( int width, int height ) :
     m_width( width ),
-    m_height( height )
+    m_height( height ),
+    m_zoom( 1.0f )
 {
     m_adjust_width = 1.0 / ( ( width - 1.0 ) * 0.5 );
     m_adjust_height = 1.0 / ( ( height - 1.0 ) * 0.5 );
@@ -27,4 +28,9 @@ void CameraBase::set_win_size( int width,  int height )
     m_height = height;
     m_adjust_width = 1.0 / ( ( width - 1.0 ) * 0.5 );
     m_adjust_height = 1.0 / ( ( height - 1.0 ) * 0.5 );
+}
+
+float CameraBase::getZoom()
+{
+    return m_zoom;
 }
