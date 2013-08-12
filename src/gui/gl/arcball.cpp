@@ -6,6 +6,8 @@
  */
 #include "arcball.h"
 
+#include "../../data/models.h"
+
 #include <QtDebug>
 
 #include <math.h>
@@ -100,21 +102,11 @@ void ArcBall::midClick( int x, int y )
     m_oldMoveY = m_moveY;
 }
 
-void ArcBall::mouseWheel( float step )
-{
-    if ( m_zoom < 2.0f )
-    {
-        step /= 2.0;
-    }
-    m_zoom += step;
-
-    m_zoom = qMax( 1.0f, m_zoom );
-}
-
 void ArcBall::midDrag( int x, int y )
 {
-    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / m_zoom / m_zoom / 2 );
-    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / m_zoom / m_zoom / 2 );
+    float zoom = Models::g()->data( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / zoom / zoom / 2 );
+    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / zoom / zoom / 2 );
 }
 
 void ArcBall::setRotCenter( float x, float y, float z )
@@ -124,7 +116,8 @@ void ArcBall::setRotCenter( float x, float y, float z )
 
 void ArcBall::setView( Fn::Orient view )
 {
-    m_zoom = 1.0;
+    float zoom = 1.0;
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
     m_moveX = 0;
     m_moveY = 0;
     m_oldMoveX = 0;
@@ -176,7 +169,8 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = m_currentRot * mv ;
 
-    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, -300 );
+    float zoom = Models::g()->data( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+    QVector3D halfMove( -m_moveX * zoom, m_moveY * zoom, -300 );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
@@ -210,7 +204,6 @@ QList<QVariant> ArcBall::getState()
     state.push_back( m_oldMoveY );
     state.push_back( m_midClickX );
     state.push_back( m_midClickY );
-    state.push_back( m_zoom );
     state.push_back( m_rotCenter );
     state.push_back( q_current_rotation );
     return state;
@@ -226,7 +219,6 @@ void ArcBall::setState( QList<QVariant> state )
     m_oldMoveY = state[5].toInt();
     m_midClickX = state[6].toInt();
     m_midClickY = state[7].toInt();
-    m_zoom = state[8].toFloat();
     m_rotCenter = state[9].value<QVector3D>();
     q_current_rotation = state[10].value<QQuaternion>();
 }

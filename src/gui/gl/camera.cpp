@@ -57,17 +57,6 @@ void Camera::midDrag( int x, int y )
 {
 }
 
-void Camera::mouseWheel( float step )
-{
-    if ( m_zoom < 2.0f )
-    {
-        step /= 2.0;
-    }
-    m_zoom += step;
-
-    m_zoom = qMax( 1.0f, m_zoom );
-}
-
 void Camera::viewUp()
 {
     getGlobals();
@@ -194,7 +183,8 @@ void Camera::setView( Fn::Orient view )
 
     m_lookAt = QVector3D( nx, ny, nz );
     m_up = QVector3D( 0, 0 , 1 );
-    m_zoom = 1.0;
+    float zoom = 1.0;
+    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
     switch( view )
     {
         case Fn::Orient::NONE:
