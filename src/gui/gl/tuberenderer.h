@@ -46,6 +46,7 @@ private:
 
     QVector< QVector< float > >* m_data;
     QVector< QVector< float > >* m_extraData;
+    QVector< QVector< float > >* m_indexData;
 
     int m_numLines;
     int m_numPoints;

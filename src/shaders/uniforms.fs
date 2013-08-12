@@ -12,3 +12,4 @@ in vec3 v_texcoord;
 in vec3 v_normal;
 in float v_extra;
 in vec4 frontColor;
+in float v_index;

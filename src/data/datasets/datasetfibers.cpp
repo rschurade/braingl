@@ -21,6 +21,8 @@
 #include "../../gui/gl/fiberrenderer.h"
 #include "../../gui/gl/tuberenderer.h"
 
+#include <QTimer>
+
 DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
@@ -141,6 +143,8 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->create( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NZ, 800, 0, 1600, "special" );
 
+    m_properties["maingl"]->create( Fn::Property::D_FIBER_GROW_LENGTH, 200, 0, 200, "special" );
+
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( colorChanged() ) );
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
@@ -172,6 +176,10 @@ void DatasetFibers::createProps()
 
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
     }
+
+    m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY, false, "autoplay" );
+    m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
 }
 
 QVector< QVector< float > > DatasetFibers::getFibs()
@@ -199,11 +207,68 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     {
         QVector<bool>*selected = m_selector->getSelection();
         QVector<QVector<float> >out;
+        int first = 0;
         for ( int i = 0; i < selected->size(); ++i )
         {
             if ( selected->at( i ) )
             {
-                out.push_back( m_fibs[i] );
+                first = i;
+                break;
+            }
+        }
+        QVector<float>f0;
+        f0 = m_fibs[first];
+        float radius = 20.0f;
+        QVector3D start;
+        if ( Models::r()->rowCount()  > 0 )
+        {
+            int shape = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt();
+            if ( shape >= 0 && shape <= 3 )
+            {
+                float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
+                float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
+                float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
+                float dx = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DX ), Qt::DisplayRole ).toFloat();
+                float dy = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DY ), Qt::DisplayRole ).toFloat();
+                float dz = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DZ ), Qt::DisplayRole ).toFloat();
+                start = QVector3D( x, y, z );
+                radius = sqrt( dx*dx + dy*dy + dz*dz ) * 2;
+            }
+            else
+            {
+                start = QVector3D( f0[0], f0[1], f0[2] );
+            }
+        }
+        else
+        {
+            start = QVector3D( f0[0], f0[1], f0[2] );
+        }
+
+
+        for ( int i = 0; i < selected->size(); ++i )
+        {
+            if ( selected->at( i ) )
+            {
+                QVector<float>f = m_fibs[i];
+                QVector3D s1( f[0], f[1], f[2] );
+
+                if ( ( start - s1 ).length() < radius )
+                {
+                    out.push_back( m_fibs[i] );
+                }
+                else
+                {
+                    // flip fiber
+                    QVector<float>f = m_fibs[i];
+                    QVector<float>newfib;
+                    for ( int k = 0; k < f.size() / 3; ++k )
+                    {
+                        newfib.push_front( f[k*3+2] );
+                        newfib.push_front( f[k*3+1] );
+                        newfib.push_front( f[k*3] );
+                    }
+                    out.push_back( newfib );
+                }
             }
         }
         return out;
@@ -409,5 +474,24 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
         }
         m_data.push_back( data0 );
         m_dataNames.push_back( "no data" );
+    }
+}
+
+void DatasetFibers::autoplay()
+{
+    if ( m_properties["maingl"]->get( Fn::Property::D_AUTOPLAY ).toBool() )
+    {
+        int dim = 200;
+        int currentframe = m_properties["maingl"]->get( Fn::Property::D_FIBER_GROW_LENGTH ).toInt();
+        ++currentframe;
+        if ( currentframe >= dim )
+        {
+            currentframe = 0;
+        }
+        m_properties["maingl"]->set( Fn::Property::D_FIBER_GROW_LENGTH, currentframe );
+
+        int interval = m_properties["maingl"]->get( Fn::Property::D_AUTOPLAY_INTERVAL ).toInt();
+        QTimer::singleShot( interval, this, SLOT( autoplay() ) );
+        //Models::d()->submit();
     }
 }
