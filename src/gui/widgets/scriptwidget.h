@@ -76,6 +76,7 @@ private:
 
     QVBoxLayout* m_scriptLayout;
 
+    QScrollArea* m_scrollArea;
     QPushButton* m_runButton;
 
     int m_runScript;
@@ -133,6 +134,7 @@ private slots:
     void slotPropertySelectChanged( int line, int prop, int data );
     void deleteCommand( int row );
     void insertCommand( int row );
+    void moveScrollBarToBottom( int min, int max );
 
 signals:
     void enable( bool e, int id );
