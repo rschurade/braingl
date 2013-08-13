@@ -232,10 +232,9 @@ QWidget* ScriptWidget::buildScriptLayout()
                 addEdit( layout, i* 10 + 1, 5 );
                 QVector4D vec = command[1].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
-                emit( enable( false, i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                emit( editChanged( command[4].toString(), i * 10 + 4 ) );
                 break;
             }
             case ScriptCommand::INTERPOLATE_ARCBALL:
@@ -244,9 +243,9 @@ QWidget* ScriptWidget::buildScriptLayout()
                 QVector4D vec = command[1].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
                 emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                emit( editChanged( command[4].toString(), i * 10 + 4 ) );
+                emit( editChanged( command[5].toString(), i * 10 + 5 ) );
                 break;
             }
         }
@@ -322,13 +321,25 @@ void ScriptWidget::commandChanged( int line, int command )
         case ScriptCommand::SET_ARCBALL:
         {
             QQuaternion rot = m_glWidget->getArcBall()->getRotation();
+            float zoom = m_glWidget->getArcBall()->getZoom();
+            float moveX = m_glWidget->getArcBall()->getMoveX();
+            float moveY = m_glWidget->getArcBall()->getMoveY();
             commandLine.push_back( rot );
+            commandLine.push_back( zoom );
+            commandLine.push_back( moveX );
+            commandLine.push_back( moveY );
             break;
         }
         case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             QQuaternion rot = m_glWidget->getArcBall()->getRotation();
+            float zoom = m_glWidget->getArcBall()->getZoom();
+            float moveX = m_glWidget->getArcBall()->getMoveX();
+            float moveY = m_glWidget->getArcBall()->getMoveY();
             commandLine.push_back( rot );
+            commandLine.push_back( zoom );
+            commandLine.push_back( moveX );
+            commandLine.push_back( moveY );
             commandLine.push_back( 25 );
             break;
         }
@@ -606,14 +617,26 @@ void ScriptWidget::run()
         case ScriptCommand::SET_ARCBALL:
         {
             QQuaternion rot  = line[1].value<QQuaternion>();
+            float zoom = line[2].toFloat();
+            float moveX = line[3].toFloat();
+            float moveY = line[4].toFloat();
             m_glWidget->getArcBall()->setRotation( rot );
+            m_glWidget->getArcBall()->setZoom( zoom );
+            m_glWidget->getArcBall()->setMoveX( moveX );
+            m_glWidget->getArcBall()->setMoveY( moveY );
             break;
         }
         case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             m_currentRot = m_glWidget->getArcBall()->getRotation();
             m_targetRot = line[1].value<QQuaternion>();
-            m_interpolateSteps = line[2].toInt();
+            m_currentZoom = m_glWidget->getArcBall()->getZoom();
+            m_targetZoom = line[2].toFloat();
+            m_currentMoveX = m_glWidget->getArcBall()->getMoveX();
+            m_targetMoveX = line[3].toFloat();
+            m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
+            m_targetMoveY = line[4].toFloat();
+            m_interpolateSteps = line[5].toInt();
             m_currentInterpolateStep = 0;
             slotInterpolateArcball();
             return;
@@ -648,6 +671,14 @@ void ScriptWidget::slotInterpolateArcball()
 
     QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
     m_glWidget->getArcBall()->setRotation( rot );
+
+    float zoom = ( 1.0f - div ) * m_currentZoom + div * m_targetZoom;
+    float moveX = ( 1.0f - div ) * m_currentMoveX + div * m_targetMoveX;
+    float moveY = ( 1.0f - div ) * m_currentMoveY + div * m_targetMoveY;
+
+    m_glWidget->getArcBall()->setZoom( zoom );
+    m_glWidget->getArcBall()->setMoveX( moveX );
+    m_glWidget->getArcBall()->setMoveY( moveY );
 
     Models::g()->submit();
 
@@ -859,6 +890,9 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 if ( countDS > ds && ds >= 0 )
                 {
                     m_script[row].replace( column, ds );
+                    delete this->layout();
+                    this->repaint();
+                    initLayout();
                 }
                 else
                 {
@@ -880,6 +914,9 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 if ( countDS > ds && ds >= 0 )
                 {
                     m_script[row].replace( column, text.toInt() );
+                    delete this->layout();
+                    this->repaint();
+                    initLayout();
                 }
                 else
                 {
@@ -923,6 +960,10 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     }
                 }
             }
+            if ( column > 1 )
+            {
+                m_script[row].replace( column, text );
+            }
             break;
         }
         case ScriptCommand::INTERPOLATE_ARCBALL:
@@ -952,9 +993,9 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     }
                 }
             }
-            if ( column == 2 )
+            if ( column > 1 )
             {
-                m_script[row].replace( column, text.toInt() );
+                m_script[row].replace( column, text );
             }
             break;
         }

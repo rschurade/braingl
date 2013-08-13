@@ -231,6 +231,16 @@ float Camera::getMoveY()
     return 0;
 }
 
+void Camera::setMoveX( float x )
+{
+
+}
+
+void Camera::setMoveY( float y )
+{
+
+}
+
 QList<QVariant> Camera::getState()
 {
     QList<QVariant> state;

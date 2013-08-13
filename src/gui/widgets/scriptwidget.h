@@ -103,6 +103,12 @@ private:
 
     QQuaternion m_currentRot;
     QQuaternion m_targetRot;
+    float m_currentZoom;
+    float m_targetZoom;
+    float m_currentMoveX;
+    float m_currentMoveY;
+    float m_targetMoveX;
+    float m_targetMoveY;
 
 public slots:
 
