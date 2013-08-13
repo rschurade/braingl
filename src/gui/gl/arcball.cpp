@@ -199,6 +199,16 @@ float ArcBall::getMoveY()
     return m_moveY;
 }
 
+void ArcBall::setMoveX( float x )
+{
+    m_moveX = x;
+}
+
+void ArcBall::setMoveY( float y )
+{
+    m_moveY = y;
+}
+
 QList<QVariant> ArcBall::getState()
 {
     QList<QVariant> state;

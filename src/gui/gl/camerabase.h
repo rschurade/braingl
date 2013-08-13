@@ -37,8 +37,11 @@ public:
     virtual void setView( Fn::Orient view ) = 0;
 
     virtual float getZoom();
+    virtual void setZoom( float zoom );
     virtual float getMoveX() = 0;
     virtual float getMoveY() = 0;
+    virtual void setMoveX( float x ) = 0;
+    virtual void setMoveY( float y ) = 0;
 
     virtual QList<QVariant>getState() = 0;
     virtual void setState( QList<QVariant> state ) = 0;

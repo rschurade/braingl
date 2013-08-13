@@ -32,6 +32,8 @@ public:
 
     float getMoveX();
     float getMoveY();
+    void setMoveX( float x );
+    void setMoveY( float y );
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );

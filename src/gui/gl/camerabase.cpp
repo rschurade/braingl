@@ -34,3 +34,8 @@ float CameraBase::getZoom()
 {
     return m_zoom;
 }
+
+void CameraBase::setZoom( float zoom )
+{
+    m_zoom = zoom;
+}

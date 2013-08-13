@@ -35,6 +35,8 @@ public:
 
     float getMoveX();
     float getMoveY();
+    void setMoveX( float x );
+    void setMoveY( float y );
 
     void viewUp();
     void viewDown();
