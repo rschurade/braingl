@@ -987,8 +987,8 @@ void MainWindow::slotToggleShaderEdit()
     m_shaderEditWidget = new ShaderEditWidget( this );
     FNDockWidget* dockSEW = new FNDockWidget( QString("shader edit" ), m_shaderEditWidget, this );
     viewMenu->addAction( dockSEW->toggleViewAction() );
-    addDockWidget( Qt::RightDockWidgetArea, dockSEW );
-
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockSEW );
+    tabifiedDockWidgets( dockSEW );
 }
 
 void MainWindow::slotRenderCrosshairs( bool value )

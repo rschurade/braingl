@@ -38,9 +38,9 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_MOVEY, 0 );
     m_properties->create( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "camera" );
-    m_properties->create( Fn::Property::G_CAMERA_POS_X, 0, -1000, 1000, "camera" );
-    m_properties->create( Fn::Property::G_CAMERA_POS_Y, 0, -1000, 1000, "camera" );
-    m_properties->create( Fn::Property::G_CAMERA_POS_Z, 40, -1000, 1000, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_X, 0.0f, -1000.0f, 1000.0f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_Y, 0.0f, -1000.0f, 1000.0f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_POS_Z, 40.0f, -1000.0f, 1000.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_LOOKAT_X, 80.0f, -1000.f, 1000.f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_LOOKAT_Y, 100.0f, -1000.f, 1000.f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_LOOKAT_Z, 80.0f, -1000.f, 1000.f, "camera" );
