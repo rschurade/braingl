@@ -57,6 +57,10 @@ void ScriptWidget::initLayout()
     QVBoxLayout* layout2 = new QVBoxLayout();
     QHBoxLayout* buttons1 = new QHBoxLayout();
 
+    QPushButton* resetButton = new QPushButton( "Reset", this );
+    buttons1->addWidget( resetButton );
+    connect( resetButton, SIGNAL( clicked() ), this, SLOT( resetScript() ) );
+
     QPushButton* lbutton = new QPushButton( "Load", this );
     buttons1->addWidget( lbutton );
     connect( lbutton, SIGNAL( clicked() ), this, SLOT( loadScript() ) );
@@ -1073,4 +1077,15 @@ void ScriptWidget::moveScrollBarToBottom( int min, int max )
 {
     Q_UNUSED( min );
     m_scrollArea->verticalScrollBar()->setValue( max );
+}
+
+void ScriptWidget::resetScript()
+{
+    m_script.clear();
+    QList<QVariant> command;
+    command.push_back( (int)ScriptCommand::NONE );
+    m_script.push_back( command );
+    delete this->layout();
+    this->repaint();
+    initLayout();
 }
