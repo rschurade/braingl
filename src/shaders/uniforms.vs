@@ -50,10 +50,3 @@ uniform float u_sizeX;
 uniform float u_sizeY;
 uniform float u_pos;
 uniform float u_char;
-
-uniform bool u_cutLowerX;
-uniform bool u_cutLowerY;
-uniform bool u_cutLowerZ;
-uniform bool u_cutHigherX;
-uniform bool u_cutHigherY;
-uniform bool u_cutHigherZ;

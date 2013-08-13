@@ -7,14 +7,67 @@
 #include peel_fs
 
 in float v_value;
-in float v_discard;
+in vec3 vertex;
 
 void main()
 {
-	if ( v_discard > 0.0 )
-	{
-		discard;
-	}
+    bool dis = false;
+    if ( u_cutLowerX && vertex.x < u_x + 0.1 )
+    {
+        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        {
+            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            {
+                dis = true;
+            }
+            if ( u_cutHigherZ && vertex.z > u_z - 0.1)
+            {
+                dis = true;
+            }
+        }
+        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        {
+            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            {
+                dis = true;
+            }
+            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            {
+                dis = true;
+            }
+        }
+    }   
+    if ( u_cutHigherX && vertex.x > u_x - 0.1 )
+    {
+        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        {
+            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            {
+                dis = true;
+            }
+            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            {
+                dis = true;
+            }
+        }
+        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        {
+            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            {
+                dis = true;
+            }
+            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            {
+                dis = true;
+            }
+        }
+    }   
+
+    if ( dis )
+    {
+        discard;
+    }
+
 
     vec3 color = light( u_color ).rgb;
     float test1 = dot( v_lightDir.xyz, v_normal.xyz );
