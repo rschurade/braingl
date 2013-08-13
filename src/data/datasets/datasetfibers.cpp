@@ -218,7 +218,6 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
         }
         QVector<float>f0;
         f0 = m_fibs[first];
-        float radius = 20.0f;
         QVector3D start;
         if ( Models::r()->rowCount()  > 0 )
         {
@@ -228,11 +227,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
                 float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
                 float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
                 float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
-                float dx = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DX ), Qt::DisplayRole ).toFloat();
-                float dy = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DY ), Qt::DisplayRole ).toFloat();
-                float dz = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_DZ ), Qt::DisplayRole ).toFloat();
                 start = QVector3D( x, y, z );
-                radius = sqrt( dx*dx + dy*dy + dz*dz ) * 2;
             }
             else
             {
@@ -251,8 +246,9 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
             {
                 QVector<float>f = m_fibs[i];
                 QVector3D s1( f[0], f[1], f[2] );
+                QVector3D s2( f[f.size() - 3], f[f.size() - 2], f[f.size() - 1] );
 
-                if ( ( start - s1 ).length() < radius )
+                if ( ( start - s1 ).length() < ( start - s2 ).length() )
                 {
                     out.push_back( m_fibs[i] );
                 }
