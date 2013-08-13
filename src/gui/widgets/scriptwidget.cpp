@@ -46,8 +46,13 @@ ScriptWidget::~ScriptWidget()
 void ScriptWidget::initLayout()
 {
     QWidget* widget1 = buildScriptLayout();
-    QScrollArea* scrollArea = new QScrollArea;
-    scrollArea->setWidget( widget1 );
+    m_scrollArea = new QScrollArea;
+    m_scrollArea->setWidget( widget1 );
+
+    QScrollBar* scrollbar = m_scrollArea->verticalScrollBar();
+    QObject::connect( scrollbar, SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)) );
+
+
 
     QVBoxLayout* layout2 = new QVBoxLayout();
     QHBoxLayout* buttons1 = new QHBoxLayout();
@@ -93,13 +98,11 @@ void ScriptWidget::initLayout()
     buttons2->addStretch();
     buttons2->addWidget( m_delay );
 
-
-
     layout2->addLayout( buttons2 );
     layout2->addLayout( buttons1 );
 
     QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget( scrollArea );
+    layout->addWidget( m_scrollArea );
     layout->addLayout( layout2 );
 
     this->setLayout( layout );
@@ -1064,4 +1067,10 @@ void ScriptWidget::insertCommand( int row )
     delete this->layout();
     this->repaint();
     initLayout();
+}
+
+void ScriptWidget::moveScrollBarToBottom( int min, int max )
+{
+    Q_UNUSED( min );
+    m_scrollArea->verticalScrollBar()->setValue( max );
 }
