@@ -135,6 +135,7 @@ private slots:
     void deleteCommand( int row );
     void insertCommand( int row );
     void moveScrollBarToBottom( int min, int max );
+    void resetScript();
 
 signals:
     void enable( bool e, int id );
