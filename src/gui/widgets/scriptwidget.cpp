@@ -766,7 +766,8 @@ void ScriptWidget::run()
 
     if ( m_inBlock )
     {
-        run();
+        QTimer::singleShot( 1, this, SLOT( run() ) );
+        return;
     }
 
     Models::g()->submit();
