@@ -409,10 +409,31 @@ void ScriptWidget::commandChanged( int line, int command )
             break;
         }
         case ScriptCommand::BEGIN_LOOP:
+        {
             commandLine.push_back( 1 );
+            QList<QVariant> commandLine2;
+            commandLine2.push_back( true );
+            commandLine2.push_back( (int)ScriptCommand::NONE );
+            m_script.insert( line + 1, commandLine2 );
+            QList<QVariant> commandLine3;
+            commandLine3.push_back( true );
+            commandLine3.push_back( (int)ScriptCommand::END_LOOP );
+            m_script.insert( line + 2, commandLine3 );
             break;
+        }
         case ScriptCommand::END_LOOP:
         case ScriptCommand::BEGIN_BLOCK:
+        {
+            QList<QVariant> commandLine2;
+            commandLine2.push_back( true );
+            commandLine2.push_back( (int)ScriptCommand::NONE );
+            m_script.insert( line + 1, commandLine2 );
+            QList<QVariant> commandLine3;
+            commandLine3.push_back( true );
+            commandLine3.push_back( (int)ScriptCommand::END_BLOCK );
+            m_script.insert( line + 2, commandLine3 );
+            break;
+        }
         case ScriptCommand::END_BLOCK:
             break;
         case ScriptCommand::COMMENT:
