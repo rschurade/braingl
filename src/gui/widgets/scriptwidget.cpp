@@ -52,9 +52,7 @@ void ScriptWidget::initLayout()
     m_scrollArea->setWidget( widget1 );
 
     QScrollBar* scrollbar = m_scrollArea->verticalScrollBar();
-    QObject::connect( scrollbar, SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)) );
-
-
+    QObject::connect( scrollbar, SIGNAL( rangeChanged( int, int ) ), this, SLOT( moveScrollBarToBottom( int, int ) ) );
 
     QVBoxLayout* layout2 = new QVBoxLayout();
     QHBoxLayout* buttons1 = new QHBoxLayout();
@@ -77,7 +75,6 @@ void ScriptWidget::initLayout()
     connect( m_runButton, SIGNAL( toggled( bool ) ), this, SLOT( run( bool ) ) );
 
     buttons1->addStretch();
-
 
     QHBoxLayout* buttons2 = new QHBoxLayout();
 
@@ -129,6 +126,7 @@ QWidget* ScriptWidget::buildScriptLayout()
         bool lineActive = line[0].toBool();
         checkBox->setChecked( lineActive );
         connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
+        connect( this, SIGNAL( checkBoxChanged( int, int ) ), checkBox, SLOT( slotSetChecked2( int, int ) ) );
 
         PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
         layout->addWidget( insertButton );
@@ -172,6 +170,7 @@ QWidget* ScriptWidget::buildScriptLayout()
         layout->addWidget( select );
         select->setCurrentIndex( line[1].toInt() );
         connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int ) ) );
+        connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
 
         switch( (ScriptCommand)( line[1].toInt() ) )
         {
@@ -482,6 +481,7 @@ void ScriptWidget::addGlobalSelect( QHBoxLayout* layout, int id, int selected, b
         }
     }
     connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( slotGlobalSelectChanged( int, int, int ) ) );
+    connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
     layout->addWidget( select );
     select->setEnabled( active );
 }
@@ -511,6 +511,7 @@ void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected,
         select->setCurrentIndex( toSelect );
     }
     connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( slotPropertySelectChanged( int, int, int ) ) );
+    connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
     layout->addWidget( select );
     select->setEnabled( active );
 }
@@ -1161,6 +1162,14 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
         do
         {
             m_script[line].replace( 0, state );
+            emit( checkBoxChanged( state, line ) );
+            emit( enable2( state, line ) );
+            emit( enable2( state, line * 10 ) );
+            emit( enable( state, line * 10 + 1 ) );
+            emit( enable( state, line * 10 + 2 ) );
+            emit( enable( state, line * 10 + 3 ) );
+            emit( enable( state, line * 10 + 4 ) );
+            emit( enable( state, line * 10 + 5 ) );
             ++line;
         }
         while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_LOOP );
@@ -1169,13 +1178,26 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
     {
         do
         {
+            emit( checkBoxChanged( state, line ) );
+            emit( enable2( state, line ) );
+            emit( enable2( state, line * 10 ) );
+            emit( enable( state, line * 10 + 1 ) );
+            emit( enable( state, line * 10 + 2 ) );
+            emit( enable( state, line * 10 + 3 ) );
+            emit( enable( state, line * 10 + 4 ) );
+            emit( enable( state, line * 10 + 5 ) );
             m_script[line].replace( 0, state );
             ++line;
         }
         while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_BLOCK );
     }
     m_script[line].replace( 0, state );
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    emit( checkBoxChanged( state, line ) );
+    emit( enable2( state, line ) );
+    emit( enable2( state, line * 10 ) );
+    emit( enable( state, line * 10 + 1 ) );
+    emit( enable( state, line * 10 + 2 ) );
+    emit( enable( state, line * 10 + 3 ) );
+    emit( enable( state, line * 10 + 4 ) );
+    emit( enable( state, line * 10 + 5 ) );
 }

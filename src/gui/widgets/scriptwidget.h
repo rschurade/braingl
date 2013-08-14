@@ -146,8 +146,10 @@ private slots:
 
 signals:
     void enable( bool e, int id );
+    void enable2( bool e, int id );
     void editChanged( QString text, int id );
     void selectChanged( int index, int id );
+    void checkBoxChanged( int state, int id );
     void screenshot();
 };
 
