@@ -108,6 +108,7 @@ private:
     int m_targetStep;
     int m_currentStep;
     int m_loopCount;
+    int m_totalLoops;
     int m_loopBegin;
     bool m_inBlock;
 
@@ -129,11 +130,6 @@ private slots:
     void saveScript();
     void run( bool checked );
     void run();
-
-    void slotInterpolateCamera();
-    void slotInterpolateArcball();
-
-    void copyCamera();
 
     void commandChanged( int line, int command );
     void slotEditChanged( QString, int );

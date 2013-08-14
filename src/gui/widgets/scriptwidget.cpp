@@ -199,16 +199,14 @@ QWidget* ScriptWidget::buildScriptLayout()
             case ScriptCommand::INTERPOLATE_CAMERA:
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 4 );
+                addEdit( layout, i* 10 + 1, 3 );
                 QVector3D vec = line[2].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
                 vec = line[3].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
                 vec = line[4].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                int steps = line[5].toInt();
-                emit( editChanged( QString::number( steps ), i * 10 + 4 ) );
-                addStretch( layout, 1 );
+                addStretch( layout, 2 );
                 break;
             }
             case ScriptCommand::SET_GLOBAL:
@@ -265,13 +263,13 @@ QWidget* ScriptWidget::buildScriptLayout()
             case ScriptCommand::INTERPOLATE_ARCBALL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 5 );
+                addEdit( layout, i* 10 + 1, 4 );
                 QVector4D vec = line[2].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
                 emit( editChanged( line[3].toString(), i * 10 + 2 ) );
                 emit( editChanged( line[4].toString(), i * 10 + 3 ) );
                 emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                emit( editChanged( line[6].toString(), i * 10 + 5 ) );
+                addStretch( layout, 1 );
                 break;
             }
             case ScriptCommand::BEGIN_LOOP:
@@ -408,7 +406,6 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( zoom );
             commandLine.push_back( moveX );
             commandLine.push_back( moveY );
-            commandLine.push_back( 25 );
             break;
         }
         case ScriptCommand::BEGIN_LOOP:
@@ -596,7 +593,8 @@ void ScriptWidget::saveScript()
 void ScriptWidget::run( bool checked )
 {
     m_inBlock = false;
-    m_loopCount = 0;
+    m_loopCount = 1;
+    m_totalLoops = 1;
     if ( checked )
     {
         qDebug() << "start script";
@@ -671,15 +669,37 @@ void ScriptWidget::run()
         }
         case ScriptCommand::INTERPOLATE_CAMERA:
         {
-            m_currentCamera = camera;
-            m_interpolatedCamera.clear();
-            m_interpolatedCamera.push_back( line[2] );
-            m_interpolatedCamera.push_back( line[3] );
-            m_interpolatedCamera.push_back( line[4] );
-            m_targetStep = line[5].toInt();
-            slotInterpolateCamera();
-            return;
+            if ( m_loopCount == m_totalLoops )
+            {
+                m_currentCamera = camera;
+                m_interpolatedCamera.clear();
+                m_interpolatedCamera.push_back( line[2] );
+                m_interpolatedCamera.push_back( line[3] );
+                m_interpolatedCamera.push_back( line[4] );
+            }
+
+            QVector3D pos1 = m_currentCamera[0].value<QVector3D>();
+            QVector3D pos2 = m_interpolatedCamera[0].value<QVector3D>();
+
+            QVector3D look1 = m_currentCamera[1].value<QVector3D>();
+            QVector3D look2 = m_interpolatedCamera[1].value<QVector3D>();
+
+            QVector3D up1 = m_currentCamera[2].value<QVector3D>();
+            QVector3D up2 = m_interpolatedCamera[2].value<QVector3D>();
+
+            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+
+            QVector3D pos = div * pos2 + ( 1.0f - div ) * pos1;
+            QVector3D look = div * look2 + ( 1.0f - div ) * look1;
+            QVector3D up = div * up2 + ( 1.0f - div ) * up1;
+
+            QList<QVariant>newCam;
+            newCam.push_back( pos );
+            newCam.push_back( look );
+            newCam.push_back( up );
+            m_glWidget->getCamera()->setState( newCam );
             break;
+
         }
         case ScriptCommand::SET_GLOBAL:
         {
@@ -736,22 +756,37 @@ void ScriptWidget::run()
         }
         case ScriptCommand::INTERPOLATE_ARCBALL:
         {
-            m_currentRot = m_glWidget->getArcBall()->getRotation();
-            m_targetRot = line[2].value<QQuaternion>();
-            m_currentZoom = m_glWidget->getArcBall()->getZoom();
-            m_targetZoom = line[3].toFloat();
-            m_currentMoveX = m_glWidget->getArcBall()->getMoveX();
-            m_targetMoveX = line[4].toFloat();
-            m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
-            m_targetMoveY = line[5].toFloat();
-            m_targetStep = line[6].toInt();
-            slotInterpolateArcball();
-            return;
+            if ( m_loopCount == m_totalLoops )
+            {
+                m_currentRot = m_glWidget->getArcBall()->getRotation();
+                m_targetRot = line[2].value<QQuaternion>();
+                m_currentZoom = m_glWidget->getArcBall()->getZoom();
+                m_targetZoom = line[3].toFloat();
+                m_currentMoveX = m_glWidget->getArcBall()->getMoveX();
+                m_targetMoveX = line[4].toFloat();
+                m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
+                m_targetMoveY = line[5].toFloat();
+            }
+
+            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+
+            QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
+            m_glWidget->getArcBall()->setRotation( rot );
+
+            float zoom = ( 1.0f - div ) * m_currentZoom + div * m_targetZoom;
+            float moveX = ( 1.0f - div ) * m_currentMoveX + div * m_targetMoveX;
+            float moveY = ( 1.0f - div ) * m_currentMoveY + div * m_targetMoveY;
+
+            m_glWidget->getArcBall()->setZoom( zoom );
+            m_glWidget->getArcBall()->setMoveX( moveX );
+            m_glWidget->getArcBall()->setMoveY( moveY );
+
             break;
         }
         case ScriptCommand::BEGIN_LOOP:
         {
             m_loopCount = line[2].toInt();
+            m_totalLoops = line[2].toInt();
             m_loopBegin = m_currentCommandLine;
             break;
         }
@@ -760,6 +795,11 @@ void ScriptWidget::run()
             if ( --m_loopCount )
             {
                 m_currentCommandLine = m_loopBegin;
+            }
+            else
+            {
+                m_loopCount = 1;
+                m_totalLoops = 1;
             }
             break;
         }
@@ -791,92 +831,6 @@ void ScriptWidget::run()
     QTimer::singleShot( delay, this, SLOT( run() ) );
 }
 
-void ScriptWidget::slotInterpolateArcball()
-{
-    if ( !m_runScript )
-    {
-        return;
-    }
-
-    int delay = m_delay->getValue();
-    if ( ++m_currentStep > m_targetStep )
-    {
-        QTimer::singleShot( delay, this, SLOT( run() ) );
-        return;
-    }
-
-    float div = (float)m_currentStep / (float)m_targetStep;
-
-    QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
-    m_glWidget->getArcBall()->setRotation( rot );
-
-    float zoom = ( 1.0f - div ) * m_currentZoom + div * m_targetZoom;
-    float moveX = ( 1.0f - div ) * m_currentMoveX + div * m_targetMoveX;
-    float moveY = ( 1.0f - div ) * m_currentMoveY + div * m_targetMoveY;
-
-    m_glWidget->getArcBall()->setZoom( zoom );
-    m_glWidget->getArcBall()->setMoveX( moveX );
-    m_glWidget->getArcBall()->setMoveY( moveY );
-
-    Models::g()->submit();
-
-    if ( m_screenshotEach->checked() )
-    {
-        emit( screenshot() );
-    }
-
-    QTimer::singleShot( delay, this, SLOT( slotInterpolateArcball() ) );
-}
-
-void ScriptWidget::slotInterpolateCamera()
-{
-    if ( !m_runScript )
-    {
-        return;
-    }
-
-    int delay = m_delay->getValue();
-    if ( ++m_currentStep > m_targetStep )
-    {
-        QTimer::singleShot( delay, this, SLOT( run() ) );
-        return;
-    }
-
-    QVector3D pos1 = m_currentCamera[0].value<QVector3D>();
-    QVector3D pos2 = m_interpolatedCamera[0].value<QVector3D>();
-
-    QVector3D look1 = m_currentCamera[1].value<QVector3D>();
-    QVector3D look2 = m_interpolatedCamera[1].value<QVector3D>();
-
-    QVector3D up1 = m_currentCamera[2].value<QVector3D>();
-    QVector3D up2 = m_interpolatedCamera[2].value<QVector3D>();
-
-    float div = (float)m_currentStep / (float)m_targetStep;
-
-    QVector3D pos = div * pos2 + ( 1.0f - div ) * pos1;
-    QVector3D look = div * look2 + ( 1.0f - div ) * look1;
-    QVector3D up = div * up2 + ( 1.0f - div ) * up1;
-
-    QList<QVariant>newCam;
-    newCam.push_back( pos );
-    newCam.push_back( look );
-    newCam.push_back( up );
-    m_glWidget->getCamera()->setState( newCam );
-    Models::g()->submit();
-
-    if ( m_screenshotEach->checked() )
-    {
-        emit( screenshot() );
-    }
-
-    QTimer::singleShot( delay, this, SLOT( slotInterpolateCamera() ) );
-}
-
-void ScriptWidget::copyCamera()
-{
-
-}
-
 void ScriptWidget::slotEditChanged( QString text, int id )
 {
     int row = id / 10;
@@ -904,10 +858,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column > 1 && column < 5 )
             {
                 m_script[row].replace( column, string2Vector3D( text ) );
-            }
-            if ( column == 5 )
-            {
-                m_script[row].replace( column, text.toInt() );
             }
             break;
         }
