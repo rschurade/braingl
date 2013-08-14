@@ -146,6 +146,7 @@ QWidget* ScriptWidget::buildScriptLayout()
         QColor lightPurple( 255, 158, 255 );
         QColor yellow( 255, 255, 0 );
         QColor magenta( 0, 255, 255 );
+        QColor orange( 255, 160, 0 );
 
         if( inLoop && line[1].toInt() != (int)ScriptCommand::END_LOOP )
         {
@@ -325,6 +326,13 @@ QWidget* ScriptWidget::buildScriptLayout()
                 addStretch( layout, 5 );
                 break;
             }
+            case ScriptCommand::COMMENT:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
+                addEdit( layout, i* 10 + 1, 1 );
+                emit( editChanged( line[2].toString(), i * 10 + 1 ) );
+                break;
+            }
         }
 
         select->setEnabled( lineActive );
@@ -434,6 +442,11 @@ void ScriptWidget::commandChanged( int line, int command )
         case ScriptCommand::BEGIN_BLOCK:
         case ScriptCommand::END_BLOCK:
             break;
+        case ScriptCommand::COMMENT:
+        {
+            commandLine.push_back( "comment" );
+            break;
+        }
     }
     m_script[line] = commandLine;
     if ( line == m_script.size() - 1 && command != 0 )
@@ -595,6 +608,7 @@ void ScriptWidget::saveScript()
 void ScriptWidget::run( bool checked )
 {
     m_inBlock = false;
+    m_loopCount = 0;
     if ( checked )
     {
         qDebug() << "start script";
@@ -650,7 +664,11 @@ void ScriptWidget::run()
     switch( (ScriptCommand)( command ) )
     {
         case ScriptCommand::NONE:
-            break;
+        case ScriptCommand::COMMENT:
+        {
+                QTimer::singleShot( 1, this, SLOT( run() ) );
+                return;
+        }
         case ScriptCommand::DELAY:
         {
             break;
@@ -1129,6 +1147,14 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         case ScriptCommand::BEGIN_BLOCK:
         case ScriptCommand::END_BLOCK:
             break;
+        case ScriptCommand::COMMENT:
+        {
+            if ( column == 2 )
+            {
+                m_script[row].replace( column, text );
+            }
+            break;
+        }
     }
 }
 
