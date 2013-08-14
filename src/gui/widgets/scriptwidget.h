@@ -26,11 +26,12 @@ enum class ScriptCommand : int
     BEGIN_LOOP,
     END_LOOP,
     BEGIN_BLOCK,
-    END_BLOCK
+    END_BLOCK,
+    COMMENT
 
 };
 
-#define NUM_SCRIPT_COMMANDS 14
+#define NUM_SCRIPT_COMMANDS 15
 
 struct Script2String
 {
@@ -52,6 +53,7 @@ struct Script2String
             case ScriptCommand::END_LOOP: return QString( "end loop" ); break;
             case ScriptCommand::BEGIN_BLOCK: return QString( "begin block" ); break;
             case ScriptCommand::END_BLOCK: return QString( "end block" ); break;
+            case ScriptCommand::COMMENT: return QString( "comment" ); break;
         }
         return QString( "command doesn't exist" );
     }
