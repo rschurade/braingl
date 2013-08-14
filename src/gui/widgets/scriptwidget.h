@@ -59,7 +59,7 @@ struct Script2String
 
 class GLWidget;
 class CheckboxWithLabel;
-class SliderWithEditInt2;
+class SliderWithEditInt;
 
 class ScriptWidget : public QWidget
 {
@@ -74,8 +74,8 @@ private:
     QWidget* buildScriptLayout();
     QVector3D string2Vector3D( QString string );
 
-    void addGlobalSelect( QHBoxLayout* layout, int id, int selected );
-    void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset );
+    void addGlobalSelect( QHBoxLayout* layout, int id, int selected, bool active );
+    void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset, bool active );
     void addEdit( QHBoxLayout* layout, int startId, int count );
     void addStretch( QHBoxLayout* layout, int count );
 
@@ -93,7 +93,7 @@ private:
 
     CheckboxWithLabel* m_contRunning;
     CheckboxWithLabel* m_screenshotEach;
-    SliderWithEditInt2* m_delay;
+    SliderWithEditInt* m_delay;
 
     QList<QVariant>m_currentCamera;
     QList<QVariant>m_interpolatedCamera;
@@ -142,6 +142,7 @@ private slots:
     void insertCommand( int row );
     void moveScrollBarToBottom( int min, int max );
     void resetScript();
+    void slotCheckboxChanged( int, int );
 
 signals:
     void enable( bool e, int id );

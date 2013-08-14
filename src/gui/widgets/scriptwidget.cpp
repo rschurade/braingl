@@ -10,10 +10,11 @@
 #include "../gl/camera.h"
 #include "../gl/arcball.h"
 
+#include "controls/checkboxid.h"
 #include "controls/comboboxid.h"
 #include "controls/lineeditid.h"
 #include "controls/checkboxwithlabel.h"
-#include "controls/sliderwitheditint2.h"
+#include "controls/sliderwitheditint.h"
 #include "controls/pushbuttonwithid.h"
 
 #include "../../data/enums.h"
@@ -32,9 +33,10 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_lastDataset( 0 ),
     m_lastProperty( (int)Fn::Property::D_ACTIVE )
 {
-    QList<QVariant> command;
-    command.push_back( (int)ScriptCommand::NONE );
-    m_script.push_back( command );
+    QList<QVariant> line;
+    line.push_back( true );
+    line.push_back( (int)ScriptCommand::NONE );
+    m_script.push_back( line );
 
     initLayout();
 }
@@ -85,13 +87,16 @@ void ScriptWidget::initLayout()
     m_screenshotEach = new CheckboxWithLabel( "screenshot each step", -1, this );
     buttons2->addWidget( m_screenshotEach );
 
-    m_delay = new SliderWithEditInt2( this );
+    m_delay = new SliderWithEditInt( "delay", 0, this );
     m_delay->setMin( 1 );
     m_delay->setMax( 1000 );
     m_delay->setValue( 25 );
 
     buttons2->addStretch();
-    buttons2->addWidget( m_delay );
+    buttons2->addStretch();
+    buttons2->addStretch();
+    buttons1->addStretch();
+    buttons1->addWidget( m_delay );
 
     layout2->addLayout( buttons2 );
     layout2->addLayout( buttons1 );
@@ -117,7 +122,13 @@ QWidget* ScriptWidget::buildScriptLayout()
     {
 
         QHBoxLayout* layout = new QHBoxLayout();
-        QList<QVariant>command = m_script[i];
+        QList<QVariant>line = m_script[i];
+
+        CheckBoxID* checkBox = new CheckBoxID( i, this );
+        layout->addWidget( checkBox );
+        bool lineActive = line[0].toBool();
+        checkBox->setChecked( lineActive );
+        connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
 
         PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
         layout->addWidget( insertButton );
@@ -136,13 +147,13 @@ QWidget* ScriptWidget::buildScriptLayout()
         QColor yellow( 255, 255, 0 );
         QColor magenta( 0, 255, 255 );
 
-        if( inLoop && command[0].toInt() != (int)ScriptCommand::END_LOOP )
+        if( inLoop && line[1].toInt() != (int)ScriptCommand::END_LOOP )
         {
             QLabel* label = new QLabel( "loop", this );
             label->setStyleSheet("QLabel { background-color : " + lightRed.name() + "}");
             layout->addWidget( label );
         }
-        if( inBlock && command[0].toInt() != (int)ScriptCommand::END_BLOCK )
+        if( inBlock && line[1].toInt() != (int)ScriptCommand::END_BLOCK )
         {
             QLabel* label = new QLabel( "block", this );
 
@@ -158,10 +169,10 @@ QWidget* ScriptWidget::buildScriptLayout()
         }
 
         layout->addWidget( select );
-        select->setCurrentIndex( command[0].toInt() );
+        select->setCurrentIndex( line[1].toInt() );
         connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int ) ) );
 
-        switch( (ScriptCommand)( command[0].toInt() ) )
+        switch( (ScriptCommand)( line[1].toInt() ) )
         {
             case ScriptCommand::NONE:
                 addStretch( layout, 5 );
@@ -176,11 +187,11 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 3 );
-                QVector3D vec = command[1].value<QVector3D>();
+                QVector3D vec = line[2].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = command[2].value<QVector3D>();
+                vec = line[3].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = command[3].value<QVector3D>();
+                vec = line[4].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
                 addStretch( layout, 2 );
                 break;
@@ -189,13 +200,13 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 4 );
-                QVector3D vec = command[1].value<QVector3D>();
+                QVector3D vec = line[2].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = command[2].value<QVector3D>();
+                vec = line[3].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = command[3].value<QVector3D>();
+                vec = line[4].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                int steps = command[4].toInt();
+                int steps = line[5].toInt();
                 emit( editChanged( QString::number( steps ), i * 10 + 4 ) );
                 addStretch( layout, 1 );
                 break;
@@ -203,27 +214,27 @@ QWidget* ScriptWidget::buildScriptLayout()
             case ScriptCommand::SET_GLOBAL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
-                addGlobalSelect( layout, i, command[1].toInt() );
+                addGlobalSelect( layout, i, line[2].toInt(), lineActive );
                 addEdit( layout, i* 10 + 2, 1 );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
                 addStretch( layout, 3 );
                 break;
             }
             case ScriptCommand::INCREMENT_GLOBAL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
-                addGlobalSelect( layout, i, command[1].toInt() );
+                addGlobalSelect( layout, i, line[2].toInt(), lineActive );
                 if ( !inLoop )
                 {
                     addEdit( layout, i* 10 + 2, 2 );
-                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
                     addStretch( layout, 2 );
                 }
                 else
                 {
                     addEdit( layout, i* 10 + 2, 1 );
-                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
                     addStretch( layout, 3 );
                 }
                 break;
@@ -232,30 +243,30 @@ QWidget* ScriptWidget::buildScriptLayout()
             case ScriptCommand::SET_PROPERTY:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
-                addPropertySelect( layout, i, command[1].toInt(), command[2].toInt() );
+                addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
                 addEdit( layout, i* 10 + 2, 2 );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
                 addStretch( layout, 2 );
                 break;
             }
             case ScriptCommand::INCREMENT_PROPERTY:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
-                addPropertySelect( layout, i, command[1].toInt(), command[2].toInt() );
+                addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
                 if ( !inLoop )
                 {
                     addEdit( layout, i* 10 + 2, 3 );
-                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                    emit( editChanged( command[4].toString(), i * 10 + 4 ) );
+                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                    emit( editChanged( line[5].toString(), i * 10 + 4 ) );
                     addStretch( layout, 1 );
                 }
                 else
                 {
                     addEdit( layout, i* 10 + 2, 2 );
-                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
                     addStretch( layout, 2 );
                 }
                 break;
@@ -264,11 +275,11 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 4 );
-                QVector4D vec = command[1].value<QQuaternion>().toVector4D();
+                QVector4D vec = line[2].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                emit( editChanged( command[4].toString(), i * 10 + 4 ) );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
                 addStretch( layout, 1 );
                 break;
             }
@@ -276,19 +287,19 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 5 );
-                QVector4D vec = command[1].value<QQuaternion>().toVector4D();
+                QVector4D vec = line[2].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                emit( editChanged( command[4].toString(), i * 10 + 4 ) );
-                emit( editChanged( command[5].toString(), i * 10 + 5 ) );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+                emit( editChanged( line[6].toString(), i * 10 + 5 ) );
                 break;
             }
             case ScriptCommand::BEGIN_LOOP:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
                 addEdit( layout, i* 10 + 1, 1 );
-                emit( editChanged( command[1].toString(), i * 10 + 1 ) );
+                emit( editChanged( line[2].toString(), i * 10 + 1 ) );
                 addStretch( layout, 4 );
                 inLoop = true;
                 break;
@@ -316,6 +327,13 @@ QWidget* ScriptWidget::buildScriptLayout()
             }
         }
 
+        select->setEnabled( lineActive );
+        emit( enable( lineActive, i * 10 + 1 ) );
+        emit( enable( lineActive, i * 10 + 2 ) );
+        emit( enable( lineActive, i * 10 + 3 ) );
+        emit( enable( lineActive, i * 10 + 4 ) );
+        emit( enable( lineActive, i * 10 + 5 ) );
+
         layout->addStretch();
         m_scriptLayout->addLayout( layout );
     }
@@ -328,6 +346,7 @@ void ScriptWidget::commandChanged( int line, int command )
 {
     line /= 10;
     QList<QVariant> commandLine;
+    commandLine.push_back( true );
     commandLine.push_back( command );
 
     QList<QVariant> camera = m_glWidget->getCamera()->getState();
@@ -420,6 +439,7 @@ void ScriptWidget::commandChanged( int line, int command )
     if ( line == m_script.size() - 1 && command != 0 )
     {
         QList<QVariant> command;
+        command.push_back( true );
         command.push_back( (int)ScriptCommand::NONE );
         m_script.push_back( command );
     }
@@ -449,7 +469,7 @@ void ScriptWidget::addStretch( QHBoxLayout* layout, int count )
     }
 }
 
-void ScriptWidget::addGlobalSelect( QHBoxLayout* layout, int id, int selected )
+void ScriptWidget::addGlobalSelect( QHBoxLayout* layout, int id, int selected, bool active )
 {
     ComboBoxID* select = new ComboBoxID( id, this );
     for ( int j = (int)Fn::Property::G_FIRST + 1; j < (int)Fn::Property::G_LAST; ++j )
@@ -473,9 +493,10 @@ void ScriptWidget::addGlobalSelect( QHBoxLayout* layout, int id, int selected )
     }
     connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( slotGlobalSelectChanged( int, int, int ) ) );
     layout->addWidget( select );
+    select->setEnabled( active );
 }
 
-void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset )
+void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset, bool active )
 {
     ComboBoxID* select = new ComboBoxID( id, this );
 
@@ -501,6 +522,7 @@ void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected,
     }
     connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( slotPropertySelectChanged( int, int, int ) ) );
     layout->addWidget( select );
+    select->setEnabled( active );
 }
 
 void ScriptWidget::loadScript()
@@ -610,8 +632,14 @@ void ScriptWidget::run()
 
     QList<QVariant> line = m_script[m_currentCommandLine++];
 
+    if ( !line[0].toBool() )
+    {
+        QTimer::singleShot( 1, this, SLOT( run() ) );
+        return;
+    }
+
     int delay = m_delay->getValue();
-    int command = line[0].toInt();
+    int command = line[1].toInt();
 
     QList<QVariant>camera = m_glWidget->getCamera()->getState();
 
@@ -629,9 +657,9 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_CAMERA:
         {
-            camera[0] = line[1];
-            camera[1] = line[2];
-            camera[2] = line[3];
+            camera[0] = line[2];
+            camera[1] = line[3];
+            camera[2] = line[4];
             m_glWidget->getCamera()->setState( camera );
             break;
         }
@@ -639,31 +667,31 @@ void ScriptWidget::run()
         {
             m_currentCamera = camera;
             m_interpolatedCamera.clear();
-            m_interpolatedCamera.push_back( line[1] );
             m_interpolatedCamera.push_back( line[2] );
             m_interpolatedCamera.push_back( line[3] );
-            m_targetStep = line[4].toInt();
+            m_interpolatedCamera.push_back( line[4] );
+            m_targetStep = line[5].toInt();
             slotInterpolateCamera();
             return;
             break;
         }
         case ScriptCommand::SET_GLOBAL:
         {
-            Models::g()->setData( Models::g()->index( line[1].toInt(), 0 ), line[2] );
+            Models::g()->setData( Models::g()->index( line[2].toInt(), 0 ), line[3] );
             break;
         }
         case ScriptCommand::INCREMENT_GLOBAL:
         {
-            m_lastGlobal = line[1].toInt();
-            m_stepSize = line[2].toFloat();
-            m_targetStep = line[3].toInt();
+            m_lastGlobal = line[2].toInt();
+            m_stepSize = line[3].toFloat();
+            m_targetStep = line[4].toInt();
             slotIncrementGlobal();
             return;
             break;
         }
         case ScriptCommand::SET_PROPERTY:
         {
-            QString v = line[3].toString();
+            QString v = line[4].toString();
             bool ok;
             if ( v.startsWith( "(float)" ) )
             {
@@ -671,31 +699,31 @@ void ScriptWidget::run()
                 float f = v.toFloat( &ok );
                 if ( ok )
                 {
-                    Models::d()->setData( Models::d()->index( line[2].toInt(), line[1].toInt() ), f, Qt::DisplayRole );
+                    Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), f, Qt::DisplayRole );
                 }
             }
             else
             {
-                Models::d()->setData( Models::d()->index( line[2].toInt(), line[1].toInt() ), line[3], Qt::DisplayRole );
+                Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4], Qt::DisplayRole );
             }
             break;
         }
         case ScriptCommand::INCREMENT_PROPERTY:
         {
-            m_lastDataset = line[2].toInt();
-            m_lastProperty = line[1].toInt();
-            m_stepSize = line[3].toFloat();
-            m_targetStep = line[4].toInt();
+            m_lastDataset = line[3].toInt();
+            m_lastProperty = line[2].toInt();
+            m_stepSize = line[4].toFloat();
+            m_targetStep = line[5].toInt();
             slotIncrementProperty();
             return;
             break;
         }
         case ScriptCommand::SET_ARCBALL:
         {
-            QQuaternion rot  = line[1].value<QQuaternion>();
-            float zoom = line[2].toFloat();
-            float moveX = line[3].toFloat();
-            float moveY = line[4].toFloat();
+            QQuaternion rot  = line[2].value<QQuaternion>();
+            float zoom = line[3].toFloat();
+            float moveX = line[4].toFloat();
+            float moveY = line[5].toFloat();
             m_glWidget->getArcBall()->setRotation( rot );
             m_glWidget->getArcBall()->setZoom( zoom );
             m_glWidget->getArcBall()->setMoveX( moveX );
@@ -705,21 +733,21 @@ void ScriptWidget::run()
         case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             m_currentRot = m_glWidget->getArcBall()->getRotation();
-            m_targetRot = line[1].value<QQuaternion>();
+            m_targetRot = line[2].value<QQuaternion>();
             m_currentZoom = m_glWidget->getArcBall()->getZoom();
-            m_targetZoom = line[2].toFloat();
+            m_targetZoom = line[3].toFloat();
             m_currentMoveX = m_glWidget->getArcBall()->getMoveX();
-            m_targetMoveX = line[3].toFloat();
+            m_targetMoveX = line[4].toFloat();
             m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
-            m_targetMoveY = line[4].toFloat();
-            m_targetStep = line[5].toInt();
+            m_targetMoveY = line[5].toFloat();
+            m_targetStep = line[6].toInt();
             slotInterpolateArcball();
             return;
             break;
         }
         case ScriptCommand::BEGIN_LOOP:
         {
-            m_loopCount = line[1].toInt();
+            m_loopCount = line[2].toInt();
             m_loopBegin = m_currentCommandLine;
             break;
         }
@@ -916,9 +944,9 @@ void ScriptWidget::copyCamera()
 void ScriptWidget::slotEditChanged( QString text, int id )
 {
     int row = id / 10;
-    int column = id % 10;
+    int column = ( id % 10 ) + 1;
 
-    int command = m_script[row].at( 0 ).toInt();
+    int command = m_script[row].at( 1 ).toInt();
     switch( (ScriptCommand)( command ) )
     {
         case ScriptCommand::NONE:
@@ -937,11 +965,11 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::INTERPOLATE_CAMERA:
         {
-            if ( column > 0 && column < 4 )
+            if ( column > 1 && column < 5 )
             {
                 m_script[row].replace( column, string2Vector3D( text ) );
             }
-            if ( column == 4 )
+            if ( column == 5 )
             {
                 m_script[row].replace( column, text.toInt() );
             }
@@ -949,20 +977,20 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::SET_GLOBAL:
         {
-            if ( column == 2 )
+            if ( column == 3 )
             {
-                if ( m_script[row].at( 1 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
+                if ( m_script[row].at( 2 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
-                    m_script[row].replace( 2, text );
+                    m_script[row].replace( 3, text );
                 }
             }
             break;
         }
         case ScriptCommand::INCREMENT_GLOBAL:
         {
-            if ( column == 2 || column == 3 )
+            if ( column == 3 || column == 4 )
             {
-                if ( m_script[row].at( 1 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
+                if ( m_script[row].at( 2 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
                     m_script[row].replace( column, text );
                 }
@@ -971,7 +999,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::SET_PROPERTY:
         {
-            if ( column == 2 )
+            if ( column == 3 )
             {
                 int ds = text.toInt();
                 m_lastDataset = ds;
@@ -988,7 +1016,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     m_script[row].replace( column, 0 );
                 }
             }
-            if ( column == 3 )
+            if ( column == 4 )
             {
                 m_script[row].replace( column, text );
             }
@@ -996,7 +1024,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::INCREMENT_PROPERTY:
         {
-            if ( column == 2 )
+            if ( column == 3 )
             {
                 int ds = text.toInt();
                 m_lastDataset = ds;
@@ -1013,11 +1041,11 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     m_script[row].replace( column, 0 );
                 }
             }
-            if ( column == 3 )
+            if ( column == 4 )
             {
                 m_script[row].replace( column, text );
             }
-            if ( column == 4 )
+            if ( column == 5 )
             {
                 m_script[row].replace( column, text.toInt() );
             }
@@ -1025,7 +1053,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::SET_ARCBALL:
         {
-            if ( column == 1 )
+            if ( column == 2 )
             {
                 QStringList parts = text.split( ",", QString::SkipEmptyParts );
                 if( parts.size() == 4 )
@@ -1050,7 +1078,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     }
                 }
             }
-            if ( column > 1 )
+            if ( column > 2 )
             {
                 m_script[row].replace( column, text );
             }
@@ -1058,7 +1086,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::INTERPOLATE_ARCBALL:
         {
-            if ( column == 1 )
+            if ( column == 2 )
             {
                 QStringList parts = text.split( ",", QString::SkipEmptyParts );
                 if( parts.size() == 4 )
@@ -1083,7 +1111,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                     }
                 }
             }
-            if ( column > 1 )
+            if ( column > 2 )
             {
                 m_script[row].replace( column, text );
             }
@@ -1091,7 +1119,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::BEGIN_LOOP:
         {
-            if ( column == 1 )
+            if ( column == 2 )
             {
                 m_script[row].replace( column, text.toInt() );
             }
@@ -1106,13 +1134,13 @@ void ScriptWidget::slotEditChanged( QString text, int id )
 
 void ScriptWidget::slotGlobalSelectChanged( int line, int prop, int data )
 {
-    m_script[line].replace( 1, data );
+    m_script[line].replace( 2, data );
     m_lastGlobal = data;
 }
 
 void ScriptWidget::slotPropertySelectChanged( int line, int prop, int data )
 {
-    m_script[line].replace( 1, data );
+    m_script[line].replace( 2, data );
     m_lastProperty = data;
 }
 
@@ -1164,9 +1192,10 @@ void ScriptWidget::insertCommand( int row )
 {
     if ( row >= 0 && row < m_script.size() )
     {
-        QList<QVariant> command;
-        command.push_back( (int)ScriptCommand::NONE );
-        m_script.insert( row, command );
+        QList<QVariant> line;
+        line.push_back( true );
+        line.push_back( (int)ScriptCommand::NONE );
+        m_script.insert( row, line );
     }
     delete this->layout();
     this->repaint();
@@ -1182,9 +1211,37 @@ void ScriptWidget::moveScrollBarToBottom( int min, int max )
 void ScriptWidget::resetScript()
 {
     m_script.clear();
-    QList<QVariant> command;
-    command.push_back( (int)ScriptCommand::NONE );
-    m_script.push_back( command );
+    QList<QVariant> line;
+    line.push_back( true );
+    line.push_back( (int)ScriptCommand::NONE );
+    m_script.push_back( line );
+    delete this->layout();
+    this->repaint();
+    initLayout();
+}
+
+void ScriptWidget::slotCheckboxChanged( int line, int state )
+{
+    m_script[line].replace( 0, state );
+    if ( m_script[line].at( 1 ).toInt() == (int)ScriptCommand::BEGIN_LOOP )
+    {
+        do
+        {
+            m_script[line].replace( 0, state );
+            ++line;
+        }
+        while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_LOOP );
+    }
+    if ( m_script[line].at( 1 ).toInt() == (int)ScriptCommand::BEGIN_BLOCK )
+    {
+        do
+        {
+            m_script[line].replace( 0, state );
+            ++line;
+        }
+        while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_BLOCK );
+    }
+    m_script[line].replace( 0, state );
     delete this->layout();
     this->repaint();
     initLayout();
