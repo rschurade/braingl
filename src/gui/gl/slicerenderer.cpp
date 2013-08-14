@@ -57,16 +57,10 @@ void SliceRenderer::initGeometry()
     m_x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
     m_y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
     m_z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
-    int xi = m_x;
-    int yi = m_y;
-    int zi = m_z;
 
     m_nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
     m_ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
     m_nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
-    int xbi = m_nx;
-    int ybi = m_ny;
-    int zbi = m_nz;
 
     m_dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
     m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
@@ -79,7 +73,7 @@ void SliceRenderer::initGeometry()
     float yb = m_ny * m_dy;
     float zb = m_nz * m_dz;
 
-    if ( zi != m_zOld || zbi != m_zbOld )
+    if ( m_z != m_zOld || zb != m_zbOld )
     {
         VertexData verticesAxial[] =
         {
@@ -94,7 +88,7 @@ void SliceRenderer::initGeometry()
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    if ( yi != m_yOld || ybi != m_ybOld )
+    if ( m_y != m_yOld || yb != m_ybOld )
     {
         VertexData verticesCoronal[] =
         {
@@ -110,7 +104,7 @@ void SliceRenderer::initGeometry()
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    if ( xi != m_xOld  || xbi != m_xbOld )
+    if ( m_x != m_xOld  || xb != m_xbOld )
     {
         VertexData verticesSagittal[] =
         {
@@ -125,12 +119,12 @@ void SliceRenderer::initGeometry()
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    m_xOld = xi;
-    m_yOld = yi;
-    m_zOld = zi;
-    m_xbOld = xbi;
-    m_ybOld = ybi;
-    m_zbOld = zbi;
+    m_xOld = m_x;
+    m_yOld = m_y;
+    m_zOld = m_z;
+    m_xbOld = xb;
+    m_ybOld = yb;
+    m_zbOld = zb;
 }
 
 void SliceRenderer::setupTextures()

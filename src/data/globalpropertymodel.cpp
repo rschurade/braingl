@@ -16,9 +16,9 @@
 GlobalPropertyModel::GlobalPropertyModel()
 {
     m_properties = new PropertyGroup();
-    m_properties->create( Fn::Property::G_SAGITTAL, 0, 0, 0, "general" );
-    m_properties->create( Fn::Property::G_CORONAL, 0, 0, 0, "general" );
-    m_properties->create( Fn::Property::G_AXIAL, 0, 0, 0, "general" );
+    m_properties->create( Fn::Property::G_SAGITTAL, 0.0f, 0.0f, 0.0f, "general" );
+    m_properties->create( Fn::Property::G_CORONAL, 0.0f, 0.0f, 0.0f, "general" );
+    m_properties->create( Fn::Property::G_AXIAL, 0.0f, 0.0f, 0.0f, "general" );
     m_properties->create( Fn::Property::G_MAX_AXIAL, 1 );
     m_properties->create( Fn::Property::G_MAX_CORONAL, 1 );
     m_properties->create( Fn::Property::G_MAX_SAGITTAL, 1 );
