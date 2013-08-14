@@ -22,3 +22,11 @@ void ComboBoxID::slotIndexChanged( int index )
 {
     emit( currentIndexChanged( m_id, index, itemData( index ).toInt() ) );
 }
+
+void ComboBoxID::setEnabled2( bool enable, int id )
+{
+    if ( id == m_id )
+    {
+        setEnabled( enable );
+    }
+}

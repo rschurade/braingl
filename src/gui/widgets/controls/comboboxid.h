@@ -24,8 +24,9 @@ private:
 signals:
     void currentIndexChanged( int, int, int );
 
-private slots:
+public slots:
     void slotIndexChanged( int index );
+    void setEnabled2( bool enable, int id );
 };
 
 #endif /* COMBOBOXID_H_ */

@@ -24,8 +24,9 @@ private:
 signals:
     void signalStateChanged( int id, int state );
 
-private slots:
+public slots:
     void slotStateChanged( int state );
+    void slotSetChecked2( int state, int id );
 };
 
 #endif /* CHECKBOXID_H_ */

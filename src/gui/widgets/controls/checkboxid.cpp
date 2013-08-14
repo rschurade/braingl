@@ -23,3 +23,11 @@ void CheckBoxID::slotStateChanged( int state )
 {
     emit( signalStateChanged( m_id, state ) );
 }
+
+void CheckBoxID::slotSetChecked2( int state, int id )
+{
+    if ( id == m_id )
+    {
+        setChecked( state );
+    }
+}
