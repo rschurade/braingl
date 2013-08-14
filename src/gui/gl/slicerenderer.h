@@ -47,12 +47,12 @@ private:
 	float m_dy;
 	float m_dz;
 
-	int m_xOld;
-    int m_yOld;
-    int m_zOld;
-    int m_xbOld;
-    int m_ybOld;
-    int m_zbOld;
+	float m_xOld;
+    float m_yOld;
+    float m_zOld;
+    float m_xbOld;
+    float m_ybOld;
+    float m_zbOld;
 };
 
 #endif /* SLICERENDERER_H_ */
