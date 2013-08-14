@@ -869,7 +869,7 @@ void ScriptWidget::slotInterpolateCamera()
         emit( screenshot() );
     }
 
-    QTimer::singleShot( delay, this, SLOT( interpolateCamera() ) );
+    QTimer::singleShot( delay, this, SLOT( slotInterpolateCamera() ) );
 }
 
 void ScriptWidget::copyCamera()
