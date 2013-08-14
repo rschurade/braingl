@@ -1051,6 +1051,11 @@ QVector3D ScriptWidget::string2Vector3D( QString string )
 
 void ScriptWidget::deleteCommand( int row )
 {
+    if ( m_script.size() == 1 )
+    {
+        // do not delete the last command
+        return;
+    }
     if ( row >= 0 && row < m_script.size() )
     {
         m_script.removeAt( row );
