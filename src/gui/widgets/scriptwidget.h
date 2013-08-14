@@ -130,8 +130,6 @@ private slots:
     void run();
 
     void slotInterpolateCamera();
-    void slotIncrementGlobal();
-    void slotIncrementProperty();
     void slotInterpolateArcball();
 
     void copyCamera();
