@@ -225,19 +225,9 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
                 addGlobalSelect( layout, i, line[2].toInt(), lineActive );
-                if ( !inLoop )
-                {
-                    addEdit( layout, i* 10 + 2, 2 );
-                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                    addStretch( layout, 2 );
-                }
-                else
-                {
-                    addEdit( layout, i* 10 + 2, 1 );
-                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                    addStretch( layout, 3 );
-                }
+                addEdit( layout, i* 10 + 2, 1 );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                addStretch( layout, 3 );
                 break;
             }
 
@@ -255,21 +245,10 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
                 addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
-                if ( !inLoop )
-                {
-                    addEdit( layout, i* 10 + 2, 3 );
-                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                    emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                    addStretch( layout, 1 );
-                }
-                else
-                {
-                    addEdit( layout, i* 10 + 2, 2 );
-                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                    emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                    addStretch( layout, 2 );
-                }
+                addEdit( layout, i* 10 + 2, 2 );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                addStretch( layout, 2 );
                 break;
             }
             case ScriptCommand::SET_ARCBALL:
@@ -392,7 +371,6 @@ void ScriptWidget::commandChanged( int line, int command )
         {
             commandLine.push_back( m_lastGlobal );
             commandLine.push_back( 1 );
-            commandLine.push_back( 1 );
             break;
         }
         case ScriptCommand::SET_PROPERTY:
@@ -406,7 +384,6 @@ void ScriptWidget::commandChanged( int line, int command )
         {
             commandLine.push_back( (int)Fn::Property::D_ACTIVE );
             commandLine.push_back( m_lastDataset );
-            commandLine.push_back( 1 );
             commandLine.push_back( 1 );
             break;
         }
@@ -702,9 +679,8 @@ void ScriptWidget::run()
         {
             m_lastGlobal = line[2].toInt();
             m_stepSize = line[3].toFloat();
-            m_targetStep = line[4].toInt();
-            slotIncrementGlobal();
-            return;
+            float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat() + m_stepSize;
+            Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
             break;
         }
         case ScriptCommand::SET_PROPERTY:
@@ -731,9 +707,8 @@ void ScriptWidget::run()
             m_lastDataset = line[3].toInt();
             m_lastProperty = line[2].toInt();
             m_stepSize = line[4].toFloat();
-            m_targetStep = line[5].toInt();
-            slotIncrementProperty();
-            return;
+            float value = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat() + m_stepSize;
+            Models::d()->setData( Models::d()->index( m_lastDataset, m_lastProperty ), value, Qt::DisplayRole );
             break;
         }
         case ScriptCommand::SET_ARCBALL:
@@ -841,75 +816,6 @@ void ScriptWidget::slotInterpolateArcball()
     QTimer::singleShot( delay, this, SLOT( slotInterpolateArcball() ) );
 }
 
-void ScriptWidget::slotIncrementGlobal()
-{
-    if ( !m_runScript )
-    {
-        return;
-    }
-
-    int delay = m_delay->getValue();
-    if ( ++m_currentStep > m_targetStep )
-    {
-        QTimer::singleShot( delay, this, SLOT( run() ) );
-        return;
-    }
-    float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat();
-    value += m_stepSize;
-    Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
-
-    if ( m_loopCount > 0 )
-    {
-        QTimer::singleShot( 1, this, SLOT( run() ) );
-        return;
-    }
-
-    Models::g()->submit();
-
-    if ( m_screenshotEach->checked() )
-    {
-        emit( screenshot() );
-    }
-
-    QTimer::singleShot( delay, this, SLOT( slotIncrementGlobal() ) );
-
-}
-
-void ScriptWidget::slotIncrementProperty()
-{
-    if ( !m_runScript )
-    {
-        return;
-    }
-
-    int delay = m_delay->getValue();
-    if ( ++m_currentStep > m_targetStep )
-    {
-        QTimer::singleShot( delay, this, SLOT( run() ) );
-        return;
-    }
-    float value = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat();
-    value += m_stepSize;
-
-    Models::d()->setData( Models::d()->index( m_lastDataset, m_lastProperty ), value, Qt::DisplayRole );
-
-    if ( m_loopCount > 0 )
-    {
-        QTimer::singleShot( 1, this, SLOT( run() ) );
-        return;
-    }
-
-    Models::d()->submit();
-
-    if ( m_screenshotEach->checked() )
-    {
-        emit( screenshot() );
-    }
-
-    QTimer::singleShot( delay, this, SLOT( slotIncrementProperty() ) );
-
-}
-
 void ScriptWidget::slotInterpolateCamera()
 {
     if ( !m_runScript )
@@ -1006,7 +912,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
         }
         case ScriptCommand::INCREMENT_GLOBAL:
         {
-            if ( column == 3 || column == 4 )
+            if ( column == 3 )
             {
                 if ( m_script[row].at( 2 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
