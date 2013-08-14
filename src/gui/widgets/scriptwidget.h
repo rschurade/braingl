@@ -88,19 +88,14 @@ private:
 
     QList<QVariant>m_currentCamera;
     QList<QVariant>m_interpolatedCamera;
-    int m_interpolateSteps;
-    int m_currentInterpolateStep;
 
     int m_lastGlobal;
+    int m_lastDataset;
+    int m_lastProperty;
+
     float m_stepSize;
     int m_targetStep;
     int m_currentStep;
-
-    int m_currentDelay;
-    int m_targetDelay;
-
-    int m_lastDataset;
-    int m_lastProperty;
 
     QQuaternion m_currentRot;
     QQuaternion m_targetRot;

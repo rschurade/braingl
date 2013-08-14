@@ -78,16 +78,7 @@ void ScriptWidget::initLayout()
 
 
     QHBoxLayout* buttons2 = new QHBoxLayout();
-//
-//    QPushButton* addbutton = new QPushButton( "Add", this );
-//    buttons2->addWidget( addbutton );
-//    connect( addbutton, SIGNAL( clicked() ), this, SLOT( addCommand() ) );
-//
-//    QPushButton* cambutton = new QPushButton( "Copy Camera", this );
-//    buttons2->addWidget( cambutton );
-//    connect( cambutton, SIGNAL( clicked() ), this, SLOT( copyCamera() ) );
-//
-//
+
     m_contRunning = new CheckboxWithLabel( "continous", -1, this );
     buttons2->addWidget( m_contRunning );
 
@@ -543,14 +534,15 @@ void ScriptWidget::run()
 
     //qDebug() << Script2String::s( (ScriptCommand)command );
 
+    m_currentStep = 0;
+
     switch( (ScriptCommand)( command ) )
     {
         case ScriptCommand::NONE:
             break;
         case ScriptCommand::DELAY:
         {
-            m_targetDelay = line[1].toInt();
-            m_currentDelay = 0;
+            m_targetStep = line[1].toInt() / delay;
             slotDelay();
             return;
             break;
@@ -570,8 +562,7 @@ void ScriptWidget::run()
             m_interpolatedCamera.push_back( line[1] );
             m_interpolatedCamera.push_back( line[2] );
             m_interpolatedCamera.push_back( line[3] );
-            m_interpolateSteps = line[4].toInt();
-            m_currentInterpolateStep = 0;
+            m_targetStep = line[4].toInt();
             interpolateCamera();
             return;
             break;
@@ -586,7 +577,6 @@ void ScriptWidget::run()
             m_lastGlobal = line[1].toInt();
             m_stepSize = line[2].toFloat();
             m_targetStep = line[3].toInt();
-            m_currentStep = 0;
             slotIncrementGlobal();
             return;
             break;
@@ -616,7 +606,6 @@ void ScriptWidget::run()
             m_lastProperty = line[1].toInt();
             m_stepSize = line[3].toFloat();
             m_targetStep = line[4].toInt();
-            m_currentStep = 0;
             slotIncrementProperty();
             return;
             break;
@@ -643,8 +632,7 @@ void ScriptWidget::run()
             m_targetMoveX = line[3].toFloat();
             m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
             m_targetMoveY = line[4].toFloat();
-            m_interpolateSteps = line[5].toInt();
-            m_currentInterpolateStep = 0;
+            m_targetStep = line[5].toInt();
             slotInterpolateArcball();
             return;
             break;
@@ -668,13 +656,13 @@ void ScriptWidget::slotInterpolateArcball()
     }
 
     int delay = m_delay->getValue();
-    if ( ++m_currentInterpolateStep > m_interpolateSteps )
+    if ( ++m_currentStep > m_targetStep )
     {
         QTimer::singleShot( delay, this, SLOT( run() ) );
         return;
     }
 
-    float div = (float)m_currentInterpolateStep / (float)m_interpolateSteps;
+    float div = (float)m_currentStep / (float)m_targetStep;
 
     QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
     m_glWidget->getArcBall()->setRotation( rot );
@@ -762,12 +750,11 @@ void ScriptWidget::slotDelay()
     }
 
     int delay = m_delay->getValue();
-    if ( m_currentDelay > m_targetDelay )
+    if ( ++m_currentStep > m_targetStep )
     {
         QTimer::singleShot( delay, this, SLOT( run() ) );
         return;
     }
-    m_currentDelay += delay;
 
     Models::g()->submit();
 
@@ -787,7 +774,7 @@ void ScriptWidget::interpolateCamera()
     }
 
     int delay = m_delay->getValue();
-    if ( ++m_currentInterpolateStep > m_interpolateSteps )
+    if ( ++m_currentStep > m_targetStep )
     {
         QTimer::singleShot( delay, this, SLOT( run() ) );
         return;
@@ -802,7 +789,7 @@ void ScriptWidget::interpolateCamera()
     QVector3D up1 = m_currentCamera[2].value<QVector3D>();
     QVector3D up2 = m_interpolatedCamera[2].value<QVector3D>();
 
-    float div = (float)m_currentInterpolateStep / (float)m_interpolateSteps;
+    float div = (float)m_currentStep / (float)m_targetStep;
 
     QVector3D pos = div * pos2 + ( 1.0f - div ) * pos1;
     QVector3D look = div * look2 + ( 1.0f - div ) * look1;
@@ -893,6 +880,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 2 )
             {
                 int ds = text.toInt();
+                m_lastDataset = ds;
                 int countDS = Models::d()->rowCount();
                 if ( countDS > ds && ds >= 0 )
                 {
@@ -917,6 +905,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 2 )
             {
                 int ds = text.toInt();
+                m_lastDataset = ds;
                 int countDS = Models::d()->rowCount();
                 if ( countDS > ds && ds >= 0 )
                 {
