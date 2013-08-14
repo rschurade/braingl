@@ -246,6 +246,10 @@ void MainWindow::load( QString fileName )
         {
             loadScene( fileName );
         }
+        else if( fileName.endsWith( "bgscript" ) )
+        {
+            m_scriptWidget->loadScript( fileName );
+        }
         else
         {
             Loader loader;
@@ -837,12 +841,12 @@ void MainWindow::createDockWindows()
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
 
-    ScriptWidget* scriptWidget = new ScriptWidget( mainGLWidget, this );
-    FNDockWidget* dockSW = new FNDockWidget( "script", scriptWidget, this );
+    m_scriptWidget = new ScriptWidget( mainGLWidget, this );
+    FNDockWidget* dockSW = new FNDockWidget( "script", m_scriptWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockSW );
     viewMenu->addAction( dockSW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
-    connect( scriptWidget, SIGNAL( screenshot() ), this, SLOT( screenshot() ) );
+    connect( m_scriptWidget, SIGNAL( screenshot() ), this, SLOT( screenshot() ) );
     dockSW->hide();
     tabifyDockWidget( dockGP, dockSW );
 

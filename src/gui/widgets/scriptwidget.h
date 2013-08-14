@@ -121,7 +121,8 @@ private:
     float m_targetMoveY;
 
 public slots:
-
+    void loadScript( QString fileName );
+    void saveScript( QString fileName );
 
 private slots:
     void loadScript();

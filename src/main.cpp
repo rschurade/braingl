@@ -100,11 +100,11 @@ int main( int argc, char *argv[] )
             // reset saved settings
             makeScreenshot = true;
         }
-        if ( args.at( i ) == "-h" )
+        if ( args.at( i ) == "-h" || args.at( i ) == "?" )
         {
             qDebug() << "Command line options:";
             qDebug() << "-h : displays this message";
-            qDebug() << "-v : toggles verbose mode, warning this will spam your console with messages";
+            qDebug() << "-v : toggles verbose mode, warning: this will spam your console with messages";
             qDebug() << "-l : logs debug messages to text file";
             qDebug() << "-r : resets saved settings";
             qDebug() << "---";

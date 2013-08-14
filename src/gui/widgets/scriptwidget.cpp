@@ -516,10 +516,8 @@ void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected,
     select->setEnabled( active );
 }
 
-void ScriptWidget::loadScript()
+void ScriptWidget::loadScript( QString fileName )
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
-    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     QSettings settings( fileName, QSettings::IniFormat );
 
     if ( settings.contains( "appName" ) && settings.contains( "fileType" ) )
@@ -567,10 +565,15 @@ void ScriptWidget::loadScript()
     }
 }
 
-void ScriptWidget::saveScript()
+void ScriptWidget::loadScript()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
-    QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
+    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
+    loadScript( fileName );
+}
+
+void ScriptWidget::saveScript( QString fileName )
+{
     QSettings settings( fileName, QSettings::IniFormat );
     settings.setValue( "appName", "braingl" );
     settings.setValue( "version", "0.7.0" );
@@ -581,6 +584,13 @@ void ScriptWidget::saveScript()
     {
         settings.setValue( QString::number( i ), m_script[i] );
     }
+}
+
+void ScriptWidget::saveScript()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
+    saveScript( fileName );
 }
 
 void ScriptWidget::run( bool checked )

@@ -23,6 +23,7 @@ class QTableView;
 class DatasetListWidget;
 class ROIWidget;
 class ShaderEditWidget;
+class ScriptWidget;
 
 class GLWidget;
 class ToolBar;
@@ -66,6 +67,7 @@ private:
     DatasetListWidget* m_datasetWidget;
     ROIWidget* m_roiWidget;
     ShaderEditWidget* m_shaderEditWidget;
+    ScriptWidget* m_scriptWidget;
 
     QMenu* fileMenu;
     QMenu* optionMenu;
