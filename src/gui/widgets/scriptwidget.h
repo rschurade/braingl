@@ -22,11 +22,15 @@ enum class ScriptCommand : int
     SET_PROPERTY,
     INCREMENT_PROPERTY,
     SET_ARCBALL,
-    INTERPOLATE_ARCBALL
+    INTERPOLATE_ARCBALL,
+    BEGIN_LOOP,
+    END_LOOP,
+    BEGIN_BLOCK,
+    END_BLOCK
 
 };
 
-#define NUM_SCRIPT_COMMANDS 10
+#define NUM_SCRIPT_COMMANDS 14
 
 struct Script2String
 {
@@ -44,6 +48,10 @@ struct Script2String
             case ScriptCommand::INCREMENT_PROPERTY: return QString( "increment property" ); break;
             case ScriptCommand::SET_ARCBALL: return QString( "set arcball" ); break;
             case ScriptCommand::INTERPOLATE_ARCBALL: return QString( "interpolate arcball" ); break;
+            case ScriptCommand::BEGIN_LOOP: return QString( "begin loop" ); break;
+            case ScriptCommand::END_LOOP: return QString( "end loop" ); break;
+            case ScriptCommand::BEGIN_BLOCK: return QString( "begin block" ); break;
+            case ScriptCommand::END_BLOCK: return QString( "end block" ); break;
         }
         return QString( "command doesn't exist" );
     }
@@ -69,6 +77,7 @@ private:
     void addGlobalSelect( QHBoxLayout* layout, int id, int selected );
     void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset );
     void addEdit( QHBoxLayout* layout, int startId, int count );
+    void addStretch( QHBoxLayout* layout, int count );
 
     GLWidget* m_glWidget;
 
@@ -96,6 +105,9 @@ private:
     float m_stepSize;
     int m_targetStep;
     int m_currentStep;
+    int m_loopCount;
+    int m_loopBegin;
+    bool m_inBlock;
 
     QQuaternion m_currentRot;
     QQuaternion m_targetRot;
@@ -115,8 +127,7 @@ private slots:
     void run( bool checked );
     void run();
 
-    void interpolateCamera();
-    void slotDelay();
+    void slotInterpolateCamera();
     void slotIncrementGlobal();
     void slotIncrementProperty();
     void slotInterpolateArcball();

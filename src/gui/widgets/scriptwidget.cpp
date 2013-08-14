@@ -86,7 +86,7 @@ void ScriptWidget::initLayout()
     buttons2->addWidget( m_screenshotEach );
 
     m_delay = new SliderWithEditInt2( this );
-    m_delay->setMin( 0 );
+    m_delay->setMin( 1 );
     m_delay->setMax( 1000 );
     m_delay->setValue( 25 );
 
@@ -110,6 +110,9 @@ QWidget* ScriptWidget::buildScriptLayout()
     m_scriptLayout = new QVBoxLayout();
     groupBox->setLayout( m_scriptLayout );
 
+    bool inLoop = false;
+    bool inBlock = false;
+
     for ( int i = 0; i < m_script.size(); ++i )
     {
 
@@ -126,6 +129,28 @@ QWidget* ScriptWidget::buildScriptLayout()
         deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
         connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( deleteCommand( int ) ) );
 
+        QColor lightRed( 255, 168, 168 );
+        QColor lightBlue( 168, 168, 255 );
+        QColor lightGreen( 168, 255, 168 );
+        QColor lightPurple( 255, 158, 255 );
+        QColor yellow( 255, 255, 0 );
+        QColor magenta( 0, 255, 255 );
+
+        if( inLoop && command[0].toInt() != (int)ScriptCommand::END_LOOP )
+        {
+            QLabel* label = new QLabel( "loop", this );
+            label->setStyleSheet("QLabel { background-color : " + lightRed.name() + "}");
+            layout->addWidget( label );
+        }
+        if( inBlock && command[0].toInt() != (int)ScriptCommand::END_BLOCK )
+        {
+            QLabel* label = new QLabel( "block", this );
+
+            label->setStyleSheet("QLabel { background-color : " + lightBlue.name() + "}");
+            layout->addWidget( label );
+        }
+
+
         ComboBoxID* select = new ComboBoxID( i * 10, this );
         for ( int j = 0; j < NUM_SCRIPT_COMMANDS; ++j )
         {
@@ -139,40 +164,31 @@ QWidget* ScriptWidget::buildScriptLayout()
         switch( (ScriptCommand)( command[0].toInt() ) )
         {
             case ScriptCommand::NONE:
-                addEdit( layout, i* 10 + 1, 5 );
-                emit( enable( false, i * 10 + 1 ) );
-                emit( enable( false, i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
-
+                addStretch( layout, 5 );
                 break;
             case ScriptCommand::DELAY:
             {
-                addEdit( layout, i* 10 + 1, 5 );
-                emit( editChanged( command[1].toString(), i * 10 + 1 ) );
-                emit( enable( false, i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+                addStretch( layout, 5 );
                 break;
             }
             case ScriptCommand::SET_CAMERA:
             {
-                addEdit( layout, i* 10 + 1, 5 );
+                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
+                addEdit( layout, i* 10 + 1, 3 );
                 QVector3D vec = command[1].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
                 vec = command[2].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
                 vec = command[3].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                addStretch( layout, 2 );
                 break;
             }
             case ScriptCommand::INTERPOLATE_CAMERA:
             {
-                addEdit( layout, i* 10 + 1, 5 );
+                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
+                addEdit( layout, i* 10 + 1, 4 );
                 QVector3D vec = command[1].value<QVector3D>();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
                 vec = command[2].value<QVector3D>();
@@ -181,62 +197,84 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
                 int steps = command[4].toInt();
                 emit( editChanged( QString::number( steps ), i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                addStretch( layout, 1 );
                 break;
             }
             case ScriptCommand::SET_GLOBAL:
             {
+                select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
                 addGlobalSelect( layout, i, command[1].toInt() );
-                addEdit( layout, i* 10 + 2, 4 );
+                addEdit( layout, i* 10 + 2, 1 );
                 emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( enable( false, i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                addStretch( layout, 3 );
                 break;
             }
             case ScriptCommand::INCREMENT_GLOBAL:
             {
+                select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
                 addGlobalSelect( layout, i, command[1].toInt() );
-                addEdit( layout, i* 10 + 2, 4 );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                if ( !inLoop )
+                {
+                    addEdit( layout, i* 10 + 2, 2 );
+                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                    addStretch( layout, 2 );
+                }
+                else
+                {
+                    addEdit( layout, i* 10 + 2, 1 );
+                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                    addStretch( layout, 3 );
+                }
                 break;
             }
 
             case ScriptCommand::SET_PROPERTY:
             {
+                select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
                 addPropertySelect( layout, i, command[1].toInt(), command[2].toInt() );
-                addEdit( layout, i* 10 + 2, 4 );
+                addEdit( layout, i* 10 + 2, 2 );
                 emit( editChanged( command[2].toString(), i * 10 + 2 ) );
                 emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                emit( enable( false, i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                addStretch( layout, 2 );
                 break;
             }
             case ScriptCommand::INCREMENT_PROPERTY:
             {
+                select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
                 addPropertySelect( layout, i, command[1].toInt(), command[2].toInt() );
-                addEdit( layout, i* 10 + 2, 4 );
-                emit( editChanged( command[2].toString(), i * 10 + 2 ) );
-                emit( editChanged( command[3].toString(), i * 10 + 3 ) );
-                emit( editChanged( command[4].toString(), i * 10 + 4 ) );
-                emit( enable( false, i * 10 + 5 ) );
+                if ( !inLoop )
+                {
+                    addEdit( layout, i* 10 + 2, 3 );
+                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                    emit( editChanged( command[4].toString(), i * 10 + 4 ) );
+                    addStretch( layout, 1 );
+                }
+                else
+                {
+                    addEdit( layout, i* 10 + 2, 2 );
+                    emit( editChanged( command[2].toString(), i * 10 + 2 ) );
+                    emit( editChanged( command[3].toString(), i * 10 + 3 ) );
+                    addStretch( layout, 2 );
+                }
                 break;
             }
             case ScriptCommand::SET_ARCBALL:
             {
-                addEdit( layout, i* 10 + 1, 5 );
+                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
+                addEdit( layout, i* 10 + 1, 4 );
                 QVector4D vec = command[1].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
                 emit( editChanged( command[2].toString(), i * 10 + 2 ) );
                 emit( editChanged( command[3].toString(), i * 10 + 3 ) );
                 emit( editChanged( command[4].toString(), i * 10 + 4 ) );
+                addStretch( layout, 1 );
                 break;
             }
             case ScriptCommand::INTERPOLATE_ARCBALL:
             {
+                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 5 );
                 QVector4D vec = command[1].value<QQuaternion>().toVector4D();
                 emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
@@ -244,6 +282,36 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( editChanged( command[3].toString(), i * 10 + 3 ) );
                 emit( editChanged( command[4].toString(), i * 10 + 4 ) );
                 emit( editChanged( command[5].toString(), i * 10 + 5 ) );
+                break;
+            }
+            case ScriptCommand::BEGIN_LOOP:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
+                addEdit( layout, i* 10 + 1, 1 );
+                emit( editChanged( command[1].toString(), i * 10 + 1 ) );
+                addStretch( layout, 4 );
+                inLoop = true;
+                break;
+            }
+            case ScriptCommand::END_LOOP:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
+                inLoop = false;
+                addStretch( layout, 5 );
+                break;
+            }
+            case ScriptCommand::BEGIN_BLOCK:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
+                inBlock = true;
+                addStretch( layout, 5 );
+                break;
+            }
+            case ScriptCommand::END_BLOCK:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
+                inBlock = false;
+                addStretch( layout, 5 );
                 break;
             }
         }
@@ -270,7 +338,6 @@ void ScriptWidget::commandChanged( int line, int command )
             break;
         case ScriptCommand::DELAY:
         {
-            commandLine.push_back( 25 );
             break;
         }
         case ScriptCommand::SET_CAMERA:
@@ -341,6 +408,13 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( 25 );
             break;
         }
+        case ScriptCommand::BEGIN_LOOP:
+            commandLine.push_back( 1 );
+            break;
+        case ScriptCommand::END_LOOP:
+        case ScriptCommand::BEGIN_BLOCK:
+        case ScriptCommand::END_BLOCK:
+            break;
     }
     m_script[line] = commandLine;
     if ( line == m_script.size() - 1 && command != 0 )
@@ -364,6 +438,14 @@ void ScriptWidget::addEdit( QHBoxLayout* layout, int startId, int count  )
         connect( this, SIGNAL( editChanged( QString, int ) ), edit, SLOT( setText2( QString, int ) ) );
         connect( edit, SIGNAL( textEdited2( QString, int ) ), this, SLOT( slotEditChanged( QString, int ) ) );
         layout->addWidget( edit );
+    }
+}
+
+void ScriptWidget::addStretch( QHBoxLayout* layout, int count )
+{
+    for ( int i = 0; i < count; ++i )
+    {
+        layout->addStretch();
     }
 }
 
@@ -490,6 +572,7 @@ void ScriptWidget::saveScript()
 
 void ScriptWidget::run( bool checked )
 {
+    m_inBlock = false;
     if ( checked )
     {
         qDebug() << "start script";
@@ -542,9 +625,6 @@ void ScriptWidget::run()
             break;
         case ScriptCommand::DELAY:
         {
-            m_targetStep = line[1].toInt() / delay;
-            slotDelay();
-            return;
             break;
         }
         case ScriptCommand::SET_CAMERA:
@@ -563,7 +643,7 @@ void ScriptWidget::run()
             m_interpolatedCamera.push_back( line[2] );
             m_interpolatedCamera.push_back( line[3] );
             m_targetStep = line[4].toInt();
-            interpolateCamera();
+            slotInterpolateCamera();
             return;
             break;
         }
@@ -637,7 +717,37 @@ void ScriptWidget::run()
             return;
             break;
         }
+        case ScriptCommand::BEGIN_LOOP:
+        {
+            m_loopCount = line[1].toInt();
+            m_loopBegin = m_currentCommandLine;
+            break;
+        }
+        case ScriptCommand::END_LOOP:
+        {
+            if ( --m_loopCount )
+            {
+                m_currentCommandLine = m_loopBegin;
+            }
+            break;
+        }
+        case ScriptCommand::BEGIN_BLOCK:
+        {
+            m_inBlock = true;
+            break;
+        }
+        case ScriptCommand::END_BLOCK:
+        {
+            m_inBlock = false;
+            break;
+        }
     }
+
+    if ( m_inBlock )
+    {
+        run();
+    }
+
     Models::g()->submit();
 
     if ( m_screenshotEach->checked() )
@@ -702,6 +812,12 @@ void ScriptWidget::slotIncrementGlobal()
     value += m_stepSize;
     Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
 
+    if ( m_loopCount > 0 )
+    {
+        QTimer::singleShot( 1, this, SLOT( run() ) );
+        return;
+    }
+
     Models::g()->submit();
 
     if ( m_screenshotEach->checked() )
@@ -731,6 +847,12 @@ void ScriptWidget::slotIncrementProperty()
 
     Models::d()->setData( Models::d()->index( m_lastDataset, m_lastProperty ), value, Qt::DisplayRole );
 
+    if ( m_loopCount > 0 )
+    {
+        QTimer::singleShot( 1, this, SLOT( run() ) );
+        return;
+    }
+
     Models::d()->submit();
 
     if ( m_screenshotEach->checked() )
@@ -742,31 +864,7 @@ void ScriptWidget::slotIncrementProperty()
 
 }
 
-void ScriptWidget::slotDelay()
-{
-    if ( !m_runScript )
-    {
-        return;
-    }
-
-    int delay = m_delay->getValue();
-    if ( ++m_currentStep > m_targetStep )
-    {
-        QTimer::singleShot( delay, this, SLOT( run() ) );
-        return;
-    }
-
-    Models::g()->submit();
-
-    if ( m_screenshotEach->checked() )
-    {
-        emit( screenshot() );
-    }
-
-    QTimer::singleShot( delay, this, SLOT( slotDelay() ) );
-}
-
-void ScriptWidget::interpolateCamera()
+void ScriptWidget::slotInterpolateCamera()
 {
     if ( !m_runScript )
     {
@@ -827,10 +925,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             break;
         case ScriptCommand::DELAY:
         {
-            if ( column == 1 )
-            {
-                m_script[row].replace( column, text.toInt() );
-            }
             break;
         }
         case ScriptCommand::SET_CAMERA:
@@ -995,6 +1089,18 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             break;
         }
+        case ScriptCommand::BEGIN_LOOP:
+        {
+            if ( column == 1 )
+            {
+                m_script[row].replace( column, text.toInt() );
+            }
+            break;
+        }
+        case ScriptCommand::END_LOOP:
+        case ScriptCommand::BEGIN_BLOCK:
+        case ScriptCommand::END_BLOCK:
+            break;
     }
 }
 
