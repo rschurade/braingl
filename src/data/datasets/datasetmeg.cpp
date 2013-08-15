@@ -76,6 +76,7 @@ void DatasetMEG::setProperties()
     m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectFrame() ) );
+    connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
     m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 }
 
@@ -115,5 +116,13 @@ void DatasetMEG::selectFrame()
     for ( int i = 0; i < data.size(); ++i )
     {
         mesh->setVertexData( i, data[i] );
+    }
+}
+
+void DatasetMEG::slotPropSet( int id )
+{
+    if ( id == (int)Fn::Property::D_SELECTED_TEXTURE )
+    {
+        selectFrame();
     }
 }

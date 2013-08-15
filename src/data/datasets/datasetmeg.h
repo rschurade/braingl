@@ -38,6 +38,7 @@ private:
     float m_dataMax;
 public slots:
     void selectFrame();
+    void slotPropSet( int id );
 
 };
 

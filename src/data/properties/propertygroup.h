@@ -70,6 +70,7 @@ public slots:
 
 signals:
     void signalPropChanged();
+    void signalSetProp( int id );
 };
 
 #endif /* PROPERTYGROUP_H_ */
