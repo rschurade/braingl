@@ -111,6 +111,8 @@ private:
     int m_totalLoops;
     int m_loopBegin;
     bool m_inBlock;
+    bool m_inLoop;
+    bool m_render;
 
     QQuaternion m_currentRot;
     QQuaternion m_targetRot;
