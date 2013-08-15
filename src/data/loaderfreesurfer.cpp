@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QStringList>
 #include <QTextStream>
+#include <QDebug>
 
 LoaderFreesurfer::LoaderFreesurfer()
 {
@@ -36,7 +37,7 @@ bool LoaderFreesurfer::loadASC( QString fn )
     QFile n( fn );
     if ( !n.open( QIODevice::ReadOnly ) )
     {
-        qDebug( "nodes unreadable" );
+        qDebug() << "nodes unreadable" << fn;
         return false;
     }
     QTextStream ns( &n );

@@ -52,6 +52,7 @@ private:
     bool loadSet();
     bool loadGlyphset();
     bool loadCons();
+    bool loadMEG();
 
     nifti_image* m_header;
     QDir m_fileName;

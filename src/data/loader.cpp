@@ -20,6 +20,7 @@
 #include "datasets/datasetsurfaceset.h"
 #include "datasets/datasetglyphset.h"
 #include "datasets/datasetcons.h"
+#include "datasets/datasetmeg.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -101,6 +102,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".cons" ) )
     {
         return loadCons();
+    }
+
+    if ( m_fileName.path().endsWith( ".meg" ) )
+    {
+        return loadMEG();
     }
 
     return false;
@@ -1219,7 +1225,6 @@ bool Loader::loadSet()
     m_dataset.push_back( dataset );
 
     return true;
-
 }
 
 bool Loader::loadGlyphset()
@@ -1436,5 +1441,128 @@ bool Loader::loadCons()
     QString filename = m_fileName.path();
     DatasetCons* dataset = new DatasetCons( filename );
     m_dataset.push_back(dataset);
+    return true;
+}
+
+bool Loader::loadMEG()
+{
+    QString fn = m_fileName.path();
+
+    DatasetMEG* dataset = new DatasetMEG( fn, Fn::DatasetType::MEG_SET );
+
+    qDebug() << "loading meg set: " << fn;
+
+    QFile setfile( fn );
+    if ( !setfile.open( QIODevice::ReadOnly ) )
+    {
+        qDebug( "set file unreadable" );
+    }
+    QTextStream ts( &setfile );
+    QString nl;
+    //TODO: Will windows have a problem with this?
+    QString trunk = QFileInfo( fn ).path();
+    while ( !ts.atEnd() )
+    {
+        nl = ts.readLine();
+        //For commenting out stuff in the setfiles
+        if ( nl.startsWith( "#meg") )
+        {
+            QStringList sl = nl.split( " " );
+            bool ok;
+            int count = sl[1].toInt( &ok );
+            if ( ok )
+            {
+                qDebug() << count << "meg data files in set definition";
+                for ( int i = 1; i <= count; ++i )
+                {
+                    QString numberString = QString::number( i );
+                    int nss = numberString.size();
+                    for ( int k = 0; k < 3 - nss; ++k )
+                    {
+                        numberString = "0" + numberString;
+                    }
+                    QFile dataFile( trunk + QDir::separator() + numberString + ".txt" );
+                    if ( !dataFile.open( QIODevice::ReadOnly ) )
+                    {
+                        qDebug() << "data file unreadable, skipping"  << numberString + ".txt";
+                        continue;
+                    }
+                    QVector<float>data;
+                    QTextStream ds( &dataFile );
+                    while( !ds.atEnd() )
+                    {
+                        nl = ds.readLine();
+                        float val = nl.toFloat( &ok );
+                        if ( ok )
+                        {
+                            data.push_back( val );
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if ( !ok )
+                    {
+                        qDebug() << "error while reading data file, skipping" << numberString + ".txt";
+                        continue;
+                    }
+                    else
+                    {
+                        dataset->addData( data );
+                    }
+                }
+            }
+            else
+            {
+                qDebug() << "can't read count meg data files";
+            }
+        }
+        else if ( !nl.startsWith( "#" ) )
+        {
+            QStringList sl = nl.split( " " );
+            QString fullname = trunk + QDir::separator() + sl.at( 0 );
+            float x = 0;
+            float y = 0;
+            float z = 0;
+            if ( sl.length() > 1 )
+                x = sl.at( 1 ).toFloat();
+            if ( sl.length() > 2 )
+                y = sl.at( 2 ).toFloat();
+            if ( sl.length() > 3 )
+                z = sl.at( 3 ).toFloat();
+            QVector3D s( x, y, z );
+
+            LoaderFreesurfer lf;
+
+            if ( !lf.loadASC( fullname ) )
+            {
+                qDebug() << "unable to load: " << fn;
+                return false;
+            }
+
+            QVector<float> points = lf.getPoints();
+            QVector<int> triangles = lf.getTriangles();
+            int numPoints = points.size() / 3;
+            int numTriangles = triangles.size() / 3;
+
+            TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
+            for ( int i = 0; i < numPoints; ++i )
+            {
+                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+            }
+            for ( int i = 0; i < numTriangles; ++i )
+            {
+                //TODO: Check orientation change (0,2,1)...
+                mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
+            }
+            mesh->finalize();
+
+            dataset->addMesh( mesh, sl.at( 0 ) );
+        }
+    }
+    dataset->setProperties();
+    m_dataset.push_back( dataset );
+
     return true;
 }
