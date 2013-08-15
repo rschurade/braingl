@@ -47,6 +47,7 @@ EditWithLabel::EditWithLabel( QString label, int id, QWidget* parent ) :
 
 EditWithLabel::~EditWithLabel()
 {
+    delete this->layout();
 }
 
 void EditWithLabel::slotTextChanged( QString text )

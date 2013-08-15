@@ -85,10 +85,11 @@ private:
 
     QList<QList<QVariant> >m_script;
 
-    QVBoxLayout* m_scriptLayout;
-
     QScrollArea* m_scrollArea;
     QPushButton* m_runButton;
+
+    int m_lastInsertedLine;
+    QWidget* m_widgetToEnsureVisible;
 
     int m_runScript;
     int m_currentCommandLine;

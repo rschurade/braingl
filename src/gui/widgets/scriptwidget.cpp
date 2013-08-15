@@ -28,6 +28,7 @@
 ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_glWidget( glWidget ),
     m_runScript( false ),
+    m_widgetToEnsureVisible( 0 ),
     m_currentCommandLine( 0 ),
     m_lastGlobal( (int)Fn::Property::G_SAGITTAL ),
     m_lastDataset( 0 ),
@@ -47,8 +48,10 @@ ScriptWidget::~ScriptWidget()
 
 void ScriptWidget::initLayout()
 {
+    m_widgetToEnsureVisible = 0;
+
     QWidget* widget1 = buildScriptLayout();
-    m_scrollArea = new QScrollArea;
+    m_scrollArea = new QScrollArea( this );
     m_scrollArea->setWidget( widget1 );
 
     QScrollBar* scrollbar = m_scrollArea->verticalScrollBar();
@@ -104,13 +107,18 @@ void ScriptWidget::initLayout()
 
     this->setLayout( layout );
     this->setMinimumSize( 600, 600 );
+
+    if ( m_widgetToEnsureVisible )
+    {
+        m_scrollArea->ensureWidgetVisible( m_widgetToEnsureVisible );
+    }
 }
 
 QWidget* ScriptWidget::buildScriptLayout()
 {
     QGroupBox *groupBox = new QGroupBox( this );
-    m_scriptLayout = new QVBoxLayout();
-    groupBox->setLayout( m_scriptLayout );
+    QVBoxLayout* scriptLayout = new QVBoxLayout();
+    groupBox->setLayout( scriptLayout );
 
     bool inLoop = false;
     bool inBlock = false;
@@ -127,6 +135,11 @@ QWidget* ScriptWidget::buildScriptLayout()
         checkBox->setChecked( lineActive );
         connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
         connect( this, SIGNAL( checkBoxChanged( int, int ) ), checkBox, SLOT( slotSetChecked2( int, int ) ) );
+
+        if ( i == m_lastInsertedLine )
+        {
+            m_widgetToEnsureVisible = checkBox;
+        }
 
         PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
         layout->addWidget( insertButton );
@@ -319,9 +332,9 @@ QWidget* ScriptWidget::buildScriptLayout()
         emit( enable( lineActive, i * 10 + 5 ) );
 
         layout->addStretch();
-        m_scriptLayout->addLayout( layout );
+        scriptLayout->addLayout( layout );
     }
-    m_scriptLayout->addStretch();
+    scriptLayout->addStretch();
 
     return groupBox;
 }
@@ -419,9 +432,19 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine3.push_back( true );
             commandLine3.push_back( (int)ScriptCommand::END_LOOP );
             m_script.insert( line + 2, commandLine3 );
+            if ( line + 2 == m_script.size() - 1 )
+            {
+                QList<QVariant> command4;
+                command4.push_back( true );
+                command4.push_back( (int)ScriptCommand::NONE );
+                m_script.push_back( command4 );
+            }
             break;
         }
         case ScriptCommand::END_LOOP:
+        {
+            break;
+        }
         case ScriptCommand::BEGIN_BLOCK:
         {
             QList<QVariant> commandLine2;
@@ -432,6 +455,13 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine3.push_back( true );
             commandLine3.push_back( (int)ScriptCommand::END_BLOCK );
             m_script.insert( line + 2, commandLine3 );
+            if ( line + 2 == m_script.size() - 1 )
+            {
+                QList<QVariant> command4;
+                command4.push_back( true );
+                command4.push_back( (int)ScriptCommand::NONE );
+                m_script.push_back( command4 );
+            }
             break;
         }
         case ScriptCommand::END_BLOCK:
@@ -919,6 +949,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 if ( countDS > ds && ds >= 0 )
                 {
                     m_script[row].replace( column, ds );
+                    m_lastInsertedLine = row;
                     delete this->layout();
                     this->repaint();
                     initLayout();
@@ -944,6 +975,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 if ( countDS > ds && ds >= 0 )
                 {
                     m_script[row].replace( column, text.toInt() );
+                    m_lastInsertedLine = row;
                     delete this->layout();
                     this->repaint();
                     initLayout();
@@ -1103,6 +1135,7 @@ void ScriptWidget::deleteCommand( int row )
     {
         m_script.removeAt( row );
     }
+    m_lastInsertedLine = row;
     delete this->layout();
     this->repaint();
     initLayout();
@@ -1117,6 +1150,7 @@ void ScriptWidget::insertCommand( int row )
         line.push_back( (int)ScriptCommand::NONE );
         m_script.insert( row, line );
     }
+    m_lastInsertedLine = row;
     delete this->layout();
     this->repaint();
     initLayout();
@@ -1125,7 +1159,14 @@ void ScriptWidget::insertCommand( int row )
 void ScriptWidget::moveScrollBarToBottom( int min, int max )
 {
     Q_UNUSED( min );
-    m_scrollArea->verticalScrollBar()->setValue( max );
+    if ( m_widgetToEnsureVisible)
+    {
+        m_scrollArea->ensureWidgetVisible( m_widgetToEnsureVisible );
+    }
+    else
+    {
+        m_scrollArea->verticalScrollBar()->setValue( max );
+    }
 }
 
 void ScriptWidget::resetScript()

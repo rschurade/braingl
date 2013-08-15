@@ -56,7 +56,7 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
 
 SliderWithEditInt2::~SliderWithEditInt2()
 {
-
+    delete this->layout();
 }
 
 void SliderWithEditInt2::sliderMoved( int value )

@@ -51,6 +51,7 @@ SelectWithLabel::SelectWithLabel( QString label, int id, QWidget* parent ) :
 
 SelectWithLabel::~SelectWithLabel()
 {
+    delete this->layout();
 }
 
 void SelectWithLabel::insertItem( int index, QString label )
