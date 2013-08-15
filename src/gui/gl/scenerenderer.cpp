@@ -38,7 +38,8 @@ SceneRenderer::SceneRenderer( QString renderTarget ) :
     pbo_a( 0 ),
     pbo_b( 0 ),
     RBO( 0 ),
-    FBO( 0 )
+    FBO( 0 ),
+    m_doScreenshot( false )
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( Models::g() );
@@ -141,6 +142,12 @@ void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 
     m_mvMatrix = mvMatrix;
     m_pMatrix = pMatrix;
+
+    if ( m_doScreenshot )
+    {
+        m_doScreenshot = false;
+        screenshot1();
+    }
 
     renderScene();
 
@@ -348,7 +355,14 @@ void SceneRenderer::renderMerge()
     GLFunctions::getAndPrintGLError( m_renderTarget + "after render scene" );
 }
 
-QImage* SceneRenderer::screenshot()
+
+void SceneRenderer::screenshot( QString fn )
+{
+    m_screenshotFileName = fn;
+    m_doScreenshot = true;
+}
+
+void SceneRenderer::screenshot1()
 {
     int size = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ).toInt();
     int tmpWidth = m_width;
@@ -361,13 +375,13 @@ QImage* SceneRenderer::screenshot()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     renderMerge();
 
-    QImage* out = getOffscreenTexture( m_width, m_height );
+    m_screenshot = getOffscreenTexture( m_width, m_height );
 
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     resizeGL( tmpWidth, tmpHeight );
 
-    return out;
-
+    m_screenshot->save(  m_screenshotFileName, "PNG" );
+    delete m_screenshot;
 }
 
 void SceneRenderer::renderDatasets()

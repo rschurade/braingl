@@ -1002,7 +1002,7 @@ void MainWindow::slotRenderCrosshairs( bool value )
 
 void MainWindow::screenshot()
 {
-    QImage* image = mainGLWidget->screenshot();
+
     QString path = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ).toString();
     if ( !path.endsWith( '/') )
     {
@@ -1015,11 +1015,7 @@ void MainWindow::screenshot()
         numberString = "0" + numberString;
     }
 
-    image->save(  path +
-                  QString("screenshot_") +
-                  numberString +
-                  QString( ".png" ), "PNG" );
-    delete image;
+    mainGLWidget->screenshot( path + QString("screenshot_") + numberString + QString( ".png" ) );
 }
 
 void MainWindow::resetSettings()
