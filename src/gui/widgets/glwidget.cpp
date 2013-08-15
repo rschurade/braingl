@@ -267,9 +267,9 @@ void GLWidget::setView( Fn::Orient view )
     update();
 }
 
-QImage* GLWidget::screenshot()
+void GLWidget::screenshot( QString fn )
 {
-    return m_sceneRenderer->screenshot();
+    m_sceneRenderer->screenshot( fn );
 }
 
 void GLWidget::rightMouseDown( QMouseEvent* event )

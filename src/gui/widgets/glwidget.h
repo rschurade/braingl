@@ -35,7 +35,7 @@ public:
     QSize sizeHint() const;
 
     void setView( Fn::Orient view );
-    QImage* screenshot();
+    void screenshot( QString fn );
 
     CameraBase* getCameraInUse();
     ArcBall* getArcBall();

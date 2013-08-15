@@ -847,12 +847,11 @@ void ScriptWidget::run()
         return;
     }
 
-    Models::g()->submit();
-
     if ( m_screenshotEach->checked() )
     {
         emit( screenshot() );
     }
+    Models::g()->submit();
 
     m_render = false;
     QTimer::singleShot( delay, this, SLOT( run() ) );
