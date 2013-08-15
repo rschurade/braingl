@@ -52,3 +52,12 @@ QAbstractItemModel* Models::r()
     return m_roiModel;
 }
 
+void Models::setGlobal( Fn::Property var, QVariant value )
+{
+    m_globalModel->setData( m_globalModel->index( (int)var, 0 ), value );
+}
+
+QVariant Models::getGlobal( Fn::Property var )
+{
+    return m_globalModel->data( m_globalModel->index( (int)var, 0 ) );
+}

@@ -8,6 +8,7 @@
 #ifndef MODELS_H_
 #define MODELS_H_
 
+#include "enums.h"
 
 #include <QAbstractItemModel>
 
@@ -15,6 +16,9 @@ class Models
 {
 public:
     static void init();
+
+    static void setGlobal( Fn::Property var, QVariant value );
+    static QVariant getGlobal( Fn::Property var );
 
     static QAbstractItemModel* globalModel();
     static QAbstractItemModel* dataModel();
