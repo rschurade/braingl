@@ -76,6 +76,8 @@ private:
     QWidget* buildScriptLayout();
     QVector3D string2Vector3D( QString string );
 
+    void rebuild();
+
     void addGlobalSelect( QHBoxLayout* layout, int id, int selected, bool active );
     void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset, bool active );
     void addEdit( QHBoxLayout* layout, int startId, int count );
