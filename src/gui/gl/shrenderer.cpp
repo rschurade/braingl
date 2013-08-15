@@ -16,6 +16,7 @@
 
 #include "../../data/mesh/tesselation.h"
 #include "../../data/properties/propertygroup.h"
+#include "../../data/mesh/trianglemesh2.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -256,4 +257,115 @@ void SHRenderer::setRenderParams( PropertyGroup* props )
     {
         m_orient += 4;
     }
+}
+
+TriangleMesh2* SHRenderer::createMesh()
+{
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+   float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+   float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+
+   int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+   int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+   int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+
+   xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
+   yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
+   zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
+
+   float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+   float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
+   float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
+
+   int lod = m_lodAdjust;
+
+   //qDebug() << "SH Renderer: using lod " << lod;
+
+   int numVerts = tess::n_vertices( lod );
+   int numTris = tess::n_faces( lod );
+
+   int numThreads = GLFunctions::idealThreadCount;
+
+   QVector<SHRendererThread*> threads;
+   // create threads
+
+   for ( int i = 0; i < numThreads; ++i )
+   {
+       threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, lod,
+                                                   m_order, m_orient, m_minMaxScaling, m_pMatrix, m_mvMatrix ) );
+   }
+
+   // run threads
+   for ( int i = 0; i < numThreads; ++i )
+   {
+       threads[i]->start();
+   }
+
+   // wait for all threads to finish
+   for ( int i = 0; i < numThreads; ++i )
+   {
+       threads[i]->wait();
+   }
+
+   QVector<float> verts;
+   // combine verts from all threads
+   for ( int i = 0; i < numThreads; ++i )
+   {
+       verts += *( threads[i]->getVerts() );
+       delete threads[i];
+   }
+
+   TriangleMesh2* mesh = 0;
+
+   try
+   {
+
+       int numBalls = verts.size() / ( numVerts * 7 );
+
+       mesh = new TriangleMesh2( numVerts * numBalls, numTris * numBalls );
+
+       const int* faces = tess::faces( lod );
+
+       float posX, posY, posZ;
+       float newPosX, newPosY, newPosZ;
+       float offsetX, offsetY, offsetZ;
+       float radius;
+
+
+       for ( int i = 0; i < verts.size() / 7; ++i )
+       {
+           posX = verts[i*7];
+           posY = verts[i*7+1];
+           posZ = verts[i*7+2];
+           offsetX = verts[i*7+3];
+           offsetY = verts[i*7+4];
+           offsetZ = verts[i*7+5];
+           radius = verts[i*7+6];
+
+           newPosX = posX * radius * m_scaling + offsetX;
+           newPosY = posY * radius * m_scaling + offsetY;
+           newPosZ = posZ * radius * m_scaling + offsetZ;
+
+           mesh->addVertex( newPosX, newPosY, newPosZ );
+           mesh->setVertexColor( i, fabs( posX), fabs( posY), fabs( posZ), 1.0f );
+       }
+
+       verts.clear();
+       verts.squeeze();
+
+       for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
+       {
+           for ( int i = 0; i < numTris; ++i )
+           {
+               mesh->addTriangle( faces[i*3] + numVerts * currentBall, faces[i*3+2] + numVerts * currentBall, faces[i*3+1] + numVerts * currentBall );
+           }
+       }
+
+   }
+   catch (std::bad_alloc& ba)
+   {
+       qDebug() << "bad alloc sh renderer";
+   }
+   mesh->finalize();
+   return mesh;
 }

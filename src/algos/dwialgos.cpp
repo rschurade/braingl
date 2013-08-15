@@ -7,11 +7,13 @@
 #include "dwialgos.h"
 #include "../data/enums.h"
 
+#include "../data/mesh/trianglemesh2.h"
 #include "../data/mesh/tesselation.h"
 #include "../data/datasets/dataset3d.h"
 #include "../data/datasets/datasetbingham.h"
 #include "../data/datasets/datasetdwi.h"
 #include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetmesh.h"
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasettensor.h"
 #include "../data/datasets/datasetsh.h"
@@ -296,3 +298,14 @@ QList<Dataset*> DWIAlgos::bingham2DWI( Dataset* ds )
     }
     return l;
 }
+
+QList<Dataset*> DWIAlgos::sh2mesh( Dataset* ds )
+{
+    DatasetSH* dsh = dynamic_cast<DatasetSH*>( ds );
+
+    QList<Dataset*> l;
+    DatasetMesh* dsm = new DatasetMesh( dsh->getMeshFromCurrent(), QDir( "SH Mesh" ) );
+    l.push_back( dsm );
+    return l;
+}
+

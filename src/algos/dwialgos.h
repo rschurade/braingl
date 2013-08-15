@@ -24,6 +24,7 @@ public:
     static QList<Dataset*> calcEVFromTensor( Dataset* ds );
     static QList<Dataset*> fitBingham( Dataset* ds );
     static QList<Dataset*> bingham2DWI( Dataset* ds );
+    static QList<Dataset*> sh2mesh( Dataset* ds );
 
     static QList<Dataset*> tensorTrack( Dataset* ds );
 

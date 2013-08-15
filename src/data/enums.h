@@ -69,7 +69,8 @@ namespace Fn
         LOAD1D,
         AVG_CON,
         AVG_CON_RZ,
-        LITTLE_BRAINS
+        LITTLE_BRAINS,
+        SH_2_MESH
     };
 
     enum class Orient : int

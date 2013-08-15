@@ -159,6 +159,10 @@ void ToolBar::createActions()
     m_littleBrainsAction->setStatusTip( tr( "Create little brains at all points painted (different from background color) in the current color layer" ) );
     connect( m_littleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_sh2meshAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "convert sh 2 mesh" ), this, Fn::Algo::SH_2_MESH );
+    m_sh2meshAction->setStatusTip( tr( "create a mesh dataset from the currently displayed SH glyphs" ) );
+    connect( m_sh2meshAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -213,6 +217,9 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::BINGHAM:
             l = DWIAlgos::fitBingham( ds );
+            break;
+        case Fn::Algo::SH_2_MESH:
+            l = DWIAlgos::sh2mesh( ds );
             break;
         case Fn::Algo::TENSOR_TRACK:
         {
@@ -350,6 +357,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::NIFTI_SH:
         {
             this->addAction( m_binghamAction );
+            this->addAction( m_sh2meshAction );
             break;
         }
         case Fn::DatasetType::NIFTI_DWI:
