@@ -7,6 +7,8 @@
 #include "datasetsh.h"
 #include "../models.h"
 
+#include "../mesh/trianglemesh2.h"
+
 #include "../../gui/gl/shrenderer.h"
 
 DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* header ) :
@@ -137,4 +139,20 @@ void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
 QString DatasetSH::getValueAsString( int x, int y, int z )
 {
     return QString( "" );
+}
+
+TriangleMesh2* DatasetSH::getMeshFromCurrent()
+{
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new SHRenderer( &m_data, properties( "maingl" )->get( Fn::Property::D_NX ).toInt(),
+                                              properties( "maingl" )->get( Fn::Property::D_NY ).toInt(),
+                                              properties( "maingl" )->get( Fn::Property::D_NZ ).toInt(),
+                                              properties( "maingl" )->get( Fn::Property::D_DX ).toFloat(),
+                                              properties( "maingl" )->get( Fn::Property::D_DY ).toFloat(),
+                                              properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat() );
+        m_renderer->setModel( Models::g() );
+        m_renderer->init();
+    }
+    return m_renderer->createMesh();
 }

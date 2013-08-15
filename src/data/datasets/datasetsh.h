@@ -16,6 +16,7 @@
 #include <QVector3D>
 
 class SHRenderer;
+class TriangleMesh2;
 
 class DatasetSH: public DatasetNifti
 {
@@ -27,6 +28,8 @@ public:
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
+
+    TriangleMesh2* getMeshFromCurrent();
 
 private:
     void createTexture();
