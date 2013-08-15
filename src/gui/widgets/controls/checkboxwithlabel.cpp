@@ -43,6 +43,7 @@ CheckboxWithLabel::CheckboxWithLabel( QString label, int id, QWidget* parent ) :
 
 CheckboxWithLabel::~CheckboxWithLabel()
 {
+    delete this->layout();
 }
 
 void CheckboxWithLabel::slotStateChanged( int state )
