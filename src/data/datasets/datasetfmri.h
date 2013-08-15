@@ -35,9 +35,10 @@ private:
 
     void flipX();
 
-    private slots:
-        void selectTexture();
-        void autoplay();
+private slots:
+    void selectTexture();
+    void autoplay();
+    void slotPropSet( int id );
 
 };
 

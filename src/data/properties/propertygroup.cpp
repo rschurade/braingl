@@ -270,6 +270,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
         if ( m_properties[i].first == name )
         {
             m_properties[i].second->setValue( value );
+            emit( signalSetProp( (int) name ) );
             return true;
         }
     }

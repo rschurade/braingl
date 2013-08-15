@@ -99,6 +99,7 @@ void DatasetFMRI::examineDataset()
 
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectTexture() ) );
+    connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
 }
 
 void DatasetFMRI::createTexture()
@@ -203,9 +204,17 @@ void DatasetFMRI::autoplay()
         }
         m_properties["maingl"]->set( Fn::Property::D_SELECTED_TEXTURE, currentframe );
         selectTexture();
+        Models::d()->submit();
 
         int interval = m_properties["maingl"]->get( Fn::Property::D_AUTOPLAY_INTERVAL ).toInt();
         QTimer::singleShot( interval, this, SLOT( autoplay() ) );
-        Models::d()->submit();
+    }
+}
+
+void DatasetFMRI::slotPropSet( int id )
+{
+    if ( id == (int)Fn::Property::D_SELECTED_TEXTURE )
+    {
+        selectTexture();
     }
 }
