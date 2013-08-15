@@ -196,6 +196,9 @@ namespace Fn
         D_MESH_CUT_HIGHER_Y,
         D_MESH_CUT_HIGHER_Z,
         D_FIBER_GROW_LENGTH,
+        D_ADJUST_X,
+        D_ADJUST_Y,
+        D_ADJUST_Z,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -374,6 +377,9 @@ namespace Fn
                 case Property::D_MESH_CUT_HIGHER_Y: return QString( "cut higher than y" ); break;
                 case Property::D_MESH_CUT_HIGHER_Z: return QString( "cut higher than z" ); break;
                 case Property::D_FIBER_GROW_LENGTH: return QString( "fiber growth" ); break;
+                case Property::D_ADJUST_X: return QString( "adjust x" ); break;
+                case Property::D_ADJUST_Y: return QString( "adjust y" ); break;
+                case Property::D_ADJUST_Z: return QString( "adjust z" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

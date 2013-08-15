@@ -123,6 +123,10 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "u_cutHigherY", props->get( Fn::Property::D_MESH_CUT_HIGHER_Y ).toBool() );
     program->setUniformValue( "u_cutHigherZ", props->get( Fn::Property::D_MESH_CUT_HIGHER_Z ).toBool() );
 
+    program->setUniformValue( "u_adjustX", props->get( Fn::Property::D_ADJUST_X ).toFloat() );
+    program->setUniformValue( "u_adjustY", props->get( Fn::Property::D_ADJUST_Y ).toFloat() );
+    program->setUniformValue( "u_adjustZ", props->get( Fn::Property::D_ADJUST_Z ).toFloat() );
+
     program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );

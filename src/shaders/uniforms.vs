@@ -50,3 +50,7 @@ uniform float u_sizeX;
 uniform float u_sizeY;
 uniform float u_pos;
 uniform float u_char;
+
+uniform float u_adjustX;
+uniform float u_adjustY;
+uniform float u_adjustZ; 
