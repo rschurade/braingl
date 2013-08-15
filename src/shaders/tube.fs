@@ -35,6 +35,15 @@ void main()
     {
         color = frontColor;
     }
+    
+//    int i_index = int(  v_index );    
+//    int i_fibGrowth = int( u_fibGrowth );
+//    if ( ( i_index % 50 ) > ( i_fibGrowth % 50 ) -1  &&
+//         ( i_index % 50 ) < ( i_fibGrowth % 50 ) +1 )
+//    {
+//        color = vec4( 1.0 );
+//    }
+        
     float view_dot_normal = sqrt( 1. - v_sparam * v_sparam ) + .1;    
     color = clamp( view_dot_normal * ( color + 0.15 * pow( view_dot_normal, 10. ) * pow( v_tangent_dot_view, 10. ) ), 0., 1. );
     color.a = 1.0;
