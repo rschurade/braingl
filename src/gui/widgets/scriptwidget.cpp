@@ -616,6 +616,8 @@ void ScriptWidget::run( bool checked )
     m_inBlock = false;
     m_loopCount = 1;
     m_totalLoops = 1;
+    m_inLoop = false;
+    m_render = false;
     if ( checked )
     {
         qDebug() << "start script";
@@ -809,6 +811,7 @@ void ScriptWidget::run()
             m_loopCount = line[2].toInt();
             m_totalLoops = line[2].toInt();
             m_loopBegin = m_currentCommandLine;
+            m_inLoop = true;
             break;
         }
         case ScriptCommand::END_LOOP:
@@ -816,11 +819,13 @@ void ScriptWidget::run()
             if ( --m_loopCount )
             {
                 m_currentCommandLine = m_loopBegin;
+                m_render = true;
             }
             else
             {
                 m_loopCount = 1;
                 m_totalLoops = 1;
+                m_inLoop = false;
             }
             break;
         }
@@ -836,7 +841,7 @@ void ScriptWidget::run()
         }
     }
 
-    if ( m_inBlock )
+    if ( m_inBlock || ( m_inLoop && !m_render ) )
     {
         QTimer::singleShot( 1, this, SLOT( run() ) );
         return;
@@ -849,6 +854,7 @@ void ScriptWidget::run()
         emit( screenshot() );
     }
 
+    m_render = false;
     QTimer::singleShot( delay, this, SLOT( run() ) );
 }
 
