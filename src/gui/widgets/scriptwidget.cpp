@@ -46,6 +46,14 @@ ScriptWidget::~ScriptWidget()
 {
 }
 
+void ScriptWidget::rebuild()
+{
+    delete this->layout();
+    qDeleteAll( this->children() );
+    this->repaint();
+    initLayout();
+}
+
 void ScriptWidget::initLayout()
 {
     m_widgetToEnsureVisible = 0;
@@ -481,9 +489,7 @@ void ScriptWidget::commandChanged( int line, int command )
         m_script.push_back( command );
     }
 
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    rebuild();
 }
 
 void ScriptWidget::addEdit( QHBoxLayout* layout, int startId, int count  )
@@ -604,9 +610,7 @@ void ScriptWidget::loadScript( QString fileName )
             qDebug() << "*** ERROR *** script file corrupt.";
         }
     }
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    rebuild();
     if ( settings.contains( "delay" ) )
     {
         m_delay->setValue( settings.value( "delay").toInt() );
@@ -950,9 +954,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 {
                     m_script[row].replace( column, ds );
                     m_lastInsertedLine = row;
-                    delete this->layout();
-                    this->repaint();
-                    initLayout();
+                   rebuild();
                 }
                 else
                 {
@@ -976,9 +978,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 {
                     m_script[row].replace( column, text.toInt() );
                     m_lastInsertedLine = row;
-                    delete this->layout();
-                    this->repaint();
-                    initLayout();
+                    rebuild();
                 }
                 else
                 {
@@ -1136,9 +1136,7 @@ void ScriptWidget::deleteCommand( int row )
         m_script.removeAt( row );
     }
     m_lastInsertedLine = row;
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    rebuild();
 }
 
 void ScriptWidget::insertCommand( int row )
@@ -1151,9 +1149,7 @@ void ScriptWidget::insertCommand( int row )
         m_script.insert( row, line );
     }
     m_lastInsertedLine = row;
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    rebuild();
 }
 
 void ScriptWidget::moveScrollBarToBottom( int min, int max )
@@ -1176,9 +1172,7 @@ void ScriptWidget::resetScript()
     line.push_back( true );
     line.push_back( (int)ScriptCommand::NONE );
     m_script.push_back( line );
-    delete this->layout();
-    this->repaint();
-    initLayout();
+    rebuild();
 }
 
 void ScriptWidget::slotCheckboxChanged( int line, int state )
