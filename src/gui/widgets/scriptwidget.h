@@ -16,13 +16,11 @@ enum class ScriptCommand : int
     NONE,
     DELAY,
     SET_CAMERA,  // #1 position #2 lookat #3 up
-    INTERPOLATE_CAMERA,
     SET_GLOBAL,
     INCREMENT_GLOBAL,
     SET_PROPERTY,
     INCREMENT_PROPERTY,
     SET_ARCBALL,
-    INTERPOLATE_ARCBALL,
     BEGIN_LOOP,
     END_LOOP,
     BEGIN_BLOCK,
@@ -31,7 +29,7 @@ enum class ScriptCommand : int
 
 };
 
-#define NUM_SCRIPT_COMMANDS 15
+#define NUM_SCRIPT_COMMANDS 13
 
 struct Script2String
 {
@@ -42,13 +40,11 @@ struct Script2String
             case ScriptCommand::NONE: return QString( "none" ); break;
             case ScriptCommand::DELAY: return QString( "delay" ); break;
             case ScriptCommand::SET_CAMERA: return QString( "set camera" ); break;
-            case ScriptCommand::INTERPOLATE_CAMERA: return QString( "interpolate camera" ); break;
             case ScriptCommand::SET_GLOBAL: return QString( "set global" ); break;
             case ScriptCommand::INCREMENT_GLOBAL: return QString( "increment global" ); break;
             case ScriptCommand::SET_PROPERTY: return QString( "set property" ); break;
             case ScriptCommand::INCREMENT_PROPERTY: return QString( "increment property" ); break;
             case ScriptCommand::SET_ARCBALL: return QString( "set arcball" ); break;
-            case ScriptCommand::INTERPOLATE_ARCBALL: return QString( "interpolate arcball" ); break;
             case ScriptCommand::BEGIN_LOOP: return QString( "begin loop" ); break;
             case ScriptCommand::END_LOOP: return QString( "end loop" ); break;
             case ScriptCommand::BEGIN_BLOCK: return QString( "begin block" ); break;
@@ -111,6 +107,8 @@ private:
     int m_totalLoops;
     int m_loopBegin;
     bool m_inBlock;
+    bool m_inLoop;
+    bool m_render;
 
     QQuaternion m_currentRot;
     QQuaternion m_targetRot;
