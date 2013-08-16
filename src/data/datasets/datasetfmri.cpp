@@ -124,7 +124,17 @@ void DatasetFMRI::createTexture()
     float max = m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat();
     max = max + ( (max-min)/100. );
 
+    int dim = m_properties["maingl"]->get( Fn::Property::D_DIM ).toInt();
     int frame = m_properties["maingl"]->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    if ( frame < 0 )
+    {
+        frame = 0;
+    }
+
+    if ( frame > dim - 1 )
+    {
+        frame = dim - 1;
+    }
     int offset = nx * ny * nz * frame;
 
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
