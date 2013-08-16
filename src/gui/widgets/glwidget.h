@@ -41,6 +41,8 @@ public:
     ArcBall* getArcBall();
     Camera* getCamera();
 
+    void getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVector3D &viewdir, QVector3D &updir );
+
 private:
     QItemSelectionModel* m_roiSelectionModel;
 
