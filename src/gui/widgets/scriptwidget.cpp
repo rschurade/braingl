@@ -793,6 +793,7 @@ void ScriptWidget::run()
 
     QList<QVariant>camera = m_glWidget->getCamera()->getState();
 
+
     switch( (ScriptCommand)( command ) )
     {
         case ScriptCommand::NONE:
@@ -842,7 +843,24 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_GLOBAL:
         {
-            Models::g()->setData( Models::g()->index( line[2].toInt(), 0 ), line[3] );
+            if ( m_inLoop && m_loopCount == m_totalLoops )
+            {
+                int lastGlobal = line[2].toInt();
+                float currentValue = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat();
+                float targetValue = line[3].toFloat();
+                QList<QVariant>loopLine;
+                loopLine.push_back( "g" );
+                loopLine.push_back( lastGlobal );
+                loopLine.push_back( currentValue );
+                loopLine.push_back( targetValue );
+                m_loopList.push_back( loopLine );
+            }
+            else if ( !m_inLoop )
+            {
+//                float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+//                float value = ( 1.0f - div ) * m_currentValue + div * m_targetValue;
+                Models::g()->setData( Models::g()->index( line[2].toInt(), 0 ), line[3].toFloat() );
+            }
             break;
         }
         case ScriptCommand::INC_GLOBAL:
@@ -855,20 +873,25 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_PROPERTY:
         {
-            QString v = line[4].toString();
-            bool ok;
-            if ( v.startsWith( "(float)" ) )
+            if ( m_inLoop && m_loopCount == m_totalLoops )
             {
-                v = v.right( v.size() - 7 );
-                float f = v.toFloat( &ok );
-                if ( ok )
-                {
-                    Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), f, Qt::DisplayRole );
-                }
+                int lastDataset = line[3].toInt();
+                int lastProperty = line[2].toInt();
+                float currentValue = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat();
+                float targetValue = line[4].toFloat();
+                QList<QVariant>loopLine;
+                loopLine.push_back( "d" );
+                loopLine.push_back( lastDataset );
+                loopLine.push_back( lastProperty );
+                loopLine.push_back( currentValue );
+                loopLine.push_back( targetValue );
+                m_loopList.push_back( loopLine );
             }
-            else
+            else if ( !m_inLoop )
             {
-                Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4], Qt::DisplayRole );
+//                float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+//                float value = ( 1.0f - div ) * m_currentValue + div * m_targetValue;
+                Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4].toFloat(), Qt::DisplayRole );
             }
             break;
         }
@@ -912,6 +935,7 @@ void ScriptWidget::run()
         }
         case ScriptCommand::BEGIN_LOOP:
         {
+            m_loopList.clear();
             m_loopCount = line[2].toInt();
             m_totalLoops = line[2].toInt();
             m_loopBegin = m_currentCommandLine;
@@ -920,9 +944,32 @@ void ScriptWidget::run()
         }
         case ScriptCommand::END_LOOP:
         {
+            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
             if ( --m_loopCount )
             {
                 m_currentCommandLine = m_loopBegin;
+
+                for ( int i = 0; i < m_loopList.size(); ++i )
+                {
+                    QList<QVariant>loopLine = m_loopList[i];
+                    if ( loopLine[0] == "g" )
+                    {
+                        float value = ( 1.0f - div ) * loopLine[2].toFloat() + div * loopLine[3].toFloat();
+                        Models::g()->setData( Models::g()->index( loopLine[1].toInt(), 0 ), value );
+                    }
+                    if ( loopLine[0] == "d" )
+                    {
+                        float value = ( 1.0f - div ) * loopLine[3].toFloat() + div * loopLine[4].toFloat();
+                        Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), value, Qt::DisplayRole );
+                    }
+                    if ( loopLine[0] == "r" )
+                    {
+                        float value = ( 1.0f - div ) * loopLine[4].toFloat() + div * loopLine[5].toFloat();
+                        Models::r()->setData( Models::createRoiIndex( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt() ), value, Qt::DisplayRole );
+                    }
+                }
+
+
                 m_render = true;
             }
             else
@@ -946,10 +993,37 @@ void ScriptWidget::run()
         case ScriptCommand::SET_ROI_PROPERTY:
         {
             ROI* roi = Models::getRoi( line[3].toInt(), line[4].toInt() );
-            if ( dynamic_cast<ROIBox*>( roi) )
+
+
+            if ( m_inLoop && m_loopCount == m_totalLoops )
             {
-                Models::r()->setData( Models::createRoiIndex( line[3].toInt(), line[4].toInt(), line[2].toInt() ), line[5], Qt::DisplayRole );
+                if ( dynamic_cast<ROIBox*>( roi) )
+                {
+                    int branch = line[3].toInt();
+                    int row = line[4].toInt();
+                    int lastProperty = line[2].toInt();
+                    PropertyGroup* props = roi->properties();
+                    float currentValue = props->get( (Fn::Property)line[2].toInt() ).toFloat() ;
+                    float targetValue = line[5].toFloat();
+                    QList<QVariant>loopLine;
+                    loopLine.push_back( "r" );
+                    loopLine.push_back( branch );
+                    loopLine.push_back( row );
+                    loopLine.push_back( lastProperty );
+                    loopLine.push_back( currentValue );
+                    loopLine.push_back( targetValue );
+                    m_loopList.push_back( loopLine );
+                }
             }
+            else if ( !m_inLoop )
+            {
+                if ( dynamic_cast<ROIBox*>( roi) )
+                {
+                    Models::r()->setData( Models::createRoiIndex( line[3].toInt(), line[4].toInt(), line[2].toInt() ), line[5], Qt::DisplayRole );
+                }
+            }
+
+
             break;
         }
         case ScriptCommand::INC_ROI_PROPERTY:
@@ -958,10 +1032,9 @@ void ScriptWidget::run()
             if ( dynamic_cast<ROIBox*>( roi) )
             {
                 PropertyGroup* props = roi->properties();
-                float value = props->get( (Fn::Property)line[2].toInt() ).toFloat() + + line[5].toFloat();
+                float value = props->get( (Fn::Property)line[2].toInt() ).toFloat() + line[5].toFloat();
                 Models::r()->setData( Models::createRoiIndex( line[3].toInt(), line[4].toInt(), line[2].toInt() ), value, Qt::DisplayRole );
             }
-
             break;
         }
     }

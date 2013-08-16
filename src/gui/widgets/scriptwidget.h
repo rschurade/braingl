@@ -127,6 +127,10 @@ private:
     float m_targetMoveX;
     float m_targetMoveY;
 
+    float m_currentValue;
+    float m_targetValue;
+    QList< QList<QVariant> >m_loopList;
+
 public slots:
     void loadScript( QString fileName );
     void saveScript( QString fileName );
