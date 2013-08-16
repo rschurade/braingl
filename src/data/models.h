@@ -12,6 +12,8 @@
 
 #include <QAbstractItemModel>
 
+class ROI;
+
 class Models
 {
 public:
@@ -19,6 +21,7 @@ public:
 
     static void setGlobal( Fn::Property var, QVariant value );
     static QVariant getGlobal( Fn::Property var );
+    static ROI* getRoi( int branch, int pos );
 
     static QAbstractItemModel* globalModel();
     static QAbstractItemModel* dataModel();
@@ -32,6 +35,8 @@ private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;
     static QAbstractItemModel* m_roiModel;
+
+    static QModelIndex createRoiIndex( int branch, int pos, int column );
 
     Models() {};
     virtual ~Models() {};
