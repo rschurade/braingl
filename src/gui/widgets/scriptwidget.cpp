@@ -109,6 +109,11 @@ void ScriptWidget::initLayout()
     buttons1->addWidget( m_runButton );
     connect( m_runButton, SIGNAL( toggled( bool ) ), this, SLOT( run( bool ) ) );
 
+    m_pauseButton = new QPushButton( "Pause", this );
+    m_pauseButton->setCheckable( true );
+    buttons1->addWidget( m_pauseButton );
+    connect( m_pauseButton, SIGNAL( toggled( bool ) ), this, SLOT( pause( bool ) ) );
+
     buttons1->addStretch();
 
     QHBoxLayout* buttons2 = new QHBoxLayout();
@@ -634,6 +639,20 @@ void ScriptWidget::saveScript()
     saveScript( fileName );
 }
 
+void ScriptWidget::pause( bool checked )
+{
+    m_paused = checked;
+    if ( m_paused )
+    {
+        qDebug() << "pause script";
+    }
+    else
+    {
+        qDebug() << "continue script";
+        run();
+    }
+}
+
 void ScriptWidget::run( bool checked )
 {
     m_inBlock = false;
@@ -652,13 +671,14 @@ void ScriptWidget::run( bool checked )
     {
         qDebug() << "stop script";
         m_runScript = false;
+        m_pauseButton->setChecked( false );
     }
 
 }
 
 void ScriptWidget::run()
 {
-    if ( !m_runScript )
+    if ( !m_runScript || m_paused )
     {
         return;
     }
@@ -1167,4 +1187,19 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
     emit( enable( state, line * 10 + 3 ) );
     emit( enable( state, line * 10 + 4 ) );
     emit( enable( state, line * 10 + 5 ) );
+}
+
+void ScriptWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
+{
+    if ( key == 32 )
+    {
+        if ( mods & Qt::ShiftModifier )
+        {
+            m_runButton->toggle();
+        }
+        else
+        {
+            m_pauseButton->toggle();
+        }
+    }
 }
