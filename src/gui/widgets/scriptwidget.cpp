@@ -71,22 +71,23 @@ ScriptWidget::~ScriptWidget()
 
 void ScriptWidget::rebuild()
 {
-    delete this->layout();
-    //qDeleteAll( this->children() );
+    m_scrollArea->takeWidget();
+    //delete m_scriptPanel;
+    m_scriptPanel = buildScriptLayout();
+    m_scrollArea->setWidget( m_scriptPanel );
     this->repaint();
-    initLayout();
 }
 
 void ScriptWidget::initLayout()
 {
     m_widgetToEnsureVisible = 0;
 
-    QWidget* widget1 = buildScriptLayout();
+    m_scriptPanel = buildScriptLayout();
     m_scrollArea = new QScrollArea( this );
-    m_scrollArea->setWidget( widget1 );
+    m_scrollArea->setWidget( m_scriptPanel );
 
     QScrollBar* scrollbar = m_scrollArea->verticalScrollBar();
-    QObject::connect( scrollbar, SIGNAL( rangeChanged( int, int ) ), this, SLOT( moveScrollBarToBottom( int, int ) ) );
+    connect( scrollbar, SIGNAL( rangeChanged( int, int ) ), this, SLOT( moveScrollBarToBottom( int, int ) ) );
 
     QVBoxLayout* layout2 = new QVBoxLayout();
     QHBoxLayout* buttons1 = new QHBoxLayout();
@@ -181,6 +182,17 @@ QWidget* ScriptWidget::buildScriptLayout()
         layout->addWidget( deleteButton );
         deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
         connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( deleteCommand( int ) ) );
+
+        PushButtonWithId* upButton = new PushButtonWithId( "^", i );
+        layout->addWidget( upButton );
+        upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandUp( int ) ) );
+
+        PushButtonWithId* downButton = new PushButtonWithId( "v", i );
+        layout->addWidget( downButton );
+        downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandDown( int ) ) );
+
 
         QColor lightRed( 255, 168, 168 );
         QColor lightBlue( 168, 168, 255 );
@@ -1061,6 +1073,28 @@ void ScriptWidget::insertCommand( int row )
         m_script.insert( row, line );
     }
     m_lastInsertedLine = row;
+    rebuild();
+}
+
+void ScriptWidget::moveCommandUp( int row )
+{
+    if ( row == 0 )
+    {
+        return;
+    }
+    QList<QVariant> line = m_script.takeAt( row );
+    m_script.insert( row - 1, line );
+    rebuild();
+}
+
+void ScriptWidget::moveCommandDown( int row )
+{
+    if ( row == m_script.size() - 1 )
+    {
+        return;
+    }
+    QList<QVariant> line = m_script.takeAt( row );
+    m_script.insert( row + 1, line );
     rebuild();
 }
 

@@ -88,6 +88,7 @@ private:
     QList<QList<QVariant> >m_script;
 
     QScrollArea* m_scrollArea;
+    QWidget* m_scriptPanel;
     QPushButton* m_runButton;
 
     int m_lastInsertedLine;
@@ -134,6 +135,8 @@ private slots:
     void slotPropertySelectChanged( int line, int prop, int data );
     void deleteCommand( int row );
     void insertCommand( int row );
+    void moveCommandUp( int row );
+    void moveCommandDown( int row );
     void moveScrollBarToBottom( int min, int max );
     void resetScript();
     void slotCheckboxChanged( int, int );
