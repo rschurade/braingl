@@ -13,6 +13,7 @@
 #include "controls/checkboxid.h"
 #include "controls/comboboxid.h"
 #include "controls/lineeditid.h"
+#include "controls/labelid.h"
 #include "controls/checkboxwithlabel.h"
 #include "controls/sliderwitheditint.h"
 #include "controls/pushbuttonwithid.h"
@@ -347,6 +348,11 @@ QWidget* ScriptWidget::buildScriptLayout()
             }
         }
 
+        LabelID* indicator = new LabelID( i, "<---", this );
+        indicator->setHidden( true );
+        connect( this, SIGNAL( hideIndicator( bool, int ) ), indicator, SLOT( slotSetHidden( bool, int ) ) );
+        layout->addWidget( indicator );
+
         select->setEnabled( lineActive );
         emit( enable( lineActive, i * 10 + 1 ) );
         emit( enable( lineActive, i * 10 + 2 ) );
@@ -660,8 +666,13 @@ void ScriptWidget::run( bool checked )
     m_totalLoops = 1;
     m_inLoop = false;
     m_render = false;
+
     if ( checked )
     {
+        for ( int i = 0; i < m_script.size(); ++i )
+        {
+            emit( hideIndicator( true, i ) );
+        }
         qDebug() << "start script";
         m_currentCommandLine = 0;
         m_runScript = true;
@@ -673,7 +684,6 @@ void ScriptWidget::run( bool checked )
         m_runScript = false;
         m_pauseButton->setChecked( false );
     }
-
 }
 
 void ScriptWidget::run()
@@ -683,6 +693,7 @@ void ScriptWidget::run()
         return;
     }
 
+    emit( hideIndicator( true, m_currentCommandLine - 1 ) );
     if ( m_currentCommandLine >= m_script.size() )
     {
         if( m_contRunning->checked() )
@@ -696,6 +707,7 @@ void ScriptWidget::run()
         }
     }
 
+    emit( hideIndicator( false, m_currentCommandLine ) );
     QList<QVariant> line = m_script[m_currentCommandLine++];
 
     if ( !line[0].toBool() )
@@ -714,6 +726,7 @@ void ScriptWidget::run()
         case ScriptCommand::NONE:
         case ScriptCommand::COMMENT:
         {
+                emit( hideIndicator( true, m_currentCommandLine - 1 ) );
                 QTimer::singleShot( 1, this, SLOT( run() ) );
                 return;
         }
@@ -862,6 +875,7 @@ void ScriptWidget::run()
 
     if ( m_inBlock || ( m_inLoop && !m_render ) )
     {
+        emit( hideIndicator( true, m_currentCommandLine - 1 ) );
         QTimer::singleShot( 1, this, SLOT( run() ) );
         return;
     }
@@ -877,6 +891,7 @@ void ScriptWidget::run()
     delay = qMax( 1, delay - timeSpent );
 
     m_render = false;
+
     QTimer::singleShot( delay, this, SLOT( run() ) );
 }
 
