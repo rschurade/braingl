@@ -529,6 +529,14 @@ void MainWindow::loadScene( QString fileName )
                 GLFunctions::roi = new ROIBox();
                 GLFunctions::roi->properties()->setState( roiState );
                 Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
+
+                for ( int l = 0; l < roiState.size() / 2; ++l )
+                {
+                    if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::R_COLOR )
+                    {
+                        GLFunctions::roi->properties()->set( (Fn::Property)( roiState[l*2].toInt() ), roiState[l*2+1] );
+                    }
+                }
             }
         }
     }
