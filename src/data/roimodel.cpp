@@ -81,11 +81,24 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     QVariant roi;
     if ( index.internalId() == -1 )
     {
-        roi = m_rois[index.row()][0];
+        if ( index.row() < m_rois.size() )
+        {
+            if ( m_rois[index.row()].size() > 0 )
+            {
+                roi = m_rois[index.row()][0];
+            }
+        }
     }
     else
     {
-        roi = m_rois[index.internalId()][index.row()+1];
+        if ( index.internalId() < m_rois.size() )
+        {
+            if ( m_rois[index.row()].size() > index.row()+1 )
+            {
+                roi = m_rois[index.internalId()][index.row()+1];
+            }
+        }
+
     }
     switch ( role )
     {

@@ -10,6 +10,8 @@
 #include "datastore.h"
 #include "globalpropertymodel.h"
 #include "roimodel.h"
+#include "roi.h"
+#include "vptr.h"
 
 QAbstractItemModel* Models::m_dataModel = 0;
 QAbstractItemModel* Models::m_globalModel = 0;
@@ -60,4 +62,26 @@ void Models::setGlobal( Fn::Property var, QVariant value )
 QVariant Models::getGlobal( Fn::Property var )
 {
     return m_globalModel->data( m_globalModel->index( (int)var, 0 ) );
+}
+
+ROI* Models::getRoi( int branch, int pos )
+{
+    ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( createRoiIndex( branch, pos, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
+    return roi;
+}
+
+QModelIndex Models::createRoiIndex( int branch, int pos, int column )
+{
+    int row;
+    QModelIndex parent;
+    if ( pos == 0 )
+    {
+        row = branch;
+    }
+    else
+    {
+        row = pos - 1;
+        parent = m_roiModel->index( branch, 0 );
+    }
+    return m_roiModel->index( row, column, parent );
 }

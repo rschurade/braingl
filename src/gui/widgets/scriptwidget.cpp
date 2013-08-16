@@ -21,6 +21,8 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/vptr.h"
+#include "../../data/roi.h"
+#include "../../data/roibox.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/properties/propertygroup.h"
 
@@ -42,6 +44,8 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_lastGlobal( (int)Fn::Property::G_SAGITTAL ),
     m_lastDataset( 0 ),
     m_lastProperty( (int)Fn::Property::D_ACTIVE ),
+    m_lastRoiBranch( 0 ),
+    m_lastRoiRow( 0 ),
 
     m_loopCount( 1 ),
     m_totalLoops( 1 ),
@@ -241,7 +245,7 @@ QWidget* ScriptWidget::buildScriptLayout()
                 break;
             case ScriptCommand::DELAY:
             {
-                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+                select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
                 addStretch( layout, 5 );
                 break;
             }
@@ -267,7 +271,7 @@ QWidget* ScriptWidget::buildScriptLayout()
                 addStretch( layout, 3 );
                 break;
             }
-            case ScriptCommand::INCREMENT_GLOBAL:
+            case ScriptCommand::INC_GLOBAL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
                 addGlobalSelect( layout, i, line[2].toInt(), lineActive );
@@ -287,7 +291,7 @@ QWidget* ScriptWidget::buildScriptLayout()
                 addStretch( layout, 2 );
                 break;
             }
-            case ScriptCommand::INCREMENT_PROPERTY:
+            case ScriptCommand::INC_PROPERTY:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
                 addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
@@ -346,6 +350,28 @@ QWidget* ScriptWidget::buildScriptLayout()
                 emit( editChanged( line[2].toString(), i * 10 + 1 ) );
                 break;
             }
+            case ScriptCommand::SET_ROI_PROPERTY:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+                addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
+                addEdit( layout, i* 10 + 2, 3 );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+                addStretch( layout, 1 );
+                break;
+            }
+            case ScriptCommand::INC_ROI_PROPERTY:
+            {
+                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+                addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
+                addEdit( layout, i* 10 + 2, 3 );
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+                addStretch( layout, 1 );
+                break;
+            }
         }
 
         LabelID* indicator = new LabelID( i, "<---", this );
@@ -398,7 +424,7 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toInt() );
             break;
         }
-        case ScriptCommand::INCREMENT_GLOBAL:
+        case ScriptCommand::INC_GLOBAL:
         {
             commandLine.push_back( m_lastGlobal );
             commandLine.push_back( 1 );
@@ -411,7 +437,7 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( 1 );
             break;
         }
-        case ScriptCommand::INCREMENT_PROPERTY:
+        case ScriptCommand::INC_PROPERTY:
         {
             commandLine.push_back( (int)Fn::Property::D_ACTIVE );
             commandLine.push_back( m_lastDataset );
@@ -478,6 +504,22 @@ void ScriptWidget::commandChanged( int line, int command )
         case ScriptCommand::COMMENT:
         {
             commandLine.push_back( "comment" );
+            break;
+        }
+        case ScriptCommand::SET_ROI_PROPERTY:
+        {
+            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
+            commandLine.push_back( m_lastRoiBranch );
+            commandLine.push_back( m_lastRoiRow );
+            commandLine.push_back( 1 );
+            break;
+        }
+        case ScriptCommand::INC_ROI_PROPERTY:
+        {
+            commandLine.push_back( (int)Fn::Property::D_ACTIVE );
+            commandLine.push_back( m_lastRoiBranch );
+            commandLine.push_back( m_lastRoiRow );
+            commandLine.push_back( 1 );
             break;
         }
     }
@@ -548,6 +590,36 @@ void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected,
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( dataset, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         PropertyGroup* props = ds->properties();
+        int toSelect = 0;
+
+        for ( int i = 0; i < props->size(); ++i )
+        {
+            QPair<Fn::Property, Property*> prop = props->getNthPropertyPair( i );
+            if ( prop.second->getPropertyTab() != "none" || prop.first == Fn::Property::D_ACTIVE )
+            {
+                select->insertItem( i, Fn::Prop2String::s( prop.first ), (int)prop.first );
+                if ( selected == (int)prop.first )
+                {
+                    toSelect = select->count() - 1;
+                }
+            }
+        }
+        select->setCurrentIndex( toSelect );
+    }
+    connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( slotPropertySelectChanged( int, int, int ) ) );
+    connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
+    layout->addWidget( select );
+    select->setEnabled( active );
+}
+
+void ScriptWidget::addRoiPropertySelect( QHBoxLayout* layout, int id, int selected, int branch, int row, bool active )
+{
+    ComboBoxID* select = new ComboBoxID( id, this );
+
+    ROI* roi = Models::getRoi( branch, row );
+    if ( dynamic_cast<ROIBox*>( roi) )
+    {
+        PropertyGroup* props = roi->properties();
         int toSelect = 0;
 
         for ( int i = 0; i < props->size(); ++i )
@@ -773,7 +845,7 @@ void ScriptWidget::run()
             Models::g()->setData( Models::g()->index( line[2].toInt(), 0 ), line[3] );
             break;
         }
-        case ScriptCommand::INCREMENT_GLOBAL:
+        case ScriptCommand::INC_GLOBAL:
         {
             m_lastGlobal = line[2].toInt();
             float stepSize = line[3].toFloat();
@@ -800,7 +872,7 @@ void ScriptWidget::run()
             }
             break;
         }
-        case ScriptCommand::INCREMENT_PROPERTY:
+        case ScriptCommand::INC_PROPERTY:
         {
             m_lastDataset = line[3].toInt();
             m_lastProperty = line[2].toInt();
@@ -871,6 +943,29 @@ void ScriptWidget::run()
             m_inBlock = false;
             break;
         }
+        case ScriptCommand::SET_ROI_PROPERTY:
+        {
+            //TODO
+            ROI* roi = Models::getRoi( line[3].toInt(), line[4].toInt() );
+            if ( dynamic_cast<ROIBox*>( roi) )
+            {
+                PropertyGroup* props = roi->properties();
+                props->set( (Fn::Property)line[2].toInt(), line[5].toInt() );
+            }
+            break;
+        }
+        case ScriptCommand::INC_ROI_PROPERTY:
+        {
+            ROI* roi = Models::getRoi( line[3].toInt(), line[4].toInt() );
+            if ( dynamic_cast<ROIBox*>( roi) )
+            {
+                PropertyGroup* props = roi->properties();
+                float value = props->get( (Fn::Property)line[2].toInt() ).toFloat();
+                props->set( (Fn::Property)line[2].toInt(), value + line[5].toFloat() );
+            }
+
+            break;
+        }
     }
 
     if ( m_inBlock || ( m_inLoop && !m_render ) )
@@ -928,7 +1023,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             break;
         }
-        case ScriptCommand::INCREMENT_GLOBAL:
+        case ScriptCommand::INC_GLOBAL:
         {
             if ( column == 3 )
             {
@@ -963,7 +1058,7 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             break;
         }
-        case ScriptCommand::INCREMENT_PROPERTY:
+        case ScriptCommand::INC_PROPERTY:
         {
             if ( column == 3 )
             {
@@ -984,10 +1079,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 4 )
             {
                 m_script[row].replace( column, text );
-            }
-            if ( column == 5 )
-            {
-                m_script[row].replace( column, text.toInt() );
             }
             break;
         }
@@ -1041,6 +1132,32 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             if ( column == 2 )
             {
                 m_script[row].replace( column, text );
+            }
+            break;
+        }
+        case ScriptCommand::SET_ROI_PROPERTY:
+        {
+            m_script[row].replace( column, text );
+            if ( column == 3 )
+            {
+                m_lastRoiBranch = text.toInt();
+            }
+            if ( column == 4 )
+            {
+                m_lastRoiRow = text.toInt();
+            }
+            break;
+        }
+        case ScriptCommand::INC_ROI_PROPERTY:
+        {
+            m_script[row].replace( column, text );
+            if ( column == 3 )
+            {
+                m_lastRoiBranch = text.toInt();
+            }
+            if ( column == 4 )
+            {
+                m_lastRoiRow = text.toInt();
             }
             break;
         }

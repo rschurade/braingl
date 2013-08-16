@@ -17,19 +17,20 @@ enum class ScriptCommand : int
     DELAY,
     SET_CAMERA,  // #1 position #2 lookat #3 up
     SET_GLOBAL,
-    INCREMENT_GLOBAL,
+    INC_GLOBAL,
     SET_PROPERTY,
-    INCREMENT_PROPERTY,
+    INC_PROPERTY,
     SET_ARCBALL,
     BEGIN_LOOP,
     END_LOOP,
     BEGIN_BLOCK,
     END_BLOCK,
-    COMMENT
-
+    COMMENT,
+    SET_ROI_PROPERTY,
+    INC_ROI_PROPERTY
 };
 
-#define NUM_SCRIPT_COMMANDS 13
+#define NUM_SCRIPT_COMMANDS 15
 
 struct Script2String
 {
@@ -41,15 +42,17 @@ struct Script2String
             case ScriptCommand::DELAY: return QString( "delay" ); break;
             case ScriptCommand::SET_CAMERA: return QString( "set camera" ); break;
             case ScriptCommand::SET_GLOBAL: return QString( "set global" ); break;
-            case ScriptCommand::INCREMENT_GLOBAL: return QString( "increment global" ); break;
+            case ScriptCommand::INC_GLOBAL: return QString( "increment global" ); break;
             case ScriptCommand::SET_PROPERTY: return QString( "set property" ); break;
-            case ScriptCommand::INCREMENT_PROPERTY: return QString( "increment property" ); break;
+            case ScriptCommand::INC_PROPERTY: return QString( "increment property" ); break;
             case ScriptCommand::SET_ARCBALL: return QString( "set arcball" ); break;
             case ScriptCommand::BEGIN_LOOP: return QString( "begin loop" ); break;
             case ScriptCommand::END_LOOP: return QString( "end loop" ); break;
             case ScriptCommand::BEGIN_BLOCK: return QString( "begin block" ); break;
             case ScriptCommand::END_BLOCK: return QString( "end block" ); break;
             case ScriptCommand::COMMENT: return QString( "comment" ); break;
+            case ScriptCommand::SET_ROI_PROPERTY: return QString( "set roi property" ); break;
+            case ScriptCommand::INC_ROI_PROPERTY: return QString( "increment roi property" ); break;
         }
         return QString( "command doesn't exist" );
     }
@@ -76,6 +79,7 @@ private:
 
     void addGlobalSelect( QHBoxLayout* layout, int id, int selected, bool active );
     void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset, bool active );
+    void addRoiPropertySelect( QHBoxLayout* layout, int id, int selected, int branch, int row, bool active );
     void addEdit( QHBoxLayout* layout, int startId, int count );
     void addStretch( QHBoxLayout* layout, int count );
 
@@ -104,6 +108,8 @@ private:
     int m_lastGlobal;
     int m_lastDataset;
     int m_lastProperty;
+    int m_lastRoiBranch;
+    int m_lastRoiRow;
 
     int m_loopCount;
     int m_totalLoops;
