@@ -153,6 +153,7 @@ signals:
     void selectChanged( int index, int id );
     void checkBoxChanged( int state, int id );
     void screenshot();
+    void hideIndicator( bool state, int id );
 };
 
 #endif /* SCRIPTWIDGET_H_ */
