@@ -89,7 +89,6 @@ private:
     QAction* openAct;
     QAction* saveAct;
     QAction* quitAct;
-    QAction* loadSceneAct;
     QAction* saveSceneAct;
     QAction* newMainGLAct;
 
@@ -126,7 +125,6 @@ private slots:
     void open();
     void openRecentFile();
     void save();
-    void loadScene();
     void saveScene();
     void about();
     void resetSettings();

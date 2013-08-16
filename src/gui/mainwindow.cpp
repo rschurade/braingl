@@ -370,14 +370,6 @@ void MainWindow::saveScene()
     saveScene( fileName );
 }
 
-void MainWindow::loadScene()
-{
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
-    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
-
-    loadScene( fileName );
-}
-
 void MainWindow::saveScene( QString fileName )
 {
     QSettings settings( fileName, QSettings::IniFormat );
@@ -607,10 +599,6 @@ void MainWindow::createActions()
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
     connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
 
-    loadSceneAct = new QAction( tr( "Load Scene" ), this );
-    loadSceneAct->setStatusTip( tr( "Load the current scene" ) );
-    connect( loadSceneAct, SIGNAL(triggered()), this, SLOT(loadScene()) );
-
     screenshotAct = new QAction( tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
     connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
@@ -703,7 +691,6 @@ void MainWindow::createMenus()
     fileMenu->addAction( saveAct );
     separatorAct = fileMenu->addSeparator();
     fileMenu->addAction( saveSceneAct );
-    fileMenu->addAction( loadSceneAct );
     //fileMenu->addAction( printAct );
     separatorAct = fileMenu->addSeparator();
 
