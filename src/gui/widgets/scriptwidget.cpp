@@ -870,7 +870,11 @@ void ScriptWidget::run()
     {
         emit( screenshot() );
     }
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
     Models::g()->submit();
+    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+    int timeSpent = endTime - startTime;
+    delay = qMax( 1, delay - timeSpent );
 
     m_render = false;
     QTimer::singleShot( delay, this, SLOT( run() ) );
