@@ -31,12 +31,12 @@ public:
     static QAbstractItemModel* d();
     static QAbstractItemModel* r();
 
+    static QModelIndex createRoiIndex( int branch, int pos, int column );
+
 private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;
     static QAbstractItemModel* m_roiModel;
-
-    static QModelIndex createRoiIndex( int branch, int pos, int column );
 
     Models() {};
     virtual ~Models() {};

@@ -945,12 +945,10 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_ROI_PROPERTY:
         {
-            //TODO
             ROI* roi = Models::getRoi( line[3].toInt(), line[4].toInt() );
             if ( dynamic_cast<ROIBox*>( roi) )
             {
-                PropertyGroup* props = roi->properties();
-                props->set( (Fn::Property)line[2].toInt(), line[5].toInt() );
+                Models::r()->setData( Models::createRoiIndex( line[3].toInt(), line[4].toInt(), line[2].toInt() ), line[5], Qt::DisplayRole );
             }
             break;
         }
@@ -960,8 +958,8 @@ void ScriptWidget::run()
             if ( dynamic_cast<ROIBox*>( roi) )
             {
                 PropertyGroup* props = roi->properties();
-                float value = props->get( (Fn::Property)line[2].toInt() ).toFloat();
-                props->set( (Fn::Property)line[2].toInt(), value + line[5].toFloat() );
+                float value = props->get( (Fn::Property)line[2].toInt() ).toFloat() + + line[5].toFloat();
+                Models::r()->setData( Models::createRoiIndex( line[3].toInt(), line[4].toInt(), line[2].toInt() ), value, Qt::DisplayRole );
             }
 
             break;
