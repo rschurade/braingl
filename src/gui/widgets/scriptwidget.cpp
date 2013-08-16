@@ -27,12 +27,35 @@
 
 ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_glWidget( glWidget ),
+    m_widgetToEnsureVisible ( 0 ),
+    m_contRunning( 0 ),
+    m_screenshotEach( 0 ),
+    m_delay( 0 ),
+    m_scrollArea( 0 ),
+    m_runButton( 0 ),
+
+    m_lastInsertedLine( 0 ),
     m_runScript( false ),
-    m_widgetToEnsureVisible( 0 ),
     m_currentCommandLine( 0 ),
+
     m_lastGlobal( (int)Fn::Property::G_SAGITTAL ),
     m_lastDataset( 0 ),
-    m_lastProperty( (int)Fn::Property::D_ACTIVE )
+    m_lastProperty( (int)Fn::Property::D_ACTIVE ),
+
+    m_loopCount( 1 ),
+    m_totalLoops( 1 ),
+    m_loopBegin( 0 ),
+    m_inBlock( false ),
+    m_inLoop( false ),
+    m_render( false ),
+
+
+    m_currentZoom( 1.0f ),
+    m_targetZoom( 1.0f ),
+    m_currentMoveX( 0.0f ),
+    m_currentMoveY( 0.0f ),
+    m_targetMoveX( 0.0f ),
+    m_targetMoveY( 0.0f )
 {
     QList<QVariant> line;
     line.push_back( true );
@@ -49,7 +72,7 @@ ScriptWidget::~ScriptWidget()
 void ScriptWidget::rebuild()
 {
     delete this->layout();
-    qDeleteAll( this->children() );
+    //qDeleteAll( this->children() );
     this->repaint();
     initLayout();
 }
@@ -217,19 +240,6 @@ QWidget* ScriptWidget::buildScriptLayout()
                 addStretch( layout, 2 );
                 break;
             }
-            case ScriptCommand::INTERPOLATE_CAMERA:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 3 );
-                QVector3D vec = line[2].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = line[3].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = line[4].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                addStretch( layout, 2 );
-                break;
-            }
             case ScriptCommand::SET_GLOBAL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
@@ -270,18 +280,6 @@ QWidget* ScriptWidget::buildScriptLayout()
                 break;
             }
             case ScriptCommand::SET_ARCBALL:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 4 );
-                QVector4D vec = line[2].value<QQuaternion>().toVector4D();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                addStretch( layout, 1 );
-                break;
-            }
-            case ScriptCommand::INTERPOLATE_ARCBALL:
             {
                 select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
                 addEdit( layout, i* 10 + 1, 4 );
@@ -371,14 +369,6 @@ void ScriptWidget::commandChanged( int line, int command )
             commandLine.push_back( camera[2] );
             break;
         }
-        case ScriptCommand::INTERPOLATE_CAMERA:
-        {
-            commandLine.push_back( camera[0] );
-            commandLine.push_back( camera[1] );
-            commandLine.push_back( camera[2] );
-            commandLine.push_back( 25 );
-            break;
-        }
         case ScriptCommand::SET_GLOBAL:
         {
             commandLine.push_back( m_lastGlobal );
@@ -406,18 +396,6 @@ void ScriptWidget::commandChanged( int line, int command )
             break;
         }
         case ScriptCommand::SET_ARCBALL:
-        {
-            QQuaternion rot = m_glWidget->getArcBall()->getRotation();
-            float zoom = m_glWidget->getArcBall()->getZoom();
-            float moveX = m_glWidget->getArcBall()->getMoveX();
-            float moveY = m_glWidget->getArcBall()->getMoveY();
-            commandLine.push_back( rot );
-            commandLine.push_back( zoom );
-            commandLine.push_back( moveX );
-            commandLine.push_back( moveY );
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             QQuaternion rot = m_glWidget->getArcBall()->getRotation();
             float zoom = m_glWidget->getArcBall()->getZoom();
@@ -488,7 +466,6 @@ void ScriptWidget::commandChanged( int line, int command )
         command.push_back( (int)ScriptCommand::NONE );
         m_script.push_back( command );
     }
-
     rebuild();
 }
 
@@ -700,10 +677,6 @@ void ScriptWidget::run()
 
     QList<QVariant>camera = m_glWidget->getCamera()->getState();
 
-    //qDebug() << Script2String::s( (ScriptCommand)command );
-
-    m_currentStep = 0;
-
     switch( (ScriptCommand)( command ) )
     {
         case ScriptCommand::NONE:
@@ -717,14 +690,6 @@ void ScriptWidget::run()
             break;
         }
         case ScriptCommand::SET_CAMERA:
-        {
-            camera[0] = line[2];
-            camera[1] = line[3];
-            camera[2] = line[4];
-            m_glWidget->getCamera()->setState( camera );
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_CAMERA:
         {
             if ( m_loopCount == m_totalLoops )
             {
@@ -766,8 +731,8 @@ void ScriptWidget::run()
         case ScriptCommand::INCREMENT_GLOBAL:
         {
             m_lastGlobal = line[2].toInt();
-            m_stepSize = line[3].toFloat();
-            float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat() + m_stepSize;
+            float stepSize = line[3].toFloat();
+            float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat() + stepSize;
             Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
             break;
         }
@@ -794,24 +759,12 @@ void ScriptWidget::run()
         {
             m_lastDataset = line[3].toInt();
             m_lastProperty = line[2].toInt();
-            m_stepSize = line[4].toFloat();
-            float value = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat() + m_stepSize;
+            float stepSize = line[4].toFloat();
+            float value = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat() + stepSize;
             Models::d()->setData( Models::d()->index( m_lastDataset, m_lastProperty ), value, Qt::DisplayRole );
             break;
         }
         case ScriptCommand::SET_ARCBALL:
-        {
-            QQuaternion rot  = line[2].value<QQuaternion>();
-            float zoom = line[3].toFloat();
-            float moveX = line[4].toFloat();
-            float moveY = line[5].toFloat();
-            m_glWidget->getArcBall()->setRotation( rot );
-            m_glWidget->getArcBall()->setZoom( zoom );
-            m_glWidget->getArcBall()->setMoveX( moveX );
-            m_glWidget->getArcBall()->setMoveY( moveY );
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             if ( m_loopCount == m_totalLoops )
             {
@@ -913,14 +866,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             break;
         }
-        case ScriptCommand::INTERPOLATE_CAMERA:
-        {
-            if ( column > 1 && column < 5 )
-            {
-                m_script[row].replace( column, string2Vector3D( text ) );
-            }
-            break;
-        }
         case ScriptCommand::SET_GLOBAL:
         {
             if ( column == 3 )
@@ -996,39 +941,6 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             break;
         }
         case ScriptCommand::SET_ARCBALL:
-        {
-            if ( column == 2 )
-            {
-                QStringList parts = text.split( ",", QString::SkipEmptyParts );
-                if( parts.size() == 4 )
-                {
-                    bool ok = true;
-                    bool totalOk = true;
-                    float x = parts[0].toFloat( &ok );
-                    totalOk &= ok;
-                    float y = parts[1].toFloat( &ok );
-                    totalOk &= ok;
-                    float z = parts[2].toFloat( &ok );
-                    totalOk &= ok;
-                    float w = parts[2].toFloat( &ok );
-                    totalOk &= ok;
-                    if ( !totalOk )
-                    {
-                        m_script[row].replace( column, QQuaternion( 0, 0, 0, 0 ) );
-                    }
-                    else
-                    {
-                        m_script[row].replace( column, QQuaternion( w, x, y, z ) );
-                    }
-                }
-            }
-            if ( column > 2 )
-            {
-                m_script[row].replace( column, text );
-            }
-            break;
-        }
-        case ScriptCommand::INTERPOLATE_ARCBALL:
         {
             if ( column == 2 )
             {
