@@ -90,6 +90,7 @@ private:
     QScrollArea* m_scrollArea;
     QWidget* m_scriptPanel;
     QPushButton* m_runButton;
+    QPushButton* m_pauseButton;
 
     int m_lastInsertedLine;
     int m_runScript;
@@ -110,6 +111,7 @@ private:
     bool m_inBlock;
     bool m_inLoop;
     bool m_render;
+    bool m_paused;
 
 
     float m_currentZoom;
@@ -128,6 +130,7 @@ private slots:
     void saveScript();
     void run( bool checked );
     void run();
+    void pause( bool checked );
 
     void commandChanged( int line, int command );
     void slotEditChanged( QString, int );
@@ -140,6 +143,8 @@ private slots:
     void moveScrollBarToBottom( int min, int max );
     void resetScript();
     void slotCheckboxChanged( int, int );
+    void slotKeyPressed( int, Qt::KeyboardModifiers mods );
+
 
 signals:
     void enable( bool e, int id );
