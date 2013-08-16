@@ -200,6 +200,18 @@ void GLWidget::calcMVPMatrix()
     }
     m_mvMatrix = m_cameraInUse->getMVMat();
 
+    if ( dynamic_cast<ArcBall*>( m_cameraInUse ) )
+    {
+        QVector3D pos;
+        QVector3D view;
+        QVector3D up;
+        getCameraParametersFromModelviewMatrix( pos, view, up );
+        QList<QVariant>l;
+        l.push_back( pos );
+        l.push_back( pos + view * 10 );
+        l.push_back( up );
+        m_camera->setState( l );
+    }
 
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_cameraInUse->getMoveX() );
@@ -567,4 +579,40 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
 void GLWidget::visibilityChanged( bool visible )
 {
     m_visible = visible;
+}
+
+/// get camera parameters from
+/// the OpenGL modelview matrix
+///
+/// \param[out] eyepos  eye position
+/// \param[out] viewdir viewing direction
+/// \param[out] updir   up direction vector
+void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVector3D &viewdir, QVector3D &updir )
+{
+    QVector3D xdir( 0.0, 0.0, 0.0 );
+    QVector3D ydir( 0.0, 0.0, 0.0 );
+    QVector3D zdir( 0.0, 0.0, 0.0 );
+
+    xdir.setX( m_mvMatrix( 0, 0 ) );
+    ydir.setX( m_mvMatrix( 1, 0 ) );
+    zdir.setX( m_mvMatrix( 2, 0 ) );
+    xdir.setY( m_mvMatrix( 0, 1 ) );
+    ydir.setY( m_mvMatrix( 1, 1 ) );
+    zdir.setY( m_mvMatrix( 2, 1 ) );
+    xdir.setZ( m_mvMatrix( 0, 2 ) );
+    ydir.setZ( m_mvMatrix( 1, 2 ) );
+    zdir.setZ( m_mvMatrix( 2, 2 ) );
+
+    // This is a, b, c components.
+    QVector3D bvec( -m_mvMatrix( 0, 3 ), -m_mvMatrix( 1, 3 ), -m_mvMatrix( 2, 3 ) );
+
+    QMatrix4x4 basis_mat( xdir.x(), xdir.y(), xdir.z(), 0, ydir.x(), ydir.y(), ydir.z(), 0, zdir.x(), zdir.y(), zdir.z(), 0, 0, 0, 0, 1 );
+    // This matrix should not be singular.
+    // invert() gives matrix inverse.
+    basis_mat = basis_mat.inverted();
+
+    eyepos = basis_mat * bvec;
+    viewdir = -zdir;
+    updir = ydir;
+    //qDebug() << eyepos << viewdir << updir;
 }
