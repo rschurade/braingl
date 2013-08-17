@@ -53,6 +53,7 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_inBlock( false ),
     m_inLoop( false ),
     m_render( false ),
+    m_paused( false ),
 
 
     m_currentZoom( 1.0f ),
@@ -738,6 +739,7 @@ void ScriptWidget::run( bool checked )
     m_totalLoops = 1;
     m_inLoop = false;
     m_render = false;
+    m_paused = m_pauseButton->isChecked();
 
     if ( checked )
     {
