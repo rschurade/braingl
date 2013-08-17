@@ -69,6 +69,10 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_script.push_back( line );
 
     initLayout();
+
+    float test = 1.0f;
+    QVariant tv( test );
+    qDebug() << "test:" << tv.type() << tv.typeName();
 }
 
 ScriptWidget::~ScriptWidget()
@@ -267,8 +271,17 @@ QWidget* ScriptWidget::buildScriptLayout()
             {
                 select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
                 addGlobalSelect( layout, i, line[2].toInt(), lineActive );
+
                 addEdit( layout, i* 10 + 2, 1 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                if ( line[2].toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
+                {
+                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+                }
+                else
+                {
+                    QColor vec = line[3].value<QColor>();
+                    emit( editChanged( QString::number( vec.red() ) + ", " + QString::number( vec.green() ) + ", " + QString::number( vec.blue() ), i * 10 + 2 ) );
+                }
                 addStretch( layout, 3 );
                 break;
             }
@@ -422,7 +435,7 @@ void ScriptWidget::commandChanged( int line, int command )
         case ScriptCommand::SET_GLOBAL:
         {
             commandLine.push_back( m_lastGlobal );
-            commandLine.push_back( Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toInt() );
+            commandLine.push_back( Models::getGlobal( m_lastGlobal ) );
             break;
         }
         case ScriptCommand::INC_GLOBAL:
@@ -692,7 +705,7 @@ void ScriptWidget::loadScript( QString fileName )
 
 void ScriptWidget::loadScript()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal( (int)Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
     loadScript( fileName );
 }
@@ -713,7 +726,7 @@ void ScriptWidget::saveScript( QString fileName )
 
 void ScriptWidget::saveScript()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal( (int)Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
     saveScript( fileName );
 }
@@ -848,8 +861,8 @@ void ScriptWidget::run()
             if ( m_inLoop && m_loopCount == m_totalLoops )
             {
                 int lastGlobal = line[2].toInt();
-                float currentValue = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat();
-                float targetValue = line[3].toFloat();
+                QVariant currentValue = Models::getGlobal( lastGlobal );
+                QVariant targetValue = line[3];
                 QList<QVariant>loopLine;
                 loopLine.push_back( "g" );
                 loopLine.push_back( lastGlobal );
@@ -859,9 +872,7 @@ void ScriptWidget::run()
             }
             else if ( !m_inLoop )
             {
-//                float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
-//                float value = ( 1.0f - div ) * m_currentValue + div * m_targetValue;
-                Models::g()->setData( Models::g()->index( line[2].toInt(), 0 ), line[3].toFloat() );
+                Models::setGlobal( line[2].toInt(), line[3] );
             }
             break;
         }
@@ -869,8 +880,8 @@ void ScriptWidget::run()
         {
             m_lastGlobal = line[2].toInt();
             float stepSize = line[3].toFloat();
-            float value = Models::g()->data( Models::g()->index( m_lastGlobal, 0 ) ).toFloat() + stepSize;
-            Models::g()->setData( Models::g()->index( m_lastGlobal, 0 ), value );
+            float value = Models::getGlobal( m_lastGlobal ).toFloat() + stepSize;
+            Models::setGlobal( m_lastGlobal, value );
             break;
         }
         case ScriptCommand::SET_PROPERTY:
@@ -891,8 +902,6 @@ void ScriptWidget::run()
             }
             else if ( !m_inLoop )
             {
-//                float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
-//                float value = ( 1.0f - div ) * m_currentValue + div * m_targetValue;
                 Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4].toFloat(), Qt::DisplayRole );
             }
             break;
@@ -947,8 +956,9 @@ void ScriptWidget::run()
         case ScriptCommand::END_LOOP:
         {
             float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
-            if ( --m_loopCount )
+            if ( m_loopCount )
             {
+                --m_loopCount;
                 m_currentCommandLine = m_loopBegin;
 
                 for ( int i = 0; i < m_loopList.size(); ++i )
@@ -956,18 +966,15 @@ void ScriptWidget::run()
                     QList<QVariant>loopLine = m_loopList[i];
                     if ( loopLine[0] == "g" )
                     {
-                        float value = ( 1.0f - div ) * loopLine[2].toFloat() + div * loopLine[3].toFloat();
-                        Models::g()->setData( Models::g()->index( loopLine[1].toInt(), 0 ), value );
+                        Models::setGlobal( loopLine[1].toInt(), interpolateQVariant( loopLine[2], loopLine[3], div ) );
                     }
                     if ( loopLine[0] == "d" )
                     {
-                        float value = ( 1.0f - div ) * loopLine[3].toFloat() + div * loopLine[4].toFloat();
-                        Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), value, Qt::DisplayRole );
+                        Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
                     }
                     if ( loopLine[0] == "r" )
                     {
-                        float value = ( 1.0f - div ) * loopLine[4].toFloat() + div * loopLine[5].toFloat();
-                        Models::r()->setData( Models::createRoiIndex( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt() ), value, Qt::DisplayRole );
+                        Models::setROIProp( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt(), interpolateQVariant( loopLine[4], loopLine[5], div ) );
                     }
                 }
 
@@ -1091,7 +1098,12 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             {
                 if ( m_script[row].at( 2 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
-                    m_script[row].replace( 3, text );
+                    m_script[row].replace( column, text );
+                }
+                else
+                {
+                    QVector3D vec = string2Vector3D( text );
+                    m_script[row].replace( column, QColor( vec.x(), vec.y(), vec.z() ) );
                 }
             }
             break;
@@ -1103,6 +1115,10 @@ void ScriptWidget::slotEditChanged( QString text, int id )
                 if ( m_script[row].at( 2 ).toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
                 {
                     m_script[row].replace( column, text );
+                }
+                else
+                {
+                    m_script[row].replace( column, string2Vector3D( text ) );
                 }
             }
             break;
@@ -1410,5 +1426,43 @@ void ScriptWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
         {
             m_pauseButton->toggle();
         }
+    }
+}
+
+QVariant ScriptWidget::interpolateQVariant( QVariant &lhs, QVariant &rhs, float div )
+{
+    if ( lhs.type() == rhs.type() )
+    {
+        switch( lhs.type() )
+        {
+            case QVariant::Color:
+            {
+                QColor color1 = lhs.value<QColor>();
+                QColor color2 = rhs.value<QColor>();
+                QVector3D vec1( color1.redF(), color1.greenF(), color1.blueF() );
+                QVector3D vec2( color2.redF(), color2.greenF(), color2.blueF() );
+                QVector3D value = ( 1.0f - div ) * vec1 + div * vec2;
+                return QColor( value.x() * 255.0f, value.y() * 255.0f, value.z() * 255.0f );
+            }
+                break;
+            case QVariant::Vector3D:
+            {
+                QVector3D vec1 = lhs.value<QVector3D>();
+                QVector3D vec2 = rhs.value<QVector3D>();
+                return ( 1.0f - div ) * vec1 + div * vec2;
+            }
+                break;
+            default: // assume something that is convertible to float
+            {
+                float v1 = lhs.toFloat();
+                float v2 = rhs.toFloat();
+                return ( 1.0f - div ) * v1 + div * v2;
+            }
+                break;
+        }
+    }
+    else
+    {
+        return lhs;
     }
 }
