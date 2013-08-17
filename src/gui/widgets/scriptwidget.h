@@ -82,6 +82,7 @@ private:
     void addRoiPropertySelect( QHBoxLayout* layout, int id, int selected, int branch, int row, bool active );
     void addEdit( QHBoxLayout* layout, int startId, int count );
     void addStretch( QHBoxLayout* layout, int count );
+    QVariant interpolateQVariant( QVariant &lhs, QVariant &rhs, float div );
 
     GLWidget* m_glWidget;
     QWidget* m_widgetToEnsureVisible;

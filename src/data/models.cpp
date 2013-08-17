@@ -54,6 +54,12 @@ QAbstractItemModel* Models::r()
     return m_roiModel;
 }
 
+void Models::setGlobal( int var, QVariant value )
+{
+    m_globalModel->setData( m_globalModel->index( var, 0 ), value );
+}
+
+
 void Models::setGlobal( Fn::Property var, QVariant value )
 {
     m_globalModel->setData( m_globalModel->index( (int)var, 0 ), value );
@@ -64,11 +70,27 @@ QVariant Models::getGlobal( Fn::Property var )
     return m_globalModel->data( m_globalModel->index( (int)var, 0 ) );
 }
 
+QVariant Models::getGlobal( int var )
+{
+    return m_globalModel->data( m_globalModel->index( var, 0 ) );
+}
+
 ROI* Models::getRoi( int branch, int pos )
 {
     ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( createRoiIndex( branch, pos, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
     return roi;
 }
+
+void Models::setROIProp( int branch, int pos, int prop, QVariant value )
+{
+    m_roiModel->setData( createRoiIndex( branch, pos, prop ), value, Qt::DisplayRole );
+}
+
+void Models::setROIProp( int branch, int pos, Fn::Property prop, QVariant value )
+{
+    m_roiModel->setData( createRoiIndex( branch, pos, (int)prop ), value, Qt::DisplayRole );
+}
+
 
 QModelIndex Models::createRoiIndex( int branch, int pos, int column )
 {
