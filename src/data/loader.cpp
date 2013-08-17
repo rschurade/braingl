@@ -151,12 +151,6 @@ bool Loader::loadNifti()
         m_datasetType = Fn::DatasetType::NIFTI_SH;
         return loadNiftiQBall( fn );
     }
-    else if ( m_header->dim[4] > 3 && m_header->datatype == 16 )
-    {
-        qDebug() << "fmri dataset found";
-        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
-        return loadNiftiFMRI( fn );
-    }
     else if ( m_header->dim[4] > 3 )
     {
         if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) )
@@ -164,6 +158,12 @@ bool Loader::loadNifti()
             qDebug() << "fnav2 dwi dataset found";
             m_datasetType = Fn::DatasetType::NIFTI_DWI;
             return loadNiftiDWI_FNAV2( fn );
+        }
+        else if ( m_header->datatype == 16 )
+        {
+            qDebug() << "fmri dataset found";
+            m_datasetType = Fn::DatasetType::NIFTI_FMRI;
+            return loadNiftiFMRI( fn );
         }
         else
         {
