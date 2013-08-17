@@ -55,7 +55,10 @@ vec4 texColor( vec3 texCoord )
     if ( u_texActive0 )
     {
         color0 = texture( texture0, texCoord );
-        color0 = colormap( unpackFloat( color0 ), u_colormap0, u_lowerThreshold0, u_upperThreshold0, u_selectedMin0, u_selectedMax0 );
+        if ( u_colormap0 != -1 )
+        {
+            color0 = colormap( unpackFloat( color0 ), u_colormap0, u_lowerThreshold0, u_upperThreshold0, u_selectedMin0, u_selectedMax0 );
+        }
         if ( length( color0.rgb ) > 0.0 )
         {
             color0.a = u_alpha0;
@@ -65,7 +68,10 @@ vec4 texColor( vec3 texCoord )
     if ( u_texActive1 )
     {
         color1 = texture( texture1, texCoord );
-        color1 = colormap( unpackFloat( color1 ), u_colormap1, u_lowerThreshold1, u_upperThreshold1, u_selectedMin1, u_selectedMax1 );
+        if ( u_colormap1 != -1 )
+        {
+            color1 = colormap( unpackFloat( color1 ), u_colormap1, u_lowerThreshold1, u_upperThreshold1, u_selectedMin1, u_selectedMax1 );
+        }
         if ( length( color1.rgb ) > 0.0 )
         {
             color1.a = u_alpha1;
@@ -75,7 +81,10 @@ vec4 texColor( vec3 texCoord )
     if ( u_texActive2 )
     {
         color2 = texture( texture2, texCoord );
-        color2 = colormap( unpackFloat( color2 ), u_colormap2, u_lowerThreshold2, u_upperThreshold2, u_selectedMin2, u_selectedMax2 );
+        if ( u_colormap2 != -1 )
+        {
+            color2 = colormap( unpackFloat( color2 ), u_colormap2, u_lowerThreshold2, u_upperThreshold2, u_selectedMin2, u_selectedMax2 );
+        }
         if ( length( color2.rgb ) > 0.0 )
         {
             color2.a = u_alpha2;
@@ -85,7 +94,10 @@ vec4 texColor( vec3 texCoord )
     if ( u_texActive3 )
     {
         color3 = texture( texture3, texCoord );
-        color3 = colormap( unpackFloat( color3 ), u_colormap3, u_lowerThreshold3, u_upperThreshold3, u_selectedMin3, u_selectedMax3 );
+        if ( u_colormap3 != -1 )
+        {
+            color3 = colormap( unpackFloat( color3 ), u_colormap3, u_lowerThreshold3, u_upperThreshold3, u_selectedMin3, u_selectedMax3 );
+        }
         if ( length( color3.rgb ) > 0.0 )
         {
             color3.a = u_alpha3;
@@ -95,7 +107,10 @@ vec4 texColor( vec3 texCoord )
     if ( u_texActive4 )
     {
         color4 = texture( texture4, texCoord );
-        color4 = colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4 );
+        if ( u_colormap4 != -1 )
+        {
+            color4 = colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4 );
+        }
         if ( length( color4.rgb ) > 0.0 )
         {
             color4.a = u_alpha4;
