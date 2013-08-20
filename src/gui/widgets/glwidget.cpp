@@ -126,10 +126,12 @@ void GLWidget::paintGL()
         }
         else
         {
+            calcMVPMatrix();
             m_doScreenshot = false;
-            QImage* image = m_sceneRenderer->screenshot();
+            QImage* image = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
             image->save(  m_screenshotFileName, "PNG" );
             delete image;
+            calcMVPMatrix();
         }
     }
 
@@ -207,7 +209,17 @@ void GLWidget::calcMVPMatrix()
     float zoom  = m_cameraInUse->getZoom();
     float halfBB = boundingbox / 2.0 / zoom;
 
-    float ratio = static_cast<float>( m_width ) / static_cast<float>( m_height );
+    float ratio = 1.0f;
+    if ( m_doScreenshot )
+    {
+        float screenshotWidth = Models::getGlobal( Fn::Property::G_SCREENSHOT_WIDTH ).toFloat();
+        float screenshotHeight = Models::getGlobal( Fn::Property::G_SCREENSHOT_HEIGHT ).toFloat();
+        ratio = screenshotWidth / screenshotHeight;
+    }
+    else
+    {
+        ratio = static_cast<float>( m_width ) / static_cast<float>( m_height );
+    }
 
     if ( projection == 0 )
     {
@@ -226,7 +238,15 @@ void GLWidget::calcMVPMatrix()
         float farPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
         float angle = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_ANGLE, 0 ) ).toFloat();
         angle /= zoom;
-        m_pMatrix.perspective( angle, ratio, nearPlane, farPlane );
+
+        if ( m_doScreenshot && Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
+        {
+            //m_pMatrix.frustum( something )
+        }
+        else
+        {
+            m_pMatrix.perspective( angle, ratio, nearPlane, farPlane );
+        }
     }
     m_mvMatrix = m_cameraInUse->getMVMat();
 
