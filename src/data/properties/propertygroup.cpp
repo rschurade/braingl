@@ -13,6 +13,7 @@
 #include "propertypath.h"
 #include "propertystring.h"
 #include "propertyselection.h"
+#include "propertybutton.h"
 
 #include "../models.h"
 
@@ -238,6 +239,21 @@ bool PropertyGroup::create( Fn::Property name, QVector<QString> options, int val
     return true;
 }
 
+bool PropertyGroup::createButton( Fn::Property name, QString tab )
+{
+    if ( contains( name ) )
+    {
+        return true;
+    }
+    else
+    {
+        PropertyButton* prop = new PropertyButton( Fn::Prop2String::s( (Fn::Property)name ) );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
 
 bool PropertyGroup::contains( Fn::Property name ) const
 {
@@ -344,41 +360,21 @@ QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n )
     return m_properties[n];
 }
 
-bool PropertyGroup::setMinF( Fn::Property name, float value )
+bool PropertyGroup::setMin( Fn::Property name, QVariant value )
 {
     if ( contains( name ) )
     {
-        ( (PropertyFloat*)( getProperty( name ) ) )->setMin( value );
+        ( (Property*)( getProperty( name ) ) )->setMin( value );
         return true;
     }
     return false;
 }
 
-bool PropertyGroup::setMaxF( Fn::Property name, float value )
+bool PropertyGroup::setMax( Fn::Property name, QVariant value )
 {
     if ( contains( name ) )
     {
-        ( (PropertyFloat*)( getProperty( name ) ) )->setMax( value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::setMinI( Fn::Property name, int value )
-{
-    if ( contains( name ) )
-    {
-        ( (PropertyInt*)( getProperty( name ) ) )->setMin( value );
-        return true;
-    }
-    return false;
-}
-
-bool PropertyGroup::setMaxI( Fn::Property name, int value )
-{
-    if ( contains( name ) )
-    {
-        ( (PropertyInt*)( getProperty( name ) ) )->setMax( value );
+        ( (Property*)( getProperty( name ) ) )->setMax( value );
         return true;
     }
     return false;

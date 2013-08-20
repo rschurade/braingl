@@ -21,8 +21,10 @@ public:
 
     static void setGlobal( int var, QVariant value );
     static void setGlobal( Fn::Property var, QVariant value );
+
     static QVariant getGlobal( Fn::Property var );
     static QVariant getGlobal( int var );
+
     static ROI* getRoi( int branch, int pos );
     static void setROIProp( int branch, int pos, Fn::Property prop, QVariant value );
     static void setROIProp( int branch, int pos, int prop, QVariant value );

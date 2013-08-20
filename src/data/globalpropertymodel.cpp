@@ -15,6 +15,8 @@
 
 GlobalPropertyModel::GlobalPropertyModel()
 {
+    using namespace Fn;
+
     m_properties = new PropertyGroup();
     m_properties->create( Fn::Property::G_SAGITTAL, 0.0f, 0.0f, 0.0f, "general" );
     m_properties->create( Fn::Property::G_CORONAL, 0.0f, 0.0f, 0.0f, "general" );
@@ -52,6 +54,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_CAMERA_ANGLE, 90, 1, 180, "camera" );
 
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
+    m_properties->create( Fn::Property::G_BACKGROUND_COLOR_MAIN2, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), "general" );
@@ -59,9 +62,40 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_RENDER_CROSSHAIRS, true, "general" );
     m_properties->create( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
     m_properties->create( Fn::Property::G_SHOW_NAV_SLIDERS, true, "general" );
-    m_properties->create( Fn::Property::G_SCREENSHOT_QUALITY, 1, 1, 5, "general" );
-    m_properties->create( Fn::Property::G_SCREENSHOT_PATH, QDir(""), "general" );
     m_properties->create( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );
+
+    m_properties->create( Fn::Property::G_SCREENSHOT_QUALITY, 1, 50, 1000000 );
+    m_properties->create( Fn::Property::G_SCREENSHOT_QUALITY, 1, 50, 1000000 );
+    m_properties->create( Fn::Property::G_SCREENSHOT_PATH, QDir(""), "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_PREFIX, QString( "screenshot_" ) , "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_PREFIX2, QString( "screenshot_gl2_" ) , "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER, 0, 0, std::numeric_limits<int>().max(), "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_DIGITS, 4, 1, 10 , "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_WIDTH, 1920, 50, 4096, "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_HEIGHT, 1200, 50, 4096, "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_KEEP_ASPECT, false, "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_SIZE_RATIO, 1.0f );
+    m_properties->create( Fn::Property::G_SCREENSHOT_SIZE_SELECTION, { Resolution2String::s( Resolution::R_1024x768 ),
+                                                                       Resolution2String::s( Resolution::R_1920x1080 ),
+                                                                       Resolution2String::s( Resolution::R_1920x1200 ),
+    }, 0, "screenshot" );
+    m_properties->createButton( Fn::Property::G_SCREENSHOT_COPY_CURRENT, "screenshot" );
+    m_properties->create( Fn::Property::G_WIDTH_MAINGL, 1 );
+    m_properties->create( Fn::Property::G_HEIGHT_MAINGL, 1 );
+    m_properties->create( Fn::Property::G_WIDTH_MAINGL2, 1 );
+    m_properties->create( Fn::Property::G_HEIGHT_MAINGL2, 1 );
+
+    m_properties->create( Fn::Property::G_SCREENSHOT_DO_MAINGL, true, "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_DO_MAINGL2, false, "screenshot" );
+    m_properties->create( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false, "screenshot" );
+
+    connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
+    connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );
+    connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotKeepAspect( QVariant ) ) );
+    connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotPredefined( QVariant ) ) );
+    connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_COPY_CURRENT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotCopyCurrent( QVariant ) ) );
+
+
     connect( m_properties, SIGNAL( signalPropChanged() ), this, SLOT( submit() ) );
 }
 
@@ -138,6 +172,13 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
             m_properties->set( Fn::Property::G_SAGITTAL, value.toPoint().x() );
             m_properties->set( Fn::Property::G_CORONAL, value.toPoint().y() );
             break;
+        case Fn::Property::G_SCREENSHOT_QUALITY:
+        {
+            m_properties->set( (Fn::Property)index.row(), value );
+            m_properties->setMax( Fn::Property::G_SCREENSHOT_WIDTH, value );
+            m_properties->setMax( Fn::Property::G_SCREENSHOT_HEIGHT, value );
+            break;
+        }
         default:
             m_properties->set( (Fn::Property)index.row(), value );
             break;
@@ -148,9 +189,77 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
 
 bool GlobalPropertyModel::submit()
 {
-    m_properties->setMaxI( Fn::Property::G_AXIAL, m_properties->get( Fn::Property::G_MAX_AXIAL ).toInt() - 1 );
-    m_properties->setMaxI( Fn::Property::G_CORONAL, m_properties->get( Fn::Property::G_MAX_CORONAL ).toInt() - 1 );
-    m_properties->setMaxI( Fn::Property::G_SAGITTAL, m_properties->get( Fn::Property::G_MAX_SAGITTAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_AXIAL, m_properties->get( Fn::Property::G_MAX_AXIAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_CORONAL, m_properties->get( Fn::Property::G_MAX_CORONAL ).toInt() - 1 );
+    m_properties->setMax( Fn::Property::G_SAGITTAL, m_properties->get( Fn::Property::G_MAX_SAGITTAL ).toInt() - 1 );
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
+}
+
+void GlobalPropertyModel::slotScreenShotWidth( QVariant value )
+{
+    float maxSize = m_properties->get( Fn::Property::G_SCREENSHOT_QUALITY ).toFloat();
+    float ratio = m_properties->get( Fn::Property::G_SCREENSHOT_SIZE_RATIO ).toFloat();
+
+    if ( m_properties->get( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ).toBool() )
+    {
+        m_properties->setMax( Fn::Property::G_SCREENSHOT_HEIGHT, qMin( maxSize, maxSize / ratio ) );
+        m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, value.toFloat() / ratio );
+    }
+
+}
+
+void GlobalPropertyModel::slotScreenShotHeight( QVariant value )
+{
+    float maxSize = m_properties->get( Fn::Property::G_SCREENSHOT_QUALITY ).toFloat();
+    float ratio = m_properties->get( Fn::Property::G_SCREENSHOT_SIZE_RATIO ).toFloat();
+
+    if ( m_properties->get( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ).toBool() )
+    {
+        m_properties->setMax( Fn::Property::G_SCREENSHOT_WIDTH, qMin( maxSize, maxSize * ratio ) );
+        m_properties->set( Fn::Property::G_SCREENSHOT_WIDTH, value.toFloat() * ratio );
+    }
+}
+
+void GlobalPropertyModel::slotScreenShotKeepAspect( QVariant value )
+{
+    int maxSize = m_properties->get( Fn::Property::G_SCREENSHOT_QUALITY ).toInt();
+    if ( value.toBool() )
+    {
+        float width = m_properties->get( Fn::Property::G_SCREENSHOT_WIDTH ).toFloat();
+        float height = m_properties->get( Fn::Property::G_SCREENSHOT_HEIGHT ).toFloat();
+        m_properties->set( Fn::Property::G_SCREENSHOT_SIZE_RATIO, width / height );
+    }
+    else
+    {
+        m_properties->setMax( Fn::Property::G_SCREENSHOT_WIDTH, maxSize );
+        m_properties->setMax( Fn::Property::G_SCREENSHOT_HEIGHT, maxSize );
+    }
+}
+
+void GlobalPropertyModel::slotScreenShotPredefined( QVariant value )
+{
+    m_properties->set( Fn::Property::G_SCREENSHOT_KEEP_ASPECT, false );
+    switch( (Fn::Resolution)value.toInt() )
+    {
+        case Fn::Resolution::R_1024x768:
+            m_properties->set( Fn::Property::G_SCREENSHOT_WIDTH, 1024 );
+            m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, 768 );
+            break;
+        case Fn::Resolution::R_1920x1080:
+            m_properties->set( Fn::Property::G_SCREENSHOT_WIDTH, 1920 );
+            m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, 1080 );
+            break;
+        case Fn::Resolution::R_1920x1200:
+            m_properties->set( Fn::Property::G_SCREENSHOT_WIDTH, 1920 );
+            m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, 1200 );
+            break;
+    }
+}
+
+void GlobalPropertyModel::slotScreenShotCopyCurrent( QVariant value )
+{
+    m_properties->set( Fn::Property::G_SCREENSHOT_WIDTH, m_properties->get( Fn::Property::G_WIDTH_MAINGL ) );
+    m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, m_properties->get( Fn::Property::G_HEIGHT_MAINGL ) );
+
 }

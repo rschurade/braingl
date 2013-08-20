@@ -32,8 +32,7 @@ public:
 	void initGL();
 	void draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix );
 	void renderMerge();
-	void screenshot( QString fn );
-	void screenshot1();
+	QImage* screenshot();
 
     QVector3D mapMouse2World( int x, int y, int z );
     QVector2D mapWorld2Mouse( float x, float y, float z );
@@ -79,11 +78,6 @@ private:
     QHash<QString, GLuint>textures;
     GLuint RBO;
     GLuint FBO;
-
-    bool m_doScreenshot;
-    QImage* m_screenshot;
-    QString m_screenshotFileName;
-
 };
 
 #endif /* SCENERENDERER_H_ */

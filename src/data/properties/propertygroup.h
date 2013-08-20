@@ -45,11 +45,10 @@ public:
     bool create( Fn::Property name, QDir value, QString tab = "none" );
     bool create( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
     bool create( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+    bool createButton( Fn::Property name, QString tab = "none" );
 
-    bool setMinF( Fn::Property name,  float value );
-    bool setMaxF( Fn::Property name,  float value );
-    bool setMinI( Fn::Property name,  int value );
-    bool setMaxI( Fn::Property name,  int value );
+    bool setMin( Fn::Property name,  QVariant value );
+    bool setMax( Fn::Property name,  QVariant value );
 
     int size() const;
 

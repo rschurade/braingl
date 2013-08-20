@@ -38,8 +38,7 @@ SceneRenderer::SceneRenderer( QString renderTarget ) :
     pbo_a( 0 ),
     pbo_b( 0 ),
     RBO( 0 ),
-    FBO( 0 ),
-    m_doScreenshot( false )
+    FBO( 0 )
 {
     m_sliceRenderer = new SliceRenderer();
     m_sliceRenderer->setModel( Models::g() );
@@ -88,7 +87,15 @@ void SceneRenderer::initGL()
         GLFunctions::loadShaders();
     }
 
-    QColor color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor color;
+    if ( m_renderTarget == "maingl2" )
+    {
+        color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN2, 0 ) ).value<QColor>();
+    }
+    else
+    {
+        color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    }
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     glEnable( GL_DEPTH_TEST );
@@ -106,8 +113,8 @@ void SceneRenderer::initGL()
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
+
     Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ), textureSizeMax );
-    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ), textureSizeMax / 4 );
 
     VertexData vertices[] =
     {
@@ -143,12 +150,6 @@ void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
     m_mvMatrix = mvMatrix;
     m_pMatrix = pMatrix;
 
-    if ( m_doScreenshot )
-    {
-        m_doScreenshot = false;
-        screenshot1();
-    }
-
     renderScene();
 
     //***************************************************************************************************
@@ -163,7 +164,15 @@ void SceneRenderer::draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 void SceneRenderer::renderScene()
 {
     GLFunctions::getAndPrintGLError( "before render scene" );
-    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor bgColor;
+    if ( m_renderTarget == "maingl2" )
+    {
+        bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN2, 0 ) ).value<QColor>();
+    }
+    else
+    {
+        bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    }
 
     int transparencyMode = Models::g()->data( Models::g()->index( (int) Fn::Property::G_TRANSPARENCY, 0 ) ).value<int>();
 
@@ -355,33 +364,34 @@ void SceneRenderer::renderMerge()
     GLFunctions::getAndPrintGLError( m_renderTarget + "after render scene" );
 }
 
-
-void SceneRenderer::screenshot( QString fn )
+QImage* SceneRenderer::screenshot()
 {
-    m_screenshotFileName = fn;
-    m_doScreenshot = true;
-}
-
-void SceneRenderer::screenshot1()
-{
-    int size = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ).toInt();
+    int screenshotWidth = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_WIDTH, 0 ) ).toInt();
+    int screenshotHeight = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_HEIGHT, 0 ) ).toInt();
     int tmpWidth = m_width;
     int tmpHeight = m_height;
-    resizeGL( size, qRound( size * (double) m_height / (double) m_width ) );
+    resizeGL( screenshotWidth, screenshotHeight );
     renderScene();
     setRenderTarget( "SCREENSHOT" );
-    QColor bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    QColor bgColor;
+    if ( m_renderTarget == "maingl2" )
+    {
+        bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN2, 0 ) ).value<QColor>();
+    }
+    else
+    {
+        bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
+    }
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     renderMerge();
 
-    m_screenshot = getOffscreenTexture( m_width, m_height );
+    QImage* screenshot = getOffscreenTexture( m_width, m_height );
 
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     resizeGL( tmpWidth, tmpHeight );
 
-    m_screenshot->save(  m_screenshotFileName, "PNG" );
-    delete m_screenshot;
+    return screenshot;
 }
 
 void SceneRenderer::renderDatasets()

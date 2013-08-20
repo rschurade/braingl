@@ -34,6 +34,13 @@ private:
 
 public slots:
     bool submit();
+
+private slots:
+    void slotScreenShotWidth( QVariant value );
+    void slotScreenShotHeight( QVariant value );
+    void slotScreenShotKeepAspect( QVariant value );
+    void slotScreenShotPredefined( QVariant value );
+    void slotScreenShotCopyCurrent( QVariant value );
 };
 
 #endif /* GLOBALPROPERTYMODEL_H_ */

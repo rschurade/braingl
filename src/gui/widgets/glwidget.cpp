@@ -22,6 +22,7 @@
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
     QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
+    m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
     m_nx( 160 ),
@@ -33,7 +34,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_sliceZPosAtPick( 0 ),
     skipDraw( false ),
     m_width( 0 ),
-    m_height( 0 )
+    m_height( 0 ),
+    m_doScreenshot( false )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -50,6 +52,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( parent, shareWidget ),
+    m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
     m_nx( 160 ),
@@ -61,7 +64,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_sliceZPosAtPick( 0 ),
     skipDraw( false ),
     m_width( 0 ),
-    m_height( 0 )
+    m_height( 0 ),
+    m_doScreenshot( false )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -114,6 +118,21 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    if ( m_doScreenshot )
+    {
+        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
+        {
+            // insert code for stereoscopic screenshots here
+        }
+        else
+        {
+            m_doScreenshot = false;
+            QImage* image = m_sceneRenderer->screenshot();
+            image->save(  m_screenshotFileName, "PNG" );
+            delete image;
+        }
+    }
+
     if ( !skipDraw )
     {
         if ( m_visible )
@@ -133,6 +152,17 @@ void GLWidget::resizeGL( int width, int height )
     m_sceneRenderer->resizeGL( width, height );
     m_width = width;
     m_height = height;
+
+    if ( m_name == "maingl" )
+    {
+        Models::setGlobal( Fn::Property::G_WIDTH_MAINGL, width );
+        Models::setGlobal( Fn::Property::G_HEIGHT_MAINGL, height );
+    }
+    else if( m_name == "maingl2" )
+    {
+        Models::setGlobal( Fn::Property::G_WIDTH_MAINGL2, width );
+        Models::setGlobal( Fn::Property::G_HEIGHT_MAINGL2, height );
+    }
 
     update();
 }
@@ -281,7 +311,8 @@ void GLWidget::setView( Fn::Orient view )
 
 void GLWidget::screenshot( QString fn )
 {
-    m_sceneRenderer->screenshot( fn );
+    m_doScreenshot = true;
+    m_screenshotFileName = fn;
 }
 
 void GLWidget::rightMouseDown( QMouseEvent* event )

@@ -114,7 +114,6 @@ private:
 
     QAction* dilbertAct;
 
-    static int screenshotNumber;
     static int countMainGL;
 
 public slots:
