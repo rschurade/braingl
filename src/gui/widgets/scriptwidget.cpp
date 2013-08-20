@@ -69,10 +69,6 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_script.push_back( line );
 
     initLayout();
-
-    float test = 1.0f;
-    QVariant tv( test );
-    qDebug() << "test:" << tv.type() << tv.typeName();
 }
 
 ScriptWidget::~ScriptWidget()
