@@ -461,7 +461,7 @@ namespace Fn
                 case Property::G_HEIGHT_MAINGL2: return QString( "width maingl2" ); break;
                 case Property::G_SCREENSHOT_DO_MAINGL: return QString( "do maingl" ); break;
                 case Property::G_SCREENSHOT_DO_MAINGL2: return QString( "do maingl2" ); break;
-                case Property::G_SCREENSHOT_STEREOSCOPIC: return QString( "stereoskopic screenshot" ); break;
+                case Property::G_SCREENSHOT_STEREOSCOPIC: return QString( "stereoscopic screenshot" ); break;
                 case Property::G_SCREENSHOT_PREFIX: return QString( "filename prefix" ); break;
                 case Property::G_SCREENSHOT_PREFIX2: return QString( "filename prefix maingl2" ); break;
                 case Property::G_SCREENSHOT_DIGITS: return QString( "filename num digits" ); break;
