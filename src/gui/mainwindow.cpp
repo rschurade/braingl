@@ -906,15 +906,15 @@ void MainWindow::screenshot()
 
     // iterate over all datasets
     // modify to count datasets
-    int frames = 3;
+    int frames = 180;
     for ( int i = 0; i < frames; ++i )
     {
-        mainGLWidget->getArcBall()->rotateZ(1);  //Rotation
-        mainGLWidget->getArcBall()->rotate(1,0,1,0);  //Bspw: Rotation um y-Achse um ein Grad (Winkel (Schritt), x,y,z)
+        //mainGLWidget->getArcBall()->rotateZ(1);  //Rotation
+        mainGLWidget->getArcBall()->rotate(2,0,0,1);  //Bspw: Rotation um y-Achse um ein Grad (Winkel (Schritt), x,y,z)
         //mainGLWidget->getArcBall()->translate(0,0,100);  //Translation
 
         // für simple rotation ohne datensatzwechsel replace #if 1 durch #if 0
-#if 1
+#if 0
         // delete last dataset in list to preserve memory
         Models::d()->setData( Models::d()->index( 0, (int)Fn::Property::D_DELETE_LAST ), true );
 
