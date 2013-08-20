@@ -45,7 +45,6 @@
 #include <QtGui>
 #include <QWebView>
 
-int MainWindow::screenshotNumber = 0;
 int MainWindow::countMainGL = 2;
 
 MainWindow::MainWindow( bool debug, bool resetSettings ) :
@@ -1004,14 +1003,26 @@ void MainWindow::screenshot()
     {
         path += '/';
     }
-    QString numberString = QString::number( screenshotNumber++ );
+    QString numberString = Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toString();
+    Models::setGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER, Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toInt() + 1 );
     int nss = numberString.size();
-    for ( int i = 0; i < 4 - nss; ++i )
+    int numDigits = Models::getGlobal( Fn::Property::G_SCREENSHOT_DIGITS ).toInt();
+    QString prefix = Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ).toString();
+    QString prefix2 = Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ).toString();
+
+    for ( int i = 0; i < numDigits - nss; ++i )
     {
         numberString = "0" + numberString;
     }
 
-    mainGLWidget->screenshot( path + QString("screenshot_") + numberString + QString( ".png" ) );
+    if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ).toBool() )
+    {
+        mainGLWidget->screenshot( path + prefix + numberString + QString( ".png" ) );
+    }
+    if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ).toBool() )
+    {
+        mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ) );
+    }
 }
 
 void MainWindow::resetSettings()

@@ -245,11 +245,29 @@ namespace Fn
         G_OBJECT,
         G_NEED_SHADER_UPDATE,
         G_BACKGROUND_COLOR_MAIN,
+        G_BACKGROUND_COLOR_MAIN2,
         G_BACKGROUND_COLOR_COMBINED,
         G_BACKGROUND_COLOR_NAV1,
         G_BACKGROUND_COLOR_NAV2,
         G_BACKGROUND_COLOR_NAV3,
         G_CROSSHAIR_COLOR,
+        G_SCREENSHOT_WIDTH,
+        G_SCREENSHOT_HEIGHT,
+        G_SCREENSHOT_KEEP_ASPECT,
+        G_SCREENSHOT_SIZE_RATIO,
+        G_SCREENSHOT_SIZE_SELECTION,
+        G_SCREENSHOT_COPY_CURRENT,
+        G_WIDTH_MAINGL,
+        G_HEIGHT_MAINGL,
+        G_WIDTH_MAINGL2,
+        G_HEIGHT_MAINGL2,
+        G_SCREENSHOT_DO_MAINGL,
+        G_SCREENSHOT_DO_MAINGL2,
+        G_SCREENSHOT_STEREOSCOPIC,
+        G_SCREENSHOT_PREFIX,
+        G_SCREENSHOT_PREFIX2,
+        G_SCREENSHOT_DIGITS,
+        G_SCREENSHOT_CURRENT_NUMBER,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -425,11 +443,29 @@ namespace Fn
                 case Property::G_LAST_PATH: return QString( "" ); break;
                 case Property::G_SCREENSHOT_PATH: return QString( "screenshot dir" ); break;
                 case Property::G_BACKGROUND_COLOR_MAIN: return QString( "background color main" ); break;
+                case Property::G_BACKGROUND_COLOR_MAIN2: return QString( "background color main 2" ); break;
                 case Property::G_BACKGROUND_COLOR_COMBINED: return QString( "background color combined" ); break;
                 case Property::G_BACKGROUND_COLOR_NAV1: return QString( "background color nav 1" ); break;
                 case Property::G_BACKGROUND_COLOR_NAV2: return QString( "background color nav 2" ); break;
                 case Property::G_BACKGROUND_COLOR_NAV3: return QString( "background color nav 3" ); break;
                 case Property::G_CROSSHAIR_COLOR: return QString( "crosshair color" ); break;
+                case Property::G_SCREENSHOT_WIDTH: return QString( "screenshot width" ); break;
+                case Property::G_SCREENSHOT_HEIGHT: return QString( "screenshot height" ); break;
+                case Property::G_SCREENSHOT_KEEP_ASPECT: return QString( "keep current aspect ratio" ); break;
+                case Property::G_SCREENSHOT_SIZE_RATIO: return QString( "current aspect ratio" ); break;
+                case Property::G_SCREENSHOT_SIZE_SELECTION: return QString( "select screenshot size" ); break;
+                case Property::G_SCREENSHOT_COPY_CURRENT: return QString( "copy current screen size" ); break;
+                case Property::G_WIDTH_MAINGL: return QString( "width maingl" ); break;
+                case Property::G_HEIGHT_MAINGL: return QString( "height maingl" ); break;
+                case Property::G_WIDTH_MAINGL2: return QString( "width maingl2" ); break;
+                case Property::G_HEIGHT_MAINGL2: return QString( "width maingl2" ); break;
+                case Property::G_SCREENSHOT_DO_MAINGL: return QString( "do maingl" ); break;
+                case Property::G_SCREENSHOT_DO_MAINGL2: return QString( "do maingl2" ); break;
+                case Property::G_SCREENSHOT_STEREOSCOPIC: return QString( "stereoskopic screenshot" ); break;
+                case Property::G_SCREENSHOT_PREFIX: return QString( "filename prefix" ); break;
+                case Property::G_SCREENSHOT_PREFIX2: return QString( "filename prefix maingl2" ); break;
+                case Property::G_SCREENSHOT_DIGITS: return QString( "filename num digits" ); break;
+                case Property::G_SCREENSHOT_CURRENT_NUMBER: return QString( "current screenshot number" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
@@ -461,6 +497,27 @@ namespace Fn
     enum class ROIType : int
     {
         Box, Sphere, Potato
+    };
+
+    enum class Resolution : int
+    {
+        R_1024x768,
+        R_1920x1080,
+        R_1920x1200
+    };
+
+    struct Resolution2String
+    {
+        static QString s( Resolution r )
+        {
+            switch ( r )
+            {
+                case Resolution::R_1024x768: return QString( "1024x786" ); break;
+                case Resolution::R_1920x1080: return QString( "1920x1080" ); break;
+                case Resolution::R_1920x1200: return QString( "1920x1200" ); break;
+            }
+            return QString( "resolution not defined" );
+        }
     };
 }
 

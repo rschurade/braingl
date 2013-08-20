@@ -44,6 +44,8 @@ public:
     void getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVector3D &viewdir, QVector3D &updir );
 
 private:
+    QString m_name;
+
     QItemSelectionModel* m_roiSelectionModel;
 
     CameraBase* m_cameraInUse;
@@ -71,6 +73,9 @@ private:
 
     int m_width;
     int m_height;
+
+    bool m_doScreenshot;
+    QString m_screenshotFileName;
 
     void calcMVPMatrix();
 
