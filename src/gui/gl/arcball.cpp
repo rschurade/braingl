@@ -6,6 +6,8 @@
  */
 #include "arcball.h"
 
+#include "../../data/models.h"
+
 #include <QtDebug>
 
 #include <math.h>
@@ -176,7 +178,9 @@ QMatrix4x4 ArcBall::getMVMat()
 
     mv = m_currentRot * mv ;
 
-    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, -300 );
+    float dist = Models::getGlobal( Fn::Property::G_ARCBALL_DISTANCE ).toFloat();
+
+    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, -dist );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );

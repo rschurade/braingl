@@ -87,7 +87,8 @@ void Camera::viewLeft()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_lookAt = m_lookAt + m_keyboardStep * dir;
+    //m_lookAt = m_lookAt + m_keyboardStep * dir;
+    m_position = m_position + m_keyboardStep * dir;
     setGlobals();
 }
 void Camera::viewRight()
@@ -97,7 +98,8 @@ void Camera::viewRight()
     dir.normalize();
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
-    m_lookAt = m_lookAt - m_keyboardStep * dir;
+    //m_lookAt = m_lookAt - m_keyboardStep * dir;
+    m_position = m_position - m_keyboardStep * dir;
     setGlobals();
 
 }
