@@ -165,8 +165,11 @@ void GLWidget::calcMVPMatrix()
     //m_pMatrix.perspective(45.0, ratio, 100, 10000);
     //m_pMatrix.translate(m_x_shift,0.0,-1000.0);
 
-    m_pMatrix.frustum(-800-m_x_shift/10.0,800-m_x_shift/10.0,-160,900-160,900,30000);
-    m_pMatrix.translate(m_x_shift,0.0,-20000.0);
+    float near = 10.0;
+    m_pMatrix.frustum((-8000-m_x_shift)/near,(8000-m_x_shift)/near,-1600/near,(9000-1600)/near,9000/near,30000);
+    m_pMatrix.translate(m_x_shift,0.0,-1000.0); //original: 20000
+
+    m_pMatrix.scale(1/near);
 
     qDebug() << m_pMatrix;
 
