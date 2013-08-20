@@ -221,7 +221,7 @@ void GLWidget::calcMVPMatrix()
         ratio = static_cast<float>( m_width ) / static_cast<float>( m_height );
     }
 
-    if ( projection == 0 )
+    if ( projection == 0 ) // ortho
     {
         if ( ratio >= 1.0 )
         {
@@ -232,7 +232,7 @@ void GLWidget::calcMVPMatrix()
             m_pMatrix.ortho( -halfBB, halfBB, -halfBB / ratio, halfBB / ratio, -3000, 3000 );
         }
     }
-    else
+    else // perspective
     {
         float nearPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
         float farPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();

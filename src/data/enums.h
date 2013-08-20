@@ -268,6 +268,7 @@ namespace Fn
         G_SCREENSHOT_PREFIX2,
         G_SCREENSHOT_DIGITS,
         G_SCREENSHOT_CURRENT_NUMBER,
+        G_ARCBALL_DISTANCE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -466,6 +467,7 @@ namespace Fn
                 case Property::G_SCREENSHOT_PREFIX2: return QString( "filename prefix maingl2" ); break;
                 case Property::G_SCREENSHOT_DIGITS: return QString( "filename num digits" ); break;
                 case Property::G_SCREENSHOT_CURRENT_NUMBER: return QString( "current screenshot number" ); break;
+                case Property::G_ARCBALL_DISTANCE: return QString( "arcball distance" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
