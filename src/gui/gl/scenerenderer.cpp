@@ -364,8 +364,11 @@ void SceneRenderer::renderMerge()
     GLFunctions::getAndPrintGLError( m_renderTarget + "after render scene" );
 }
 
-QImage* SceneRenderer::screenshot()
+QImage* SceneRenderer::screenshot( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
 {
+    m_mvMatrix = mvMatrix;
+    m_pMatrix = pMatrix;
+
     int screenshotWidth = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_WIDTH, 0 ) ).toInt();
     int screenshotHeight = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SCREENSHOT_HEIGHT, 0 ) ).toInt();
     int tmpWidth = m_width;

@@ -32,7 +32,7 @@ public:
 	void initGL();
 	void draw( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix );
 	void renderMerge();
-	QImage* screenshot();
+	QImage* screenshot( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix );
 
     QVector3D mapMouse2World( int x, int y, int z );
     QVector2D mapWorld2Mouse( float x, float y, float z );
