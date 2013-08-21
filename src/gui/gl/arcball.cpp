@@ -115,8 +115,8 @@ void ArcBall::mouseWheel( float step )
 
 void ArcBall::midDrag( int x, int y )
 {
-    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / m_zoom / m_zoom / 2 );
-    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / m_zoom / m_zoom / 2 );
+    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / 2 );
+    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / 2 );
 }
 
 void ArcBall::setRotCenter( float x, float y, float z )
@@ -180,7 +180,7 @@ QMatrix4x4 ArcBall::getMVMat()
 
     float dist = Models::getGlobal( Fn::Property::G_ARCBALL_DISTANCE ).toFloat();
 
-    QVector3D halfMove( -m_moveX * m_zoom, m_moveY * m_zoom, -dist );
+    QVector3D halfMove( -m_moveX / m_zoom, m_moveY / m_zoom, -dist );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
