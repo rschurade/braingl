@@ -8,6 +8,7 @@
 #include "datasetsurfaceset.h"
 
 #include "../../gui/gl/pointglyphrenderer.h"
+#include "../../gui/gl/diffpointglyphrenderer.h"
 #include "../../gui/gl/vectorglyphrenderer.h"
 #include "../../gui/gl/pieglyphrenderer.h"
 
@@ -37,7 +38,9 @@ public:
     int vecsNumber;
 
     void makePies();
+
     void makeDiffPoints();
+    int diffsNumber;
 
     QList<Dataset*> createConnections();
 
@@ -61,12 +64,14 @@ private:
     int m_n;  //number of vertices, has to match size of matrix
 
     float* consArray;
+    float* diffsArray;
     float* vecsArray;
 
     QVector<float*>* pieArrays;
     QVector<int>* numbers;
 
     PointGlyphRenderer* m_prenderer;
+    DiffPointGlyphRenderer* m_dprenderer;
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
 

@@ -33,6 +33,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 m_prenderer( NULL ),
                 m_vrenderer( NULL ),
                 m_pierenderer( NULL ),
+                m_dprenderer( NULL ),
                 prevGeo( -1 ),
                 prevGlyph( -1 ),
                 prevCol( -1 ),
@@ -290,17 +291,17 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     }
 
     if ( ( glyphstyle == 3 )
-            && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
+            && ( ( m_dprenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
                     || ( prevGlyphstyle != glyphstyle ) ) )
     {
-        if ( m_prenderer )
+        if ( m_dprenderer )
         {
-            delete m_prenderer;
+            delete m_dprenderer;
         }
-        m_prenderer = new PointGlyphRenderer();
-        m_prenderer->init();
+        m_dprenderer = new DiffPointGlyphRenderer();
+        m_dprenderer->init();
         makeDiffPoints();
-        m_prenderer->initGeometry( consArray, consNumber );
+        m_dprenderer->initGeometry( diffsArray, diffsNumber );
     }
 
     //TODO: Deal with multiple passes / switching btw. styles etc.:
@@ -326,7 +327,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     }
     if ( glyphstyle == 3 )
     {
-        m_prenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+        m_dprenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
     if ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool() )
     {
@@ -436,7 +437,7 @@ void DatasetGlyphset::makeDiffPoints()
 
     m_n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << m_n;
-    int offset = 13;
+    int offset = 14;
     //TODO: ROIs?
     //for each triangle
     QVector<int> tris = m_mesh.at( geo )->getTriangles();
@@ -455,7 +456,7 @@ void DatasetGlyphset::makeDiffPoints()
         idPairs.append( tris.at( tri ) );
     }
     qDebug() << "idPairs done, size: " << idPairs.size();
-    consNumber = 0;
+    diffsNumber = 0;
     for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
         //get two point ids i1,i2
@@ -467,17 +468,20 @@ void DatasetGlyphset::makeDiffPoints()
         {
             for ( int j = 0; j < m_n; ++j )
             {
-                float v = qAbs( conn[i1][j] - conn[i2][j] );
-                if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
+                //float v = qAbs( conn[i1][j] - conn[i2][j] );
+                //if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
+                float v1 = conn[i1][j];
+                float v2 = conn[i2][j];
+                if ( ( v1 > minthresh ) && ( v1 < maxthresh ) && roi[i1] && ( v2 > minthresh ) && ( v2 < maxthresh ) && roi[i2] )
                 {
-                    consNumber++;
+                    diffsNumber++;
                 }
             }
         }
     }
-    consArray = new float[offset * consNumber];
-    qDebug() << "cons: " << consNumber;
-    consNumber = 0;
+    diffsArray = new float[offset * diffsNumber];
+    qDebug() << "diffs: " << diffsNumber;
+    diffsNumber = 0;
     for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
         //get two point ids i1,i2
@@ -495,9 +499,12 @@ void DatasetGlyphset::makeDiffPoints()
             //qDebug() << "point: " << i1 << " " << i2;
             for ( int j = 0; j < m_n; ++j )
             {
-                float v = qAbs( conn[i1][j] - conn[i2][j] );
+                //float v = qAbs( conn[i1][j] - conn[i2][j] );
+                //if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
                 //TODO: What treshold do we use?
-                if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
+                float v1 = conn[i1][j];
+                float v2 = conn[i2][j];
+                if ( ( v1 > minthresh ) && ( v1 < maxthresh ) && roi[i1] && ( v2 > minthresh ) && ( v2 < maxthresh ) && roi[i2] )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
                     QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -518,22 +525,23 @@ void DatasetGlyphset::makeDiffPoints()
                     QVector3D fc2 = m_mesh.at( col )->getVertex( i2 );
                     QVector3D dc2 = tc - fc2;
 
-                    consArray[offset * consNumber] = ( f1.x() + f2.x() ) / 2.0;
-                    consArray[offset * consNumber + 1] = ( f1.y() + f2.y() ) / 2.0;
-                    consArray[offset * consNumber + 2] = ( f1.z() + f2.z() ) / 2.0;
-                    consArray[offset * consNumber + 3] = v;
-                    consArray[offset * consNumber + 4] = t.x();
-                    consArray[offset * consNumber + 5] = t.y();
-                    consArray[offset * consNumber + 6] = t.z();
+                    diffsArray[offset * diffsNumber] = ( f1.x() + f2.x() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 1] = ( f1.y() + f2.y() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 2] = ( f1.z() + f2.z() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 3] = v1;
+                    diffsArray[offset * diffsNumber + 4] = t.x();
+                    diffsArray[offset * diffsNumber + 5] = t.y();
+                    diffsArray[offset * diffsNumber + 6] = t.z();
 
-                    consArray[offset * consNumber + 7] = ( dg1.x() + dg2.x() ) / 2.0;
-                    consArray[offset * consNumber + 8] = ( dg1.y() + dg2.y() ) / 2.0;
-                    consArray[offset * consNumber + 9] = ( dg1.z() + dg2.z() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 7] = ( dg1.x() + dg2.x() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 8] = ( dg1.y() + dg2.y() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 9] = ( dg1.z() + dg2.z() ) / 2.0;
 
-                    consArray[offset * consNumber + 10] = ( dc1.x() + dc2.x() ) / 2.0;
-                    consArray[offset * consNumber + 11] = ( dc1.y() + dc2.y() ) / 2.0;
-                    consArray[offset * consNumber + 12] = ( dc1.z() + dc2.z() ) / 2.0;
-                    consNumber++;
+                    diffsArray[offset * diffsNumber + 10] = ( dc1.x() + dc2.x() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 11] = ( dc1.y() + dc2.y() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 12] = ( dc1.z() + dc2.z() ) / 2.0;
+                    diffsArray[offset * diffsNumber + 13] = v2;
+                    diffsNumber++;
                 }
             }
         }
