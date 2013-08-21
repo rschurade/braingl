@@ -42,9 +42,11 @@ public:
     QQuaternion getRotation();
     void setRotation( QQuaternion quat );
 
+    QQuaternion mat2quat( QMatrix4x4 &mat );
+
 private:
     QVector3D map_sphere( int x, int y );
-    QQuaternion mat2quat( QMatrix4x4 &mat );
+
 
     float Epsilon;
 

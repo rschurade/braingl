@@ -264,6 +264,12 @@ void GLWidget::calcMVPMatrix()
         m_camera->setState( l );
     }
 
+    if ( dynamic_cast<Camera*>( m_cameraInUse ) )
+    {
+        QMatrix4x4 rot = m_camera->getMVMat();
+        m_arcBall->setRotation( m_arcBall->mat2quat( rot ) );
+    }
+
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_cameraInUse->getMoveX() );
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );

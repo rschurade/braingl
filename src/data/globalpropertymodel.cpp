@@ -51,9 +51,9 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_CAMERA_UP_Z, 1.0f, -1.0f, 1.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_NEAR, 2.0f, -500.0f, 100.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
-    m_properties->create( Fn::Property::G_CAMERA_ANGLE, 90, 1, 180, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_ANGLE, 45, 1, 180, "camera" );
 
-    m_properties->create( Fn::Property::G_ARCBALL_DISTANCE, 300.0f, 1.0f, 20000.0f, "arcball" );
+    m_properties->create( Fn::Property::G_ARCBALL_DISTANCE, 500.0f, 1.0f, 20000.0f, "arcball" );
 
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
     m_properties->create( Fn::Property::G_BACKGROUND_COLOR_MAIN2, QColor( 255, 255, 255 ), "general" );
