@@ -38,14 +38,21 @@ public:
     void setMoveX( float x );
     void setMoveY( float y );
 
+    // these functions modify the look at position
     void viewUp();
     void viewDown();
     void viewLeft();
     void viewRight();
-    void forward();
-    void backward();
+
+    // these functions modify the camera position
     void up();
     void down();
+    void left();
+    void right();
+
+    // these functions modify both look at and camera position
+    void forward();
+    void backward();
     void strafeLeft();
     void strafeRight();
 
@@ -63,6 +70,7 @@ private:
     int m_clickX;
     int m_clickY;
     QVector3D m_lookAtTemp;
+    QVector3D m_positionTemp;
     float m_keyboardStep;
 };
 

@@ -258,7 +258,8 @@ void GLWidget::calcMVPMatrix()
         getCameraParametersFromModelviewMatrix( pos, view, up );
         QList<QVariant>l;
         l.push_back( pos );
-        l.push_back( pos + view * 10 );
+        //l.push_back( pos + view * 10 );
+        l.push_back( -m_arcBall->getRotCenter() );
         l.push_back( up );
         m_camera->setState( l );
     }
@@ -561,35 +562,45 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         {
             switch( event->key() )
             {
-                case 69:
                 case Qt::Key_Left :
+                    m_camera->viewLeft();
+                    break;
+                case Qt::Key_Right:
+                    m_camera->viewRight();
+                    break;
+                case Qt::Key_Up :
+                    m_camera->viewUp();
+                    break;
+                case Qt::Key_Down:
+                    m_camera->viewDown();
+                    break;
+                case 69:
                     m_camera->strafeLeft();
                     break;
                 case 81:
-                case Qt::Key_Right:
                     m_camera->strafeRight();
                     break;
                 case 87:
-                case Qt::Key_Up :
-                    m_camera->forward();
-                    break;
-                case 83:
-                case Qt::Key_Down:
-                    m_camera->backward();
-                    break;
-                case 68:
-                    m_camera->viewLeft();
-                    break;
-                case 65:
-                    m_camera->viewRight();
-                    break;
-                case 82:
                     m_camera->up();
                     break;
-                case 70:
+                case 83:
                     m_camera->down();
                     break;
+                case 68:
+                    m_camera->left();
+                    break;
+                case 65:
+                    m_camera->right();
+                    break;
+                case 82:
+                    m_camera->forward();
+                    break;
+                case 70:
+                    m_camera->backward();
+                    break;
             }
+            QList<QVariant> state = m_camera->getState();
+            emit signalCameraChanged();
         }
         else
         {

@@ -130,6 +130,9 @@ void ScriptWidget::initLayout()
     m_screenshotEach = new CheckboxWithLabel( "screenshot each step", -1, this );
     buttons2->addWidget( m_screenshotEach );
 
+    m_copyCamera = new CheckboxWithLabel( "copy camera", -1, this );
+    buttons2->addWidget( m_copyCamera );
+
     m_delay = new SliderWithEditInt( "delay", 0, this );
     m_delay->setMin( 1 );
     m_delay->setMax( 1000 );
@@ -1460,5 +1463,35 @@ QVariant ScriptWidget::interpolateQVariant( QVariant &lhs, QVariant &rhs, float 
     else
     {
         return lhs;
+    }
+}
+
+void ScriptWidget::slotCameraChanged()
+{
+    if ( m_copyCamera->checked() )
+    {
+        QList<QVariant> camera = m_glWidget->getCamera()->getState();
+        QList<QVariant>commandLine;
+
+        commandLine.push_back( true );
+        commandLine.push_back( (int)ScriptCommand::SET_CAMERA );
+
+        commandLine.push_back( camera[0] );
+        commandLine.push_back( camera[1] );
+        commandLine.push_back( camera[2] );
+
+        if ( m_script.last().at( 1 ).toInt() ==  (int)ScriptCommand::NONE )
+        {
+            m_script.replace( m_script.size() - 1, commandLine );
+        }
+        else
+        {
+            m_script.push_back( commandLine );
+        }
+        QList<QVariant> command;
+        command.push_back( true );
+        command.push_back( (int)ScriptCommand::NONE );
+        m_script.push_back( command );
+        rebuild();
     }
 }

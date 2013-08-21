@@ -34,6 +34,7 @@ public:
     float getMoveY();
     void setMoveX( float x );
     void setMoveY( float y );
+    QVector3D getRotCenter();
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );

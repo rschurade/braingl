@@ -88,6 +88,7 @@ private:
     QWidget* m_widgetToEnsureVisible;
     CheckboxWithLabel* m_contRunning;
     CheckboxWithLabel* m_screenshotEach;
+    CheckboxWithLabel* m_copyCamera;
     SliderWithEditInt* m_delay;
 
     QList<QList<QVariant> >m_script;
@@ -135,6 +136,7 @@ private:
 public slots:
     void loadScript( QString fileName );
     void saveScript( QString fileName );
+    void slotCameraChanged();
 
 private slots:
     void loadScript();

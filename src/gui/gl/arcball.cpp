@@ -330,3 +330,7 @@ QQuaternion ArcBall::mat2quat( QMatrix4x4 &mat )
     return QQuaternion( q0, q1, q2, q3 );
 }
 
+QVector3D ArcBall::getRotCenter()
+{
+    return m_rotCenter;
+}
