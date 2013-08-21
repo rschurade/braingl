@@ -108,6 +108,20 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
 
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_WIDTH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_WIDTH ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_HEIGHT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_HEIGHT ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_SIZE_RATIO ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_RATIO ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_COPY_CURRENT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_COPY_CURRENT ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DO_MAINGL ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ), Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PREFIX ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DIGITS ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DIGITS ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
+
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
 
@@ -153,6 +167,20 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV3 );
     loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
     loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
+
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_WIDTH );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_HEIGHT );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_KEEP_ASPECT );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_SIZE_RATIO );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_SIZE_SELECTION );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_COPY_CURRENT );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_DO_MAINGL );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_DO_MAINGL2 );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_STEREOSCOPIC );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX2 );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_DIGITS );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_CURRENT_NUMBER );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
@@ -382,22 +410,23 @@ void MainWindow::saveScene( QString fileName )
     //  save global settings
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SAGITTAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CORONAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_AXIAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_AXIAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_CORONAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_SAGITTAL ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV1, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_RENDER_CROSSHAIRS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_QUALITY, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_TRANSPARENCY, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SAGITTAL ), Models::getGlobal( Fn::Property::G_SAGITTAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CORONAL ), Models::getGlobal( Fn::Property::G_CORONAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_AXIAL ), Models::getGlobal( Fn::Property::G_AXIAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_AXIAL ), Models::getGlobal( Fn::Property::G_SHOW_AXIAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_CORONAL ), Models::getGlobal( Fn::Property::G_SHOW_CORONAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_SAGITTAL ), Models::getGlobal( Fn::Property::G_SHOW_SAGITTAL ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_MAIN ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV1 ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV2 ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_RENDER_CROSSHAIRS ), Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::getGlobal( Fn::Property::G_SHOW_NAV_SLIDERS ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::getGlobal( Fn::Property::G_SCREENSHOT_QUALITY ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_TRANSPARENCY ) );
+
     settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
     settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
 
