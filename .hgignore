@@ -1,0 +1,9 @@
+syntax: blob
+.autotools
+.project
+.cproject
+.settings
+syntax: regexp
+^build$
+syntax: regexp
+^tmp$
