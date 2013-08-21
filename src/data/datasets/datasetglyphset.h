@@ -79,11 +79,16 @@ private:
     float prevThresh, prevMinlength;
 
     QString m_colors_name;
-    int pickedID;
     QVector<int> picked;
+    //int pickedID;
     QVector<MeshRenderer*> littleBrains;
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
+
+    int m_prevPickedID;
+
+    void setPickedID( int id );
+
 };
 
 #endif /* DATASETGLYPHSET_H_ */
