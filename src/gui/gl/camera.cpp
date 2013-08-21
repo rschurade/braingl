@@ -35,8 +35,8 @@ void Camera::click( int x, int y )
 
 void Camera::drag( int x, int y )
 {
-    float distX = ( m_clickX - x ) / 5;
-    float distY = ( m_clickY - y ) / 5;
+    float distX = ( m_clickX - x );
+    float distY = ( m_clickY - y );
 
     QVector3D dir = m_lookAt -  m_positionTemp;
     float distance = dir.length();
