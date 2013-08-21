@@ -134,12 +134,13 @@ private:
     QList< QList<QVariant> >m_loopList;
 
 public slots:
-    void loadScript( QString fileName );
+    void loadScript( QString fileName, bool append );
     void saveScript( QString fileName );
     void slotCameraChanged();
 
 private slots:
     void loadScript();
+    void appendScript();
     void saveScript();
     void run( bool checked );
     void run();
