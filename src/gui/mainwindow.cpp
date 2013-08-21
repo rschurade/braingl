@@ -275,7 +275,7 @@ void MainWindow::load( QString fileName )
         }
         else if( fileName.endsWith( "bgscript" ) )
         {
-            m_scriptWidget->loadScript( fileName );
+            m_scriptWidget->loadScript( fileName, true );
         }
         else
         {
