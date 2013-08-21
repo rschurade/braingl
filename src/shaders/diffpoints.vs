@@ -21,7 +21,8 @@ void main()
 {
     vec3 d = abs( normalize( dc ) );
     frontColor =  vec4(d, pow( a_value, 10*(1-u_beta) ) );
-    if ( ( ((threshold > a_value)&&(threshold < a_value2)) || ((threshold < a_value)&&(threshold > a_value2)) ) && length(a_position-a_to) > minlength) {
+    //if ( ( ((threshold > a_value)&&(threshold < a_value2)) || ((threshold < a_value)&&(threshold > a_value2)) ) && length(a_position-a_to) > minlength) { 
+    if ( (abs(a_value-a_value2)>threshold) && length(a_position-a_to) > minlength) {
         v_discard = 0.0;
     } else {
         v_discard = 1.0;
