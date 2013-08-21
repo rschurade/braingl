@@ -180,7 +180,7 @@ QMatrix4x4 ArcBall::getMVMat()
 
     float dist = Models::getGlobal( Fn::Property::G_ARCBALL_DISTANCE ).toFloat();
 
-    QVector3D halfMove( -m_moveX / m_zoom, m_moveY / m_zoom, -dist );
+    QVector3D halfMove( -m_moveX, m_moveY, -dist );
     QMatrix4x4 tmp;
     tmp.setToIdentity();
     tmp.translate( halfMove );
