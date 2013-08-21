@@ -207,7 +207,7 @@ void GLWidget::calcMVPMatrix()
     m_pMatrix.setToIdentity();
 
     float zoom  = m_cameraInUse->getZoom();
-    float halfBB = boundingbox / 2.0 / zoom;
+    float halfBB = ( boundingbox / 2 ) / zoom;
 
     float ratio = 1.0f;
     if ( m_doScreenshot )
