@@ -106,6 +106,10 @@ void ScriptWidget::initLayout()
     buttons1->addWidget( lbutton );
     connect( lbutton, SIGNAL( clicked() ), this, SLOT( loadScript() ) );
 
+    QPushButton* appendButton = new QPushButton( "Append", this );
+    buttons1->addWidget( appendButton );
+    connect( appendButton, SIGNAL( clicked() ), this, SLOT( appendScript() ) );
+
     QPushButton* sbutton = new QPushButton( "Save", this );
     buttons1->addWidget( sbutton );
     connect( sbutton, SIGNAL( clicked() ), this, SLOT( saveScript() ) );
@@ -655,7 +659,7 @@ void ScriptWidget::addRoiPropertySelect( QHBoxLayout* layout, int id, int select
     select->setEnabled( active );
 }
 
-void ScriptWidget::loadScript( QString fileName )
+void ScriptWidget::loadScript( QString fileName, bool append )
 {
     QSettings settings( fileName, QSettings::IniFormat );
 
@@ -682,7 +686,12 @@ void ScriptWidget::loadScript( QString fileName )
     {
         qDebug() << "*** ERROR *** No size entry in script file.";
     }
-    m_script.clear();
+
+    if ( !append )
+    {
+        m_script.clear();
+    }
+
     for ( int i = 0; i < size; ++i )
     {
         if( settings.contains( QString::number( i ) ) )
@@ -706,7 +715,14 @@ void ScriptWidget::loadScript()
 {
     QString fn = Models::getGlobal( (int)Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
-    loadScript( fileName );
+    loadScript( fileName, false );
+}
+
+void ScriptWidget::appendScript()
+{
+    QString fn = Models::getGlobal( (int)Fn::Property::G_LAST_PATH ).toString();
+    QString fileName = QFileDialog::getOpenFileName( this, "Open File", fn );
+    loadScript( fileName, true );
 }
 
 void ScriptWidget::saveScript( QString fileName )
