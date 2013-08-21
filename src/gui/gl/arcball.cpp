@@ -115,8 +115,8 @@ void ArcBall::mouseWheel( float step )
 
 void ArcBall::midDrag( int x, int y )
 {
-    m_moveX = ( m_oldMoveX + ( m_midClickX - x ) / 2 );
-    m_moveY = ( m_oldMoveY + ( m_midClickY - y ) / 2 );
+    m_moveX = m_oldMoveX + ( ( m_midClickX - x ) / 2 ) / m_zoom;
+    m_moveY = m_oldMoveY + ( ( m_midClickY - y ) / 2 ) / m_zoom;
 }
 
 void ArcBall::setRotCenter( float x, float y, float z )
