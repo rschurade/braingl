@@ -41,10 +41,10 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
-                pickedID( -1 ),
                 littleBrains( QVector<MeshRenderer*>() ),
                 shifts1( QVector<QVector3D>() ),
-                shifts2( QVector<QVector3D>() )
+                shifts2( QVector<QVector3D>() ),
+                m_prevPickedID( -1 )
 {
     qDebug() << "minthresh set to: " << minthresh;
 
@@ -61,6 +61,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, 100000, "general" ); //TODO: Change the limits later?
 
     float min = -1.0;
     float max = 1.0;
@@ -199,6 +200,12 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
+    }
+
+    int pickedID = properties( target )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
+    if ( m_prevPickedID != pickedID )
+    {
+        setPickedID( pickedID );
     }
 
     if ( properties( target )->get( Fn::Property::D_DRAW_SURFACE ).toBool() )
@@ -983,9 +990,19 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
 //TODO: Extra property for radius...
     picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
-    pickedID = getMesh( target )->closestVertexIndex( pos );
+    int pickedID = getMesh( target )->closestVertexIndex( pos );
+
+    properties( target )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
 
     DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
+    setPickedID( pickedID );
+    return true;
+}
+
+void DatasetGlyphset::setPickedID( int pickedID )
+{
+    qDebug() << "pickedID: " << pickedID;
+    m_prevPickedID = pickedID;
     for ( int i = 0; i < m_n; ++i )
     {
         if ( pickedID != -1 )
@@ -996,7 +1013,6 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
             }
         }
     }
-    return true;
 }
 
 void DatasetGlyphset::avgCon()
