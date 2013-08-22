@@ -34,6 +34,8 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_contRunning( 0 ),
     m_screenshotEach( 0 ),
     m_delay( 0 ),
+    m_beginSlider( 0 ),
+    m_endSlider( 0 ),
     m_scrollArea( 0 ),
     m_runButton( 0 ),
 
@@ -83,6 +85,11 @@ void ScriptWidget::rebuild()
     //delete m_scriptPanel;
     m_scriptPanel = buildScriptLayout();
     m_scrollArea->setWidget( m_scriptPanel );
+
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setValue( qMax( 0, m_script.size() - 1 ) );
+
     this->repaint();
 }
 
@@ -145,10 +152,22 @@ void ScriptWidget::initLayout()
     m_delay->setMax( 1000 );
     m_delay->setValue( 25 );
 
+    m_beginSlider = new SliderWithEditInt( "begin", 0, this );
+    m_beginSlider->setMin( 0 );
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_beginSlider->setValue( 0 );
+
+    m_endSlider = new SliderWithEditInt( "end", 0, this );
+    m_endSlider->setMin( 0 );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setValue( m_script.size() - 1  );
+
+
     buttons2->addStretch();
     buttons2->addStretch();
     buttons2->addStretch();
-    buttons1->addStretch();
+    buttons1->addWidget( m_beginSlider );
+    buttons1->addWidget( m_endSlider );
     buttons1->addWidget( m_delay );
 
     layout2->addLayout( buttons2 );
@@ -181,6 +200,9 @@ QWidget* ScriptWidget::buildScriptLayout()
 
         QHBoxLayout* layout = new QHBoxLayout();
         QList<QVariant>line = m_script[i];
+
+        QLabel* label = new QLabel( QString::number( i ), this );
+        layout->addWidget( label );
 
         CheckBoxID* checkBox = new CheckBoxID( i, this );
         layout->addWidget( checkBox );
@@ -730,15 +752,23 @@ void ScriptWidget::appendScript()
 
 void ScriptWidget::saveScript( QString fileName )
 {
+    if ( m_script.size() == 0 )
+    {
+        qDebug() << "script size is zero, no file saved ";
+        return;
+    }
     QSettings settings( fileName, QSettings::IniFormat );
     settings.setValue( "appName", "braingl" );
     settings.setValue( "version", "0.7.0" );
     settings.setValue( "fileType", "script" );
-    settings.setValue( "size", m_script.size() );
+    int begin = m_beginSlider->getValue();
+    int end = m_endSlider->getValue();
+    settings.setValue( "size", end - begin + 1 );
     settings.setValue( "delay", m_delay->getValue() );
-    for ( int i = 0; i < m_script.size(); ++i )
+    int lineIndex = 0;
+    for ( int i = begin; i <= end; ++i )
     {
-        settings.setValue( QString::number( i ), m_script[i] );
+        settings.setValue( QString::number( lineIndex++ ), m_script[i] );
     }
 }
 
@@ -779,7 +809,7 @@ void ScriptWidget::run( bool checked )
             emit( hideIndicator( true, i ) );
         }
         qDebug() << "start script";
-        m_currentCommandLine = 0;
+        m_currentCommandLine = m_beginSlider->getValue();
         m_runScript = true;
         run();
     }
@@ -799,11 +829,11 @@ void ScriptWidget::run()
     }
 
     emit( hideIndicator( true, m_currentCommandLine - 1 ) );
-    if ( m_currentCommandLine >= m_script.size() )
+    if ( m_currentCommandLine > m_endSlider->getValue() )
     {
         if( m_contRunning->checked() )
         {
-            m_currentCommandLine = 0;
+            m_currentCommandLine = m_beginSlider->getValue();
         }
         else
         {
