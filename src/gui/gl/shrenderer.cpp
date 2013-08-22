@@ -273,9 +273,9 @@ TriangleMesh2* SHRenderer::createMesh()
    yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
    zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
-   float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-   float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
-   float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
+//   float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
+//   float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
+//   float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
 
    int lod = m_lodAdjust;
 

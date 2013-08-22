@@ -68,5 +68,6 @@ void SDWidget::slotFinished()
 
 QList<Dataset*> SDWidget::getResult()
 {
-
+    QList<Dataset*>out;
+    return out;
 }
