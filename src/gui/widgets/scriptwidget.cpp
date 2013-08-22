@@ -79,16 +79,14 @@ ScriptWidget::~ScriptWidget()
 
 void ScriptWidget::rebuild()
 {
-    m_scrollArea->takeWidget();
+    m_scriptPanel = m_scrollArea->takeWidget();
+    delete m_scriptPanel->layout();
     // delete of old widget currently deactivated because of crash, possible connected to signals
     // i have no idea how to fix that
     //delete m_scriptPanel;
+
     m_scriptPanel = buildScriptLayout();
     m_scrollArea->setWidget( m_scriptPanel );
-
-    m_beginSlider->setMax( qMax( 0, m_script.size() - 1 ) );
-    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
-    m_endSlider->setValue( qMax( 0, m_script.size() - 1 ) );
 
     this->repaint();
 }
@@ -97,9 +95,26 @@ void ScriptWidget::initLayout()
 {
     m_widgetToEnsureVisible = 0;
 
+    // need to initialize these two slider here
+    m_beginSlider = new SliderWithEditInt( "begin", 0, this );
+    m_beginSlider->setMin( 0 );
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+    m_beginSlider->setValue( 0 );
+
+    m_endSlider = new SliderWithEditInt( "end", 0, this );
+    m_endSlider->setMin( 0 );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setValue( m_script.size() - 1  );
+
+    m_buildRange = new CheckboxWithLabel( "show only begin-end", -1, this );
+
     m_scriptPanel = buildScriptLayout();
     m_scrollArea = new QScrollArea( this );
     m_scrollArea->setWidget( m_scriptPanel );
+
+
+    connect( m_beginSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( slotRangeChanged() ) );
+    connect( m_endSlider, SIGNAL( valueChanged( int, int ) ), this, SLOT( slotRangeChanged() ) );
 
     QScrollBar* scrollbar = m_scrollArea->verticalScrollBar();
     connect( scrollbar, SIGNAL( rangeChanged( int, int ) ), this, SLOT( moveScrollBarToBottom( int, int ) ) );
@@ -147,20 +162,13 @@ void ScriptWidget::initLayout()
     buttons2->addWidget( m_copyCamera );
     connect( m_copyCamera, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCopyCameraChanged() ) );
 
+    buttons2->addWidget( m_buildRange );
+    connect( m_buildRange, SIGNAL( stateChanged( int, int ) ), this, SLOT( rebuild() ) );
+
     m_delay = new SliderWithEditInt( "delay", 0, this );
     m_delay->setMin( 1 );
     m_delay->setMax( 1000 );
     m_delay->setValue( 25 );
-
-    m_beginSlider = new SliderWithEditInt( "begin", 0, this );
-    m_beginSlider->setMin( 0 );
-    m_beginSlider->setMax( qMax( 0, m_script.size() - 1 ) );
-    m_beginSlider->setValue( 0 );
-
-    m_endSlider = new SliderWithEditInt( "end", 0, this );
-    m_endSlider->setMin( 0 );
-    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
-    m_endSlider->setValue( m_script.size() - 1  );
 
 
     buttons2->addStretch();
@@ -195,245 +203,260 @@ QWidget* ScriptWidget::buildScriptLayout()
     bool inLoop = false;
     bool inBlock = false;
 
+    int begin = m_beginSlider->getValue();
+    int end = m_endSlider->getValue();
+
     for ( int i = 0; i < m_script.size(); ++i )
     {
+        if ( m_buildRange->checked() && ( i < begin || i > end  ) )
+        {
+            continue;
+        }
 
-        QHBoxLayout* layout = new QHBoxLayout();
         QList<QVariant>line = m_script[i];
 
-        QLabel* label = new QLabel( QString::number( i ), this );
-        layout->addWidget( label );
-
-        CheckBoxID* checkBox = new CheckBoxID( i, this );
-        layout->addWidget( checkBox );
-        bool lineActive = line[0].toBool();
-        checkBox->setChecked( lineActive );
-        connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
-        connect( this, SIGNAL( checkBoxChanged( int, int ) ), checkBox, SLOT( slotSetChecked2( int, int ) ) );
-
-        if ( i == m_lastInsertedLine )
-        {
-            m_widgetToEnsureVisible = checkBox;
-        }
-
-        PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
-        layout->addWidget( insertButton );
-        insertButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
-        connect( insertButton, SIGNAL( signalClicked( int ) ), this, SLOT( insertCommand( int ) ) );
-
-        PushButtonWithId* deleteButton = new PushButtonWithId( "-", i );
-        layout->addWidget( deleteButton );
-        deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
-        connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( deleteCommand( int ) ) );
-
-        PushButtonWithId* upButton = new PushButtonWithId( "^", i );
-        layout->addWidget( upButton );
-        upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
-        connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandUp( int ) ) );
-
-        PushButtonWithId* downButton = new PushButtonWithId( "v", i );
-        layout->addWidget( downButton );
-        downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
-        connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandDown( int ) ) );
-
-
-        QColor lightRed( 255, 168, 168 );
-        QColor lightBlue( 168, 168, 255 );
-        QColor lightGreen( 168, 255, 168 );
-        QColor lightPurple( 255, 158, 255 );
-        QColor yellow( 255, 255, 0 );
-        QColor magenta( 0, 255, 255 );
-        QColor orange( 255, 160, 0 );
-
-        if( inLoop && line[1].toInt() != (int)ScriptCommand::END_LOOP )
-        {
-            QLabel* label = new QLabel( "loop", this );
-            label->setStyleSheet("QLabel { background-color : " + lightRed.name() + "}");
-            layout->addWidget( label );
-        }
-        if( inBlock && line[1].toInt() != (int)ScriptCommand::END_BLOCK )
-        {
-            QLabel* label = new QLabel( "block", this );
-
-            label->setStyleSheet("QLabel { background-color : " + lightBlue.name() + "}");
-            layout->addWidget( label );
-        }
-
-
-        ComboBoxID* select = new ComboBoxID( i * 10, this );
-        for ( int j = 0; j < NUM_SCRIPT_COMMANDS; ++j )
-        {
-            select->insertItem( j, Script2String::s( (ScriptCommand)j ) );
-        }
-
-        layout->addWidget( select );
-        select->setCurrentIndex( line[1].toInt() );
-        connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int ) ) );
-        connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
-
-        switch( (ScriptCommand)( line[1].toInt() ) )
-        {
-            case ScriptCommand::NONE:
-                addStretch( layout, 5 );
-                break;
-            case ScriptCommand::DELAY:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
-                addStretch( layout, 5 );
-                break;
-            }
-            case ScriptCommand::SET_CAMERA:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 3 );
-                QVector3D vec = line[2].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
-                vec = line[3].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
-                vec = line[4].value<QVector3D>();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
-                addStretch( layout, 2 );
-                break;
-            }
-            case ScriptCommand::SET_GLOBAL:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
-                addGlobalSelect( layout, i, line[2].toInt(), lineActive );
-
-                addEdit( layout, i* 10 + 2, 1 );
-                if ( line[2].toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
-                {
-                    emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                }
-                else
-                {
-                    QColor vec = line[3].value<QColor>();
-                    emit( editChanged( QString::number( vec.red() ) + ", " + QString::number( vec.green() ) + ", " + QString::number( vec.blue() ), i * 10 + 2 ) );
-                }
-                addStretch( layout, 3 );
-                break;
-            }
-            case ScriptCommand::INC_GLOBAL:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
-                addGlobalSelect( layout, i, line[2].toInt(), lineActive );
-                addEdit( layout, i* 10 + 2, 1 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                addStretch( layout, 3 );
-                break;
-            }
-
-            case ScriptCommand::SET_PROPERTY:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
-                addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
-                addEdit( layout, i* 10 + 2, 2 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                addStretch( layout, 2 );
-                break;
-            }
-            case ScriptCommand::INC_PROPERTY:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
-                addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
-                addEdit( layout, i* 10 + 2, 2 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                addStretch( layout, 2 );
-                break;
-            }
-            case ScriptCommand::SET_ARCBALL:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
-                addEdit( layout, i* 10 + 1, 4 );
-                QVector4D vec = line[2].value<QQuaternion>().toVector4D();
-                emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                addStretch( layout, 1 );
-                break;
-            }
-            case ScriptCommand::BEGIN_LOOP:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
-                addEdit( layout, i* 10 + 1, 1 );
-                emit( editChanged( line[2].toString(), i * 10 + 1 ) );
-                addStretch( layout, 4 );
-                inLoop = true;
-                break;
-            }
-            case ScriptCommand::END_LOOP:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
-                inLoop = false;
-                addStretch( layout, 5 );
-                break;
-            }
-            case ScriptCommand::BEGIN_BLOCK:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
-                inBlock = true;
-                addStretch( layout, 5 );
-                break;
-            }
-            case ScriptCommand::END_BLOCK:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
-                inBlock = false;
-                addStretch( layout, 5 );
-                break;
-            }
-            case ScriptCommand::COMMENT:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
-                addEdit( layout, i* 10 + 1, 1 );
-                emit( editChanged( line[2].toString(), i * 10 + 1 ) );
-                break;
-            }
-            case ScriptCommand::SET_ROI_PROPERTY:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
-                addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
-                addEdit( layout, i* 10 + 2, 3 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                addStretch( layout, 1 );
-                break;
-            }
-            case ScriptCommand::INC_ROI_PROPERTY:
-            {
-                select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
-                addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
-                addEdit( layout, i* 10 + 2, 3 );
-                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
-                emit( editChanged( line[4].toString(), i * 10 + 3 ) );
-                emit( editChanged( line[5].toString(), i * 10 + 4 ) );
-                addStretch( layout, 1 );
-                break;
-            }
-        }
-
-        LabelID* indicator = new LabelID( i, "<---", this );
-        indicator->setHidden( true );
-        connect( this, SIGNAL( hideIndicator( bool, int ) ), indicator, SLOT( slotSetHidden( bool, int ) ) );
-        layout->addWidget( indicator );
-
-        select->setEnabled( lineActive );
-        emit( enable( lineActive, i * 10 + 1 ) );
-        emit( enable( lineActive, i * 10 + 2 ) );
-        emit( enable( lineActive, i * 10 + 3 ) );
-        emit( enable( lineActive, i * 10 + 4 ) );
-        emit( enable( lineActive, i * 10 + 5 ) );
-
-        layout->addStretch();
-        scriptLayout->addLayout( layout );
+        scriptLayout->addLayout( addWidgetLine( i, line, inLoop, inBlock ) );
     }
     scriptLayout->addStretch();
 
     return groupBox;
+}
+
+
+QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &inLoop, bool &inBlock )
+{
+    QHBoxLayout* layout = new QHBoxLayout();
+
+    QLabel* label = new QLabel( QString::number( i ), this );
+    layout->addWidget( label );
+
+    CheckBoxID* checkBox = new CheckBoxID( i, this );
+    layout->addWidget( checkBox );
+    bool lineActive = line[0].toBool();
+    checkBox->setChecked( lineActive );
+    connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
+    connect( this, SIGNAL( checkBoxChanged( int, int ) ), checkBox, SLOT( slotSetChecked2( int, int ) ) );
+
+    if ( i == m_lastInsertedLine )
+    {
+        m_widgetToEnsureVisible = checkBox;
+    }
+
+    PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
+    layout->addWidget( insertButton );
+    insertButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+    connect( insertButton, SIGNAL( signalClicked( int ) ), this, SLOT( insertCommand( int ) ) );
+
+    PushButtonWithId* deleteButton = new PushButtonWithId( "-", i );
+    layout->addWidget( deleteButton );
+    deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+    connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( deleteCommand( int ) ) );
+
+    PushButtonWithId* upButton = new PushButtonWithId( "^", i );
+    layout->addWidget( upButton );
+    upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+    connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandUp( int ) ) );
+
+    PushButtonWithId* downButton = new PushButtonWithId( "v", i );
+    layout->addWidget( downButton );
+    downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+    connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandDown( int ) ) );
+
+
+    QColor lightRed( 255, 168, 168 );
+    QColor lightBlue( 168, 168, 255 );
+    QColor lightGreen( 168, 255, 168 );
+    QColor lightPurple( 255, 158, 255 );
+    QColor yellow( 255, 255, 0 );
+    QColor magenta( 0, 255, 255 );
+    QColor orange( 255, 160, 0 );
+
+    if( inLoop && line[1].toInt() != (int)ScriptCommand::END_LOOP )
+    {
+        QLabel* label = new QLabel( "loop", this );
+        label->setStyleSheet("QLabel { background-color : " + lightRed.name() + "}");
+        layout->addWidget( label );
+    }
+    if( inBlock && line[1].toInt() != (int)ScriptCommand::END_BLOCK )
+    {
+        QLabel* label = new QLabel( "block", this );
+
+        label->setStyleSheet("QLabel { background-color : " + lightBlue.name() + "}");
+        layout->addWidget( label );
+    }
+
+
+    ComboBoxID* select = new ComboBoxID( i * 10, this );
+    for ( int j = 0; j < NUM_SCRIPT_COMMANDS; ++j )
+    {
+        select->insertItem( j, Script2String::s( (ScriptCommand)j ) );
+    }
+
+    layout->addWidget( select );
+    select->setCurrentIndex( line[1].toInt() );
+    connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int ) ) );
+    connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
+
+    switch( (ScriptCommand)( line[1].toInt() ) )
+    {
+        case ScriptCommand::NONE:
+            addStretch( layout, 5 );
+            break;
+        case ScriptCommand::DELAY:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
+            addStretch( layout, 5 );
+            break;
+        }
+        case ScriptCommand::SET_CAMERA:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
+            addEdit( layout, i* 10 + 1, 3 );
+            QVector3D vec = line[2].value<QVector3D>();
+            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 1 ) );
+            vec = line[3].value<QVector3D>();
+            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 2 ) );
+            vec = line[4].value<QVector3D>();
+            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ), i * 10 + 3 ) );
+            addStretch( layout, 2 );
+            break;
+        }
+        case ScriptCommand::SET_GLOBAL:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
+            addGlobalSelect( layout, i, line[2].toInt(), lineActive );
+
+            addEdit( layout, i* 10 + 2, 1 );
+            if ( line[2].toInt() < (int)Fn::Property::G_BACKGROUND_COLOR_MAIN )
+            {
+                emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            }
+            else
+            {
+                QColor vec = line[3].value<QColor>();
+                emit( editChanged( QString::number( vec.red() ) + ", " + QString::number( vec.green() ) + ", " + QString::number( vec.blue() ), i * 10 + 2 ) );
+            }
+            addStretch( layout, 3 );
+            break;
+        }
+        case ScriptCommand::INC_GLOBAL:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightGreen.name() + "}");
+            addGlobalSelect( layout, i, line[2].toInt(), lineActive );
+            addEdit( layout, i* 10 + 2, 1 );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            addStretch( layout, 3 );
+            break;
+        }
+
+        case ScriptCommand::SET_PROPERTY:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
+            addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
+            addEdit( layout, i* 10 + 2, 2 );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+            addStretch( layout, 2 );
+            break;
+        }
+        case ScriptCommand::INC_PROPERTY:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightPurple.name() + "}");
+            addPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), lineActive );
+            addEdit( layout, i* 10 + 2, 2 );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+            addStretch( layout, 2 );
+            break;
+        }
+        case ScriptCommand::SET_ARCBALL:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + yellow.name() + "}");
+            addEdit( layout, i* 10 + 1, 4 );
+            QVector4D vec = line[2].value<QQuaternion>().toVector4D();
+            emit( editChanged( QString::number( vec.x() ) + ", " + QString::number( vec.y() ) + ", " + QString::number( vec.z() ) + ", " + QString::number( vec.w() ), i * 10 + 1 ) );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+            emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+            addStretch( layout, 1 );
+            break;
+        }
+        case ScriptCommand::BEGIN_LOOP:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
+            addEdit( layout, i* 10 + 1, 1 );
+            emit( editChanged( line[2].toString(), i * 10 + 1 ) );
+            addStretch( layout, 4 );
+            inLoop = true;
+            break;
+        }
+        case ScriptCommand::END_LOOP:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightRed.name() + "}");
+            inLoop = false;
+            addStretch( layout, 5 );
+            break;
+        }
+        case ScriptCommand::BEGIN_BLOCK:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
+            inBlock = true;
+            addStretch( layout, 5 );
+            break;
+        }
+        case ScriptCommand::END_BLOCK:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + lightBlue.name() + "}");
+            inBlock = false;
+            addStretch( layout, 5 );
+            break;
+        }
+        case ScriptCommand::COMMENT:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + orange.name() + "}");
+            addEdit( layout, i* 10 + 1, 1 );
+            emit( editChanged( line[2].toString(), i * 10 + 1 ) );
+            break;
+        }
+        case ScriptCommand::SET_ROI_PROPERTY:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+            addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
+            addEdit( layout, i* 10 + 2, 3 );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+            emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+            addStretch( layout, 1 );
+            break;
+        }
+        case ScriptCommand::INC_ROI_PROPERTY:
+        {
+            select->setStyleSheet("QComboBox { background-color : " + magenta.name() + "}");
+            addRoiPropertySelect( layout, i, line[2].toInt(), line[3].toInt(), line[4].toInt(), lineActive );
+            addEdit( layout, i* 10 + 2, 3 );
+            emit( editChanged( line[3].toString(), i * 10 + 2 ) );
+            emit( editChanged( line[4].toString(), i * 10 + 3 ) );
+            emit( editChanged( line[5].toString(), i * 10 + 4 ) );
+            addStretch( layout, 1 );
+            break;
+        }
+    }
+
+    LabelID* indicator = new LabelID( i, "<---", this );
+    indicator->setHidden( true );
+    connect( this, SIGNAL( hideIndicator( bool, int ) ), indicator, SLOT( slotSetHidden( bool, int ) ) );
+    layout->addWidget( indicator );
+
+    select->setEnabled( lineActive );
+    emit( enable( lineActive, i * 10 + 1 ) );
+    emit( enable( lineActive, i * 10 + 2 ) );
+    emit( enable( lineActive, i * 10 + 3 ) );
+    emit( enable( lineActive, i * 10 + 4 ) );
+    emit( enable( lineActive, i * 10 + 5 ) );
+
+    layout->addStretch();
+
+    return layout;
 }
 
 void ScriptWidget::commandChanged( int line, int command )
@@ -573,6 +596,9 @@ void ScriptWidget::commandChanged( int line, int command )
         command.push_back( (int)ScriptCommand::NONE );
         m_script.push_back( command );
     }
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setValue( qMax( 0, m_script.size() - 1 ) );
     rebuild();
 }
 
@@ -729,6 +755,9 @@ void ScriptWidget::loadScript( QString fileName, bool append )
             qDebug() << "*** ERROR *** script file corrupt.";
         }
     }
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->setValue( qMax( 0, m_script.size() - 1 ) );
     rebuild();
     if ( settings.contains( "delay" ) )
     {
@@ -758,6 +787,7 @@ void ScriptWidget::saveScript( QString fileName )
         return;
     }
     QSettings settings( fileName, QSettings::IniFormat );
+    settings.clear();
     settings.setValue( "appName", "braingl" );
     settings.setValue( "version", "0.7.0" );
     settings.setValue( "fileType", "script" );
@@ -1353,6 +1383,9 @@ void ScriptWidget::deleteCommand( int row )
         m_script.removeAt( row );
     }
     m_lastInsertedLine = row;
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+    m_endSlider->decrement();
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
     rebuild();
 }
 
@@ -1366,6 +1399,9 @@ void ScriptWidget::insertCommand( int row )
         m_script.insert( row, line );
     }
     m_lastInsertedLine = row;
+    m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+    m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+    m_endSlider->increment();
     rebuild();
 }
 
@@ -1541,13 +1577,26 @@ void ScriptWidget::slotCameraChanged()
         command.push_back( true );
         command.push_back( (int)ScriptCommand::NONE );
         m_script.push_back( command );
-        //rebuild();
+
+        m_beginSlider->increment();
+        m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+        m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+        m_endSlider->increment();
+        rebuild();
     }
 }
 
 void ScriptWidget::slotCopyCameraChanged()
 {
     if ( !m_copyCamera->checked() )
+    {
+        rebuild();
+    }
+}
+
+void ScriptWidget::slotRangeChanged()
+{
+    if ( m_buildRange->checked() )
     {
         rebuild();
     }
