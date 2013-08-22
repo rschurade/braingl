@@ -16,9 +16,9 @@ Camera::Camera( int width, int height ) :
     m_up( 0, 1, 0 ),
     m_clickX( 0 ),
     m_clickY( 0 ),
-    m_lookAtTemp( 0, 0, 0),
-    m_keyboardStep( 5.0f )
+    m_lookAtTemp( 0, 0, 0)
 {
+    m_keyboardStep = Models::getGlobal( Fn::Property::G_CAMERA_KEYBOARD_STEP ).toFloat();
 }
 
 Camera::~Camera()
@@ -111,20 +111,34 @@ void Camera::left()
 {
     getGlobals();
     QVector3D dir = m_lookAt -  m_position;
+    float distance = dir.length();
     dir.normalize();
+
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
     m_position = m_position + m_keyboardStep * dir;
+
+    dir = m_lookAt - m_position;
+    dir.normalize();
+    m_position = m_lookAt - distance * dir;
+
     setGlobals();
 }
 void Camera::right()
 {
     getGlobals();
     QVector3D dir = m_lookAt -  m_position;
+    float distance = dir.length();
     dir.normalize();
+
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
     m_position = m_position - m_keyboardStep * dir;
+
+    dir = m_lookAt - m_position;
+    dir.normalize();
+    m_position = m_lookAt - distance * dir;
+
     setGlobals();
 }
 
@@ -315,6 +329,7 @@ void Camera::getGlobals()
     m_up.setX( Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_UP_X, 0 ) ).toFloat() );
     m_up.setY( Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_UP_Y, 0 ) ).toFloat() );
     m_up.setZ( Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_UP_Z, 0 ) ).toFloat() );
+    m_keyboardStep = Models::getGlobal( Fn::Property::G_CAMERA_KEYBOARD_STEP ).toFloat();
 }
 
 void Camera::setGlobals()
