@@ -968,8 +968,8 @@ void ScriptWidget::run()
             {
                 int lastDataset = line[3].toInt();
                 int lastProperty = line[2].toInt();
-                float currentValue = Models::d()->data( Models::d()->index( m_lastDataset, m_lastProperty ) ).toFloat();
-                float targetValue = line[4].toFloat();
+                QVariant currentValue = Models::d()->data( Models::d()->index( lastDataset, lastProperty ) );
+                QVariant targetValue = line[4];
                 QList<QVariant>loopLine;
                 loopLine.push_back( "d" );
                 loopLine.push_back( lastDataset );
@@ -980,7 +980,7 @@ void ScriptWidget::run()
             }
             else if ( !m_inLoop )
             {
-                Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4].toFloat(), Qt::DisplayRole );
+                Models::d()->setData( Models::d()->index( line[3].toInt(), line[2].toInt() ), line[4], Qt::DisplayRole );
             }
             break;
         }
