@@ -73,9 +73,9 @@ public:
 private:
     void initLayout();
     QWidget* buildScriptLayout();
-    QVector3D string2Vector3D( QString string );
+    QHBoxLayout* addWidgetLine( int i, QList<QVariant> &line, bool &inLoop, bool &inBlock );
 
-    void rebuild();
+    QVector3D string2Vector3D( QString string );
 
     void addGlobalSelect( QHBoxLayout* layout, int id, int selected, bool active );
     void addPropertySelect( QHBoxLayout* layout, int id, int selected, int dataset, bool active );
@@ -89,6 +89,7 @@ private:
     CheckboxWithLabel* m_contRunning;
     CheckboxWithLabel* m_screenshotEach;
     CheckboxWithLabel* m_copyCamera;
+    CheckboxWithLabel* m_buildRange;
     SliderWithEditInt* m_delay;
     SliderWithEditInt* m_beginSlider;
     SliderWithEditInt* m_endSlider;
@@ -141,6 +142,7 @@ public slots:
     void slotCameraChanged();
 
 private slots:
+    void rebuild();
     void loadScript();
     void appendScript();
     void saveScript();
@@ -161,6 +163,7 @@ private slots:
     void slotCheckboxChanged( int, int );
     void slotKeyPressed( int, Qt::KeyboardModifiers mods );
     void slotCopyCameraChanged();
+    void slotRangeChanged();
 
 
 signals:
