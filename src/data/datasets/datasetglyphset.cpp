@@ -61,7 +61,6 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, 100000, "general" ); //TODO: Change the limits later?
 
     float min = -1.0;
     float max = 1.0;
@@ -151,6 +150,7 @@ void DatasetGlyphset::readConnectivity( QString filename )
     }
     f.close();
     qDebug() << "connectivity read";
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n-1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::setMinthresh( float mt )
@@ -202,7 +202,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         return;
     }
 
-    int pickedID = properties( target )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
+    int pickedID = properties( "maingl" )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
     if ( m_prevPickedID != pickedID )
     {
         setPickedID( pickedID );
@@ -992,7 +992,7 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
 
     int pickedID = getMesh( target )->closestVertexIndex( pos );
 
-    properties( target )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
+    properties( "maingl" )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
 
     DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
     setPickedID( pickedID );
