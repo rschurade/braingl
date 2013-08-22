@@ -78,6 +78,8 @@ ScriptWidget::~ScriptWidget()
 void ScriptWidget::rebuild()
 {
     m_scrollArea->takeWidget();
+    // delete of old widget currently deactivated because of crash, possible connected to signals
+    // i have no idea how to fix that
     //delete m_scriptPanel;
     m_scriptPanel = buildScriptLayout();
     m_scrollArea->setWidget( m_scriptPanel );
@@ -136,6 +138,7 @@ void ScriptWidget::initLayout()
 
     m_copyCamera = new CheckboxWithLabel( "copy camera", -1, this );
     buttons2->addWidget( m_copyCamera );
+    connect( m_copyCamera, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCopyCameraChanged() ) );
 
     m_delay = new SliderWithEditInt( "delay", 0, this );
     m_delay->setMin( 1 );
@@ -1508,6 +1511,14 @@ void ScriptWidget::slotCameraChanged()
         command.push_back( true );
         command.push_back( (int)ScriptCommand::NONE );
         m_script.push_back( command );
+        //rebuild();
+    }
+}
+
+void ScriptWidget::slotCopyCameraChanged()
+{
+    if ( !m_copyCamera->checked() )
+    {
         rebuild();
     }
 }

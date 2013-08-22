@@ -158,6 +158,7 @@ private slots:
     void resetScript();
     void slotCheckboxChanged( int, int );
     void slotKeyPressed( int, Qt::KeyboardModifiers mods );
+    void slotCopyCameraChanged();
 
 
 signals:
