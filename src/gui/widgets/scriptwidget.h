@@ -90,6 +90,8 @@ private:
     CheckboxWithLabel* m_screenshotEach;
     CheckboxWithLabel* m_copyCamera;
     SliderWithEditInt* m_delay;
+    SliderWithEditInt* m_beginSlider;
+    SliderWithEditInt* m_endSlider;
 
     QList<QList<QVariant> >m_script;
 
