@@ -1533,32 +1533,87 @@ bool Loader::loadMEG()
                 z = sl.at( 3 ).toFloat();
             QVector3D s( x, y, z );
 
-            LoaderFreesurfer lf;
+            TriangleMesh2* mesh;
+            QVector<float> points;
+            QVector<int> triangles;
 
-            if ( !lf.loadASC( fullname ) )
+            if ( fullname.endsWith( ".asc" ) )
             {
-                qDebug() << "unable to load: " << fn;
-                return false;
+                LoaderFreesurfer lf;
+
+                if ( !lf.loadASC( fullname ) )
+                {
+                    qDebug() << "unable to load: " << fn;
+                    return false;
+                }
+
+                points = lf.getPoints();
+                triangles = lf.getTriangles();
+
+                int numPoints = points.size() / 3;
+                int numTriangles = triangles.size() / 3;
+
+
+                if ( numPoints > 0 && numTriangles > 0 )
+                {
+                    mesh = new TriangleMesh2( numPoints, numTriangles );
+                    for ( int i = 0; i < numPoints; ++i )
+                    {
+                        mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+                    }
+                    for ( int i = 0; i < numTriangles; ++i )
+                    {
+                        mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
+                    }
+                    mesh->finalize();
+
+                    dataset->addMesh( mesh, sl.at( 0 ) );
+                }
             }
 
-            QVector<float> points = lf.getPoints();
-            QVector<int> triangles = lf.getTriangles();
-            int numPoints = points.size() / 3;
-            int numTriangles = triangles.size() / 3;
-
-            TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
-            for ( int i = 0; i < numPoints; ++i )
+            if ( fullname.endsWith( ".vtk" ) )
             {
-                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
-            }
-            for ( int i = 0; i < numTriangles; ++i )
-            {
-                //TODO: Check orientation change (0,2,1)...
-                mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
-            }
-            mesh->finalize();
+                LoaderVTK* lv = new LoaderVTK( fullname );
 
-            dataset->addMesh( mesh, sl.at( 0 ) );
+                if ( !lv->load() )
+                {
+                    qDebug() << lv->getStatus();
+                    return false;
+                }
+
+                if ( lv->getPrimitiveType() == 1 )
+                {
+                    points = lv->getPoints();
+                    triangles = lv->getPrimitives();
+
+                    if ( triangles[0] != 3 )
+                    {
+                        qDebug() << "*ERROR* " << fn << " can only load triangle polygon data";
+                        return false;
+                    }
+
+                    int numPoints = lv->getNumPoints();
+                    int numTriangles = lv->getNumPrimitives();
+
+                    if ( numPoints > 0 && numTriangles > 0 )
+                    {
+                        mesh = new TriangleMesh2( numPoints, numTriangles );
+                        for ( int i = 0; i < numPoints; ++i )
+                        {
+                            mesh->addVertex( points[i * 3], points[i * 3 + 1], points[i * 3 + 2] );
+                        }
+
+                        for ( int i = 0; i < numTriangles; ++i )
+                        {
+                            mesh->addTriangle( triangles[i * 4 + 1], triangles[i * 4 + 2], triangles[i * 4 + 3] );
+                        }
+
+                        mesh->finalize();
+
+                        dataset->addMesh( mesh, sl.at( 0 ) );
+                    }
+                }
+            }
         }
     }
     dataset->setProperties();
