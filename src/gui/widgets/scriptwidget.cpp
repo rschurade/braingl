@@ -1221,7 +1221,15 @@ void ScriptWidget::slotEditChanged( QString text, int id )
             }
             if ( column == 4 )
             {
-                m_script[row].replace( column, text );
+                if ( m_script[row].at( 2 ).toInt() == (int)Fn::Property::D_COLOR )
+                {
+                    QVector3D vec = string2Vector3D( text );
+                    m_script[row].replace( column, QColor( vec.x(), vec.y(), vec.z() ) );
+                }
+                else
+                {
+                    m_script[row].replace( column, text );
+                }
             }
             break;
         }
