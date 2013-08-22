@@ -37,8 +37,8 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     m_button2 = new QPushButton( tr(" + "), this );
     m_button2->setMaximumWidth( _metrics.boundingRect("  +  ").width() );
 
-    connect( m_button1, SIGNAL( clicked() ), this, SLOT( minusPressed() ) );
-    connect( m_button2, SIGNAL( clicked() ), this, SLOT( plusPressed() ) );
+    connect( m_button1, SIGNAL( clicked() ), this, SLOT( decrement() ) );
+    connect( m_button2, SIGNAL( clicked() ), this, SLOT( increment() ) );
 
     QVBoxLayout* vLayout = new QVBoxLayout();
 
@@ -77,9 +77,10 @@ SliderWithEditInt::~SliderWithEditInt()
 
 void SliderWithEditInt::sliderMoved( int value )
 {
+    m_slider->setValue( value );
     m_edit->setText( QString::number( value ) );
-    m_slider->repaint();
     emit( valueChanged( value, m_id ) );
+    m_slider->repaint();
 }
 
 void SliderWithEditInt::editEdited()
@@ -105,6 +106,11 @@ int SliderWithEditInt::getValue()
 void SliderWithEditInt::setMin( int min )
 {
     m_slider->setMinimum( min );
+    if ( m_slider->value() < min )
+    {
+        m_slider->setValue( min );
+        m_edit->setText( QString::number( min ) );
+    }
     m_slider->repaint();
 }
 
@@ -112,6 +118,11 @@ void SliderWithEditInt::setMin( int min )
 void SliderWithEditInt::setMax( int max )
 {
     m_slider->setMaximum( max );
+    if ( m_slider->value() > max )
+    {
+        m_slider->setValue( max );
+        m_edit->setText( QString::number( max ) );
+    }
     m_slider->repaint();
 }
 
@@ -120,7 +131,7 @@ void SliderWithEditInt::setStep( int step )
     m_slider->setSingleStep( step );
 }
 
-void SliderWithEditInt::minusPressed()
+void SliderWithEditInt::decrement()
 {
     int current = m_slider->value();
     if ( current == m_slider->minimum() )
@@ -134,7 +145,7 @@ void SliderWithEditInt::minusPressed()
     emit( valueChanged( value, m_id ) );
 }
 
-void SliderWithEditInt::plusPressed()
+void SliderWithEditInt::increment()
 {
     int current = m_slider->value();
     if ( current == m_slider->maximum() )

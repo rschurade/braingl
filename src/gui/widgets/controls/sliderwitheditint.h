@@ -33,8 +33,8 @@ public:
 public slots:
     void sliderMoved( int value );
     void editEdited();
-    void minusPressed();
-    void plusPressed();
+    void increment();
+    void decrement();
 
 signals:
     void valueChanged( int value, int );
