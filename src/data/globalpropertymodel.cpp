@@ -52,6 +52,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_CAMERA_NEAR, 2.0f, -500.0f, 100.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_ANGLE, 45, 1, 180, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_KEYBOARD_STEP, 2.0f, 1.0f, 20.f, "camera" );
 
     m_properties->create( Fn::Property::G_ARCBALL_DISTANCE, 500.0f, 1.0f, 20000.0f, "arcball" );
 
