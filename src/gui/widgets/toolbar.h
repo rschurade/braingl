@@ -57,6 +57,7 @@ private:
     FNAction* m_makeConsAction;
     FNAction* m_saveRGBAction;
     FNAction* m_loadRGBAction;
+    FNAction* m_exportRGBAction;
     FNAction* m_save1DsAction;
     FNAction* m_load1DAction;
     FNAction* m_avgConAction;

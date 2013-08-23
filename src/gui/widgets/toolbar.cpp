@@ -139,8 +139,12 @@ void ToolBar::createActions()
     m_loadRGBAction->setStatusTip( tr( "loads colors from a RGB file on the surface" ) );
     connect( m_loadRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_save1DsAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Save painted nodes to 1D file" ), this, Fn::Algo::SAVE1D );
-    m_save1DsAction->setStatusTip( tr( "Save all painted nodes to 1D (SUMA-readable) file" ) );
+    m_exportRGBAction = new FNAction( QIcon( ":/icons/save_rgb.png" ), tr( "Export surface colors as set of 1D files" ), this, Fn::Algo::EXPORTRGB );
+    m_exportRGBAction->setStatusTip( tr( "saves the current colors as series of 1D files (one per color)" ) );
+    connect( m_exportRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_save1DsAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Save 1D values file" ), this, Fn::Algo::SAVE1D );
+    m_save1DsAction->setStatusTip( tr( "Save all node values to 1D (SUMA-readable) file" ) );
     connect( m_save1DsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_load1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Load 1D values file" ), this, Fn::Algo::LOAD1D );
@@ -162,7 +166,6 @@ void ToolBar::createActions()
     m_sh2meshAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "convert sh 2 mesh" ), this, Fn::Algo::SH_2_MESH );
     m_sh2meshAction->setStatusTip( tr( "create a mesh dataset from the currently displayed SH glyphs" ) );
     connect( m_sh2meshAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -291,6 +294,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::LOADRGB:
             ((DatasetGlyphset*)ds)->loadRGB();
             break;
+        case Fn::Algo::EXPORTRGB:
+            ((DatasetGlyphset*)ds)->exportColors();
+            break;
         case Fn::Algo::SAVE1D:
             if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::SURFACESET )
             {
@@ -389,6 +395,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_makeConsAction );
             this->addAction( m_saveRGBAction );
             this->addAction( m_loadRGBAction );
+            this->addAction( m_exportRGBAction );
             this->addAction( m_save1DsAction );
             this->addAction( m_load1DAction );
             this->addAction( m_avgConAction );

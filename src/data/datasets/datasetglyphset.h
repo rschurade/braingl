@@ -49,7 +49,7 @@ public:
 
     void loadRGB();
     void saveRGB();
-    void save1Ds();
+    void exportColors();
     bool load1D();
     void loadROI( QString filename );
     void initROI();
