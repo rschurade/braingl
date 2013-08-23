@@ -760,6 +760,13 @@ void ScriptWidget::loadScript( QString fileName, bool append )
     {
         m_script.clear();
     }
+    else
+    {
+        if ( lastIsNone() )
+        {
+            m_script.takeLast();
+        }
+    }
 
     for ( int i = 0; i < size; ++i )
     {
