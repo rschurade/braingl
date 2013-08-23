@@ -263,8 +263,8 @@ void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
     glBufferData( GL_ARRAY_BUFFER, data.size() * sizeof(GLfloat), data.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    glDeleteBuffers( 1, &vboIds[2] );
-    glGenBuffers( 1, &vboIds[2] );
+    glDeleteBuffers( 1, &vboIds[3] );
+    glGenBuffers( 1, &vboIds[3] );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[3] );
     glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
