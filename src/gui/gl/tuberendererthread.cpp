@@ -57,9 +57,9 @@ void TubeRendererThread::run()
     {
         QVector<float> fib = m_data->at( i );
 
-        if ( fib.size() < 9 )
+        if ( fib.size() < 6 )
         {
-            printf( "fib with size < 3 detected" );
+            printf( "fib with size < 2 detected" );
             continue;
         }
 
