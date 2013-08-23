@@ -26,7 +26,7 @@
 #include <qcoreapplication.h>
 
 DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
-                DatasetSurfaceset( filename, Fn::DatasetType::GLYPHSET ),
+                DatasetSurfaceset( true, filename, Fn::DatasetType::GLYPHSET ),
                 minthresh( mt ),
                 maxthresh( maxt ),
                 conn( NULL ),
@@ -46,49 +46,12 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
                 shifts2( QVector<QVector3D>() ),
                 m_prevPickedID( -1 )
 {
-    qDebug() << "minthresh set to: " << minthresh;
+    addProperties();
 
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
-    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
-
-    float min = -1.0;
-    float max = 1.0;
-
-    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "colormap" );
-
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( float ) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float ) ),
-            m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( float ) ) );
-
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
-    m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    finalizeProperties();
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
     m_properties["maingl2"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
-
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
-
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -118,6 +81,32 @@ DatasetGlyphset::~DatasetGlyphset()
         delete[] conn;
         conn = NULL;
     }
+}
+
+void DatasetGlyphset::addProperties()
+{
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
+    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
+
+    m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( -1 );
+    m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setValue( -1 );
+
+    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMin( -1 );
+    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setValue( -1 );
+
+    m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
+    m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 }
 
 void DatasetGlyphset::readConnectivity( QString filename )
@@ -150,7 +139,7 @@ void DatasetGlyphset::readConnectivity( QString filename )
     }
     f.close();
     qDebug() << "connectivity read";
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n-1, "general" ); //TODO: Change the limits later?
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::setMinthresh( float mt )

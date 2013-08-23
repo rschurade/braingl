@@ -17,12 +17,15 @@ class MeshRenderer;
 
 class DatasetMesh: public Dataset
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     DatasetMesh( TriangleMesh2* mesh, QDir filename = QDir( "new mesh" ) );
     DatasetMesh( QDir filename, Fn::DatasetType type );
     virtual ~DatasetMesh();
+
+    void initProperties();
+    void finalizeProperties();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
