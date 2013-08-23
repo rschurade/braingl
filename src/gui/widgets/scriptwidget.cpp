@@ -67,6 +67,8 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_targetMoveX( 0.0f ),
     m_targetMoveY( 0.0f )
 {
+    m_commandLookUp = QVector<int>( { 11, 10, 1, 2, 11, 3, 11, 0, 5, 6, 7, 8, 9, 4, 11 } );
+
     QList<QVariant> line;
     line.push_back( true );
     line.push_back( (int)ScriptCommand::NONE );
@@ -224,6 +226,25 @@ QWidget* ScriptWidget::buildScriptLayout()
     return groupBox;
 }
 
+ComboBoxID* ScriptWidget::createCommandSelect( int id )
+{
+    ComboBoxID* select = new ComboBoxID( id, this );
+    int i = 0;
+    select->insertItem( i++, Script2String::s( ScriptCommand::SET_ARCBALL ),      (int)ScriptCommand::SET_ARCBALL );
+    select->insertItem( i++, Script2String::s( ScriptCommand::SET_CAMERA ),       (int)ScriptCommand::SET_CAMERA );
+    select->insertItem( i++, Script2String::s( ScriptCommand::SET_GLOBAL ),       (int)ScriptCommand::SET_GLOBAL );
+    select->insertItem( i++, Script2String::s( ScriptCommand::SET_PROPERTY ),     (int)ScriptCommand::SET_PROPERTY );
+    select->insertItem( i++, Script2String::s( ScriptCommand::SET_ROI_PROPERTY ), (int)ScriptCommand::SET_ROI_PROPERTY );
+    select->insertItem( i++, Script2String::s( ScriptCommand::BEGIN_LOOP ),       (int)ScriptCommand::BEGIN_LOOP );
+    select->insertItem( i++, Script2String::s( ScriptCommand::END_LOOP ),         (int)ScriptCommand::END_LOOP );
+    select->insertItem( i++, Script2String::s( ScriptCommand::BEGIN_BLOCK ),      (int)ScriptCommand::BEGIN_BLOCK );
+    select->insertItem( i++, Script2String::s( ScriptCommand::END_BLOCK ),        (int)ScriptCommand::END_BLOCK );
+    select->insertItem( i++, Script2String::s( ScriptCommand::COMMENT ),          (int)ScriptCommand::COMMENT );
+    select->insertItem( i++, Script2String::s( ScriptCommand::DELAY ),            (int)ScriptCommand::DELAY );
+    select->insertItem( i++, Script2String::s( ScriptCommand::NONE ),             (int)ScriptCommand::NONE );
+
+    return select;
+}
 
 QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &inLoop, bool &inBlock )
 {
@@ -287,16 +308,11 @@ QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &in
         layout->addWidget( label );
     }
 
-
-    ComboBoxID* select = new ComboBoxID( i * 10, this );
-    for ( int j = 0; j < NUM_SCRIPT_COMMANDS; ++j )
-    {
-        select->insertItem( j, Script2String::s( (ScriptCommand)j ) );
-    }
+    ComboBoxID* select = createCommandSelect( i * 10 );
 
     layout->addWidget( select );
-    select->setCurrentIndex( line[1].toInt() );
-    connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int ) ) );
+    select->setCurrentIndex( m_commandLookUp[ line[1].toInt() ] );
+    connect( select, SIGNAL( currentIndexChanged( int, int, int ) ), this, SLOT( commandChanged( int, int, int ) ) );
     connect( this, SIGNAL( enable2( bool, int ) ), select, SLOT( setEnabled2( bool, int ) ) );
 
     switch( (ScriptCommand)( line[1].toInt() ) )
@@ -461,7 +477,7 @@ QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &in
     return layout;
 }
 
-void ScriptWidget::commandChanged( int line, int command )
+void ScriptWidget::commandChanged( int line, int index, int command )
 {
     line /= 10;
     QList<QVariant> commandLine;
