@@ -14,6 +14,7 @@
 #include "../thirdparty/newmat10/precisio.h"
 
 #include <QDebug>
+#include <QColor>
 #include <qmath.h>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
@@ -1251,4 +1252,42 @@ bool FMath::linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D 
         return true; // line intersects plane
     }
     return false; // line does not
+}
+
+QVariant FMath::interpolateQVariant( QVariant &lhs, QVariant &rhs, float div )
+{
+    if ( lhs.type() == rhs.type() )
+    {
+        switch( lhs.type() )
+        {
+            case QVariant::Color:
+            {
+                QColor color1 = lhs.value<QColor>();
+                QColor color2 = rhs.value<QColor>();
+                QVector3D vec1( color1.redF(), color1.greenF(), color1.blueF() );
+                QVector3D vec2( color2.redF(), color2.greenF(), color2.blueF() );
+                QVector3D value = ( 1.0f - div ) * vec1 + div * vec2;
+                return QColor( value.x() * 255.0f, value.y() * 255.0f, value.z() * 255.0f );
+            }
+                break;
+            case QVariant::Vector3D:
+            {
+                QVector3D vec1 = lhs.value<QVector3D>();
+                QVector3D vec2 = rhs.value<QVector3D>();
+                return ( 1.0f - div ) * vec1 + div * vec2;
+            }
+                break;
+            default: // assume something that is convertible to float
+            {
+                float v1 = lhs.toFloat();
+                float v2 = rhs.toFloat();
+                return ( 1.0f - div ) * v1 + div * v2;
+            }
+                break;
+        }
+    }
+    else
+    {
+        return lhs;
+    }
 }

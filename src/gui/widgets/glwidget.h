@@ -100,6 +100,7 @@ public slots:
 signals:
     void signalKeyPressed( int key, Qt::KeyboardModifiers mods );
     void signalCameraChanged();
+    void signalCopyCameraToScript( int mode );
 };
 
 #endif
