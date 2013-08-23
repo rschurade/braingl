@@ -21,6 +21,11 @@ PropertyFloat::PropertyFloat( QString name, float value, float min, float max ) 
     m_widget = widget;
 }
 
+void PropertyFloat::setDigits( int i )
+{
+    ( (SliderWithEdit*) m_widget )->setDigits( i );
+}
+
 PropertyFloat::~PropertyFloat()
 {
 }

@@ -8,6 +8,8 @@
 #include "datasetglyphset.h"
 #include "datasetcons.h"
 
+#include "../properties/propertyfloat.h"
+
 #include "../mesh/trianglemesh2.h"
 
 #include "../../gui/gl/meshrenderer.h"
@@ -107,6 +109,8 @@ void DatasetGlyphset::addProperties()
 
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
+
+    ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
 }
 
 void DatasetGlyphset::readConnectivity( QString filename )

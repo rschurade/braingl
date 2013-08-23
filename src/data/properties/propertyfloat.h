@@ -24,7 +24,7 @@ public:
                      float max = std::numeric_limits<float>::max() );
     virtual ~PropertyFloat();
 
-
+    void setDigits(int i);
 
 private:
     int determineDigits();
