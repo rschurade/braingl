@@ -12,7 +12,6 @@
 
 enum class ScriptCommand : int
 {
-    // 0 parameters
     NONE,
     DELAY,
     SET_CAMERA,  // #1 position #2 lookat #3 up
@@ -61,6 +60,7 @@ struct Script2String
 class GLWidget;
 class CheckboxWithLabel;
 class SliderWithEditInt;
+class ComboBoxID;
 
 class ScriptWidget : public QWidget
 {
@@ -74,6 +74,7 @@ private:
     void initLayout();
     QWidget* buildScriptLayout();
     QHBoxLayout* addWidgetLine( int i, QList<QVariant> &line, bool &inLoop, bool &inBlock );
+    ComboBoxID* createCommandSelect( int id );
 
     QVector3D string2Vector3D( QString string );
 
@@ -96,6 +97,7 @@ private:
     SliderWithEditInt* m_endSlider;
 
     QList<QList<QVariant> >m_script;
+    QVector<int>m_commandLookUp;
 
     QScrollArea* m_scrollArea;
     QWidget* m_scriptPanel;
@@ -152,7 +154,7 @@ private slots:
     void run();
     void pause( bool checked );
 
-    void commandChanged( int line, int command );
+    void commandChanged( int line, int index, int command );
     void slotEditChanged( QString, int );
     void slotGlobalSelectChanged( int line, int prop, int data );
     void slotPropertySelectChanged( int line, int prop, int data );
