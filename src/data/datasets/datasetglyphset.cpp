@@ -904,7 +904,7 @@ inline uint qHash( const QColor color )
     return color.red() + color.green() + color.blue();
 }
 
-void DatasetGlyphset::save1Ds()
+void DatasetGlyphset::exportColors()
 {
     QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".col_" );
 

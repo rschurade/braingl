@@ -70,7 +70,8 @@ namespace Fn
         AVG_CON,
         AVG_CON_RZ,
         LITTLE_BRAINS,
-        SH_2_MESH
+        SH_2_MESH,
+        EXPORTRGB
     };
 
     enum class Orient : int
