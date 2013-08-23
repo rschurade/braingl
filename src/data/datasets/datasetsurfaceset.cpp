@@ -18,6 +18,12 @@
 DatasetSurfaceset::DatasetSurfaceset( QDir fn, Fn::DatasetType type ) :
         DatasetMesh( fn, type )
 {
+    finalizeProperties();
+}
+
+DatasetSurfaceset::DatasetSurfaceset( bool schnuppe, QDir fn, Fn::DatasetType type ) :
+        DatasetMesh( fn, type )
+{
 
 }
 
@@ -108,7 +114,7 @@ bool DatasetSurfaceset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifi
                         value = 1.0;
                     }
 
-                    m_mesh[m]->setVertexData( picked[i],  value );
+                    m_mesh[m]->setVertexData( picked[i], value );
                 }
             }
         }
@@ -129,9 +135,9 @@ void DatasetSurfaceset::save1Ds()
         return;
     }
     QTextStream out( &file );
-    for ( int i = 0; i < getMesh("maingl")->numVerts(); i++ )
+    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
     {
-        float vcolor = getMesh("maingl")->getVertexData( i );
+        float vcolor = getMesh( "maingl" )->getVertexData( i );
 
         out << vcolor << endl;
     }
@@ -148,7 +154,7 @@ bool DatasetSurfaceset::load1D()
     }
     QTextStream in( &file );
 
-    for ( int i = 0; i < getMesh("maingl")->numVerts(); i++ )
+    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
     {
         float v;
         in >> v;

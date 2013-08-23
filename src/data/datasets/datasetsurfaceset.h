@@ -17,6 +17,7 @@ class DatasetSurfaceset: public DatasetMesh
 {
 public:
     DatasetSurfaceset( QDir fn = QDir( "surfaceset" ), Fn::DatasetType type = Fn::DatasetType::MESH_ASCII );
+    DatasetSurfaceset( bool schnuppe, QDir fn = QDir( "surfaceset" ), Fn::DatasetType type = Fn::DatasetType::MESH_ASCII );
     virtual ~DatasetSurfaceset();
 
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );

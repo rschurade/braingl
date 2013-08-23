@@ -21,6 +21,7 @@ DatasetMEG::DatasetMEG( QDir fn, Fn::DatasetType type ) :
 {
     m_dataMin = std::numeric_limits<float>().max();
     m_dataMax = std::numeric_limits<float>().min();
+    finalizeProperties();
 }
 
 DatasetMEG::~DatasetMEG()
