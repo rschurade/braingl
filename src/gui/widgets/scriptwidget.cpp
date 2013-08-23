@@ -1105,6 +1105,7 @@ void ScriptWidget::run()
                     }
                     if ( loopLine[0] == "d" )
                     {
+                        qDebug() << loopLine[3] << loopLine[4] << div << FMath::interpolateQVariant( loopLine[3], loopLine[4], div ).toInt();
                         Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), FMath::interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
                     }
                     if ( loopLine[0] == "r" )
