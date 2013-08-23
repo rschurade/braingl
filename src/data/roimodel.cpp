@@ -93,7 +93,7 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     {
         if ( index.internalId() < m_rois.size() )
         {
-            if ( m_rois[index.row()].size() > index.row()+1 )
+            if ( m_rois[index.internalId()].size() > index.row()+1 )
             {
                 roi = m_rois[index.internalId()][index.row()+1];
             }
