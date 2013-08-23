@@ -165,6 +165,7 @@ private slots:
     void moveScrollBarToBottom( int min, int max );
     void resetScript();
     void slotCheckboxChanged( int, int );
+    void slotCheckboxChanged2( int, int );
     void slotKeyPressed( int, Qt::KeyboardModifiers mods );
     void slotRangeChanged();
     void slotCopyCameraChanged();
