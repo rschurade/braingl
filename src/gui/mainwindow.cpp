@@ -870,7 +870,8 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockSW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
     connect( m_scriptWidget, SIGNAL( screenshot() ), this, SLOT( screenshot() ) );
-    connect( mainGLWidget, SIGNAL( signalCameraChanged() ), m_scriptWidget, SLOT( slotCameraChanged() ) );
+    //connect( mainGLWidget, SIGNAL( signalCameraChanged() ), m_scriptWidget, SLOT( slotCameraChanged() ) );
+    connect( mainGLWidget, SIGNAL( signalCopyCameraToScript( int ) ), m_scriptWidget, SLOT( slotCopyCamera( int ) ) );
     dockSW->hide();
     tabifyDockWidget( dockGP, dockSW );
 

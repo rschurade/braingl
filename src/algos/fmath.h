@@ -59,6 +59,8 @@ public:
 
     static bool linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord);
 
+    static QVariant interpolateQVariant( QVariant &lhs, QVariant &rhs, float div );
+
 
     static Matrix expT( Matrix& t );
 

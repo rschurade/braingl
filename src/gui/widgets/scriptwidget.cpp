@@ -18,6 +18,8 @@
 #include "controls/sliderwitheditint.h"
 #include "controls/pushbuttonwithid.h"
 
+#include "../../algos/fmath.h"
+
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/vptr.h"
@@ -158,9 +160,9 @@ void ScriptWidget::initLayout()
     m_screenshotEach = new CheckboxWithLabel( "screenshot each step", -1, this );
     buttons2->addWidget( m_screenshotEach );
 
-    m_copyCamera = new CheckboxWithLabel( "copy camera", -1, this );
-    buttons2->addWidget( m_copyCamera );
-    connect( m_copyCamera, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCopyCameraChanged() ) );
+//    m_copyCamera = new CheckboxWithLabel( "copy camera", -1, this );
+//    buttons2->addWidget( m_copyCamera );
+//    connect( m_copyCamera, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCopyCameraChanged() ) );
 
     buttons2->addWidget( m_buildRange );
     connect( m_buildRange, SIGNAL( stateChanged( int, int ) ), this, SLOT( rebuild() ) );
@@ -920,7 +922,8 @@ void ScriptWidget::run()
             QVector3D up1 = m_currentCamera[2].value<QVector3D>();
             QVector3D up2 = m_interpolatedCamera[2].value<QVector3D>();
 
-            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+            float div = (float)( m_totalLoops - m_loopCount ) / (float)m_totalLoops;
+            div = qMax( (float)!m_inLoop, div );
 
             QVector3D pos = div * pos2 + ( 1.0f - div ) * pos1;
             QVector3D look = div * look2 + ( 1.0f - div ) * look1;
@@ -1007,7 +1010,8 @@ void ScriptWidget::run()
                 m_targetMoveY = line[5].toFloat();
             }
 
-            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
+            float div = (float)( m_totalLoops - m_loopCount ) / (float)m_totalLoops;
+            div = qMax( (float)!m_inLoop, div );
 
             QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
             m_glWidget->getArcBall()->setRotation( rot );
@@ -1044,15 +1048,15 @@ void ScriptWidget::run()
                     QList<QVariant>loopLine = m_loopList[i];
                     if ( loopLine[0] == "g" )
                     {
-                        Models::setGlobal( loopLine[1].toInt(), interpolateQVariant( loopLine[2], loopLine[3], div ) );
+                        Models::setGlobal( loopLine[1].toInt(), FMath::interpolateQVariant( loopLine[2], loopLine[3], div ) );
                     }
                     if ( loopLine[0] == "d" )
                     {
-                        Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
+                        Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), FMath::interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
                     }
                     if ( loopLine[0] == "r" )
                     {
-                        Models::setROIProp( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt(), interpolateQVariant( loopLine[4], loopLine[5], div ) );
+                        Models::setROIProp( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt(), FMath::interpolateQVariant( loopLine[4], loopLine[5], div ) );
                     }
                 }
 
@@ -1521,44 +1525,6 @@ void ScriptWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
     }
 }
 
-QVariant ScriptWidget::interpolateQVariant( QVariant &lhs, QVariant &rhs, float div )
-{
-    if ( lhs.type() == rhs.type() )
-    {
-        switch( lhs.type() )
-        {
-            case QVariant::Color:
-            {
-                QColor color1 = lhs.value<QColor>();
-                QColor color2 = rhs.value<QColor>();
-                QVector3D vec1( color1.redF(), color1.greenF(), color1.blueF() );
-                QVector3D vec2( color2.redF(), color2.greenF(), color2.blueF() );
-                QVector3D value = ( 1.0f - div ) * vec1 + div * vec2;
-                return QColor( value.x() * 255.0f, value.y() * 255.0f, value.z() * 255.0f );
-            }
-                break;
-            case QVariant::Vector3D:
-            {
-                QVector3D vec1 = lhs.value<QVector3D>();
-                QVector3D vec2 = rhs.value<QVector3D>();
-                return ( 1.0f - div ) * vec1 + div * vec2;
-            }
-                break;
-            default: // assume something that is convertible to float
-            {
-                float v1 = lhs.toFloat();
-                float v2 = rhs.toFloat();
-                return ( 1.0f - div ) * v1 + div * v2;
-            }
-                break;
-        }
-    }
-    else
-    {
-        return lhs;
-    }
-}
-
 void ScriptWidget::slotCameraChanged()
 {
     if ( m_copyCamera->checked() )
@@ -1575,16 +1541,12 @@ void ScriptWidget::slotCameraChanged()
 
         if ( m_script.last().at( 1 ).toInt() ==  (int)ScriptCommand::NONE )
         {
-            m_script.replace( m_script.size() - 1, commandLine );
+            m_script.insert( m_script.size() - 1, commandLine );
         }
         else
         {
             m_script.push_back( commandLine );
         }
-        QList<QVariant> command;
-        command.push_back( true );
-        command.push_back( (int)ScriptCommand::NONE );
-        m_script.push_back( command );
 
         m_beginSlider->increment();
         m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
@@ -1608,4 +1570,155 @@ void ScriptWidget::slotRangeChanged()
     {
         rebuild();
     }
+}
+
+void ScriptWidget::slotCopyCamera( int mode )
+{
+    QList<QVariant> camera = m_glWidget->getCamera()->getState();
+    QList<QVariant> arcball = m_glWidget->getArcBall()->getState();
+
+    switch ( mode )
+    {
+        case 0: // copy camera
+        {
+            QList<QVariant>commandLine;
+
+            commandLine.push_back( true );
+            commandLine.push_back( (int)ScriptCommand::SET_CAMERA );
+
+            commandLine.push_back( camera[0] );
+            commandLine.push_back( camera[1] );
+            commandLine.push_back( camera[2] );
+
+            if ( lastIsNone() )
+            {
+                m_script.insert( m_script.size() - 1, commandLine );
+            }
+            else
+            {
+                m_script.push_back( commandLine );
+            }
+
+            m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+            m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+            m_endSlider->increment();
+
+        }
+            break;
+        case 1: // copy camera with loop
+        {
+            QList<QVariant>commandLine0;
+            QList<QVariant>commandLine1;
+            QList<QVariant>commandLine2;
+
+            commandLine0.push_back( true );
+            commandLine0.push_back( (int)ScriptCommand::BEGIN_LOOP );
+            commandLine0.push_back( 25 );
+
+            commandLine1.push_back( true );
+            commandLine1.push_back( (int)ScriptCommand::SET_CAMERA );
+            commandLine1.push_back( camera[0] );
+            commandLine1.push_back( camera[1] );
+            commandLine1.push_back( camera[2] );
+
+            commandLine2.push_back( true );
+            commandLine2.push_back( (int)ScriptCommand::END_LOOP );
+
+            if ( lastIsNone() )
+            {
+                m_script.insert( m_script.size() - 1, commandLine0 );
+                m_script.insert( m_script.size() - 1, commandLine1 );
+                m_script.insert( m_script.size() - 1, commandLine2 );
+            }
+            else
+            {
+                m_script.push_back( commandLine0 );
+                m_script.push_back( commandLine1 );
+                m_script.push_back( commandLine2 );
+            }
+
+            m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+            m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+            m_endSlider->increment();
+            m_endSlider->increment();
+            m_endSlider->increment();
+
+        }
+            break;
+        case 2: // copy arcball
+        {
+            QList<QVariant>commandLine;
+
+            commandLine.push_back( true );
+            commandLine.push_back( (int)ScriptCommand::SET_ARCBALL );
+
+            commandLine.push_back( m_glWidget->getArcBall()->getRotation() );
+            commandLine.push_back( arcball[8] );
+            commandLine.push_back( arcball[2] );
+            commandLine.push_back( arcball[3] );
+
+            if ( lastIsNone() )
+            {
+                m_script.insert( m_script.size() - 1, commandLine );
+            }
+            else
+            {
+                m_script.push_back( commandLine );
+            }
+
+            m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+            m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+            m_endSlider->increment();
+
+        }
+            break;
+        case 3: // copy arcball with loop
+        {
+            QList<QVariant>commandLine0;
+            QList<QVariant>commandLine1;
+            QList<QVariant>commandLine2;
+
+            commandLine0.push_back( true );
+            commandLine0.push_back( (int)ScriptCommand::BEGIN_LOOP );
+            commandLine0.push_back( 25 );
+
+            commandLine1.push_back( true );
+            commandLine1.push_back( (int)ScriptCommand::SET_ARCBALL );
+            commandLine1.push_back( m_glWidget->getArcBall()->getRotation() );
+            commandLine1.push_back( arcball[8] );
+            commandLine1.push_back( arcball[2] );
+            commandLine1.push_back( arcball[3] );
+
+            commandLine2.push_back( true );
+            commandLine2.push_back( (int)ScriptCommand::END_LOOP );
+
+            if ( lastIsNone() )
+            {
+                m_script.insert( m_script.size() - 1, commandLine0 );
+                m_script.insert( m_script.size() - 1, commandLine1 );
+                m_script.insert( m_script.size() - 1, commandLine2 );
+            }
+            else
+            {
+                m_script.push_back( commandLine0 );
+                m_script.push_back( commandLine1 );
+                m_script.push_back( commandLine2 );
+            }
+
+            m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
+            m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
+            m_endSlider->increment();
+            m_endSlider->increment();
+            m_endSlider->increment();
+
+        }
+            break;
+    }
+
+    rebuild();
+}
+
+bool ScriptWidget::lastIsNone()
+{
+    return ( m_script.last().at( 1 ).toInt() == 0 );
 }

@@ -82,7 +82,8 @@ private:
     void addRoiPropertySelect( QHBoxLayout* layout, int id, int selected, int branch, int row, bool active );
     void addEdit( QHBoxLayout* layout, int startId, int count );
     void addStretch( QHBoxLayout* layout, int count );
-    QVariant interpolateQVariant( QVariant &lhs, QVariant &rhs, float div );
+
+    bool lastIsNone();
 
     GLWidget* m_glWidget;
     QWidget* m_widgetToEnsureVisible;
@@ -140,6 +141,7 @@ public slots:
     void loadScript( QString fileName, bool append );
     void saveScript( QString fileName );
     void slotCameraChanged();
+    void slotCopyCamera( int mode );
 
 private slots:
     void rebuild();
@@ -162,8 +164,9 @@ private slots:
     void resetScript();
     void slotCheckboxChanged( int, int );
     void slotKeyPressed( int, Qt::KeyboardModifiers mods );
-    void slotCopyCameraChanged();
     void slotRangeChanged();
+    void slotCopyCameraChanged();
+
 
 
 signals:

@@ -604,6 +604,12 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case 70:
                     m_camera->backward();
                     break;
+                case 71: //G
+                    emit ( signalCopyCameraToScript( 0 ) );
+                    break;
+                case 72: //H
+                    emit ( signalCopyCameraToScript( 1 ) );
+                    break;
             }
             QList<QVariant> state = m_camera->getState();
             emit signalCameraChanged();
@@ -636,6 +642,11 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                     m_cameraInUse->drag( x, y + 20 );
                     break;
                 }
+                case 71: //G
+                    emit ( signalCopyCameraToScript( 2 ) );
+                    break;
+                case 72: //H
+                    emit ( signalCopyCameraToScript( 3 ) );
             }
         }
     }
