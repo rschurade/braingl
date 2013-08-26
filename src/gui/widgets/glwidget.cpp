@@ -708,7 +708,7 @@ void GLWidget::cameraCircle( bool dir )
     QVector3D pos = cs[0].value<QVector3D>();
     QVector3D lat = cs[1].value<QVector3D>();
 
-    int steps = 360;
+    int steps = Models::getGlobal( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS ).toInt();
 
     QVector2D point =  pos.toVector2D() - lat.toVector2D();
     float r = point.length();
@@ -720,10 +720,11 @@ void GLWidget::cameraCircle( bool dir )
     float alpha2 = asin( y )  * 180.0 / M_PI;
 
     float angle = 0;
-
+    float neg = -1.0;
     if ( x >= 0 && y >= 0 )
     {
         angle = 90 - alpha;
+        neg = 1.0;
     }
     if ( x >= 0 && y < 0 )
     {
@@ -732,25 +733,26 @@ void GLWidget::cameraCircle( bool dir )
     if ( x < 0 && y < 0 )
     {
         angle = 90 + alpha;
+        neg = 1.0;
     }
     if ( x < 0 && y >= 0 )
     {
         angle = 270 + alpha2;
     }
 
-    for ( int i = 0; i < steps; ++i )
+    for ( int i = 1; i <= steps; ++i )
     {
         float newAngle;
         if ( dir )
         {
-            newAngle = angle + ( i * ( 360.0f / (float)steps ) );
+            newAngle = (int)( angle + ( i * ( 360.0f / (float)steps ) ) ) % 360;
         }
         else
         {
-            newAngle = angle - ( i * ( 360.0f / (float)steps ) );
+            newAngle = (int)( angle - ( i * ( 360.0f / (float)steps ) ) ) % 360;
         }
-        float newX = -cos( newAngle * M_PI / 180 ) * r;
-        float newY = -sin( newAngle * M_PI / 180 ) * r;
+        float newX = neg * cos( newAngle * M_PI / 180 ) * r;
+        float newY = neg * sin( newAngle * M_PI / 180 ) * r;
 
         pos.setX( newX + lat.x() );
         pos.setY( newY + lat.y() );
