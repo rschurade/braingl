@@ -810,6 +810,10 @@ void ScriptWidget::loadScript( QString fileName, bool append )
     {
         m_delay->setValue( settings.value( "delay").toInt() );
     }
+    if ( settings.contains( "continuous" ) )
+    {
+        m_contRunning->setChecked( settings.value( "continuous").toBool() );
+    }
 }
 
 void ScriptWidget::loadScript()
@@ -842,6 +846,7 @@ void ScriptWidget::saveScript( QString fileName )
     int end = m_endSlider->getValue();
     settings.setValue( "size", end - begin + 1 );
     settings.setValue( "delay", m_delay->getValue() );
+    settings.setValue( "continuous", m_contRunning->checked() );
     int lineIndex = 0;
     for ( int i = begin; i <= end; ++i )
     {
