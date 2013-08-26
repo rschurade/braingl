@@ -82,6 +82,8 @@ private:
     void rightMouseDown( QMouseEvent* event );
     void rightMouseDrag( QMouseEvent* event );
 
+    void cameraCircle( bool dir );
+
 protected:
     void initializeGL();
     void paintGL();

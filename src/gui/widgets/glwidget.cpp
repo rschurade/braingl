@@ -610,6 +610,12 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case 72: //H
                     emit ( signalCopyCameraToScript( 1 ) );
                     break;
+                case 67: // c
+                    cameraCircle( false );
+                    break;
+                case 86: // v
+                    cameraCircle( true );
+                    break;
             }
             QList<QVariant> state = m_camera->getState();
             emit signalCameraChanged();
@@ -694,4 +700,62 @@ void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVect
     viewdir = -zdir;
     updir = ydir;
     //qDebug() << eyepos << viewdir << updir;
+}
+
+void GLWidget::cameraCircle( bool dir )
+{
+    QList<QVariant> cs = m_camera->getState();
+    QVector3D pos = cs[0].value<QVector3D>();
+    QVector3D lat = cs[1].value<QVector3D>();
+
+    int steps = 360;
+
+    QVector2D point =  pos.toVector2D() - lat.toVector2D();
+    float r = point.length();
+
+    float x = point.x() / r;
+    float y = point.y() / r;
+
+    float alpha = acos( x )  * 180.0 / M_PI ;
+    float alpha2 = asin( y )  * 180.0 / M_PI;
+
+    float angle = 0;
+
+    if ( x >= 0 && y >= 0 )
+    {
+        angle = 90 - alpha;
+    }
+    if ( x >= 0 && y < 0 )
+    {
+        angle = 90 + alpha;
+    }
+    if ( x < 0 && y < 0 )
+    {
+        angle = 90 + alpha;
+    }
+    if ( x < 0 && y >= 0 )
+    {
+        angle = 270 + alpha2;
+    }
+
+    for ( int i = 0; i < steps; ++i )
+    {
+        float newAngle;
+        if ( dir )
+        {
+            newAngle = angle + ( i * ( 360.0f / (float)steps ) );
+        }
+        else
+        {
+            newAngle = angle - ( i * ( 360.0f / (float)steps ) );
+        }
+        float newX = -cos( newAngle * M_PI / 180 ) * r;
+        float newY = -sin( newAngle * M_PI / 180 ) * r;
+
+        pos.setX( newX + lat.x() );
+        pos.setY( newY + lat.y() );
+        cs.replace( 0, pos );
+        m_camera->setState( cs );
+        update();
+    }
 }
