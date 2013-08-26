@@ -167,10 +167,15 @@ void ScriptWidget::initLayout()
     m_delay->setMax( 1000 );
     m_delay->setValue( 25 );
 
+    m_loopSize = new SliderWithEditInt( "loop size", 0, this );
+    m_loopSize->setMin( 1 );
+    m_loopSize->setMax( 1000 );
+    m_loopSize->setValue( 25 );
+
 
     buttons2->addStretch();
     buttons2->addStretch();
-    buttons2->addStretch();
+    buttons2->addWidget( m_loopSize );
     buttons1->addWidget( m_beginSlider );
     buttons1->addWidget( m_endSlider );
     buttons1->addWidget( m_delay );
@@ -546,7 +551,7 @@ void ScriptWidget::commandChanged( int line, int index, int command )
         }
         case ScriptCommand::BEGIN_LOOP:
         {
-            commandLine.push_back( 1 );
+            commandLine.push_back( m_loopSize->getValue() );
             QList<QVariant> commandLine2;
             commandLine2.push_back( true );
             commandLine2.push_back( true );
@@ -1627,7 +1632,7 @@ void ScriptWidget::slotCopyCamera( int mode )
             commandLine0.push_back( true );
             commandLine0.push_back( true );
             commandLine0.push_back( (int)ScriptCommand::BEGIN_LOOP );
-            commandLine0.push_back( 25 );
+            commandLine0.push_back( m_loopSize->getValue() );
 
             commandLine1.push_back( true );
             commandLine1.push_back( true );
@@ -1698,7 +1703,7 @@ void ScriptWidget::slotCopyCamera( int mode )
             commandLine0.push_back( true );
             commandLine0.push_back( true );
             commandLine0.push_back( (int)ScriptCommand::BEGIN_LOOP );
-            commandLine0.push_back( 25 );
+            commandLine0.push_back( m_loopSize->getValue() );
 
             commandLine1.push_back( true );
             commandLine1.push_back( true );
