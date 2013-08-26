@@ -272,6 +272,7 @@ namespace Fn
         G_ARCBALL_DISTANCE,
         G_CAMERA_KEYBOARD_STEP,
         G_CAMERA_FIXATE_Z,
+        G_CAMERA_FULLCIRCLE_STEPS,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -474,6 +475,7 @@ namespace Fn
                 case Property::G_ARCBALL_DISTANCE: return QString( "arcball distance" ); break;
                 case Property::G_CAMERA_KEYBOARD_STEP: return QString( "keyboard step size" ); break;
                 case Property::G_CAMERA_FIXATE_Z: return QString( "fixate z" ); break;
+                case Property::G_CAMERA_FULLCIRCLE_STEPS: return QString( "steps to do full cirlce" ); break;
 
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
