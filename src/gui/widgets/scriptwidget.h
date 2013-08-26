@@ -129,13 +129,13 @@ public slots:
     void saveScript( QString fileName );
     void slotCameraChanged();
     void slotCopyCamera( int mode );
+    void run( bool checked );
 
 private slots:
     void rebuild();
     void loadScript();
     void appendScript();
     void saveScript();
-    void run( bool checked );
     void run();
     void pause( bool checked );
 

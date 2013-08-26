@@ -1135,3 +1135,8 @@ void MainWindow::continousRendering()
         Models::g()->submit();
     }
 }
+
+void MainWindow::runScript()
+{
+    m_scriptWidget->run( true );
+}

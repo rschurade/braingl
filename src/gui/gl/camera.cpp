@@ -110,6 +110,7 @@ void Camera::viewLeft()
 void Camera::left()
 {
     getGlobals();
+    float z = m_position.z();
     QVector3D dir = m_lookAt -  m_position;
     float distance = dir.length();
     dir.normalize();
@@ -117,7 +118,10 @@ void Camera::left()
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
     m_position = m_position + m_keyboardStep * dir;
-
+    if ( Models::getGlobal( Fn::Property::G_CAMERA_FIXATE_Z).toBool() )
+    {
+        m_position.setZ( z );
+    }
     dir = m_lookAt - m_position;
     dir.normalize();
     m_position = m_lookAt - distance * dir;
@@ -127,6 +131,7 @@ void Camera::left()
 void Camera::right()
 {
     getGlobals();
+    float z = m_position.z();
     QVector3D dir = m_lookAt -  m_position;
     float distance = dir.length();
     dir.normalize();
@@ -134,7 +139,10 @@ void Camera::right()
     dir = QVector3D::crossProduct( dir, m_up );
     dir.normalize();
     m_position = m_position - m_keyboardStep * dir;
-
+    if ( Models::getGlobal( Fn::Property::G_CAMERA_FIXATE_Z).toBool() )
+    {
+        m_position.setZ( z );
+    }
     dir = m_lookAt - m_position;
     dir.normalize();
     m_position = m_lookAt - distance * dir;

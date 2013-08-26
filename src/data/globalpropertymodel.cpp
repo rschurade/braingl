@@ -18,6 +18,9 @@ GlobalPropertyModel::GlobalPropertyModel()
     using namespace Fn;
 
     m_properties = new PropertyGroup();
+    m_properties->create( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "general" );
+    m_properties->create( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "general" );
+
     m_properties->create( Fn::Property::G_SAGITTAL, 0.0f, 0.0f, 0.0f, "general" );
     m_properties->create( Fn::Property::G_CORONAL, 0.0f, 0.0f, 0.0f, "general" );
     m_properties->create( Fn::Property::G_AXIAL, 0.0f, 0.0f, 0.0f, "general" );
@@ -38,8 +41,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_ZOOM, 1.0f );
     m_properties->create( Fn::Property::G_MOVEX, 0 );
     m_properties->create( Fn::Property::G_MOVEY, 0 );
-    m_properties->create( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "camera" );
-    m_properties->create( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "camera" );
+
     m_properties->create( Fn::Property::G_CAMERA_POS_X, 0.0f, -1000.0f, 1000.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_POS_Y, 0.0f, -1000.0f, 1000.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_POS_Z, 40.0f, -1000.0f, 1000.0f, "camera" );
@@ -53,6 +55,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_ANGLE, 45, 1, 180, "camera" );
     m_properties->create( Fn::Property::G_CAMERA_KEYBOARD_STEP, 2.0f, 1.0f, 20.f, "camera" );
+    m_properties->create( Fn::Property::G_CAMERA_FIXATE_Z, false, "camera" );
 
     m_properties->create( Fn::Property::G_ARCBALL_DISTANCE, 500.0f, 1.0f, 20000.0f, "arcball" );
 
