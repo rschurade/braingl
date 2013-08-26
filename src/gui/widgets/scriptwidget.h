@@ -92,6 +92,7 @@ private:
     CheckboxWithLabel* m_screenshotEach;
     CheckboxWithLabel* m_copyCamera;
     CheckboxWithLabel* m_buildRange;
+    SliderWithEditInt* m_loopSize;
     SliderWithEditInt* m_delay;
     SliderWithEditInt* m_beginSlider;
     SliderWithEditInt* m_endSlider;
