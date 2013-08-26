@@ -57,15 +57,7 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_inBlock( false ),
     m_inLoop( false ),
     m_render( false ),
-    m_paused( false ),
-
-
-    m_currentZoom( 1.0f ),
-    m_targetZoom( 1.0f ),
-    m_currentMoveX( 0.0f ),
-    m_currentMoveY( 0.0f ),
-    m_targetMoveX( 0.0f ),
-    m_targetMoveY( 0.0f )
+    m_paused( false )
 {
     m_commandLookUp = QVector<int>( { 11, 10, 1, 2, 11, 3, 11, 0, 5, 6, 7, 8, 9, 4, 11 } );
 
@@ -957,36 +949,27 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_CAMERA:
         {
-            if ( m_loopCount == m_totalLoops )
+            if ( m_inLoop && m_loopCount == m_totalLoops )
             {
-                m_currentCamera = camera;
-                m_interpolatedCamera.clear();
-                m_interpolatedCamera.push_back( line[3] );
-                m_interpolatedCamera.push_back( line[4] );
-                m_interpolatedCamera.push_back( line[5] );
+                QList<QVariant>loopLine;
+                loopLine.push_back( "c" );
+                loopLine.push_back( camera[0] );
+                loopLine.push_back( camera[1] );
+                loopLine.push_back( camera[2] );
+                loopLine.push_back( line[3] );
+                loopLine.push_back( line[4] );
+                loopLine.push_back( line[5] );
+                m_loopList.push_back( loopLine );
+
             }
-
-            QVector3D pos1 = m_currentCamera[0].value<QVector3D>();
-            QVector3D pos2 = m_interpolatedCamera[0].value<QVector3D>();
-
-            QVector3D look1 = m_currentCamera[1].value<QVector3D>();
-            QVector3D look2 = m_interpolatedCamera[1].value<QVector3D>();
-
-            QVector3D up1 = m_currentCamera[2].value<QVector3D>();
-            QVector3D up2 = m_interpolatedCamera[2].value<QVector3D>();
-
-            float div = (float)( m_totalLoops - m_loopCount ) / (float)m_totalLoops;
-            div = qMax( (float)!m_inLoop, div );
-
-            QVector3D pos = div * pos2 + ( 1.0f - div ) * pos1;
-            QVector3D look = div * look2 + ( 1.0f - div ) * look1;
-            QVector3D up = div * up2 + ( 1.0f - div ) * up1;
-
-            QList<QVariant>newCam;
-            newCam.push_back( pos );
-            newCam.push_back( look );
-            newCam.push_back( up );
-            m_glWidget->getCamera()->setState( newCam );
+            else
+            {
+                QList<QVariant>newCam;
+                newCam.push_back( line[3].value<QVector3D>() );
+                newCam.push_back( line[4].value<QVector3D>() );
+                newCam.push_back( line[5].value<QVector3D>() );
+                m_glWidget->getCamera()->setState( newCam );
+            }
             break;
 
         }
@@ -1053,30 +1036,25 @@ void ScriptWidget::run()
         {
             if ( m_loopCount == m_totalLoops )
             {
-                m_currentRot = m_glWidget->getArcBall()->getRotation();
-                m_targetRot = line[3].value<QQuaternion>();
-                m_currentZoom = m_glWidget->getArcBall()->getZoom();
-                m_targetZoom = line[4].toFloat();
-                m_currentMoveX = m_glWidget->getArcBall()->getMoveX();
-                m_targetMoveX = line[5].toFloat();
-                m_currentMoveY = m_glWidget->getArcBall()->getMoveY();
-                m_targetMoveY = line[6].toFloat();
+                QList<QVariant>loopLine;
+                loopLine.push_back( "a" );
+                loopLine.push_back( m_glWidget->getArcBall()->getRotation() );
+                loopLine.push_back( m_glWidget->getArcBall()->getZoom() );
+                loopLine.push_back( m_glWidget->getArcBall()->getMoveX() );
+                loopLine.push_back( m_glWidget->getArcBall()->getMoveY() );
+                loopLine.push_back( line[3] );
+                loopLine.push_back( line[4] );
+                loopLine.push_back( line[5] );
+                loopLine.push_back( line[6] );
+                m_loopList.push_back( loopLine );
             }
-
-            float div = (float)( m_totalLoops - m_loopCount ) / (float)m_totalLoops;
-            div = qMax( (float)!m_inLoop, div );
-
-            QQuaternion rot = QQuaternion::slerp( m_currentRot, m_targetRot, div );
-            m_glWidget->getArcBall()->setRotation( rot );
-
-            float zoom = ( 1.0f - div ) * m_currentZoom + div * m_targetZoom;
-            float moveX = ( 1.0f - div ) * m_currentMoveX + div * m_targetMoveX;
-            float moveY = ( 1.0f - div ) * m_currentMoveY + div * m_targetMoveY;
-
-            m_glWidget->getArcBall()->setZoom( zoom );
-            m_glWidget->getArcBall()->setMoveX( moveX );
-            m_glWidget->getArcBall()->setMoveY( moveY );
-
+            else if ( !m_inLoop )
+            {
+                m_glWidget->getArcBall()->setRotation( line[3].value<QQuaternion>() );
+                m_glWidget->getArcBall()->setZoom( line[4].toFloat() );
+                m_glWidget->getArcBall()->setMoveX( line[5].toFloat() );
+                m_glWidget->getArcBall()->setMoveY( line[6].toFloat() );
+            }
             break;
         }
         case ScriptCommand::BEGIN_LOOP:
@@ -1111,6 +1089,26 @@ void ScriptWidget::run()
                     if ( loopLine[0] == "r" )
                     {
                         Models::setROIProp( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt(), FMath::interpolateQVariant( loopLine[4], loopLine[5], div ) );
+                    }
+                    if ( loopLine[0] == "c" )
+                    {
+                        QList<QVariant>newCam;
+                        newCam.push_back( FMath::interpolateQVariant( loopLine[1], loopLine[4], div ) );
+                        newCam.push_back( FMath::interpolateQVariant( loopLine[2], loopLine[5], div ) );
+                        newCam.push_back( FMath::interpolateQVariant( loopLine[3], loopLine[6], div ) );
+                        m_glWidget->getCamera()->setState( newCam );
+                    }
+                    if ( loopLine[0] == "a" )
+                    {
+                        QQuaternion currentRot = loopLine[1].value<QQuaternion>();
+                        QQuaternion targetRot = loopLine[5].value<QQuaternion>();
+                        QQuaternion rot = QQuaternion::slerp( currentRot, targetRot, div );
+                        m_glWidget->getArcBall()->setRotation( rot );
+
+                        m_glWidget->getArcBall()->setZoom( FMath::interpolateQVariant( loopLine[2], loopLine[6], div ).toFloat() );
+                        m_glWidget->getArcBall()->setMoveX( FMath::interpolateQVariant( loopLine[3], loopLine[7], div ).toFloat() );
+                        m_glWidget->getArcBall()->setMoveY( FMath::interpolateQVariant( loopLine[4], loopLine[8], div ).toFloat() );
+
                     }
                 }
                 m_render = true;
