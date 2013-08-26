@@ -35,7 +35,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     skipDraw( false ),
     m_width( 0 ),
     m_height( 0 ),
-    m_doScreenshot( false )
+    m_doScreenshot( false ),
+    m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -65,7 +66,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     skipDraw( false ),
     m_width( 0 ),
     m_height( 0 ),
-    m_doScreenshot( false )
+    m_doScreenshot( false ),
+    m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -610,6 +612,10 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case 72: //H
                     emit ( signalCopyCameraToScript( 1 ) );
                     break;
+                case 66: // b
+                    m_copyCameraMode = ( m_copyCameraMode + 1 ) % 3;
+                    qDebug() << "copy camera mode:" << m_copyCameraMode;
+                    break;
                 case 67: // c
                     cameraCircle( false );
                     break;
@@ -759,5 +765,14 @@ void GLWidget::cameraCircle( bool dir )
         cs.replace( 0, pos );
         m_camera->setState( cs );
         update();
+
+        if ( m_copyCameraMode == 1 )
+        {
+            emit ( signalCopyCameraToScript( 0 ) );
+        }
+        if ( m_copyCameraMode == 2 )
+        {
+            emit ( signalCopyCameraToScript( 1 ) );
+        }
     }
 }
