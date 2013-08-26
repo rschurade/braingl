@@ -82,9 +82,14 @@ void ColormapEditWidget::redrawWidget()
 
     m_buttonPanel = new QWidget();
     m_buttonPanel->setLayout( createButtonPanel() );
-    vLayout->addWidget( m_buttonPanel );
 
-    vLayout->addStretch();
+    QScrollArea* scrollArea = new QScrollArea( this );
+    scrollArea->setWidgetResizable( true );
+    scrollArea->setWidget( m_buttonPanel );
+
+    vLayout->addWidget( scrollArea );
+
+
     QHBoxLayout* hLayout5 = new QHBoxLayout();
     hLayout5->addStretch();
     CheckboxWithLabel* contUpdating = new CheckboxWithLabel( tr("continuous updating"), false );
@@ -184,7 +189,7 @@ QVBoxLayout* ColormapEditWidget::createButtonPanel()
     connect( colorWidget2, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
     hLayout3->addWidget( colorWidget2 );
     vLayout->addLayout( hLayout3 );
-
+    vLayout->addStretch();
     return vLayout;
 }
 

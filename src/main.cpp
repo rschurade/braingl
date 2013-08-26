@@ -76,6 +76,8 @@ int main( int argc, char *argv[] )
 
     bool debug = false;
     bool resetSettings = false;
+    bool runScript = false;
+
     for ( int i = 1; i < args.size(); ++i )
     {
         if ( args.at( i ) == "-v" )
@@ -97,9 +99,13 @@ int main( int argc, char *argv[] )
         }
         if ( args.at( i ) == "-s" )
         {
-            // reset saved settings
             makeScreenshot = true;
         }
+        if ( args.at( i ) == "-rs" )
+        {
+            runScript = true;
+        }
+
         if ( args.at( i ) == "-h" || args.at( i ) == "?" )
         {
             qDebug() << "Command line options:";
@@ -107,6 +113,8 @@ int main( int argc, char *argv[] )
             qDebug() << "-v : toggles verbose mode, warning: this will spam your console with messages";
             qDebug() << "-l : logs debug messages to text file";
             qDebug() << "-r : resets saved settings";
+            qDebug() << "-s : makes a screenshot and quits";
+            qDebug() << "-rs : runs the loaded script";
             qDebug() << "---";
 
         }
@@ -127,6 +135,11 @@ int main( int argc, char *argv[] )
     for ( int i = 1; i < args.size(); ++i )
     {
         mainWin.load( args.at( i ) );
+    }
+
+    if ( runScript )
+    {
+        mainWin.runScript();
     }
 
     if ( makeScreenshot )

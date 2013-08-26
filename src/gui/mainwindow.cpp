@@ -51,6 +51,8 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	QMainWindow(),
     m_debug( debug )
 {
+    setDockOptions( QMainWindow::AnimatedDocks |  QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks | QMainWindow::VerticalTabs );
+
 	m_centralWidget = new QMainWindow();
 	m_centralWidget->setObjectName( "central widget" );
 	m_centralWidget->setDockOptions( QMainWindow::AnimatedDocks |  QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks );
@@ -1134,4 +1136,9 @@ void MainWindow::continousRendering()
         QTimer::singleShot( 40, this, SLOT( continousRendering() ) );
         Models::g()->submit();
     }
+}
+
+void MainWindow::runScript()
+{
+    m_scriptWidget->run( true );
 }
