@@ -108,11 +108,6 @@ private:
     int m_runScript;
     int m_currentCommandLine;
 
-    QList<QVariant>m_currentCamera;
-    QList<QVariant>m_interpolatedCamera;
-    QQuaternion m_currentRot;
-    QQuaternion m_targetRot;
-
     int m_lastGlobal;
     int m_lastDataset;
     int m_lastProperty;
@@ -127,16 +122,6 @@ private:
     bool m_render;
     bool m_paused;
 
-
-    float m_currentZoom;
-    float m_targetZoom;
-    float m_currentMoveX;
-    float m_currentMoveY;
-    float m_targetMoveX;
-    float m_targetMoveY;
-
-    float m_currentValue;
-    float m_targetValue;
     QList< QList<QVariant> >m_loopList;
 
 public slots:
