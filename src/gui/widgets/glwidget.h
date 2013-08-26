@@ -77,6 +77,8 @@ private:
     bool m_doScreenshot;
     QString m_screenshotFileName;
 
+    int m_copyCameraMode;
+
     void calcMVPMatrix();
 
     void rightMouseDown( QMouseEvent* event );
