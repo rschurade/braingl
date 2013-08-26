@@ -79,7 +79,11 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             widget->setLayout( layout );
             widget->setContentsMargins( 0, 0, 0, 0 );
 
-            addTab( widget, tab );
+            QScrollArea* scrollArea = new QScrollArea( this );
+            scrollArea->setWidgetResizable( true );
+            scrollArea->setWidget( widget );
+
+            addTab( scrollArea, tab );
             tabs[tab] = layout;
         }
         // insert property in tab
