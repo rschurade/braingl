@@ -53,7 +53,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
     finalizeProperties();
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
-    m_properties["maingl2"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -161,12 +161,13 @@ void DatasetGlyphset::makeLittleBrains()
     }
     littleBrains.clear();
     shifts1.clear();
+    shifts2.clear();
 
     for ( int i = 0; i < m_n; ++i )
     {
         if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() )
         {
-            TriangleMesh2* mesh = new TriangleMesh2( getMesh( "maingl" ) );
+            TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
             MeshRenderer* m_renderer = new MeshRenderer( mesh );
 
             m_renderer->setModel( Models::g() );
@@ -179,9 +180,11 @@ void DatasetGlyphset::makeLittleBrains()
             {
                 mesh->setVertexData( p, conn[i][p] );
             }
-            QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
+            qDebug() << "d_surface" << properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
             shifts1 << f1;
-            QVector3D f2 = m_mesh.at( properties( "maingl2" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            QVector3D f2 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            qDebug() << "d_surface_gg" << properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
             shifts2 << f2;
         }
     }
@@ -206,7 +209,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
-    if ( ( target == "maingl2" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
+    if ( ( target == "maingl" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
         for ( int i = 0; i < littleBrains.size(); ++i )
         {
@@ -214,14 +217,14 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             QVector3D shift2 = shifts2[i];
             QMatrix4x4 toOrigin;
             toOrigin.translate( shift2 );
-            toOrigin.scale( properties( "maingl2" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+            toOrigin.scale( properties( "maingl" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
             //Rotation of the individual glyphs:
-            float rotx = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+            float rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
             QMatrix4x4 rotMatrix;
             rotMatrix.rotate( rotx, 1, 0, 0 );
-            float roty = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+            float roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
             rotMatrix.rotate( roty, 0, 1, 0 );
-            float rotz = properties( "maingl2" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+            float rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
             rotMatrix.rotate( rotz, 0, 0, 1 );
             toOrigin *= rotMatrix;
             toOrigin.translate( -shift1 );

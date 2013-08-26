@@ -35,7 +35,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     skipDraw( false ),
     m_width( 0 ),
     m_height( 0 ),
-    m_doScreenshot( false )
+    m_doScreenshot( false ),
+    m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -65,7 +66,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     skipDraw( false ),
     m_width( 0 ),
     m_height( 0 ),
-    m_doScreenshot( false )
+    m_doScreenshot( false ),
+    m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -610,6 +612,16 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case 72: //H
                     emit ( signalCopyCameraToScript( 1 ) );
                     break;
+                case 66: // b
+                    m_copyCameraMode = ( m_copyCameraMode + 1 ) % 3;
+                    qDebug() << "copy camera mode:" << m_copyCameraMode;
+                    break;
+                case 67: // c
+                    cameraCircle( false );
+                    break;
+                case 86: // v
+                    cameraCircle( true );
+                    break;
             }
             QList<QVariant> state = m_camera->getState();
             emit signalCameraChanged();
@@ -694,4 +706,73 @@ void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVect
     viewdir = -zdir;
     updir = ydir;
     //qDebug() << eyepos << viewdir << updir;
+}
+
+void GLWidget::cameraCircle( bool dir )
+{
+    QList<QVariant> cs = m_camera->getState();
+    QVector3D pos = cs[0].value<QVector3D>();
+    QVector3D lat = cs[1].value<QVector3D>();
+
+    int steps = Models::getGlobal( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS ).toInt();
+
+    QVector2D point =  pos.toVector2D() - lat.toVector2D();
+    float r = point.length();
+
+    float x = point.x() / r;
+    float y = point.y() / r;
+
+    float alpha = acos( x )  * 180.0 / M_PI ;
+    float alpha2 = asin( y )  * 180.0 / M_PI;
+
+    float angle = 0;
+    float neg = -1.0;
+    if ( x >= 0 && y >= 0 )
+    {
+        angle = 90 - alpha;
+        neg = 1.0;
+    }
+    if ( x >= 0 && y < 0 )
+    {
+        angle = 90 + alpha;
+    }
+    if ( x < 0 && y < 0 )
+    {
+        angle = 90 + alpha;
+        neg = 1.0;
+    }
+    if ( x < 0 && y >= 0 )
+    {
+        angle = 270 + alpha2;
+    }
+
+    for ( int i = 1; i <= steps; ++i )
+    {
+        float newAngle;
+        if ( dir )
+        {
+            newAngle = (int)( angle + ( i * ( 360.0f / (float)steps ) ) ) % 360;
+        }
+        else
+        {
+            newAngle = (int)( angle - ( i * ( 360.0f / (float)steps ) ) ) % 360;
+        }
+        float newX = neg * cos( newAngle * M_PI / 180 ) * r;
+        float newY = neg * sin( newAngle * M_PI / 180 ) * r;
+
+        pos.setX( newX + lat.x() );
+        pos.setY( newY + lat.y() );
+        cs.replace( 0, pos );
+        m_camera->setState( cs );
+        update();
+
+        if ( m_copyCameraMode == 1 )
+        {
+            emit ( signalCopyCameraToScript( 0 ) );
+        }
+        if ( m_copyCameraMode == 2 )
+        {
+            emit ( signalCopyCameraToScript( 1 ) );
+        }
+    }
 }

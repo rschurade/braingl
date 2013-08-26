@@ -118,6 +118,7 @@ private:
 
 public slots:
     void screenshot();
+    void runScript();
 
 private slots:
     void slotNew();
