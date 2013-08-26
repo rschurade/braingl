@@ -1090,10 +1090,10 @@ void ScriptWidget::run()
         }
         case ScriptCommand::END_LOOP:
         {
-            float div = (float)( m_totalLoops - m_loopCount + 1 ) / (float)m_totalLoops;
-            if ( m_loopCount )
+            --m_loopCount;
+            float div = (float)( m_totalLoops - m_loopCount ) / (float)m_totalLoops;
+            if ( m_loopCount + 1 )
             {
-                --m_loopCount;
                 m_currentCommandLine = m_loopBegin;
 
                 for ( int i = 0; i < m_loopList.size(); ++i )
@@ -1105,7 +1105,7 @@ void ScriptWidget::run()
                     }
                     if ( loopLine[0] == "d" )
                     {
-                        qDebug() << loopLine[3] << loopLine[4] << div << FMath::interpolateQVariant( loopLine[3], loopLine[4], div ).toInt();
+                        //qDebug() << loopLine[3] <<  loopLine[4] << div << FMath::interpolateQVariant( loopLine[3], loopLine[4], div ).toInt();
                         Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), FMath::interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
                     }
                     if ( loopLine[0] == "r" )
@@ -1113,8 +1113,6 @@ void ScriptWidget::run()
                         Models::setROIProp( loopLine[1].toInt(), loopLine[2].toInt(), loopLine[3].toInt(), FMath::interpolateQVariant( loopLine[4], loopLine[5], div ) );
                     }
                 }
-
-
                 m_render = true;
             }
             else
@@ -1122,6 +1120,9 @@ void ScriptWidget::run()
                 m_loopCount = 1;
                 m_totalLoops = 1;
                 m_inLoop = false;
+                emit( hideIndicator( true, m_currentCommandLine - 1 ) );
+                QTimer::singleShot( 1, this, SLOT( run() ) );
+                return;
             }
             break;
         }
@@ -1467,7 +1468,7 @@ void ScriptWidget::resetScript()
 void ScriptWidget::slotCheckboxChanged( int line, int state )
 {
     m_script[line].replace( 0, state );
-    if ( m_script[line].at( 1 ).toInt() == (int)ScriptCommand::BEGIN_LOOP )
+    if ( m_script[line].at( 2 ).toInt() == (int)ScriptCommand::BEGIN_LOOP )
     {
         do
         {
@@ -1482,9 +1483,9 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
             emit( enable( state, line * 10 + 5 ) );
             ++line;
         }
-        while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_LOOP );
+        while( m_script[line].at( 2 ).toInt() != (int)ScriptCommand::END_LOOP );
     }
-    if ( m_script[line].at( 1 ).toInt() == (int)ScriptCommand::BEGIN_BLOCK )
+    if ( m_script[line].at( 2 ).toInt() == (int)ScriptCommand::BEGIN_BLOCK )
     {
         do
         {
@@ -1499,7 +1500,7 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
             m_script[line].replace( 0, state );
             ++line;
         }
-        while( m_script[line].at( 1 ).toInt() != (int)ScriptCommand::END_BLOCK );
+        while( m_script[line].at( 2 ).toInt() != (int)ScriptCommand::END_BLOCK );
     }
     m_script[line].replace( 0, state );
     emit( checkBoxChanged( state, line ) );
