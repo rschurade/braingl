@@ -58,7 +58,7 @@ struct Script2String
 };
 
 class GLWidget;
-class CheckboxWithLabel;
+class CheckBox;
 class SliderWithEditInt;
 class ComboBoxID;
 
@@ -88,10 +88,9 @@ private:
 
     GLWidget* m_glWidget;
     QWidget* m_widgetToEnsureVisible;
-    CheckboxWithLabel* m_contRunning;
-    CheckboxWithLabel* m_screenshotEach;
-    CheckboxWithLabel* m_copyCamera;
-    CheckboxWithLabel* m_buildRange;
+    CheckBox* m_contRunning;
+    CheckBox* m_screenshotEach;
+    CheckBox* m_buildRange;
     SliderWithEditInt* m_loopSize;
     SliderWithEditInt* m_delay;
     SliderWithEditInt* m_beginSlider;
@@ -128,7 +127,6 @@ private:
 public slots:
     void loadScript( QString fileName, bool append );
     void saveScript( QString fileName );
-    void slotCameraChanged();
     void slotCopyCamera( int mode );
     void run( bool checked );
 
@@ -154,9 +152,6 @@ private slots:
     void slotCheckboxChanged2( int, int );
     void slotKeyPressed( int, Qt::KeyboardModifiers mods );
     void slotRangeChanged();
-    void slotCopyCameraChanged();
-
-
 
 signals:
     void enable( bool e, int id );
