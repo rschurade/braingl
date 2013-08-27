@@ -6,14 +6,13 @@
  */
 #include "propertybool.h"
 
-#include "../../gui/widgets/controls/checkboxwithlabel.h"
-
+#include "../../gui/widgets/controls/checkbox.h"
 #include <QDebug>
 
 PropertyBool::PropertyBool( QString name, bool value ) :
     Property( name, value )
 {
-    CheckboxWithLabel* widget = new CheckboxWithLabel( m_name );
+    CheckBox* widget = new CheckBox( m_name );
     widget->setChecked( value );
     connect( widget, SIGNAL( stateChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
     m_widget = widget;
@@ -27,7 +26,7 @@ PropertyBool::~PropertyBool()
 void PropertyBool::setValue( QVariant value )
 {
     m_value = value;
-    ( ( CheckboxWithLabel* )m_widget )->setChecked( m_value.toBool() );
+    ( ( CheckBox* )m_widget )->setChecked( m_value.toBool() );
 }
 
 void PropertyBool::widgetChanged( int value, int id )

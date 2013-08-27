@@ -11,7 +11,7 @@
 #include "../widgets/controls/sliderwithedit.h"
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../widgets/controls/selectwithlabel.h"
-#include "../widgets/controls/checkboxwithlabel.h"
+#include "../widgets/controls/checkbox.h"
 
 #include "../../data/enums.h"
 #include "../../data/vptr.h"
