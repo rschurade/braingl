@@ -124,7 +124,14 @@ void GLWidget::paintGL()
     {
         if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
-            // insert code for stereoscopic screenshots here
+            // TODO: insert code for stereoscopic screenshots here
+            m_xshift = -30.0;
+            calcMVPMatrix();
+            QImage* image = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
+            image->save(  m_screenshotFileName, "PNG" );
+            delete image;
+            m_doScreenshot = false;
+            calcMVPMatrix();
         }
         else
         {
@@ -243,7 +250,7 @@ void GLWidget::calcMVPMatrix()
 
         if ( m_doScreenshot && Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
-            //m_pMatrix.frustum( something )
+            //TODO: m_pMatrix.frustum(  ) mit m_xshift, skaliert so dass das mit den zwei metern passt...
         }
         else
         {
