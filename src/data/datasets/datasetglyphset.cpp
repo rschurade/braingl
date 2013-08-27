@@ -111,6 +111,7 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE, { "orientation", "value" }, 0, "glyphs" );
 }
 
 void DatasetGlyphset::readConnectivity( QString filename )
@@ -181,10 +182,8 @@ void DatasetGlyphset::makeLittleBrains()
                 mesh->setVertexData( p, conn[i][p] );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
-            qDebug() << "d_surface" << properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
             shifts1 << f1;
             QVector3D f2 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
-            qDebug() << "d_surface_gg" << properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
             shifts2 << f2;
         }
     }

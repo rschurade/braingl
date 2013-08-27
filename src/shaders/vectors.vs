@@ -16,6 +16,7 @@ in vec3 dg;
 in vec3 dc;
 
 out float v_discard;
+out float out_value;
 
 void main()
 {
@@ -34,6 +35,7 @@ void main()
 	   v_position = mvp_matrix * vec4( a_to, 1.0 );
 	}
 	v_position += vec4( 0, 0, -0.00001*u_scale, 0 );
-    gl_Position = v_position;  
-
+    gl_Position = v_position;
+     
+    out_value = a_value;
 }
