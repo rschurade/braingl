@@ -1044,7 +1044,7 @@ void ScriptWidget::run()
         }
         case ScriptCommand::SET_ARCBALL:
         {
-            if ( m_loopCount == m_totalLoops )
+            if ( m_inLoop && m_loopCount == m_totalLoops )
             {
                 QList<QVariant>loopLine;
                 loopLine.push_back( "a" );
