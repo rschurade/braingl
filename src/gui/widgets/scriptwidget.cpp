@@ -10,11 +10,10 @@
 #include "../gl/camera.h"
 #include "../gl/arcball.h"
 
-#include "controls/checkboxid.h"
 #include "controls/comboboxid.h"
 #include "controls/lineeditid.h"
 #include "controls/labelid.h"
-#include "controls/checkboxwithlabel.h"
+#include "controls/checkbox.h"
 #include "controls/sliderwitheditint.h"
 #include "controls/pushbuttonwithid.h"
 
@@ -103,7 +102,8 @@ void ScriptWidget::initLayout()
     m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
     m_endSlider->setValue( m_script.size() - 1  );
 
-    m_buildRange = new CheckboxWithLabel( "show only begin-end", -1, this );
+    m_buildRange = new CheckBox( "show only begin-end", -1, this );
+    m_buildRange->setChecked( false );
 
     m_scriptPanel = buildScriptLayout();
     m_scrollArea = new QScrollArea( this );
@@ -149,15 +149,13 @@ void ScriptWidget::initLayout()
 
     QHBoxLayout* buttons2 = new QHBoxLayout();
 
-    m_contRunning = new CheckboxWithLabel( "continous", -1, this );
+    m_contRunning = new CheckBox( "continous", -1, this );
+    m_contRunning->uncheck();
     buttons2->addWidget( m_contRunning );
 
-    m_screenshotEach = new CheckboxWithLabel( "screenshot each step", -1, this );
+    m_screenshotEach = new CheckBox( "screenshot each step", -1, this );
+    m_screenshotEach->uncheck();
     buttons2->addWidget( m_screenshotEach );
-
-//    m_copyCamera = new CheckboxWithLabel( "copy camera", -1, this );
-//    buttons2->addWidget( m_copyCamera );
-//    connect( m_copyCamera, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCopyCameraChanged() ) );
 
     buttons2->addWidget( m_buildRange );
     connect( m_buildRange, SIGNAL( stateChanged( int, int ) ), this, SLOT( rebuild() ) );
@@ -175,6 +173,7 @@ void ScriptWidget::initLayout()
 
     buttons2->addStretch();
     buttons2->addStretch();
+    buttons2->addStretch();
     buttons2->addWidget( m_loopSize );
     buttons1->addWidget( m_beginSlider );
     buttons1->addWidget( m_endSlider );
@@ -188,7 +187,7 @@ void ScriptWidget::initLayout()
     layout->addLayout( layout2 );
 
     this->setLayout( layout );
-    this->setMinimumSize( 600, 600 );
+    this->setMinimumSize( 300, 300 );
 
     if ( m_widgetToEnsureVisible )
     {
@@ -251,11 +250,11 @@ QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &in
     QLabel* label = new QLabel( QString::number( i ), this );
     layout->addWidget( label );
 
-    CheckBoxID* checkBox = new CheckBoxID( i, this );
+    CheckBox* checkBox = new CheckBox( i, this );
     layout->addWidget( checkBox );
     bool lineActive = line[0].toBool();
     checkBox->setChecked( lineActive );
-    connect( checkBox, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
+    connect( checkBox, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCheckboxChanged( int, int ) ) );
     connect( this, SIGNAL( checkBoxChanged( int, int ) ), checkBox, SLOT( slotSetChecked2( int, int ) ) );
 
     if ( i == m_lastInsertedLine )
@@ -283,11 +282,11 @@ QHBoxLayout* ScriptWidget::addWidgetLine( int i, QList<QVariant> &line, bool &in
     downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
     connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveCommandDown( int ) ) );
 
-    CheckBoxID* checkBox2 = new CheckBoxID( i, this );
+    CheckBox* checkBox2 = new CheckBox( i, this );
     layout->addWidget( checkBox2 );
     bool screenshotActive = line[1].toBool();
     checkBox2->setChecked( screenshotActive );
-    connect( checkBox2, SIGNAL( signalStateChanged( int, int ) ), this, SLOT( slotCheckboxChanged2( int, int ) ) );
+    connect( checkBox2, SIGNAL( stateChanged( int, int ) ), this, SLOT( slotCheckboxChanged2( int, int ) ) );
 
     if( ( line[2].toInt() == (int)ScriptCommand::BEGIN_LOOP ) || ( line[2].toInt() == (int)ScriptCommand::BEGIN_BLOCK ) )
     {
@@ -1473,7 +1472,7 @@ void ScriptWidget::resetScript()
     rebuild();
 }
 
-void ScriptWidget::slotCheckboxChanged( int line, int state )
+void ScriptWidget::slotCheckboxChanged( int state, int line )
 {
     m_script[line].replace( 0, state );
     if ( m_script[line].at( 2 ).toInt() == (int)ScriptCommand::BEGIN_LOOP )
@@ -1521,7 +1520,7 @@ void ScriptWidget::slotCheckboxChanged( int line, int state )
     emit( enable( state, line * 10 + 5 ) );
 }
 
-void ScriptWidget::slotCheckboxChanged2( int line, int state )
+void ScriptWidget::slotCheckboxChanged2( int state, int line )
 {
     m_script[line].replace( 1, state );
 }
@@ -1538,46 +1537,6 @@ void ScriptWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
         {
             m_pauseButton->toggle();
         }
-    }
-}
-
-void ScriptWidget::slotCameraChanged()
-{
-    if ( m_copyCamera->checked() )
-    {
-        QList<QVariant> camera = m_glWidget->getCamera()->getState();
-        QList<QVariant>commandLine;
-
-        commandLine.push_back( true );
-        commandLine.push_back( true );
-        commandLine.push_back( (int)ScriptCommand::SET_CAMERA );
-
-        commandLine.push_back( camera[0] );
-        commandLine.push_back( camera[1] );
-        commandLine.push_back( camera[2] );
-
-        if ( m_script.last().at( 1 ).toInt() ==  (int)ScriptCommand::NONE )
-        {
-            m_script.insert( m_script.size() - 1, commandLine );
-        }
-        else
-        {
-            m_script.push_back( commandLine );
-        }
-
-        m_beginSlider->increment();
-        m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
-        m_endSlider->setMax( qMax( 0, m_script.size() - 1 ) );
-        m_endSlider->increment();
-        rebuild();
-    }
-}
-
-void ScriptWidget::slotCopyCameraChanged()
-{
-    if ( !m_copyCamera->checked() )
-    {
-        rebuild();
     }
 }
 

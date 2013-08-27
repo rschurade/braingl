@@ -11,7 +11,7 @@
 #include "../widgets/controls/sliderwithedit.h"
 #include "../widgets/controls/sliderwitheditint.h"
 #include "../widgets/controls/selectwithlabel.h"
-#include "../widgets/controls/checkboxwithlabel.h"
+#include "../widgets/controls/checkbox.h"
 #include "../widgets/controls/colormapwidget.h"
 
 #include "../gl/colormapfunctions.h"
@@ -32,7 +32,7 @@ DatasetPropertyWidget::DatasetPropertyWidget( QString target, QWidget* parent ) 
     m_propertyView = new DatasetPropertyView( this );
     m_propertyView->setModel( Models::d() );
 
-    setTabPosition( QTabWidget::South );
+    setTabPosition( QTabWidget::North );
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
 }

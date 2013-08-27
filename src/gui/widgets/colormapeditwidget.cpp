@@ -6,7 +6,7 @@
  */
 #include "colormapeditwidget.h"
 
-#include "../widgets/controls/checkboxwithlabel.h"
+#include "../widgets/controls/checkbox.h"
 #include "../widgets/controls/colorwidgetwithlabel.h"
 #include "../widgets/controls/editwithlabel.h"
 #include "../widgets/controls/pushbuttonwithid.h"
@@ -92,7 +92,8 @@ void ColormapEditWidget::redrawWidget()
 
     QHBoxLayout* hLayout5 = new QHBoxLayout();
     hLayout5->addStretch();
-    CheckboxWithLabel* contUpdating = new CheckboxWithLabel( tr("continuous updating"), false );
+    CheckBox* contUpdating = new CheckBox( tr("continuous updating") );
+    contUpdating->setChecked( false );
     contUpdating->setChecked( m_contUpdating );
     connect( contUpdating, SIGNAL( stateChanged( int, int ) ), this, SLOT( contUpdatingChanged( int ) ) );
     hLayout5->addWidget( contUpdating );
