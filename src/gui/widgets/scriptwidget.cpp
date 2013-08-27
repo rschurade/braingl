@@ -187,7 +187,7 @@ void ScriptWidget::initLayout()
     layout->addLayout( layout2 );
 
     this->setLayout( layout );
-    this->setMinimumSize( 600, 600 );
+    this->setMinimumSize( 300, 300 );
 
     if ( m_widgetToEnsureVisible )
     {
