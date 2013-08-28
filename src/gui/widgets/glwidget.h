@@ -77,6 +77,8 @@ private:
     bool m_doScreenshot;
     QString m_screenshotFileName;
 
+    float m_xshift;
+
     int m_copyCameraMode;
 
     void calcMVPMatrix();
