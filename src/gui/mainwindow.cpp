@@ -643,7 +643,8 @@ void MainWindow::loadScene( QString fileName )
 void MainWindow::about()
 {
     QMessageBox::about( this, tr( "About brainGL" ),
-            tr( "<b>brainGL</b> exploring and visualizing anatomical and functional connectivity in the brain." ) );
+            tr( "<b>brainGL v0.8.0</b>\n"
+                    "exploring and visualizing anatomical and functional connectivity in the brain." ) );
 }
 
 void MainWindow::createActions()
