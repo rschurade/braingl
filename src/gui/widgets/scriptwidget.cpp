@@ -84,6 +84,8 @@ void ScriptWidget::rebuild()
     m_scriptPanel = buildScriptLayout();
     m_scrollArea->setWidget( m_scriptPanel );
 
+    moveScrollBarToBottom( 0, 0 );
+
     this->repaint();
 }
 
@@ -1450,8 +1452,9 @@ void ScriptWidget::moveCommandDown( int row )
 
 void ScriptWidget::moveScrollBarToBottom( int min, int max )
 {
+    qDebug() << "huhu";
     Q_UNUSED( min );
-    if ( m_widgetToEnsureVisible)
+    if ( m_widgetToEnsureVisible )
     {
         m_scrollArea->ensureWidgetVisible( m_widgetToEnsureVisible );
     }
