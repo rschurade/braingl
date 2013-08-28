@@ -34,6 +34,8 @@ void PointGlyphRenderer::init()
 
 void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
+    setRenderParams(props);
+
     float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
     if ( renderMode == 1 ) // we are drawing opaque objects
@@ -79,6 +81,14 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
+    program->setUniformValue( "u_colorMode", m_colorMode );
+    program->setUniformValue( "u_colormap", m_colormap );
+    program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
+    program->setUniformValue( "u_selectedMin", m_selectedMin );
+    program->setUniformValue( "u_selectedMax", m_selectedMax );
+    program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    program->setUniformValue( "u_upperThreshold", m_upperThreshold );
+
     float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
 
@@ -102,6 +112,17 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     }
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
+
+void PointGlyphRenderer::setRenderParams( PropertyGroup* props )
+{
+    m_colorMode = props->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+    m_colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
+    m_selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    m_selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
 void PointGlyphRenderer::setupTextures()

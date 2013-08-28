@@ -868,14 +868,14 @@ void MainWindow::createDockWindows()
 
     m_scriptWidget = new ScriptWidget( mainGLWidget, this );
     FNDockWidget* dockSW = new FNDockWidget( "script", m_scriptWidget, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockSW );
+    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSW );
     viewMenu->addAction( dockSW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSW, SLOT( toggleTitleWidget() ) );
     connect( m_scriptWidget, SIGNAL( screenshot() ), this, SLOT( screenshot() ) );
     //connect( mainGLWidget, SIGNAL( signalCameraChanged() ), m_scriptWidget, SLOT( slotCameraChanged() ) );
     connect( mainGLWidget, SIGNAL( signalCopyCameraToScript( int ) ), m_scriptWidget, SLOT( slotCopyCamera( int ) ) );
-    dockSW->hide();
-    tabifyDockWidget( dockGP, dockSW );
+    m_centralWidget->tabifiedDockWidgets( dockSW );
+    //dockSW->hide();
 
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
     FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );
@@ -934,6 +934,7 @@ void MainWindow::createDockWindows()
     m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
+    m_centralWidget->tabifyDockWidget( dockSW, dockMainGL );
 
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
