@@ -54,6 +54,17 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
 
     m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
     m_properties["maingl"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_COLORMODE ), SIGNAL( valueChanged(QVariant)), this,
+            SLOT( colorModeChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHSTYLE ), SIGNAL( valueChanged(QVariant)), this,
+            SLOT( glyphStyleChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_ROTATION ), SIGNAL( valueChanged(QVariant)), this,
+            SLOT( rotationChanged(QVariant) ) );
+
+    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
+    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
+    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -92,10 +103,12 @@ void DatasetGlyphset::addProperties()
     { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
     m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
     m_properties["maingl"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
     m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
@@ -111,7 +124,57 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE, { "orientation", "value" }, 0, "glyphs" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
+    { "orientation", "value" }, 0, "glyphs" );
+}
+
+void DatasetGlyphset::colorModeChanged( QVariant qv )
+{
+    if ( qv == 1 )
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_SURFACE_GLYPH_COLOR )->setDisabled( true );
+    }
+    else
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_SURFACE_GLYPH_COLOR )->setDisabled( false );
+    }
+}
+
+void DatasetGlyphset::glyphStyleChanged( QVariant qv )
+{
+    if ( qv != 2 )
+    {
+        //Geometry-based glyphs
+        m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
+        m_properties["maingl"]->getWidget( Fn::Property::D_PRIMSIZE )->setHidden( false );
+        m_properties["maingl"]->getWidget( Fn::Property::D_SURFACE_GLYPH_GEOMETRY )->setHidden( false );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
+    }
+    else
+    {
+        //Piechart glyphs
+        m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( false );
+        m_properties["maingl"]->getWidget( Fn::Property::D_PRIMSIZE )->setHidden( true );
+        m_properties["maingl"]->getWidget( Fn::Property::D_SURFACE_GLYPH_GEOMETRY )->setHidden( true );
+        m_properties["maingl2"]->set( Fn::Property::D_GLYPH_COLORMODE, 0 );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( true );
+    }
+}
+
+void DatasetGlyphset::rotationChanged( QVariant qv )
+{
+    if ( !qv.toBool() )
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
+    }
+    else
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( false );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( false );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( false );
+    }
 }
 
 void DatasetGlyphset::readConnectivity( QString filename )
@@ -218,12 +281,18 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             toOrigin.translate( shift2 );
             toOrigin.scale( properties( "maingl" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
             //Rotation of the individual glyphs:
-            float rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+            float rotx = 0;
+            float roty = 0;
+            float rotz = 0;
+            if ( properties( "maingl" )->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+            {
+                rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+                roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+                rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+            }
             QMatrix4x4 rotMatrix;
             rotMatrix.rotate( rotx, 1, 0, 0 );
-            float roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
             rotMatrix.rotate( roty, 0, 1, 0 );
-            float rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
             rotMatrix.rotate( rotz, 0, 0, 1 );
             toOrigin *= rotMatrix;
             toOrigin.translate( -shift1 );
@@ -446,8 +515,8 @@ void DatasetGlyphset::makeDiffPoints()
     QVector<int> idPairs;
     for ( int tri = 0; tri < tris.size(); tri += 3 )
     {
-        // all three edges
-        //qDebug() << "tri: " << tri;
+// all three edges
+//qDebug() << "tri: " << tri;
         idPairs.append( tris.at( tri ) );
         idPairs.append( tris.at( tri + 1 ) );
 
@@ -461,11 +530,11 @@ void DatasetGlyphset::makeDiffPoints()
     diffsNumber = 0;
     for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
-        //get two point ids i1,i2
+//get two point ids i1,i2
         int i1 = idPairs.at( idpair );
         int i2 = idPairs.at( idpair + 1 );
-        //if triangle on one side...
-        //TODO: check while creating edgelist?
+//if triangle on one side...
+//TODO: check while creating edgelist?
         if ( i1 > i2 )
         {
             for ( int j = 0; j < m_n; ++j )
@@ -486,15 +555,15 @@ void DatasetGlyphset::makeDiffPoints()
     diffsNumber = 0;
     for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
-        //get two point ids i1,i2
+//get two point ids i1,i2
 
-        //qDebug() << "idpair: " << idpair;
+//qDebug() << "idpair: " << idpair;
 
         int i1 = idPairs.at( idpair );
         int i2 = idPairs.at( idpair + 1 );
 
-        //if triangle on one side...
-        //TODO: check while creating edgelist?
+//if triangle on one side...
+//TODO: check while creating edgelist?
         if ( i1 > i2 )
         {
 
@@ -710,10 +779,10 @@ void DatasetGlyphset::makePies()
             }
         }
         numbers->replace( i, count );
-        //qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
+//qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
 
-        //Magic!:
-        //TODO: There is some memory leakage somewhere...
+//Magic!:
+//TODO: There is some memory leakage somewhere...
         qSort( sortlist.begin(), sortlist.end(), edgeCompare );
 
         int offset = 8;
@@ -853,7 +922,7 @@ void DatasetGlyphset::loadROI( QString filename )
 
     if ( filename.endsWith( ".1D" ) )
     {
-        //List of as many values as mesh nodes
+//List of as many values as mesh nodes
         for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float v;
@@ -870,7 +939,7 @@ void DatasetGlyphset::loadROI( QString filename )
     }
     else
     {
-        //File with node ids
+//File with node ids
         QVector<int> ids;
         while ( !in.atEnd() )
         {

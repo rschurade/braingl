@@ -203,6 +203,7 @@ namespace Fn
         D_ADJUST_Z,
         D_GLYPHSET_PICKED_ID,
         D_GLYPH_COLORMODE,
+        D_GLYPH_ROTATION,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -408,6 +409,7 @@ namespace Fn
                 case Property::D_ADJUST_Z: return QString( "adjust z" ); break;
                 case Property::D_GLYPHSET_PICKED_ID: return QString( "picked ID" ); break;
                 case Property::D_GLYPH_COLORMODE: return QString( "colormode for glyphs" ); break;
+                case Property::D_GLYPH_ROTATION: return QString( "glyph rotation enabled" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

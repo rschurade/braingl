@@ -34,7 +34,7 @@ void DiffPointGlyphRenderer::init()
 
 void DiffPointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    setRenderParams(props);
+    setRenderParams( props );
 
     float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
@@ -63,12 +63,19 @@ void DiffPointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, in
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
     //Rotation of the individual glyphs:
-    float rotx = props->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+    //Rotation of the individual glyphs:
+    float rotx = 0;
+    float roty = 0;
+    float rotz = 0;
+    if ( props->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+    {
+        rotx = props->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+        roty = props->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+        rotz = props->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+    }
     QMatrix4x4 rotMatrix;
     rotMatrix.rotate( rotx, 1, 0, 0 );
-    float roty = props->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
     rotMatrix.rotate( roty, 0, 1, 0 );
-    float rotz = props->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
     rotMatrix.rotate( rotz, 0, 0, 1 );
     program->setUniformValue( "rot_matrix", rotMatrix );
 

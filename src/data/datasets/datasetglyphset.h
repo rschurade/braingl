@@ -21,6 +21,7 @@
 
 class DatasetGlyphset: public DatasetSurfaceset
 {
+    Q_OBJECT
 public:
     DatasetGlyphset( QDir filename, float mt, float maxt );
     virtual ~DatasetGlyphset();
@@ -92,6 +93,10 @@ private:
 
     void setPickedID( int id );
 
+private slots:
+    void colorModeChanged(QVariant qv);
+    void glyphStyleChanged(QVariant qv);
+    void rotationChanged(QVariant qv);
 };
 
 #endif /* DATASETGLYPHSET_H_ */
