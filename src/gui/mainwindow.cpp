@@ -370,6 +370,8 @@ void MainWindow::save()
                 case QMessageBox::Save :
                 {
                     Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
+                    ds->properties()->set( Fn::Property::D_FILENAME, fileName );
+                    ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
                     Writer writer( ds, fileName );
                     writer.save();
                     break;
@@ -381,6 +383,8 @@ void MainWindow::save()
         else
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
+            ds->properties()->set( Fn::Property::D_FILENAME, fileName );
+            ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
             Writer writer( ds, fileName );
             writer.save();
         }
