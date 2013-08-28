@@ -20,6 +20,7 @@ class QMenu;
 class QTabWidget;
 class QTableView;
 
+class Dataset;
 class DatasetListWidget;
 class ROIWidget;
 class ShaderEditWidget;
@@ -36,7 +37,7 @@ public:
     MainWindow( bool debug = false, bool resetSettings = false );
 
     void closeEvent( QCloseEvent *event );
-    void load( QString fileName );
+    bool load( QString fileName );
 
     void saveScene( QString fileName );
     void loadScene( QString fileName );
@@ -47,6 +48,9 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
+
+    bool save( Dataset* ds );
+    void saveDataset( Dataset* ds );
 
     void saveSettings();
     QModelIndex createIndex( int branch, int pos, int column );
