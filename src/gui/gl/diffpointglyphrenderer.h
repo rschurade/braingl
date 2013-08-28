@@ -28,6 +28,7 @@ protected:
     void setupTextures();
     void setShaderVars(PropertyGroup* props);
 
+    void setRenderParams( PropertyGroup* props );
 
 private:
     GLuint *vboIds;
@@ -36,6 +37,14 @@ private:
     int np;
     int ao;
     int m_pickId;
+
+    int m_colorMode;
+    int m_colormap;
+    float m_selectedMin;
+    float m_selectedMax;
+    float m_lowerThreshold;
+    float m_upperThreshold;
+    QColor m_color;
 };
 
 #endif /* DIFFPOINTGLYPHRENDERER_H_ */
