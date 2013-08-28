@@ -58,7 +58,7 @@ void noOutput(QtMsgType type, const char *msg) {}
 
 int main( int argc, char *argv[] )
 {
-    qDebug() << "brainGL version 0.8.0";
+    qDebug() << "brainGL version 0.8.0 (development)";
     qDebug() << "(c) 2012, 2013 Ralph Schurade, Joachim Boettger";
     qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
 
