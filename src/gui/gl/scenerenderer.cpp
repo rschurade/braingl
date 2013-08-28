@@ -24,6 +24,7 @@
 #include <QDebug>
 
 #include <math.h>
+#include <iostream>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -83,6 +84,14 @@ void SceneRenderer::initGL()
         qDebug() << "GL Version (string) :" << QString( (char*) version );
         qDebug() << "GL Version (integer) :" << major << "." << minor;
         qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
+
+        if ( ( major < 3 ) || ( major == 3 && minor < 3 ) )
+        {
+            std::cout << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting." << std::endl;
+            std::cout << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers." << std::endl;
+            std::cout << "Note: braingl will not run remotely." << std::endl;
+            exit( 0 );
+        }
 
         GLFunctions::loadShaders();
     }
