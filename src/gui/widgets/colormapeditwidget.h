@@ -62,6 +62,8 @@ private slots:
     void update();
     void selectionChanged( int id );
     void contUpdatingChanged( int value );
+    void moveUp( int id );
+    void moveDown( int id );
 };
 
 #endif /* COLORMAPEDITWIDGET_H_ */

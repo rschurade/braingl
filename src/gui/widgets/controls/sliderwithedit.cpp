@@ -22,6 +22,7 @@ SliderWithEdit::SliderWithEdit( QString name,  Fn::Position editPos, int id, QWi
 {
     m_slider = new QSlider();
     m_slider->setOrientation( Qt::Horizontal );
+    m_slider->setValue( -1 );
 
     m_edit = new QLineEdit();
     m_edit->setMaxLength( 10 );

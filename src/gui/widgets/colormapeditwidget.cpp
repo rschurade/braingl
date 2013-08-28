@@ -55,7 +55,7 @@ void ColormapEditWidget::redrawWidget()
 {
     if( layout() )
     {
-        QWidget().setLayout(layout());
+        QWidget().setLayout( layout() );
     }
 
     QVBoxLayout* vLayout = new QVBoxLayout();
@@ -126,6 +126,7 @@ QVBoxLayout* ColormapEditWidget::createButtonPanel()
 
     QHBoxLayout* hLayout = new QHBoxLayout();
     m_cLabel = new QLabel( this );
+    m_sliders.clear();
 
     QImage* image;
     image = createImage( this->width() - 20 );
@@ -138,58 +139,131 @@ QVBoxLayout* ColormapEditWidget::createButtonPanel()
     vLayout->addLayout( hLayout );
     vLayout->addSpacing( 5 );
 
-    QHBoxLayout* hLayout1 = new QHBoxLayout();
-    hLayout1->addStretch();
-    ColorWidgetWithLabel* colorWidget = new ColorWidgetWithLabel( tr("0"), 0 );
-    colorWidget->setValue( m_colormap.get( 0 ).color );
-    connect( colorWidget, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
-    hLayout1->addWidget( colorWidget );
-    vLayout->addLayout( hLayout1 );
-    m_sliders.clear();
-    for ( int i = 1; i < m_colormap.size() - 1; ++i )
+    int i = 0;
     {
-        QHBoxLayout* hLayout4 = new QHBoxLayout();
-        hLayout4->addStretch();
-        PushButtonWithId* newButton= new PushButtonWithId( tr("new entry"), i );
-        connect( newButton, SIGNAL( signalClicked(int ) ), this, SLOT( newEntry( int ) ) );
-        hLayout4->addWidget( newButton );
-        hLayout4->addStretch();
-        vLayout->addLayout( hLayout4 );
-
         QHBoxLayout* hLayout2 = new QHBoxLayout();
+        PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
+        insertButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( insertButton, SIGNAL( signalClicked( int ) ), this, SLOT( newEntry( int ) ) );
+        insertButton->setDisabled( true );
+
+        PushButtonWithId* deleteButton = new PushButtonWithId( "-", i );
+        deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( removeEntry( int ) ) );
+        deleteButton->setDisabled( true );
+
+        PushButtonWithId* upButton = new PushButtonWithId( "^", i );
+        upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        upButton->setDisabled( true );
+        //connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveUp( int ) ) );
+
+        PushButtonWithId* downButton = new PushButtonWithId( "v", i );
+        downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveDown( int ) ) );
+
         SliderWithEdit* slider = new SliderWithEdit( tr(""), Fn::Position::EAST, i );
         m_sliders.push_back( slider );
-        slider->setValue( m_colormap.get( i ).value );
-        slider->setMin( m_colormap.get( i - 1 ).value );
+        slider->setMin( 0.0f );
         slider->setMax( m_colormap.get( i + 1 ).value );
+        slider->setValue( m_colormap.get( i ).value );
         connect( slider, SIGNAL( valueChanged( float, int ) ), this, SLOT( sliderChanged( float, int ) ) );
+
+
         ColorWidgetWithLabel* colorWidget = new ColorWidgetWithLabel( QString::number( i ), i );
         colorWidget->setValue( m_colormap.get( i ).color );
         connect( colorWidget, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
-        PushButtonWithId* removeButton = new PushButtonWithId( tr("remove"), i );
-        connect( removeButton, SIGNAL( signalClicked( int) ), this, SLOT( removeEntry( int ) ) );
 
+        hLayout2->addWidget( insertButton );
+        hLayout2->addWidget( deleteButton );
+        hLayout2->addWidget( upButton );
+        hLayout2->addWidget( downButton );
         hLayout2->addWidget( slider );
         hLayout2->addWidget( colorWidget );
-        hLayout2->addWidget( removeButton );
         vLayout->addLayout( hLayout2 );
     }
 
-    QHBoxLayout* hLayout4 = new QHBoxLayout();
-    hLayout4->addStretch();
-    PushButtonWithId* newButton= new PushButtonWithId( tr("new entry"), m_colormap.size() - 1 );
-    connect( newButton, SIGNAL( signalClicked(int ) ), this, SLOT( newEntry( int ) ) );
-    hLayout4->addWidget( newButton );
-    hLayout4->addStretch();
-    vLayout->addLayout( hLayout4 );
 
-    QHBoxLayout* hLayout3 = new QHBoxLayout();
-    hLayout3->addStretch();
-    ColorWidgetWithLabel* colorWidget2 = new ColorWidgetWithLabel( QString::number( m_colormap.size() - 1 ), m_colormap.size() - 1 );
-    colorWidget2->setValue( m_colormap.get( m_colormap.size() - 1 ).color );
-    connect( colorWidget2, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
-    hLayout3->addWidget( colorWidget2 );
-    vLayout->addLayout( hLayout3 );
+    for ( int i = 1; i < m_colormap.size() - 1; ++i )
+    {
+        QHBoxLayout* hLayout4 = new QHBoxLayout();
+        PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
+        hLayout4->addWidget( insertButton );
+        insertButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( insertButton, SIGNAL( signalClicked( int ) ), this, SLOT( newEntry( int ) ) );
+
+        PushButtonWithId* deleteButton = new PushButtonWithId( "-", i );
+        hLayout4->addWidget( deleteButton );
+        deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( removeEntry( int ) ) );
+
+        PushButtonWithId* upButton = new PushButtonWithId( "^", i );
+        hLayout4->addWidget( upButton );
+        upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveUp( int ) ) );
+
+        PushButtonWithId* downButton = new PushButtonWithId( "v", i );
+        hLayout4->addWidget( downButton );
+        downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveDown( int ) ) );
+
+        SliderWithEdit* slider = new SliderWithEdit( tr(""), Fn::Position::EAST, i );
+        m_sliders.push_back( slider );
+        slider->setMin( m_colormap.get( i - 1 ).value );
+        slider->setMax( m_colormap.get( i + 1 ).value );
+        slider->setValue( m_colormap.get( i ).value );
+        connect( slider, SIGNAL( valueChanged( float, int ) ), this, SLOT( sliderChanged( float, int ) ) );
+        hLayout4->addWidget( slider );
+
+        ColorWidgetWithLabel* colorWidget = new ColorWidgetWithLabel( QString::number( i ), i );
+        colorWidget->setValue( m_colormap.get( i ).color );
+        connect( colorWidget, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
+        hLayout4->addWidget( colorWidget );
+
+        vLayout->addLayout( hLayout4 );
+    }
+
+    {
+        i = m_colormap.size() - 1;
+        QHBoxLayout* hLayout2 = new QHBoxLayout();
+        PushButtonWithId* insertButton = new PushButtonWithId( "+", i );
+        insertButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( insertButton, SIGNAL( signalClicked( int ) ), this, SLOT( newEntry( int ) ) );
+
+        PushButtonWithId* deleteButton = new PushButtonWithId( "-", i );
+        deleteButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( deleteButton, SIGNAL( signalClicked( int ) ), this, SLOT( removeEntry( int ) ) );
+        deleteButton->setDisabled( true );
+
+        PushButtonWithId* upButton = new PushButtonWithId( "^", i );
+        upButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        connect( upButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveUp( int ) ) );
+
+        PushButtonWithId* downButton = new PushButtonWithId( "v", i );
+        downButton->setStyleSheet( "QPushButton { font:  bold 12px; max-width: 14px; max-height: 14px; } ");
+        downButton->setDisabled( true );
+        //connect( downButton, SIGNAL( signalClicked( int ) ), this, SLOT( moveDown( int ) ) );
+
+        SliderWithEdit* slider = new SliderWithEdit( tr(""), Fn::Position::EAST, i );
+        m_sliders.push_back( slider );
+        slider->setMin( m_colormap.get( i - 1 ).value );
+        slider->setMax( 1.0f );
+        slider->setValue( m_colormap.get( i ).value );
+        connect( slider, SIGNAL( valueChanged( float, int ) ), this, SLOT( sliderChanged( float, int ) ) );
+
+
+        ColorWidgetWithLabel* colorWidget = new ColorWidgetWithLabel( QString::number( i ), i );
+        colorWidget->setValue( m_colormap.get( i ).color );
+        connect( colorWidget, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( colorChanged( QColor, int ) ) );
+
+        hLayout2->addWidget( insertButton );
+        hLayout2->addWidget( deleteButton );
+        hLayout2->addWidget( upButton );
+        hLayout2->addWidget( downButton );
+        hLayout2->addWidget( slider );
+        hLayout2->addWidget( colorWidget );
+        vLayout->addLayout( hLayout2 );
+    }
+
     vLayout->addStretch();
     return vLayout;
 }
@@ -221,11 +295,14 @@ void ColormapEditWidget::sliderChanged( float value, int id )
     pix.convertFromImage( *image );
     m_cLabel->setPixmap( pix );
 
-    for ( int i = 0; i < m_sliders.size(); ++i )
+    for ( int i = 1; i < m_sliders.size() - 1; ++i )
     {
-        m_sliders[i]->setMin( m_colormap.get( i ).value);
-        m_sliders[i]->setMax( m_colormap.get( i + 2 ).value );
+        m_sliders[i]->setMin( m_colormap.get( i - 1 ).value );
+        m_sliders[i]->setMax( m_colormap.get( i + 1 ).value );
     }
+    m_sliders.first()->setMax( m_colormap.get( 1 ).value );
+    m_sliders.last()->setMin( m_colormap.get( m_colormap.size() - 2 ).value );
+
     repaint();
 
     if ( m_contUpdating )
@@ -305,4 +382,26 @@ void ColormapEditWidget::selectionChanged( int id )
 void ColormapEditWidget::contUpdatingChanged( int value )
 {
     m_contUpdating = value;
+}
+
+void ColormapEditWidget::moveUp( int id )
+{
+    QColor color1 = m_colormap.get( id ).color;
+    QColor color2 = m_colormap.get( id - 1 ).color;
+
+    m_colormap.setColor( id, color2 );
+    m_colormap.setColor( id - 1, color1 );
+
+    redrawWidget();
+}
+
+void ColormapEditWidget::moveDown( int id )
+{
+    QColor color1 = m_colormap.get( id ).color;
+    QColor color2 = m_colormap.get( id + 1 ).color;
+
+    m_colormap.setColor( id, color2 );
+    m_colormap.setColor( id + 1, color1 );
+
+    redrawWidget();
 }
