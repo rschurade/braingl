@@ -125,11 +125,11 @@ void GLWidget::paintGL()
         if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
             // code for stereoscopic screenshots
-            m_xshift = -30.0;
+            m_xshift = -3.0;
             calcMVPMatrix();
             QImage* imagel = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
             imagel->save( m_screenshotFileName + "_l_.png", "PNG" ); //TODO: remove ".png"
-            m_xshift = 30.0;
+            m_xshift = 3.0;
             calcMVPMatrix();
             QImage* imager = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
             imager->save( m_screenshotFileName + "_r_.png", "PNG" ); //TODO: remove ".png"
@@ -278,11 +278,17 @@ void GLWidget::calcMVPMatrix()
 
         if ( m_doScreenshot && Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
-            float near = 10.0;
-            m_pMatrix.frustum( ( -8000 - m_xshift ) / near, ( 8000 - m_xshift ) / near, -1600 / near, ( 9000 - 1600 ) / near, 9000 / near, 30000 );
-            //m_pMatrix.translate( m_xshift, 0.0, -1000.0 ); //original: 20000
+            float near = nearPlane / 900; // ratio of viewing plane & distance to screen (in cm)
 
-            //m_pMatrix.scale( 1 / near ); //TODO: skalieren / winkel anpassen, so dass das mit den zwei metern passt, rotieren, so dass Zentralstrahl in der mitte ist
+            m_pMatrix.frustum( ( -800 - m_xshift ) * near, ( 800 - m_xshift ) * near, -160 * near, ( 900 - 160 ) * near, nearPlane, farPlane );
+            m_pMatrix.translate( m_xshift, 0.0, 0.0 );
+
+            //TODO: skalieren / Kamera verschieben / winkel anpassen, so dass das mit Christophs passt
+
+            //rotieren, so dass Zentralstrahl in der mitte ist
+            float pi = 3.14159265359;
+            float angle = 180*qAtan2((9/2.0)-1.6,9.0)/pi;
+            m_pMatrix.rotate(angle,1,0,0);
         }
         else
         {
