@@ -58,7 +58,7 @@ void noOutput(QtMsgType type, const char *msg) {}
 
 int main( int argc, char *argv[] )
 {
-    qDebug() << "brainGL development version";
+    qDebug() << "brainGL version 0.8.0 (development)";
     qDebug() << "(c) 2012, 2013 Ralph Schurade, Joachim Boettger";
     qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
 
@@ -68,7 +68,7 @@ int main( int argc, char *argv[] )
     QCoreApplication::setOrganizationDomain( "braingl.de" );
 	QCoreApplication::setOrganizationName( "MPI_CBS" );
 	QCoreApplication::setApplicationName( "braingl" );
-	QCoreApplication::setApplicationVersion( "1.0.0" );
+	QCoreApplication::setApplicationVersion( "0.8.0" );
 
     Q_INIT_RESOURCE( resources );
 
