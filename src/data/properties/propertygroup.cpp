@@ -301,7 +301,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
     }
 
     qDebug() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
-    exit( 0 );
+//    exit( 0 );
     return false;
 }
 
