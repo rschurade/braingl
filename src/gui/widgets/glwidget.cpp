@@ -355,9 +355,8 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
     int y = event->y();
     m_rightMouseDown = QVector2D( x, y );
     // get id
-    m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
-
     m_sceneRenderer->renderPick();
+    m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
