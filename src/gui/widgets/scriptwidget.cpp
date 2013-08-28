@@ -1452,7 +1452,6 @@ void ScriptWidget::moveCommandDown( int row )
 
 void ScriptWidget::moveScrollBarToBottom( int min, int max )
 {
-    qDebug() << "huhu";
     Q_UNUSED( min );
     if ( m_widgetToEnsureVisible )
     {
