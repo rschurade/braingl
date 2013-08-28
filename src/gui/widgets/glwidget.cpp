@@ -21,22 +21,22 @@
 #include <QtGui>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
-    m_name( name ),
-    m_roiSelectionModel( roiSelectionModel ),
-    m_visible( false ),
-    m_nx( 160 ),
-    m_ny( 200 ),
-    m_nz( 160 ),
-    m_picked( 0 ),
-    m_sliceXPosAtPick( 0 ),
-    m_sliceYPosAtPick( 0 ),
-    m_sliceZPosAtPick( 0 ),
-    skipDraw( false ),
-    m_width( 0 ),
-    m_height( 0 ),
-    m_doScreenshot( false ),
-    m_copyCameraMode( 0 )
+                QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
+                m_name( name ),
+                m_roiSelectionModel( roiSelectionModel ),
+                m_visible( false ),
+                m_nx( 160 ),
+                m_ny( 200 ),
+                m_nz( 160 ),
+                m_picked( 0 ),
+                m_sliceXPosAtPick( 0 ),
+                m_sliceYPosAtPick( 0 ),
+                m_sliceZPosAtPick( 0 ),
+                skipDraw( false ),
+                m_width( 0 ),
+                m_height( 0 ),
+                m_doScreenshot( false ),
+                m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -52,22 +52,22 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 }
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget ),
-    m_name( name ),
-    m_roiSelectionModel( roiSelectionModel ),
-    m_visible( false ),
-    m_nx( 160 ),
-    m_ny( 200 ),
-    m_nz( 160 ),
-    m_picked( 0 ),
-    m_sliceXPosAtPick( 0 ),
-    m_sliceYPosAtPick( 0 ),
-    m_sliceZPosAtPick( 0 ),
-    skipDraw( false ),
-    m_width( 0 ),
-    m_height( 0 ),
-    m_doScreenshot( false ),
-    m_copyCameraMode( 0 )
+                QGLWidget( parent, shareWidget ),
+                m_name( name ),
+                m_roiSelectionModel( roiSelectionModel ),
+                m_visible( false ),
+                m_nx( 160 ),
+                m_ny( 200 ),
+                m_nz( 160 ),
+                m_picked( 0 ),
+                m_sliceXPosAtPick( 0 ),
+                m_sliceYPosAtPick( 0 ),
+                m_sliceZPosAtPick( 0 ),
+                skipDraw( false ),
+                m_width( 0 ),
+                m_height( 0 ),
+                m_doScreenshot( false ),
+                m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -122,16 +122,51 @@ void GLWidget::paintGL()
 {
     if ( m_doScreenshot )
     {
-        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
+        if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
-            // insert code for stereoscopic screenshots here
+            // code for stereoscopic screenshots
+            m_xshift = -30.0;
+            calcMVPMatrix();
+            QImage* imagel = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
+            imagel->save( m_screenshotFileName + "_l_.png", "PNG" ); //TODO: remove ".png"
+            m_xshift = 30.0;
+            calcMVPMatrix();
+            QImage* imager = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
+            imager->save( m_screenshotFileName + "_r_.png", "PNG" ); //TODO: remove ".png"
+
+            QPainter painter;
+
+            //parallel stereo
+            QImage* imagespa = new QImage( imager->width() + imagel->width(), imager->height(), imager->format() );
+            painter.begin( imagespa );
+            painter.drawImage( 0, 0, *imager );
+            painter.drawImage( imager->width(), 0, *imagel );
+            painter.end();
+            imagespa->save( m_screenshotFileName + "_spa_.png", "PNG" );
+
+            //crosseyed stereo
+            QImage* imagesce = new QImage( imager->width() + imagel->width(), imager->height(), imager->format() );
+            painter.begin( imagesce );
+            painter.drawImage( 0, 0, *imagel );
+            painter.drawImage( imager->width(), 0, *imager );
+            painter.end();
+            imagesce->save( m_screenshotFileName + "_sce_.png", "PNG" );
+
+            delete imagel;
+            delete imager;
+            delete imagespa;
+            delete imagesce;
+
+            m_doScreenshot = false;
+            m_xshift = 0;
+            calcMVPMatrix();
         }
         else
         {
             calcMVPMatrix();
             m_doScreenshot = false;
             QImage* image = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
-            image->save(  m_screenshotFileName, "PNG" );
+            image->save( m_screenshotFileName, "PNG" );
             delete image;
             calcMVPMatrix();
         }
@@ -162,7 +197,7 @@ void GLWidget::resizeGL( int width, int height )
         Models::setGlobal( Fn::Property::G_WIDTH_MAINGL, width );
         Models::setGlobal( Fn::Property::G_HEIGHT_MAINGL, height );
     }
-    else if( m_name == "maingl2" )
+    else if ( m_name == "maingl2" )
     {
         Models::setGlobal( Fn::Property::G_WIDTH_MAINGL2, width );
         Models::setGlobal( Fn::Property::G_HEIGHT_MAINGL2, height );
@@ -180,9 +215,9 @@ void GLWidget::update()
 
 void GLWidget::calcMVPMatrix()
 {
-    int cam = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_TYPE, 0 ) ).toInt();
-    int projection = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_PROJECTION, 0 ) ).toInt();
-    if (  cam == 0 )
+    int cam = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CAMERA_TYPE, 0 ) ).toInt();
+    int projection = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CAMERA_PROJECTION, 0 ) ).toInt();
+    if ( cam == 0 )
     {
         m_cameraInUse = m_arcBall;
     }
@@ -191,24 +226,24 @@ void GLWidget::calcMVPMatrix()
         m_cameraInUse = m_camera;
     }
 
-    m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    m_nx = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
+    m_ny = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
+    m_nz = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float dx = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
     m_nx *= dx;
     m_ny *= dy;
     m_nz *= dz;
 
     m_arcBall->setRotCenter( m_nx / 2., m_ny / 2., m_nz / 2. );
 
-    int boundingbox = qMax ( m_nx, qMax( m_ny, m_nz ) );
+    int boundingbox = qMax( m_nx, qMax( m_ny, m_nz ) );
 
     // Reset projection
     m_pMatrix.setToIdentity();
 
-    float zoom  = m_cameraInUse->getZoom();
+    float zoom = m_cameraInUse->getZoom();
     float halfBB = ( boundingbox / 2 ) / zoom;
 
     float ratio = 1.0f;
@@ -236,14 +271,18 @@ void GLWidget::calcMVPMatrix()
     }
     else // perspective
     {
-        float nearPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
-        float farPlane = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
-        float angle = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CAMERA_ANGLE, 0 ) ).toFloat();
+        float nearPlane = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CAMERA_NEAR, 0 ) ).toFloat();
+        float farPlane = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CAMERA_FAR, 0 ) ).toFloat();
+        float angle = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CAMERA_ANGLE, 0 ) ).toFloat();
         angle /= zoom;
 
         if ( m_doScreenshot && Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
-            //m_pMatrix.frustum( something )
+            float near = 10.0;
+            m_pMatrix.frustum( ( -8000 - m_xshift ) / near, ( 8000 - m_xshift ) / near, -1600 / near, ( 9000 - 1600 ) / near, 9000 / near, 30000 );
+            //m_pMatrix.translate( m_xshift, 0.0, -1000.0 ); //original: 20000
+
+            //m_pMatrix.scale( 1 / near ); //TODO: skalieren / winkel anpassen, so dass das mit den zwei metern passt, rotieren, so dass Zentralstrahl in der mitte ist
         }
         else
         {
@@ -258,7 +297,7 @@ void GLWidget::calcMVPMatrix()
         QVector3D view;
         QVector3D up;
         getCameraParametersFromModelviewMatrix( pos, view, up );
-        QList<QVariant>l;
+        QList<QVariant> l;
         l.push_back( pos );
         //l.push_back( pos + view * 10 );
         l.push_back( -m_arcBall->getRotCenter() );
@@ -272,11 +311,10 @@ void GLWidget::calcMVPMatrix()
         m_arcBall->setRotation( m_arcBall->mat2quat( rot ) );
     }
 
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_ZOOM, 0 ), zoom );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEX, 0 ), m_cameraInUse->getMoveX() );
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_ZOOM, 0 ), zoom );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_MOVEX, 0 ), m_cameraInUse->getMoveX() );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );
 }
-
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
@@ -366,17 +404,18 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
+        QModelIndex index = Models::d()->index( i, (int) Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr(
+                    Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             ds->mousePick( m_picked, pickPos, event->modifiers(), target );
         }
     }
 
     if ( Models::r()->rowCount() > 0 )
     {
-        QModelIndex mi = Models::r()->index( 0, (int)Fn::Property::R_PICK_ID );
+        QModelIndex mi = Models::r()->index( 0, (int) Fn::Property::R_PICK_ID );
         QModelIndexList l = ( Models::r()->match( mi, Qt::DisplayRole, m_picked ) );
         m_roiSelectionModel->clear();
         if ( l.size() > 0 )
@@ -385,9 +424,9 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
         }
     }
 
-    m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-    m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-    m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
+    m_sliceXPosAtPick = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+    m_sliceYPosAtPick = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CORONAL, 0 ) ).toInt();
+    m_sliceZPosAtPick = Models::g()->data( Models::g()->index( (int) Fn::Property::G_AXIAL, 0 ) ).toInt();
 
     m_pickOld = QVector2D( x, y );
     m_rightMouseDown = QVector2D( x, y );
@@ -408,24 +447,24 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
 
     m_pickOld = QVector2D( x, y );
 
-    int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-    int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-    int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
+    int m_x = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+    int m_y = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CORONAL, 0 ) ).toInt();
+    int m_z = Models::g()->data( Models::g()->index( (int) Fn::Property::G_AXIAL, 0 ) ).toInt();
     float slowDown = 4.0f * m_cameraInUse->getZoom();
 
     m_sceneRenderer->renderPick();
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
-    /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    /* return to the default frame buffer */glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     bool updateRequired = false;
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
+        QModelIndex index = Models::d()->index( i, (int) Fn::Property::D_ACTIVE );
         if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+            Dataset* ds = VPtr<Dataset>::asPtr(
+                    Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             updateRequired |= ds->mousePick( m_picked, pickPos, event->modifiers(), target );
         }
     }
@@ -436,7 +475,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         Models::g()->submit();
     }
 
-    if ( !(event->modifiers() & Qt::ControlModifier) )
+    if ( !( event->modifiers() & Qt::ControlModifier ) )
     {
         switch ( m_picked )
         {
@@ -452,7 +491,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
                 if ( m_z != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_AXIAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -468,7 +507,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
                 if ( m_y != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_CORONAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -484,7 +523,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
                 if ( m_x != newSlice )
                 {
-                    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), newSlice );
+                    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SAGITTAL, 0 ), newSlice );
                     skipDraw = true;
                     Models::g()->submit();
                 }
@@ -495,7 +534,8 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 if ( m_roiSelectionModel->hasSelection() )
                 {
                     QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::R_POINTER, mi.parent() ), Qt::DisplayRole ) );
+                    ROI* roi = VPtr<ROI>::asPtr(
+                            Models::r()->data( Models::r()->index( mi.row(), (int) Fn::Property::R_POINTER, mi.parent() ), Qt::DisplayRole ) );
                     float newx = roi->properties()->get( Fn::Property::R_X ).toFloat() + dir.x();
                     float newy = roi->properties()->get( Fn::Property::R_Y ).toFloat() + dir.y();
                     float newz = roi->properties()->get( Fn::Property::R_Z ).toFloat() + dir.z();
@@ -518,65 +558,65 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
 
     if ( event->modifiers() & Qt::ShiftModifier )
     {
-        int m_x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-        int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-        int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
+        int m_x = Models::g()->data( Models::g()->index( (int) Fn::Property::G_SAGITTAL, 0 ) ).toInt();
+        int m_y = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CORONAL, 0 ) ).toInt();
+        int m_z = Models::g()->data( Models::g()->index( (int) Fn::Property::G_AXIAL, 0 ) ).toInt();
 
-        int m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
-        int m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
-        int m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
-        switch( event->key() )
+        int m_nx = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
+        int m_ny = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
+        int m_nz = Models::g()->data( Models::g()->index( (int) Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
+        switch ( event->key() )
         {
-            case Qt::Key_Left :
+            case Qt::Key_Left:
             {
-                m_x = qMax( 0, m_x -1 );
+                m_x = qMax( 0, m_x - 1 );
                 break;
             }
             case Qt::Key_Right:
             {
-                m_x = qMin( m_nx, m_x +1 );
+                m_x = qMin( m_nx, m_x + 1 );
                 break;
             }
-            case Qt::Key_Down :
+            case Qt::Key_Down:
             {
-                m_y = qMax( 0, m_y -1 );
+                m_y = qMax( 0, m_y - 1 );
                 break;
             }
             case Qt::Key_Up:
             {
-                m_y = qMin( m_ny, m_y +1 );
+                m_y = qMin( m_ny, m_y + 1 );
                 break;
             }
             case Qt::Key_PageDown:
             {
-                m_z = qMax( 0, m_z -1 );
+                m_z = qMax( 0, m_z - 1 );
                 break;
             }
             case Qt::Key_PageUp:
             {
-                m_z = qMin( m_nz, m_z +1 );
+                m_z = qMin( m_nz, m_z + 1 );
                 break;
             }
         }
-        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), m_x );
-        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), m_y );
-        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), m_z );
+        Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SAGITTAL, 0 ), m_x );
+        Models::g()->setData( Models::g()->index( (int) Fn::Property::G_CORONAL, 0 ), m_y );
+        Models::g()->setData( Models::g()->index( (int) Fn::Property::G_AXIAL, 0 ), m_z );
 
         Models::g()->submit();
     }
     else
     {
-        if ( dynamic_cast<Camera*>( m_cameraInUse) )
+        if ( dynamic_cast<Camera*>( m_cameraInUse ) )
         {
-            switch( event->key() )
+            switch ( event->key() )
             {
-                case Qt::Key_Left :
+                case Qt::Key_Left:
                     m_camera->viewLeft();
                     break;
                 case Qt::Key_Right:
                     m_camera->viewRight();
                     break;
-                case Qt::Key_Up :
+                case Qt::Key_Up:
                     m_camera->viewUp();
                     break;
                 case Qt::Key_Down:
@@ -628,9 +668,9 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         }
         else
         {
-            switch( event->key() )
+            switch ( event->key() )
             {
-                case Qt::Key_Left :
+                case Qt::Key_Left:
                 {
                     m_cameraInUse->click( x, y );
                     m_cameraInUse->drag( x - 20, y );
@@ -642,7 +682,7 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                     m_cameraInUse->drag( x + 20, y );
                     break;
                 }
-                case Qt::Key_Up :
+                case Qt::Key_Up:
                 {
                     m_cameraInUse->click( x, y );
                     m_cameraInUse->drag( x, y - 20 );
@@ -678,7 +718,7 @@ void GLWidget::visibilityChanged( bool visible )
 /// \param[out] eyepos  eye position
 /// \param[out] viewdir viewing direction
 /// \param[out] updir   up direction vector
-void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVector3D &viewdir, QVector3D &updir )
+void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos, QVector3D &viewdir, QVector3D &updir )
 {
     QVector3D xdir( 0.0, 0.0, 0.0 );
     QVector3D ydir( 0.0, 0.0, 0.0 );
@@ -716,14 +756,14 @@ void GLWidget::cameraCircle( bool dir )
 
     int steps = Models::getGlobal( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS ).toInt();
 
-    QVector2D point =  pos.toVector2D() - lat.toVector2D();
+    QVector2D point = pos.toVector2D() - lat.toVector2D();
     float r = point.length();
 
     float x = point.x() / r;
     float y = point.y() / r;
 
-    float alpha = acos( x )  * 180.0 / M_PI ;
-    float alpha2 = asin( y )  * 180.0 / M_PI;
+    float alpha = acos( x ) * 180.0 / M_PI;
+    float alpha2 = asin( y ) * 180.0 / M_PI;
 
     float angle = 0;
     float neg = -1.0;
@@ -751,11 +791,11 @@ void GLWidget::cameraCircle( bool dir )
         float newAngle;
         if ( dir )
         {
-            newAngle = (int)( angle + ( i * ( 360.0f / (float)steps ) ) ) % 360;
+            newAngle = (int) ( angle + ( i * ( 360.0f / (float) steps ) ) ) % 360;
         }
         else
         {
-            newAngle = (int)( angle - ( i * ( 360.0f / (float)steps ) ) ) % 360;
+            newAngle = (int) ( angle - ( i * ( 360.0f / (float) steps ) ) ) % 360;
         }
         float newX = neg * cos( newAngle * M_PI / 180 ) * r;
         float newY = neg * sin( newAngle * M_PI / 180 ) * r;
