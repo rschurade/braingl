@@ -143,7 +143,14 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->create( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NZ, 800, 0, 1600, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_FIBER_GROW_LENGTH, 200, 0, 200, "special" );
+
+    int maxLength = 0;
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        maxLength = qMax( maxLength, m_fibs[i].size() / 3 );
+    }
+
+    m_properties["maingl"]->create( Fn::Property::D_FIBER_GROW_LENGTH, (float)maxLength, 0.0f, (float)maxLength, "special" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( colorChanged() ) );
 
