@@ -143,6 +143,11 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->create( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NZ, 800, 0, 1600, "special" );
 
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   1.0f, 0.0f, 10.0f, "material" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   1.0f, 0.0f, 10.0f, "material" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  1.0f, 0.0f, 10.0f, "material" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 100.0f, "material" );
+
 
     int maxLength = 0;
     for ( int i = 0; i < m_fibs.size(); ++i )

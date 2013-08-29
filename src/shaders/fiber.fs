@@ -3,6 +3,7 @@
 #include colormap_fs
 #include textures_fs
 #include uniforms_fs
+#include lighting_fs
 #include peel_fs
 
 in float v_discard;
@@ -37,5 +38,5 @@ void main()
         color = frontColor.rgb;
     }
     
-    writePeel( color );
+    writePeel( fiberLight( vec4( color, 1.0 ) ).rgb );
 }

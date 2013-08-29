@@ -204,6 +204,10 @@ namespace Fn
         D_GLYPHSET_PICKED_ID,
         D_GLYPH_COLORMODE,
         D_GLYPH_ROTATION,
+        D_MATERIAL_AMBIENT,
+        D_MATERIAL_DIFFUSE,
+        D_MATERIAL_SPECULAR,
+        D_MATERIAL_SHININESS,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -276,6 +280,9 @@ namespace Fn
         G_CAMERA_KEYBOARD_STEP,
         G_CAMERA_FIXATE_Z,
         G_CAMERA_FULLCIRCLE_STEPS,
+        G_LIGHT_SWITCH,
+        G_LIGHT_AMBIENT,
+        G_LIGHT_DIFFUSE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -410,6 +417,10 @@ namespace Fn
                 case Property::D_GLYPHSET_PICKED_ID: return QString( "picked ID" ); break;
                 case Property::D_GLYPH_COLORMODE: return QString( "colormode for glyphs" ); break;
                 case Property::D_GLYPH_ROTATION: return QString( "glyph rotation enabled" ); break;
+                case Property::D_MATERIAL_AMBIENT: return QString( "ambient" ); break;
+                case Property::D_MATERIAL_DIFFUSE: return QString( "diffuse" ); break;
+                case Property::D_MATERIAL_SPECULAR: return QString( "specular" ); break;
+                case Property::D_MATERIAL_SHININESS: return QString( "shininess" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
@@ -481,7 +492,9 @@ namespace Fn
                 case Property::G_CAMERA_KEYBOARD_STEP: return QString( "keyboard step size" ); break;
                 case Property::G_CAMERA_FIXATE_Z: return QString( "fixate z" ); break;
                 case Property::G_CAMERA_FULLCIRCLE_STEPS: return QString( "steps to do full cirlce" ); break;
-
+                case Property::G_LIGHT_SWITCH: return QString( "toggle light" ); break;
+                case Property::G_LIGHT_AMBIENT: return QString( "ambient" ); break;
+                case Property::G_LIGHT_DIFFUSE: return QString( "diffuse" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;

@@ -13,6 +13,15 @@ in vec4 v_viewDir;
 
 uniform bool u_lighting;
 
+uniform float u_lightAmbient;
+uniform float u_lightDiffuse;
+
+
+uniform float u_materialAmbient;
+uniform float u_materialDiffuse;
+uniform float u_materialSpecular;
+uniform float u_materialShininess;
+
 /**
  * Function to calculate lighting based on "Real-Time Volume Graphics, p 119, chapter 5.4, Listing 5.1".
  *
@@ -53,19 +62,51 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
 vec4 light( vec4 color )
 {
+    if( !u_lighting )
+    {
+        return color;
+    }
+
     vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
     vec3 ambient = vec3( 1.0, 1.0, 1.0 );
 
     return blinnPhongIllumination(
             // material properties
-            color.rgb * 0.2,                    // ambient color
-            color.rgb,                    // diffuse color
-            color.rgb,                          // specular color
-            1.0,                                  // shininess
+            color.rgb * u_materialAmbient,                    // ambient color
+            color.rgb * u_materialDiffuse,                    // diffuse color
+            color.rgb * u_materialSpecular,                          // specular color
+            u_materialShininess,                                  // shininess
         
             // light color properties
-            diffuse * 0.5,         // light color
-            ambient * 0.5,         // ambient light
+            diffuse * u_lightDiffuse,         // light color
+            ambient * u_lightAmbient,         // ambient light
+        
+            // directions
+            normalize( v_normal ),                 // normal
+            v_viewDir.xyz,                         // viewdir
+            v_lightDir.xyz );                    // light direction
+}
+
+vec4 fiberLight( vec4 color )
+{
+    if( !u_lighting )
+    {
+        return color;
+    }
+
+    vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
+    vec3 ambient = vec3( 1.0, 1.0, 1.0 );
+
+    return blinnPhongIllumination(
+            // material properties
+            color.rgb * u_materialAmbient,                    // ambient color
+            color.rgb * u_materialDiffuse,                    // diffuse color
+            color.rgb * u_materialSpecular,                          // specular color
+            u_materialShininess,                                  // shininess
+        
+            // light color properties
+            diffuse * u_lightDiffuse,         // light color
+            ambient * u_lightAmbient,         // ambient light
         
             // directions
             normalize( v_normal ),                 // normal
