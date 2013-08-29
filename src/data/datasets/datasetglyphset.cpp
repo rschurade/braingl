@@ -1070,7 +1070,6 @@ bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifier
 
 void DatasetGlyphset::setPickedID( int pickedID )
 {
-    qDebug() << "pickedID: " << pickedID;
     m_prevPickedID = pickedID;
     for ( int i = 0; i < m_n; ++i )
     {
