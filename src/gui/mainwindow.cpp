@@ -296,7 +296,47 @@ bool MainWindow::load( QString fileName )
                 QString lastPath = dir.absolutePath();
                 Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
 
-                setCurrentFile(fileName);
+                setCurrentFile( fileName );
+
+                GLFunctions::reloadShaders();
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool MainWindow::load( QString fileName, QList<QVariant> state )
+{
+    if ( !fileName.isEmpty() )
+    {
+        if ( fileName.endsWith( "scn" ) )
+        {
+            loadScene( fileName );
+            return true;
+        }
+        else if( fileName.endsWith( "bgscript" ) )
+        {
+            m_scriptWidget->loadScript( fileName, true );
+            return true;
+        }
+        else
+        {
+            Loader loader;
+            loader.setFilename( QDir( fileName ) );
+            if ( loader.load() )
+            {
+                for ( int k = 0; k < loader.getNumDatasets(); ++k )
+                {
+                    loader.getDataset( k )->properties()->setState( state );
+                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                }
+                QFileInfo fi( fileName );
+                QDir dir = fi.absoluteDir();
+                QString lastPath = dir.absolutePath();
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+
+                setCurrentFile( fileName );
 
                 GLFunctions::reloadShaders();
                 return true;
@@ -316,7 +356,9 @@ void MainWindow::setCurrentFile( const QString &fileName )
     files.removeAll( fileName );
     files.prepend( fileName );
     while ( files.size() > MaxRecentFiles )
+    {
         files.removeLast();
+    }
 
     settings.setValue( "recentFileList", files );
 
@@ -324,7 +366,9 @@ void MainWindow::setCurrentFile( const QString &fileName )
     {
         MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
         if ( mainWin )
+        {
             mainWin->updateRecentFileActions();
+        }
     }
 }
 
@@ -367,34 +411,9 @@ bool MainWindow::save( Dataset* ds )
     if ( !fileName.isEmpty() )
     {
         QDir dir;
-//        if ( dir.exists( fileName ) )
-//        {
-//            QMessageBox msgBox;
-//            msgBox.setText( "File already exists." );
-//            msgBox.setInformativeText( "Do you want to overwrite it?" );
-//            msgBox.setStandardButtons( QMessageBox::Save | QMessageBox::Cancel );
-//            msgBox.setDefaultButton( QMessageBox::Save );
-//            int ret = msgBox.exec();
-//            switch ( ret )
-//            {
-//                case QMessageBox::Save :
-//                {
-//                    ds->properties()->set( Fn::Property::D_FILENAME, fileName );
-//                    ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-//                    saveDataset( ds );
-//                    break;
-//                }
-//                case QMessageBox::Cancel :
-//                    return false;
-//                    break;
-//            }
-//        }
-//        else
-//        {
-            ds->properties()->set( Fn::Property::D_FILENAME, fileName );
-            ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-            saveDataset( ds );
-//        }
+        ds->properties()->set( Fn::Property::D_FILENAME, fileName );
+        ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
+        saveDataset( ds );
 
         QFileInfo fi( fileName );
         dir = fi.absoluteDir();
@@ -559,16 +578,11 @@ void MainWindow::loadScene( QString fileName )
 
     for ( int i = 0; i < files.size(); ++i )
     {
-         if ( load( files[i].toString() ) )
-         {
-             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( Models::d()->rowCount() - 1, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-             QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
-
-             if ( settings.contains( "file_" + QString::number( i ) + "_state" ) )
-             {
-                 ds->properties()->setState( settings.value( "file_" + QString::number( i ) + "_state" ).toList() );
-             }
-         }
+        if ( settings.contains( "file_" + QString::number( i ) + "_state" ) )
+        {
+            QList<QVariant> state = settings.value( "file_" + QString::number( i ) + "_state" ).toList();
+            load( files[i].toString(), state );
+        }
     }
 
     GLFunctions::reloadShaders();
