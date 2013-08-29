@@ -62,6 +62,8 @@ private:
     void updateRecentFileActions();
     QString strippedName( const QString &fullFileName );
 
+    bool load( QString fileName, QList<QVariant> state );
+
     bool m_debug;
 
     QMainWindow* m_centralWidget;
