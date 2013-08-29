@@ -8,6 +8,7 @@
 #include "shaperenderer.h"
 #include "glfunctions.h"
 
+#include "../../data/models.h"
 #include "../../data/mesh/tesselation.h"
 
 #include <QDebug>
@@ -273,6 +274,15 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "u_lighting", true );
+
+    program->setUniformValue( "u_lighting", Models::getGlobal( Fn::Property::G_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", Models::getGlobal( Fn::Property::G_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", Models::getGlobal( Fn::Property::G_LIGHT_DIFFUSE ).toFloat() );
+
+    program->setUniformValue( "u_materialAmbient", 1.0f );
+    program->setUniformValue( "u_materialDiffuse", 1.0f );
+    program->setUniformValue( "u_materialSpecular", 1.0f );
+    program->setUniformValue( "u_materialShininess", 1.0f );
 
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
