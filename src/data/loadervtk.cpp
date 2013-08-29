@@ -755,28 +755,18 @@ bool LoaderVTK::copyPointData( QStringList tokens )
     }
     else if ( toks.size() == 3 && toks[0] == "COLOR_SCALARS" && toks[1] == "Colors" && toks[2].toInt() == 3 )
     {
-        char* pointField = new char[m_numPoints * sizeof( float ) * 3];
-
         int begin = m_bufferPointer;
-        int end = begin + m_numPoints * sizeof( float ) * 3;
+        int end = begin + m_numPoints * 3;
         int i, j;
-        for ( i = begin, j = 0; i < end; ++i, ++j )
-        {
-            pointField[j] = m_binaryFile[i];
-        }
-
-        float* rawPointData = reinterpret_cast<float*>( pointField );
-        switchByteOrderOfArray< float >( rawPointData, m_numPoints * 3 );
 
         m_pointColors.resize( m_numPoints * 3 );
-        for ( int k = 0; k < m_points.size(); ++k )
+
+        for ( i = begin, j = 0; i < end; ++i, ++j )
         {
-            m_pointColors[k] = rawPointData[k];
+            m_pointColors[j] = static_cast<unsigned char>( m_binaryFile[i] ) / 255.0f;
         }
 
-        delete[] rawPointData;
-
-        m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
+        m_bufferPointer += m_numPoints * 3 + 1;
         m_hasPointColors = true;
     }
     else
