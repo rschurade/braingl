@@ -478,7 +478,7 @@ void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
     int numTris = mesh->numTris();
 
     float* pointsOut = new float[ numPoints * 3 ];
-    float* colorsOut = new float[ numPoints * 3 ];
+    char* colorsOut = new char[ numPoints * 3 ];
     int* trisOut = new int[numTris*4];
 
     for ( int i = 0; i < numTris; ++i )
@@ -494,13 +494,13 @@ void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
         pointsOut[3*i  ] = points[bufferSize * i];
         pointsOut[3*i+1] = points[bufferSize * i+1];
         pointsOut[3*i+2] = points[bufferSize * i+2];
-        colorsOut[3*i  ] = colors[4*i];
-        colorsOut[3*i+1] = colors[4*i+1];
-        colorsOut[3*i+2] = colors[4*i+2];
+        colorsOut[3*i  ] = colors[4*i] * 255;
+        colorsOut[3*i+1] = colors[4*i+1] * 255;
+        colorsOut[3*i+2] = colors[4*i+2] * 255;
     }
 
     switchByteOrderOfArray< float >( pointsOut, numPoints * 3 );
-    switchByteOrderOfArray< float >( colorsOut, numPoints * 3 );
+    //switchByteOrderOfArray< float >( colorsOut, numPoints * 3 );
     switchByteOrderOfArray< int >( trisOut, numTris * 4 );
 
 
@@ -528,7 +528,8 @@ void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
 
     out << "POINT_DATA " << numPoints << lineDelimiter;
     out << "COLOR_SCALARS Colors 3" << lineDelimiter;
-    out.write( reinterpret_cast< char* >( colorsOut ), sizeof( float ) * numPoints * 3 );
+    //out.write( reinterpret_cast< char* >( colorsOut ), sizeof( float ) * numPoints * 3 );
+    out.write( colorsOut, numPoints * 3 );
     out << lineDelimiter;
 
     out.close();
