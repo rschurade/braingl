@@ -1,6 +1,7 @@
 #version 330
 
 #include uniforms_vs
+#include lighting_vs
 #include peel_vs
 
 out float v_discard;
@@ -10,6 +11,8 @@ void main()
 	v_normal = normalize( a_normal );
 	v_extra = a_extra;
 	v_index = a_indexes;
+	
+	prepareLight();
 	
 	if ( u_colorMode == 0 )
 	{

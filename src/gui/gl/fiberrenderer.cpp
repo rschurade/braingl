@@ -10,6 +10,7 @@
 #include "glfunctions.h"
 
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/datasets/fiberselector.h"
 
 #include "../../data/properties/propertygroup.h"
@@ -103,6 +104,16 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "P0", 12 );
     program->setUniformValue( "C5", 13 );
     program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
+
+    program->setUniformValue( "u_lighting", Models::getGlobal( Fn::Property::G_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", Models::getGlobal( Fn::Property::G_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", Models::getGlobal( Fn::Property::G_LIGHT_DIFFUSE ).toFloat() );
+
+    program->setUniformValue( "u_materialAmbient", props->get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_materialDiffuse", props->get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
+    program->setUniformValue( "u_materialShininess", props->get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
+
 
     glLineWidth( props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
