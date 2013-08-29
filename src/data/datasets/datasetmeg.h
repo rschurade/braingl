@@ -26,7 +26,7 @@ public:
 
     void setProperties();
 
-    TriangleMesh2* getMesh( QString target );
+    TriangleMesh2* getMesh( QString target = "maingl" );
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
@@ -39,6 +39,7 @@ private:
 public slots:
     void selectFrame();
     void slotPropSet( int id );
+    void slotCopyColors();
 
 };
 

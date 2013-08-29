@@ -11,6 +11,9 @@
 
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
+#include "../../gui/gl/colormapfunctions.h"
+
+#include "../../algos/colormapbase.h"
 
 #include <QFile>
 #include <QFileDialog>
@@ -79,6 +82,9 @@ void DatasetMEG::setProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectFrame() ) );
     connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
     m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+
+    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
 TriangleMesh2* DatasetMEG::getMesh( QString target )
@@ -125,5 +131,28 @@ void DatasetMEG::slotPropSet( int id )
     if ( id == (int)Fn::Property::D_SELECTED_TEXTURE )
     {
         selectFrame();
+    }
+}
+
+void DatasetMEG::slotCopyColors()
+{
+    int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
+    QVector<float>data = m_data[frame];
+
+    QColor color;
+
+    float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+
+    for ( int i = 0; i < data.size(); ++i )
+    {
+        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+
+        float value = ( data[i] - selectedMin ) / ( selectedMax - selectedMin );
+        color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
+
+        mesh->setVertexColor( i, color );
     }
 }

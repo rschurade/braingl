@@ -14,7 +14,9 @@
 
 #include "../../gui/gl/meshrenderer.h"
 #include "../../gui/gl/glfunctions.h"
+#include "../../gui/gl/colormapfunctions.h"
 
+#include "../../algos/colormapbase.h"
 #include "../../algos/connection.h"
 #include "../../algos/connections.h"
 
@@ -126,6 +128,9 @@ void DatasetGlyphset::addProperties()
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
     { "orientation", "value" }, 0, "glyphs" );
+
+    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
 void DatasetGlyphset::colorModeChanged( QVariant qv )
@@ -1138,4 +1143,26 @@ void DatasetGlyphset::avgConRtoZ()
         }
     }
     Models::g()->submit();
+}
+
+void DatasetGlyphset::slotCopyColors()
+{
+    int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
+
+    QColor color;
+
+    float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+
+    for ( int i = 0; i < m_n; ++i )
+    {
+        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+
+        float value = ( conn[m_prevPickedID][i] - selectedMin ) / ( selectedMax - selectedMin );
+        color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
+
+        mesh->setVertexColor( i, color );
+    }
 }
