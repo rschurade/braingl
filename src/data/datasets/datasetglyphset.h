@@ -97,6 +97,7 @@ private slots:
     void colorModeChanged(QVariant qv);
     void glyphStyleChanged(QVariant qv);
     void rotationChanged(QVariant qv);
+    void slotCopyColors();
 };
 
 #endif /* DATASETGLYPHSET_H_ */

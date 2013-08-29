@@ -208,6 +208,7 @@ namespace Fn
         D_MATERIAL_DIFFUSE,
         D_MATERIAL_SPECULAR,
         D_MATERIAL_SHININESS,
+        D_COPY_COLORS,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -421,6 +422,7 @@ namespace Fn
                 case Property::D_MATERIAL_DIFFUSE: return QString( "diffuse" ); break;
                 case Property::D_MATERIAL_SPECULAR: return QString( "specular" ); break;
                 case Property::D_MATERIAL_SHININESS: return QString( "shininess" ); break;
+                case Property::D_COPY_COLORS: return QString( "copy colors" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
