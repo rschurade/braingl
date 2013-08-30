@@ -261,7 +261,8 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
             {
                 QVector<float>f = m_fibs[i];
                 QVector3D s1( f[0], f[1], f[2] );
-                QVector3D s2( f[f.size() - 3], f[f.size() - 2], f[f.size() - 1] );
+                int size = f.size();
+                QVector3D s2( f[size - 3], f[size - 2], f[size - 1] );
 
                 if ( ( start - s1 ).length() < ( start - s2 ).length() )
                 {

@@ -1146,7 +1146,6 @@ void DatasetGlyphset::avgConRtoZ()
 
 void DatasetGlyphset::slotCopyColors()
 {
-    int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
