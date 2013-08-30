@@ -105,10 +105,9 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "C5", 13 );
     program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
 
-    program->setUniformValue( "u_lighting", Models::getGlobal( Fn::Property::G_LIGHT_SWITCH ).toBool() );
-    program->setUniformValue( "u_lightAmbient", Models::getGlobal( Fn::Property::G_LIGHT_AMBIENT ).toFloat() );
-    program->setUniformValue( "u_lightDiffuse", Models::getGlobal( Fn::Property::G_LIGHT_DIFFUSE ).toFloat() );
-
+    program->setUniformValue( "u_lighting", props->get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", props->get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", props->get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
     program->setUniformValue( "u_materialAmbient", props->get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
     program->setUniformValue( "u_materialDiffuse", props->get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
     program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );

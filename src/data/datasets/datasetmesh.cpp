@@ -78,10 +78,14 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Y, 0.0f, -500.0f, 500.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Z, 0.0f, -500.0f, 500.0f, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   0.0f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   0.54f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 1.21f, 0.0f, 100.0f, "material" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
 
 }
 

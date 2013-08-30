@@ -54,7 +54,10 @@ vec4 blinnPhongIllumination( vec3 ambient, vec3 diffuse, vec3 specular, float sh
 
     // compute specular term
     float specularLight = pow( max( dot( H, normalDir ), 0.0 ), shininess );
-    if( diffuseLight <= 0.) specularLight = 0.;
+    if( diffuseLight <= 0. ) 
+    {
+        specularLight = 0.;
+    }
     vec3 specularV = specular * specularLight;
 
     return vec4( ambientV + ( diffuseV + specularV ) * lightColor, 1.0 );
@@ -74,42 +77,15 @@ vec4 light( vec4 color )
             // material properties
             color.rgb * u_materialAmbient,                    // ambient color
             color.rgb * u_materialDiffuse,                    // diffuse color
-            color.rgb * u_materialSpecular,                          // specular color
-            u_materialShininess,                                  // shininess
+            color.rgb * u_materialSpecular,                   // specular color
+            u_materialShininess,                              // shininess
         
             // light color properties
             diffuse * u_lightDiffuse,         // light color
             ambient * u_lightAmbient,         // ambient light
         
             // directions
-            normalize( v_normal ),                 // normal
-            v_viewDir.xyz,                         // viewdir
-            v_lightDir.xyz );                    // light direction
-}
-
-vec4 fiberLight( vec4 color )
-{
-    if( !u_lighting )
-    {
-        return color;
-    }
-
-    vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
-    vec3 ambient = vec3( 1.0, 1.0, 1.0 );
-
-    return blinnPhongIllumination(
-            // material properties
-            color.rgb * u_materialAmbient,                    // ambient color
-            color.rgb * u_materialDiffuse,                    // diffuse color
-            color.rgb * u_materialSpecular,                          // specular color
-            u_materialShininess,                                  // shininess
-        
-            // light color properties
-            diffuse * u_lightDiffuse,         // light color
-            ambient * u_lightAmbient,         // ambient light
-        
-            // directions
-            normalize( v_normal ),                 // normal
-            v_viewDir.xyz,                         // viewdir
+            normalize( v_normal ),               // normal
+            v_viewDir.xyz,                       // viewdir
             v_lightDir.xyz );                    // light direction
 }
