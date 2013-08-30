@@ -124,12 +124,13 @@ void GLWidget::paintGL()
     {
         if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
         {
+
             // code for stereoscopic screenshots
-            m_xshift = -3.0;
+            m_xshift = -1 * Models::getGlobal( Fn::Property::G_EYE_SHIFT ).toFloat();
             calcMVPMatrix();
             QImage* imagel = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
             imagel->save( m_screenshotFileName + "_l_.png", "PNG" ); //TODO: remove ".png"
-            m_xshift = 3.0;
+            m_xshift = Models::getGlobal( Fn::Property::G_EYE_SHIFT ).toFloat();
             calcMVPMatrix();
             QImage* imager = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
             imager->save( m_screenshotFileName + "_r_.png", "PNG" ); //TODO: remove ".png"
