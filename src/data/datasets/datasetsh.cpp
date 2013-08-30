@@ -24,6 +24,15 @@ DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* he
     m_properties["maingl"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
+
     examineDataset();
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
@@ -154,5 +163,5 @@ TriangleMesh2* DatasetSH::getMeshFromCurrent()
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
-    return m_renderer->createMesh();
+    return m_renderer->getMesh();
 }

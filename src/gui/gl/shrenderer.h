@@ -16,9 +16,12 @@
 
 class PropertyGroup;
 class TriangleMesh2;
+class SHRendererThread2;
 
 class SHRenderer : public ObjectRenderer
 {
+    Q_OBJECT
+
 public:
     SHRenderer( QVector<ColumnVector>* data, int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~SHRenderer();
@@ -27,7 +30,8 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
 
-    TriangleMesh2* createMesh();
+    void createMesh();
+    TriangleMesh2* getMesh();
 
 protected:
     void setupTextures();
@@ -35,11 +39,14 @@ protected:
     void setRenderParams( PropertyGroup* props );
 
     void initGeometry();
+    void updateMesh();
 
 private:
-    int m_tris1;
+    int m_tris;
 
     GLuint *vboIds;
+    TriangleMesh2* m_mesh;
+    TriangleMesh2* m_newMesh;
 
     QVector<ColumnVector>* m_data;
 
@@ -53,7 +60,7 @@ private:
     float m_scaling;
     int m_orient;
     int m_offset;
-    int m_lodAdjust;
+    int m_lod;
     bool m_minMaxScaling;
     bool m_hideNegativeLobes;
     int m_order;
@@ -63,6 +70,26 @@ private:
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_mvMatrix;
 
+    float* m_colorBufferPointer;
+
+    bool m_dirty;
+    int m_pickId;
+    int m_renderMode;
+    int m_colorMode;
+    int m_colormap;
+    float m_selectedMin;
+    float m_selectedMax;
+    float m_lowerThreshold;
+    float m_upperThreshold;
+    QColor m_color;
+
+    SHRendererThread2* m_masterThread;
+    bool m_meshUpdated;
+    bool m_updateWaiting;
+
+
+private slots:
+    void slotNewMeshCreated( TriangleMesh2* mesh );
 };
 
 #endif /* SHRENDERER_H_ */

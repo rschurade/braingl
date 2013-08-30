@@ -86,6 +86,15 @@ TriangleMesh2::~TriangleMesh2()
     m_triNormals.clear();
     m_threads.clear();
     m_toRemove.clear();
+
+    m_vertices.squeeze();
+    m_vertexColors.squeeze();
+    m_vertIsInTriangle.squeeze();
+    m_vertNeighbors.squeeze();
+    m_triangles.squeeze();
+    m_triNormals.squeeze();
+    m_threads.squeeze();
+    m_toRemove.squeeze();
 }
 
 int TriangleMesh2::bufferSize()

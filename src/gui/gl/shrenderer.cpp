@@ -6,10 +6,12 @@
  */
 #include "shrenderer.h"
 #include "shrendererthread.h"
+#include "shrendererthread2.h"
 #include "glfunctions.h"
 
 #include "../../data/datasets/datasetsh.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/vptr.h"
 #include "../../algos/fmath.h"
 #include "../../algos/qball.h"
@@ -29,8 +31,9 @@
 
 SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
-    m_tris1( 0 ),
-    vboIds( new GLuint[ 2 ] ),
+    m_tris( 0 ),
+    vboIds( new GLuint[ 3 ] ),
+    m_mesh( 0 ),
     m_data( data ),
     m_nx( m_nx ),
     m_ny( m_ny ),
@@ -41,10 +44,14 @@ SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_n
     m_scaling( 1.0 ),
     m_orient( 0 ),
     m_offset( 0 ),
-    m_lodAdjust( 0 ),
+    m_lod( 0 ),
     m_minMaxScaling( false ),
     m_order( 4 ),
-    m_oldLoD( -1 )
+    m_oldLoD( -1 ),
+    m_pickId( GLFunctions::getPickIndex() ),
+    m_masterThread( 0 ),
+    m_meshUpdated( false ),
+    m_updateWaiting( false )
 {
 }
 
@@ -52,34 +59,89 @@ SHRenderer::~SHRenderer()
 {
     glDeleteBuffers(1, &( vboIds[ 0 ] ) );
     glDeleteBuffers(1, &( vboIds[ 1 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 2 ] ) );
 }
 
 void SHRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 3, vboIds );
 }
 
 void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
-    if ( renderMode != 1 ) // we are drawing opaque objects
+    float alpha = 1.0; //props->get( Fn::Property::D_ALPHA ).toFloat();
+    m_renderMode = renderMode;
+
+    m_pMatrix = p_matrix;
+    m_mvMatrix = mv_matrix;
+
+    switch ( renderMode )
     {
-        // obviously not opaque
-        return;
+        case 0:
+            break;
+        case 1:
+        {
+            if ( alpha < 1.0 ) // obviously not opaque
+            {
+                return;
+            }
+            break;
+        }
+        default:
+        {
+            if ( alpha == 1.0  ) // not transparent
+            {
+                return;
+            }
+            break;
+        }
     }
 
     setRenderParams( props );
 
-    if ( m_orient == 0 )
-    {
-        return;
-    }
-    m_pMatrix = p_matrix;
-    m_mvMatrix = mv_matrix;
+    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
-    QGLShaderProgram* program = GLFunctions::getShader( "qball" );
     program->bind();
 
-    program->setUniformValue( "u_alpha", 1.0f );
+    GLFunctions::setupTextures();
+    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
+    // Set modelview-projection matrix
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
+    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    program->setUniformValue( "u_colorMode", 2 );
+    program->setUniformValue( "u_colormap", m_colormap );
+    program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
+    program->setUniformValue( "u_selectedMin", m_selectedMin );
+    program->setUniformValue( "u_selectedMax", m_selectedMax );
+    program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
+    program->setUniformValue( "u_upperThreshold", m_upperThreshold );
+
+    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
+    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
+    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+
+    program->setUniformValue( "u_x", sx * dx + dx / 2.0f );
+    program->setUniformValue( "u_y", sy * dy + dy / 2.0f );
+    program->setUniformValue( "u_z", sz * dz + dz / 2.0f );
+    program->setUniformValue( "u_cutLowerX", false );
+    program->setUniformValue( "u_cutLowerY", false );
+    program->setUniformValue( "u_cutLowerZ", false );
+    program->setUniformValue( "u_cutHigherX", false );
+    program->setUniformValue( "u_cutHigherY", false );
+    program->setUniformValue( "u_cutHigherZ", false );
+
+    program->setUniformValue( "u_adjustX",   0.0f );
+    program->setUniformValue( "u_adjustY", 0.0f );
+    program->setUniformValue( "u_adjustZ", 0.0f );
+
+    program->setUniformValue( "u_alpha", alpha );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );
@@ -87,19 +149,48 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    // Set modelview-projection matrix
-    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
-    program->setUniformValue( "u_hideNegativeLobes", m_hideNegativeLobes );
-    program->setUniformValue( "u_scaling", m_scaling );
+    program->setUniformValue( "u_lighting", props->get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", props->get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", props->get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialAmbient", props->get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_materialDiffuse", props->get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
+    program->setUniformValue( "u_materialShininess", props->get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
+
+
+    float pAlpha =  1.0;
+    float blue = (float) ( ( m_pickId ) & 0xFF ) / 255.f;
+    float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
+    float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
+    program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
+
+    program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
     initGeometry();
+
+    if ( m_meshUpdated )
+    {
+        updateMesh();
+    }
+
+    if ( !m_mesh )
+    {
+        return;
+    }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
-    glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
 
+    glEnable(GL_CULL_FACE);
+    glCullFace( GL_BACK );
+    glFrontFace( GL_CW );
+
+    glDrawElements( GL_TRIANGLES, m_tris, GL_UNSIGNED_INT, 0 );
+
+    glDisable(GL_CULL_FACE);
+
+    glShadeModel( GL_SMOOTH );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
@@ -110,26 +201,36 @@ void SHRenderer::setupTextures()
 
 void SHRenderer::setShaderVars()
 {
-    QGLShaderProgram* program = GLFunctions::getShader( "qball" );
+    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
     program->bind();
 
     intptr_t offset = 0;
-    int countValues = 7;
     // Tell OpenGL programmable pipeline how to locate vertex position data
+
+    int bufferSize = m_mesh->bufferSize();
+
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * countValues, (const void *) offset );
-
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
     offset += sizeof(float) * 3;
-    int offsetLocation = program->attributeLocation( "a_offset" );
-    program->enableAttributeArray( offsetLocation );
-    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * countValues, (const void *) offset );
 
+    int normalLocation = program->attributeLocation( "a_normal" );
+    program->enableAttributeArray( normalLocation );
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
     offset += sizeof(float) * 3;
-    int radiusLocation = program->attributeLocation( "a_radius" );
-    program->enableAttributeArray( radiusLocation );
-    glVertexAttribPointer( radiusLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * countValues, (const void *) offset );
+
+    int valueLocation = program->attributeLocation( "a_value" );
+    program->enableAttributeArray( valueLocation );
+    glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
+    offset += sizeof(float) * 1;
+
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0 );
 }
 
 void SHRenderer::initGeometry()
@@ -150,96 +251,21 @@ void SHRenderer::initGeometry()
     float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
     float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
 
-    int lod = m_lodAdjust;
-
-    QString s = createSettingsString( { xi, yi, zi, m_orient, zoom, m_minMaxScaling, m_hideNegativeLobes, moveX, moveY, lod, m_offset } );
-    if ( s == m_previousSettings || m_orient == 0 )
+    QString s = createSettingsString( { xi, yi, zi, m_orient, zoom, m_minMaxScaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
+    if ( !m_updateWaiting && ( s == m_previousSettings || m_orient == 0 ) )
     {
         return;
     }
     m_previousSettings = s;
 
-
-    //qDebug() << "SH Renderer: using lod " << lod;
-
-    int numVerts = tess::n_vertices( lod );
-    int numTris = tess::n_faces( lod );
-
-    int numThreads = GLFunctions::idealThreadCount;
-
-    QVector<SHRendererThread*> threads;
-    // create threads
-
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, lod,
-                                                    m_order, m_orient, m_minMaxScaling, m_pMatrix, m_mvMatrix ) );
-    }
-
-    // run threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        threads[i]->start();
-    }
-
-    // wait for all threads to finish
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        threads[i]->wait();
-    }
-
-    QVector<float> verts;
-    // combine verts from all threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        verts += *( threads[i]->getVerts() );
-        delete threads[i];
-    }
-
-    try
-    {
-
-        int numBalls = verts.size() / ( numVerts * 7 );
-
-        m_tris1 = numTris * numBalls * 3;
-
-        glDeleteBuffers(1, &( vboIds[ 0 ] ) );
-        glDeleteBuffers(1, &( vboIds[ 1 ] ) );
-        glGenBuffers( 2, vboIds );
-
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-        glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-        const int* faces = tess::faces( lod );
-        std::vector<int>indexes;
-        indexes.reserve( m_tris1 );
-
-        for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
-        {
-            for ( int i = 0; i < numTris; ++i )
-            {
-                indexes.push_back( faces[i*3] + numVerts * currentBall );
-                indexes.push_back( faces[i*3+1] + numVerts * currentBall );
-                indexes.push_back( faces[i*3+2] + numVerts * currentBall );
-            }
-        }
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexes.size() * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW );
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-    }
-    catch (std::bad_alloc& ba)
-    {
-        qDebug() << "bad alloc sh renderer";
-    }
+    createMesh();
 }
 
 void SHRenderer::setRenderParams( PropertyGroup* props )
 {
     m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props->get( Fn::Property::D_OFFSET ).toInt();
-    m_lodAdjust = props->get( Fn::Property::D_LOD ).toInt();
+    m_lod = props->get( Fn::Property::D_LOD ).toInt();
     m_minMaxScaling = props->get( Fn::Property::D_MINMAX_SCALING ).toBool();
     m_hideNegativeLobes = props->get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
     m_order = props->get( Fn::Property::D_ORDER ).toInt();
@@ -257,115 +283,87 @@ void SHRenderer::setRenderParams( PropertyGroup* props )
     {
         m_orient += 4;
     }
+
+    m_colorMode = props->get( Fn::Property::D_COLORMODE ).toInt();
+    m_colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
+    m_selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    m_selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
-TriangleMesh2* SHRenderer::createMesh()
+void SHRenderer::createMesh()
 {
+    if ( m_masterThread && m_masterThread->isRunning() )
+    {
+        m_updateWaiting = true;
+        return;
+    }
+
+    m_updateWaiting = false;
+
     float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-   float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-   float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-   int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-   int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-   int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
 
-   xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
-   yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
-   zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
+    xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
+    yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
+    zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
-//   float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-//   float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
-//   float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
+    m_masterThread = new SHRendererThread2( 0, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_lod,
+                                                       m_order, m_orient, m_minMaxScaling, m_pMatrix, m_mvMatrix );
+    connect( m_masterThread, SIGNAL( finished( TriangleMesh2* ) ), this, SLOT( slotNewMeshCreated( TriangleMesh2* ) ) );
 
-   int lod = m_lodAdjust;
+    m_masterThread->start();
+}
 
-   //qDebug() << "SH Renderer: using lod " << lod;
+TriangleMesh2* SHRenderer::getMesh()
+{
+    return m_mesh;
+}
 
-   int numVerts = tess::n_vertices( lod );
-   int numTris = tess::n_faces( lod );
+void SHRenderer::slotNewMeshCreated( TriangleMesh2* mesh )
+{
+    m_newMesh = mesh;
+    m_meshUpdated = true;
+    Models::g()->submit();
+}
 
-   int numThreads = GLFunctions::idealThreadCount;
+void SHRenderer::updateMesh()
+{
+    if ( m_mesh != 0 )
+    {
+        delete m_mesh;
 
-   QVector<SHRendererThread*> threads;
-   // create threads
+        glDeleteBuffers( 3, vboIds );
+        glGenBuffers( 3, vboIds );
+    }
 
-   for ( int i = 0; i < numThreads; ++i )
-   {
-       threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, lod,
-                                                   m_order, m_orient, m_minMaxScaling, m_pMatrix, m_mvMatrix ) );
-   }
+    if ( m_newMesh )
+    {
+        m_mesh = m_newMesh;
+        int bufferSize = m_mesh->bufferSize();
 
-   // run threads
-   for ( int i = 0; i < numThreads; ++i )
-   {
-       threads[i]->start();
-   }
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numTris() * 3 * sizeof(GLuint), m_mesh->getIndexes(), GL_STATIC_DRAW );
 
-   // wait for all threads to finish
-   for ( int i = 0; i < numThreads; ++i )
-   {
-       threads[i]->wait();
-   }
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+        glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * bufferSize * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
 
-   QVector<float> verts;
-   // combine verts from all threads
-   for ( int i = 0; i < numThreads; ++i )
-   {
-       verts += *( threads[i]->getVerts() );
-       delete threads[i];
-   }
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+        glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexColors(), GL_DYNAMIC_DRAW );
 
-   TriangleMesh2* mesh = 0;
+        m_tris = m_mesh->numTris() * 3;
 
-   try
-   {
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-       int numBalls = verts.size() / ( numVerts * 7 );
-
-       mesh = new TriangleMesh2( numVerts * numBalls, numTris * numBalls );
-
-       const int* faces = tess::faces( lod );
-
-       float posX, posY, posZ;
-       float newPosX, newPosY, newPosZ;
-       float offsetX, offsetY, offsetZ;
-       float radius;
-
-
-       for ( int i = 0; i < verts.size() / 7; ++i )
-       {
-           posX = verts[i*7];
-           posY = verts[i*7+1];
-           posZ = verts[i*7+2];
-           offsetX = verts[i*7+3];
-           offsetY = verts[i*7+4];
-           offsetZ = verts[i*7+5];
-           radius = verts[i*7+6];
-
-           newPosX = posX * radius * m_scaling + offsetX;
-           newPosY = posY * radius * m_scaling + offsetY;
-           newPosZ = posZ * radius * m_scaling + offsetZ;
-
-           mesh->addVertex( newPosX, newPosY, newPosZ );
-           mesh->setVertexColor( i, fabs( posX), fabs( posY), fabs( posZ), 1.0f );
-       }
-
-       verts.clear();
-       verts.squeeze();
-
-       for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
-       {
-           for ( int i = 0; i < numTris; ++i )
-           {
-               mesh->addTriangle( faces[i*3] + numVerts * currentBall, faces[i*3+2] + numVerts * currentBall, faces[i*3+1] + numVerts * currentBall );
-           }
-       }
-
-   }
-   catch (std::bad_alloc& ba)
-   {
-       qDebug() << "bad alloc sh renderer";
-   }
-   mesh->finalize();
-   return mesh;
+        m_newMesh = 0;
+    }
+    m_meshUpdated = false;
 }
