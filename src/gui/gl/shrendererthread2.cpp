@@ -26,6 +26,7 @@ SHRendererThread2::SHRendererThread2( int id, QVector<ColumnVector>* data,
                                                                 int order,
                                                                 int orient,
                                                                 bool scaling,
+                                                                float scaleFactor,
                                                                 QMatrix4x4 pMatrix,
                                                                 QMatrix4x4 mvMatrix
                                                                  ) :
@@ -44,6 +45,7 @@ SHRendererThread2::SHRendererThread2( int id, QVector<ColumnVector>* data,
     m_order( order ),
     m_orient( orient ),
     m_scaling( scaling ),
+    m_scaleFactor( scaleFactor ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix ),
     m_mesh( 0 )
@@ -110,7 +112,6 @@ void SHRendererThread2::run()
         float offsetX, offsetY, offsetZ;
         float radius;
 
-
         for ( int i = 0; i < verts.size() / 7; ++i )
         {
             posX = verts[i*7];
@@ -121,9 +122,9 @@ void SHRendererThread2::run()
             offsetZ = verts[i*7+5];
             radius = verts[i*7+6];
 
-            newPosX = posX * radius * 1.0 + offsetX;
-            newPosY = posY * radius * 1.0 + offsetY;
-            newPosZ = posZ * radius * 1.0 + offsetZ;
+            newPosX = posX * radius * m_scaleFactor + offsetX;
+            newPosY = posY * radius * m_scaleFactor + offsetY;
+            newPosZ = posZ * radius * m_scaleFactor + offsetZ;
 
             m_mesh->addVertex( newPosX, newPosY, newPosZ );
             m_mesh->setVertexColor( i, fabs( posX), fabs( posY), fabs( posZ), 1.0f );
