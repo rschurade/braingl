@@ -38,5 +38,5 @@ void main()
         color = frontColor.rgb;
     }
     
-    writePeel( fiberLight( vec4( color, 1.0 ) ).rgb );
+    writePeel( light( vec4( color, 1.0 ) ).rgb );
 }

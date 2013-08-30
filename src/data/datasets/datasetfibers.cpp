@@ -143,11 +143,14 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->create( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NZ, 800, 0, 1600, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   1.0f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   1.0f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  1.0f, 0.0f, 10.0f, "material" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 100.0f, "material" );
-
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.2f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_DIFFUSE,   0.45f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   2.0f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
 
     int maxLength = 0;
     for ( int i = 0; i < m_fibs.size(); ++i )
