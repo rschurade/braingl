@@ -95,6 +95,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_SCREENSHOT_DO_MAINGL, true, "screenshot" );
     m_properties->create( Fn::Property::G_SCREENSHOT_DO_MAINGL2, false, "screenshot" );
     m_properties->create( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false, "screenshot" );
+    m_properties->create( Fn::Property::G_EYE_SHIFT, 3.0f, 0.0f, 100.0f, "screenshot" );
 
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );
