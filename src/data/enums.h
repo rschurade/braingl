@@ -53,6 +53,7 @@ namespace Fn
         BINGHAM,
         ISOSURFACE,
         DISTANCE_MAP,
+        GAUSS,
         TENSOR_TRACK,
         CROSSING_TRACK,
         BINGHAM_2_TENSOR,
@@ -288,6 +289,7 @@ namespace Fn
         G_LIGHT_SWITCH,
         G_LIGHT_AMBIENT,
         G_LIGHT_DIFFUSE,
+        G_FILTER_SIZE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -505,6 +507,7 @@ namespace Fn
                 case Property::G_LIGHT_SWITCH: return QString( "toggle light" ); break;
                 case Property::G_LIGHT_AMBIENT: return QString( "light ambient" ); break;
                 case Property::G_LIGHT_DIFFUSE: return QString( "light diffuse" ); break;
+                case Property::G_FILTER_SIZE: return QString( "filter size" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
