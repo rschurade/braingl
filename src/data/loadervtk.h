@@ -20,7 +20,7 @@ public:
     virtual ~LoaderVTK();
 
     bool load();
-    QString getStatus();
+    QStringList getStatus();
     int getPrimitiveType();
     QVector<float> getPoints();
     QVector<int>getPrimitives();
@@ -56,7 +56,7 @@ private:
     QString readLine( QDataStream& in );
 
     QString m_filename;
-    QString m_status;
+    QStringList m_status;
     int m_type; // 0 - undefined, 1 - ASCII, 2 - BINARY
     int m_primitiveType; // 0 - undefined, 1 - POLYGONS, 2 - LINES
 
