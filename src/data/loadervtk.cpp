@@ -503,8 +503,6 @@ bool LoaderVTK::loadBinary()
         {
             continue;
         }
-        qDebug() << fieldHeader.size() << m_bufferPointer << m_binFileSize;
-        qDebug() << "field header: " << fieldHeader;
 
         if ( tokens[0] == "POINTS" )
         {
@@ -577,7 +575,6 @@ bool LoaderVTK::copyPoints( QStringList tokens )
     }
     else
     {
-        qDebug() << tokens;
         m_status.push_back( "*ERROR* unexpected field in points declaration " + m_filename );
         return false;
     }
@@ -656,7 +653,7 @@ bool LoaderVTK::copyPrimitiveData( QStringList tokens )
         m_status.push_back( "*ERROR* cell data size doesn't match num primitives " + m_filename );
     }
     QString line = readLineBinary();
-    //qDebug() << line;
+
     QStringList toks = line.split( " ", QString::SkipEmptyParts );
     if ( toks.size() == 3 && toks[0] == "FIELD" && toks[1] == "FieldData" )
     {
@@ -664,7 +661,7 @@ bool LoaderVTK::copyPrimitiveData( QStringList tokens )
         for ( int i = 0; i < numFields; ++i )
         {
             line = readLineBinary();
-            //qDebug() << line;
+
             toks = line.split( " ", QString::SkipEmptyParts );
 
             if ( toks.size() == 4 && toks[1].toInt() == 1 && toks[2].toInt() == m_numPrimitives && toks[3] == "float" )
@@ -719,7 +716,6 @@ bool LoaderVTK::copyPointData( QStringList tokens )
         m_status.push_back( "*ERROR* point data size doesn't match num points " + m_filename );
     }
     QString line = readLineBinary();
-    qDebug() << line;
     line.remove( 0x0D );
     QStringList toks = line.split( " ", QString::SkipEmptyParts );
     if ( toks.size() == 3 && toks[0] == "FIELD" && toks[1] == "FieldData" )
@@ -728,7 +724,7 @@ bool LoaderVTK::copyPointData( QStringList tokens )
         for ( int i = 0; i < numFields; ++i )
         {
             line = readLineBinary();
-            //qDebug() << line;
+
             toks = line.split( " ", QString::SkipEmptyParts );
 
             if ( toks.size() == 4 && toks[1].toInt() == 1 && toks[2].toInt() == m_numPoints && toks[3] == "float" )
@@ -758,7 +754,7 @@ bool LoaderVTK::copyPointData( QStringList tokens )
                 delete[] rawData;
                 m_pointData.push_back( dataField );
 
-                m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
+                m_bufferPointer += m_numPoints * sizeof( float ) + 1;
             }
             else
             {
