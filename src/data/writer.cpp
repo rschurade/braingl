@@ -393,13 +393,6 @@ void Writer::saveFibs( QString filename )
     QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
     QVector< QVector< QVector<float> > >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData();
 
-    using std::fstream;
-    fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
-    if( !out || out.bad() )
-    {
-        // error
-    }
-
     unsigned int numPoints = 0;
     unsigned int numLines = fibs.size();
     for( int i = 0; i < fibs.size(); ++i )
@@ -430,34 +423,50 @@ void Writer::saveFibs( QString filename )
     switchByteOrderOfArray< float >( pointsOut, numPoints * 3 );
     switchByteOrderOfArray< unsigned int >( linesOut, numLines + numPoints );
 
-    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
-    char lineDelimiter = '\n';
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadWrite | QIODevice::Truncate ) )
+    {
+        qDebug() << "***ERROR*** open file to write";
+        return;
+    }
+    QByteArray out;
 
-    out << "# vtk DataFile Version 3.0" << lineDelimiter;
-    out << "Fibers" << lineDelimiter;
-    out << "BINARY" << lineDelimiter;
-    out << "DATASET POLYDATA" << lineDelimiter;
+    const char lineDelimiter = '\n';
 
-    out << "POINTS " << numPoints << " float" << lineDelimiter;
-    out.write( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
-    out << lineDelimiter;
+    out.append( "# vtk DataFile Version 3.0" );
+    out.append( lineDelimiter );
+    out.append( "braingl Mesh" );
+    out.append( lineDelimiter );
+    out.append( "BINARY" );
+    out.append( lineDelimiter );
+    out.append( "DATASET POLYDATA" );
+    out.append( lineDelimiter );
+
+    out.append( "POINTS " + QString::number( numPoints ) + " float" );
+    out.append( lineDelimiter );
+    out.append( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
+    out.append( lineDelimiter );
     delete[] pointsOut;
 
-    out << "LINES " << numLines << " " << numPoints + numLines << lineDelimiter;
-    out.write( reinterpret_cast< char* >( linesOut ), sizeof( unsigned int ) * ( numPoints + numLines ) );
-    out << lineDelimiter;
+    out.append( "LINES " + QString::number( numLines ) + " " + QString::number( numPoints + numLines ) );
+    out.append( lineDelimiter );
+    out.append( reinterpret_cast< char* >( linesOut ), sizeof( unsigned int ) * ( numPoints + numLines ) );
+    out.append( lineDelimiter );
     delete[] linesOut;
 
     QVector< QString >dataNames = dynamic_cast<DatasetFibers*>( m_dataset )->getDataNames();
 
     if ( dataNames[0] != "no data" )
     {
-        out << "POINT_DATA " << numPoints << lineDelimiter;
-        out << "FIELD FieldData " << dataNames.size() << lineDelimiter;
+        out.append( "POINT_DATA " + QString::number( numPoints ) );
+        out.append( lineDelimiter );
+        out.append( "FIELD FieldData " + QString::number( dataNames.size() ) );
+        out.append( lineDelimiter );
 
         for ( int i = 0; i < dataNames.size(); ++i )
         {
-            out << dataNames[i].toStdString() << " 1 " << numPoints << " float" << lineDelimiter;
+            out.append( dataNames[i] + " 1 " + QString::number( numPoints ) + " float" );
+            out.append( lineDelimiter );
             float *dataOut = new float[numPoints];
             QVector<QVector<float> >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData( i );
             pntPosOffset = 0;
@@ -470,15 +479,16 @@ void Writer::saveFibs( QString filename )
                 }
             }
             switchByteOrderOfArray< float >( dataOut, numPoints );
-            out.write( reinterpret_cast< char* >( dataOut ), sizeof( float ) * numPoints );
-            out << lineDelimiter;
+            out.append( reinterpret_cast< char* >( dataOut ), sizeof( float ) * numPoints );
+            out.append( lineDelimiter );
 
             delete[] dataOut;
         }
     }
 
+    file.write( out );
 
-    out.close();
+    file.close();
 }
 
 void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
@@ -518,35 +528,45 @@ void Writer::saveMeshVTK( QString filename, TriangleMesh2* mesh )
     switchByteOrderOfArray< int >( trisOut, numTris * 4 );
 
 
-    using std::fstream;
-    fstream out( filename.toStdString().c_str(), fstream::out | fstream::in | fstream::trunc );
-    if( !out || out.bad() )
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadWrite | QIODevice::Truncate ) )
     {
-        // error
+        qDebug() << "***ERROR*** open file to write";
+        return;
     }
-    // We use '\n' as line delimiter so also files written under windows (having '\r\n' as delimtier) may be read anywhere
-    char lineDelimiter = '\n';
+    QByteArray out;
 
-    out << "# vtk DataFile Version 3.0" << lineDelimiter;
-    out << "Fibernavigator 2 Mesh" << lineDelimiter;
-    out << "BINARY" << lineDelimiter;
-    out << "DATASET POLYDATA" << lineDelimiter;
+    const char lineDelimiter = '\n';
 
-    out << "POINTS " << numPoints << " float" << lineDelimiter;
-    out.write( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
-    out << lineDelimiter;
+    out.append( "# vtk DataFile Version 3.0" );
+    out.append( lineDelimiter );
+    out.append( "braingl Mesh" );
+    out.append( lineDelimiter );
+    out.append( "BINARY" );
+    out.append( lineDelimiter );
+    out.append( "DATASET POLYDATA" );
+    out.append( lineDelimiter );
 
-    out << "POLYGONS " << numTris << " " << numTris * 4 << lineDelimiter;
-    out.write( reinterpret_cast< char* >( trisOut ), sizeof( int ) * ( numTris * 4 ) );
-    out << lineDelimiter;
+    out.append( "POINTS " + QString::number( numPoints ) + " float" );
+    out.append( lineDelimiter );
+    out.append( reinterpret_cast< char* >( pointsOut ), sizeof( float ) * numPoints * 3 );
+    out.append( lineDelimiter );
 
-    out << "POINT_DATA " << numPoints << lineDelimiter;
-    out << "COLOR_SCALARS Colors 3" << lineDelimiter;
-    //out.write( reinterpret_cast< char* >( colorsOut ), sizeof( float ) * numPoints * 3 );
-    out.write( colorsOut, numPoints * 3 );
-    out << lineDelimiter;
+    out.append( "POLYGONS " + QString::number( numTris ) + " " + QString::number( numTris * 4 ) );
+    out.append( lineDelimiter );
+    out.append( reinterpret_cast< char* >( trisOut ), sizeof( int ) * ( numTris * 4 ) );
+    out.append( lineDelimiter );
 
-    out.close();
+    out.append( "POINT_DATA " + QString::number( numPoints ) );
+    out.append( lineDelimiter );
+    out.append( "COLOR_SCALARS Colors 3" );
+    out.append( lineDelimiter );
+    out.append( colorsOut, numPoints * 3 );
+    out.append( lineDelimiter );
+
+    file.write( out );
+
+    file.close();
 
     delete[] pointsOut;
     delete[] colorsOut;

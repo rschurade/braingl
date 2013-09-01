@@ -14,7 +14,6 @@
 
 LoaderVTK::LoaderVTK( QString fn ) :
     m_filename( fn ),
-    m_status( "ok" ),
     m_type( 0 ),
     m_primitiveType( 0 ),
     m_numPoints( 0 ),
@@ -26,6 +25,7 @@ LoaderVTK::LoaderVTK( QString fn ) :
     m_hasPrimitiveData( false ),
     m_hasPointColors( false )
 {
+    m_status.push_back( "ok" );
 }
 
 LoaderVTK::~LoaderVTK()
@@ -43,7 +43,7 @@ LoaderVTK::~LoaderVTK()
     m_pointColors.squeeze();
 }
 
-QString LoaderVTK::getStatus()
+QStringList LoaderVTK::getStatus()
 {
     return m_status;
 }
@@ -135,7 +135,7 @@ bool LoaderVTK::exists()
 
     if ( !dir.exists( dir.absolutePath() ) )
     {
-        m_status = "*ERROR* file " + m_filename + " doesn't exist";
+        m_status.push_back(  "*ERROR* file " + m_filename + " doesn't exist" );
         return false;
     }
     else
@@ -149,7 +149,7 @@ bool LoaderVTK::open()
     m_file = new QFile( m_filename );
     if ( !m_file->open( QIODevice::ReadOnly ) )
     {
-        m_status = "*ERROR* couldn't open file " + m_filename;
+        m_status.push_back( "*ERROR* couldn't open file " + m_filename );
         return false;
     }
     else
@@ -173,12 +173,12 @@ bool LoaderVTK::loadHeader()
     }
     if( m_header.size() != 4 )
     {
-        m_status = "*ERROR* couldn't load header of file " + m_filename;
+        m_status.push_back( "*ERROR* couldn't load header of file " + m_filename );
         return false;
     }
     if ( m_header[0] != "# vtk DataFile Version 3.0" )
     {
-        m_status = "*ERROR* unexpected field at header line 0 (vtk version) in file " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field at header line 0 (vtk version) in file " + m_filename );
         return false;
     }
 
@@ -194,13 +194,13 @@ bool LoaderVTK::loadHeader()
     }
     else
     {
-        m_status = "*ERROR* unexpected field at header line 2 (data representation) in file " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field at header line 2 (data representation) in file " + m_filename );
         return false;
     }
 
     if ( m_header[3] != "DATASET POLYDATA" )
     {
-        m_status = "*ERROR* unexpected field at header line 3 (dataset type) in file " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field at header line 3 (dataset type) in file " + m_filename );
         return false;
     }
     return true;
@@ -245,7 +245,7 @@ bool LoaderVTK::loadPointsAscii()
     }
     else
     {
-        m_status = "*ERROR* while searching for point declaration, unexpected EOF in file " + m_filename;
+        m_status.push_back( "*ERROR* while searching for point declaration, unexpected EOF in file " + m_filename );
         return false;
     }
 
@@ -266,7 +266,7 @@ bool LoaderVTK::loadPointsAscii()
     }
     if ( m_points.size() != ( m_numPoints * 3 ) )
     {
-        m_status = "*ERROR* unexpected EOF while loading POINTS in file" + m_filename;
+        m_status.push_back( "*ERROR* unexpected EOF while loading POINTS in file" + m_filename );
         return false;
     }
 
@@ -298,7 +298,7 @@ bool LoaderVTK::loadPrimitivesAscii()
     }
     else
     {
-        m_status = "*ERROR* while searching for primitive declaration, unexpected EOF in file " + m_filename;
+        m_status.push_back( "*ERROR* while searching for primitive declaration, unexpected EOF in file " + m_filename );
         return false;
     }
 
@@ -323,7 +323,7 @@ bool LoaderVTK::loadPrimitivesAscii()
     }
     if ( m_primitives.size() != m_primitiveSize )
     {
-        m_status = "*ERROR* unexpected EOF while loading primitives in file" + m_filename;
+        m_status.push_back( "*ERROR* unexpected EOF while loading primitives in file" + m_filename );
         return false;
     }
 
@@ -442,7 +442,7 @@ bool LoaderVTK::loadPointColorsAscii()
     }
     if ( m_pointColors.size() != ( m_numPoints * 3 ) )
     {
-        m_status = "*ERROR* unexpected EOF while loading POINT COLORS in file" + m_filename;
+        m_status.push_back( "*ERROR* unexpected EOF while loading POINT COLORS in file" + m_filename );
         return false;
     }
 
@@ -456,8 +456,16 @@ QString LoaderVTK::readLineBinary()
     while( m_binaryFile[ m_bufferPointer ] != '\n' )
     {
         out += m_binaryFile[ m_bufferPointer++ ];
+//        if ( m_binaryFile[ m_bufferPointer ] != '\r' )
+//        {
+//
+//        }
+//        else
+//        {
+//            ++m_bufferPointer;
+//        }
     }
-    m_bufferPointer++;
+    ++m_bufferPointer;
     return out;
 }
 
@@ -486,14 +494,23 @@ bool LoaderVTK::loadBinary()
     while ( m_bufferPointer < m_binFileSize )
     {
         fieldHeader = readLineBinary();
-        qDebug() << fieldHeader;
+
+        fieldHeader.remove( 0x0D );
+
         tokens = fieldHeader.split( " ", QString::SkipEmptyParts );
+
+        if ( tokens.size() < 2 )
+        {
+            continue;
+        }
+        qDebug() << fieldHeader.size() << m_bufferPointer << m_binFileSize;
+        qDebug() << "field header: " << fieldHeader;
 
         if ( tokens[0] == "POINTS" )
         {
             if ( !copyPoints( tokens ) )
             {
-                m_status = "*ERROR* while loading POINTS in file" + m_filename;
+                m_status.push_back( "*ERROR* while loading POINTS in file" + m_filename );
                 return false;
             }
             pointsLoaded = true;
@@ -503,7 +520,7 @@ bool LoaderVTK::loadBinary()
             m_primitiveType = 2;
             if ( !copyPrimitives( tokens ) )
             {
-                m_status = "*ERROR* while loading PRIMITIVES in file" + m_filename;
+                m_status.push_back( "*ERROR* while loading PRIMITIVES in file" + m_filename );
                 return false;
             }
             primitivesLoaded = true;
@@ -513,7 +530,7 @@ bool LoaderVTK::loadBinary()
             m_primitiveType = 1;
             if ( !copyPrimitives( tokens ) )
             {
-                m_status = "*ERROR* while loading PRIMITIVES in file" + m_filename;
+                m_status.push_back( "*ERROR* while loading PRIMITIVES in file" + m_filename );
                 return false;
             }
             primitivesLoaded = true;
@@ -548,7 +565,7 @@ bool LoaderVTK::loadBinary()
     {
         return true;
     }
-    m_status = "*ERROR* " + m_filename;
+    m_status.push_back( "*ERROR* " + m_filename );
     return false;
 }
 
@@ -560,7 +577,8 @@ bool LoaderVTK::copyPoints( QStringList tokens )
     }
     else
     {
-        m_status = "*ERROR* unexpected field in points declaration " + m_filename;
+        qDebug() << tokens;
+        m_status.push_back( "*ERROR* unexpected field in points declaration " + m_filename );
         return false;
     }
     char* pointField = new char[m_numPoints * sizeof( float ) * 3];
@@ -584,7 +602,7 @@ bool LoaderVTK::copyPoints( QStringList tokens )
 
     delete[] rawPointData;
 
-    m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
+    m_bufferPointer += ( m_numPoints * sizeof( float ) * 3 + 1 );
 
     return true;
 }
@@ -598,7 +616,7 @@ bool LoaderVTK::copyPrimitives( QStringList tokens )
     }
     else
     {
-        m_status = "*ERROR* unexpected field in primitive declaration " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field in primitive declaration " + m_filename );
         return false;
     }
 
@@ -635,7 +653,7 @@ bool LoaderVTK::copyPrimitiveData( QStringList tokens )
 {
     if ( m_numPrimitives != tokens[1].toInt() )
     {
-        m_status = "*ERROR* cell data size doesn't match num primitives " + m_filename;
+        m_status.push_back( "*ERROR* cell data size doesn't match num primitives " + m_filename );
     }
     QString line = readLineBinary();
     //qDebug() << line;
@@ -680,14 +698,14 @@ bool LoaderVTK::copyPrimitiveData( QStringList tokens )
             }
             else
             {
-                m_status = "*ERROR* unexpected field in cell data definition " + m_filename;
+                m_status.push_back( "*ERROR* unexpected field in cell data definition " + m_filename );
                 return false;
             }
         }
     }
     else
     {
-        m_status = "*ERROR* unexpected field in cell data fields definition " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field in cell data fields definition " + m_filename );
         return false;
     }
     m_hasPrimitiveData = true;
@@ -698,10 +716,11 @@ bool LoaderVTK::copyPointData( QStringList tokens )
 {
     if ( m_numPoints != tokens[1].toInt() )
     {
-        m_status != "*ERROR* point data size doesn't match num points " + m_filename;
+        m_status.push_back( "*ERROR* point data size doesn't match num points " + m_filename );
     }
     QString line = readLineBinary();
-    //qDebug() << line;
+    qDebug() << line;
+    line.remove( 0x0D );
     QStringList toks = line.split( " ", QString::SkipEmptyParts );
     if ( toks.size() == 3 && toks[0] == "FIELD" && toks[1] == "FieldData" )
     {
@@ -739,11 +758,11 @@ bool LoaderVTK::copyPointData( QStringList tokens )
                 delete[] rawData;
                 m_pointData.push_back( dataField );
 
-                m_bufferPointer += m_numPoints * sizeof( float ) + 1;
+                m_bufferPointer += m_numPoints * sizeof( float ) * 3 + 1;
             }
             else
             {
-                m_status = "*ERROR* unexpected field in point data definition " + m_filename;
+                m_status.push_back( "*ERROR* unexpected field in point data definition " + m_filename );
                 return false;
             }
             m_hasPointData = true;
@@ -771,7 +790,7 @@ bool LoaderVTK::copyPointData( QStringList tokens )
     }
     else
     {
-        m_status = "*ERROR* unexpected field in point data fields definition " + m_filename;
+        m_status.push_back( "*ERROR* unexpected field in point data fields definition " + m_filename );
         return false;
     }
     return true;

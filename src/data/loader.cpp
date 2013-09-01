@@ -1050,7 +1050,11 @@ bool Loader::loadVTK()
 
     if ( !lv->load() )
     {
-        qDebug() << lv->getStatus();
+        QStringList status = lv->getStatus();
+        for ( int i = 0; i < status.size(); ++i )
+        {
+            qDebug() << status[i];
+        }
         return false;
     }
 
