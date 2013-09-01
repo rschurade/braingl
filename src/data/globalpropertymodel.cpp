@@ -100,6 +100,8 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
     m_properties->create( Fn::Property::G_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
 
+    m_properties->create( Fn::Property::G_FILTER_SIZE, 1, 1, 20, "algos" );
+
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotKeepAspect( QVariant ) ) );

@@ -34,6 +34,7 @@ private:
 
     FNAction* m_isosurfaceAct;
     FNAction* m_distanceMapAct;
+    FNAction* m_gaussAct;
     FNAction* m_createNewAct;
     FNAction* m_testAct;
     FNAction* m_vectorAction1;

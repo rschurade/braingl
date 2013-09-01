@@ -49,9 +49,13 @@ void ToolBar::createActions()
     m_isosurfaceAct->setStatusTip( tr( "iso surface" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_distanceMapAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "distance map" ), this, Fn::Algo::DISTANCE_MAP );
+    m_distanceMapAct = new FNAction( QIcon( ":/icons/distance.png" ), tr( "distance map" ), this, Fn::Algo::DISTANCE_MAP );
     m_distanceMapAct->setStatusTip( tr( "distance map" ) );
     connect( m_distanceMapAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_gaussAct = new FNAction( QIcon( ":/icons/gauss.png" ), tr( "gauss filter" ), this, Fn::Algo::GAUSS );
+    m_gaussAct->setStatusTip( tr( "gauss filter" ) );
+    connect( m_gaussAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_createNewAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create new" ), this, Fn::Algo::CREATE_NEW_DATASET );
     m_createNewAct->setStatusTip( tr( "create a new empty dataset with the dimensions of the selected dataset" ) );
@@ -251,6 +255,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::DISTANCE_MAP:
             l = ScalarAlgos::distanceMap( ds );
             break;
+        case Fn::Algo::GAUSS:
+            l = ScalarAlgos::gauss( ds );
+            break;
         case Fn::Algo::CREATE_NEW_DATASET:
             l = ScalarAlgos::createNew( ds );
             break;
@@ -344,7 +351,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_isosurfaceAct );
             this->addAction( m_distanceMapAct );
-            //this->addAction( m_createNewAct );
+            this->addAction( m_gaussAct );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:

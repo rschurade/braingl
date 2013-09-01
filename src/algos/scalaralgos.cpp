@@ -9,6 +9,8 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetisosurface.h"
 
+#include "../data/models.h"
+
 ScalarAlgos::ScalarAlgos()
 {
 }
@@ -303,6 +305,135 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     out = tmp;
 
     DatasetScalar* dsOut = new DatasetScalar( QDir( "distance map" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+
+    QList<Dataset*> l;
+    l.push_back( dsOut );
+    return l;
+}
+
+QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
+{
+    QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
+    QVector<float> out( data->size() );
+
+    for ( int i = 0; i < data->size(); ++i )
+    {
+        out[i] = data->at( i );
+    }
+
+    int b, r, c, bb, rr, r0, b0, c0;
+
+    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    int npixels = nz * ny * nx;
+
+    // create the filter kernel
+    double sigma = Models::getGlobal( Fn::Property::G_FILTER_SIZE ).toInt();
+
+    int dim = (int) ( sigma + 1 );
+    int n = 2 * dim + 1;
+    double step = 1;
+
+    float* kernel = new float[n];
+
+    double sum = 0;
+    double x = -(float) dim;
+
+    double uu;
+    for ( int i = 0; i < n; ++i )
+    {
+        uu = xxgauss( x, sigma );
+        sum += uu;
+        kernel[i] = uu;
+        x += step;
+    }
+
+    /* normalize */
+    for ( int i = 0; i < n; ++i )
+    {
+        uu = kernel[i];
+        uu /= sum;
+        kernel[i] = uu;
+    }
+
+    int d = n / 2;
+    float* float_pp;
+    QVector<float> tmp( npixels );
+    int c1, cc;
+
+    for ( int i = 0; i < npixels; ++i )
+    {
+        tmp[i] = 0.0;
+    }
+
+    for ( b = 0; b < nz; ++b )
+    {
+        for ( r = 0; r < ny; ++r )
+        {
+            for ( c = d; c < nx - d; ++c )
+            {
+
+                float_pp = kernel;
+                sum = 0;
+                c0 = c - d;
+                c1 = c + d;
+                for ( cc = c0; cc <= c1; ++cc )
+                {
+                    x = out[b * ny * nx + r * nx + cc];
+                    sum += x * ( *float_pp++ );
+                }
+                tmp[b * ny * nx + r * nx + c] = sum;
+            }
+        }
+    }
+    int r1;
+    for ( b = 0; b < nz; ++b )
+    {
+        for ( r = d; r < ny - d; ++r )
+        {
+            for ( c = 0; c < nx; ++c )
+            {
+                float_pp = kernel;
+                sum = 0;
+                r0 = r - d;
+                r1 = r + d;
+                for ( rr = r0; rr <= r1; rr++ )
+                {
+                    x = tmp[b * ny * nx + rr * nx + c];
+                    sum += x * ( *float_pp++ );
+                }
+                out[b * ny * nx + r * nx + c] = sum;
+            }
+        }
+    }
+    int b1;
+    for ( b = d; b < nz - d; ++b )
+    {
+        for ( r = 0; r < ny; ++r )
+        {
+            for ( c = 0; c < nx; ++c )
+            {
+
+                float_pp = kernel;
+                sum = 0;
+                b0 = b - d;
+                b1 = b + d;
+                for ( bb = b0; bb <= b1; bb++ )
+                {
+                    x = out[bb * ny * nx + r * nx + c];
+                    sum += x * ( *float_pp++ );
+                }
+                tmp[b * ny * nx + r * nx + c] = sum;
+            }
+        }
+    }
+
+    delete[] kernel;
+
+    out = tmp;
+
+    DatasetScalar* dsOut = new DatasetScalar( QDir( "gauss" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
