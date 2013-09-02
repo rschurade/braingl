@@ -59,10 +59,6 @@ vec4 texColor( vec3 texCoord )
         {
             color0 = colormap( unpackFloat( color0 ), u_colormap0, u_lowerThreshold0, u_upperThreshold0, u_selectedMin0, u_selectedMax0 );
         }
-        if ( length( color0.rgb ) > 0.0 )
-        {
-            color0.a = u_alpha0;
-        }
     }
 
     if ( u_texActive1 )
@@ -71,10 +67,6 @@ vec4 texColor( vec3 texCoord )
         if ( u_colormap1 != -1 )
         {
             color1 = colormap( unpackFloat( color1 ), u_colormap1, u_lowerThreshold1, u_upperThreshold1, u_selectedMin1, u_selectedMax1 );
-        }
-        if ( length( color1.rgb ) > 0.0 )
-        {
-            color1.a = u_alpha1;
         }
     }
     
@@ -85,10 +77,6 @@ vec4 texColor( vec3 texCoord )
         {
             color2 = colormap( unpackFloat( color2 ), u_colormap2, u_lowerThreshold2, u_upperThreshold2, u_selectedMin2, u_selectedMax2 );
         }
-        if ( length( color2.rgb ) > 0.0 )
-        {
-            color2.a = u_alpha2;
-        }
     }
     
     if ( u_texActive3 )
@@ -97,10 +85,6 @@ vec4 texColor( vec3 texCoord )
         if ( u_colormap3 != -1 )
         {
             color3 = colormap( unpackFloat( color3 ), u_colormap3, u_lowerThreshold3, u_upperThreshold3, u_selectedMin3, u_selectedMax3 );
-        }
-        if ( length( color3.rgb ) > 0.0 )
-        {
-            color3.a = u_alpha3;
         }
     }
     
@@ -111,16 +95,23 @@ vec4 texColor( vec3 texCoord )
         {
             color4 = colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4 );
         }
-        if ( length( color4.rgb ) > 0.0 )
-        {
-            color4.a = u_alpha4;
-        }
     }
     vec3 mcolor = color0.rgb;
-    mcolor = mix( mcolor.rgb, color1.rgb, color1.a );
-    mcolor = mix( mcolor.rgb, color2.rgb, color2.a );
-    mcolor = mix( mcolor.rgb, color3.rgb, color3.a );
-    mcolor = mix( mcolor.rgb, color4.rgb, color4.a );
-    
-    return vec4( mcolor, color0.a );
+    if( length( color1.rgb ) > 0.0 )
+    {
+        mcolor = mix( mcolor.rgb, color1.rgb, u_alpha1 );
+    }
+    if( length( color1.rgb ) > 0.0 )
+    {
+        mcolor = mix( mcolor.rgb, color2.rgb, u_alpha2 );
+    }
+    if( length( color1.rgb ) > 0.0 )
+    {
+        mcolor = mix( mcolor.rgb, color3.rgb, u_alpha3 );
+    }
+    if( length( color1.rgb ) > 0.0 )
+    {
+        mcolor = mix( mcolor.rgb, color4.rgb, u_alpha4 );
+    }
+    return vec4( mcolor, u_alpha0 );
 }
