@@ -54,6 +54,7 @@ namespace Fn
         ISOSURFACE,
         DISTANCE_MAP,
         GAUSS,
+        MEDIAN,
         TENSOR_TRACK,
         CROSSING_TRACK,
         BINGHAM_2_TENSOR,

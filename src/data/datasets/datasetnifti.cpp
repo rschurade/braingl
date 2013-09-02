@@ -195,3 +195,56 @@ int DatasetNifti::getId( int x, int y, int z )
 
     return px + py * nx + pz * nx * ny;
 }
+
+QList<int> DatasetNifti::getNeighbourhood3x3( int x, int y, int z )
+{
+    QList<int> out;
+    out.push_back( getId( x - 1, y - 1, z - 1 ) );
+    out.push_back( getId( x - 1, y    , z - 1 ) );
+    out.push_back( getId( x - 1, y + 1, z - 1 ) );
+    out.push_back( getId( x    , y - 1, z - 1 ) );
+    out.push_back( getId( x    , y    , z - 1 ) );
+    out.push_back( getId( x    , y + 1, z - 1 ) );
+    out.push_back( getId( x + 1, y - 1, z - 1 ) );
+    out.push_back( getId( x + 1, y    , z - 1 ) );
+    out.push_back( getId( x + 1, y + 1, z - 1 ) );
+
+    out.push_back( getId( x - 1, y - 1, z ) );
+    out.push_back( getId( x - 1, y    , z ) );
+    out.push_back( getId( x - 1, y + 1, z ) );
+    out.push_back( getId( x    , y - 1, z ) );
+    out.push_back( getId( x    , y    , z ) );
+    out.push_back( getId( x    , y + 1, z ) );
+    out.push_back( getId( x + 1, y - 1, z ) );
+    out.push_back( getId( x + 1, y    , z ) );
+    out.push_back( getId( x + 1, y + 1, z ) );
+
+    out.push_back( getId( x - 1, y - 1, z + 1 ) );
+    out.push_back( getId( x - 1, y    , z + 1 ) );
+    out.push_back( getId( x - 1, y + 1, z + 1 ) );
+    out.push_back( getId( x    , y - 1, z + 1 ) );
+    out.push_back( getId( x    , y    , z + 1 ) );
+    out.push_back( getId( x    , y + 1, z + 1 ) );
+    out.push_back( getId( x + 1, y - 1, z + 1 ) );
+    out.push_back( getId( x + 1, y    , z + 1 ) );
+    out.push_back( getId( x + 1, y + 1, z + 1 ) );
+
+    return out;
+}
+
+QList<int> DatasetNifti::getNeighbourhoodXxX( int x, int y, int z, int dist )
+{
+    QList<int>out;
+
+    for(int zz = z - dist; zz <= z + dist; ++zz )
+    {
+        for(int yy = y - dist; yy <= y + dist; ++yy )
+        {
+            for(int xx = x - dist; xx <= x + dist; ++xx )
+            {
+                out.push_back( getId( xx, yy, zz ) );
+            }
+        }
+    }
+    return out;
+}

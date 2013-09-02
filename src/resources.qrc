@@ -36,6 +36,7 @@
         <file>icons/save_1D.png</file>
         <file>icons/distance.png</file>
         <file>icons/gauss.png</file>
+        <file>icons/median.png</file>
         <file>icons/bundle.png</file>
         <file>icons/new_cons.png</file>
         <file>shaders/colormapbar.vs</file>

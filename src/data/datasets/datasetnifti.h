@@ -32,6 +32,8 @@ public:
 
     int getIdFromPos( float x, float y, float z );
     int getId( int x, int y, int z );
+    QList<int>getNeighbourhood3x3( int x, int y, int z );
+    QList<int>getNeighbourhoodXxX( int x, int y, int z, int dist );
 
 protected:
     virtual void createTexture() = 0;

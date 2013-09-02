@@ -462,3 +462,42 @@ QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
     l.push_back( dsOut );
     return l;
 }
+
+QList<Dataset*> ScalarAlgos::median( Dataset* ds )
+{
+    DatasetScalar* dss = static_cast<DatasetScalar*>( ds );
+
+    QVector<float>* data = dss->getData();
+    QVector<float> out( data->size() );
+
+    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+
+    // create the filter kernel
+    int dist = Models::getGlobal( Fn::Property::G_FILTER_SIZE ).toInt();
+
+    for ( int z = 0; z < nz; ++z )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+        for ( int x = 0; x < nx; ++x )
+            {
+                QList<int> neighs = dss->getNeighbourhoodXxX( x, y, z, dist );
+                QList<float>values;
+                for ( int i = 0; i < neighs.size(); ++i )
+                {
+                    values.push_back( data->at( neighs[i] ) );
+                }
+                qSort( values );
+                out[dss->getId( x, y, z)] = values.at( values.size() / 2 );
+            }
+        }
+    }
+
+    DatasetScalar* dsOut = new DatasetScalar( QDir( "median" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+
+    QList<Dataset*> l;
+    l.push_back( dsOut );
+    return l;
+}

@@ -21,6 +21,7 @@ public:
     static QList<Dataset*> isoSurface( Dataset* ds );
     static QList<Dataset*> distanceMap( Dataset* ds );
     static QList<Dataset*> gauss( Dataset* ds );
+    static QList<Dataset*> median( Dataset* ds );
 
     static QList<Dataset*> createNew( Dataset* ds );
 
