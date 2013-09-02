@@ -118,7 +118,7 @@ void ToolBar::createActions()
     m_fiberTractDensityAct->setStatusTip( tr( "tract density" ) );
     connect( m_fiberTractDensityAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_fiberTractColorAct = new FNAction( QIcon( ":/icons/tmpf.png" ), tr( "tract color" ), this, Fn::Algo::TRACT_COLOR );
+    m_fiberTractColorAct = new FNAction( QIcon( ":/icons/palette_brush.png" ), tr( "tract color" ), this, Fn::Algo::TRACT_COLOR );
     m_fiberTractColorAct->setStatusTip( tr( "tract color" ) );
     connect( m_fiberTractColorAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
