@@ -316,7 +316,7 @@ void SHRenderer::createMesh()
     zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
     m_masterThread = new SHRendererThread2( 0, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_lod,
-                                                       m_order, m_orient, m_minMaxScaling, m_scaling, m_pMatrix, m_mvMatrix );
+                                                       m_order, m_orient, m_minMaxScaling, m_scaling, m_hideNegativeLobes, m_pMatrix, m_mvMatrix );
     connect( m_masterThread, SIGNAL( finished( TriangleMesh2* ) ), this, SLOT( slotNewMeshCreated( TriangleMesh2* ) ) );
 
     m_masterThread->start();

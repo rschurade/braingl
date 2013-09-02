@@ -21,6 +21,7 @@ SHRendererThread::SHRendererThread( int id, QVector<ColumnVector>* data, int nx,
                                                                 int order,
                                                                 int orient,
                                                                 bool scaling,
+                                                                bool hideNegative,
                                                                 QMatrix4x4 pMatrix,
                                                                 QMatrix4x4 mvMatrix
                                                                  ) :
@@ -39,6 +40,7 @@ SHRendererThread::SHRendererThread( int id, QVector<ColumnVector>* data, int nx,
     m_order( order ),
     m_orient( orient ),
     m_scaling( scaling ),
+    m_hideNegative( hideNegative ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {

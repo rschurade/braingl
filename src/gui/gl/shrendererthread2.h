@@ -26,6 +26,7 @@ public:
                                                      float m_dx, float m_dy, float m_dz,
                                                      int   xi,     int yi,       int zi,
                                                      int lod, int order, int orient, bool scaling, float scaleFactor,
+                                                     bool hideNegative,
                                                      QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     virtual ~SHRendererThread2();
 
@@ -54,6 +55,7 @@ private:
     int m_orient;
     bool m_scaling;
     float m_scaleFactor;
+    float m_hideNegative;
 
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_mvMatrix;
