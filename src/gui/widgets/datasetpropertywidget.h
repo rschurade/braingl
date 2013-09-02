@@ -8,6 +8,7 @@
 #ifndef DATASETPROPERTYWIDGET_H_
 #define DATASETPROPERTYWIDGET_H_
 
+#include <QHash>
 #include <QString>
 #include <QTabWidget>
 #include <QWidget>
@@ -31,9 +32,14 @@ private:
 
     DatasetPropertyView* m_propertyView;
 
+    QHash<QString, QVBoxLayout*>m_tabs;
+    QString m_lastUsedTab;
+    bool m_buildingTabs;
+
 public slots:
     void updateWidgetVisibility();
     void colormapSelectionChanged( int id );
+    void slotTabChanged( int tab );
     void update();
 };
 

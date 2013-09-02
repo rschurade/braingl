@@ -27,7 +27,8 @@
 
 DatasetPropertyWidget::DatasetPropertyWidget( QString target, QWidget* parent ) :
     QTabWidget( parent ),
-    m_target( target )
+    m_target( target ),
+    m_buildingTabs( false )
 {
     m_propertyView = new DatasetPropertyView( this );
     m_propertyView->setModel( Models::d() );
@@ -35,6 +36,7 @@ DatasetPropertyWidget::DatasetPropertyWidget( QString target, QWidget* parent ) 
     setTabPosition( QTabWidget::North );
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
+    connect( this, SIGNAL( currentChanged( int ) ), this, SLOT( slotTabChanged( int ) ) );
 }
 
 DatasetPropertyWidget::~DatasetPropertyWidget()
@@ -48,6 +50,7 @@ void DatasetPropertyWidget::setSelectionModel( QItemSelectionModel* selectionMod
 
 void DatasetPropertyWidget::updateWidgetVisibility()
 {
+    m_buildingTabs = true;
     // clear tabs
     while ( count() > 0 )
     {
@@ -58,7 +61,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::D_DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
     PropertyGroup* props = ds->properties( m_target );
-    QHash<QString, QVBoxLayout*>tabs;
+    m_tabs.clear();
 
     for ( int i = 0; i < props->size(); ++i )
     {
@@ -69,7 +72,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             continue;
         }
         //create tab if not exists
-        if ( !tabs.contains( tab ) )
+        if ( !m_tabs.contains( tab ) )
         {
             QVBoxLayout* layout = new QVBoxLayout();
             layout->setContentsMargins( 1, 1, 1, 1 );
@@ -84,7 +87,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             scrollArea->setWidget( widget );
 
             addTab( scrollArea, tab );
-            tabs[tab] = layout;
+            m_tabs[tab] = layout;
         }
         // insert property in tab
         if ( props->getNthProperty( i )->getName() == Fn::Prop2String::s( Fn::Property::D_COLORMAP ) )
@@ -97,13 +100,13 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             }
             int selectedCmap = ds->properties( m_target )->get( Fn::Property::D_COLORMAP ).toInt();
             cmapSel->setCurrentIndex( selectedCmap );
-            tabs[tab]->addWidget( cmapSel );
+            m_tabs[tab]->addWidget( cmapSel );
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( colormapSelectionChanged( int) ) );
 
             float min = ds->properties( m_target )->get( Fn::Property::D_MIN ).toFloat();
             float max = ds->properties( m_target )->get( Fn::Property::D_MAX ).toFloat();
             ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 14, min, max );
-            tabs[tab]->addWidget( cmapWidget );
+            m_tabs[tab]->addWidget( cmapWidget );
 
             cmapWidget->setMin( ds->properties( m_target )->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
             cmapWidget->setMax( ds->properties( m_target )->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
@@ -122,16 +125,26 @@ void DatasetPropertyWidget::updateWidgetVisibility()
         }
         else
         {
-            tabs[tab]->addWidget( props->getNthProperty( i )->getWidget() );
+            m_tabs[tab]->addWidget( props->getNthProperty( i )->getWidget() );
         }
     }
 
-    QHashIterator<QString, QVBoxLayout*> ti( tabs );
+    QHashIterator<QString, QVBoxLayout*> ti( m_tabs );
     while ( ti.hasNext() )
     {
         ti.next();
         ti.value()->addStretch();
     }
+
+    for ( int i = 0; i < count(); ++i )
+    {
+        if ( m_lastUsedTab == tabText( i ) )
+        {
+            setCurrentIndex( i );
+            break;
+        }
+    }
+    m_buildingTabs = false;
 }
 
 void DatasetPropertyWidget::colormapSelectionChanged( int id )
@@ -148,4 +161,13 @@ void DatasetPropertyWidget::colormapSelectionChanged( int id )
 void DatasetPropertyWidget::update()
 {
     updateWidgetVisibility();
+}
+
+void DatasetPropertyWidget::slotTabChanged( int tab )
+{
+    if( m_buildingTabs )
+    {
+        return;
+    }
+    m_lastUsedTab = tabText( tab );
 }
