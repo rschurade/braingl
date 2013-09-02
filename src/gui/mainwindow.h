@@ -25,6 +25,7 @@ class DatasetListWidget;
 class ROIWidget;
 class ShaderEditWidget;
 class ScriptWidget;
+class FNDockWidget;
 
 class GLWidget;
 class ToolBar;
@@ -74,6 +75,7 @@ private:
     ROIWidget* m_roiWidget;
     ShaderEditWidget* m_shaderEditWidget;
     ScriptWidget* m_scriptWidget;
+    FNDockWidget* m_dockDSP;
 
     QMenu* fileMenu;
     QMenu* optionMenu;
@@ -149,6 +151,8 @@ private slots:
     void slotDilbert();
 
     void slotRenderCrosshairs( bool value );
+
+    void slotDatasetSelectionChanged();
 };
 
 #endif

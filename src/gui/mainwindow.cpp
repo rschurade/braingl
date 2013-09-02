@@ -871,11 +871,12 @@ void MainWindow::createDockWindows()
     connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
 
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( "maingl", this );
-	FNDockWidget* dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
-    addDockWidget( Qt::LeftDockWidgetArea, dockDSP );
+	m_dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
+    addDockWidget( Qt::LeftDockWidgetArea, m_dockDSP );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP, SLOT( toggleTitleWidget() ) );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockDSP, SLOT( toggleTitleWidget() ) );
     connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
+    connect( m_datasetWidget->selectionModel(), SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), this, SLOT( slotDatasetSelectionChanged() ) );
 
     DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl2", this );
     FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties 2"), dsProperties2, this );
@@ -911,7 +912,7 @@ void MainWindow::createDockWindows()
     dockDSI->hide();
 
 
-    tabifyDockWidget( dockGP, dockDSP );
+    tabifyDockWidget( dockGP, m_dockDSP );
     tabifyDockWidget( dockGP, dockCE );
     tabifyDockWidget( dockGP, dockDSP2 );
 
@@ -985,7 +986,7 @@ void MainWindow::createDockWindows()
 
     viewMenu->addSeparator();
     viewMenu->addAction( dockMainGL->toggleViewAction() );
-    viewMenu->addAction( dockDSP->toggleViewAction() );
+    viewMenu->addAction( m_dockDSP->toggleViewAction() );
     viewMenu->addAction( dockMainGL2->toggleViewAction() );
     viewMenu->addAction( dockDSP2->toggleViewAction() );
 
@@ -1200,4 +1201,10 @@ void MainWindow::continousRendering()
 void MainWindow::runScript()
 {
     m_scriptWidget->run( true );
+}
+
+void MainWindow::slotDatasetSelectionChanged()
+{
+    m_dockDSP->show();
+    m_dockDSP->raise();
 }
