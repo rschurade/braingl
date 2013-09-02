@@ -27,6 +27,7 @@ SHRendererThread2::SHRendererThread2( int id, QVector<ColumnVector>* data,
                                                                 int orient,
                                                                 bool scaling,
                                                                 float scaleFactor,
+                                                                bool hideNegative,
                                                                 QMatrix4x4 pMatrix,
                                                                 QMatrix4x4 mvMatrix
                                                                  ) :
@@ -46,6 +47,7 @@ SHRendererThread2::SHRendererThread2( int id, QVector<ColumnVector>* data,
     m_orient( orient ),
     m_scaling( scaling ),
     m_scaleFactor( scaleFactor ),
+    m_hideNegative( hideNegative ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix ),
     m_mesh( 0 )
@@ -76,7 +78,7 @@ void SHRendererThread2::run()
     for ( int i = 0; i < numThreads; ++i )
     {
         threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_xi, m_yi, m_zi, m_lod,
-                                                   m_order, m_orient, m_scaling, m_pMatrix, m_mvMatrix ) );
+                                                   m_order, m_orient, m_scaling, m_hideNegative, m_pMatrix, m_mvMatrix ) );
     }
 
     // run threads
@@ -120,7 +122,14 @@ void SHRendererThread2::run()
             offsetX = verts[i*7+3];
             offsetY = verts[i*7+4];
             offsetZ = verts[i*7+5];
-            radius = verts[i*7+6];
+            if ( m_hideNegative )
+            {
+                radius = qMax( 0.0f, verts[i*7+6] );
+            }
+            else
+            {
+                radius = verts[i*7+6];
+            }
 
             newPosX = posX * radius * m_scaleFactor + offsetX;
             newPosY = posY * radius * m_scaleFactor + offsetY;
