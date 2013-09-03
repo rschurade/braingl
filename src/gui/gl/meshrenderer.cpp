@@ -166,7 +166,14 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glCullFace( GL_BACK );
     glFrontFace( GL_CW );
 
+    if ( props->get( Fn::Property::D_RENDER_WIREFRAME ).toBool() )
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    }
+
     glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     glDisable(GL_CULL_FACE);
 
@@ -245,7 +252,14 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glCullFace( GL_BACK );
     glFrontFace( GL_CW );
 
+    if ( props.get( Fn::Property::D_RENDER_WIREFRAME ).toBool() )
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    }
+
     glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
     glDisable(GL_CULL_FACE);
 

@@ -19,6 +19,8 @@ MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int n
 
 MeshThread::~MeshThread()
 {
+    m_triNormals.clear();
+    m_triNormals.squeeze();
 }
 
 QVector<QVector3D>* MeshThread::getTriNormals()

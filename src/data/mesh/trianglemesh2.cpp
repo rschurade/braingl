@@ -39,14 +39,14 @@ TriangleMesh2::TriangleMesh2( int numVerts, int numTris ) :
 }
 
 TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
-            m_bufferSize( 7 ),
-            m_numVerts( trim->numVerts() ),
-            m_numTris( trim->numTris() ),
-            m_vertexInsertId( 0 ),
-            m_colorInsertId( 0 ),
-            m_triangleInsertId( 0 ),
-            m_ocTree( 0 )
-        {
+    m_bufferSize( 7 ),
+    m_numVerts( trim->numVerts() ),
+    m_numTris( trim->numTris() ),
+    m_vertexInsertId( 0 ),
+    m_colorInsertId( 0 ),
+    m_triangleInsertId( 0 ),
+    m_ocTree( 0 )
+{
     m_vertices.resize( trim->numVerts() * m_bufferSize );
     m_vertexColors.resize( trim->numVerts() * 4 );
     m_vertIsInTriangle.resize( trim->numVerts() );
@@ -56,6 +56,10 @@ TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
     m_triNormals.resize( trim->numTris() );
 
     m_numThreads = GLFunctions::idealThreadCount;
+
+    m_triangleInsertId = m_numTris * 3;
+    m_vertexInsertId = m_numVerts * m_bufferSize;
+    m_colorInsertId = m_numVerts * 4;
 
     // create threads
     for ( int i = 0; i < m_numThreads; ++i )
@@ -97,6 +101,32 @@ TriangleMesh2::~TriangleMesh2()
     m_toRemove.squeeze();
 }
 
+void TriangleMesh2::resize( int numVerts, int numTris )
+{
+    m_vertices.resize( numVerts * m_bufferSize );
+    m_vertexColors.resize( numVerts * 4 );
+    m_vertIsInTriangle.resize( numVerts );
+    m_vertNeighbors.resize( numVerts );
+
+    m_numVerts = numVerts;
+
+    m_triangles.resize( numTris * 3 );
+    m_triNormals.resize( numTris );
+
+    m_numTris = numTris;
+
+    // create threads
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        delete m_threads[i];
+    }
+    m_threads.clear();
+    for ( int i = 0; i < m_numThreads; ++i )
+    {
+        m_threads.push_back( new MeshThread( &m_vertices, &m_triangles, m_numTris, m_bufferSize, i ) );
+    }
+}
+
 int TriangleMesh2::bufferSize()
 {
     return m_bufferSize;
@@ -124,6 +154,11 @@ void TriangleMesh2::addVertex( int id, float x, float y, float z )
     m_vertexColors[ id * 4 + 1 ] = 1.0;
     m_vertexColors[ id * 4 + 2 ] = 1.0;
     m_vertexColors[ id * 4 + 3 ] = 1.0;
+}
+
+void TriangleMesh2::addVertex( int id, QVector3D pos )
+{
+    addVertex( id, pos.x(), pos.y(), pos.z() );
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -217,6 +252,40 @@ QVector3D TriangleMesh2::getVertex(int id)
     float y = m_vertices[id * m_bufferSize + 1];
     float z = m_vertices[id * m_bufferSize + 2];
     return QVector3D(x,y,z);
+}
+
+QVector<int> TriangleMesh2::getTriangle( int id )
+{
+    QVector<int> out;
+    out.push_back( m_triangles[id * 3] );
+    out.push_back( m_triangles[id * 3 + 1] );
+    out.push_back( m_triangles[id * 3 + 2] );
+    return out;
+}
+
+QVector<int> TriangleMesh2::getStar( int id )
+{
+    return m_vertIsInTriangle[id];
+}
+
+int TriangleMesh2::getNextVertex( int triNum, int vertNum )
+{
+    int answer = -1;
+
+    if ( m_triangles[triNum * 3] == vertNum )
+    {
+        answer = m_triangles[triNum * 3 + 1];
+    }
+    else if ( m_triangles[triNum * 3 + 1] == vertNum )
+    {
+        answer = m_triangles[triNum * 3 + 2];
+    }
+    else
+    {
+        answer = m_triangles[triNum * 3];
+    }
+
+    return answer;
 }
 
 void TriangleMesh2::calcTriNormals()
@@ -320,4 +389,22 @@ int TriangleMesh2::closestVertexIndex( QVector3D pos )
         }
     }
     return closest;
+}
+
+int TriangleMesh2::getNeighbor( int coVert1, int coVert2, int triangleNum )
+{
+    QVector<int>candidates = m_vertIsInTriangle[coVert1];
+    QVector<int>compares   = m_vertIsInTriangle[coVert2];
+
+    for ( int i = 0; i < candidates.size(); ++i )
+    {
+        for ( int k = 0; k < compares.size(); ++k )
+        {
+            if ( ( candidates[i] != triangleNum ) && ( candidates[i] == compares[k] ) )
+            {
+                return candidates[i];
+            }
+        }
+    }
+    return triangleNum;
 }
