@@ -12,7 +12,7 @@
 #include "../../gui/gl/meshrenderer.h"
 
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
-        Dataset( fileName, Fn::DatasetType::MESH_BINARY ), m_renderer( 0 )
+    Dataset( fileName, Fn::DatasetType::MESH_BINARY ), m_renderer( 0 )
 {
     m_mesh.push_back( mesh );
     initProperties();
@@ -20,7 +20,7 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
 }
 
 DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
-        Dataset( fileName, type ), m_renderer( 0 )
+    Dataset( fileName, type ), m_renderer( 0 )
 {
     initProperties();
 }
@@ -77,6 +77,8 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_X, 0.0f, -500.0f, 500.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Y, 0.0f, -500.0f, 500.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Z, 0.0f, -500.0f, 500.0f, "special" );
+
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_WIREFRAME, false, "special" );
 
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );

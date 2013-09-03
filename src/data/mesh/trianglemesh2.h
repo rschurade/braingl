@@ -21,7 +21,10 @@ public:
     TriangleMesh2( TriangleMesh2* trim );
     virtual ~TriangleMesh2();
 
+    void resize( int numVerts, int numTris );
+
     void addVertex( int id, float x, float y, float z );
+    void addVertex( int id, QVector3D pos );
     void addVertex( float x, float y, float z );
     void addTriangle( int id, int v0, int v1, int v2 );
     void addTriangle( int v0, int v1, int v2 );
@@ -31,6 +34,10 @@ public:
 
     void setVertexData( int id, float value );
     float getVertexData( int id );
+
+    QVector<int> getStar( int id );
+    int getNextVertex( int triNum, int vertNum );
+    int getNeighbor( int coVert1, int coVert2, int triangleNum );
 
     void finalize();
 
@@ -42,11 +49,17 @@ public:
     int numVerts() { return m_numVerts; };
     int numTris() { return m_numTris; };
 
+    int currentNumVerts() { return m_vertexInsertId / m_bufferSize; };
+    int currenNumTris() { return m_triangleInsertId / 3; };
+
     int bufferSize();
 
     QVector<int> pick( QVector3D pos, float radius );
     int closestVertexIndex( QVector3D pos );
+
     QVector3D getVertex(int id);
+    QVector<int> getTriangle( int id );
+
     QVector<int> getTriangles() { return m_triangles; };
 
 private:

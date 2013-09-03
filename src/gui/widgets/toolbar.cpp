@@ -14,6 +14,7 @@
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
 #include "../../algos/fiberalgos.h"
+#include "../../algos/meshalgos.h"
 #include "../../data/vptr.h"
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
@@ -174,6 +175,10 @@ void ToolBar::createActions()
     m_sh2meshAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "convert sh 2 mesh" ), this, Fn::Algo::SH_2_MESH );
     m_sh2meshAction->setStatusTip( tr( "create a mesh dataset from the currently displayed SH glyphs" ) );
     connect( m_sh2meshAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_loopSubDAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "loop subdivision" ), this, Fn::Algo::LOOP_SUBDIVISION );
+    m_loopSubDAction->setStatusTip( tr( "loop subdivision" ) );
+    connect( m_loopSubDAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -340,6 +345,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::LITTLE_BRAINS:
             ((DatasetGlyphset*)ds)->makeLittleBrains();
             break;
+        case Fn::Algo::LOOP_SUBDIVISION:
+            l = MeshAlgos::loopSubdivision( ds );
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -427,6 +435,13 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::CONS:
         {
             this->addAction( m_bundleAction );
+            break;
+        }
+        case Fn::DatasetType::MESH_ASCII:
+        case Fn::DatasetType::MESH_BINARY:
+        case Fn::DatasetType::MESH_ISOSURFACE:
+        {
+            this->addAction( m_loopSubDAction );
             break;
         }
         default:
