@@ -23,10 +23,10 @@ public:
 
     void resize( int numVerts, int numTris );
 
-    void addVertex( int id, float x, float y, float z );
-    void addVertex( int id, QVector3D pos );
+    void setVertex( int id, float x, float y, float z );
+    void setVertex( int id, QVector3D pos );
     void addVertex( float x, float y, float z );
-    void addTriangle( int id, int v0, int v1, int v2 );
+    void setTriangle( int id, int v0, int v1, int v2 );
     void addTriangle( int v0, int v1, int v2 );
 
     void setVertexColor( int id, QColor color );
