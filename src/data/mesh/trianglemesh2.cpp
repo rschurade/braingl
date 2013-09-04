@@ -70,12 +70,12 @@ TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
     for ( int i = 0; i < trim->numVerts(); ++i )
     {
         QVector3D v = trim->getVertex( i );
-        this->addVertex( i, v.x(), v.y(), v.z() );
+        this->setVertex( i, v.x(), v.y(), v.z() );
     }
     QVector<int> tris = trim->getTriangles();
     for ( int i = 0; i < trim->numTris(); ++i )
     {
-        this->addTriangle( i, tris[i * 3], tris[i * 3 + 1], tris[i * 3 + 2] );
+        this->setTriangle( i, tris[i * 3], tris[i * 3 + 1], tris[i * 3 + 2] );
     }
     finalize();
 }
@@ -144,7 +144,7 @@ void TriangleMesh2::finalize()
     //qDebug() << m_numVerts << "vertices";
 }
 
-void TriangleMesh2::addVertex( int id, float x, float y, float z )
+void TriangleMesh2::setVertex( int id, float x, float y, float z )
 {
     m_vertices[ id * m_bufferSize     ] = x;
     m_vertices[ id * m_bufferSize + 1 ] = y;
@@ -156,9 +156,9 @@ void TriangleMesh2::addVertex( int id, float x, float y, float z )
     m_vertexColors[ id * 4 + 3 ] = 1.0;
 }
 
-void TriangleMesh2::addVertex( int id, QVector3D pos )
+void TriangleMesh2::setVertex( int id, QVector3D pos )
 {
-    addVertex( id, pos.x(), pos.y(), pos.z() );
+    setVertex( id, pos.x(), pos.y(), pos.z() );
 }
 
 void TriangleMesh2::addVertex( float x, float y, float z )
@@ -175,7 +175,7 @@ void TriangleMesh2::addVertex( float x, float y, float z )
     m_vertexColors[ m_colorInsertId++ ] = 1.0;
 }
 
-void TriangleMesh2::addTriangle( int id, int v0, int v1, int v2 )
+void TriangleMesh2::setTriangle( int id, int v0, int v1, int v2 )
 {
     m_triangles[ id * 3     ] = v0;
     m_triangles[ id * 3 + 1 ] = v1;

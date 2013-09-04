@@ -46,7 +46,7 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
 
     for ( int i = 0; i < m_numVerts; ++i )
     {
-        m_mesh->addVertex( i, newVertexPositions[i] );
+        m_mesh->setVertex( i, newVertexPositions[i] );
     }
 
     m_numVerts = m_mesh->numVerts();
@@ -110,7 +110,7 @@ void LoopSubdivision::insertCornerTriangles( int triNum )
 
     m_mesh->addTriangle( originalTri[1], centerTri[1], centerTri[0] );
     m_mesh->addTriangle( originalTri[2], centerTri[2], centerTri[1] );
-    m_mesh->addTriangle( triNum, originalTri[0], centerTri[0], centerTri[2] );
+    m_mesh->setTriangle( triNum, originalTri[0], centerTri[0], centerTri[2] );
 }
 
 int LoopSubdivision::calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 )
