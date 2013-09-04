@@ -23,7 +23,7 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
     m_numVerts = m_mesh->numVerts();
     m_numTris = m_mesh->numTris();
 
-    qDebug() << m_numVerts << m_numTris;
+    //qDebug() << m_numVerts << m_numTris;
 
     m_mesh->resize( m_numVerts * 4, m_numTris * 4 );
 
@@ -34,19 +34,16 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
         newVertexPositions[i] = calcNewPosition( i );
     }
 
-    //printf("loop subdivision pass 2\n");
     for ( int i = 0; i < m_numTris; ++i )
     {
         insertCenterTriangle( i );
     }
 
-    //printf("loop subdivision pass 3\n");
     for ( int i = 0; i < m_numTris; ++i )
     {
         insertCornerTriangles( i );
     }
 
-    //printf("loop subdivision pass 4\n");
     for ( int i = 0; i < m_numVerts; ++i )
     {
         m_mesh->addVertex( i, newVertexPositions[i] );
@@ -55,7 +52,7 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
     m_numVerts = m_mesh->numVerts();
     m_numTris = m_mesh->numTris();
 
-    qDebug() << m_numVerts << m_numTris;
+    //qDebug() << m_numVerts << m_numTris;
 
     m_mesh->finalize();
 
