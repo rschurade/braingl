@@ -163,16 +163,40 @@ void TriangleMesh2::setVertex( int id, QVector3D pos )
 
 void TriangleMesh2::addVertex( float x, float y, float z )
 {
-    m_vertices[ m_vertexInsertId++ ] = x;
-    m_vertices[ m_vertexInsertId++ ] = y;
-    m_vertices[ m_vertexInsertId++ ] = z;
+    if(  m_vertices.size() > m_vertexInsertId )
+    {
+        m_vertices[ m_vertexInsertId++ ] = x;
+        m_vertices[ m_vertexInsertId++ ] = y;
+        m_vertices[ m_vertexInsertId++ ] = z;
 
-    m_vertexInsertId += 4;
+        m_vertexInsertId += 4;
 
-    m_vertexColors[ m_colorInsertId++ ] = 1.0;
-    m_vertexColors[ m_colorInsertId++ ] = 1.0;
-    m_vertexColors[ m_colorInsertId++ ] = 1.0;
-    m_vertexColors[ m_colorInsertId++ ] = 1.0;
+        m_vertexColors[ m_colorInsertId++ ] = 1.0;
+        m_vertexColors[ m_colorInsertId++ ] = 1.0;
+        m_vertexColors[ m_colorInsertId++ ] = 1.0;
+        m_vertexColors[ m_colorInsertId++ ] = 1.0;
+    }
+    else
+    {
+        m_vertices.push_back( x );
+        m_vertices.push_back( y );
+        m_vertices.push_back( z );
+        m_vertices.push_back( 1.0 );
+        m_vertices.push_back( 1.0 );
+        m_vertices.push_back( 1.0 );
+        m_vertices.push_back( 1.0 );
+
+        m_vertexColors.push_back( 1.0 );
+        m_vertexColors.push_back( 1.0 );
+        m_vertexColors.push_back( 1.0 );
+        m_vertexColors.push_back( 1.0 );
+
+        m_vertexInsertId += 7;
+        m_colorInsertId += 4;
+
+        m_vertIsInTriangle.resize( m_vertIsInTriangle.size() + 1 );
+        m_vertNeighbors.resize( m_vertNeighbors.size() + 1 );
+    }
 }
 
 void TriangleMesh2::setTriangle( int id, int v0, int v1, int v2 )

@@ -93,8 +93,8 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     GLFunctions::setupTextures();
     GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
     // Set modelview-projection matrix
-    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix * m_mMatrix );
+    program->setUniformValue( "mv_matrixInvert", ( mv_matrix * m_mMatrix ).inverted() );
 
     program->setUniformValue( "u_colorMode", m_colorMode );
     program->setUniformValue( "u_colormap", m_colormap );
@@ -219,8 +219,8 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     GLFunctions::setupTextures();
     GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
     // Set modelview-projection matrix
-    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
-    program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix * m_mMatrix );
+    program->setUniformValue( "mv_matrixInvert", ( mv_matrix * m_mMatrix ).inverted() );
 
     program->setUniformValue( "u_colorMode", m_colorMode );
     program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
@@ -332,6 +332,18 @@ void MeshRenderer::setRenderParams( PropertyGroup* props )
     m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
     m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
     m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
+
+    m_mMatrix.setToIdentity();
+
+    if( props->contains( Fn::Property::D_ROTATE_X ) )
+    {
+        m_mMatrix.rotate( props->get( Fn::Property::D_ROTATE_X ).toFloat(), 1.0, 0.0, 0.0 );
+        m_mMatrix.rotate( props->get( Fn::Property::D_ROTATE_Y ).toFloat(), 0.0, 1.0, 0.0 );
+        m_mMatrix.rotate( props->get( Fn::Property::D_ROTATE_Z ).toFloat(), 0.0, 0.0, 1.0 );
+        m_mMatrix.scale( props->get( Fn::Property::D_SCALE_X ).toFloat(),
+                          props->get( Fn::Property::D_SCALE_Y ).toFloat(),
+                          props->get( Fn::Property::D_SCALE_Z ).toFloat() );
+    }
 }
 
 void MeshRenderer::beginUpdateColor()

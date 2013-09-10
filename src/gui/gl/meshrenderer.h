@@ -56,6 +56,8 @@ private:
     float m_lowerThreshold;
     float m_upperThreshold;
     QColor m_color;
+
+    QMatrix4x4 m_mMatrix;
 };
 
 #endif /* MESHRENDERER_H_ */

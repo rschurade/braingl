@@ -217,6 +217,12 @@ namespace Fn
         D_MATERIAL_SHININESS,
         D_COPY_COLORS,
         D_RENDER_WIREFRAME,
+        D_ROTATE_X,
+        D_ROTATE_Y,
+        D_ROTATE_Z,
+        D_SCALE_X,
+        D_SCALE_Y,
+        D_SCALE_Z,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -437,6 +443,12 @@ namespace Fn
                 case Property::D_MATERIAL_SHININESS: return QString( "material shininess" ); break;
                 case Property::D_COPY_COLORS: return QString( "copy colors" ); break;
                 case Property::D_RENDER_WIREFRAME: return QString( "wireframe mode" ); break;
+                case Property::D_ROTATE_X: return QString( "rotate x" ); break;
+                case Property::D_ROTATE_Y: return QString( "rotate y" ); break;
+                case Property::D_ROTATE_Z: return QString( "rotate z" ); break;
+                case Property::D_SCALE_X: return QString( "scale x" ); break;
+                case Property::D_SCALE_Y: return QString( "scale y" ); break;
+                case Property::D_SCALE_Z: return QString( "scale z" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
