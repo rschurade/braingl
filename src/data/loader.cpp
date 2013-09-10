@@ -20,7 +20,7 @@
 #include "datasets/datasetsurfaceset.h"
 #include "datasets/datasetglyphset.h"
 #include "datasets/datasetcons.h"
-#include "datasets/datasetmeg.h"
+#include "datasets/datasetmeshtimeseries.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -1452,7 +1452,7 @@ bool Loader::loadMEG()
 {
     QString fn = m_fileName.path();
 
-    DatasetMEG* dataset = new DatasetMEG( fn, Fn::DatasetType::MEG_SET );
+    DatasetMeshTimeSeries* dataset = new DatasetMeshTimeSeries( fn, Fn::DatasetType::MEG_SET );
 
     qDebug() << "loading meg set: " << fn;
 

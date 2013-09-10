@@ -15,7 +15,7 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetfibers.h"
 #include "datasets/datasetmesh.h"
-#include "datasets/datasetmeg.h"
+#include "datasets/datasetmeshtimeseries.h"
 #include "datasets/datasetglyphset.h"
 #include "datasets/datasetisosurface.h"
 
@@ -302,7 +302,7 @@ bool Writer::save()
         }
         case Fn::DatasetType::MEG_SET :
         {
-            TriangleMesh2* mesh = dynamic_cast<DatasetMEG*>( m_dataset )->getMesh();
+            TriangleMesh2* mesh = dynamic_cast<DatasetMeshTimeSeries*>( m_dataset )->getMesh();
             saveMeshVTK( m_fileName, mesh );
             break;
         }

@@ -5,7 +5,7 @@
  *      Author: schurade
  */
 
-#include "datasetmeg.h"
+#include "datasetmeshtimeseries.h"
 
 #include "../models.h"
 
@@ -19,7 +19,7 @@
 #include <QFileDialog>
 
 
-DatasetMEG::DatasetMEG( QDir fn, Fn::DatasetType type ) :
+DatasetMeshTimeSeries::DatasetMeshTimeSeries( QDir fn, Fn::DatasetType type ) :
     DatasetMesh( fn, type )
 {
     m_dataMin = std::numeric_limits<float>().max();
@@ -27,17 +27,17 @@ DatasetMEG::DatasetMEG( QDir fn, Fn::DatasetType type ) :
     finalizeProperties();
 }
 
-DatasetMEG::~DatasetMEG()
+DatasetMeshTimeSeries::~DatasetMeshTimeSeries()
 {
 }
 
-void DatasetMEG::addMesh( TriangleMesh2* tm, QString displayString )
+void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
 {
     m_mesh.push_back( tm );
     m_displayList << displayString;
 }
 
-void DatasetMEG::addData( QVector<float> data )
+void DatasetMeshTimeSeries::addData( QVector<float> data )
 {
     if ( data.size() == m_mesh[0]->numVerts() )
     {
@@ -75,7 +75,7 @@ void DatasetMEG::addData( QVector<float> data )
     }
 }
 
-void DatasetMEG::setProperties()
+void DatasetMeshTimeSeries::setProperties()
 {
     m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
@@ -87,13 +87,13 @@ void DatasetMEG::setProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
-TriangleMesh2* DatasetMEG::getMesh( QString target )
+TriangleMesh2* DatasetMeshTimeSeries::getMesh( QString target )
 {
     int n = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
     return m_mesh[n];
 }
 
-void DatasetMEG::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
+void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
@@ -109,12 +109,12 @@ void DatasetMEG::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int h
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 
-bool DatasetMEG::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+bool DatasetMeshTimeSeries::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
     return false;
 }
 
-void DatasetMEG::selectFrame()
+void DatasetMeshTimeSeries::selectFrame()
 {
     int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
@@ -126,7 +126,7 @@ void DatasetMEG::selectFrame()
     }
 }
 
-void DatasetMEG::slotPropSet( int id )
+void DatasetMeshTimeSeries::slotPropSet( int id )
 {
     if ( id == (int)Fn::Property::D_SELECTED_TEXTURE )
     {
@@ -134,7 +134,7 @@ void DatasetMEG::slotPropSet( int id )
     }
 }
 
-void DatasetMEG::slotCopyColors()
+void DatasetMeshTimeSeries::slotCopyColors()
 {
     int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
