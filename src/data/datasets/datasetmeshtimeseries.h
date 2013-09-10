@@ -13,13 +13,13 @@
 class TriangleMesh2;
 class MeshRenderer;
 
-class DatasetMEG : public DatasetMesh
+class DatasetMeshTimeSeries : public DatasetMesh
 {
     Q_OBJECT
 
 public:
-    DatasetMEG( QDir fn = QDir( "MEG set" ), Fn::DatasetType type = Fn::DatasetType::MESH_ASCII );
-    virtual ~DatasetMEG();
+    DatasetMeshTimeSeries( QDir fn = QDir( "MEG set" ), Fn::DatasetType type = Fn::DatasetType::MESH_ASCII );
+    virtual ~DatasetMeshTimeSeries();
 
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );
     void addData( QVector<float> data );
