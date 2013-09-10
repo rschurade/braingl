@@ -67,6 +67,8 @@ void DatasetMesh::initProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_WIREFRAME, false, "special" );
+
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Z, false, "special" );
@@ -78,7 +80,13 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Y, 0.0f, -500.0f, 500.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_ADJUST_Z, 0.0f, -500.0f, 500.0f, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_WIREFRAME, false, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_ROTATE_X, 0.0f, 0.0f, 360.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_ROTATE_Y, 0.0f, 0.0f, 360.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_ROTATE_Z, 0.0f, 0.0f, 360.0f, "special" );
+
+    m_properties["maingl"]->create( Fn::Property::D_SCALE_X, 1.0f, 0.0f, 10.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_SCALE_Y, 1.0f, 0.0f, 10.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_SCALE_Z, 1.0f, 0.0f, 10.0f, "special" );
 
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
