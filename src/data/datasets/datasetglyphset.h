@@ -29,6 +29,7 @@ public:
     void addProperties();
 
     void readConnectivity( QString filename );
+    void addCorrelation( float** corr );
     void setMinthresh( float mt );
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );

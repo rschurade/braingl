@@ -103,6 +103,15 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
     m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
 
+    m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_VERTEX, 0 );
+    m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_TRIANGLES, 0 );
+
+    if( m_mesh.size() > 0 )
+    {
+        m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
+        m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
+    }
+
 }
 
 void DatasetMesh::finalizeProperties()

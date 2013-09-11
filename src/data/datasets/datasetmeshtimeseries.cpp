@@ -35,6 +35,9 @@ void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
 {
     m_mesh.push_back( tm );
     m_displayList << displayString;
+
+    m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
+    m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
 }
 
 void DatasetMeshTimeSeries::addData( QVector<float> data )
@@ -155,4 +158,14 @@ void DatasetMeshTimeSeries::slotCopyColors()
 
         mesh->setVertexColor( i, color );
     }
+}
+
+int DatasetMeshTimeSeries::getNumDataPoints()
+{
+    return m_data.size();
+}
+
+float DatasetMeshTimeSeries::getData( int id, int dataPoint )
+{
+    return m_data.at(dataPoint).at( id );
 }

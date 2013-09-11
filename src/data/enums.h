@@ -75,7 +75,8 @@ namespace Fn
         SH_2_MESH,
         EXPORTRGB,
         LOOP_SUBDIVISION,
-        MESH_TIME_SERIES
+        MESH_TIME_SERIES,
+        MESH_CORRELATION
     };
 
     enum class Orient : int
@@ -225,6 +226,8 @@ namespace Fn
         D_SCALE_Y,
         D_SCALE_Z,
         D_MESH_MAKE_PERMANENT,
+        D_MESH_NUM_VERTEX,
+        D_MESH_NUM_TRIANGLES,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -452,6 +455,8 @@ namespace Fn
                 case Property::D_SCALE_Y: return QString( "scale y" ); break;
                 case Property::D_SCALE_Z: return QString( "scale z" ); break;
                 case Property::D_MESH_MAKE_PERMANENT: return QString( "make permanent" ); break;
+                case Property::D_MESH_NUM_VERTEX: return QString( "num vertexes" ); break;
+                case Property::D_MESH_NUM_TRIANGLES: return QString( "num triangles" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
