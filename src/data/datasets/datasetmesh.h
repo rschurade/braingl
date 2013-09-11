@@ -40,6 +40,7 @@ protected:
 
 private slots:
     void paintModeChanged( QVariant mode );
+    void makePermanent();
 
 };
 

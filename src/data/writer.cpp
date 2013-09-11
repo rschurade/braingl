@@ -300,7 +300,7 @@ bool Writer::save()
             saveMeshVTK( m_fileName, mesh );
             break;
         }
-        case Fn::DatasetType::MEG_SET :
+        case Fn::DatasetType::MESH_TIME_SERIES :
         {
             TriangleMesh2* mesh = dynamic_cast<DatasetMeshTimeSeries*>( m_dataset )->getMesh();
             saveMeshVTK( m_fileName, mesh );

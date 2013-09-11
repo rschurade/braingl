@@ -1452,7 +1452,7 @@ bool Loader::loadMEG()
 {
     QString fn = m_fileName.path();
 
-    DatasetMeshTimeSeries* dataset = new DatasetMeshTimeSeries( fn, Fn::DatasetType::MEG_SET );
+    DatasetMeshTimeSeries* dataset = new DatasetMeshTimeSeries( fn, Fn::DatasetType::MESH_TIME_SERIES );
 
     qDebug() << "loading meg set: " << fn;
 

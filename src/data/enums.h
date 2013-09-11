@@ -30,7 +30,7 @@ namespace Fn
         GLYPHSET,
         SURFACESET,
         CONS,
-        MEG_SET
+        MESH_TIME_SERIES
     };
 
     enum class ColormapEnum : int
@@ -74,7 +74,8 @@ namespace Fn
         LITTLE_BRAINS,
         SH_2_MESH,
         EXPORTRGB,
-        LOOP_SUBDIVISION
+        LOOP_SUBDIVISION,
+        MESH_TIME_SERIES
     };
 
     enum class Orient : int
@@ -223,6 +224,7 @@ namespace Fn
         D_SCALE_X,
         D_SCALE_Y,
         D_SCALE_Z,
+        D_MESH_MAKE_PERMANENT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -449,6 +451,7 @@ namespace Fn
                 case Property::D_SCALE_X: return QString( "scale x" ); break;
                 case Property::D_SCALE_Y: return QString( "scale y" ); break;
                 case Property::D_SCALE_Z: return QString( "scale z" ); break;
+                case Property::D_MESH_MAKE_PERMANENT: return QString( "make permanent" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

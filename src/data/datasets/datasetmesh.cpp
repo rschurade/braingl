@@ -31,9 +31,17 @@ DatasetMesh::~DatasetMesh()
 
 void DatasetMesh::initProperties()
 {
+    float min = 0.0;
+    float max = 1.0;
+
     m_properties["maingl"]->create( Fn::Property::D_COLORMODE,
     { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
+    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general"  );
+    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general"  );
+
     m_properties["maingl"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
 
@@ -50,15 +58,9 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );
 
-    float min = 0.0;
-    float max = 1.0;
 
     m_properties["maingl"]->create( Fn::Property::D_MIN, min );
     m_properties["maingl"]->create( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "colormap"  );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "colormap"  );
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "colormap"  );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "colormap"  );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
@@ -87,6 +89,10 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_SCALE_X, 1.0f, 0.0f, 10.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_SCALE_Y, 1.0f, 0.0f, 10.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_SCALE_Z, 1.0f, 0.0f, 10.0f, "special" );
+
+    m_properties["maingl"]->createButton( Fn::Property::D_MESH_MAKE_PERMANENT, "special" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_MESH_MAKE_PERMANENT ), SIGNAL( valueChanged( QVariant ) ), this,
+            SLOT( makePermanent() ) );
 
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
     m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
@@ -196,4 +202,54 @@ void DatasetMesh::paintModeChanged( QVariant mode )
     {
         m_properties["maingl"]->set( Fn::Property::D_COLORMODE, 3 );
     }
+}
+
+void DatasetMesh::makePermanent()
+{
+    QMatrix4x4 mMatrix;
+    mMatrix.setToIdentity();
+
+    if( m_properties["maingl"]->contains( Fn::Property::D_ROTATE_X ) )
+    {
+        mMatrix.rotate( -m_properties["maingl"]->get( Fn::Property::D_ROTATE_X ).toFloat(), 1.0, 0.0, 0.0 );
+        mMatrix.rotate( -m_properties["maingl"]->get( Fn::Property::D_ROTATE_Y ).toFloat(), 0.0, 1.0, 0.0 );
+        mMatrix.rotate( -m_properties["maingl"]->get( Fn::Property::D_ROTATE_Z ).toFloat(), 0.0, 0.0, 1.0 );
+        mMatrix.scale( m_properties["maingl"]->get( Fn::Property::D_SCALE_X ).toFloat(),
+                m_properties["maingl"]->get( Fn::Property::D_SCALE_Y ).toFloat(),
+                m_properties["maingl"]->get( Fn::Property::D_SCALE_Z ).toFloat() );
+    }
+
+    int adjustX = m_properties["maingl"]->get( Fn::Property::D_ADJUST_X ).toFloat();
+    int adjustY = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Y ).toFloat();
+    int adjustZ = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Z ).toFloat();
+
+    int numVerts = m_mesh[0]->numVerts();
+
+    for( int i = 0; i < numVerts; ++i )
+    {
+        QVector3D vert = m_mesh[0]->getVertex( i );
+
+        vert = vert * mMatrix;
+        vert.setX( vert.x() + adjustX );
+        vert.setY( vert.y() + adjustY );
+        vert.setZ( vert.z() + adjustZ );
+
+        m_mesh[0]->setVertex( i, vert );
+    }
+
+    m_mesh[0]->finalize();
+    delete m_renderer;
+    m_renderer = 0;
+
+    m_properties["maingl"]->set( Fn::Property::D_ROTATE_X, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_ROTATE_Y, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_ROTATE_Z, 0 );
+
+    m_properties["maingl"]->set( Fn::Property::D_ADJUST_X, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_ADJUST_Y, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_ADJUST_Z, 0 );
+
+    m_properties["maingl"]->set( Fn::Property::D_SCALE_X, 1 );
+    m_properties["maingl"]->set( Fn::Property::D_SCALE_Y, 1 );
+    m_properties["maingl"]->set( Fn::Property::D_SCALE_Z, 1 );
 }

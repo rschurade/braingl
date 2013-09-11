@@ -11,11 +11,13 @@
 #include <QList>
 
 class Dataset;
+class TriangleMesh2;
 
 class MeshAlgos
 {
 public:
     static QList<Dataset*> loopSubdivision( Dataset* ds );
+    static QList<Dataset*> meshTimeSeries( Dataset* ds, TriangleMesh2* mesh );
 
 private:
     MeshAlgos() {};

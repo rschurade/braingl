@@ -14,10 +14,10 @@ DatasetFMRI::DatasetFMRI( QDir filename, QVector<float> data, nifti_image* heade
     DatasetNifti( filename, Fn::DatasetType::NIFTI_FMRI, header ),
     m_data( data )
 {
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
     m_properties["maingl"]->create( Fn::Property::D_INTERPOLATION, false, "general" );
     m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
 
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "general" );
     examineDataset();
 
     m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, true );

@@ -13,15 +13,25 @@
 #include <QtGui>
 
 class Dataset;
+class SelectWithLabel;
 
 class DatasetSelectionWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
-    DatasetSelectionWidget( QVector< QPair<QString, Fn::DatasetType> >&filter, QList<Dataset*> &dsl, QWidget* parent = 0 );
+    DatasetSelectionWidget( QVector< QPair<QString, QList<Fn::DatasetType > > >&filter, QList<QVariant> &dsl, QWidget* parent = 0 );
     virtual ~DatasetSelectionWidget();
 
 private:
     QVBoxLayout* m_layout;
+    QList<SelectWithLabel*>m_selectList;
+    QList<QVariant>m_selections;
+signals:
+    void signalSelected( QList<QVariant> );
+
+public slots:
+    void selectButtonPressed();
 };
 
 #endif /* DATASETSELECTIONWIDGET_H_ */

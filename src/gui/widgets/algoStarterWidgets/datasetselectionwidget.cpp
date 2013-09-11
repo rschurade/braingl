@@ -9,8 +9,9 @@
 #include "../controls/selectwithlabel.h"
 
 #include "../../../data/datasets/dataset.h"
+#include "../../../data/vptr.h"
 
-DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, Fn::DatasetType> >&filter, QList<Dataset*> &dsl, QWidget* parent ) :
+DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, QList<Fn::DatasetType> > >&filter, QList<QVariant> &dsl, QWidget* parent ) :
     QWidget( parent )
 {
     m_layout = new QVBoxLayout();
@@ -18,16 +19,28 @@ DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, Fn::Data
     for ( int i = 0; i < filter.size(); ++i )
     {
         SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
+        m_selectList.push_back( sel );
+
+        QList<Fn::DatasetType> types = filter[i].second;
+
         for ( int k = 0; k < dsl.size(); ++k )
         {
-            if ( dsl[k]->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)filter[i].second || (int)filter[i].second == (int)Fn::DatasetType::NIFTI_ANY )
+            for( int l = 0; l < types.size(); ++l )
             {
-                sel->insertItem( k, dsl[k]->properties()->get( Fn::Property::D_NAME ).toString() );
+                if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)types[l] )
+                {
+                    sel->insertItem( k, VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString() );
+                    m_selections.push_back( dsl[k] );
+                }
             }
         }
         m_layout->addWidget( sel );
     }
     m_layout->addStretch();
+
+    QPushButton* button = new QPushButton( tr("Select") );
+    connect( button, SIGNAL( clicked() ), this, SLOT( selectButtonPressed() ) );
+    m_layout->addWidget( button );
     setLayout( m_layout );
 }
 
@@ -35,3 +48,13 @@ DatasetSelectionWidget::~DatasetSelectionWidget()
 {
 }
 
+void DatasetSelectionWidget::selectButtonPressed()
+{
+    QList<QVariant>out;
+    for( int i = 0; i < m_selectList.size(); ++i )
+    {
+        out.push_back( m_selections[m_selectList[i]->getCurrentIndex()] );
+    }
+    emit( signalSelected( out ) );
+    this->hide();
+}
