@@ -10,6 +10,7 @@
 #include "../widgets/algoStarterWidgets/tensortrackwidget.h"
 #include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
 #include "../widgets/algoStarterWidgets/sdwidget.h"
+#include "../widgets/algoStarterWidgets/datasetselectionwidget.h"
 
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
@@ -179,6 +180,10 @@ void ToolBar::createActions()
     m_loopSubDAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "loop subdivision" ), this, Fn::Algo::LOOP_SUBDIVISION );
     m_loopSubDAction->setStatusTip( tr( "loop subdivision" ) );
     connect( m_loopSubDAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_meshTimeSeriesAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "create time series mesh" ), this, Fn::Algo::MESH_TIME_SERIES );
+    m_meshTimeSeriesAction->setStatusTip( tr( "mesh time series" ) );
+    connect( m_meshTimeSeriesAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -348,6 +353,21 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::LOOP_SUBDIVISION:
             l = MeshAlgos::loopSubdivision( ds );
             break;
+        case Fn::Algo::MESH_TIME_SERIES:
+            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+            QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
+            QList<Fn::DatasetType>types;
+            types.push_back(Fn::DatasetType::MESH_BINARY );
+            types.push_back(Fn::DatasetType::MESH_ASCII );
+            types.push_back(Fn::DatasetType::MESH_ISOSURFACE );
+            QPair<QString, QList<Fn::DatasetType> > d1( "mesh", types );
+            filter.push_back( d1 );
+
+            DatasetSelectionWidget* dsw = new DatasetSelectionWidget( filter, dsList );
+            connect( dsw, SIGNAL( signalSelected( QList<QVariant> ) ), this, SLOT( slotMeshSelected( QList<QVariant> ) ) );
+            dsw->show();
+            break;
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -381,6 +401,11 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_evAct );
             this->addAction( m_fiberTrackingAct );
             this->addAction( m_crossingTrackingAct );
+            break;
+        }
+        case Fn::DatasetType::NIFTI_FMRI:
+        {
+            this->addAction( m_meshTimeSeriesAction );
             break;
         }
         case Fn::DatasetType::NIFTI_SH:
@@ -488,4 +513,22 @@ void ToolBar::sdFinished()
 //    }
     m_sdw->hide();
     destroy( m_sdw );
+}
+
+void ToolBar::slotMeshSelected( QList<QVariant> meshes )
+{
+    qDebug() << VPtr<DatasetMesh>::asPtr( meshes[0] )->properties()->get( Fn::Property::D_NAME ).toString();
+
+    QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), (int)Fn::Property::D_DATASET_POINTER );
+    Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
+
+    TriangleMesh2* mesh = VPtr<DatasetMesh>::asPtr( meshes[0] )->getMesh();
+
+    QList<Dataset*>l = MeshAlgos::meshTimeSeries( ds, mesh );
+
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
+    }
 }

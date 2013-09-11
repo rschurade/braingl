@@ -67,6 +67,7 @@ private:
     FNAction* m_littleBrainsAction;
     FNAction* m_sh2meshAction;
     FNAction* m_loopSubDAction;
+    FNAction* m_meshTimeSeriesAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
@@ -81,6 +82,7 @@ private slots:
     void tensorTrackFinished();
     void crossingTrackFinished();
     void sdFinished();
+    void slotMeshSelected( QList<QVariant> meshes );
 };
 
 #endif /* TOOLBAR_H_ */

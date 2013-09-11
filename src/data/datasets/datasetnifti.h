@@ -14,6 +14,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QVector>
+
 class DatasetNifti: public Dataset
 {
 public:
@@ -31,6 +33,7 @@ public:
     static QString getNiftiDataType( const int type );
 
     int getIdFromPos( float x, float y, float z );
+    int getIdFromPos( QVector3D pos );
     int getId( int x, int y, int z );
     QList<int>getNeighbourhood3x3( int x, int y, int z );
     QList<int>getNeighbourhoodXxX( int x, int y, int z, int dist );

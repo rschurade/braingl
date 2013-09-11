@@ -162,6 +162,11 @@ QString DatasetNifti::getNiftiDataType( const int type )
     return QString( "unknown" );
 }
 
+int DatasetNifti::getIdFromPos( QVector3D pos )
+{
+    return getIdFromPos( pos.x(), pos.y(), pos.z() );
+}
+
 int DatasetNifti::getIdFromPos( float x, float y, float z )
 {
     float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
@@ -176,9 +181,9 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
     int py = y / dy;
     int pz = z / dz;
 
-    px = qMax( 0, qMin( px, nx - 1) );
-    py = qMax( 0, qMin( py, ny - 1) );
-    pz = qMax( 0, qMin( pz, nz - 1) );
+    px = qMax( 0, qMin( px, nx - 1 ) );
+    py = qMax( 0, qMin( py, ny - 1 ) );
+    pz = qMax( 0, qMin( pz, nz - 1 ) );
 
     return px + py * nx + pz * nx * ny;
 }

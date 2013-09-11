@@ -199,6 +199,12 @@ void TriangleMesh2::addVertex( float x, float y, float z )
     }
 }
 
+QVector3D TriangleMesh2::getVertex( int id )
+{
+    QVector3D vert( m_vertices[id * m_bufferSize], m_vertices[id * m_bufferSize + 1], m_vertices[id * m_bufferSize + 2]);
+    return vert;
+}
+
 void TriangleMesh2::setTriangle( int id, int v0, int v1, int v2 )
 {
     m_triangles[ id * 3     ] = v0;
@@ -267,15 +273,6 @@ float* TriangleMesh2::getVertexColors()
 int* TriangleMesh2::getIndexes()
 {
     return m_triangles.data();
-}
-
-
-QVector3D TriangleMesh2::getVertex(int id)
-{
-    float x = m_vertices[id * m_bufferSize];
-    float y = m_vertices[id * m_bufferSize + 1];
-    float z = m_vertices[id * m_bufferSize + 2];
-    return QVector3D(x,y,z);
 }
 
 QVector<int> TriangleMesh2::getTriangle( int id )
