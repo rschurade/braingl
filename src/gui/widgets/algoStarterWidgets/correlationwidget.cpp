@@ -61,10 +61,11 @@ CorrelationWidget::~CorrelationWidget()
 QList<Dataset*> CorrelationWidget::getResult()
 {
     QList<Dataset*> l;
-    DatasetGlyphset* ds = new DatasetGlyphset( QDir( "new glyphset" ), 0.0, 1.0 );
+    DatasetGlyphset* ds = new DatasetGlyphset( QDir( "new glyphset" ), 0.5, 1.0 );
     ds->addMesh( m_dataset->getMesh(), "mesh" );
     ds->addCorrelation( m_correlation->getResult() );
     ds->initROI();
+    ds->setProperties();
     l.push_back( ds );
     return l;
 }

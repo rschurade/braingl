@@ -218,6 +218,8 @@ void DatasetGlyphset::readConnectivity( QString filename )
 void DatasetGlyphset::addCorrelation( float** corr )
 {
     conn = corr;
+    m_n = m_mesh[0]->numVerts();
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::setMinthresh( float mt )
