@@ -10,6 +10,7 @@
 #include "../widgets/algoStarterWidgets/tensortrackwidget.h"
 #include "../widgets/algoStarterWidgets/crossingtrackwidget.h"
 #include "../widgets/algoStarterWidgets/sdwidget.h"
+#include "../widgets/algoStarterWidgets/correlationwidget.h"
 #include "../widgets/algoStarterWidgets/datasetselectionwidget.h"
 
 #include "../../algos/dwialgos.h"
@@ -184,6 +185,10 @@ void ToolBar::createActions()
     m_meshTimeSeriesAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "create time series mesh" ), this, Fn::Algo::MESH_TIME_SERIES );
     m_meshTimeSeriesAction->setStatusTip( tr( "mesh time series" ) );
     connect( m_meshTimeSeriesAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_meshCorrelationAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "correlation" ), this, Fn::Algo::MESH_CORRELATION );
+    m_meshCorrelationAction->setStatusTip( tr( "correlation" ) );
+    connect( m_meshCorrelationAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -354,6 +359,7 @@ void ToolBar::slot( Fn::Algo algo )
             l = MeshAlgos::loopSubdivision( ds );
             break;
         case Fn::Algo::MESH_TIME_SERIES:
+        {
             QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
 
             QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
@@ -368,6 +374,15 @@ void ToolBar::slot( Fn::Algo algo )
             connect( dsw, SIGNAL( signalSelected( QList<QVariant> ) ), this, SLOT( slotMeshSelected( QList<QVariant> ) ) );
             dsw->show();
             break;
+        }
+        case Fn::Algo::MESH_CORRELATION:
+        {
+            m_cw = new CorrelationWidget( ds, this->parentWidget() );
+            connect( m_cw, SIGNAL( finished() ), this, SLOT( correlationFinished() ) );
+            m_cw->show();
+            break;
+        }
+
     }
     for ( int i = 0; i < l.size(); ++i )
     {
@@ -469,6 +484,9 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_loopSubDAction );
             break;
         }
+        case Fn::DatasetType::MESH_TIME_SERIES:
+            this->addAction( m_meshCorrelationAction );
+            break;
         default:
         {
             break;
@@ -514,6 +532,20 @@ void ToolBar::sdFinished()
     m_sdw->hide();
     destroy( m_sdw );
 }
+
+void ToolBar::correlationFinished()
+{
+    qDebug() << "toolbar correlation finished";
+    QList<Dataset*>l = m_cw->getResult();
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
+    }
+    m_cw->hide();
+    destroy( m_cw );
+}
+
 
 void ToolBar::slotMeshSelected( QList<QVariant> meshes )
 {

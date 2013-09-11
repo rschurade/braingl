@@ -24,6 +24,9 @@ public:
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );
     void addData( QVector<float> data );
 
+    int getNumDataPoints();
+    float getData( int id, int dataPoint );
+
     void setProperties();
 
     TriangleMesh2* getMesh( QString target = "maingl" );

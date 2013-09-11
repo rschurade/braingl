@@ -15,6 +15,7 @@
 #include <QtGui>
 
 class ToolBarView;
+class CorrelationWidget;
 class TensorTrackWidget;
 class CrossingTrackWidget;
 class SDWidget;
@@ -68,10 +69,12 @@ private:
     FNAction* m_sh2meshAction;
     FNAction* m_loopSubDAction;
     FNAction* m_meshTimeSeriesAction;
+    FNAction* m_meshCorrelationAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
     SDWidget* m_sdw;
+    CorrelationWidget* m_cw;
 
     void createActions();
 
@@ -82,6 +85,7 @@ private slots:
     void tensorTrackFinished();
     void crossingTrackFinished();
     void sdFinished();
+    void correlationFinished();
     void slotMeshSelected( QList<QVariant> meshes );
 };
 
