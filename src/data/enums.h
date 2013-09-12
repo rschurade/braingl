@@ -26,11 +26,12 @@ namespace Fn
         MESH_ASCII,
         MESH_BINARY,
         MESH_ISOSURFACE,
+        MESH_TIME_SERIES,
+        MESH_CORRELATION,
         FIBERS,
         GLYPHSET,
         SURFACESET,
-        CONS,
-        MESH_TIME_SERIES
+        CONS
     };
 
     enum class ColormapEnum : int

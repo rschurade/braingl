@@ -154,9 +154,9 @@ void ToolBar::createActions()
     m_exportRGBAction->setStatusTip( tr( "saves the current colors as series of 1D files (one per color)" ) );
     connect( m_exportRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_save1DsAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Save 1D values file" ), this, Fn::Algo::SAVE1D );
-    m_save1DsAction->setStatusTip( tr( "Save all node values to 1D (SUMA-readable) file" ) );
-    connect( m_save1DsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+    m_save1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Save 1D values file" ), this, Fn::Algo::SAVE1D );
+    m_save1DAction->setStatusTip( tr( "Save all node values to 1D (SUMA-readable) file" ) );
+    connect( m_save1DAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_load1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Load 1D values file" ), this, Fn::Algo::LOAD1D );
     m_load1DAction->setStatusTip( tr( "Load a list of values and put them in the value buffer of the surfaces" ) );
@@ -198,6 +198,8 @@ void ToolBar::slot( Fn::Algo algo )
     QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), (int)Fn::Property::D_DATASET_POINTER );
     QList<Dataset*>l;
     Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
+    QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
     switch ( algo )
     {
         case Fn::Algo::QBALL4:
@@ -214,8 +216,6 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::SD:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
-
             m_sdw = new SDWidget( ds, dsList, this->parentWidget() );
             connect( m_sdw, SIGNAL( finished() ), this, SLOT( sdFinished() ) );
             m_sdw->show();
@@ -249,25 +249,18 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::TENSOR_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
-
             m_ttw = new TensorTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ttw, SIGNAL( finished() ), this, SLOT( tensorTrackFinished() ) );
             m_ttw->show();
             break;
-
         }
         case Fn::Algo::CROSSING_TRACK:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
-
             m_ctw = new CrossingTrackWidget( ds, dsList, this->parentWidget() );
             connect( m_ctw, SIGNAL( finished() ), this, SLOT( crossingTrackFinished() ) );
             m_ctw->show();
             break;
-
         }
-
         case Fn::Algo::ISOSURFACE:
             l = ScalarAlgos::isoSurface( ds );
             break;
@@ -327,24 +320,10 @@ void ToolBar::slot( Fn::Algo algo )
             ((DatasetGlyphset*)ds)->exportColors();
             break;
         case Fn::Algo::SAVE1D:
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::SURFACESET )
-            {
-                ( (DatasetSurfaceset*) ds )->save1Ds();
-            }
-            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::GLYPHSET )
-            {
-                ( (DatasetGlyphset*) ds )->save1Ds();
-            }
+            dynamic_cast<DatasetMesh*>( ds )->save1Ds();
             break;
         case Fn::Algo::LOAD1D:
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::SURFACESET )
-            {
-                ( (DatasetSurfaceset*) ds )->load1D();
-            }
-            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int) Fn::DatasetType::GLYPHSET )
-            {
-                ( (DatasetGlyphset*) ds )->load1D();
-            }
+            dynamic_cast<DatasetMesh*>( ds )->load1D();
             break;
         case Fn::Algo::AVG_CON:
             ( (DatasetGlyphset*)ds)->avgCon();
@@ -360,8 +339,6 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::MESH_TIME_SERIES:
         {
-            QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
-
             QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
             QList<Fn::DatasetType>types;
             types.push_back(Fn::DatasetType::MESH_BINARY );
@@ -459,7 +436,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_saveRGBAction );
             this->addAction( m_loadRGBAction );
             this->addAction( m_exportRGBAction );
-            this->addAction( m_save1DsAction );
+            this->addAction( m_save1DAction );
             this->addAction( m_load1DAction );
             this->addAction( m_avgConAction );
             this->addAction( m_avgConRZAction );
@@ -468,7 +445,7 @@ void ToolBar::slotSelectionChanged( int type )
         }
         case Fn::DatasetType::SURFACESET:
         {
-            this->addAction( m_save1DsAction );
+            this->addAction( m_save1DAction );
             this->addAction( m_load1DAction );
             break;
         }

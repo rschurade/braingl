@@ -5,7 +5,7 @@
  *      Author: boettgerj
  */
 
-#include "datasetsurfaceset.h"
+#include "datasetcorrelation.h"
 
 #include "../../gui/gl/pointglyphrenderer.h"
 #include "../../gui/gl/diffpointglyphrenderer.h"
@@ -19,11 +19,11 @@
 #ifndef DATASETGLYPHSET_H_
 #define DATASETGLYPHSET_H_
 
-class DatasetGlyphset: public DatasetSurfaceset
+class DatasetGlyphset: public DatasetCorrelation
 {
     Q_OBJECT
 public:
-    DatasetGlyphset( QDir filename, float mt, float maxt );
+    DatasetGlyphset( QDir filename, float minThreshold, float maxThreshold = 1.0 );
     virtual ~DatasetGlyphset();
 
     void addProperties();
@@ -55,16 +55,12 @@ public:
     bool load1D();
     void loadROI( QString filename );
     void initROI();
-    bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void avgCon();
     void avgConRtoZ();
     void makeLittleBrains();
 
 private:
-    float minthresh;
-    float maxthresh;
     bool* roi;
-    float** conn; //square connectivity matrix
 
     int m_n;  //number of vertices, has to match size of matrix
 
@@ -84,20 +80,17 @@ private:
     float prevThresh, prevMinlength;
 
     QString m_colors_name;
-    QVector<int> picked;
+
     //int pickedID;
     QVector<MeshRenderer*> littleBrains;
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
 
-    int m_prevPickedID;
-
-    void setPickedID( int id );
 
 private slots:
-    void colorModeChanged(QVariant qv);
-    void glyphStyleChanged(QVariant qv);
-    void rotationChanged(QVariant qv);
+    void colorModeChanged( QVariant qv );
+    void glyphStyleChanged( QVariant qv );
+    void rotationChanged( QVariant qv );
     void slotCopyColors();
 };
 
