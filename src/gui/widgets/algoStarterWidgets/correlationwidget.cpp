@@ -13,11 +13,11 @@
 #include "../../../algos/correlation.h"
 
 #include "../../../data/datasets/dataset.h"
+#include "../../../data/datasets/datasetcorrelation.h"
 #include "../../../data/datasets/datasetglyphset.h"
 #include "../../../data/datasets/datasetmeshtimeseries.h"
 
 #include "../../../data/mesh/trianglemesh2.h"
-
 
 #include <QPushButton>
 #include <QProgressBar>
@@ -60,14 +60,24 @@ CorrelationWidget::~CorrelationWidget()
 
 QList<Dataset*> CorrelationWidget::getResult()
 {
+//    QList<Dataset*> l;
+//    DatasetGlyphset* ds = new DatasetGlyphset( QDir( "new glyphset" ), 0.5, 1.0 );
+//    ds->addMesh( m_dataset->getMesh(), "mesh" );
+//    ds->addCorrelation( m_correlation->getResult() );
+//    ds->initROI();
+//    ds->setProperties();
+//    l.push_back( ds );
+//    return l;
+
     QList<Dataset*> l;
-    DatasetGlyphset* ds = new DatasetGlyphset( QDir( "new glyphset" ), 0.5, 1.0 );
+    DatasetCorrelation* ds = new DatasetCorrelation( QDir( "new correlation" ), 0.5, 1.0 );
     ds->addMesh( m_dataset->getMesh(), "mesh" );
-    ds->addCorrelation( m_correlation->getResult() );
-    ds->initROI();
+    ds->setCorrelationMatrix( m_correlation->getResult() );
+    //ds->initROI();
     ds->setProperties();
     l.push_back( ds );
     return l;
+
 }
 
 void CorrelationWidget::start()

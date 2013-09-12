@@ -17,7 +17,6 @@
 #include "datasets/datasetfmri.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
-#include "datasets/datasetsurfaceset.h"
 #include "datasets/datasetglyphset.h"
 #include "datasets/datasetcons.h"
 #include "datasets/datasetmeshtimeseries.h"
@@ -1165,7 +1164,7 @@ bool Loader::loadSet()
 {
     QString fn = m_fileName.path();
 
-    DatasetSurfaceset* dataset = new DatasetSurfaceset( fn, Fn::DatasetType::SURFACESET );
+    DatasetMesh* dataset = new DatasetMesh( fn, Fn::DatasetType::MESH_BINARY );
 
     qDebug() << "loading surface set: " << fn;
 

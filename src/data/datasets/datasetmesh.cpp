@@ -11,8 +11,12 @@
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
 
+#include <QFile>
+#include <QFileDialog>
+
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
-    Dataset( fileName, Fn::DatasetType::MESH_BINARY ), m_renderer( 0 )
+    Dataset( fileName, Fn::DatasetType::MESH_BINARY ),
+    m_renderer( 0 )
 {
     m_mesh.push_back( mesh );
     initProperties();
@@ -20,7 +24,8 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
 }
 
 DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
-    Dataset( fileName, type ), m_renderer( 0 )
+    Dataset( fileName, type ),
+    m_renderer( 0 )
 {
     initProperties();
 }
@@ -106,6 +111,8 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_VERTEX, 0 );
     m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_TRIANGLES, 0 );
 
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, 0 );
+
     if( m_mesh.size() > 0 )
     {
         m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
@@ -128,10 +135,56 @@ void DatasetMesh::finalizeProperties()
             SLOT( paintModeChanged( QVariant ) ) );
 }
 
+void DatasetMesh::setProperties()
+{
+    m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+}
+
+
+/*****************************************************************************************************************************************************
+ *
+ * adds TriangleMesh to the list of meshes only if those meshes have the exact same number of vertexes
+ *
+ ****************************************************************************************************************************************************/
+void DatasetMesh::addMesh( TriangleMesh2* tm, QString displayString )
+{
+    if ( m_mesh.size() > 0 )
+    {
+        int numVerts = m_mesh[0]->numVerts();
+        if ( numVerts != tm->numVerts() )
+        {
+            return;
+        }
+    }
+    m_mesh.push_back( tm );
+    m_displayList.push_back( displayString );
+}
+
 TriangleMesh2* DatasetMesh::getMesh()
 {
-    return m_mesh[0];
+    if ( m_mesh.size() > 0 )
+    {
+        return m_mesh[0];
+    }
+    return 0;
 }
+
+TriangleMesh2* DatasetMesh::getMesh( int id )
+{
+    if ( m_mesh.size() > id )
+    {
+        return m_mesh[id];
+    }
+    return 0;
+}
+
+TriangleMesh2* DatasetMesh::getMesh( QString target )
+{
+    int n = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
+    return m_mesh[n];
+}
+
 
 void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
@@ -147,11 +200,6 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     }
 
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
-}
-
-QString DatasetMesh::getValueAsString( int x, int y, int z )
-{
-    return QString( "" );
 }
 
 bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
@@ -176,22 +224,34 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
         return false;
     }
 
-    QVector<int> picked = getMesh()->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
+    QVector<int> picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     if ( picked.size() > 0 )
     {
         m_renderer->beginUpdateColor();
         for ( int i = 0; i < picked.size(); ++i )
         {
-            if ( paintMode == 1 ) //paint color
+            m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
+            for ( int m = 0; m < m_mesh.size(); m++ )
             {
-                m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-                m_mesh[0]->setVertexColor( picked[i], color );
-            }
-            else if ( paintMode == 2 ) //TODO: paint values does not work
-            {
-                qDebug() << "setting: " << picked[i];
-                m_mesh[0]->setVertexData( picked[i], 1.0f ); //m_mesh[0]->getVertexData( picked[i] ) + 0.1 );
+                if ( paintMode == 1 ) //paint color
+                {
+                    m_mesh[m]->setVertexColor( picked[i], color );
+                }
+                else if ( paintMode == 2 ) //paint values
+                {
+                    float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    if ( value < 0.0 )
+                    {
+                        value = 0.0;
+                    }
+                    if ( value > 1.0 )
+                    {
+                        value = 1.0;
+                    }
+
+                    m_mesh[m]->setVertexData( picked[i], value );
+                }
             }
         }
         m_renderer->endUpdateColor();
@@ -261,4 +321,46 @@ void DatasetMesh::makePermanent()
     m_properties["maingl"]->set( Fn::Property::D_SCALE_X, 1 );
     m_properties["maingl"]->set( Fn::Property::D_SCALE_Y, 1 );
     m_properties["maingl"]->set( Fn::Property::D_SCALE_Z, 1 );
+}
+
+void DatasetMesh::save1Ds()
+{
+    QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", ".1D" );
+
+    QFile file( filename );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        qDebug() << "file open failed: " << filename;
+        return;
+    }
+    QTextStream out( &file );
+    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
+    {
+        float vcolor = getMesh( "maingl" )->getVertexData( i );
+
+        out << vcolor << endl;
+    }
+    file.close();
+}
+
+bool DatasetMesh::load1D()
+{
+    QString filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return false;
+    }
+    QTextStream in( &file );
+
+    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
+    {
+        float v;
+        in >> v;
+        for ( int m = 0; m < m_mesh.size(); m++ )
+        {
+            m_mesh[m]->setVertexData( i, v );
+        }
+    }
+    return true;
 }

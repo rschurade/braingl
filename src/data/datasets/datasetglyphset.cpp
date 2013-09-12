@@ -29,26 +29,22 @@
 
 #include <qcoreapplication.h>
 
-DatasetGlyphset::DatasetGlyphset( QDir filename, float mt, float maxt = 1.0 ) :
-                DatasetSurfaceset( true, filename, Fn::DatasetType::GLYPHSET ),
-                minthresh( mt ),
-                maxthresh( maxt ),
-                conn( NULL ),
-                m_prenderer( NULL ),
-                m_dprenderer( NULL ),
-                m_vrenderer( NULL ),
-                m_pierenderer( NULL ),
-                prevGeo( -1 ),
-                prevGlyph( -1 ),
-                prevCol( -1 ),
-                prevGlyphstyle( -1 ),
-                prevThresh( -1 ),
-                prevMinlength( -1 ),
-                m_colors_name( "" ),
-                littleBrains( QVector<MeshRenderer*>() ),
-                shifts1( QVector<QVector3D>() ),
-                shifts2( QVector<QVector3D>() ),
-                m_prevPickedID( -1 )
+DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxThreshold ) :
+    DatasetCorrelation( filename, minThreshold, maxThreshold, Fn::DatasetType::GLYPHSET ),
+    m_prenderer( NULL ),
+    m_dprenderer( NULL ),
+    m_vrenderer( NULL ),
+    m_pierenderer( NULL ),
+    prevGeo( -1 ),
+    prevGlyph( -1 ),
+    prevCol( -1 ),
+    prevGlyphstyle( -1 ),
+    prevThresh( -1 ),
+    prevMinlength( -1 ),
+    m_colors_name( "" ),
+    littleBrains( QVector<MeshRenderer*>() ),
+    shifts1( QVector<QVector3D>() ),
+    shifts2( QVector<QVector3D>() )
 {
     addProperties();
 
@@ -86,15 +82,15 @@ DatasetGlyphset::~DatasetGlyphset()
         delete m_pierenderer;
         m_pierenderer = NULL;
     }
-    if ( conn )
+    if ( m_correlationMatrix )
     {
         for ( int i = 0; i < m_n; i++ )
         {
-            delete[] conn[i];
-            conn[i] = NULL;
+            delete[] m_correlationMatrix[i];
+            m_correlationMatrix[i] = NULL;
         }
-        delete[] conn;
-        conn = NULL;
+        delete[] m_correlationMatrix;
+        m_correlationMatrix = NULL;
     }
 }
 
@@ -191,10 +187,10 @@ void DatasetGlyphset::readConnectivity( QString filename )
     //This assumes a square matrix of float32...
     m_n = qSqrt( f.size() / 4 );
     qDebug() << "connectivity matrix size: " << m_n;
-    conn = new float*[m_n];
+    m_correlationMatrix = new float*[m_n];
     for ( int i = 0; i < m_n; i++ )
     {
-        conn[i] = new float[m_n];
+        m_correlationMatrix[i] = new float[m_n];
     }
 
     QDataStream ins( &f );
@@ -206,7 +202,7 @@ void DatasetGlyphset::readConnectivity( QString filename )
     {
         for ( int j = 0; j < m_n; j++ )
         {
-            ins >> conn[i][j];
+            ins >> m_correlationMatrix[i][j];
             //qDebug() << i << j << conn[i][j];
         }
     }
@@ -217,7 +213,7 @@ void DatasetGlyphset::readConnectivity( QString filename )
 
 void DatasetGlyphset::addCorrelation( float** corr )
 {
-    conn = corr;
+    m_correlationMatrix = corr;
     m_n = m_mesh[0]->numVerts();
     m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
@@ -225,7 +221,7 @@ void DatasetGlyphset::addCorrelation( float** corr )
 void DatasetGlyphset::setMinthresh( float mt )
 {
     //TODO: Check how I set that...
-    minthresh = mt;
+    m_minThreshold = mt;
 }
 
 void DatasetGlyphset::makeLittleBrains()
@@ -254,7 +250,7 @@ void DatasetGlyphset::makeLittleBrains()
             QMatrix4x4 sc;
             for ( int p = 0; p < m_n; ++p )
             {
-                mesh->setVertexData( p, conn[i][p] );
+                mesh->setVertexData( p, m_correlationMatrix[i][p] );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
             shifts1 << f1;
@@ -272,15 +268,9 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         return;
     }
 
-    int pickedID = properties( "maingl" )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
-    if ( m_prevPickedID != pickedID )
-    {
-        setPickedID( pickedID );
-    }
-
     if ( properties( target )->get( Fn::Property::D_DRAW_SURFACE ).toBool() )
     {
-        DatasetSurfaceset::draw( pMatrix, mvMatrix, width, height, renderMode, target );
+        DatasetCorrelation::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
     if ( ( target == "maingl" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
@@ -412,38 +402,11 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     {
         m_dprenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-    if ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool() )
-    {
-        if ( pickedID > -1 )
-        {
-            float sx, sy, sz;
-            QVector3D sel = getMesh( target )->getVertex( pickedID );
-            sx = sel.x();
-            sy = sel.y();
-            sz = sel.z();
-            QColor color = Models::g()->data( Models::g()->index( (int) Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
-            color.setAlphaF( 0.8 );
-
-            float s = 5.0;
-            float t = 0.5;
-
-            GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, s, s, s, color, 0, width, height, renderMode );
-
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx + s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx - s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
-
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy + s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy - s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
-
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz + s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz - s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
-        }
-    }
 }
 
 void DatasetGlyphset::makeCons()
 {
-    qDebug() << "making consArray: " << minthresh << " maxthresh: " << maxthresh;
+    qDebug() << "making consArray: " << m_minThreshold << " m_maxThreshold: " << m_maxThreshold;
     //if (consArray) delete[] consArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -458,8 +421,8 @@ void DatasetGlyphset::makeCons()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > m_minThreshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 ++consNumber;
             }
@@ -473,8 +436,8 @@ void DatasetGlyphset::makeCons()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > m_minThreshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -511,8 +474,8 @@ void DatasetGlyphset::makeCons()
 
 void DatasetGlyphset::makeDiffPoints()
 {
-    float diffMinThresh = minthresh / 3.0;
-    qDebug() << "making diffPoints: " << diffMinThresh << " maxthresh: " << maxthresh;
+    float diffMinThresh = m_minThreshold / 3.0;
+    qDebug() << "making diffPoints: " << diffMinThresh << " m_maxThreshold: " << m_maxThreshold;
     //if (consArray) delete[] consArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -552,10 +515,10 @@ void DatasetGlyphset::makeDiffPoints()
             for ( int j = 0; j < m_n; ++j )
             {
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
-                //if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
-                float v1 = conn[i1][j];
-                float v2 = conn[i2][j];
-                if ( ( v1 > minthresh ) && ( v1 < maxthresh ) && roi[i1] && ( v2 > minthresh ) && ( v2 < maxthresh ) && roi[i2] )
+                //if ( ( v > diffMinThresh ) && ( v < m_maxThreshold ) )
+                float v1 = m_correlationMatrix[i1][j];
+                float v2 = m_correlationMatrix[i2][j];
+                if ( ( v1 > m_minThreshold ) && ( v1 < m_maxThreshold ) && roi[i1] && ( v2 > m_minThreshold ) && ( v2 < m_maxThreshold ) && roi[i2] )
                 {
                     diffsNumber++;
                 }
@@ -583,11 +546,11 @@ void DatasetGlyphset::makeDiffPoints()
             for ( int j = 0; j < m_n; ++j )
             {
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
-                //if ( ( v > diffMinThresh ) && ( v < maxthresh ) )
+                //if ( ( v > diffMinThresh ) && ( v < m_maxThreshold ) )
                 //TODO: What treshold do we use?
-                float v1 = conn[i1][j];
-                float v2 = conn[i2][j];
-                if ( ( v1 > minthresh ) && ( v1 < maxthresh ) && roi[i1] && ( v2 > minthresh ) && ( v2 < maxthresh ) && roi[i2] )
+                float v1 = m_correlationMatrix[i1][j];
+                float v2 = m_correlationMatrix[i2][j];
+                if ( ( v1 > m_minThreshold ) && ( v1 < m_maxThreshold ) && roi[i1] && ( v2 > m_minThreshold ) && ( v2 < m_maxThreshold ) && roi[i2] )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
                     QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -633,7 +596,7 @@ void DatasetGlyphset::makeDiffPoints()
 
 void DatasetGlyphset::makeVecs()
 {
-    qDebug() << "making vecsArray: " << minthresh;
+    qDebug() << "making vecsArray: " << m_minThreshold;
 //if (vecsArray) delete[] vecsArray;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -648,8 +611,8 @@ void DatasetGlyphset::makeVecs()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > m_minThreshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 ++vecsNumber;
             }
@@ -663,8 +626,8 @@ void DatasetGlyphset::makeVecs()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > minthresh ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > m_minThreshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -734,8 +697,8 @@ void DatasetGlyphset::makePies()
 
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
-    if ( threshold < minthresh )
-        threshold = minthresh;
+    if ( threshold < m_minThreshold )
+        threshold = m_minThreshold;
 
     qDebug() << "threshold: " << threshold;
 
@@ -772,8 +735,8 @@ void DatasetGlyphset::makePies()
 
         for ( int j = 0; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -785,7 +748,7 @@ void DatasetGlyphset::makePies()
 
                 if ( gdiff.length() > minlength )
                 {
-                    sortlist.push_back( new Connection( f, dc, conn[i][j] ) );
+                    sortlist.push_back( new Connection( f, dc, m_correlationMatrix[i][j] ) );
                     ++count;
                 }
             }
@@ -837,8 +800,8 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     {
         for ( int j = i + 1; j < m_n; ++j )
         {
-            float v = conn[i][j];
-            if ( ( v > threshold ) && ( v < maxthresh ) && roi[i] )
+            float v = m_correlationMatrix[i][j];
+            if ( ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -864,7 +827,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
 
 void DatasetGlyphset::setProperties()
 {
-    DatasetSurfaceset::setProperties();
+    DatasetCorrelation::setProperties();
     m_properties["maingl"]->create( Fn::Property::D_SURFACE_GLYPH_GEOMETRY, m_displayList, 0, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
 }
@@ -1060,36 +1023,6 @@ bool DatasetGlyphset::load1D()
     return true;
 }
 
-bool DatasetGlyphset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
-{
-
-//TODO: Extra property for radius...
-    picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
-
-    int pickedID = getMesh( target )->closestVertexIndex( pos );
-
-    properties( "maingl" )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
-
-    DatasetSurfaceset::mousePick( pickId, pos, modifiers, target );
-    setPickedID( pickedID );
-    return true;
-}
-
-void DatasetGlyphset::setPickedID( int pickedID )
-{
-    m_prevPickedID = pickedID;
-    for ( int i = 0; i < m_n; ++i )
-    {
-        if ( pickedID != -1 )
-        {
-            for ( int m = 0; m < m_mesh.size(); m++ )
-            {
-                m_mesh[m]->setVertexData( i, conn[pickedID][i] );
-            }
-        }
-    }
-}
-
 void DatasetGlyphset::avgCon()
 {
     for ( int i = 0; i < m_n; ++i )
@@ -1106,7 +1039,7 @@ void DatasetGlyphset::avgCon()
                 }
                 else
                 {
-                    v += conn[r][i];
+                    v += m_correlationMatrix[r][i];
                 }
                 ++nroi;
             }
@@ -1135,7 +1068,7 @@ void DatasetGlyphset::avgConRtoZ()
                 }
                 else
                 {
-                    double v1 = conn[r][i];
+                    double v1 = m_correlationMatrix[r][i];
                     double z = 0.5 * qLn( ( 1 + v1 ) / ( 1 - v1 ) );
                     v += z;
                 }
@@ -1165,7 +1098,7 @@ void DatasetGlyphset::slotCopyColors()
     {
         ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 
-        float value = ( conn[m_prevPickedID][i] - selectedMin ) / ( selectedMax - selectedMin );
+        float value = ( m_correlationMatrix[m_prevPickedID][i] - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
 
         mesh->setVertexColor( i, color );
