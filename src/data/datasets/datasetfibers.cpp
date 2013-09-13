@@ -507,3 +507,13 @@ void DatasetFibers::autoplay()
         //Models::d()->submit();
     }
 }
+
+QString DatasetFibers::getSaveFilter()
+{
+    return QString( "fib files binary(*.fib *.vtk );;fib files ascii (*.fib *.vtk);;all files (*.*)" );
+}
+
+QString DatasetFibers::getDefaultSuffix()
+{
+    return QString( "fib" );
+}

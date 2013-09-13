@@ -364,3 +364,14 @@ bool DatasetMesh::load1D()
     }
     return true;
 }
+
+QString DatasetMesh::getSaveFilter()
+{
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.asc);;all files (*.*)" );
+}
+
+QString DatasetMesh::getDefaultSuffix()
+{
+    return QString( "vtk" );
+}
+

@@ -253,3 +253,13 @@ QList<int> DatasetNifti::getNeighbourhoodXxX( int x, int y, int z, int dist )
     }
     return out;
 }
+
+QString DatasetNifti::getSaveFilter()
+{
+    return QString( "niftii (*.nii *.nii.gz);;all files (*.*)" );
+}
+
+QString DatasetNifti::getDefaultSuffix()
+{
+    return QString( "nii.gz" );
+}

@@ -36,7 +36,7 @@ ENDFUNCTION( SPLIT_VERSION_STRING )
 # _TestFiles contains only the test headers
 FUNCTION( COLLECT_COMPILE_FILES _DirString _CPPFiles _HFiles _TestFiles )
     # recursively get all files
-    FILE( GLOB_RECURSE CPP_FILES ${_DirString}/*.cpp )
+    FILE( GLOB_RECURSE CPP_FILES ${_DirString}/*.cpp ${_DirString}/*.cxx )
     FILE( GLOB_RECURSE H_FILES   ${_DirString}/*.h )
     FILE( GLOB_RECURSE TEST_FILES   ${_DirString}/*_test.h )
 

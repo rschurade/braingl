@@ -90,12 +90,6 @@ void DatasetMeshTimeSeries::setProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
-TriangleMesh2* DatasetMeshTimeSeries::getMesh( QString target )
-{
-    int n = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
-    return m_mesh[n];
-}
-
 void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
