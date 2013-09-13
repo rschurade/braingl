@@ -38,6 +38,9 @@ public:
     QList<int>getNeighbourhood3x3( int x, int y, int z );
     QList<int>getNeighbourhoodXxX( int x, int y, int z, int dist );
 
+    QString getSaveFilter();
+    QString getDefaultSuffix();
+
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;

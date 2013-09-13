@@ -46,7 +46,8 @@ public:
     QVector<float> getDataMins();
     QVector<float> getDataMaxes();
 
-
+    QString getSaveFilter();
+    QString getDefaultSuffix();
 
 protected:
     void createTexture() {};

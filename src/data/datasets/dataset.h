@@ -41,6 +41,9 @@ public:
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void copySettings( QString target );
 
+    virtual QString getSaveFilter();
+    virtual QString getDefaultSuffix();
+
 protected:
     virtual void createTexture();
 

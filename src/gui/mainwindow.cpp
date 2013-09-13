@@ -250,7 +250,10 @@ void MainWindow::loadColormaps( bool resetSettings )
 void MainWindow::open()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
-    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn );
+
+    QString filter( "all files (*.*);;niftii (*.nii *.nii.gz);;fib files (*.fib *.vtk *.asc);;surfaces (*.vtk *.asc)" );
+
+    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn, filter );
     for ( int i = 0; i < fileNames.size(); ++i )
     {
         load( fileNames[i] );
@@ -406,28 +409,38 @@ void MainWindow::save()
 bool MainWindow::save( Dataset* ds )
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
-    QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
 
-    if ( !fileName.isEmpty() )
+    QFileDialog fd( this, "Save File", fn, ds->getSaveFilter() );
+    fd.setFileMode( QFileDialog::AnyFile );
+    fd.setAcceptMode( QFileDialog::AcceptSave );
+    fd.setDefaultSuffix( ds->getDefaultSuffix() );
+
+    if ( fd.exec() )
     {
-        QDir dir;
-        ds->properties()->set( Fn::Property::D_FILENAME, fileName );
-        ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-        saveDataset( ds );
+        QString fileName = fd.selectedFiles().first();
+        qDebug() << fileName << fd.selectedFilter();
 
-        QFileInfo fi( fileName );
-        dir = fi.absoluteDir();
-        QString lastPath = dir.absolutePath();
-        Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
-        return true;
+        if ( !fileName.isEmpty() )
+        {
+            QDir dir;
+            ds->properties()->set( Fn::Property::D_FILENAME, fileName );
+            ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
+            saveDataset( ds, fd.selectedFilter() );
+
+            QFileInfo fi( fileName );
+            dir = fi.absoluteDir();
+            QString lastPath = dir.absolutePath();
+            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+            return true;
+        }
     }
     return false;
 }
 
-void MainWindow::saveDataset( Dataset* ds )
+void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
     QString fileName = ds->properties()->get( Fn::Property::D_FILENAME ).toString();
-    Writer writer( ds, fileName );
+    Writer writer( ds, fileName, filter );
     writer.save();
 }
 

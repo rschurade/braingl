@@ -51,7 +51,7 @@ private:
     void createDockWindows();
 
     bool save( Dataset* ds );
-    void saveDataset( Dataset* ds );
+    void saveDataset( Dataset* ds, QString filter = "" );
 
     void saveSettings();
     QModelIndex createIndex( int branch, int pos, int column );

@@ -86,3 +86,13 @@ void Dataset::copySettings( QString target )
     m_properties[target]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
     m_properties[target]->getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
 }
+
+QString Dataset::getSaveFilter()
+{
+    return QString( "" );
+}
+
+QString Dataset::getDefaultSuffix()
+{
+    return QString( "" );
+}
