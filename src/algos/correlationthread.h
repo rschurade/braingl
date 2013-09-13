@@ -18,7 +18,7 @@ class CorrelationThread : public QThread
     Q_OBJECT
 
 public:
-    CorrelationThread( int id, DatasetMeshTimeSeries* ds );
+    CorrelationThread( int id, DatasetMeshTimeSeries* ds, float* exField, float* ex2Field );
     virtual ~CorrelationThread();
 
     QVector< QVector<float> >* getResult();
@@ -28,6 +28,8 @@ private:
 
     int m_id;
     DatasetMeshTimeSeries* m_dataset;
+    float* m_exField;
+    float* m_ex2Field;
 
     QVector< QVector<float> >m_result;
 

@@ -32,6 +32,9 @@ private:
     QVector<CorrelationThread*> m_threads;
     int m_threadsRunning;
 
+    float* m_exField;
+    float* m_ex2Field;
+
     float** m_result;
 
 private slots:

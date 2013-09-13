@@ -13,9 +13,11 @@
 
 #include "../gui/gl/glfunctions.h"
 
-CorrelationThread::CorrelationThread( int id, DatasetMeshTimeSeries* ds ) :
+CorrelationThread::CorrelationThread( int id, DatasetMeshTimeSeries* ds, float* exField, float* ex2Field ) :
     m_id( id ),
-    m_dataset( ds )
+    m_dataset( ds ),
+    m_exField( exField ),
+    m_ex2Field( ex2Field )
 {
 }
 
@@ -44,23 +46,19 @@ void CorrelationThread::run()
         for ( int j = i; j < nroi; ++j )
         {
             //calculate correlation btw. timeseries at i and j...
-            double ex = 0;
-            double ey = 0;
+            double ex = m_exField[i];
+            double ey = m_exField[j];
             double exy = 0;
-            double ex2 = 0;
-            double ey2 = 0;
-            for (int k = 0; k < ntp; ++k){ //for all timepoints
+            double ex2 = m_ex2Field[i];
+            double ey2 = m_ex2Field[j];
+            for ( int k = 0; k < ntp; ++k )
+            { //for all timepoints
                 float xk, yk;
 
                 //this needs to get connected to whatever data representation of the timeseries data is used:
                 xk = m_dataset->getData( i, k ); //timepoint k at position i...
                 yk = m_dataset->getData( j, k );
-
-                ex += xk;
-                ey += yk;
                 exy += xk*yk;
-                ex2 += xk*xk;
-                ey2 += yk*yk;
             }
 
             float corr = (ntp*exy - ex*ey) / sqrt((ntp*ex2 - ex*ex) * (ntp*ey2 - ey*ey));
