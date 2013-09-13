@@ -25,18 +25,41 @@ Correlation::~Correlation()
 
 void Correlation::start()
 {
+    int nroi = m_dataset->getMesh()->numVerts();
+    int ntp = m_dataset->getNumDataPoints();
+
+    m_exField = new float[ nroi ];
+    m_ex2Field = new float[ nroi ];
+
+    for ( int i = 0; i < nroi; ++i )
+    {
+        //calculate correlation btw. timeseries at i and j...
+        double ex = 0;
+        double ex2 = 0;
+        float xk;
+        for ( int k = 0; k < ntp; ++k )
+        { //for all timepoints
+            xk = m_dataset->getData( i, k ); //timepoint k at position i...
+            ex += xk;
+            ex2 += xk*xk;
+        }
+        m_exField[i] = ex;
+        m_ex2Field[i] = ex2;
+    }
+
+
     QAtomicInt currentId( 0 );
     int numThreads = GLFunctions::idealThreadCount;
 
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        CorrelationThread* t = new CorrelationThread( i, m_dataset );
+        CorrelationThread* t = new CorrelationThread( i, m_dataset, m_exField, m_ex2Field );
         m_threads.push_back( t );
         connect( t, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
         connect( t, SIGNAL( finished() ), this, SLOT( slotThreadFinished() ), Qt::QueuedConnection );
     }
-
+    qDebug() << "start calculating correlation";
     // run threads
     for ( int i = 0; i < numThreads; ++i )
     {
@@ -90,6 +113,14 @@ void Correlation::slotThreadFinished()
         {
             delete m_threads[i];
         }
+        qDebug() << "finished calculating correlation";
+
+//        16:24:44:737 [D] start calculating correlation
+//        16:25:35:116 [D] finished calculating correlation
+
+//        16:38:54:592 [D] start calculating correlation
+//        16:39:43:759 [D] finished calculating correlation
+
         emit( finished() );
     }
 }
