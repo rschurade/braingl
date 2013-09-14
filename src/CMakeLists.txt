@@ -139,7 +139,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
 	QT4_AUTOMOC( ${TARGET_CPP_FILES} )
 
     # This is needed since the mocs will be generated there
-    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
+    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
 
     QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 
@@ -181,7 +181,7 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
 
     # This is needed since the mocs will be generated there
-    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR})
+    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
 
     QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
     
