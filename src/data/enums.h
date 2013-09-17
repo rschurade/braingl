@@ -31,7 +31,8 @@ namespace Fn
         FIBERS,
         GLYPHSET,
         SURFACESET,
-        CONS
+        CONS,
+        TREE
     };
 
     enum class ColormapEnum : int
