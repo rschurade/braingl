@@ -194,6 +194,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "tube" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
+        GLFunctions::m_shaderNames.push_back( "line" );
         GLFunctions::m_shaderNames.push_back( "colormapscale" );
         GLFunctions::m_shaderNames.push_back( "qball" );
         GLFunctions::m_shaderNames.push_back( "crosshair" );

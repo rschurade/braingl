@@ -52,6 +52,8 @@
         <file>shaders/fiber.fs</file>
         <file>shaders/lighting.vs</file>
         <file>shaders/lighting.fs</file>
+        <file>shaders/line.vs</file>
+        <file>shaders/line.fs</file>
         <file>shaders/merge.vs</file>
         <file>shaders/merge.fs</file>
         <file>shaders/mesh.vs</file>

@@ -20,6 +20,7 @@
 #include "datasets/datasetglyphset.h"
 #include "datasets/datasetcons.h"
 #include "datasets/datasetmeshtimeseries.h"
+#include "datasets/datasettree.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -28,7 +29,8 @@
 #include <QtGui>
 
 Loader::Loader() :
-        m_datasetType( Fn::DatasetType::UNKNOWN ), m_success( false )
+    m_datasetType( Fn::DatasetType::UNKNOWN ),
+    m_success( false )
 {
 }
 
@@ -67,11 +69,6 @@ bool Loader::load()
         return loadNifti();
     }
 
-    if ( m_fileName.path().endsWith( ".mesh" ) )
-    {
-        return loadMesh();
-    }
-
     if ( m_fileName.path().endsWith( ".fib" ) )
     {
         return loadVTK();
@@ -107,6 +104,12 @@ bool Loader::load()
     {
         return loadMEG();
     }
+
+    if ( m_fileName.path().endsWith( ".dtree" ) )
+    {
+        return loadTree();
+    }
+
 
     return false;
 }
@@ -968,79 +971,6 @@ QVector<QVector3D> Loader::loadBvecs( QString fileName, QVector<float> bvals )
     }
 }
 
-bool Loader::loadMesh()
-{
-    return loadMeshBinary();
-}
-
-bool Loader::loadMeshBinary()
-{
-    /*
-     qDebug() << "load mesh";
-     QFile file( m_fileName.path() );
-     file.open( QIODevice::ReadOnly );
-     QDataStream in( &file );
-     char* s = new char[29];
-     char* s1 = new char[10];
-     for ( int i = 0; i < 9; ++i )
-     {
-     s1[i] = s[i];
-     }
-     s1[9] = 0;
-     QString s2 = QString::fromLocal8Bit( s1 );
-     if ( s2 == "binarABCD" )
-     {
-     in.setByteOrder( QDataStream::BigEndian );
-     //qDebug() << "big endian";
-     }
-     else if ( s2 == "binarDCBA" )
-     {
-     in.setByteOrder( QDataStream::LittleEndian );
-     //qDebug() << "little endian";
-     }
-     else
-     {
-     qDebug() << "unknown entry in file";
-     return false;
-     }
-     m_datasetType = FNDT_MESH_BINARY;
-
-     in.setFloatingPointPrecision( QDataStream::SinglePrecision );
-     qint32 iVal;
-     TriangleMesh* tmesh = new TriangleMesh();
-     in >> iVal;
-     qDebug() << iVal;
-     float x, y, z;
-     for ( qint32 i = 0; i < iVal; ++i )
-     {
-     in >> x;
-     in >> y;
-     in >> z;
-     tmesh->addVertex( x, y, z );
-     }
-     in >> iVal;
-     qDebug() << iVal;
-     for ( qint32 i = 0; i < iVal; ++i )
-     {
-     in >> x;
-     in >> y;
-     in >> z;
-     }
-     in >> iVal;
-     in >> iVal;
-     qDebug() << iVal;
-     qint32 v1, v2, v3;
-     for ( qint32 i = 0; i < iVal; ++i )
-     {
-     in >> v1;
-     in >> v2;
-     in >> v3;
-     tmesh->addTriangle( v1, v2, v3 );
-     }
-     */
-    return false;
-}
-
 bool Loader::loadVTK()
 {
     QString fn = m_fileName.path();
@@ -1622,5 +1552,58 @@ bool Loader::loadMEG()
     dataset->setProperties();
     m_dataset.push_back( dataset );
 
+    return true;
+}
+
+bool Loader::loadTree()
+{
+    QString fn = m_fileName.path();
+
+    DatasetTree* dataset = new DatasetTree( fn );
+
+    qDebug() << "loading tree: " << fn;
+
+    QFile setfile( fn );
+    if ( !setfile.open( QIODevice::ReadOnly ) )
+    {
+        qDebug( "set file unreadable" );
+    }
+    QTextStream ts( &setfile );
+    QString nl;
+
+    QString dims;
+    QVector<QString>coordinates;
+    QVector<QString>clusters;
+
+    while ( !ts.atEnd() )
+    {
+        nl = ts.readLine();
+        if ( nl.startsWith( "#imagesize" ) )
+        {
+            dims = ts.readLine();
+        }
+
+        if ( nl.startsWith( "#coordinates" ) )
+        {
+            nl = ts.readLine();
+            while( nl != "#endcoordinates" )
+            {
+                coordinates.push_back( nl );
+                nl = ts.readLine();
+            }
+        }
+
+        if ( nl.startsWith( "#clusters" ) )
+        {
+            nl = ts.readLine();
+            while( nl != "#endclusters" )
+            {
+                clusters.push_back( nl );
+                nl = ts.readLine();
+            }
+        }
+    }
+    dataset->importTree( dims, coordinates, clusters );
+    m_dataset.push_back( dataset );
     return true;
 }

@@ -45,14 +45,13 @@ private:
     QVector<float> loadBvals( QString fileName );
     QVector<QVector3D> loadBvecs( QString fileName, QVector<float> bvals );
 
-    bool loadMesh();
-    bool loadMeshBinary();
     bool loadVTK();
     bool loadASC( QVector3D offset = QVector3D(0,0,0) );
     bool loadSet();
     bool loadGlyphset();
     bool loadCons();
     bool loadMEG();
+    bool loadTree();
 
     nifti_image* m_header;
     QDir m_fileName;

@@ -26,6 +26,7 @@
 #include "widgets/shadereditwidget.h"
 #include "widgets/colormapeditwidget.h"
 #include "widgets/scriptwidget.h"
+#include "widgets/hierarchicaltreeglwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
 #include "gl/camerabase.h"
@@ -983,11 +984,20 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
+    HierarchicalTreeGLWidget* htw = new HierarchicalTreeGLWidget( QString( "tree" ), this, mainGLWidget );
+    FNDockWidget* dockHTW = new FNDockWidget( QString("tree"), htw, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW );
+    viewMenu->addAction( dockHTW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
+    connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
+
+
     dockNav1->hide();
     dockNav2->hide();
     dockNav3->hide();
     dockNav4->hide();
     dockMainGL2->hide();
+    dockHTW->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
