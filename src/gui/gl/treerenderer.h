@@ -33,6 +33,7 @@ public:
     void middleMouseDrag( int x, int y );
 	virtual void mouseWheel( int step );
 
+	void update();
 
 private:
     void setShaderVars();
@@ -52,6 +53,8 @@ private:
     QVector<float>m_verts;
     QVector<float>m_colors;
     Tree* m_tree;
+
+    bool m_dirty;
 };
 
 #endif /* SCENERENDERER_H_ */

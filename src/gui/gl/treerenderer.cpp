@@ -29,7 +29,8 @@ TreeRenderer::TreeRenderer( QString name ) :
     ObjectRenderer(),
     m_name( name ),
     vboIds( new GLuint[ 2 ] ),
-    m_tree( 0 )
+    m_tree( 0 ),
+    m_dirty( true )
 {
 }
 
@@ -75,7 +76,7 @@ void TreeRenderer::draw()
 {
     glViewport( 0, 0, m_width, m_height );
 
-    if( !m_tree )
+    if( !m_tree || m_dirty )
     {
         initGeometry();
     }
@@ -169,6 +170,8 @@ void TreeRenderer::initGeometry()
     // Transfer vertex data to VBO 3
    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
    glBufferData( GL_ARRAY_BUFFER, m_colors.size() * sizeof( float ), m_colors.data(), GL_STATIC_DRAW );
+
+   m_dirty = false;
 }
 
 void TreeRenderer::initGeometryRec( Tree* tree, int left, int right )
@@ -198,7 +201,7 @@ void TreeRenderer::initGeometryRec( Tree* tree, int left, int right )
         m_verts.push_back( child->getValue() );
         m_verts.push_back( 0.0 );
 
-        QColor color = tree->getColor1();
+        QColor color = tree->getColor( 0 );
         m_colors.push_back( color.redF() );
         m_colors.push_back( color.greenF() );
         m_colors.push_back( color.blueF() );
@@ -263,4 +266,9 @@ void TreeRenderer::middleMouseDrag( int x, int y )
 {
 //    m_moveX = m_moveXOld - ( m_middleDownX - x );
 //    m_moveY = m_moveYOld + m_middleDownY - y;
+}
+
+void TreeRenderer::update()
+{
+    m_dirty = true;
 }

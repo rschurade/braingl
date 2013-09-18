@@ -12,10 +12,14 @@
 Tree::Tree(  int id, float value ) :
     m_id( id ),
     m_value( value ),
-    m_color1( QColor( 1.0, 0, 0 ) ),
-    m_color2( QColor( 0.5, 0.5, 0.5 ) ),
+    m_texturePosition( QVector3D( 0, 0, 0 ) ),
     m_parent( 0 )
 {
+    QColor color1( 1.0, 0, 0 );
+    QColor color2( 0.5, 0.5, 0.5 );
+
+    m_colors.push_back( color1 );
+    m_colors.push_back( color2 );
 }
 
 Tree::~Tree()
@@ -42,49 +46,25 @@ QList<Tree*> Tree::getChildren()
     return m_children;
 }
 
-QColor Tree::getColor1()
+QColor Tree::getColor( int id )
 {
-    return m_color1;
+    return m_colors[id];
 }
 
-void Tree::setColor1( QColor& color1 )
+void Tree::setColor( int id, QColor& color, bool propagateUp, bool propagateDown )
 {
-    m_color1 = color1;
-    if ( m_parent )
+    m_colors.replace( id, color );
+    if ( propagateUp && m_parent )
     {
-        m_parent->setColor1FromChild();
+        m_parent->setColor( id, color, true, false );
     }
-}
-
-void Tree::setColor1FromChild()
-{
-    float r = 0;
-    float g = 0;
-    float b = 0;
-    for( int i = 0; i < m_children.size(); ++i )
+    if ( propagateDown )
     {
-        QColor c = m_children[i]->getColor1();
-        r += c.red();
-        g += c.green();
-        b += c.blue();
+        for ( int i = 0; i < m_children.size(); ++i )
+        {
+            m_children[i]->setColor( id, color, false, true );
+        }
     }
-
-    m_color1 = QColor( r / m_children.size(), g / m_children.size(), b / m_children.size() );
-
-    if ( m_parent )
-    {
-        m_parent->setColor1FromChild();
-    }
-}
-
-QColor Tree::getColor2()
-{
-    return m_color2;
-}
-
-void Tree::setColor2( QColor& color2 )
-{
-    m_color2 = color2;
 }
 
 int Tree::getId()
@@ -118,4 +98,14 @@ int Tree::getNumLeaves()
         numLeaves = 1;
     }
     return numLeaves;
+}
+
+QVector3D Tree::getTexturePosition()
+{
+    return m_texturePosition;
+}
+
+void Tree::setTexturePosition( QVector3D value )
+{
+    m_texturePosition = value;
 }

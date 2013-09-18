@@ -230,6 +230,9 @@ namespace Fn
         D_MESH_MAKE_PERMANENT,
         D_MESH_NUM_VERTEX,
         D_MESH_NUM_TRIANGLES,
+        D_TREE_SELECTED_CLUSTER,
+        D_TREE_SELECTED_CLUSTER_COLOR,
+        D_TREE_UNSELECTED_CLUSTER_COLOR,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -459,6 +462,10 @@ namespace Fn
                 case Property::D_MESH_MAKE_PERMANENT: return QString( "make permanent" ); break;
                 case Property::D_MESH_NUM_VERTEX: return QString( "num vertexes" ); break;
                 case Property::D_MESH_NUM_TRIANGLES: return QString( "num triangles" ); break;
+                case Property::D_TREE_SELECTED_CLUSTER: return QString( "selected cluster" ); break;
+                case Property::D_TREE_SELECTED_CLUSTER_COLOR: return QString( "selected cluster color" ); break;
+                case Property::D_TREE_UNSELECTED_CLUSTER_COLOR: return QString( "unselected cluster color" ); break;
+
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
