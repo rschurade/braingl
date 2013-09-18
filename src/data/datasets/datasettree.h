@@ -17,6 +17,8 @@ class Tree;
 
 class DatasetTree : public Dataset
 {
+    Q_OBJECT
+
 public:
     DatasetTree( QDir fn = QDir( "hierarchical tree" ) );
     virtual ~DatasetTree();
@@ -28,10 +30,20 @@ public:
     Tree* getTree() { return m_tree; };
 
 private:
+    void createTexture();
+
+    void createTextureRec( Tree* tree );
+
     Tree* m_tree;
 
     int m_numLeaves;
     int m_numNodes;
+
+    QVector<float>m_textureData;
+
+private slots:
+    void selectCluster( QVariant id );
+
 };
 
 #endif /* DATASETTREE_H_ */
