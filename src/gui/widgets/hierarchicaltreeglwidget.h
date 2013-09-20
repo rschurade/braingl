@@ -11,7 +11,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
-class TreeRenderer;
+class TreeWidgetRenderer;
 
 class HierarchicalTreeGLWidget: public QGLWidget
 {
@@ -40,7 +40,7 @@ protected:
     void wheelEvent( QWheelEvent *event );
 
 private:
-    TreeRenderer* m_renderer;
+    TreeWidgetRenderer* m_renderer;
     bool m_visible;
 };
 

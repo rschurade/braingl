@@ -14,25 +14,25 @@ namespace Fn
 {
     enum class DatasetType : int
     {
-        UNKNOWN,
-        NIFTI_SCALAR,
-        NIFTI_VECTOR,
-        NIFTI_TENSOR,
-        NIFTI_SH,
-        NIFTI_FMRI,
-        NIFTI_DWI,
-        NIFTI_BINGHAM,
-        NIFTI_ANY,
-        MESH_ASCII,
-        MESH_BINARY,
-        MESH_ISOSURFACE,
-        MESH_TIME_SERIES,
-        MESH_CORRELATION,
-        FIBERS,
-        GLYPHSET,
-        SURFACESET,
-        CONS,
-        TREE
+        UNKNOWN = 0x00,
+        NIFTI_SCALAR = 0x01,
+        NIFTI_VECTOR = 0x02,
+        NIFTI_TENSOR = 0x04,
+        NIFTI_SH = 0x08,
+        NIFTI_FMRI = 0x10,
+        NIFTI_DWI = 0x20,
+        NIFTI_BINGHAM = 0x40,
+        NIFTI_ANY = 0x80,
+        MESH_ASCII = 0x100,
+        MESH_BINARY = 0x200,
+        MESH_ISOSURFACE = 0x400,
+        MESH_TIME_SERIES = 0x800,
+        MESH_CORRELATION = 0x1000,
+        FIBERS = 0x2000,
+        GLYPHSET = 0x4000,
+        SURFACESET = 0x8000,
+        CONS = 0x10000,
+        TREE = 0x20000
     };
 
     enum class ColormapEnum : int
