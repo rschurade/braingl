@@ -12,6 +12,7 @@
 
 #include <QAbstractItemModel>
 
+class Dataset;
 class ROI;
 
 class Models
@@ -38,6 +39,8 @@ public:
     static QAbstractItemModel* r();
 
     static QModelIndex createRoiIndex( int branch, int pos, int column );
+
+    static QList<Dataset*>getDatasets( Fn::DatasetType filter );
 
 private:
     static QAbstractItemModel* m_globalModel;

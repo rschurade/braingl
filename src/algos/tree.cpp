@@ -67,6 +67,25 @@ void Tree::setColor( int id, QColor& color, bool propagateUp, bool propagateDown
     }
 }
 
+void Tree::setColor( int id, int colorId, QColor& color )
+{
+    if ( id == m_id )
+    {
+        m_colors.replace( colorId, color );
+        for ( int i = 0; i < m_children.size(); ++i )
+        {
+            m_children[i]->setColor( m_children[i]->getId(), colorId, color );
+        }
+    }
+    else
+    {
+        for ( int i = 0; i < m_children.size(); ++i )
+        {
+            m_children[i]->setColor( id, colorId, color );
+        }
+    }
+}
+
 int Tree::getId()
 {
     return m_id;

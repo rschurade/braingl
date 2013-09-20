@@ -5,8 +5,8 @@
  * @author Ralph Schurade
  */
 
-#ifndef TREERENDERER_H_
-#define TREERENDERER_H_
+#ifndef TREEWIDGTERENDERER_H_
+#define TREEWIDGTERENDERER_H_
 
 #include "objectrenderer.h"
 
@@ -15,17 +15,17 @@
 class Tree;
 class QGLShaderProgram;
 
-class TreeRenderer : public ObjectRenderer
+class TreeWidgetRenderer : public ObjectRenderer
 {
 public:
-	TreeRenderer( QString name, Tree* tree );
-	virtual ~TreeRenderer();
+	TreeWidgetRenderer( QString name );
+	virtual ~TreeWidgetRenderer();
 
 	void resizeGL( int width, int height );
 
 	void init();
 	void initGL();
-	void draw( QMatrix4x4 mvpMatrix );
+	void draw();
 
 	virtual void leftMouseDown( int x, int y );
 	virtual void leftMouseDrag( int x, int y );
@@ -33,27 +33,15 @@ public:
     void middleMouseDrag( int x, int y );
 	virtual void mouseWheel( int step );
 
-	void update();
-
 private:
-    void setShaderVars();
-    void initGeometry();
-
-    void initGeometryRec( Tree* tree, int left, int right );
+	void setShaderVars();
 
 	QString m_name;
-	Tree* m_tree;
 
-    GLuint *vboIds;
+	QMatrix4x4 m_mvpMatrix;
 
     int m_width;
     int m_height;
-
-    QVector<float>m_verts;
-    QVector<float>m_colors;
-
-
-    bool m_dirty;
 };
 
 #endif /* SCENERENDERER_H_ */

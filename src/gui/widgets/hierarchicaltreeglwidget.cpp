@@ -7,9 +7,10 @@
 
 #include "hierarchicaltreeglwidget.h"
 
-#include "../gl/treerenderer.h"
+#include "../gl/treewidgetrenderer.h"
 
 #include "../../data/models.h"
+#include "../../data/datasets/dataset.h"
 
 #include <QtGui>
 #include <QDebug>
@@ -17,7 +18,7 @@
 HierarchicalTreeGLWidget::HierarchicalTreeGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
 	QGLWidget( parent, shareWidget )
 {
-    m_renderer = new TreeRenderer( "tree renderer" );
+    m_renderer = new TreeWidgetRenderer( "tree renderer" );
 
 
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
@@ -61,7 +62,11 @@ void HierarchicalTreeGLWidget::mousePressEvent( QMouseEvent *event )
 {
     if ( event->buttons() & Qt::LeftButton )
     {
-        m_renderer->leftMouseDown( event->x(), event->y() );
+        QList<Dataset*>dl = Models::getDatasets( Fn::DatasetType::TREE );
+        for ( int i = 0; i < dl.size(); ++i )
+        {
+            dl[i]->mousePick( 0, QVector3D( event->x(), event->y(), 0 ), event->modifiers(), "tree" );
+        }
     }
     if ( event->buttons() & Qt::MiddleButton )
     {
@@ -87,7 +92,7 @@ void HierarchicalTreeGLWidget::wheelEvent(QWheelEvent *event)
 {
      int numDegrees = event->delta() / 8;
      int numSteps = numDegrees / 15;
-     m_renderer->mouseWheel( numSteps );
+     //m_renderer->mouseWheel( numSteps );
      updateGL();
 
 }

@@ -23,7 +23,8 @@ public:
     void addChild( Tree* child );
 
     QColor getColor( int id );
-    void setColor( int id, QColor& color, bool propagateUp, bool propagateDown );
+    void setColor( int colorId, QColor& color, bool propagateUp, bool propagateDown );
+    void setColor( int id, int colorId, QColor& color );
 
     int getId();
 

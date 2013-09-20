@@ -13,6 +13,8 @@
 #include "roi.h"
 #include "vptr.h"
 
+#include "datasets/dataset.h"
+
 QAbstractItemModel* Models::m_dataModel = 0;
 QAbstractItemModel* Models::m_globalModel = 0;
 QAbstractItemModel* Models::m_roiModel = 0;
@@ -106,4 +108,24 @@ QModelIndex Models::createRoiIndex( int branch, int pos, int column )
         parent = m_roiModel->index( branch, 0 );
     }
     return m_roiModel->index( row, column, parent );
+}
+
+QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
+{
+    QList<Dataset*>rl;
+    int countDatasets = m_dataModel->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::D_ACTIVE );
+        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        {
+            index = m_dataModel->index( i, (int)Fn::Property::D_TYPE );
+            if ( m_dataModel->data( index, Qt::DisplayRole ).toInt() & (int)filter )
+            {
+                Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+                rl.push_back( ds );
+            }
+        }
+    }
+    return rl;
 }

@@ -8,6 +8,7 @@
 #include "datasettree.h"
 
 #include "../../gui/gl/colormapfunctions.h"
+#include "../../gui/gl/treerenderer.h"
 #include "../../algos/colormapbase.h"
 
 
@@ -18,6 +19,7 @@
 DatasetTree::DatasetTree( QDir fn ) :
     Dataset( fn , Fn::DatasetType::TREE ),
     m_tree( 0 ),
+    m_renderer( 0 ),
     m_numLeaves( 0 ),
     m_numNodes( 0 )
 {
@@ -44,6 +46,19 @@ DatasetTree::~DatasetTree()
 void DatasetTree::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
 
+}
+
+void DatasetTree::drawTree( QMatrix4x4 mvpMatrix, int width, int height )
+{
+    m_width = width;
+    m_height = height;
+
+    if ( m_renderer == 0 )
+    {
+        m_renderer = new TreeRenderer( "tree", m_tree );
+        m_renderer->init();
+    }
+    m_renderer->draw( mvpMatrix );
 }
 
 void DatasetTree::importTree( QString dims, QVector<QString>coords, QVector<QString>clusters )
@@ -185,5 +200,65 @@ void DatasetTree::createTextureRec( Tree* tree )
 
 void DatasetTree::selectCluster( QVariant id )
 {
+    QColor unselectedColor = m_properties["maingl"]->get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
+    QColor selectedColor = m_properties["maingl"]->get( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR ).value<QColor>();
+    m_tree->setColor( 0, unselectedColor , false, true );
+    m_tree->setColor( id.toInt(), 0, selectedColor );
 
+    m_renderer->update();
+}
+
+bool DatasetTree::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
+{
+    if( target != "tree" )
+    {
+        return false;
+    }
+    float x = ( pos.x() / static_cast<float>( m_width ) ) * m_numLeaves;
+    float y = 1.0 - ( pos.y() / static_cast<float>( m_height ) );
+    qDebug() << x << y ;
+    int id = pickClusterRec( m_tree, m_width, m_height, x, y );
+    qDebug() << id;
+    if ( id != -1 )
+    {
+        m_properties["maingl"]->set( Fn::Property::D_TREE_SELECTED_CLUSTER, id );
+        QColor unselectedColor = m_properties["maingl"]->get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
+        QColor selectedColor = m_properties["maingl"]->get( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR ).value<QColor>();
+        m_tree->setColor( 0, unselectedColor , false, true );
+        m_tree->setColor( id, 0, selectedColor );
+        m_renderer->update();
+    }
+    return true;
+}
+
+int DatasetTree::pickClusterRec( Tree* tree, int left, int right, float x, float y )
+{
+    if ( ( tree->getValue() > ( y - 0.01 ) ) && ( tree->getValue() < ( y + 0.01 ) ) )
+    {
+        if( x > left && x < right )
+        {
+            return tree->getId();
+        }
+    }
+    else
+    {
+        QList<Tree*> children = tree->getChildren();
+
+        int offset = 0;
+        for ( int i = 0; i < children.size(); ++i )
+        {
+            Tree* child = children[i];
+
+            int size = child->getNumLeaves();
+
+            int id = pickClusterRec( child, left + offset, left + offset + size, x, y );
+            if( id != -1 )
+            {
+                return id;
+            }
+
+            offset += size;
+        }
+    }
+    return -1;
 }
