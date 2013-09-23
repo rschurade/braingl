@@ -17,7 +17,8 @@ Edge::~Edge()
     // TODO Auto-generated destructor stub
 }
 
-Edge::Edge( QVector3D fn, QVector3D tn )
+Edge::Edge( QVector3D fn, QVector3D tn, float value ) :
+        m_value( value )
 {
     this->fn = fn;
     this->tn = tn;

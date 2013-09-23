@@ -368,19 +368,33 @@ QList<Dataset*> Connections::createDatasetFibers()
     //int m = edges.at( 0 )->points.size();
 
     QVector<QVector<float> > fibers;
+    QVector<QVector<float> > values;
     for ( int e = 0; e < n; e++ )
     {
         Edge* ed = edges.at( e );
+        float v = ed->m_value;
+
         QVector<float> line;
+        QVector<float> lineValues;
         for ( int p = 0; p < ed->points.size(); p++ )
         {
             QVector3D po = ed->points.at( p );
             line.push_back( po.x() );
             line.push_back( po.y() );
             line.push_back( po.z() );
+            lineValues.push_back( v );
         }
         fibers.push_back( line );
+        values.push_back( lineValues );
     }
+    QVector<QVector<QVector<float> > > allValues;
+    allValues.push_back( values );
+    QVector<QString> value_names;
+    value_names.push_back( "connectivity" );
+    QVector<float> mins;
+    QVector<float> maxs;
+    mins.push_back( -1 );
+    maxs.push_back( 1 );
 
     //out << "LINES " << n << " " << n * ( m + 1 ) << endl;
 
@@ -396,7 +410,7 @@ QList<Dataset*> Connections::createDatasetFibers()
      lines.push_back(line);
      }*/
 
-    DatasetFibers* ds = new DatasetFibers( QString( "new" ), fibers );
+    DatasetFibers* ds = new DatasetFibers( QString( "new" ), fibers, allValues, value_names, mins, maxs );
     QList<Dataset*> l;
     l.push_back( ds );
     return l;

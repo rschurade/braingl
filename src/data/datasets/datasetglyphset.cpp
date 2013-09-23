@@ -806,7 +806,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                Edge* aedge = new Edge( f, t );
+                Edge* aedge = new Edge( f, t, v );
 
                 if ( aedge->length() > minlength )
                 {
