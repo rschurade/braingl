@@ -7,10 +7,10 @@
 
 #include "datasetcons.h"
 
+#include "../properties/propertyfloat.h"
+
 DatasetCons::DatasetCons( QString fileName ) :
-    Dataset( fileName, Fn::DatasetType::CONS ),
-    m_vrenderer( NULL ),
-    vectorArray( NULL )
+        Dataset( fileName, Fn::DatasetType::CONS ), m_vrenderer( NULL ), vectorArray( NULL )
 {
     cons = new Connections( fileName );
     consNumber = cons->edges.length();
@@ -23,21 +23,19 @@ DatasetCons::DatasetCons( QString fileName ) :
     m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
 
     m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
 
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    //m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :
-    Dataset( QString( "new" ), Fn::DatasetType::CONS ),
-    cons( cons ),
-    m_vrenderer( NULL ),
-    vectorArray( NULL )
+        Dataset( QString( "new" ), Fn::DatasetType::CONS ), cons( cons ), m_vrenderer( NULL ), vectorArray( NULL )
 {
     consNumber = cons->edges.length();
 
@@ -49,10 +47,14 @@ DatasetCons::DatasetCons( Connections* cons ) :
     m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
 
     // add new properties
-    //m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.5f, 0.0f, 1.0f );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
 
     m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
+
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
 
 }
 
@@ -97,8 +99,9 @@ float* DatasetCons::getVectors()
 
     for ( int i = 0; i < consNumber; i++ )
     {
-        float v = 1;
         Edge* e = cons->edges.at( i );
+        float v = e->m_value;
+        v = 1;
         QVector3D f = e->fn;
         QVector3D t = e->tn;
 
