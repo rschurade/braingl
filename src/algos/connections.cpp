@@ -81,6 +81,54 @@ Connections::Connections( QString fib )
 {
     params();
     prefix = fib;
+    if ( fib.endsWith( ".fib" ) )
+    {
+        loadFib( fib );
+    }
+    else if ( fib.endsWith( ".cxls" ) )
+    {
+        loadConnexels( fib );
+    }
+}
+
+void Connections::loadConnexels( QString filename )
+{
+//load textfile with px py pz qx qy qz value:
+    QFile n( filename );
+    if ( !n.open( QIODevice::ReadOnly ) )
+    {
+        qDebug() << "connexel file unreadable: " << filename;
+    }
+    QTextStream ns( &n );
+    QString nl;
+
+    while ( !ns.atEnd() )
+    {
+        nl = ns.readLine();
+
+        QStringList vals = nl.split( " ", QString::SkipEmptyParts );
+        if ( vals.size() == 7 )
+        {
+            QVector3D* anode1;
+            QVector3D* anode2;
+            //x,y,z
+            anode1 = new QVector3D( ( (QString) ( vals.at( 0 ) ) ).toFloat(), ( (QString) ( vals.at( 1 ) ) ).toFloat(),
+                    ( (QString) ( vals.at( 2 ) ) ).toFloat() );
+
+            anode2 = new QVector3D( ( (QString) ( vals.at( 3 ) ) ).toFloat(), ( (QString) ( vals.at( 4 ) ) ).toFloat(),
+                    ( (QString) ( vals.at( 5 ) ) ).toFloat() );
+            float value = ( (QString) ( vals.at( 5 ) ) ).toFloat();
+            Edge* aedge;
+            aedge = new Edge( *anode1, *anode2 );
+            edges << aedge;
+        }
+    }
+    n.close();
+    qDebug() << "connexels read";
+}
+
+void Connections::loadFib( QString fib )
+{
     QFile n( fib );
     if ( !n.open( QIODevice::ReadOnly ) )
         qDebug() << "vtk unreadable: " << fib;
