@@ -36,6 +36,8 @@ public:
     void writeBinaryVTK();
     void writeBinaryVTK(QString name);
     void writeSegments();
+    void loadConnexels(QString filename);
+    void loadFib(QString fib);
     QString name();
 
     QList<Dataset*> createDatasetFibers();

@@ -95,7 +95,7 @@ bool Loader::load()
         return loadGlyphset();
     }
 
-    if ( m_fileName.path().endsWith( ".cons" ) )
+    if ( m_fileName.path().endsWith( ".cons" ) || m_fileName.path().endsWith( ".cxls" ) )
     {
         return loadCons();
     }
