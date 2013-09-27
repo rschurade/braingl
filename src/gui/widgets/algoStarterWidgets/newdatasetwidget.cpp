@@ -141,9 +141,28 @@ void NewDatasetWidget::createDataset()
             QVector<float>* data = ds->getData();
             QVector<float> out( data->size() );
 
+            float min = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+            float max = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+            float totalMin = ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat();
+            float totalMax = ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
+            float lowerThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+            float upperThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+
             for ( int i = 0; i < data->size(); ++i )
             {
-                out[i] = data->at( i );
+                float value = data->at( i );
+                if ( value < lowerThreshold || value > upperThreshold )
+                {
+                    value = 0.0f;
+                }
+                else
+                {
+                    value = ( value - min ) / ( max - min );
+                    value *= totalMax;
+                }
+                value = qMax( totalMin, qMin( totalMax, value ) );
+
+                out[i] = value;
             }
 
             DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, ds->getHeader() );

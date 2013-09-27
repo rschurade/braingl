@@ -78,7 +78,8 @@ namespace Fn
         EXPORTRGB,
         LOOP_SUBDIVISION,
         MESH_TIME_SERIES,
-        MESH_CORRELATION
+        MESH_CORRELATION,
+        MESH_BIGGEST_COMPONENT
     };
 
     enum class Orient : int

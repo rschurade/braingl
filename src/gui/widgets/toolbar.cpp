@@ -189,6 +189,10 @@ void ToolBar::createActions()
     m_meshCorrelationAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "correlation" ), this, Fn::Algo::MESH_CORRELATION );
     m_meshCorrelationAction->setStatusTip( tr( "correlation" ) );
     connect( m_meshCorrelationAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_meshBiggestComponentAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "biggest component" ), this, Fn::Algo::MESH_BIGGEST_COMPONENT );
+    m_meshBiggestComponentAction->setStatusTip( tr( "correlation" ) );
+    connect( m_meshBiggestComponentAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -337,6 +341,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::LOOP_SUBDIVISION:
             l = MeshAlgos::loopSubdivision( ds );
             break;
+        case Fn::Algo::MESH_BIGGEST_COMPONENT:
+            l = MeshAlgos::biggestComponent( ds );
+            break;
         case Fn::Algo::MESH_TIME_SERIES:
         {
             QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
@@ -459,6 +466,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::MESH_ISOSURFACE:
         {
             this->addAction( m_loopSubDAction );
+            this->addAction( m_meshBiggestComponentAction );
             break;
         }
         case Fn::DatasetType::MESH_TIME_SERIES:

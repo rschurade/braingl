@@ -201,6 +201,11 @@ void TriangleMesh2::addVertex( float x, float y, float z )
 
 QVector3D TriangleMesh2::getVertex( int id )
 {
+    if ( id > m_numVerts )
+    {
+        qDebug() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
+        exit( 0 );
+    }
     QVector3D vert( m_vertices[id * m_bufferSize], m_vertices[id * m_bufferSize + 1], m_vertices[id * m_bufferSize + 2]);
     return vert;
 }
@@ -277,6 +282,11 @@ int* TriangleMesh2::getIndexes()
 
 QVector<int> TriangleMesh2::getTriangle( int id )
 {
+    if ( id > m_numTris )
+    {
+        qDebug() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
+        exit( 0 );
+    }
     QVector<int> out;
     out.push_back( m_triangles[id * 3] );
     out.push_back( m_triangles[id * 3 + 1] );
