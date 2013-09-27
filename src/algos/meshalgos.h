@@ -18,6 +18,7 @@ class MeshAlgos
 public:
     static QList<Dataset*> loopSubdivision( Dataset* ds );
     static QList<Dataset*> meshTimeSeries( Dataset* ds, TriangleMesh2* mesh );
+    static QList<Dataset*> biggestComponent( Dataset* ds );
 
 private:
     MeshAlgos() {};

@@ -39,8 +39,7 @@ void DatasetMesh::initProperties()
     float min = 0.0;
     float max = 1.0;
 
-    m_properties["maingl"]->create( Fn::Property::D_COLORMODE,
-    { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
     m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
@@ -57,8 +56,7 @@ void DatasetMesh::initProperties()
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
     m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE,
-    { "off", "paint", "paint values" }, 0, "paint" );
+    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 20.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );
