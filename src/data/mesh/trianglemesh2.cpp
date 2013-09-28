@@ -103,6 +103,10 @@ TriangleMesh2::~TriangleMesh2()
 
 void TriangleMesh2::resize( int numVerts, int numTris )
 {
+    m_vertexInsertId = m_numVerts * bufferSize();
+    m_triangleInsertId = m_numTris * 3;
+    m_colorInsertId = m_numVerts * 4;
+
     m_vertices.resize( numVerts * m_bufferSize );
     m_vertexColors.resize( numVerts * 4 );
     m_vertIsInTriangle.resize( numVerts );
@@ -161,7 +165,7 @@ void TriangleMesh2::setVertex( int id, QVector3D pos )
     setVertex( id, pos.x(), pos.y(), pos.z() );
 }
 
-void TriangleMesh2::addVertex( float x, float y, float z )
+bool TriangleMesh2::addVertex( float x, float y, float z )
 {
     if(  m_vertices.size() > m_vertexInsertId )
     {
@@ -175,9 +179,11 @@ void TriangleMesh2::addVertex( float x, float y, float z )
         m_vertexColors[ m_colorInsertId++ ] = 1.0;
         m_vertexColors[ m_colorInsertId++ ] = 1.0;
         m_vertexColors[ m_colorInsertId++ ] = 1.0;
+        return true;
     }
     else
     {
+        //qDebug() << "adding vertex beyond field size";
         m_vertices.push_back( x );
         m_vertices.push_back( y );
         m_vertices.push_back( z );
@@ -196,6 +202,9 @@ void TriangleMesh2::addVertex( float x, float y, float z )
 
         m_vertIsInTriangle.resize( m_vertIsInTriangle.size() + 1 );
         m_vertNeighbors.resize( m_vertNeighbors.size() + 1 );
+
+        ++m_numVerts;
+        return false;
     }
 }
 
@@ -317,6 +326,26 @@ int TriangleMesh2::getNextVertex( int triNum, int vertNum )
     }
 
     return answer;
+}
+
+int TriangleMesh2::getThirdVert( int coVert1, int coVert2, int triangleNum )
+{
+    int index = 0;
+    bool found = false;
+
+    while ( ( index < 2 ) && !found )
+    {
+        if ( ( m_triangles[triangleNum * 3 + index] == coVert1 ) || ( m_triangles[triangleNum * 3 + index] == coVert2 ) )
+        {
+            ++index;
+        }
+        else
+        {
+            found = true;
+        }
+    }
+
+    return m_triangles[triangleNum * 3 + index];
 }
 
 void TriangleMesh2::calcTriNormals()

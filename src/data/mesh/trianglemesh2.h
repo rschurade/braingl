@@ -25,7 +25,7 @@ public:
 
     void setVertex( int id, float x, float y, float z );
     void setVertex( int id, QVector3D pos );
-    void addVertex( float x, float y, float z );
+    bool addVertex( float x, float y, float z );
     void setTriangle( int id, int v0, int v1, int v2 );
     void addTriangle( int v0, int v1, int v2 );
 
@@ -38,6 +38,7 @@ public:
     QVector<int> getStar( int id );
     int getNextVertex( int triNum, int vertNum );
     int getNeighbor( int coVert1, int coVert2, int triangleNum );
+    int getThirdVert( int coVert1, int coVert2, int triangleNum );
 
     void finalize();
 
