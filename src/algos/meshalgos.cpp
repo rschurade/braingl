@@ -69,6 +69,7 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
     DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( ds );
 
     TriangleMesh2* mesh = dsm->getMesh();
+    qDebug() << "in:  num verts:" << mesh->numVerts() << "num tris:" << mesh->numTris();
 
     int numTris = mesh->numTris();
 
@@ -108,7 +109,7 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
         }
         components.push_back( component );
         sumTris += component.size();
-        qDebug() << "new component of size:" << component.size();
+        //qDebug() << "new component of size:" << component.size();
     }
     while( sumTris < numTris );
 
@@ -116,47 +117,13 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
 
     for ( int i = 0; i < components.size(); ++i )
     {
-        if ( components[i].size() < 1000 )
+        if ( components[i].size() < Models::getGlobal( Fn::Property::G_MIN_COMPONENT_SIZE ).toInt() )
         {
             continue;
         }
 
-        QVector<int>component = components[i];
-        QMap<int, int>newVertIds;
-
-        for( int k = 0; k < component.size(); ++k )
-        {
-            QVector<int>tri = mesh->getTriangle( component[k] );
-            for( int l = 0; l < tri.size(); ++l )
-            {
-                if ( !newVertIds.contains( tri[l] ) )
-                {
-                    newVertIds.insert( tri[l], 0 );
-                }
-            }
-        }
-
-        TriangleMesh2* newMesh = new TriangleMesh2( newVertIds.size(), component.size() );
-
-        QMap<int, int>::iterator mapIterator = newVertIds.begin();
-        int vertInsertId = 0;
-        while ( mapIterator != newVertIds.end() )
-        {
-            QVector3D vert = mesh->getVertex( mapIterator.key() );
-            newVertIds[mapIterator.key()] = vertInsertId++;
-            newMesh->addVertex( vert.x(), vert.y(), vert.z() );
-            ++mapIterator;
-        }
-
-
-        for( int k = 0; k < component.size(); ++k )
-        {
-            QVector<int>tri = mesh->getTriangle( component[k] );
-            newMesh->addTriangle( newVertIds[tri[0]], newVertIds[tri[1]], newVertIds[tri[2]] );
-        }
-
-        newMesh->finalize();
-
+        TriangleMesh2* newMesh = pruneMesh( mesh, components[i] );
+        qDebug() << "out: num verts:" << newMesh->numVerts() << "num tris:" << newMesh->numTris();
         DatasetMesh* newDSM = new DatasetMesh( newMesh, "mesh component " + QString::number( i ) );
         l.push_back( newDSM );
     }
@@ -165,4 +132,146 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
 
 
    return l;
+}
+
+TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, QVector<int>component )
+{
+    QMap<int, int>newVertIds;
+
+    for( int k = 0; k < component.size(); ++k )
+    {
+        QVector<int>tri = mesh->getTriangle( component[k] );
+        for( int l = 0; l < tri.size(); ++l )
+        {
+            if ( !newVertIds.contains( tri[l] ) )
+            {
+                newVertIds.insert( tri[l], 0 );
+            }
+        }
+    }
+
+    TriangleMesh2* newMesh = new TriangleMesh2( newVertIds.size(), component.size() );
+
+    QMap<int, int>::iterator mapIterator = newVertIds.begin();
+    int vertInsertId = 0;
+    while ( mapIterator != newVertIds.end() )
+    {
+        QVector3D vert = mesh->getVertex( mapIterator.key() );
+        newVertIds[mapIterator.key()] = vertInsertId++;
+        newMesh->addVertex( vert.x(), vert.y(), vert.z() );
+        ++mapIterator;
+    }
+
+
+    for( int k = 0; k < component.size(); ++k )
+    {
+        QVector<int>tri = mesh->getTriangle( component[k] );
+        newMesh->addTriangle( newVertIds[tri[0]], newVertIds[tri[1]], newVertIds[tri[2]] );
+    }
+
+    newMesh->finalize();
+    return newMesh;
+}
+
+QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
+{
+    DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( ds );
+    TriangleMesh2* mesh = dsm->getMesh();
+    QList<Dataset*> l;
+
+    qDebug() << "in:  num verts:" << mesh->numVerts() << "num tris:" << mesh->numTris();
+
+    float epsilon = Models::getGlobal( Fn::Property::G_DECIMATE_EPSILON).toFloat();
+
+    QMap<QString, QVector<int> >cells;
+    QVector<QString>keys( mesh->numVerts() );
+
+    // put verts into cells of diameter epsilon
+    int x,y,z;
+    for ( int i = 0; i < mesh->numVerts(); ++i )
+    {
+        QVector3D vert = mesh->getVertex( i );
+        x = vert.x() / epsilon;
+        y = vert.y() / epsilon;
+        z = vert.z() / epsilon;
+        QString key = QString( x ) + "_" + QString( y ) + "_" + QString( z );
+        keys[i] = key;
+
+        if ( cells.contains( key ) )
+        {
+            cells[key].push_back( i );
+        }
+        else
+        {
+            QVector<int> entry;
+            entry.push_back( i );
+            cells.insert( key, entry );
+        }
+    }
+
+    // for each cell compute representative vertex
+
+    QMap<QString, QVector<int> >::iterator mapIterator = cells.begin();
+
+    QMap<QString, Point>newVerts;
+
+    int newPointId = 0;
+
+    while( mapIterator != cells.end() )
+    {
+        QVector<int>verts = mapIterator.value();
+
+        QVector3D newVert( 0, 0, 0 );
+        for ( int i = 0; i < verts.size(); ++i )
+        {
+            newVert += mesh->getVertex( verts[i] );
+        }
+        newVert /= verts.size();
+        Point p;
+        p.newID = newPointId++;
+        p.pos = newVert;
+        newVerts.insert( mapIterator.key(), p );
+
+        ++mapIterator;
+    }
+
+    QVector<Triangle>newTriangles;
+
+    // remove degenerative triangles
+    for ( int i = 0; i < mesh->numTris(); ++i )
+    {
+        Triangle t = mesh->getTriangle2( i );
+        QString key0 = keys[t.v0];
+        QString key1 = keys[t.v1];
+        QString key2 = keys[t.v2];
+        Triangle newT;
+        newT.v0 = newVerts[key0].newID;
+        newT.v1 = newVerts[key1].newID;
+        newT.v2 = newVerts[key2].newID;
+
+        if ( ( newT.v0 != newT.v1 ) &&  ( newT.v0 != newT.v2 ) &&  ( newT.v1 != newT.v2 ) )
+        {
+            newTriangles.push_back( newT );
+        }
+    }
+
+    TriangleMesh2* newMesh = new TriangleMesh2( newVerts.size(), newTriangles.size() );
+
+    QMap<QString, Point>::iterator vertIterator = newVerts.begin();
+
+    while( vertIterator != newVerts.end() )
+    {
+        newMesh->setVertex( vertIterator.value().newID, vertIterator.value().pos );
+        ++vertIterator;
+    }
+    for ( int i = 0; i < newTriangles.size(); ++i )
+    {
+        newMesh->setTriangle( i, newTriangles[i] );
+    }
+    newMesh->finalize();
+    qDebug() << "out: num verts:" << newMesh->numVerts() << "num tris:" << newMesh->numTris();
+    DatasetMesh* newDSM = new DatasetMesh( newMesh, QString("mesh decimate") );
+    l.push_back( newDSM );
+
+    return l;
 }

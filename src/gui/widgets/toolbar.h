@@ -71,6 +71,7 @@ private:
     FNAction* m_meshTimeSeriesAction;
     FNAction* m_meshCorrelationAction;
     FNAction* m_meshBiggestComponentAction;
+    FNAction* m_meshDecimateAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

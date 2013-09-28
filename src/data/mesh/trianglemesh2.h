@@ -14,6 +14,17 @@
 class MeshThread;
 class OcTree;
 
+struct Point {
+    int newID;
+    QVector3D pos;
+};
+
+struct Triangle {
+    int v0;
+    int v1;
+    int v2;
+};
+
 class TriangleMesh2
 {
 public:
@@ -26,8 +37,11 @@ public:
     void setVertex( int id, float x, float y, float z );
     void setVertex( int id, QVector3D pos );
     bool addVertex( float x, float y, float z );
+
     void setTriangle( int id, int v0, int v1, int v2 );
+    void setTriangle( int id, Triangle tri );
     void addTriangle( int v0, int v1, int v2 );
+    void addTriangle( Triangle tri );
 
     void setVertexColor( int id, QColor color );
     void setVertexColor( int id, float r, float g, float b, float a );
@@ -60,6 +74,7 @@ public:
 
     QVector3D getVertex(int id);
     QVector<int> getTriangle( int id );
+    Triangle getTriangle2( int id );
 
     QVector<int> getTriangles() { return m_triangles; };
 

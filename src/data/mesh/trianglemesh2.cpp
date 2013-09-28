@@ -230,6 +230,17 @@ void TriangleMesh2::setTriangle( int id, int v0, int v1, int v2 )
     m_vertIsInTriangle[v2].push_back( id );
 }
 
+void TriangleMesh2::setTriangle( int id, Triangle tri )
+{
+    m_triangles[ id * 3     ] = tri.v0;
+    m_triangles[ id * 3 + 1 ] = tri.v1;
+    m_triangles[ id * 3 + 2 ] = tri.v2;
+
+    m_vertIsInTriangle[tri.v0].push_back( id );
+    m_vertIsInTriangle[tri.v1].push_back( id );
+    m_vertIsInTriangle[tri.v2].push_back( id );
+}
+
 void TriangleMesh2::addTriangle( int v0, int v1, int v2 )
 {
     int id = m_triangleInsertId / 3;
@@ -241,6 +252,19 @@ void TriangleMesh2::addTriangle( int v0, int v1, int v2 )
     m_triangles[ m_triangleInsertId++ ] = v1;
     m_triangles[ m_triangleInsertId++ ] = v2;
 }
+
+void TriangleMesh2::addTriangle( Triangle tri )
+{
+    int id = m_triangleInsertId / 3;
+    m_vertIsInTriangle[tri.v0].push_back( id );
+    m_vertIsInTriangle[tri.v1].push_back( id );
+    m_vertIsInTriangle[tri.v2].push_back( id );
+
+    m_triangles[ m_triangleInsertId++ ] = tri.v0;
+    m_triangles[ m_triangleInsertId++ ] = tri.v1;
+    m_triangles[ m_triangleInsertId++ ] = tri.v2;
+}
+
 
 void TriangleMesh2::setVertexColor( int id, QColor color )
 {
@@ -302,6 +326,21 @@ QVector<int> TriangleMesh2::getTriangle( int id )
     out.push_back( m_triangles[id * 3 + 2] );
     return out;
 }
+
+Triangle TriangleMesh2::getTriangle2( int id )
+{
+    if ( id > m_numTris )
+    {
+        qDebug() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
+        exit( 0 );
+    }
+    Triangle out;
+    out.v0 = m_triangles[id * 3];
+    out.v1 = m_triangles[id * 3 + 1];
+    out.v2 = m_triangles[id * 3 + 2];
+    return out;
+}
+
 
 QVector<int> TriangleMesh2::getStar( int id )
 {

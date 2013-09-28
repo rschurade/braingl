@@ -79,7 +79,8 @@ namespace Fn
         LOOP_SUBDIVISION,
         MESH_TIME_SERIES,
         MESH_CORRELATION,
-        MESH_BIGGEST_COMPONENT
+        MESH_BIGGEST_COMPONENT,
+        MESH_DECIMATE
     };
 
     enum class Orient : int
@@ -310,6 +311,8 @@ namespace Fn
         G_LIGHT_AMBIENT,
         G_LIGHT_DIFFUSE,
         G_FILTER_SIZE,
+        G_DECIMATE_EPSILON,
+        G_MIN_COMPONENT_SIZE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -542,6 +545,8 @@ namespace Fn
                 case Property::G_LIGHT_AMBIENT: return QString( "light ambient" ); break;
                 case Property::G_LIGHT_DIFFUSE: return QString( "light diffuse" ); break;
                 case Property::G_FILTER_SIZE: return QString( "filter size" ); break;
+                case Property::G_DECIMATE_EPSILON: return QString( "epsilon for decimate" ); break;
+                case Property::G_MIN_COMPONENT_SIZE: return QString( "min size for component extraction" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
