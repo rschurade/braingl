@@ -133,23 +133,7 @@ int LoopSubdivision::calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 )
 
     else if ( neighborFaceNum > triNum )
     {
-        QVector<int> tri = m_mesh->getTriangle( neighborFaceNum );
-
-        if ( tri[0] == edgeV1 || tri[0] == edgeV2 )
-        {
-            if ( tri[1] == edgeV1 || tri[1] == edgeV2 )
-            {
-                neighborVert = tri[2];
-            }
-            else
-            {
-                neighborVert = tri[1];
-            }
-        }
-        else
-        {
-            neighborVert = tri[0];
-        }
+        neighborVert = m_mesh->getThirdVert( edgeV1, edgeV2, neighborFaceNum );
 
         QVector3D edgePart = m_mesh->getVertex( edgeV1 ) + m_mesh->getVertex( edgeV2 );
         QVector3D neighborPart = m_mesh->getVertex( neighborVert ) + m_mesh->getVertex( V3 );
