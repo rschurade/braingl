@@ -191,8 +191,12 @@ void ToolBar::createActions()
     connect( m_meshCorrelationAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
     m_meshBiggestComponentAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "biggest component" ), this, Fn::Algo::MESH_BIGGEST_COMPONENT );
-    m_meshBiggestComponentAction->setStatusTip( tr( "correlation" ) );
+    m_meshBiggestComponentAction->setStatusTip( tr( "biggest component" ) );
     connect( m_meshBiggestComponentAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_meshDecimateAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "decimate" ), this, Fn::Algo::MESH_DECIMATE );
+    m_meshDecimateAction->setStatusTip( tr( "decimate" ) );
+    connect( m_meshDecimateAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -344,6 +348,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::MESH_BIGGEST_COMPONENT:
             l = MeshAlgos::biggestComponent( ds );
             break;
+        case Fn::Algo::MESH_DECIMATE:
+            l = MeshAlgos::decimate( ds );
+            break;
         case Fn::Algo::MESH_TIME_SERIES:
         {
             QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
@@ -467,6 +474,7 @@ void ToolBar::slotSelectionChanged( int type )
         {
             this->addAction( m_loopSubDAction );
             this->addAction( m_meshBiggestComponentAction );
+            this->addAction( m_meshDecimateAction );
             break;
         }
         case Fn::DatasetType::MESH_TIME_SERIES:

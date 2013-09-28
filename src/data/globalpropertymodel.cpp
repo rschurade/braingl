@@ -101,6 +101,8 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->create( Fn::Property::G_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
 
     m_properties->create( Fn::Property::G_FILTER_SIZE, 1, 1, 20, "algos" );
+    m_properties->create( Fn::Property::G_MIN_COMPONENT_SIZE, 1000, 1, 100000, "algos" );
+    m_properties->create( Fn::Property::G_DECIMATE_EPSILON, 2.0f, 0.0f, 20.f, "algos" );
 
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );

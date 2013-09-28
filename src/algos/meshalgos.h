@@ -19,6 +19,8 @@ public:
     static QList<Dataset*> loopSubdivision( Dataset* ds );
     static QList<Dataset*> meshTimeSeries( Dataset* ds, TriangleMesh2* mesh );
     static QList<Dataset*> biggestComponent( Dataset* ds );
+    static TriangleMesh2* pruneMesh( TriangleMesh2* mesh, QVector<int>component );
+    static QList<Dataset*> decimate( Dataset* ds );
 
 private:
     MeshAlgos() {};
