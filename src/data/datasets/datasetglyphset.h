@@ -52,7 +52,6 @@ public:
     QList<Dataset*> createConnections();
 
     void exportColors();
-    bool load1D();
     void loadROI( QString filename );
     void initROI();
     void avgCon();

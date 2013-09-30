@@ -117,6 +117,11 @@ bool Loader::load()
         return loadRGB();
     }
 
+    if ( m_fileName.path().endsWith( ".1D" ) )
+    {
+        return load1D();
+    }
+
     return false;
 }
 
@@ -1638,6 +1643,39 @@ bool Loader::loadRGB()
             for ( int i2 = 0; i2 < sds->getNumberOfMeshes(); i2++ )
             {
                 sds->getMesh( i2 )->setVertexColor( i, r, g, b, 1.0 );
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "selected Dataset not a mesh";
+    }
+
+    file.close();
+
+    return true;
+}
+
+bool Loader::load1D()
+{
+    QFile file( m_fileName.path() );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return false;
+    }
+    QTextStream in( &file );
+
+    if ( dynamic_cast<DatasetMesh*>( m_selectedDataset ) )
+    {
+        DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
+
+        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        {
+            float v;
+            in >> v;
+            for ( int m = 0; m < sds->getNumberOfMeshes(); m++ )
+            {
+                sds->getMesh( m )->setVertexData( i, v );
             }
         }
     }

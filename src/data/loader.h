@@ -54,6 +54,7 @@ private:
     bool loadMEG();
     bool loadTree();
     bool loadRGB();
+    bool load1D();
 
     nifti_image* m_header;
     QDir m_fileName;

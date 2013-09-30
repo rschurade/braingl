@@ -142,18 +142,6 @@ void ToolBar::createActions()
     m_makeConsAction->setStatusTip( tr( "create new connections for bundling from thresholded connectivity" ) );
     connect( m_makeConsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_exportRGBAction = new FNAction( QIcon( ":/icons/save_rgb.png" ), tr( "Export surface colors as set of 1D files" ), this, Fn::Algo::EXPORTRGB );
-    m_exportRGBAction->setStatusTip( tr( "saves the current colors as series of 1D files (one per color)" ) );
-    connect( m_exportRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
-    m_save1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Save 1D values file" ), this, Fn::Algo::SAVE1D );
-    m_save1DAction->setStatusTip( tr( "Save all node values to 1D (SUMA-readable) file" ) );
-    connect( m_save1DAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
-    m_load1DAction = new FNAction( QIcon( ":/icons/save_1D.png" ), tr( "Load 1D values file" ), this, Fn::Algo::LOAD1D );
-    m_load1DAction->setStatusTip( tr( "Load a list of values and put them in the value buffer of the surfaces" ) );
-    connect( m_load1DAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
     m_avgConAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "Calculate average connectivity map" ), this, Fn::Algo::AVG_CON );
     m_avgConAction->setStatusTip( tr( "Calculate average connectivity between ROI in glyphset and put them in the value buffer of the surfaces" ) );
     connect( m_avgConAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -310,15 +298,6 @@ void ToolBar::slot( Fn::Algo algo )
             qDebug() << "Making new connections...";
             l = ((DatasetGlyphset*)ds)->createConnections();
             break;
-        case Fn::Algo::EXPORTRGB:
-            ((DatasetGlyphset*)ds)->exportColors();
-            break;
-        case Fn::Algo::SAVE1D:
-            dynamic_cast<DatasetMesh*>( ds )->save1Ds();
-            break;
-        case Fn::Algo::LOAD1D:
-            dynamic_cast<DatasetMesh*>( ds )->load1D();
-            break;
         case Fn::Algo::AVG_CON:
             ( (DatasetGlyphset*)ds )->avgCon();
             break;
@@ -433,18 +412,9 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::GLYPHSET:
         {
             this->addAction( m_makeConsAction );
-            this->addAction( m_exportRGBAction );
-            this->addAction( m_save1DAction );
-            this->addAction( m_load1DAction );
-            this->addAction( m_avgConAction );
-            this->addAction( m_avgConRZAction );
+            //this->addAction( m_avgConAction );
+            //this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
-            break;
-        }
-        case Fn::DatasetType::SURFACESET:
-        {
-            this->addAction( m_save1DAction );
-            this->addAction( m_load1DAction );
             break;
         }
         case Fn::DatasetType::CONS:
