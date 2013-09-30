@@ -832,56 +832,6 @@ void DatasetGlyphset::setProperties()
     m_properties["maingl"]->create( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
 }
 
-void DatasetGlyphset::saveRGB()
-{
-    if ( m_colors_name == "" )
-    {
-        m_colors_name = QFileDialog::getSaveFileName( NULL, "save RGB file" );
-    }
-    else
-    {
-        m_colors_name = QFileDialog::getSaveFileName( NULL, "save RGB file", m_colors_name );
-    }
-    QFile file( m_colors_name );
-    if ( !file.open( QIODevice::WriteOnly ) )
-    {
-        return;
-    }
-    QTextStream out( &file );
-    float* c = m_mesh.at( prevGeo )->getVertexColors();
-    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
-    {
-        out << c[i * 4] << " " << c[i * 4 + 1] << " " << c[i * 4 + 2] << endl;
-    }
-    file.close();
-}
-
-void DatasetGlyphset::loadRGB()
-{
-    m_colors_name = QFileDialog::getOpenFileName( NULL, "load RGB file", m_colors_name );
-    QFile file( m_colors_name );
-    if ( !file.open( QIODevice::ReadOnly ) )
-    {
-        return;
-    }
-    QTextStream in( &file );
-    m_renderer->beginUpdateColor();
-
-    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
-    {
-        float r, g, b;
-        in >> r >> g >> b;
-        for ( int i2 = 0; i2 < m_mesh.size(); i2++ )
-        {
-            m_renderer->updateColor( i, r, g, b, 1.0 );
-            m_mesh.at( i2 )->setVertexColor( i, r, g, b, 1.0 );
-        }
-    }
-    m_renderer->endUpdateColor();
-    file.close();
-    Models::d()->submit();
-}
-
 void DatasetGlyphset::loadROI( QString filename )
 {
     qDebug() << "loading roi: " << filename;

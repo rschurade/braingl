@@ -15,6 +15,8 @@
 #include "datasets/datasetscalar.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
+#include "datasets/datasetmesh.h"
+#include "mesh/trianglemesh2.h"
 
 #include <QDebug>
 
@@ -282,8 +284,19 @@ bool Writer::save()
         case Fn::DatasetType::MESH_TIME_SERIES :
         case Fn::DatasetType::GLYPHSET :
         {
-            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName, m_filter );
-            vtkWriter->save();
+            if ( m_filter.endsWith( "(*.1D)" ) )
+            {
+
+            }
+            else if ( m_filter.endsWith( "(*.rgb)" ) )
+            {
+                saveRGB();
+            }
+            else
+            {
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName, m_filter );
+                vtkWriter->save();
+            }
             break;
         }
         default:
@@ -362,4 +375,25 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
     }
 }
 
+void Writer::saveRGB()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile file( m_fileName );
+        if ( !file.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &file );
+        float* c = dsm->getMesh()->getVertexColors();
+        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        {
+            out << c[i * 4] << " " << c[i * 4 + 1] << " " << c[i * 4 + 2] << endl;
+        }
+        file.close();
+    }
+
+
+}
 

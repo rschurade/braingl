@@ -65,6 +65,8 @@ private:
 
     bool load( QString fileName, QList<QVariant> state );
 
+    Dataset* selectedDataset();
+
     bool m_debug;
 
     QMainWindow* m_centralWidget;

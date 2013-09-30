@@ -287,7 +287,7 @@ bool MainWindow::load( QString fileName )
         }
         else
         {
-            Loader loader;
+            Loader loader( selectedDataset() );
             loader.setFilename( QDir( fileName ) );
             if ( loader.load() )
             {
@@ -326,7 +326,7 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
         }
         else
         {
-            Loader loader;
+            Loader loader( selectedDataset() );
             loader.setFilename( QDir( fileName ) );
             if ( loader.load() )
             {
@@ -348,6 +348,17 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
         }
     }
     return false;
+}
+
+Dataset* MainWindow::selectedDataset()
+{
+    int selectedIndex = m_datasetWidget->getSelected();
+    if (selectedIndex > -1)
+    {
+        return VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selectedIndex, (int)Fn::Property::D_DATASET_POINTER) ) );
+    } else {
+        return NULL;
+    }
 }
 
 void MainWindow::setCurrentFile( const QString &fileName )

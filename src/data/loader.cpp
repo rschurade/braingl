@@ -23,13 +23,15 @@
 #include "datasets/datasettree.h"
 #include "mesh/trianglemesh2.h"
 
+
 #include <QDebug>
 #include <QDataStream>
 #include <QVector3D>
 #include <QtGui>
 
-Loader::Loader() :
+Loader::Loader(Dataset* selected) :
     m_datasetType( Fn::DatasetType::UNKNOWN ),
+    m_selectedDataset( selected ),
     m_success( false )
 {
 }
@@ -110,6 +112,10 @@ bool Loader::load()
         return loadTree();
     }
 
+    if ( m_fileName.path().endsWith( ".rgb" ) )
+    {
+        return loadRGB();
+    }
 
     return false;
 }
@@ -1605,5 +1611,38 @@ bool Loader::loadTree()
     }
     dataset->importTree( dims, coordinates, clusters );
     m_dataset.push_back( dataset );
+    return true;
+}
+
+bool Loader::loadRGB()
+{
+    QFile file( m_fileName.path() );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        return false;
+    }
+    QTextStream in( &file );
+
+    if ( dynamic_cast<DatasetMesh*>( m_selectedDataset ) )
+    {
+        DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
+
+        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        {
+            float r, g, b;
+            in >> r >> g >> b;
+            for ( int i2 = 0; i2 < sds->getNumberOfMeshes(); i2++ )
+            {
+                sds->getMesh( i2 )->setVertexColor( i, r, g, b, 1.0 );
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "selected Dataset not a mesh";
+    }
+
+    file.close();
+
     return true;
 }

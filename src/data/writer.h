@@ -32,6 +32,7 @@ private:
 
     void setDescrip( nifti_image* hdr, QString descrip );
 
+    void saveRGB();
 
 };
 
