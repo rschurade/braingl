@@ -136,7 +136,7 @@ void DatasetMesh::finalizeProperties()
 void DatasetMesh::setProperties()
 {
     m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    //m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 }
 
 
@@ -197,11 +197,11 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     }
     if ( m_renderer == 0 )
     {
-        m_renderer = new MeshRenderer( m_mesh[0] );
+        m_renderer = new MeshRenderer( getMesh(target) );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
-
+    m_renderer->setMesh( getMesh(target) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 }
 

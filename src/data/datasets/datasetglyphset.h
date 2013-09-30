@@ -26,6 +26,8 @@ public:
     DatasetGlyphset( QDir filename, float minThreshold, float maxThreshold = 1.0 );
     virtual ~DatasetGlyphset();
 
+    void addSecondSurfaceSelector();
+
     void addProperties();
 
     void readConnectivity( QString filename );
