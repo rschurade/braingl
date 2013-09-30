@@ -29,6 +29,7 @@ public:
     void finalizeProperties();
 
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );
+    int getNumberOfMeshes();
     TriangleMesh2* getMesh();
     TriangleMesh2* getMesh( int id );
     TriangleMesh2* getMesh( QString target );

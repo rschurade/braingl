@@ -159,6 +159,11 @@ void DatasetMesh::addMesh( TriangleMesh2* tm, QString displayString )
     m_displayList.push_back( displayString );
 }
 
+int DatasetMesh::getNumberOfMeshes()
+{
+    return m_mesh.size();
+}
+
 TriangleMesh2* DatasetMesh::getMesh()
 {
     if ( m_mesh.size() > 0 )
@@ -365,7 +370,7 @@ bool DatasetMesh::load1D()
 
 QString DatasetMesh::getSaveFilter()
 {
-    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.asc);;all files (*.*)" );
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.asc);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; all files (*.*)" );
 }
 
 QString DatasetMesh::getDefaultSuffix()

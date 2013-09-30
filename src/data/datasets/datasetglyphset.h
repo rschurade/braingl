@@ -49,8 +49,6 @@ public:
 
     QList<Dataset*> createConnections();
 
-    void loadRGB();
-    void saveRGB();
     void exportColors();
     bool load1D();
     void loadROI( QString filename );

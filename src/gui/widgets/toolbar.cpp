@@ -142,14 +142,6 @@ void ToolBar::createActions()
     m_makeConsAction->setStatusTip( tr( "create new connections for bundling from thresholded connectivity" ) );
     connect( m_makeConsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_saveRGBAction = new FNAction( QIcon( ":/icons/save_rgb.png" ), tr( "Save surface colors as RGB" ), this, Fn::Algo::SAVERGB );
-    m_saveRGBAction->setStatusTip( tr( "saves the current colors of the surface in a RGB file" ) );
-    connect( m_saveRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
-    m_loadRGBAction = new FNAction( QIcon( ":/icons/open_rgb.png" ), tr( "Load surface colors from RGB" ), this, Fn::Algo::LOADRGB );
-    m_loadRGBAction->setStatusTip( tr( "loads colors from a RGB file on the surface" ) );
-    connect( m_loadRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
     m_exportRGBAction = new FNAction( QIcon( ":/icons/save_rgb.png" ), tr( "Export surface colors as set of 1D files" ), this, Fn::Algo::EXPORTRGB );
     m_exportRGBAction->setStatusTip( tr( "saves the current colors as series of 1D files (one per color)" ) );
     connect( m_exportRGBAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -318,12 +310,6 @@ void ToolBar::slot( Fn::Algo algo )
             qDebug() << "Making new connections...";
             l = ((DatasetGlyphset*)ds)->createConnections();
             break;
-        case Fn::Algo::SAVERGB:
-            ((DatasetGlyphset*)ds)->saveRGB();
-            break;
-        case Fn::Algo::LOADRGB:
-            ((DatasetGlyphset*)ds)->loadRGB();
-            break;
         case Fn::Algo::EXPORTRGB:
             ((DatasetGlyphset*)ds)->exportColors();
             break;
@@ -334,13 +320,13 @@ void ToolBar::slot( Fn::Algo algo )
             dynamic_cast<DatasetMesh*>( ds )->load1D();
             break;
         case Fn::Algo::AVG_CON:
-            ( (DatasetGlyphset*)ds)->avgCon();
+            ( (DatasetGlyphset*)ds )->avgCon();
             break;
         case Fn::Algo::AVG_CON_RZ:
-            ((DatasetGlyphset*)ds)->avgConRtoZ();
+            ( (DatasetGlyphset*)ds)->avgConRtoZ();
             break;
         case Fn::Algo::LITTLE_BRAINS:
-            ((DatasetGlyphset*)ds)->makeLittleBrains();
+            ( (DatasetGlyphset*)ds )->makeLittleBrains();
             break;
         case Fn::Algo::LOOP_SUBDIVISION:
             l = MeshAlgos::loopSubdivision( ds );
@@ -447,8 +433,6 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::GLYPHSET:
         {
             this->addAction( m_makeConsAction );
-            this->addAction( m_saveRGBAction );
-            this->addAction( m_loadRGBAction );
             this->addAction( m_exportRGBAction );
             this->addAction( m_save1DAction );
             this->addAction( m_load1DAction );

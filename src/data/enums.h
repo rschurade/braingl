@@ -67,8 +67,6 @@ namespace Fn
         CREATE_NEW_DATASET,
         MAKECONS,
         BUNDLE,
-        SAVERGB,
-        LOADRGB,
         SAVE1D,
         LOAD1D,
         AVG_CON,

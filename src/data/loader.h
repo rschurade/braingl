@@ -9,6 +9,7 @@
 #define LOADER_H_
 
 #include "datasets/dataset.h"
+#include "datasets/datasetmesh.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
@@ -18,7 +19,7 @@
 class Loader
 {
 public:
-    Loader();
+    Loader(Dataset* selected = NULL);
     virtual ~Loader();
 
     bool load();
@@ -52,12 +53,14 @@ private:
     bool loadCons();
     bool loadMEG();
     bool loadTree();
+    bool loadRGB();
 
     nifti_image* m_header;
     QDir m_fileName;
 
     Fn::DatasetType m_datasetType;
     QVector<Dataset*> m_dataset;
+    Dataset* m_selectedDataset;
 
     bool m_success;
 };
