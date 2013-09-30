@@ -1160,7 +1160,11 @@ bool Loader::loadSet()
             dataset->addMesh( mesh, sl.at( 0 ) );
         }
     }
+    qDebug() << "surfaces read...";
+    dataset->initProperties();
     dataset->setProperties();
+    dataset->finalizeProperties();
+    qDebug() << "properties set";
     m_dataset.push_back( dataset );
 
     return true;
@@ -1369,7 +1373,7 @@ bool Loader::loadGlyphset()
     }
 
     dataset->setProperties();
-
+    dataset->addSecondSurfaceSelector();
     m_dataset.push_back( dataset );
 
     return true;

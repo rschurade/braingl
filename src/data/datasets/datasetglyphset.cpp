@@ -50,7 +50,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
 
     finalizeProperties();
 
-    m_properties["maingl2"]->set( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl2"]->create( Fn::Property::D_DRAW_GLYPHS, false );
     m_properties["maingl"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_COLORMODE ), SIGNAL( valueChanged(QVariant)), this,
@@ -94,6 +95,11 @@ DatasetGlyphset::~DatasetGlyphset()
     }
 }
 
+void DatasetGlyphset::addSecondSurfaceSelector()
+{
+    m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+}
+
 void DatasetGlyphset::addProperties()
 {
     m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
@@ -105,7 +111,7 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
     m_properties["maingl"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    //m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
