@@ -58,9 +58,6 @@ private:
     FNAction* m_cutSelectedFibersAction;
     FNAction* m_bundleAction;
     FNAction* m_makeConsAction;
-    FNAction* m_exportRGBAction;
-    FNAction* m_save1DAction;
-    FNAction* m_load1DAction;
     FNAction* m_avgConAction;
     FNAction* m_avgConRZAction;
     FNAction* m_littleBrainsAction;

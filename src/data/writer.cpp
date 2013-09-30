@@ -286,11 +286,15 @@ bool Writer::save()
         {
             if ( m_filter.endsWith( "(*.1D)" ) )
             {
-
+                save1D();
             }
             else if ( m_filter.endsWith( "(*.rgb)" ) )
             {
                 saveRGB();
+            }
+            else if ( m_filter.endsWith( "(*.roi)" ) )
+            {
+                saveROI();
             }
             else
             {
@@ -393,7 +397,47 @@ void Writer::saveRGB()
         }
         file.close();
     }
-
-
 }
 
+void Writer::save1D()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile file( m_fileName );
+        if ( !file.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &file );
+        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        {
+            float c = dsm->getMesh()->getVertexData(i);
+            out << c << endl;
+        }
+        file.close();
+    }
+}
+
+void Writer::saveROI()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile file( m_fileName );
+        if ( !file.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &file );
+        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        {
+            float c = dsm->getMesh()->getVertexData( i );
+            if ( c > 0 )
+            {
+                out << i << " " << "1" << endl;
+            }
+        }
+        file.close();
+    }
+}
