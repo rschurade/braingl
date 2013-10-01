@@ -35,6 +35,7 @@ private:
     void saveRGB();
     void save1D();
     void saveROI();
+    void saveConnexels();
 
 };
 
