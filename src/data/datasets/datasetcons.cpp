@@ -141,3 +141,13 @@ float* DatasetCons::getVectors()
     return vectorArray;
 }
 
+QString DatasetCons::getSaveFilter()
+{
+    return QString( "Connexels ascii (*.cxls)" );
+}
+
+QString DatasetCons::getDefaultSuffix()
+{
+    return QString( "cxls" );
+}
+

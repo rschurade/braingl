@@ -16,6 +16,7 @@
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
 #include "datasets/datasetmesh.h"
+#include "datasets/datasetcons.h"
 #include "mesh/trianglemesh2.h"
 
 #include <QDebug>
@@ -303,6 +304,11 @@ bool Writer::save()
             }
             break;
         }
+        case Fn::DatasetType::CONS :
+        {
+            saveConnexels();
+            break;
+        }
         default:
             break;
     }
@@ -437,6 +443,28 @@ void Writer::saveROI()
             {
                 out << i << " " << "1" << endl;
             }
+        }
+        file.close();
+    }
+}
+
+void Writer::saveConnexels()
+{
+    if ( dynamic_cast<DatasetCons*>( m_dataset ) )
+    {
+        DatasetCons* dsc = dynamic_cast<DatasetCons*>( m_dataset );
+        QFile file( m_fileName );
+        if ( !file.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &file );
+
+        QList<Edge*> connexels = dsc->getCons()->edges;
+        for ( int i = 0; i < connexels.size(); i++ )
+        {
+            Edge* edge = connexels.at( i );
+            out << edge->fn.x() << " " << edge->fn.y() << " " << edge->fn.z() << " " << edge->tn.x() << " " << edge->tn.y() << " " << edge->tn.z() << " " << edge->m_value << endl;
         }
         file.close();
     }

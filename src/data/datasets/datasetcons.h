@@ -27,7 +27,11 @@ public:
     Connections* getCons();
     float* getVectors();
 
+    QString getSaveFilter();
+    QString getDefaultSuffix();
+
     Connections* cons;
+
 private:
     VectorGlyphRenderer* m_vrenderer;
     float* vectorArray;
