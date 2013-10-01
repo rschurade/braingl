@@ -217,7 +217,7 @@ bool DatasetTree::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
     float x = ( pos.x() / static_cast<float>( m_width ) ) * m_numLeaves;
     float y = 1.0 - ( pos.y() / static_cast<float>( m_height ) );
     qDebug() << x << y ;
-    int id = pickClusterRec( m_tree, m_width, m_height, x, y );
+    int id = pickClusterRec( m_tree, 0, m_width * m_numLeaves, x, y );
     qDebug() << id;
     if ( id != -1 )
     {
