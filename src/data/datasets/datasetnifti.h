@@ -15,6 +15,7 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QVector>
+#include <QMatrix4x4>
 
 class DatasetNifti: public Dataset
 {
@@ -24,8 +25,8 @@ public:
 
     nifti_image* getHeader();
 
-    Matrix getQForm();
-    Matrix getSForm();
+    QMatrix4x4 getQForm();
+    QMatrix4x4 getSForm();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
@@ -49,8 +50,8 @@ protected:
 
     nifti_image* m_header;
 
-    Matrix m_qform;
-    Matrix m_sform;
+    QMatrix4x4 m_qform;
+    QMatrix4x4 m_sform;
 };
 
 #endif /* DATASETNIFTI_H_ */

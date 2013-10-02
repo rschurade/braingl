@@ -306,8 +306,13 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
     DatasetScalar* dsOut = new DatasetScalar( QDir( "distance map" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
+    DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
+    iso->properties()->set( Fn::Property::D_ISO_VALUE, 0.10 );
+    iso->properties()->set( Fn::Property::D_COLORMODE, 1 );
+
     QList<Dataset*> l;
-    l.push_back( dsOut );
+    //l.push_back( dsOut );
+    l.push_back( iso );
     return l;
 }
 

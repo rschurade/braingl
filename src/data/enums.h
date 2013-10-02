@@ -22,7 +22,7 @@ namespace Fn
         NIFTI_FMRI = 0x10,
         NIFTI_DWI = 0x20,
         NIFTI_BINGHAM = 0x40,
-        NIFTI_ANY = 0x80,
+        NIFTI_ANY = 0xFF,
         MESH_ASCII = 0x100,
         MESH_BINARY = 0x200,
         MESH_ISOSURFACE = 0x400,
@@ -230,6 +230,12 @@ namespace Fn
         D_TREE_SELECTED_CLUSTER,
         D_TREE_SELECTED_CLUSTER_COLOR,
         D_TREE_UNSELECTED_CLUSTER_COLOR,
+        D_S_FORM,
+        D_Q_FORM,
+        D_USE_TRANSFORM,
+        D_TRANSFORM,
+        D_APPLY_TRANSFORM,
+        D_INVERT_VERTEX_ORDER,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -464,7 +470,12 @@ namespace Fn
                 case Property::D_TREE_SELECTED_CLUSTER: return QString( "selected cluster" ); break;
                 case Property::D_TREE_SELECTED_CLUSTER_COLOR: return QString( "selected cluster color" ); break;
                 case Property::D_TREE_UNSELECTED_CLUSTER_COLOR: return QString( "unselected cluster color" ); break;
-
+                case Property::D_S_FORM: return QString( "s form matrix" ); break;
+                case Property::D_Q_FORM: return QString( "q form matrix" ); break;
+                case Property::D_USE_TRANSFORM: return QString( "use transformation matrix" ); break;
+                case Property::D_TRANSFORM: return QString( "transformation matrix" ); break;
+                case Property::D_APPLY_TRANSFORM: return QString( "apply transformation" ); break;
+                case Property::D_INVERT_VERTEX_ORDER: return QString( "invert vertex order" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

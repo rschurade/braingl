@@ -78,14 +78,14 @@ void DatasetFMRI::examineDataset()
               m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
 
-    if ( m_qform.Determinant() < 0.0 && m_qform( 1, 1 ) < 0 )
+    if ( m_qform.determinant() < 0.0 && m_qform( 0, 0 ) < 0 )
     {
         qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
         flipX();
     }
     else
     {
-        if ( m_sform.Determinant() < 0.0 && m_sform( 1, 1 ) < 0 )
+        if ( m_sform.determinant() < 0.0 && m_sform( 0, 0 ) < 0 )
         {
             qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation in s-form detected. Flipping voxels on X-Axis";
             flipX();

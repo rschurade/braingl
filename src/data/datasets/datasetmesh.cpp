@@ -131,6 +131,15 @@ void DatasetMesh::finalizeProperties()
             m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
+
+    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( transformChanged( QVariant ) ) );
+    m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
+    m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( applyTransform() ) );
+    m_properties["maingl"]->create( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
 }
 
 void DatasetMesh::setProperties()
@@ -326,48 +335,6 @@ void DatasetMesh::makePermanent()
     m_properties["maingl"]->set( Fn::Property::D_SCALE_Z, 1 );
 }
 
-void DatasetMesh::save1Ds()
-{
-    QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", ".1D" );
-
-    QFile file( filename );
-    if ( !file.open( QIODevice::WriteOnly ) )
-    {
-        qDebug() << "file open failed: " << filename;
-        return;
-    }
-    QTextStream out( &file );
-    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
-    {
-        float vcolor = getMesh( "maingl" )->getVertexData( i );
-
-        out << vcolor << endl;
-    }
-    file.close();
-}
-
-bool DatasetMesh::load1D()
-{
-    QString filename = QFileDialog::getOpenFileName( NULL, "load 1D file" );
-    QFile file( filename );
-    if ( !file.open( QIODevice::ReadOnly ) )
-    {
-        return false;
-    }
-    QTextStream in( &file );
-
-    for ( int i = 0; i < getMesh( "maingl" )->numVerts(); i++ )
-    {
-        float v;
-        in >> v;
-        for ( int m = 0; m < m_mesh.size(); m++ )
-        {
-            m_mesh[m]->setVertexData( i, v );
-        }
-    }
-    return true;
-}
-
 QString DatasetMesh::getSaveFilter()
 {
     return QString( "Mesh binary (*.vtk);; Mesh ascii (*.asc);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; all files (*.*)" );
@@ -378,3 +345,56 @@ QString DatasetMesh::getDefaultSuffix()
     return QString( "vtk" );
 }
 
+void DatasetMesh::transformChanged( QVariant value )
+{
+    QMatrix4x4 qForm;
+    QMatrix4x4 sForm;
+
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
+
+    if ( dsl.size() > 0 )
+    {
+        qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+    }
+
+    switch ( value.toInt() )
+    {
+        case 0:
+            m_transform.setToIdentity();
+            break;
+        case 1:
+            m_transform = qForm;
+            break;
+        case 2:
+            m_transform = sForm;
+            break;
+        case 3:
+            m_transform = qForm.inverted();
+            break;
+        case 4:
+            m_transform = sForm.inverted();
+            break;
+        default:
+            m_transform.setToIdentity();
+            break;
+    }
+
+    m_properties["maingl"]->set( Fn::Property::D_TRANSFORM, m_transform );
+}
+
+void DatasetMesh::applyTransform()
+{
+    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
+    for ( int i = 0; i < mesh->numVerts(); ++i )
+    {
+        QVector3D vert = mesh->getVertex( i );
+        vert = m_transform * vert;
+        mesh->setVertex( i, vert );
+    }
+    mesh->finalize();
+    delete m_renderer;
+    m_renderer = 0;
+    Models::d()->submit();
+}

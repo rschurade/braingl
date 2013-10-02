@@ -55,3 +55,13 @@ QVariant Property::getMax()
 {
     return m_max;
 }
+
+void Property::setMin( QVariant value )
+{
+
+}
+
+void Property::setMax( QVariant value )
+{
+
+}

@@ -34,9 +34,6 @@ public:
     TriangleMesh2* getMesh( int id );
     TriangleMesh2* getMesh( QString target );
 
-    void save1Ds();
-    bool load1D();
-
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
@@ -48,10 +45,13 @@ protected:
     QVector<TriangleMesh2*> m_mesh;
     MeshRenderer* m_renderer;
     QVector<QString> m_displayList;
+    QMatrix4x4 m_transform;
 
 private slots:
     void paintModeChanged( QVariant mode );
     void makePermanent();
+    void transformChanged( QVariant value );
+    void applyTransform();
 
 };
 
