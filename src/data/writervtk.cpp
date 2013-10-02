@@ -274,12 +274,25 @@ void WriterVTK::saveMeshVTK( QString filename, TriangleMesh2* mesh )
     char* colorsOut = new char[ numPoints * 3 ];
     int* trisOut = new int[numTris*4];
 
-    for ( int i = 0; i < numTris; ++i )
+    if ( m_dataset->properties()->get( Fn::Property::D_INVERT_VERTEX_ORDER ).toBool() )
     {
-        trisOut[ 4 * i    ] = 3;
-        trisOut[4 * i + 1 ] = indexes[ 3 * i ];
-        trisOut[4 * i + 2 ] = indexes[ 3 * i + 1];
-        trisOut[4 * i + 3 ] = indexes[ 3 * i + 2];
+        for ( int i = 0; i < numTris; ++i )
+        {
+            trisOut[ 4 * i    ] = 3;
+            trisOut[4 * i + 1 ] = indexes[ 3 * i ];
+            trisOut[4 * i + 2 ] = indexes[ 3 * i + 2];
+            trisOut[4 * i + 3 ] = indexes[ 3 * i + 1];
+        }
+    }
+    else
+    {
+        for ( int i = 0; i < numTris; ++i )
+        {
+            trisOut[ 4 * i    ] = 3;
+            trisOut[4 * i + 1 ] = indexes[ 3 * i ];
+            trisOut[4 * i + 2 ] = indexes[ 3 * i + 1];
+            trisOut[4 * i + 3 ] = indexes[ 3 * i + 2];
+        }
     }
 
     for ( int i = 0; i < numPoints; ++i )

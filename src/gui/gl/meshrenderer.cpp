@@ -164,7 +164,15 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glEnable(GL_CULL_FACE);
     glCullFace( GL_BACK );
-    glFrontFace( GL_CW );
+
+    if ( props->get( Fn::Property::D_INVERT_VERTEX_ORDER ).toBool() )
+    {
+        glFrontFace( GL_CCW );
+    }
+    else
+    {
+        glFrontFace( GL_CW );
+    }
 
     if ( props->get( Fn::Property::D_RENDER_WIREFRAME ).toBool() )
     {

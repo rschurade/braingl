@@ -14,6 +14,7 @@
 #include "propertystring.h"
 #include "propertyselection.h"
 #include "propertybutton.h"
+#include "propertymatrix.h"
 
 #include "../models.h"
 
@@ -184,6 +185,22 @@ bool PropertyGroup::create( Fn::Property name, QColor value, QString tab )
     else
     {
         PropertyColor* prop = new PropertyColor( Fn::Prop2String::s( (Fn::Property)name ), value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::create( Fn::Property name, QMatrix4x4 value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyMatrix* prop = new PropertyMatrix( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );

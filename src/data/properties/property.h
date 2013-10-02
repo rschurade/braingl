@@ -33,8 +33,8 @@ public:
 
 
     virtual void setValue( QVariant value ) = 0;
-    virtual void setMin( QVariant value ) = 0;
-    virtual void setMax( QVariant value ) = 0;
+    virtual void setMin( QVariant value );
+    virtual void setMax( QVariant value );
 
     void setPropertyTab( QString tab );
     QString getPropertyTab();
