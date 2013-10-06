@@ -17,7 +17,7 @@ class PropertyMatrix  : public Property
     Q_OBJECT
 
 public:
-    PropertyMatrix( QString name, QMatrix4x4 value = 0 );
+    PropertyMatrix( QString name, QMatrix4x4 value );
     virtual ~PropertyMatrix();
 
 public slots:
