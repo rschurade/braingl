@@ -342,8 +342,6 @@ QVector<QString> DatasetFibers::getDataNames()
 
 void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-   qDebug() << "fiber draw start";
-
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
@@ -381,8 +379,6 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-
-    qDebug() << "fiber draw end";
 }
 
 QString DatasetFibers::getValueAsString( int x, int y, int z )
@@ -424,8 +420,8 @@ void DatasetFibers::dataModeChanged()
 void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 {
     QVector<float> points = lv->getPoints();
-    QVector<int> lines = lv->getPrimitives();
-    int numLines = lv->getNumPrimitives();
+    QVector<int> lines = lv->getLines();
+    int numLines = lv->getNumLines();
 
     qDebug() << points.size() << lines.size() << numLines;
 

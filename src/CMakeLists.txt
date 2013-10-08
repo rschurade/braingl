@@ -88,6 +88,12 @@ FIND_PACKAGE( Boost 1.46.0 )
 # include the boost headers
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------
+# VTK
+# 
+FIND_PACKAGE( VTK REQUIRED )
+include(${VTK_USE_FILE})
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,7 +127,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} GLU )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${VTK_LIBRARIES} GLU )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )

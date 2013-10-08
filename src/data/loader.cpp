@@ -1001,7 +1001,7 @@ bool Loader::loadVTK()
     if ( lv->getPrimitiveType() == 1 )
     {
         QVector<float> points = lv->getPoints();
-        QVector<int> triangles = lv->getPrimitives();
+        QVector<int> triangles = lv->getPolys();
 
         if ( triangles[0] != 3 )
         {
@@ -1010,7 +1010,7 @@ bool Loader::loadVTK()
         }
 
         int numPoints = lv->getNumPoints();
-        int numTriangles = lv->getNumPrimitives();
+        int numTriangles = lv->getNumPolys();
 
         TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
 
@@ -1038,12 +1038,14 @@ bool Loader::loadVTK()
             }
         }
 
-        QVector<float> colors = lv->getPointColors();
+        QVector<unsigned char> colors = lv->getPointColors();
         if ( colors.size() == points.size() )
         {
             for ( int i = 0; i < numPoints; ++i )
             {
-                mesh->setVertexColor( i, colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2], 1.0 );
+                mesh->setVertexColor( i, ( (float)colors[i * 3] ) /255.,
+                                         ( (float)colors[i * 3 + 1] ) /255.,
+                                         ( (float)colors[i * 3 + 2] ) /255., 1.0 );
             }
         }
 
@@ -1532,7 +1534,7 @@ bool Loader::loadMEG()
                 if ( lv->getPrimitiveType() == 1 )
                 {
                     points = lv->getPoints();
-                    triangles = lv->getPrimitives();
+                    triangles = lv->getPolys();
 
                     if ( triangles[0] != 3 )
                     {
@@ -1541,7 +1543,7 @@ bool Loader::loadMEG()
                     }
 
                     int numPoints = lv->getNumPoints();
-                    int numTriangles = lv->getNumPrimitives();
+                    int numTriangles = lv->getNumPolys();
 
                     if ( numPoints > 0 && numTriangles > 0 )
                     {

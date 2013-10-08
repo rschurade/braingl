@@ -23,96 +23,46 @@ public:
     QStringList getStatus();
     int getPrimitiveType();
     QVector<float> getPoints();
-    QVector<int>getPrimitives();
+    QVector<int>getLines();
+    QVector<int>getPolys();
+
     QVector<QVector<float> >getPointData();
-    QVector<float> getPointColors();
     QVector<QString>getPointDataNames();
 
+    QVector<unsigned char> getPointColors();
+
     int getNumPoints();
-    int getNumPrimitives();
+    int getNumLines();
+    int getNumPolys();
 
 private:
     bool exists();
     bool open();
-    bool loadHeader();
-
-    bool loadAscii();
-    bool loadPointsAscii();
-    bool loadPrimitivesAscii();
-    bool loadPointDataAscii();
-    bool loadPointColorsAscii();
-
-    bool loadBinary();
-    /////////////////////////////////////////////////////////
-    bool copyPoints( QStringList tokens );
-    bool copyPrimitives( QStringList tokens );
-    bool copyPointData( QStringList tokens );
-    bool copyPrimitiveData( QStringList tokens );
-    bool copyNormals( QStringList tokens );
-
-    ///////////////////////////////////////////////////////////
-
-    QString readLineBinary();
-    QString readLine( QDataStream& in );
 
     QString m_filename;
     QStringList m_status;
-    int m_type; // 0 - undefined, 1 - ASCII, 2 - BINARY
     int m_primitiveType; // 0 - undefined, 1 - POLYGONS, 2 - LINES
-
     int m_numPoints;
-    int m_numPrimitives;
-    int m_primitiveSize;
-
-    QFile* m_file;
-    QStringList m_header;
-    char* m_binaryFile;
-    int m_binFileSize;
-    int m_bufferPointer;
+    int m_numLines;
+    int m_numPolys;
 
     bool m_hasPointData;
     bool m_hasPrimitiveData;
     bool m_hasPointColors;
+    bool m_hasPrimitiveColors;
 
     QVector<float>m_points;
-    QVector<int>m_primitives;
+    QVector<int>m_lines;
+    QVector<int>m_polys;
+
     QVector<QVector<float> >m_pointData;
     QVector<QString>m_pointDataNames;
+
     QVector<QVector<float> >m_primitiveData;
     QVector<QString>m_primitiveDataNames;
-    QVector<float>m_pointColors;
 
-    template< class T > T switchByteOrder( const T value )
-    {
-        size_t numBytes = sizeof( T );
-        T result = value;
-        if( numBytes == 1 )
-        {
-            return result;
-        }
-        char *s  = reinterpret_cast< char* >( &result );
-        for( size_t i = 0; i < numBytes / 2; ++i )
-        {
-            std::swap( s[i], s[ ( numBytes - 1 ) - i ] );
-        }
-        return result;
-    }
-
-    /**
-     * Transform a whole array of elements (of type T and size of sizeof(T))
-     * into opposite byte order.
-     *
-     * \param array Array containing the data
-     * \param arraySize The number of elements which is not the number of
-     * bytes but e.g. the number of floats
-     */
-    template< class T > void switchByteOrderOfArray( T *array, const size_t arraySize )
-    {
-        for( size_t i = 0; i < arraySize; ++i )
-        {
-            array[i] = switchByteOrder< T >( array[i] );
-        }
-    }
+    QVector<unsigned char>m_pointColors;
+    QVector<float>m_primitiveColors;
 };
 
 #endif /* LOADERVTK_H_ */
