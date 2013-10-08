@@ -40,6 +40,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 {
     qDebug() << "start creating kdtree";
     m_numLines = data.size();
+    qDebug() << data.size();
     int ls = 0;
     for ( int i = 0; i < m_numLines; ++i )
     {
@@ -56,7 +57,6 @@ void FiberSelector::init( QVector< QVector< float > >& data )
         }
     }
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
-    qDebug() << "end creating kdtree";
 
     connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
     connect( Models::r(), SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );

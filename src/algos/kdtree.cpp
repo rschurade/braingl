@@ -16,7 +16,7 @@ KdTree::KdTree( int size, float *pointArray, bool useThreads )
     for (int i = 0 ; i < size ;  ++i)
         m_tree[i] = i;
 
-    if( useThreads )
+    if( useThreads && size > 4 )
     {
 
         int root = ( size - 1 )/2;
