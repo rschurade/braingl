@@ -10,73 +10,83 @@
 #include "../properties/propertyfloat.h"
 
 DatasetCons::DatasetCons( QString fileName ) :
-        Dataset( fileName, Fn::DatasetType::CONS ), m_vrenderer( NULL ), vectorArray( NULL )
+        DatasetFibers( fileName, Fn::DatasetType::CONS )
 {
     cons = new Connections( fileName );
-    consNumber = cons->edges.length();
-
-    // add standard properties
-    m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
-    m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
-    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
-
-    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
-
-    // add new properties
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
-
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
-
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
-
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
-    m_properties.insert( "maingl2", props2 );
-    //m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    init();
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :
-        Dataset( QString( "new" ), Fn::DatasetType::CONS ), cons( cons ), m_vrenderer( NULL ), vectorArray( NULL )
+        DatasetFibers( QString( "new" ), Fn::DatasetType::CONS ), cons( cons )
 {
-    consNumber = cons->edges.length();
-
-    // add standard properties
-    m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
-    m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
-    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
-
-    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
-
-    // add new properties
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
-
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
-
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
-
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
-    m_properties.insert( "maingl2", props2 );
-
+    init();
 }
 
 DatasetCons::~DatasetCons()
 {
 }
 
-void DatasetCons::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
+void DatasetCons::init()
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    consNumber = cons->edges.length();
+    for ( int i = 0; i < consNumber; i++ )
     {
-        return;
+        Edge* e = cons->edges.at( i );
+        float v = e->m_value;
+        v = 1;
+        QVector3D f = e->fn;
+        QVector3D t = e->tn;
+        QVector<float> fib;
+        fib.push_back( f.x() );
+        fib.push_back( f.y() );
+        fib.push_back( f.z() );
+        fib.push_back( t.x() );
+        fib.push_back( t.y() );
+        fib.push_back( t.z() );
+        m_fibs.push_back( fib );
     }
+    QVector<QVector<float> > data0;
+    QVector<float> min0;
+    QVector<float> max0;
+    data0.reserve( m_fibs.size() );
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        data0.push_back( QVector<float>( m_fibs[i].size() / 3 ) );
+    }
+    m_data.push_back( data0 );
+    m_dataNames.push_back( "no data" );
 
-    //TODO: setup vector renderer...
-    if ( m_vrenderer == NULL )
-    {
-        m_vrenderer = new VectorGlyphRenderer();
-        m_vrenderer->init();
-        m_vrenderer->initGeometry( getVectors(), consNumber );
-    }
-    m_vrenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    /* // add standard properties
+     m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
+    m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
+    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int) Fn::Algo::NONE );
+
+    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, false );
+
+// add new properties
+    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 1.0f );
+
+    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true );
+
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+
+    float min = -1;
+    float max = 1;
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+
+    m_properties["maingl"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
+    { "orientation", "value" }, 0, "general" );
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );*/
+
+    createProps();
+
 }
 
 QString DatasetCons::getValueAsString()
@@ -87,58 +97,6 @@ QString DatasetCons::getValueAsString()
 Connections* DatasetCons::getCons()
 {
     return cons;
-}
-
-float* DatasetCons::getVectors()
-{
-    if ( vectorArray )
-        delete vectorArray;
-    qDebug() << "edges: " << consNumber;
-    int offset = 28;
-    vectorArray = new float[offset * consNumber];
-
-    for ( int i = 0; i < consNumber; i++ )
-    {
-        Edge* e = cons->edges.at( i );
-        float v = e->m_value;
-        v = 1;
-        QVector3D f = e->fn;
-        QVector3D t = e->tn;
-
-        QVector3D d = t - f;
-
-        vectorArray[offset * i] = f.x();
-        vectorArray[offset * i + 1] = f.y();
-        vectorArray[offset * i + 2] = f.z();
-        vectorArray[offset * i + 3] = t.x();
-        vectorArray[offset * i + 4] = t.y();
-        vectorArray[offset * i + 5] = t.z();
-        vectorArray[offset * i + 6] = v;
-        vectorArray[offset * i + 7] = 1;
-        vectorArray[offset * i + 8] = d.x();
-        vectorArray[offset * i + 9] = d.y();
-        vectorArray[offset * i + 10] = d.z();
-        vectorArray[offset * i + 11] = d.x();
-        vectorArray[offset * i + 12] = d.y();
-        vectorArray[offset * i + 13] = d.z();
-
-        vectorArray[offset * i + 14] = t.x();
-        vectorArray[offset * i + 15] = t.y();
-        vectorArray[offset * i + 16] = t.z();
-        vectorArray[offset * i + 17] = f.x();
-        vectorArray[offset * i + 18] = f.y();
-        vectorArray[offset * i + 19] = f.z();
-        vectorArray[offset * i + 20] = v;
-        vectorArray[offset * i + 21] = -1;
-        vectorArray[offset * i + 22] = -d.x();
-        vectorArray[offset * i + 23] = -d.y();
-        vectorArray[offset * i + 24] = -d.z();
-        vectorArray[offset * i + 25] = -d.x();
-        vectorArray[offset * i + 26] = -d.y();
-        vectorArray[offset * i + 27] = -d.z();
-
-    }
-    return vectorArray;
 }
 
 QString DatasetCons::getSaveFilter()

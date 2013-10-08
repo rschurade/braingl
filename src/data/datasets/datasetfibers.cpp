@@ -23,6 +23,16 @@
 
 #include <QTimer>
 
+
+DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
+    Dataset( filename, type ),
+    m_renderer( 0 ),
+    m_tubeRenderer( 0 ),
+    m_selector( 0 )
+{
+
+}
+
 DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
@@ -332,6 +342,8 @@ QVector<QString> DatasetFibers::getDataNames()
 
 void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+   qDebug() << "fiber draw start";
+
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
@@ -369,6 +381,8 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
+
+    qDebug() << "fiber draw end";
 }
 
 QString DatasetFibers::getValueAsString( int x, int y, int z )

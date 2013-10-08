@@ -22,6 +22,7 @@ class DatasetFibers: public Dataset
     Q_OBJECT
 
 public:
+    DatasetFibers( QDir filename, Fn::DatasetType type );
     DatasetFibers( QDir filename, QVector< QVector< float > > fibs );
     DatasetFibers( QDir filename,
                      QVector< QVector< float > > fibs,
@@ -51,9 +52,8 @@ public:
 
 protected:
     void createTexture() {};
-
-private:
     void createProps();
+
     void copyFromLoader( LoaderVTK* lv );
     QVector< QVector< float > > m_fibs;
     QVector< QVector< QVector< float > > >m_data;

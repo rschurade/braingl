@@ -8,6 +8,8 @@
 #ifndef DATASETCONS_H_
 #define DATASETCONS_H_
 
+#include "datasetfibers.h"
+
 #include "../../algos/connections.h"
 #include "../../gui/gl/vectorglyphrenderer.h"
 
@@ -15,13 +17,12 @@
 
 #include <QString>
 
-class DatasetCons: public Dataset
+class DatasetCons: public DatasetFibers
 {
 public:
     DatasetCons( QString filename );
     DatasetCons( Connections* cons );
     virtual ~DatasetCons();
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString();
 
     Connections* getCons();
@@ -33,9 +34,8 @@ public:
     Connections* cons;
 
 private:
-    VectorGlyphRenderer* m_vrenderer;
-    float* vectorArray;
     int consNumber;
+    void init();
 };
 
 #endif /* DATASETCONS_H_ */
