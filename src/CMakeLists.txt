@@ -151,7 +151,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
 
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} z glu32 opengl32 )
+	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
 	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
 ENDIF()
 
@@ -197,6 +197,6 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
 
     # Some linux distributions need to explicitily link against X11. We add this lib here.
     SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} z)
+    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} z)
 ENDIF()
 
