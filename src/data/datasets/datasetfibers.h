@@ -65,11 +65,14 @@ protected:
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
+    QMatrix4x4 m_transform;
 
 private slots:
     void colorChanged();
     void dataModeChanged();
     void autoplay();
+    void transformChanged( QVariant value );
+    void applyTransform();
 };
 
 #endif /* DATASETFIBERS_H_ */
