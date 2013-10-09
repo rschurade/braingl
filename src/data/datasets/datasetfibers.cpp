@@ -202,6 +202,15 @@ void DatasetFibers::createProps()
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
     }
 
+    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( transformChanged( QVariant ) ) );
+    m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
+    m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( applyTransform() ) );
+    m_properties["maingl"]->create( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
+
     m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY, false, "autoplay" );
     m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
@@ -526,4 +535,65 @@ QString DatasetFibers::getSaveFilter()
 QString DatasetFibers::getDefaultSuffix()
 {
     return QString( "fib" );
+}
+
+void DatasetFibers::transformChanged( QVariant value )
+{
+    QMatrix4x4 qForm;
+    QMatrix4x4 sForm;
+
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
+
+    if ( dsl.size() > 0 )
+    {
+        qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+    }
+
+    switch ( value.toInt() )
+    {
+        case 0:
+            m_transform.setToIdentity();
+            break;
+        case 1:
+            m_transform = qForm;
+            break;
+        case 2:
+            m_transform = sForm;
+            break;
+        case 3:
+            m_transform = qForm.inverted();
+            break;
+        case 4:
+            m_transform = sForm.inverted();
+            break;
+        default:
+            m_transform.setToIdentity();
+            break;
+    }
+
+    m_properties["maingl"]->set( Fn::Property::D_TRANSFORM, m_transform );
+}
+
+void DatasetFibers::applyTransform()
+{
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        QVector<float>fib = m_fibs[i];
+        for ( int k = 0; k < fib.size() / 3; ++k )
+        {
+            QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
+            vert = m_transform * vert;
+            fib[k*3] = vert.x();
+            fib[k*3+1] = vert.y();
+            fib[k*3+2] = vert.z();
+        }
+        m_fibs.replace( i, fib );
+    }
+
+    delete m_renderer;
+    m_renderer = 0;
+    delete m_selector;
+    m_selector = 0;
+    Models::d()->submit();
 }
