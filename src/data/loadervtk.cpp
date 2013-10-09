@@ -12,7 +12,6 @@
 #include <QDebug>
 
 #include <vtkGenericDataObjectReader.h>
-#include <vtkStructuredGrid.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
@@ -245,9 +244,9 @@ bool LoaderVTK::open()
             int dataTypeID = output->GetPointData()->GetArray( i )->GetDataType();
             qDebug() << "Array " << i << ": " << m_pointDataNames[i] << " (type: " << dataTypeID << ")";
 
-            QVector<float>data( m_numPoints );
             if ( dataTypeID == VTK_FLOAT )
             {
+                QVector<float>data( m_numPoints );
                 vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetPointData()->GetArray( i ) );
 
                 if ( dataArray )
@@ -258,8 +257,8 @@ bool LoaderVTK::open()
                     }
                     m_hasPointData = true;
                 }
+                m_pointData.push_back( data );
             }
-            m_pointData.push_back( data );
         }
 
         return true;

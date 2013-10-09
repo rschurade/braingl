@@ -337,7 +337,7 @@ void DatasetMesh::makePermanent()
 
 QString DatasetMesh::getSaveFilter()
 {
-    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.asc);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; all files (*.*)" );
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; all files (*.*)" );
 }
 
 QString DatasetMesh::getDefaultSuffix()
