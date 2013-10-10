@@ -141,7 +141,13 @@ void WriterVTK::saveFibs( QString filename, bool binary )
      {
          writer->SetFileTypeToASCII();
      }
-     writer->SetInput( newPolyData );
+
+#if VTK_MAJOR_VERSION < 6
+    writer->SetInput( newPolyData );
+#else
+    writer->SetInputData( newPolyData );
+#endif
+
      if ( ! writer->Write() )
      {
          qDebug() << "Error writing " << filename;
@@ -234,7 +240,11 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
     {
         writer->SetFileTypeToASCII();
     }
+#if VTK_MAJOR_VERSION < 6
     writer->SetInput( polyData );
+#else
+    writer->SetInputData( polyData );
+#endif
     if ( !writer->Write() )
     {
         qDebug() << "Error writing " << filename;
