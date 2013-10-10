@@ -200,8 +200,9 @@ bool TriangleMesh2::addVertex( float x, float y, float z )
         m_vertexInsertId += 7;
         m_colorInsertId += 4;
 
-        m_vertIsInTriangle.resize( m_vertIsInTriangle.size() + 1 );
-        m_vertNeighbors.resize( m_vertNeighbors.size() + 1 );
+        QVector<int>v;
+        m_vertIsInTriangle.push_back( v );
+        m_vertNeighbors.push_back( v );
 
         ++m_numVerts;
         return false;

@@ -117,7 +117,7 @@ void Connections::loadConnexels( QString filename )
 
             anode2 = new QVector3D( ( (QString) ( vals.at( 3 ) ) ).toFloat(), ( (QString) ( vals.at( 4 ) ) ).toFloat(),
                     ( (QString) ( vals.at( 5 ) ) ).toFloat() );
-            float value = ( (QString) ( vals.at( 5 ) ) ).toFloat();
+            //float value = ( (QString) ( vals.at( 5 ) ) ).toFloat();
             Edge* aedge;
             aedge = new Edge( *anode1, *anode2 );
             edges << aedge;
