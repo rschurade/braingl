@@ -90,8 +90,8 @@ void HierarchicalTreeGLWidget::mouseMoveEvent( QMouseEvent *event )
 
 void HierarchicalTreeGLWidget::wheelEvent(QWheelEvent *event)
 {
-     int numDegrees = event->delta() / 8;
-     int numSteps = numDegrees / 15;
+//     int numDegrees = event->delta() / 8;
+//     int numSteps = numDegrees / 15;
      //m_renderer->mouseWheel( numSteps );
      updateGL();
 

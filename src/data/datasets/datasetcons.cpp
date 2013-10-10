@@ -32,8 +32,6 @@ void DatasetCons::init()
     for ( int i = 0; i < consNumber; i++ )
     {
         Edge* e = cons->edges.at( i );
-        float v = e->m_value;
-        v = 1;
         QVector3D f = e->fn;
         QVector3D t = e->tn;
         QVector<float> fib;
