@@ -110,6 +110,7 @@ void DatasetFibers::createProps()
         numPoints += m_fibs[i].size() / 3;
     }
     bool hasData =(  m_dataNames[0] != "no data" );
+    qDebug() << "num points:" << numPoints << "num lines:" << m_fibs.size();
 
     m_properties["maingl"]->create( Fn::Property::D_NUM_POINTS, numPoints );
     m_properties["maingl"]->create( Fn::Property::D_NUM_LINES, m_fibs.size() );
@@ -432,7 +433,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
     QVector<int> lines = lv->getLines();
     int numLines = lv->getNumLines();
 
-    qDebug() << points.size() << lines.size() << numLines;
+    qDebug() << "points size:" << points.size() << "lines size:" << lines.size() << "num lines:" << numLines;
 
     int lc = 0;
     int pc = 0;

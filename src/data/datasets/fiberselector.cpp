@@ -40,7 +40,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 {
     qDebug() << "start creating kdtree";
     m_numLines = data.size();
-    qDebug() << data.size();
+    //qDebug() << "num lines:" << data.size();
     int ls = 0;
     for ( int i = 0; i < m_numLines; ++i )
     {

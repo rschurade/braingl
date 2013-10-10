@@ -23,6 +23,7 @@ public:
     DatasetFibers* thinOut();
     DatasetScalar* tractDensity();
     Dataset3D* tractColor();
+    DatasetFibers* resample();
 
 private:
     DatasetFibers* m_dataset;

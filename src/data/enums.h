@@ -75,7 +75,8 @@ namespace Fn
         MESH_TIME_SERIES,
         MESH_CORRELATION,
         MESH_BIGGEST_COMPONENT,
-        MESH_DECIMATE
+        MESH_DECIMATE,
+        FIBER_RESAMPLE
     };
 
     enum class Orient : int

@@ -71,3 +71,12 @@ QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
     }
     return l;
 }
+
+QList<Dataset*> FiberAlgos::resample( Dataset* ds )
+{
+    Fibers* fa = new Fibers( dynamic_cast<DatasetFibers*>( ds ) );
+    DatasetFibers* out = fa->resample();
+    QList<Dataset*> l;
+    l.push_back( out );
+    return l;
+}
