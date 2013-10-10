@@ -118,12 +118,18 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 
     # This is needed since the mocs will be generated there
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
-
+    
     QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
     
     QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+    
+    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
+    add_dependencies(${BinName} buildheader)
 
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
@@ -146,10 +152,16 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
 
     # This is needed since the mocs will be generated there
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
-
+    
     QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+    
+    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
+    add_dependencies(${BinName} buildheader)
 
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
 	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
@@ -194,6 +206,12 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+    
+    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
+    add_dependencies(${BinName} buildheader)
 
     # Some linux distributions need to explicitily link against X11. We add this lib here.
     SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )

@@ -3,12 +3,12 @@
 #include <QDir>
 #include <QDateTime>
 
+#include <buildtime.h>
+
 #include "data/models.h"
 #include "data/loader.h"
 #include "data/vptr.h"
 #include "gui/mainwindow.h"
-
-
 
 QTextStream *out = 0;
 bool logToFile = false;
@@ -58,7 +58,7 @@ void noOutput(QtMsgType type, const char *msg) {}
 
 int main( int argc, char *argv[] )
 {
-    qDebug() << "brainGL version 0.8.1 - 08 oct 2013 (development)";
+    qDebug() << "brainGL version 0.8.1 - " << BUILDDATE << BUILDTIME <<"(development)";
     qDebug() << "(c) 2012, 2013 Ralph Schurade, Joachim Boettger";
     qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
 
