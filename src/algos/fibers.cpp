@@ -239,3 +239,36 @@ Dataset3D* Fibers::tractColor()
     Dataset3D* out = new Dataset3D( QDir( "tract color" ), data, header );
     return out;
 }
+
+DatasetFibers* Fibers::resample()
+{
+    QVector< QVector< float > > fibs = m_dataset->getFibs();
+    QVector< QVector< float > > newFibs;
+
+    for ( int i = 0; i < fibs.size();++i )
+    {
+        QVector<float> fib = fibs[i];
+        QVector<float> newFib;
+
+        if ( fib.size() > 6 )
+        {
+            for ( int k = 0; k < fib.size() / 3; k += 2 )
+            {
+                newFib.push_back( fib[k*3] );
+                newFib.push_back( fib[k*3+1] );
+                newFib.push_back( fib[k*3+2] );
+            }
+
+            if ( ( fib.size() / 3 ) % 2 == 1 )
+            {
+                newFib.push_back( fib[fib.size()-3] );
+                newFib.push_back( fib[fib.size()-2] );
+                newFib.push_back( fib[fib.size()-1] );
+            }
+            newFibs.push_back( newFib );
+        }
+    }
+
+
+    return new DatasetFibers( QDir( "new fibers" ), newFibs );
+}

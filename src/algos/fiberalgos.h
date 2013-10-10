@@ -22,6 +22,7 @@ public:
     static QList<Dataset*> tractDensity( Dataset* ds );
     static QList<Dataset*> tractColor( Dataset* ds );
     static QList<Dataset*> cutSelecteded( Dataset* ds );
+    static QList<Dataset*> resample( Dataset* ds );
 };
 
 #endif /* FIBERALGOS_H_ */

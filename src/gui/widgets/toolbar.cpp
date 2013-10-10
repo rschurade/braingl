@@ -177,6 +177,10 @@ void ToolBar::createActions()
     m_meshDecimateAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "decimate" ), this, Fn::Algo::MESH_DECIMATE );
     m_meshDecimateAction->setStatusTip( tr( "decimate" ) );
     connect( m_meshDecimateAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_fiberResampleAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "resample" ), this, Fn::Algo::FIBER_RESAMPLE );
+    m_fiberResampleAction->setStatusTip( tr( "resample" ) );
+    connect( m_fiberResampleAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -266,6 +270,9 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
+            break;
+        case Fn::Algo::FIBER_RESAMPLE:
+            l = FiberAlgos::resample( ds );
             break;
         case Fn::Algo::TRACT_DENSITY:
             l = FiberAlgos::tractDensity( ds );
@@ -407,6 +414,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_fiberThinningAct );
             this->addAction( m_fiberTractDensityAct );
             this->addAction( m_fiberTractColorAct );
+            this->addAction( m_fiberResampleAction );
             break;
         }
         case Fn::DatasetType::GLYPHSET:
