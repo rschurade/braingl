@@ -170,6 +170,8 @@ bool LoaderNifti::loadNiftiScalar( QString fileName )
 
     nifti_image_free( filedata );
     DatasetScalar* dataset = new DatasetScalar( fileName, m_scalarData, m_header );
+    m_scalarData.clear();
+    m_scalarData.squeeze();
     m_dataset.push_back( dataset );
     return true;
 }
@@ -257,6 +259,8 @@ bool LoaderNifti::loadNiftiVector3D( QString fileName )
 
     nifti_image_free( filedata );
     Dataset3D* dataset = new Dataset3D( fileName, m_vectorData, m_header );
+    m_vectorData.clear();
+    m_vectorData.squeeze();
     m_dataset.push_back( dataset );
     return true;
 }
