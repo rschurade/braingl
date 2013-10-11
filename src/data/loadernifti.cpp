@@ -692,8 +692,6 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
 
             inputData = reinterpret_cast<int16_t*>( filedata->data );
 
-            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
-
             qDebug() << "extract data ";
 
             dataVector.reserve( blockSize );
@@ -772,6 +770,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
                 b0fn.replace( ".nii.gz", "_b0.nii" );
             }
 
+            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
             DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
             m_dataset.push_back( datasetB0 );
 
@@ -1070,10 +1069,11 @@ bool LoaderNifti::isRadialogical()
         m_header->sto_xyz.m[0][0] = fabs( m_header->sto_xyz.m[0][0] );
 
         float nx = m_header->dim[1] - 1;
-        float dx = m_header->dx;
+        float sdx = m_header->sto_xyz.m[0][0];
+        float qdx = m_header->qto_xyz.m[0][0];
 
-        m_header->qto_xyz.m[0][3] -= nx * dx;
-        m_header->sto_xyz.m[0][3] -= nx * dx;
+        m_header->qto_xyz.m[0][3] -= nx * qdx;
+        m_header->sto_xyz.m[0][3] -= nx * sdx;
     }
     return rad;
 }
