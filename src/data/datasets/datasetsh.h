@@ -35,8 +35,6 @@ private:
     void createTexture();
     void examineDataset();
 
-    void flipX();
-
     QVector<ColumnVector> m_data;
 
     SHRenderer* m_renderer;

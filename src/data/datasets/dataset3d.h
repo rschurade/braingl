@@ -34,8 +34,6 @@ private:
     void examineDataset();
     void createTexture();
 
-    void flipX();
-
     QVector<QVector3D> m_data;
 
     EVRenderer* m_renderer;

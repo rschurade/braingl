@@ -45,7 +45,7 @@ public:
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;
-    virtual void flipX() = 0;
+
     void parseNiftiHeader();
 
     nifti_image* m_header;

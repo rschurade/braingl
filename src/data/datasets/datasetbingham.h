@@ -30,8 +30,6 @@ private:
     void createTexture();
     void examineDataset();
 
-    void flipX();
-
     QVector<QVector<float> > m_data;
 
     BinghamRenderer* m_renderer;

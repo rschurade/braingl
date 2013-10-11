@@ -77,21 +77,6 @@ void DatasetFMRI::examineDataset()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
               m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
-
-    if ( m_qform.determinant() < 0.0 && m_qform( 0, 0 ) < 0 )
-    {
-        qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
-        flipX();
-    }
-    else
-    {
-        if ( m_sform.determinant() < 0.0 && m_sform( 0, 0 ) < 0 )
-        {
-            qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation in s-form detected. Flipping voxels on X-Axis";
-            flipX();
-        }
-    }
-
     m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
@@ -149,36 +134,6 @@ void DatasetFMRI::createTexture()
 
     glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
-}
-
-void DatasetFMRI::flipX()
-{
-//    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-//    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-//    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
-//
-//    QVector<float> newData;
-//
-//    for ( int z = 0; z < nz; ++z )
-//    {
-//        for ( int y = 0; y < ny; ++y )
-//        {
-//            for ( int x = nx - 1; x >= 0; --x )
-//            {
-//                newData.push_back( m_data[x + y * nx + z * nx * ny] );
-//            }
-//        }
-//    }
-//
-//    m_header->qoffset_x = 0.0;
-//
-//    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
-//    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
-//    m_header->qto_xyz.m[0][3] = 0.0;
-//    m_header->sto_xyz.m[0][3] = 0.0;
-//
-//    m_data.clear();
-//    m_data = newData;
 }
 
 void DatasetFMRI::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )

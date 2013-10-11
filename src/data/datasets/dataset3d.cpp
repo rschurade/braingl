@@ -70,12 +70,6 @@ void Dataset3D::examineDataset()
     m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
     m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
 
-    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
-    {
-        qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
-        flipX();
-    }
-
     m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
     m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
@@ -118,34 +112,6 @@ void Dataset3D::createTexture()
     }
     glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
 
-}
-
-void Dataset3D::flipX()
-{
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
-
-    QVector<QVector3D> newData;
-
-    for ( int z = 0; z < nz; ++z )
-    {
-        for ( int y = 0; y < ny; ++y )
-        {
-            for ( int x = nx - 1; x >= 0; --x )
-            {
-                newData.push_back( m_data[x + y * nx + z * nx * ny] );
-            }
-        }
-    }
-
-    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
-    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
-    m_header->qto_xyz.m[0][3] = 0.0;
-    m_header->sto_xyz.m[0][3] = 0.0;
-
-    m_data.clear();
-    m_data = newData;
 }
 
 QVector<QVector3D>* Dataset3D::getData()

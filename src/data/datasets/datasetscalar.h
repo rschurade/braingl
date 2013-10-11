@@ -32,8 +32,6 @@ private:
 
     void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
     void createTexture();
-
-    void flipX();
 };
 
 #endif /* DATASETSCALAR_H_ */
