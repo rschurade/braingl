@@ -385,12 +385,19 @@ void DatasetMesh::transformChanged( QVariant value )
 
 void DatasetMesh::applyTransform()
 {
+    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
     for ( int i = 0; i < mesh->numVerts(); ++i )
     {
         QVector3D vert = mesh->getVertex( i );
         vert = m_transform * vert;
+        vert.setX( vert.x() * dx );
+        vert.setY( vert.y() * dy );
+        vert.setZ( vert.z() * dz );
         mesh->setVertex( i, vert );
     }
     mesh->finalize();

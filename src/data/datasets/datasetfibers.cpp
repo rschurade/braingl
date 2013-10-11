@@ -578,6 +578,9 @@ void DatasetFibers::transformChanged( QVariant value )
 
 void DatasetFibers::applyTransform()
 {
+    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
         QVector<float>fib = m_fibs[i];
@@ -585,9 +588,9 @@ void DatasetFibers::applyTransform()
         {
             QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
             vert = m_transform * vert;
-            fib[k*3] = vert.x();
-            fib[k*3+1] = vert.y();
-            fib[k*3+2] = vert.z();
+            fib[k*3] = vert.x() * dx;
+            fib[k*3+1] = vert.y() * dy;
+            fib[k*3+2] = vert.z() * dz;
         }
         m_fibs.replace( i, fib );
     }
