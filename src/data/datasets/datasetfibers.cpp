@@ -594,6 +594,8 @@ void DatasetFibers::applyTransform()
 
     delete m_renderer;
     m_renderer = 0;
+    delete m_tubeRenderer;
+    m_tubeRenderer = 0;
     delete m_selector;
     m_selector = 0;
     Models::d()->submit();
