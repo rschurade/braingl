@@ -33,18 +33,6 @@ private:
     Fn::DatasetType determineType();
 
     bool loadNifti();
-    bool loadNiftiHeader( QString hdrPath );
-
-    bool loadNiftiScalar( QString fileName );
-    bool loadNiftiVector3D( QString fileName );
-    bool loadNiftiTensor( QString fileName );
-    bool loadNiftiQBall( QString fileName );
-    bool loadNiftiBingham( QString fileName );
-    bool loadNiftiFMRI( QString fileName );
-    bool loadNiftiDWI( QString fileName );
-    bool loadNiftiDWI_FNAV2( QString fileName );
-    QVector<float> loadBvals( QString fileName );
-    QVector<QVector3D> loadBvecs( QString fileName, QVector<float> bvals );
 
     bool loadVTK();
     bool loadASC( QVector3D offset = QVector3D(0,0,0) );

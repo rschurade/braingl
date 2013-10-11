@@ -38,8 +38,6 @@ private:
     void examineDataset();
     void createTexture();
 
-    void flipX();
-
     QVector<ColumnVector> m_data;
     QVector<float> m_b0Data;
     QVector<float> m_bvals;

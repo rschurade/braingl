@@ -37,8 +37,6 @@ private:
 
     void createLogTensors();
 
-    void flipX();
-
     QVector<Matrix> m_data;
     QVector<Matrix> m_logData;
 

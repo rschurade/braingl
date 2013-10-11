@@ -33,8 +33,6 @@ private:
     void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
     void createTexture();
 
-    void flipX();
-
 private slots:
     void selectTexture();
     void autoplay();

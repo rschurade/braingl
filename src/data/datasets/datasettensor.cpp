@@ -96,12 +96,6 @@ void DatasetTensor::examineDataset()
     m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f );
     m_properties["maingl"]->create( Fn::Property::D_DIM, 9 );
 
-    if ( m_qform( 1, 1 ) < 0 || m_sform( 1, 1 ) < 0 )
-    {
-        qDebug() << m_properties["maingl"]->get( Fn::Property::D_NAME ).toString() << ": RADIOLOGICAL orientation detected. Flipping voxels on X-Axis";
-        flipX();
-    }
-
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::min();
 
@@ -186,34 +180,6 @@ void DatasetTensor::createLogTensors()
         m_logData.replace( i, logM );
     }
     qDebug() << "create log tensors done!";
-}
-
-void DatasetTensor::flipX()
-{
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
-
-    QVector<Matrix> newData;
-
-    for ( int z = 0; z < nz; ++z )
-    {
-        for ( int y = 0; y < ny; ++y )
-        {
-            for ( int x = nx - 1; x >= 0; --x )
-            {
-                newData.push_back( m_data.at( x + y * nx + z * nx * ny ) );
-            }
-        }
-    }
-
-    m_header->qto_xyz.m[0][0] = qMax( m_header->qto_xyz.m[0][0], m_header->qto_xyz.m[0][0] * -1.0f );
-    m_header->sto_xyz.m[0][0] = qMax( m_header->sto_xyz.m[0][0], m_header->sto_xyz.m[0][0] * -1.0f );
-    m_header->qto_xyz.m[0][3] = 0.0;
-    m_header->sto_xyz.m[0][3] = 0.0;
-
-    m_data.clear();
-    m_data = newData;
 }
 
 void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
