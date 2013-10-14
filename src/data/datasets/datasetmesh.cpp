@@ -395,9 +395,9 @@ void DatasetMesh::applyTransform()
     {
         QVector3D vert = mesh->getVertex( i );
         vert = m_transform * vert;
-        vert.setX( vert.x() * dx );
-        vert.setY( vert.y() * dy );
-        vert.setZ( vert.z() * dz );
+        vert.setX( vert.x() * dx + dx / 2.0 );
+        vert.setY( vert.y() * dy + dy / 2.0 );
+        vert.setZ( vert.z() * dz + dz / 2.0 );
         mesh->setVertex( i, vert );
     }
     mesh->finalize();

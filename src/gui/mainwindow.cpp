@@ -7,6 +7,8 @@
 
 #include "mainwindow.h"
 
+#include <buildtime.h>
+
 #include "views/datasetinfoview.h"
 
 #include "widgets/glwidget.h"
@@ -681,9 +683,11 @@ void MainWindow::loadScene( QString fileName )
 
 void MainWindow::about()
 {
-    QMessageBox::about( this, tr( "About brainGL" ),
-             "<b>brainGL v0.8.1 development version - 08 oct 2013 </b> \n"
-                    "exploring and visualizing anatomical and functional connectivity in the brain." );
+    QString message ( "<b>brainGL v0.8.1 development version <br><br> </b>"
+            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
+            "compiled " + QString( BUILDDATE ) + " " + QString( BUILDTIME ) );
+
+    QMessageBox::about( this, tr( "About brainGL" ), message );
 }
 
 void MainWindow::createActions()
