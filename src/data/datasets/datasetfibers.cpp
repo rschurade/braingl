@@ -588,9 +588,9 @@ void DatasetFibers::applyTransform()
         {
             QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
             vert = m_transform * vert;
-            fib[k*3] = vert.x() * dx;
-            fib[k*3+1] = vert.y() * dy;
-            fib[k*3+2] = vert.z() * dz;
+            fib[k*3  ] = vert.x() * dx + dx / 2.0;
+            fib[k*3+1] = vert.y() * dy + dy / 2.0;
+            fib[k*3+2] = vert.z() * dz + dz / 2.0;
         }
         m_fibs.replace( i, fib );
     }
