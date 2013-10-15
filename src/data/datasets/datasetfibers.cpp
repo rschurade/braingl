@@ -203,7 +203,7 @@ void DatasetFibers::createProps()
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
     }
 
-    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
+    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
     m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
@@ -214,6 +214,8 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY, false, "autoplay" );
     m_properties["maingl"]->create( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
+
+    transformChanged( 3 );
 }
 
 QVector< QVector< float > > DatasetFibers::getFibs()
