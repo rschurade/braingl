@@ -88,6 +88,7 @@ QLineEdit* MatrixWidget::makeEdit()
     out->setMaxLength( 10 );
     out->setMaximumWidth( 100 );
     out->setAlignment( Qt::AlignCenter );
+    connect( out, SIGNAL( textEdited( QString ) ), this, SLOT( editChanged() ) );
     return out;
 }
 
@@ -116,5 +117,26 @@ void MatrixWidget::setValue( QMatrix4x4 value )
 
 void MatrixWidget::editChanged()
 {
+    QMatrix4x4 m;
+    m( 0, 0 ) = m_00->text().toFloat();
+    m( 0, 1 ) = m_01->text().toFloat();
+    m( 0, 2 ) = m_02->text().toFloat();
+    m( 0, 3 ) = m_03->text().toFloat();
 
+    m( 1, 0 ) = m_10->text().toFloat();
+    m( 1, 1 ) = m_11->text().toFloat();
+    m( 1, 2 ) = m_12->text().toFloat();
+    m( 1, 3 ) = m_13->text().toFloat();
+
+    m( 2, 0 ) = m_20->text().toFloat();
+    m( 2, 1 ) = m_21->text().toFloat();
+    m( 2, 2 ) = m_22->text().toFloat();
+    m( 2, 3 ) = m_23->text().toFloat();
+
+    m( 3, 0 ) = m_30->text().toFloat();
+    m( 3, 1 ) = m_31->text().toFloat();
+    m( 3, 2 ) = m_32->text().toFloat();
+    m( 3, 3 ) = m_33->text().toFloat();
+
+    emit( valueChanged( m_id,m ) );
 }

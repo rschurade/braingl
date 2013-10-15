@@ -30,5 +30,6 @@ void PropertyMatrix::setValue( QVariant value )
 
 void PropertyMatrix::widgetChanged( int id, QMatrix4x4 value )
 {
-
+    m_value = value;
+    emit( valueChanged( value ) );
 }

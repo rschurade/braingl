@@ -132,7 +132,7 @@ void DatasetMesh::finalizeProperties()
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
+    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
     m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
@@ -357,11 +357,13 @@ void DatasetMesh::transformChanged( QVariant value )
         qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
         sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
     }
+    m_properties["maingl"]->getWidget( Fn::Property::D_TRANSFORM )->setEnabled( false );
 
     switch ( value.toInt() )
     {
         case 0:
             m_transform.setToIdentity();
+            m_properties["maingl"]->getWidget( Fn::Property::D_TRANSFORM )->setEnabled( true );
             break;
         case 1:
             m_transform = qForm;
@@ -385,21 +387,61 @@ void DatasetMesh::transformChanged( QVariant value )
 
 void DatasetMesh::applyTransform()
 {
+    m_transform = m_properties["maingl"]->get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
+
     float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
     float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
     float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
-    for ( int i = 0; i < mesh->numVerts(); ++i )
+
+    int selectedMatrix = m_properties["maingl"]->get( Fn::Property::D_USE_TRANSFORM ).toInt();
+
+    m_transform = m_properties["maingl"]->get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
+
+    switch( selectedMatrix )
     {
-        QVector3D vert = mesh->getVertex( i );
-        vert = m_transform * vert;
-        vert.setX( vert.x() * dx + dx / 2.0 );
-        vert.setY( vert.y() * dy + dy / 2.0 );
-        vert.setZ( vert.z() * dz + dz / 2.0 );
-        mesh->setVertex( i, vert );
+        case 0:
+        {
+            for ( int i = 0; i < mesh->numVerts(); ++i )
+            {
+                QVector3D vert = mesh->getVertex( i );
+                vert = m_transform * vert;
+                mesh->setVertex( i, vert );
+            }
+            break;
+        }
+        case 1:
+        case 2:
+        {
+            for ( int i = 0; i < mesh->numVerts(); ++i )
+            {
+                QVector3D vert = mesh->getVertex( i );
+                vert.setX( ( vert.x() - dx / 2.0 ) / dx );
+                vert.setY( ( vert.y() - dy / 2.0 ) / dy );
+                vert.setZ( ( vert.z() - dz / 2.0 ) / dz );
+                vert = m_transform * vert;
+                mesh->setVertex( i, vert );
+            }
+            break;
+        }
+        case 3:
+        case 4:
+        {
+            for ( int i = 0; i < mesh->numVerts(); ++i )
+            {
+                QVector3D vert = mesh->getVertex( i );
+                vert = m_transform * vert;
+                vert.setX( vert.x() * dx + dx / 2.0 );
+                vert.setY( vert.y() * dy + dy / 2.0 );
+                vert.setZ( vert.z() * dz + dz / 2.0 );
+                mesh->setVertex( i, vert );
+            }
+            break;
+        }
     }
+
     mesh->finalize();
     delete m_renderer;
     m_renderer = 0;
