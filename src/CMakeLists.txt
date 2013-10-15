@@ -81,6 +81,7 @@ INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 ADD_DEFINITIONS( -DHAVE_ZLIB )
 
 INCLUDE( Utils )
+INCLUDE( HGVersion )
 
 # find the boost packages
 FIND_PACKAGE( Boost 1.46.0 )
@@ -125,11 +126,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
     
-    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
-    add_dependencies(${BinName} buildheader)
+    ReadProjectRevisionStatus()
 
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
@@ -157,11 +154,7 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
     
-    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
-    add_dependencies(${BinName} buildheader)
+    ReadProjectRevisionStatus()
 
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
 	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
@@ -207,11 +200,7 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
     
-    add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h "#define BUILDTIME __TIME__\n#define BUILDDATE __DATE__\n")
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/buildtime.h PROPERTIES GENERATED TRUE HEADER_FILE_ONLY TRUE)
-    add_dependencies(${BinName} buildheader)
+    ReadProjectRevisionStatus()
 
     # Some linux distributions need to explicitily link against X11. We add this lib here.
     SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
