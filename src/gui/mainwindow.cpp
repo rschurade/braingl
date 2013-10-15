@@ -683,9 +683,14 @@ void MainWindow::loadScene( QString fileName )
 
 void MainWindow::about()
 {
-    QString message ( "<b>brainGL v0.8.1 development version <br><br> </b>"
-            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
-            "compiled " + QString( BUILDDATE ) + " " + QString( BUILDTIME ) );
+    QString hg = HGTIP;
+    hg.remove( ";" );
+    hg.remove( "changeset:" );
+    hg.replace( " ","" );
+
+    QString message ( "<b>brainGL development version " + hg + "<br><br> </b>"
+            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>" );
+            //"compiled " + QString( BUILDDATE ) + " " + QString( BUILDTIME ) );
 
     QMessageBox::about( this, tr( "About brainGL" ), message );
 }
