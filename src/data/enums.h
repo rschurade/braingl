@@ -237,6 +237,9 @@ namespace Fn
         D_TRANSFORM,
         D_APPLY_TRANSFORM,
         D_INVERT_VERTEX_ORDER,
+        D_START_INDEX,
+        D_END_INDEX,
+        D_LEFT_RIGHT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -477,6 +480,9 @@ namespace Fn
                 case Property::D_TRANSFORM: return QString( "transformation matrix" ); break;
                 case Property::D_APPLY_TRANSFORM: return QString( "apply transformation" ); break;
                 case Property::D_INVERT_VERTEX_ORDER: return QString( "invert vertex order" ); break;
+                case Property::D_START_INDEX: return QString( "first index that gets rendered" ); break;
+                case Property::D_END_INDEX: return QString( "last index that gets rendered" ); break;
+                case Property::D_LEFT_RIGHT: return QString( "left right visibility" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

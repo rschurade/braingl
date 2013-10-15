@@ -58,6 +58,10 @@ public:
     void avgConRtoZ();
     void makeLittleBrains();
 
+    int m_tris_middle;
+    int m_points_middle;
+    bool m_is_split;
+
 private:
     bool* roi;
 
@@ -75,7 +79,7 @@ private:
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
 
-    int prevGeo, prevGlyph, prevCol, prevGlyphstyle;
+    int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR;
     float prevThresh, prevMinlength;
 
     QString m_colors_name;
@@ -85,6 +89,7 @@ private:
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
 
+    bool filter( int i, int j, int lr, float threshold );
 
 private slots:
     void colorModeChanged( QVariant qv );

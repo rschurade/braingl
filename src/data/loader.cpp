@@ -500,6 +500,10 @@ bool Loader::loadGlyphset()
 
             if (two)
             {
+                dataset->m_tris_middle = numTriangles;
+                dataset->m_points_middle = numPoints;
+                dataset->m_is_split = true;
+
                 for ( int i = 0; i < onumPoints; ++i )
 
                 {

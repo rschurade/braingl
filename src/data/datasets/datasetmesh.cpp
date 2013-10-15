@@ -116,7 +116,6 @@ void DatasetMesh::initProperties()
         m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
         m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
     }
-
 }
 
 void DatasetMesh::finalizeProperties()
@@ -146,6 +145,13 @@ void DatasetMesh::setProperties()
 {
     m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
     //m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+
+    if( m_mesh.size() > 0 )
+    {
+        m_properties["maingl"]->create( Fn::Property::D_START_INDEX, 0 );
+        m_properties["maingl"]->create( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
+
+    }
 }
 
 

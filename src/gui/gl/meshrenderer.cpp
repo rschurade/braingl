@@ -179,7 +179,12 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     }
 
-    glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+    int firstI = props->get( Fn::Property::D_START_INDEX ).toInt();
+    int lastI = props->get( Fn::Property::D_END_INDEX ).toInt();
+    if ( firstI < lastI )
+    {
+        glDrawElements( GL_TRIANGLES, (lastI-firstI)*3, GL_UNSIGNED_INT, (void*)(firstI*3*sizeof(GLuint)) );
+    }
 
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
@@ -265,7 +270,12 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     }
 
-    glDrawElements( GL_TRIANGLES, m_mesh->numTris()*3, GL_UNSIGNED_INT, 0 );
+    int firstI = props.get( Fn::Property::D_START_INDEX ).toInt();
+    int lastI = props.get( Fn::Property::D_END_INDEX ).toInt();
+    if ( firstI < lastI )
+    {
+        glDrawElements( GL_TRIANGLES, (lastI-firstI)*3, GL_UNSIGNED_INT, (void*)(firstI*3*sizeof(GLuint)) );
+    }
 
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
