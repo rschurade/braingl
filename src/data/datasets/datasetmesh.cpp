@@ -131,7 +131,7 @@ void DatasetMesh::finalizeProperties()
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
+    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
     m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
@@ -139,6 +139,8 @@ void DatasetMesh::finalizeProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
     m_properties["maingl"]->create( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
+
+    transformChanged( 3 );
 }
 
 void DatasetMesh::setProperties()

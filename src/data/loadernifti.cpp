@@ -148,6 +148,12 @@ bool LoaderNifti::loadNiftiScalar( QString fileName )
             copyScalar( inputData );
             break;
         }
+        case NIFTI_TYPE_UINT32:
+        {
+            uint32_t* inputData = reinterpret_cast<uint32_t*>( filedata->data );
+            copyScalar( inputData );
+            break;
+        }
         case NIFTI_TYPE_FLOAT32:
         {
             float* inputData = reinterpret_cast<float*>( filedata->data );
