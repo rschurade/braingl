@@ -40,6 +40,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevGlyph( -1 ),
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
+                prevColorMode( -1 ),
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
@@ -165,7 +166,7 @@ void DatasetGlyphset::glyphStyleChanged( QVariant qv )
         m_properties["maingl"]->getWidget( Fn::Property::D_PRIMSIZE )->setHidden( true );
         m_properties["maingl"]->getWidget( Fn::Property::D_SURFACE_GLYPH_GEOMETRY )->setHidden( true );
         m_properties["maingl2"]->set( Fn::Property::D_GLYPH_COLORMODE, 0 );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( true );
+        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
     }
 }
 
@@ -334,6 +335,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int geoCol = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
     int glyphstyle = properties( "maingl" )->get( Fn::Property::D_GLYPHSTYLE ).toInt();
+    int colorMode = properties( "maingl" )->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
 
     float threshold = properties( "maingl" )->get( Fn::Property::D_THRESHOLD ).toFloat();
     float minlength = properties( "maingl" )->get( Fn::Property::D_MINLENGTH ).toFloat();
@@ -378,7 +380,8 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     if ( ( glyphstyle == 2 )
             && ( m_pierenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
-                    || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) || ( prevLR != lr ) ) )
+                    || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) || ( prevLR != lr )
+                    || ( prevColorMode != colorMode ) ) )
     {
         if ( m_pierenderer )
         {
@@ -387,7 +390,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_pierenderer = new PieGlyphRenderer();
         m_pierenderer->init();
         makePies();
-        m_pierenderer->initGeometry( pieArrays, numbers );
+        m_pierenderer->initGeometry( pieArrays, numbers, maxNodeCount );
     }
 
     if ( ( glyphstyle == 3 )
@@ -413,6 +416,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     prevThresh = threshold;
     prevMinlength = minlength;
     prevLR = lr;
+    prevColorMode = colorMode;
 
     if ( glyphstyle == 0 )
     {
@@ -747,17 +751,24 @@ void DatasetGlyphset::makeVecs()
 }
 
 //TODO: replace with something nicer...
-bool edgeCompare( Connection* e1, Connection* e2 )
+bool edgeCompareHue( Connection* e1, Connection* e2 )
 {
     QColor c1( e1->r * 255, e1->g * 255, e1->b * 255 );
     QColor c2( e2->r * 255, e2->g * 255, e2->b * 255 );
     return c1.hueF() > c2.hueF();
 }
 
+bool edgeCompareValue( Connection* e1, Connection* e2 )
+{
+    return e1->v > e2->v;
+}
+
 void DatasetGlyphset::makePies()
 {
 
     qDebug() << "makePies begin";
+
+    maxNodeCount = 0;
 
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
     float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
@@ -820,13 +831,25 @@ void DatasetGlyphset::makePies()
             }
         }
         numbers->replace( i, count );
+        if (count > maxNodeCount)
+        {
+            maxNodeCount = count;
+        }
 //qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
 
 //Magic!:
 //TODO: There is some memory leakage somewhere...
-        qSort( sortlist.begin(), sortlist.end(), edgeCompare );
+        int colorMode = m_properties["maingl"]->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+        if ( colorMode == 0 )
+        {
+            qSort( sortlist.begin(), sortlist.end(), edgeCompareHue );
+        }
+        else
+        {
+            qSort( sortlist.begin(), sortlist.end(), edgeCompareValue );
+        }
 
-        int offset = 8;
+        int offset = 9;
         float* pieNodeArray = NULL;
         if ( count > 0 )
             pieNodeArray = new float[offset * count];
@@ -834,8 +857,8 @@ void DatasetGlyphset::makePies()
         {
             Connection* c = sortlist.at( nodecount );
 
-            //TODO: values for pie charts?
-            //float v = c->v;
+            //TODO: sorting by values?
+            float v = c->v;
 
             int o = nodecount * offset;
             pieNodeArray[o] = c->fn.x();
@@ -848,6 +871,7 @@ void DatasetGlyphset::makePies()
 
             pieNodeArray[o + 6] = nodecount;
             pieNodeArray[o + 7] = count;
+            pieNodeArray[o + 8] = v;
         }
         pieArrays->replace( i, pieNodeArray );
     }
