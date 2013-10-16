@@ -44,6 +44,9 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Y, false, "special" );
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Z, false, "special" );
 
+    m_properties["maingl"]->create( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"]->create( Fn::Property::D_END_INDEX, 0 );
+
     finalizeProperties();
 
     m_properties["maingl"]->create( Fn::Property::D_ISO_VALUE, 80.0f, ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat(), "general" );
@@ -94,6 +97,9 @@ void DatasetIsosurface::generateSurface()
         m_threads[i]->wait();
     }
     renameVerticesAndTriangles();
+
+    m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
 void DatasetIsosurface::renameVerticesAndTriangles()
@@ -105,15 +111,16 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     TriangleMesh2* mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
     m_mesh.push_back( mesh );
 
-    float xOff = 0.5f;
-    float yOff = 0.5f;
-    float zOff = 0.5f;
+//    float xOff = 0.5f;
+//    float yOff = 0.5f;
+//    float zOff = 0.5f;
 
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
         ( *mapIterator ).newID = nextID++;
-        m_mesh[0]->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
+        //m_mesh[0]->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
+        m_mesh[0]->addVertex( ( *mapIterator ).x, ( *mapIterator ).y, ( *mapIterator ).z );
         ++mapIterator;
     }
 

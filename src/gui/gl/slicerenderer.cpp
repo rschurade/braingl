@@ -66,21 +66,28 @@ void SliceRenderer::initGeometry()
     m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
     m_dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    float x = m_x * m_dx + m_dx / 2.0;
-    float y = m_y * m_dy + m_dy / 2.0;
-    float z = m_z * m_dz + m_dz / 2.0;
-    float xb = m_nx * m_dx;
-    float yb = m_ny * m_dy;
-    float zb = m_nz * m_dz;
+    float x = m_x * m_dx;
+    float y = m_y * m_dy;
+    float z = m_z * m_dz;
+
+    float lx = -m_dx / 2.0;
+    float ly = -m_dy / 2.0;
+    float lz = -m_dz / 2.0;
+
+    float xb = m_nx * m_dx + lx;
+    float yb = m_ny * m_dy + ly;
+    float zb = m_nz * m_dz + lz;
+
+
 
     if ( m_z != m_zOld || zb != m_zbOld )
     {
         VertexData verticesAxial[] =
         {
-            { QVector3D( 0.0, 0.0, z ), QVector3D( 0.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( xb,  0.0, z ), QVector3D( 1.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( xb,  yb,  z ), QVector3D( 1.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( 0.0, yb,  z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
+            { QVector3D( lx, ly, z ), QVector3D( 0.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
+            { QVector3D( xb, ly, z ), QVector3D( 1.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
+            { QVector3D( xb, yb, z ), QVector3D( 1.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) },
+            { QVector3D( lx, yb, z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
         };
         // Transfer vertex data to VBO 1
         glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
@@ -92,10 +99,10 @@ void SliceRenderer::initGeometry()
     {
         VertexData verticesCoronal[] =
         {
-            { QVector3D( 0.0, y, 0.0 ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
-            { QVector3D( xb,  y, 0.0 ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
-            { QVector3D( xb,  y, zb  ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
-            { QVector3D( 0.0, y, zb  ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
+            { QVector3D( lx, y, lz ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
+            { QVector3D( xb, y, lz ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
+            { QVector3D( xb, y, zb ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
+            { QVector3D( lx, y, zb ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
         };
 
         // Transfer vertex data to VBO 2
@@ -108,10 +115,10 @@ void SliceRenderer::initGeometry()
     {
         VertexData verticesSagittal[] =
         {
-            { QVector3D( x, 0.0, 0.0 ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 0.0 ) },
-            { QVector3D( x, yb,  0.0 ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 0.0 ) },
-            { QVector3D( x, yb,  zb  ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 1.0 ) },
-            { QVector3D( x, 0.0, zb  ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 1.0 ) }
+            { QVector3D( x, ly, lz ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 0.0 ) },
+            { QVector3D( x, yb, lz ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 0.0 ) },
+            { QVector3D( x, yb, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 1.0 ) },
+            { QVector3D( x, ly, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 1.0 ) }
         };
         // Transfer vertex data to VBO 3
         glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
