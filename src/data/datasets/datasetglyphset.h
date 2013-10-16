@@ -45,6 +45,7 @@ public:
     int vecsNumber;
 
     void makePies();
+    int maxNodeCount;
 
     void makeDiffPoints();
     int diffsNumber;
@@ -79,7 +80,7 @@ private:
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
 
-    int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR;
+    int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode;
     float prevThresh, prevMinlength;
 
     QString m_colors_name;

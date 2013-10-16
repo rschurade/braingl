@@ -147,9 +147,9 @@ void DatasetFibers::createProps()
         m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
         m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
     }
-    m_properties["maingl"]->create( Fn::Property::D_DX, 100.0f, 0.0f, 100.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_DY, 100.0f, 0.0f, 100.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_DZ, 100.0f, 0.0f, 100.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_DX, 200.0f, 0.0f, 200.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_DY, 200.0f, 0.0f, 200.0f, "special" );
+    m_properties["maingl"]->create( Fn::Property::D_DZ, 200.0f, 0.0f, 200.0f, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NX, 800, 0, 1600, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->create( Fn::Property::D_NZ, 800, 0, 1600, "special" );
