@@ -35,6 +35,9 @@ public:
 
 	void update();
 
+	void setColorIndex( int index ) { m_colorIndex = index; };
+	void setSelected( int index ) { m_selected = index; };
+
 private:
     void setShaderVars();
     void initGeometry();
@@ -54,6 +57,8 @@ private:
 
 
     bool m_dirty;
+    int m_colorIndex;
+    int m_selected;
 };
 
 #endif /* SCENERENDERER_H_ */

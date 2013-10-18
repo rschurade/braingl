@@ -33,6 +33,9 @@ public:
     void middleMouseDrag( int x, int y );
 	virtual void mouseWheel( int step );
 
+	float getMoveX() { return m_moveX; };
+	int getZoom() { return m_zoom; };
+
 private:
 	void setShaderVars();
 
@@ -42,6 +45,13 @@ private:
 
     int m_width;
     int m_height;
+    int m_zoom;
+    float m_moveX;
+    float m_moveY;
+    float m_moveXOld;
+    float m_moveYOld;
+    int m_middleDownX;
+    int m_middleDownY;
 };
 
 #endif /* SCENERENDERER_H_ */

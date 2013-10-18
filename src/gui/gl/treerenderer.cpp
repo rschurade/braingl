@@ -28,7 +28,9 @@ TreeRenderer::TreeRenderer( QString name, Tree* tree ) :
     vboIds( new GLuint[ 2 ] ),
     m_width( 0 ),
     m_height( 0 ),
-    m_dirty( true )
+    m_dirty( true ),
+    m_colorIndex( 0 ),
+    m_selected( -1 )
 {
 }
 
@@ -106,45 +108,85 @@ void TreeRenderer::initGeometryRec( Tree* tree, int left, int right )
     int offset = 0;
     for ( int i = 0; i < children.size(); ++i )
     {
-        m_verts.push_back( left + ( right - left ) / 2 );
-        m_verts.push_back( tree->getValue() );
-        m_verts.push_back( 0.0 );
-
         Tree* child = children[i];
 
         int size = child->getNumLeaves();
         //qDebug() << size << child->getValue();
-        m_verts.push_back( left + offset + size / 2 );
-        m_verts.push_back( tree->getValue() );
-        m_verts.push_back( 0.0 );
 
-        m_verts.push_back( left + offset + size / 2 );
-        m_verts.push_back( tree->getValue() );
-        m_verts.push_back( 0.0 );
+        if ( size > 1 )
+        {
+            m_verts.push_back( left + ( right - left ) / 2 );
+            m_verts.push_back( tree->getValue() );
+            m_verts.push_back( 0.0 );
 
-        m_verts.push_back( left + offset + size / 2 );
-        m_verts.push_back( child->getValue() );
-        m_verts.push_back( 0.0 );
+            m_verts.push_back( left + offset + size / 2 );
+            m_verts.push_back( tree->getValue() );
+            m_verts.push_back( 0.0 );
 
-        QColor color = tree->getColor( 0 );
-        m_colors.push_back( color.redF() );
-        m_colors.push_back( color.greenF() );
-        m_colors.push_back( color.blueF() );
-        m_colors.push_back( 1.0 );
-        m_colors.push_back( color.redF() );
-        m_colors.push_back( color.greenF() );
-        m_colors.push_back( color.blueF() );
-        m_colors.push_back( 1.0 );
-        m_colors.push_back( color.redF() );
-        m_colors.push_back( color.greenF() );
-        m_colors.push_back( color.blueF() );
-        m_colors.push_back( 1.0 );
-        m_colors.push_back( color.redF() );
-        m_colors.push_back( color.greenF() );
-        m_colors.push_back( color.blueF() );
-        m_colors.push_back( 1.0 );
+            m_verts.push_back( left + offset + size / 2 );
+            m_verts.push_back( tree->getValue() );
+            m_verts.push_back( 0.0 );
 
+            m_verts.push_back( left + offset + size / 2 );
+            m_verts.push_back( child->getValue() );
+            m_verts.push_back( 0.0 );
 
+            QColor color = tree->getColor( m_colorIndex );
+
+            if ( tree->getId() == m_selected )
+            {
+                QColor color1 = tree->getColor( 1 );
+                m_colors.push_back( color1.redF() );
+                m_colors.push_back( color1.greenF() );
+                m_colors.push_back( color1.blueF() );
+                m_colors.push_back( 1.0 );
+                m_colors.push_back( color1.redF() );
+                m_colors.push_back( color1.greenF() );
+                m_colors.push_back( color1.blueF() );
+                m_colors.push_back( 1.0 );
+            }
+            else
+            {
+                m_colors.push_back( color.redF() );
+                m_colors.push_back( color.greenF() );
+                m_colors.push_back( color.blueF() );
+                m_colors.push_back( 1.0 );
+                m_colors.push_back( color.redF() );
+                m_colors.push_back( color.greenF() );
+                m_colors.push_back( color.blueF() );
+                m_colors.push_back( 1.0 );
+            }
+
+            m_colors.push_back( color.redF() );
+            m_colors.push_back( color.greenF() );
+            m_colors.push_back( color.blueF() );
+            m_colors.push_back( 1.0 );
+            m_colors.push_back( color.redF() );
+            m_colors.push_back( color.greenF() );
+            m_colors.push_back( color.blueF() );
+            m_colors.push_back( 1.0 );
+        }
+        else
+        {
+            m_verts.push_back( left + ( right - left ) / 2 );
+            m_verts.push_back( tree->getValue() );
+            m_verts.push_back( 0.0 );
+
+            m_verts.push_back( left + offset + size / 2 );
+            m_verts.push_back( child->getValue() );
+            m_verts.push_back( 0.0 );
+
+            QColor color = tree->getColor( m_colorIndex );
+
+            m_colors.push_back( color.redF() );
+            m_colors.push_back( color.greenF() );
+            m_colors.push_back( color.blueF() );
+            m_colors.push_back( 1.0 );
+            m_colors.push_back( color.redF() );
+            m_colors.push_back( color.greenF() );
+            m_colors.push_back( color.blueF() );
+            m_colors.push_back( 1.0 );
+        }
 
         initGeometryRec( child, left + offset, left + offset + size );
 

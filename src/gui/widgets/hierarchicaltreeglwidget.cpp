@@ -11,6 +11,7 @@
 
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasettree.h"
 
 #include <QtGui>
 #include <QDebug>
@@ -63,9 +64,11 @@ void HierarchicalTreeGLWidget::mousePressEvent( QMouseEvent *event )
     if ( event->buttons() & Qt::LeftButton )
     {
         QList<Dataset*>dl = Models::getDatasets( Fn::DatasetType::TREE );
+
         for ( int i = 0; i < dl.size(); ++i )
         {
-            dl[i]->mousePick( 0, QVector3D( event->x(), event->y(), 0 ), event->modifiers(), "tree" );
+            dynamic_cast<DatasetTree*>( dl[i] )->setZoom( m_renderer->getZoom() );
+            dl[i]->mousePick( 0, QVector3D( event->x(), event->y(), m_renderer->getMoveX() ), event->modifiers(), "tree" );
         }
     }
     if ( event->buttons() & Qt::MiddleButton )
@@ -90,9 +93,9 @@ void HierarchicalTreeGLWidget::mouseMoveEvent( QMouseEvent *event )
 
 void HierarchicalTreeGLWidget::wheelEvent(QWheelEvent *event)
 {
-//     int numDegrees = event->delta() / 8;
-//     int numSteps = numDegrees / 15;
-     //m_renderer->mouseWheel( numSteps );
+     int numDegrees = event->delta() / 8;
+     int numSteps = numDegrees / 15;
+     m_renderer->mouseWheel( numSteps );
      updateGL();
 
 }
