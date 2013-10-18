@@ -32,6 +32,7 @@ public:
     Tree* getTree() { return m_tree; };
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    void setZoom( int zoom ) { m_zoom = zoom; };
 
 private:
     void createTexture();
@@ -50,9 +51,14 @@ private:
     int m_width;
     int m_height;
     int m_picked;
+    int m_zoom;
 
 private slots:
     void selectCluster( QVariant id );
+    void colorSelectionChanged( QVariant value );
+    void setClusterColor();
+    void partitionModeChanged( QVariant value );
+    void applyPartitionMode();
 
 };
 

@@ -20,6 +20,8 @@ Tree::Tree(  int id, float value ) :
 
     m_colors.push_back( color1 );
     m_colors.push_back( color2 );
+    m_colors.push_back( color2 );
+    m_colors.push_back( color2 );
 }
 
 Tree::~Tree()

@@ -240,6 +240,13 @@ namespace Fn
         D_START_INDEX,
         D_END_INDEX,
         D_LEFT_RIGHT,
+        D_TREE_COLOR_SELECTION,
+        D_TREE_USER_CLUSTER_COLOR,
+        D_TREE_SET_USER_CLUSTER_COLOR,
+        D_TREE_PARTITION_MODE,
+        D_TREE_APPLY_PARTITION_MODE,
+        D_TREE_PARTITION_LEVEL,
+        D_TREE_PARTITION_SIZE,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -483,6 +490,13 @@ namespace Fn
                 case Property::D_START_INDEX: return QString( "first index that gets rendered" ); break;
                 case Property::D_END_INDEX: return QString( "last index that gets rendered" ); break;
                 case Property::D_LEFT_RIGHT: return QString( "left right visibility" ); break;
+                case Property::D_TREE_COLOR_SELECTION: return QString( "color mode" ); break;
+                case Property::D_TREE_USER_CLUSTER_COLOR: return QString( "user defined cluster color" ); break;
+                case Property::D_TREE_SET_USER_CLUSTER_COLOR: return QString( "set cluster color" ); break;
+                case Property::D_TREE_PARTITION_MODE: return QString( "partition mode" ); break;
+                case Property::D_TREE_APPLY_PARTITION_MODE: return QString( "apply partition mode" ); break;
+                case Property::D_TREE_PARTITION_LEVEL: return QString( "partition level" ); break;
+                case Property::D_TREE_PARTITION_SIZE: return QString( "partition size" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

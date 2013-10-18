@@ -27,7 +27,15 @@
 
 TreeWidgetRenderer::TreeWidgetRenderer( QString name ) :
     ObjectRenderer(),
-    m_name( name )
+    m_name( name ),
+    m_zoom( 1 ),
+    m_moveX( 0 ),
+    m_moveY( 0 ),
+    m_moveXOld( 0 ),
+    m_moveYOld( 0 ),
+    m_middleDownX( 0 ),
+    m_middleDownY( 0 )
+
 {
 }
 
@@ -103,7 +111,8 @@ void TreeWidgetRenderer::draw()
     {
         ds = VPtr<DatasetTree>::asPtr( Models::d()->data( Models::d()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         int leaves = ds->getTree()->getNumLeaves();
-        pMatrix.ortho(  0,  leaves, 0, 1., -3000, 3000 );
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
         ds->drawTree( pMatrix, m_width, m_height );
     }
     else
@@ -134,20 +143,20 @@ void TreeWidgetRenderer::setShaderVars()
 
 void TreeWidgetRenderer::mouseWheel( int step )
 {
-//    m_zoom += step;
-//    m_zoom = qMax( 1, m_zoom );
+    m_zoom += step;
+    m_zoom = qMax( 1, m_zoom );
 }
 
 void TreeWidgetRenderer::middleMouseDown( int x, int y )
 {
-//    m_moveXOld = m_moveX;
-//    m_moveYOld = m_moveY;
-//    m_middleDownX = x;
-//    m_middleDownY = y;
+    m_moveXOld = m_moveX;
+    m_moveYOld = m_moveY;
+    m_middleDownX = x;
+    m_middleDownY = y;
 }
 
 void TreeWidgetRenderer::middleMouseDrag( int x, int y )
 {
-//    m_moveX = m_moveXOld - ( m_middleDownX - x );
-//    m_moveY = m_moveYOld + m_middleDownY - y;
+    m_moveX = m_moveXOld - ( m_middleDownX - x ) * 10;
+    m_moveY = m_moveYOld + m_middleDownY - y;
 }
