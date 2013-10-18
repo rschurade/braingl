@@ -180,6 +180,8 @@ void DatasetMesh::addMesh( TriangleMesh2* tm, QString displayString )
     }
     m_mesh.push_back( tm );
     m_displayList.push_back( displayString );
+    m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
 int DatasetMesh::getNumberOfMeshes()
