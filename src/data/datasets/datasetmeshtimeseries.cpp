@@ -38,6 +38,8 @@ void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
 
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
+    m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
 void DatasetMeshTimeSeries::addData( QVector<float> data )
@@ -51,6 +53,7 @@ void DatasetMeshTimeSeries::addData( QVector<float> data )
             m_dataMin = qMin( m_dataMin, data[i] );
             m_dataMax = qMax( m_dataMax, data[i] );
         }
+        qDebug() << "min/max" << m_dataMin << m_dataMax;
 
         m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( m_dataMin );
         m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMax( m_dataMax );
