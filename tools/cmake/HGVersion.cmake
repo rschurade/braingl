@@ -9,6 +9,8 @@ macro ( ReadProjectRevisionStatus )
 exec_program( hg ${PROJECT_SOURCE_DIR} ARGS tip OUTPUT_VARIABLE __HGTIP__ )
 #message(STATUS "__HGTIP__=${__HGTIP__}")
 
+SET( CHANGESET  "\""  "\"" )
+
 string( REPLACE "\n" ";" __HGTIP__ ${__HGTIP__} )
 foreach(HGTIP ${__HGTIP__})
     string(SUBSTRING "${HGTIP}" 0 11 HGTIPSTART)
