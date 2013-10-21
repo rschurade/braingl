@@ -39,12 +39,26 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
 
+    m_properties.create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties.create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
+    m_properties.create( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
+    m_properties.create( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties.create( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
+    m_properties.create( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties.create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties.create( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
+
+
+
     m_properties.create( Fn::Property::R_NX, m_header->nx );
     m_properties.create( Fn::Property::R_NY, m_header->ny );
     m_properties.create( Fn::Property::R_NZ, m_header->nz );
     m_properties.create( Fn::Property::R_DX, m_header->dx );
     m_properties.create( Fn::Property::R_DY, m_header->dy );
     m_properties.create( Fn::Property::R_DZ, m_header->dz );
+
+    m_properties.create( Fn::Property::D_START_INDEX, 0 );
+    m_properties.create( Fn::Property::D_END_INDEX, 0 );
 
     m_properties.create( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
@@ -138,6 +152,8 @@ void ROIArea::renameVerticesAndTriangles()
         ++vecIterator;
     }
     m_mesh->finalize();
+
+    m_properties.set( Fn::Property::D_END_INDEX, m_mesh->numTris() );
 
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
