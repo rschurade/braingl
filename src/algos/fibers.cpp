@@ -11,6 +11,7 @@
 #include "../data/datasets/dataset3d.h"
 
 #include <QSet>
+#include <QVector3D>
 
 #include <limits>
 #include <math.h>
@@ -136,14 +137,33 @@ DatasetScalar* Fibers::tractDensity()
     QVector<float> data( m_blockSize, 0 );
     QVector< QVector< float > > fibs = m_dataset->getSelectedFibs();
     int x, y, z;
+    QVector3D p3;
     for ( int i = 0; i < fibs.size(); ++i )
     {
-        for( int k = 0; k < fibs[i].size() / 3; ++k )
+        QVector<float> fibdata( m_blockSize, 0 );
+
+        for( int k = 0; k < ( fibs[i].size() / 3 ) - 1; ++k )
         {
-            x = fibs[i].at( k * 3     );
-            y = fibs[i].at( k * 3 + 1 );
-            z = fibs[i].at( k * 3 + 2 );
-            ++data[ getID( x, y, z ) ];
+            QVector3D p1( fibs[i].at( k * 3     ) + 0.5, fibs[i].at( k * 3 + 1 ) + 0.5, fibs[i].at( k * 3 + 2 ) + 0.5 );
+            QVector3D p2( fibs[i].at( k * 3 + 3 ) + 0.5, fibs[i].at( k * 3 + 4 ) + 0.5, fibs[i].at( k * 3 + 5 ) + 0.5 );
+            p2 = p2 - p1;
+            p2.normalize();
+
+            for ( int l = 0; l < 10; ++l )
+            {
+                p3 = p1 + ( ( (float)l / 10 ) * p2 ) ;
+                x = p3.x();
+                y = p3.y();
+                z = p3.z();
+
+                int id = getID( x, y, z );
+
+                if ( fibdata[id] == 0 )
+                {
+                    ++fibdata[id];
+                    ++data[id];
+                }
+            }
         }
     }
 
