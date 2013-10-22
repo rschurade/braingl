@@ -101,15 +101,15 @@ vec4 texColor( vec3 texCoord )
     {
         mcolor = mix( mcolor.rgb, color1.rgb, u_alpha1 );
     }
-    if( length( color1.rgb ) > 0.0 )
+    if( length( color2.rgb ) > 0.0 )
     {
         mcolor = mix( mcolor.rgb, color2.rgb, u_alpha2 );
     }
-    if( length( color1.rgb ) > 0.0 )
+    if( length( color3.rgb ) > 0.0 )
     {
         mcolor = mix( mcolor.rgb, color3.rgb, u_alpha3 );
     }
-    if( length( color1.rgb ) > 0.0 )
+    if( length( color4.rgb ) > 0.0 )
     {
         mcolor = mix( mcolor.rgb, color4.rgb, u_alpha4 );
     }
