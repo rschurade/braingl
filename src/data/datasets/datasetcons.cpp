@@ -29,6 +29,7 @@ DatasetCons::~DatasetCons()
 void DatasetCons::init()
 {
     consNumber = cons->edges.length();
+    qDebug() << "datasetCons init";
     for ( int i = 0; i < consNumber; i++ )
     {
         Edge* e = cons->edges.at( i );
@@ -42,6 +43,8 @@ void DatasetCons::init()
         fib.push_back( t.y() );
         fib.push_back( t.z() );
         m_fibs.push_back( fib );
+
+        qDebug() << f.x() << f.z() << t.x() << t.y() << t.z();
     }
     QVector<QVector<float> > data0;
     QVector<float> min0;
