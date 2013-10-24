@@ -105,8 +105,8 @@ void Connections::loadConnexels( QString filename )
     while ( !ns.atEnd() )
     {
         nl = ns.readLine();
-
-        QStringList vals = nl.split( " ", QString::SkipEmptyParts );
+        QRegExp rx("(\\ |\\t)");
+        QStringList vals = nl.split( rx, QString::SkipEmptyParts );
         if ( vals.size() == 7 )
         {
             QVector3D* anode1;
