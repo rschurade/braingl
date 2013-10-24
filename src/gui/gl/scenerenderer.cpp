@@ -216,12 +216,12 @@ void SceneRenderer::renderScene()
     //
     //***************************************************************************************************/
     GLFunctions::getAndPrintGLError( "before pass 1" );
-    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
     clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );
-    clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    clearTexture( "C0", bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     setRenderTargets( "C0", "D0" );
     renderScenePart( 1, "C0", "D0" );
     GLFunctions::getAndPrintGLError( "after pass 1" );
@@ -394,11 +394,15 @@ QImage* SceneRenderer::screenshot( QMatrix4x4 mvMatrix, QMatrix4x4 pMatrix )
     {
         bgColor = Models::g()->data( Models::g()->index( (int) Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ).value<QColor>();
     }
-    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 0.0 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     renderMerge();
 
     QImage* screenshot = getOffscreenTexture( m_width, m_height );
+
+    screenshot = new QImage(screenshot->convertToFormat(QImage::Format_ARGB32));
+
+    qDebug() << "screenshot format bla:" << screenshot->format() << " hasAlpha: " << screenshot->hasAlphaChannel();
 
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     resizeGL( tmpWidth, tmpHeight );
@@ -615,7 +619,7 @@ QImage* SceneRenderer::getOffscreenTexture( int width, int height )
     /* get the mouse coordinates */
     /* OpenGL has the {0,0} at the down-left corner of the screen */
 
-    QImage* image = new QImage( width, height, QImage::Format_RGB32 );
+    QImage* image = new QImage( width, height, QImage::Format_ARGB32 );
     QColor c;
     for ( int x = 0; x < width; ++x )
     {
@@ -628,6 +632,7 @@ QImage* SceneRenderer::getOffscreenTexture( int width, int height )
             alpha = ptr[pixel_index + 3];
 
             c = QColor( red, green, blue, alpha );
+            //if (alpha != 255) qDebug() << " r: " << red << " g: " << green << " b: " << blue << " a: " << alpha;
             image->setPixel( x, ( height - y ) - 1, c.rgba() );
         }
     }
