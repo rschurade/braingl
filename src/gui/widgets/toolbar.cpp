@@ -12,6 +12,7 @@
 #include "../widgets/algoStarterWidgets/sdwidget.h"
 #include "../widgets/algoStarterWidgets/correlationwidget.h"
 #include "../widgets/algoStarterWidgets/datasetselectionwidget.h"
+#include "../widgets/algoStarterWidgets/bundlingwidget.h"
 
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
@@ -297,9 +298,12 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::BUNDLE:
             qDebug() << "BUNDLING...";
-            ((DatasetCons*)ds)->getCons()->fullAttract();
-            //((DatasetCons*)ds)->getCons()->writeBinaryVTK();
-            l = ((DatasetCons*)ds)->cons->createDatasetFibers();
+            {
+                Connections* cons = ( (DatasetCons*) ds )->getCons();
+                m_bw = new BundlingWidget( cons, this->parentWidget() );
+                connect( m_bw, SIGNAL( finished() ), this, SLOT( bundlingFinished() ) );
+                m_bw->show();
+            }
             break;
         case Fn::Algo::MAKECONS:
             qDebug() << "Making new connections...";
@@ -518,4 +522,19 @@ void ToolBar::slotMeshSelected( QList<QVariant> meshes )
         QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
         m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
     }
+}
+
+void ToolBar::bundlingFinished()
+{
+    qDebug() << "bundling finished";
+    QList<Dataset*>l = m_bw->getBundles();
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
+    }
+    //TODO: Ask Ralph about this: Destroy does not delete and disconnect, the old widgets keep inserting the new dataset multiple times...
+    //m_bw->hide();
+    //destroy( m_bw );
+    delete m_bw;
 }

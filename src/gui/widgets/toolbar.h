@@ -19,6 +19,7 @@ class CorrelationWidget;
 class TensorTrackWidget;
 class CrossingTrackWidget;
 class SDWidget;
+class BundlingWidget;
 
 class ToolBar : public QToolBar
 {
@@ -73,6 +74,7 @@ private:
     CrossingTrackWidget* m_ctw;
     SDWidget* m_sdw;
     CorrelationWidget* m_cw;
+    BundlingWidget* m_bw;
 
     void createActions();
 
@@ -85,6 +87,7 @@ private slots:
     void sdFinished();
     void correlationFinished();
     void slotMeshSelected( QList<QVariant> meshes );
+    void bundlingFinished();
 };
 
 #endif /* TOOLBAR_H_ */

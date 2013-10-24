@@ -204,14 +204,13 @@ void Connections::subdivide( int newp )
     for ( int i = 0; i < edges.size(); ++i )
     {
         Edge* e = edges.at( i );
-        ;
+
         e->subdivide( newp );
     }
 }
 
 void Connections::attract()
 {
-
     //for all edges...
 //#pragma omp parallel for
     for ( int ie = 0; ie < edges.size(); ++ie )
@@ -258,10 +257,36 @@ void Connections::attract()
     }
 }
 
+void Connections::startBundling()
+{
+    //TODO: paralellize comps and forces, different threads?
+    /*int numThreads = GLFunctions::idealThreadCount;
+
+    // create threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        BundlingThread* t = new BundlingThread( this );
+        m_threads.push_back( t );
+        connect( t, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
+        connect( t, SIGNAL( finished() ), this, SLOT( slotThreadFinished() ), Qt::QueuedConnection );
+    }
+
+    // run threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        ++m_threadsRunning;
+        m_threads[i]->start();
+    }*/
+    BundlingThread* t = new BundlingThread( this );
+    t->start();
+}
+
 void Connections::fullAttract()
 {
 
     qDebug() << "starting full attract";
+
+    qDebug() << "c_thr: " << c_thr << " bell: " << bell << " smooth: " << smooth;
 
     calcComps();
 
@@ -280,6 +305,7 @@ void Connections::fullAttract()
         }
         i--;
         spnow *= spfac;
+        emit( progress() );
     }
     //for further subdivision without attraction
     for ( int i = 1; i < smooth; i++ )
@@ -287,6 +313,7 @@ void Connections::fullAttract()
         subdivide( qRound( spnow ) + i );
         qDebug() << "number of subd. points: " << qRound( spnow ) + i;
     }
+    emit( finished() );
 }
 
 void Connections::calcComps()
@@ -297,7 +324,7 @@ void Connections::calcComps()
 //#pragma omp parallel for num_threads (7)
     for ( int i = 0; i < edges.length(); i++ )
     {
-        qDebug() << i;
+        //qDebug() << i;
         for ( int j = 0; j < edges.length(); j++ )
         {
             if ( i == j )
@@ -548,4 +575,24 @@ QString Connections::name()
 {
     return prefix + "_c_thr" + QString::number( c_thr, 'f', 4 ) + "_start_i" + QString( "%1" ).arg( start_i, 4, 10, QLatin1Char( '0' ) )
             + "_numcycles" + QString( "%1" ).arg( numcycles, 2, 10, QLatin1Char( '0' ) );
+}
+
+void Connections::setCthr( float value, int)
+{
+    c_thr = value;
+}
+
+void Connections::setBell( float value, int)
+{
+    bell = value;
+}
+
+void Connections::setSmooth( int value, int)
+{
+    smooth = value;
+}
+
+void Connections::attractThreadFinished()
+{
+
 }
