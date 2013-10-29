@@ -106,6 +106,7 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_LAST_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN2, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV1, 0 ) ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ) );
@@ -166,6 +167,7 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_LAST_PATH );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_PATH );
     loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN );
+    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN2 );
     loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_COMBINED );
     loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV1 );
     loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV2 );
