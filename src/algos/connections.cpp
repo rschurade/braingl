@@ -260,23 +260,6 @@ void Connections::attract()
 void Connections::startBundling()
 {
     //TODO: paralellize comps and forces, different threads?
-    /*int numThreads = GLFunctions::idealThreadCount;
-
-    // create threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        BundlingThread* t = new BundlingThread( this );
-        m_threads.push_back( t );
-        connect( t, SIGNAL( progress() ), this, SLOT( slotProgress() ), Qt::QueuedConnection );
-        connect( t, SIGNAL( finished() ), this, SLOT( slotThreadFinished() ), Qt::QueuedConnection );
-    }
-
-    // run threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        ++m_threadsRunning;
-        m_threads[i]->start();
-    }*/
     BundlingThread* t = new BundlingThread( this );
     t->start();
 }
