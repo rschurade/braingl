@@ -23,6 +23,7 @@
 #include "../../data/datasets/dataset.h"
 #include "../../data/datasets/datasetcons.h"
 #include "../../data/datasets/datasetglyphset.h"
+#include "../../data/datasets/datasetconglyphs.h"
 
 #include <QVariant>
 
@@ -182,6 +183,10 @@ void ToolBar::createActions()
     m_fiberResampleAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "resample" ), this, Fn::Algo::FIBER_RESAMPLE );
     m_fiberResampleAction->setStatusTip( tr( "resample" ) );
     connect( m_fiberResampleAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_consToGlyphsetAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "make glyphset" ), this, Fn::Algo::CONS_TO_GLYPHSET );
+    m_consToGlyphsetAction->setStatusTip( tr( "resample" ) );
+    connect( m_consToGlyphsetAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -349,8 +354,17 @@ void ToolBar::slot( Fn::Algo algo )
             m_cw->show();
             break;
         }
+        case Fn::Algo::CONS_TO_GLYPHSET:
+        {
+            DatasetCons* cons = (DatasetCons*)ds;
+            DatasetConGlyphs* consglyphs = new DatasetConGlyphs(QDir("new_conglyphs"));
+            consglyphs->setCons(cons->cons);
+            l.push_back(consglyphs);
+            break;
+        }
 
     }
+    qDebug() << "adding " << l.size() << " datasets";
     for ( int i = 0; i < l.size(); ++i )
     {
         index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
@@ -432,6 +446,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::CONS:
         {
             this->addAction( m_bundleAction );
+            this->addAction( m_consToGlyphsetAction );
             break;
         }
         case Fn::DatasetType::MESH_ASCII:
