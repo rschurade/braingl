@@ -69,6 +69,7 @@ private:
     FNAction* m_meshBiggestComponentAction;
     FNAction* m_meshDecimateAction;
     FNAction* m_fiberResampleAction;
+    FNAction* m_consToGlyphsetAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

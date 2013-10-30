@@ -32,7 +32,8 @@ namespace Fn
         GLYPHSET = 0x4000,
         SURFACESET = 0x8000,
         CONS = 0x10000,
-        TREE = 0x20000
+        TREE = 0x20000,
+        CONGLYPHS = 0x40000
     };
 
     enum class ColormapEnum : int
@@ -76,7 +77,8 @@ namespace Fn
         MESH_CORRELATION,
         MESH_BIGGEST_COMPONENT,
         MESH_DECIMATE,
-        FIBER_RESAMPLE
+        FIBER_RESAMPLE,
+        CONS_TO_GLYPHSET
     };
 
     enum class Orient : int

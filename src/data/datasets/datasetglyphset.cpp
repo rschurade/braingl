@@ -831,7 +831,7 @@ void DatasetGlyphset::makePies()
             }
         }
         numbers->replace( i, count );
-        if (count > maxNodeCount)
+        if ( count > maxNodeCount )
         {
             maxNodeCount = count;
         }
