@@ -41,6 +41,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
                 prevColorMode( -1 ),
+                prevThreshSign(0),
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
@@ -105,6 +106,8 @@ void DatasetGlyphset::addSecondSurfaceSelector()
 void DatasetGlyphset::addProperties()
 {
     m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
+    { "+", "-", "+/-" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
     { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
@@ -340,6 +343,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     float threshold = properties( "maingl" )->get( Fn::Property::D_THRESHOLD ).toFloat();
     float minlength = properties( "maingl" )->get( Fn::Property::D_MINLENGTH ).toFloat();
     int lr = properties( "maingl" )->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties( "maingl" )->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
@@ -352,7 +356,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     if ( ( glyphstyle == 0 )
             && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
-                    || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) ) )
+                    || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
         if ( m_prenderer )
         {
@@ -366,7 +370,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     if ( ( glyphstyle == 1 )
             && ( m_vrenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol ) || ( prevGlyphstyle != glyphstyle )
-                    || ( prevLR != lr ) ) )
+                    || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
         if ( m_vrenderer )
         {
@@ -381,7 +385,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     if ( ( glyphstyle == 2 )
             && ( m_pierenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
                     || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) || ( prevLR != lr )
-                    || ( prevColorMode != colorMode ) ) )
+                    || ( prevColorMode != colorMode ) || ( prevThreshSign != sign ) ) )
     {
         if ( m_pierenderer )
         {
@@ -395,7 +399,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     if ( ( glyphstyle == 3 )
             && ( ( m_dprenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
-                    || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) ) )
+                    || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
         if ( m_dprenderer )
         {
@@ -417,6 +421,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     prevMinlength = minlength;
     prevLR = lr;
     prevColorMode = colorMode;
+    prevThreshSign = sign;
 
     if ( glyphstyle == 0 )
     {
@@ -436,10 +441,18 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     }
 }
 
-bool DatasetGlyphset::filter( int i, int j, int lr, float threshold )
+bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 {
     float v = m_correlationMatrix[i][j];
-    bool include = ( v > threshold ) && ( v < m_maxThreshold ) && ( roi[i] && roi[j] );
+    bool include = false;
+    if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && ( roi[i] && roi[j] ) )
+    {
+        include = true;
+    }
+    if ( ( sign == 1 || sign == 2 ) && ( v < -threshold ) && ( v > -m_maxThreshold ) && ( roi[i] && roi[j] ) )
+    {
+        include = true;
+    }
     switch ( lr )
     {
         case 0:
@@ -477,6 +490,7 @@ void DatasetGlyphset::makeCons()
 
     PropertyGroup* properties = m_properties["maingl"];
     int lr = properties->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     m_n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << m_n;
@@ -487,7 +501,7 @@ void DatasetGlyphset::makeCons()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            if ( filter( i, j, lr, m_minThreshold ) )
+            if ( filter( i, j, lr, m_minThreshold, sign ) )
             {
                 ++consNumber;
             }
@@ -502,7 +516,7 @@ void DatasetGlyphset::makeCons()
         for ( int j = 0; j < m_n; ++j )
         {
             float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold ) )
+            if ( filter( i, j, lr, m_minThreshold, sign ) )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -548,6 +562,7 @@ void DatasetGlyphset::makeDiffPoints()
 
     PropertyGroup* properties = m_properties["maingl"];
     int lr = properties->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     m_n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << m_n;
@@ -584,7 +599,7 @@ void DatasetGlyphset::makeDiffPoints()
             {
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
                 //if ( ( v > diffMinThresh ) && ( v < m_maxThreshold ) )
-                if ( filter( i1, j, lr, m_minThreshold ) && filter( i2, j, lr, m_minThreshold ) )
+                if ( filter( i1, j, lr, m_minThreshold, sign ) && filter( i2, j, lr, m_minThreshold, sign ) )
                 {
                     diffsNumber++;
                 }
@@ -616,7 +631,7 @@ void DatasetGlyphset::makeDiffPoints()
                 //TODO: What treshold do we use?
                 float v1 = m_correlationMatrix[i1][j];
                 float v2 = m_correlationMatrix[i2][j];
-                if ( filter( i1, j, lr, m_minThreshold ) && filter( i2, j, lr, m_minThreshold ) )
+                if ( filter( i1, j, lr, m_minThreshold, sign ) && filter( i2, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
                     QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -670,6 +685,7 @@ void DatasetGlyphset::makeVecs()
 
     PropertyGroup* properties = m_properties["maingl"];
     int lr = properties->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     m_n = m_mesh.at( geo )->numVerts();
     qDebug() << "nodes: " << m_n;
@@ -680,7 +696,7 @@ void DatasetGlyphset::makeVecs()
     {
         for ( int j = 0; j < m_n; ++j )
         {
-            if ( filter( i, j, lr, m_minThreshold ) )
+            if ( filter( i, j, lr, m_minThreshold, sign ) )
             {
                 ++vecsNumber;
             }
@@ -695,7 +711,7 @@ void DatasetGlyphset::makeVecs()
         for ( int j = 0; j < m_n; ++j )
         {
             float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold ) )
+            if ( filter( i, j, lr, m_minThreshold, sign ) )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -777,6 +793,7 @@ void DatasetGlyphset::makePies()
 
     PropertyGroup* properties = m_properties["maingl"];
     int lr = properties->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     qDebug() << "threshold: " << threshold;
 
@@ -813,7 +830,7 @@ void DatasetGlyphset::makePies()
 
         for ( int j = 0; j < m_n; ++j )
         {
-            if ( filter( i, j, lr, threshold ) )
+            if ( filter( i, j, lr, threshold, sign ) )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
@@ -889,6 +906,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
 
     PropertyGroup* properties = m_properties["maingl"];
     int lr = properties->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
 //TODO: think about making upper threshold interactive...
     float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
@@ -898,7 +916,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
         for ( int j = i + 1; j < m_n; ++j )
         {
             float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, threshold ) || filter( j, i, lr, threshold ) )
+            if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
             {
                 QVector3D f = m_mesh.at( geo )->getVertex( i );
                 QVector3D t = m_mesh.at( geo )->getVertex( j );
