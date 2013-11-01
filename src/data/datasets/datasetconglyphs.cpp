@@ -359,17 +359,14 @@ bool edgeCompareValue2( Connection* e1, Connection* e2 )
     return e1->v > e2->v;
 }
 
+uint qHash(const QVector3D &v);
+
 void DatasetConGlyphs::makePies()
 {
 
     qDebug() << "makePies begin";
 
     maxNodeCount = 0;
-
-    float minlength = m_properties["maingl"]->get( Fn::Property::D_MINLENGTH ).toFloat();
-    float threshold = m_properties["maingl"]->get( Fn::Property::D_THRESHOLD ).toFloat();
-
-    qDebug() << "threshold: " << threshold;
 
     /*if ( pieArrays )
      {
@@ -384,45 +381,28 @@ void DatasetConGlyphs::makePies()
      numbers = NULL;
      }*/
 
-    qDebug() << "calcPies after deletion";
+    QMultiHash<QVector3D, Edge*> hedges = m_cons->m_hashed_edges;
 
-    m_n = m_cons->nodes.size();
+    m_n = hedges.uniqueKeys().size();
+    //qDebug() << "m_n: " << m_n;
     pieArrays = new QVector<float*>( m_n, NULL );
     numbers = new QVector<int>( m_n );
-    int edgesNumber = m_cons->edges.size();
-
-//for all nodes: iterate through other nodes, if the same, count, later put in same list...
-    for ( int i = 0; i < edgesNumber; ++i )
+    int i = 0;
+    foreach (const QVector3D &node, hedges.uniqueKeys())
     {
-        int count = 0;
-
         QList<Connection*> sortlist;
-
-        for ( int j = 0; j < edgesNumber; ++j )
+        foreach (Edge* e, hedges.values(node))
         {
-            Edge* e = m_cons->edges.at( i );
-            float v = e->m_value;
-
-            QVector3D f = e->fn;
-            QVector3D t = e->tn;
-            QVector3D gdiff = t - f;
-            QVector3D dc = gdiff;
-
-            if ( gdiff.length() > minlength )
-            {
-                sortlist.push_back( new Connection( f, dc, v ) );
-                ++count;
-            }
+            sortlist.push_back( new Connection( e->fn, e->tn - e->fn, e->m_value ) );
         }
+        //qDebug() << sortlist.size() << " edges for node: " << node;
+        int count = hedges.values(node).size();
+        //qDebug() << "count: " << count;
         numbers->replace( i, count );
         if ( count > maxNodeCount )
         {
             maxNodeCount = count;
         }
-//qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
-
-//Magic!:
-//TODO: There is some memory leakage somewhere...
         int colorMode = m_properties["maingl"]->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
         if ( colorMode == 0 )
         {
@@ -432,11 +412,10 @@ void DatasetConGlyphs::makePies()
         {
             qSort( sortlist.begin(), sortlist.end(), edgeCompareValue2 );
         }
-
         int offset = 9;
         float* pieNodeArray = NULL;
         if ( count > 0 )
-            pieNodeArray = new float[offset * count];
+        pieNodeArray = new float[offset * count];
         for ( int nodecount = 0; nodecount < count; ++nodecount )
         {
             Connection* c = sortlist.at( nodecount );
@@ -458,13 +437,14 @@ void DatasetConGlyphs::makePies()
             pieNodeArray[o + 8] = v;
         }
         pieArrays->replace( i, pieNodeArray );
+        i++;
     }
 }
 
 void DatasetConGlyphs::setProperties()
 {
-    //TODO: copy stuff from correlation?
-    //DatasetCorrelation::setProperties();
+//TODO: copy stuff from correlation?
+//DatasetCorrelation::setProperties();
 }
 
 inline uint qHash( const QColor color )

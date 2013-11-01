@@ -105,7 +105,7 @@ void Connections::loadConnexels( QString filename )
     while ( !ns.atEnd() )
     {
         nl = ns.readLine();
-        QRegExp rx("(\\ |\\t)");
+        QRegExp rx( "(\\ |\\t)" );
         QStringList vals = nl.split( rx, QString::SkipEmptyParts );
         if ( vals.size() == 7 )
         {
@@ -125,6 +125,23 @@ void Connections::loadConnexels( QString filename )
     }
     n.close();
     qDebug() << "connexels read";
+}
+
+uint qHash(const QVector3D &v)
+{
+    return qHash( QString( "%1x%2x%3" ).arg(v.x()).arg(v.y()).arg(v.z()) ) ;
+}
+
+void Connections::hashEdges()
+{
+    for ( int i = 0; i < edges.size(); ++i )
+    {
+        Edge* e = edges.at( i );
+        Edge* antie = new Edge(e->tn, e->fn, e->m_value);
+        m_hashed_edges.insert(e->fn,e);
+        m_hashed_edges.insert(antie->fn,antie);
+    }
+    qDebug() << "nodes mapped, " << m_hashed_edges.uniqueKeys().size() << " unique nodes";
 }
 
 void Connections::loadFib( QString fib )
@@ -560,17 +577,17 @@ QString Connections::name()
             + "_numcycles" + QString( "%1" ).arg( numcycles, 2, 10, QLatin1Char( '0' ) );
 }
 
-void Connections::setCthr( float value, int)
+void Connections::setCthr( float value, int )
 {
     c_thr = value;
 }
 
-void Connections::setBell( float value, int)
+void Connections::setBell( float value, int )
 {
     bell = value;
 }
 
-void Connections::setSmooth( int value, int)
+void Connections::setSmooth( int value, int )
 {
     smooth = value;
 }
