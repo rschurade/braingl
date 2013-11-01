@@ -57,7 +57,7 @@ public:
 
     QList<QVector3D> nodes;
     QList<Edge*> edges;
-    //QList<QList<Edge*> > m_node_edges; //containing a list of edges from unique nodes?
+    QMultiHash<QVector3D,Edge*> m_hashed_edges; //containing lists of edges from unique nodes
     double vis_c( Edge* e1, Edge* e2 );
     QVector3D proj( QVector3D a, QVector3D b, QVector3D p );
 
@@ -66,8 +66,7 @@ public:
     QVector<AttractThread*> m_athreads;
     int m_athreadsRunning;
 
-    //TODO: group nodes in a certain radius together...
-    //void groupNodes(float r = 0.01);
+    void hashEdges();
 
 private slots:
     void setCthr( float value, int );

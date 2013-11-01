@@ -357,6 +357,7 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::CONS_TO_GLYPHSET:
         {
             DatasetCons* cons = (DatasetCons*)ds;
+            cons->cons->hashEdges();
             DatasetConGlyphs* consglyphs = new DatasetConGlyphs(QDir("new_conglyphs"));
             consglyphs->setCons(cons->cons);
             l.push_back(consglyphs);
