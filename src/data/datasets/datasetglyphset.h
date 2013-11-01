@@ -80,7 +80,7 @@ private:
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
 
-    int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode;
+    int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode, prevThreshSign;
     float prevThresh, prevMinlength;
 
     QString m_colors_name;
@@ -90,7 +90,7 @@ private:
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
 
-    bool filter( int i, int j, int lr, float threshold );
+    bool filter( int i, int j, int lr, float threshold, int sign );
 
 private slots:
     void colorModeChanged( QVariant qv );
