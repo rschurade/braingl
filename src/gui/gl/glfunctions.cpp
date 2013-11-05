@@ -31,7 +31,7 @@
 
 #define NUM_TEXTURES 5
 
-int GLFunctions::idealThreadCount = 1; //qMax( 1, QThread::idealThreadCount() - 1 );
+int GLFunctions::idealThreadCount = qMax( 1, QThread::idealThreadCount() - 1 );
 
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
