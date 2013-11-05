@@ -20,6 +20,7 @@ class TensorTrackWidget;
 class CrossingTrackWidget;
 class SDWidget;
 class BundlingWidget;
+class FiberBundleWidget;
 
 class ToolBar : public QToolBar
 {
@@ -70,12 +71,14 @@ private:
     FNAction* m_meshDecimateAction;
     FNAction* m_fiberResampleAction;
     FNAction* m_consToGlyphsetAction;
+    FNAction* m_fiberBundlingAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
     SDWidget* m_sdw;
     CorrelationWidget* m_cw;
     BundlingWidget* m_bw;
+    FiberBundleWidget* m_fbw;
 
     void createActions();
 
@@ -89,6 +92,7 @@ private slots:
     void correlationFinished();
     void slotMeshSelected( QList<QVariant> meshes );
     void bundlingFinished();
+    void fiberBundlingFinished();
 };
 
 #endif /* TOOLBAR_H_ */

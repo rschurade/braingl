@@ -13,6 +13,7 @@
 #include "../widgets/algoStarterWidgets/correlationwidget.h"
 #include "../widgets/algoStarterWidgets/datasetselectionwidget.h"
 #include "../widgets/algoStarterWidgets/bundlingwidget.h"
+#include "../widgets/algoStarterWidgets/fiberbundlewidget.h"
 
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
@@ -187,6 +188,10 @@ void ToolBar::createActions()
     m_consToGlyphsetAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "make glyphset" ), this, Fn::Algo::CONS_TO_GLYPHSET );
     m_consToGlyphsetAction->setStatusTip( tr( "resample" ) );
     connect( m_consToGlyphsetAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_fiberBundlingAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "fiber bundling" ), this, Fn::Algo::FIBER_BUNDLING );
+    m_fiberBundlingAction->setStatusTip( tr( "fiber bundling" ) );
+    connect( m_fiberBundlingAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -279,6 +284,11 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::FIBER_RESAMPLE:
             l = FiberAlgos::resample( ds );
+            break;
+        case Fn::Algo::FIBER_BUNDLING:
+            m_fbw = new FiberBundleWidget( ds, this->parentWidget() );
+            connect( m_fbw, SIGNAL( finished() ), this, SLOT( fiberBundlingFinished() ) );
+            m_fbw->show();
             break;
         case Fn::Algo::TRACT_DENSITY:
             l = FiberAlgos::tractDensity( ds );
@@ -434,6 +444,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_fiberTractDensityAct );
             this->addAction( m_fiberTractColorAct );
             this->addAction( m_fiberResampleAction );
+            this->addAction( m_fiberBundlingAction );
             break;
         }
         case Fn::DatasetType::GLYPHSET:
@@ -553,4 +564,17 @@ void ToolBar::bundlingFinished()
     //m_bw->hide();
     //destroy( m_bw );
     delete m_bw;
+}
+
+void ToolBar::fiberBundlingFinished()
+{
+    qDebug() << "toolbar fiber bundling finished";
+    QList<Dataset*>l = m_fbw->getFibs();
+    for ( int i = 0; i < l.size(); ++i )
+    {
+        QModelIndex index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
+        m_toolBarView->model()->setData( index, VPtr<Dataset>::asQVariant( l[i] ), Qt::DisplayRole );
+    }
+    m_fbw->hide();
+    destroy( m_fbw );
 }

@@ -78,7 +78,8 @@ namespace Fn
         MESH_BIGGEST_COMPONENT,
         MESH_DECIMATE,
         FIBER_RESAMPLE,
-        CONS_TO_GLYPHSET
+        CONS_TO_GLYPHSET,
+        FIBER_BUNDLING
     };
 
     enum class Orient : int
