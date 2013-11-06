@@ -42,6 +42,7 @@
 #include "../data/vptr.h"
 #include "../data/enums.h"
 #include "../data/models.h"
+#include "../data/globalpropertymodel.h"
 #include "../data/roi.h"
 #include "../data/roibox.h"
 
@@ -475,32 +476,19 @@ void MainWindow::saveScene( QString fileName )
     //qDebug() << settings.status();
 
     settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.7.0" );
+    settings.setValue( "version", "0.8.1" );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
     //  save global settings
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SAGITTAL ), Models::getGlobal( Fn::Property::G_SAGITTAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CORONAL ), Models::getGlobal( Fn::Property::G_CORONAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_AXIAL ), Models::getGlobal( Fn::Property::G_AXIAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_AXIAL ), Models::getGlobal( Fn::Property::G_SHOW_AXIAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_CORONAL ), Models::getGlobal( Fn::Property::G_SHOW_CORONAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_SAGITTAL ), Models::getGlobal( Fn::Property::G_SHOW_SAGITTAL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_MAIN ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV1 ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV2 ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_RENDER_CROSSHAIRS ), Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::getGlobal( Fn::Property::G_SHOW_NAV_SLIDERS ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_QUALITY ), Models::getGlobal( Fn::Property::G_SCREENSHOT_QUALITY ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_TRANSPARENCY ) );
+    settings.setValue( "globalState", dynamic_cast<GlobalPropertyModel*>( Models::g() )->getState() );
 
     settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
     settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
+    settings.setValue( "camera_maingl2", mainGLWidget2->getCamera()->getState() );
+    settings.setValue( "arcball_maingl2", mainGLWidget2->getArcBall()->getState() );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -603,6 +591,12 @@ void MainWindow::loadScene( QString fileName )
     QSettings settings( fileName, QSettings::IniFormat );
     //qDebug() << settings.status();
 
+    QVariant versionString = "0.0.0";
+    if ( settings.contains( "version" ) )
+    {
+        QVariant versionString = settings.value( "version" ).toString();
+    }
+
     QList<QVariant> files = settings.value( "fileNames" ).toList();
 
     for ( int i = 0; i < files.size(); ++i )
@@ -649,24 +643,32 @@ void MainWindow::loadScene( QString fileName )
         }
     }
 
-
-
-    loadSetting( settings, Fn::Property::G_SAGITTAL );
-    loadSetting( settings, Fn::Property::G_CORONAL );
-    loadSetting( settings, Fn::Property::G_AXIAL );
-    loadSetting( settings, Fn::Property::G_SHOW_AXIAL );
-    loadSetting( settings, Fn::Property::G_SHOW_CORONAL );
-    loadSetting( settings, Fn::Property::G_SHOW_SAGITTAL );
-    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN );
-    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_COMBINED );
-    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV1 );
-    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV2 );
-    loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV3 );
-    loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS );
-    loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
-    loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
-    loadSetting( settings, Fn::Property::G_SCREENSHOT_QUALITY );
-    loadSetting( settings, Fn::Property::G_TRANSPARENCY );
+    if ( versionString == "0.7.0" )
+    {
+        loadSetting( settings, Fn::Property::G_SAGITTAL );
+        loadSetting( settings, Fn::Property::G_CORONAL );
+        loadSetting( settings, Fn::Property::G_AXIAL );
+        loadSetting( settings, Fn::Property::G_SHOW_AXIAL );
+        loadSetting( settings, Fn::Property::G_SHOW_CORONAL );
+        loadSetting( settings, Fn::Property::G_SHOW_SAGITTAL );
+        loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_MAIN );
+        loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_COMBINED );
+        loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV1 );
+        loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV2 );
+        loadSetting( settings, Fn::Property::G_BACKGROUND_COLOR_NAV3 );
+        loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS );
+        loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
+        loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
+        loadSetting( settings, Fn::Property::G_SCREENSHOT_QUALITY );
+        loadSetting( settings, Fn::Property::G_TRANSPARENCY );
+    }
+    else if ( versionString == "0.8.1" )
+    {
+        if ( settings.contains( "globalState" ) )
+        {
+            dynamic_cast<GlobalPropertyModel*>( Models::g() )->setState( settings.value( "globalState" ).toList() );
+        }
+    }
 
     if ( settings.contains( "camera_maingl" ) )
     {
@@ -677,9 +679,16 @@ void MainWindow::loadScene( QString fileName )
         mainGLWidget->getArcBall()->setState( settings.value( "arcball_maingl" ).toList() );
     }
 
+    if ( settings.contains( "camera_maingl2" ) )
+    {
+        mainGLWidget2->getCamera()->setState( settings.value( "camera_maingl2" ).toList() );
+    }
+    if ( settings.contains( "arcball_maingl2" ) )
+    {
+        mainGLWidget2->getArcBall()->setState( settings.value( "arcball_maingl2" ).toList() );
+    }
 
     Models::g()->submit();
-
 }
 
 
