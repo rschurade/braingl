@@ -364,7 +364,7 @@ void ColormapEditWidget::save()
     GLFunctions::updateColormapShader();
     m_selected = ColormapFunctions::size() - 1;
     redrawWidget();
-
+    emit( signalUpdate() );
     Models::g()->submit();
 }
 
@@ -374,6 +374,7 @@ void ColormapEditWidget::update()
     ColormapFunctions::updateColormap( m_selected, m_colormap );
     GLFunctions::reloadShaders();
     redrawWidget();
+    emit( signalUpdate() );
     Models::g()->submit();
 }
 
@@ -389,7 +390,7 @@ void ColormapEditWidget::deleteCM()
     redrawWidget();
     GLFunctions::updateColormapShader();
     GLFunctions::reloadShaders();
-
+    emit( signalUpdate() );
     Models::g()->submit();
 }
 

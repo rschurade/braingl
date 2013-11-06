@@ -1056,6 +1056,9 @@ void MainWindow::createDockWindows()
 
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
+
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
+    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
 }
 
 void MainWindow::slotToggleAxialSlice()
