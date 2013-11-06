@@ -105,6 +105,13 @@ void ColormapEditWidget::redrawWidget()
     hLayout5->addWidget( saveButton );
     vLayout->addLayout( hLayout5 );
 
+    QHBoxLayout* hLayout6 = new QHBoxLayout();
+    hLayout6->addStretch();
+    QPushButton* deleteButton = new QPushButton( tr("delete") );
+    connect( deleteButton, SIGNAL( clicked() ), this, SLOT( deleteCM() ) );
+    hLayout6->addWidget( deleteButton );
+    vLayout->addLayout( hLayout6 );
+
     layout()->setContentsMargins( 1, 1, 1, 1 );
     layout()->setSpacing( 1 );
 
@@ -365,6 +372,22 @@ void ColormapEditWidget::update()
 {
     m_colormap.setName( m_nameEdit->text() );
     ColormapFunctions::updateColormap( m_selected, m_colormap );
+    GLFunctions::reloadShaders();
+    redrawWidget();
+    Models::g()->submit();
+}
+
+void ColormapEditWidget::deleteCM()
+{
+    if ( m_selected < 4 )
+    {
+        return;
+    }
+    ColormapFunctions::deleteColormap( m_selected );
+    m_selected = 0;
+    m_colormap = ColormapFunctions::get( 0 );
+    redrawWidget();
+    GLFunctions::updateColormapShader();
     GLFunctions::reloadShaders();
 
     Models::g()->submit();

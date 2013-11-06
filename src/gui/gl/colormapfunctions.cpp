@@ -38,3 +38,8 @@ void ColormapFunctions::setName( int id, QString name )
 {
     ColormapFunctions::m_colormaps[id].setName( name );
 }
+
+void ColormapFunctions::deleteColormap( int id )
+{
+    ColormapFunctions::m_colormaps.remove( id );
+}

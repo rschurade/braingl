@@ -97,6 +97,7 @@ void MainWindow::closeEvent( QCloseEvent *event )
 void MainWindow::saveSettings()
 {
     QSettings settings;
+    settings.clear();
     settings.setValue( "mainWindowGeometry", saveGeometry() );
     settings.setValue( "mainWindowState", saveState() );
 
