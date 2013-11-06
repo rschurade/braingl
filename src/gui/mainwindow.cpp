@@ -700,8 +700,12 @@ void MainWindow::about()
     hg.replace( " ","" );
 
     QString message ( "<b>brainGL development version " + hg + "<br><br> </b>"
-            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>" );
-            //"compiled " + QString( BUILDDATE ) + " " + QString( BUILDTIME ) );
+            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
+            "For questions please consult the <a href=\"https://code.google.com/p/braingl/wiki/Main\"><b>documentation</b></a>.<br><br>"
+            "Please report bugs and feature requests <a href=\"https://code.google.com/p/braingl/issues/list\"><b>here</b></a>.<br><br>"
+
+
+    );
 
     QMessageBox::about( this, tr( "About brainGL" ), message );
 }
@@ -860,7 +864,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( newAct );
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
-    fileToolBar->addAction( continousRenderingAct );
+    //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
     {
