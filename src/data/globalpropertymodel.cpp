@@ -278,3 +278,13 @@ void GlobalPropertyModel::slotScreenShotCopyCurrent( QVariant value )
     m_properties->set( Fn::Property::G_SCREENSHOT_HEIGHT, m_properties->get( Fn::Property::G_HEIGHT_MAINGL ) );
 
 }
+
+QList<QVariant> GlobalPropertyModel::getState()
+{
+    return m_properties->getState();
+}
+
+void GlobalPropertyModel::setState( QList<QVariant> state )
+{
+    m_properties->setState( state );
+}

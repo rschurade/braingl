@@ -29,6 +29,9 @@ public:
     QModelIndex parent( const QModelIndex & index ) const;
     bool setData( const QModelIndex &index, const QVariant &value, int role = Qt::DisplayRole );
 
+    QList<QVariant> getState();
+    void setState( QList<QVariant> state );
+
 private:
     PropertyGroup* m_properties;
 
