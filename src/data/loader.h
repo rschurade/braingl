@@ -16,11 +16,6 @@
 #include <QDir>
 #include <QVector>
 
-union {
-  float f;
-  uchar b[4];
-} u;
-
 class Loader
 {
 public:
