@@ -72,6 +72,11 @@ bool Loader::load()
         return loadVTK();
     }
 
+    if ( m_fileName.path().endsWith( ".tck" ) )
+    {
+        return loadMRtrix();
+    }
+
     if ( m_fileName.path().endsWith( ".vtk" ) )
     {
         return loadVTK();
@@ -848,6 +853,100 @@ bool Loader::load1D()
     }
 
     file.close();
+
+    return true;
+}
+
+bool Loader::loadMRtrix()
+{
+    QFile file( m_fileName.path() );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        qDebug() << "Error opening the file";
+    }
+    QByteArray qba;
+
+    QDataStream dataStream( &qba, QIODevice::WriteOnly );
+    dataStream << file.readAll();
+    file.close();
+
+    int pc = 0;
+    QString offset;
+    for ( int i = 0; i < qba.size(); ++i )
+    {
+        char cur = qba.at( i );
+        QString test;
+        if ( cur == 'f' )
+        {
+            test.append( 'f' );
+            test.append( qba.at( i + 1 ) );
+            test.append( qba.at( i + 2 ) );
+            test.append( qba.at( i + 3 ) );
+            test.append( qba.at( i + 4 ) );
+            test.append( qba.at( i + 5 ) );
+            test.append( qba.at( i + 6 ) );
+
+
+            if ( test == "file: ." )
+            {
+                offset.append( qba.at( i + 7 ) );
+                offset.append( qba.at( i + 8 ) );
+                offset.append( qba.at( i + 9 ) );
+                offset.append( qba.at( i + 10 ) );
+
+                qDebug() << "found file: . at " << i << "offset:" << offset.toInt();
+                pc = offset.toInt() + 4;
+                break;
+            }
+        }
+    }
+
+    float x,y,z;
+
+    QVector<QVector<float> >fibs;
+    QVector<float>fib;
+
+    while( pc < qba.size() )
+    {
+        u.b[0] = qba.at( pc++ );
+        u.b[1] = qba.at( pc++ );
+        u.b[2] = qba.at( pc++ );
+        u.b[3] = qba.at( pc++ );
+        x = u.f;
+
+        u.b[0] = qba.at( pc++ );
+        u.b[1] = qba.at( pc++ );
+        u.b[2] = qba.at( pc++ );
+        u.b[3] = qba.at( pc++ );
+        y = u.f;
+        u.b[0] = qba.at( pc++ );
+        u.b[1] = qba.at( pc++ );
+        u.b[2] = qba.at( pc++ );
+        u.b[3] = qba.at( pc++ );
+        z = u.f;
+
+        if ( isinff( x ) )
+        {
+            break;
+        }
+
+        if ( isnanf( x ) )
+        {
+            fibs.push_back( fib );
+            fib.clear();
+            continue;
+        }
+
+        fib.push_back( x );
+        fib.push_back( y );
+        fib.push_back( z );
+    }
+    qba.clear();
+    qba.squeeze();
+
+    QString fn = m_fileName.path();
+    DatasetFibers* dataset = new DatasetFibers( fn, fibs );
+    m_dataset.push_back( dataset );
 
     return true;
 }
