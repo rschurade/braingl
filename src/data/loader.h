@@ -16,6 +16,11 @@
 #include <QDir>
 #include <QVector>
 
+union {
+  float f;
+  uchar b[4];
+} u;
+
 class Loader
 {
 public:
@@ -43,6 +48,7 @@ private:
     bool loadTree();
     bool loadRGB();
     bool load1D();
+    bool loadMRtrix();
 
     nifti_image* m_header;
     QDir m_fileName;
