@@ -906,6 +906,11 @@ bool Loader::loadMRtrix()
     QVector<QVector<float> >fibs;
     QVector<float>fib;
 
+    union {
+      float f;
+      uchar b[4];
+    } u;
+
     while( pc < qba.size() )
     {
         u.b[0] = qba.at( pc++ );
