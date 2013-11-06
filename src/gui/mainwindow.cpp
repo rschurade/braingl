@@ -737,7 +737,7 @@ void MainWindow::createActions()
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
     connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
 
-    screenshotAct = new QAction( tr( "Screenshot" ), this );
+    screenshotAct = new QAction( QIcon( ":/icons/camera.png" ), tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
     connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
 
@@ -865,6 +865,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( newAct );
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
+    fileToolBar->addAction( screenshotAct );
     //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
