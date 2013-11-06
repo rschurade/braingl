@@ -60,6 +60,7 @@ private slots:
     void removeEntry( int id );
     void save();
     void update();
+    void deleteCM();
     void selectionChanged( int id );
     void contUpdatingChanged( int value );
     void moveUp( int id );

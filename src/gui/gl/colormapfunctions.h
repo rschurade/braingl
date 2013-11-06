@@ -22,6 +22,8 @@ public:
 
     static void setName( int id, QString name );
 
+    static void deleteColormap( int id );
+
 private:
     ColormapFunctions() {}
     virtual ~ColormapFunctions() {}
