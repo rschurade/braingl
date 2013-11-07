@@ -428,22 +428,24 @@ bool MainWindow::save( Dataset* ds )
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
 
-    QFileDialog fd( this, "Save File", fn, ds->getSaveFilter() );
-    fd.setFileMode( QFileDialog::AnyFile );
-    fd.setAcceptMode( QFileDialog::AcceptSave );
-    fd.setDefaultSuffix( ds->getDefaultSuffix() );
+    fd = new QFileDialog( this, "Save File", fn, ds->getSaveFilter() );
+    fd->setFileMode( QFileDialog::AnyFile );
+    fd->setAcceptMode( QFileDialog::AcceptSave );
+    fd->setDefaultSuffix( ds->getDefaultSuffix() );
 
-    if ( fd.exec() )
+    connect(fd, SIGNAL(filterSelected(QString)), this, SLOT(saveFilterChanged(QString)));
+
+    if ( fd->exec() )
     {
-        QString fileName = fd.selectedFiles().first();
-        qDebug() << fileName << fd.selectedFilter();
+        QString fileName = fd->selectedFiles().first();
+        qDebug() << fileName << fd->selectedFilter();
 
         if ( !fileName.isEmpty() )
         {
             QDir dir;
             ds->properties()->set( Fn::Property::D_FILENAME, fileName );
             ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-            saveDataset( ds, fd.selectedFilter() );
+            saveDataset( ds, fd->selectedFilter() );
 
             QFileInfo fi( fileName );
             dir = fi.absoluteDir();
@@ -453,6 +455,22 @@ bool MainWindow::save( Dataset* ds )
         }
     }
     return false;
+    delete fd;
+}
+
+void MainWindow::saveFilterChanged( QString filterString )
+{
+    //filter strings contain (*.xxx *.xxx *.xxx) with suffixes
+    //this sets the first suffix in the first () as default suffix:
+    int i = filterString.indexOf("(*.");
+    QString suffix = filterString.remove(0,i+3);
+    suffix = suffix.left(suffix.indexOf(" "));
+    suffix = suffix.left(suffix.indexOf(")"));
+    if ( suffix != "*" )
+    {
+        qDebug() << "set default suffix: " << suffix;
+        fd->setDefaultSuffix( suffix );
+    }
 }
 
 void MainWindow::saveDataset( Dataset* ds, QString filter )

@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QAbstractItemModel>
+#include <QFileDialog>
 
 class QAction;
 class QListView;
@@ -124,6 +125,8 @@ private:
 
     QAction* dilbertAct;
 
+    QFileDialog* fd;
+
     static int countMainGL;
 
 public slots:
@@ -155,6 +158,8 @@ private slots:
     void slotRenderCrosshairs( bool value );
 
     void slotDatasetSelectionChanged();
+
+    void saveFilterChanged(QString filterString);
 };
 
 #endif
