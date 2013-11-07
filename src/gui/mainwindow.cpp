@@ -840,13 +840,14 @@ void MainWindow::createMenus()
     fileMenu->addAction( quitAct );
     updateRecentFileActions();
 
-    optionMenu = menuBar()->addMenu( tr( "&Options" ) );
-    optionMenu->addAction( lockDockTitlesAct );
-    optionMenu->addAction( renderCrosshairsAct );
+//    optionMenu = menuBar()->addMenu( tr( "&Options" ) );
+//    optionMenu->addAction( lockDockTitlesAct );
+//    optionMenu->addAction( renderCrosshairsAct );
 
-    viewMenu = menuBar()->addMenu( tr( "&View" ) );
+    viewMenu = menuBar()->addMenu( tr( "&Widgets" ) );
 //    viewMenu->addAction( newMainGLAct );
-//    viewMenu->addSeparator();
+    viewMenu->addAction( lockDockTitlesAct );
+    viewMenu->addSeparator();
 
     menuBar()->addSeparator();
 
