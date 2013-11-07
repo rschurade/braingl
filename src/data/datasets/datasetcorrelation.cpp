@@ -124,3 +124,14 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
         }
     }
 }
+
+QString DatasetCorrelation::getSaveFilter()
+{
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; all files (*.*)" );
+}
+
+QString DatasetCorrelation::getDefaultSuffix()
+{
+    return QString( "vtk" );
+}
+

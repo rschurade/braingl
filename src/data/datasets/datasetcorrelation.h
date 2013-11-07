@@ -26,6 +26,9 @@ public:
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
+    virtual QString getSaveFilter();
+    virtual QString getDefaultSuffix();
+
 protected:
     float m_minThreshold;
     float m_maxThreshold;
