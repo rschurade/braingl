@@ -60,6 +60,7 @@ void CombinedNavGLWidget::mousePressEvent( QMouseEvent *event )
     {
         m_renderer->leftMouseDown( event->x(), event->y() );
     }
+    Models::g()->submit();
     updateGL();
 }
 
@@ -69,11 +70,13 @@ void CombinedNavGLWidget::mouseMoveEvent( QMouseEvent *event )
     {
         m_renderer->leftMouseDrag( event->x(), event->y() );
     }
+    Models::g()->submit();
     updateGL();
 }
 
 void CombinedNavGLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
+    Models::g()->submit();
     updateGL();
 }
 
