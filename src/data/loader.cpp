@@ -18,11 +18,12 @@
 
 #include "mesh/trianglemesh2.h"
 
-
 #include <QDebug>
 #include <QDataStream>
 #include <QVector3D>
 #include <QtGui>
+
+#include <cmath>
 
 Loader::Loader( Dataset* selected ) :
     m_header( 0 ),
@@ -930,7 +931,7 @@ bool Loader::loadMRtrix()
         u.b[3] = qba.at( pc++ );
         z = u.f;
 
-        if ( isinff( x ) )
+        if ( std::isinf( x ) )
         {
             break;
         }
