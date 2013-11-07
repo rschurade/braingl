@@ -38,8 +38,8 @@ public:
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
-    QString getSaveFilter();
-    QString getDefaultSuffix();
+    virtual QString getSaveFilter();
+    virtual QString getDefaultSuffix();
 
 protected:
     QVector<TriangleMesh2*> m_mesh;

@@ -43,17 +43,19 @@ bool WriterVTK::save()
 {
     if ( m_fileName.endsWith( ".vtk" ) || m_fileName.endsWith( ".fib" ) )
     {
+        //qDebug() << "filter:" << m_filter;
         switch ( (Fn::DatasetType)( m_dataset->properties()->get( Fn::Property::D_TYPE ).toInt() ) )
         {
-            qDebug() << m_filter;
             case Fn::DatasetType::FIBERS:
             {
                 if ( m_filter.startsWith( "fib files ascii") )
                 {
+                    qDebug() << "save ascii";
                     saveFibs( m_fileName, false );
                 }
                 else
                 {
+                    qDebug() << "save binary";
                     saveFibs( m_fileName, true );
                 }
                 break;
