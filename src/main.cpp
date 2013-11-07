@@ -83,6 +83,10 @@ int main( int argc, char *argv[] )
     bool resetSettings = false;
     bool runScript = false;
 
+    int x = -1;
+    int y = -1;
+    int z = -1;
+
     for ( int i = 1; i < args.size(); ++i )
     {
         if ( args.at( i ) == "-v" )
@@ -110,6 +114,47 @@ int main( int argc, char *argv[] )
         {
             runScript = true;
         }
+
+        if ( args.at( i ) == "-x" )
+        {
+            bool ok = false;
+            if ( args.size() > i + 1 )
+            {
+                int tmp = args.at( i + 1 ).toInt( &ok );
+                if ( ok )
+                {
+                    x = tmp;
+                }
+            }
+        }
+
+        if ( args.at( i ) == "-y" )
+        {
+            bool ok = false;
+            if ( args.size() > i + 1 )
+            {
+                int tmp = args.at( i + 1 ).toInt( &ok );
+                if ( ok )
+                {
+                    y = tmp;
+                }
+            }
+        }
+
+        if ( args.at( i ) == "-z" )
+        {
+            bool ok = false;
+            if ( args.size() > i + 1 )
+            {
+                int tmp = args.at( i + 1 ).toInt( &ok );
+                if ( ok )
+                {
+                    z = tmp;
+                }
+            }
+        }
+
+
 
         if ( args.at( i ) == "-h" || args.at( i ) == "?" )
         {
@@ -140,6 +185,21 @@ int main( int argc, char *argv[] )
     for ( int i = 1; i < args.size(); ++i )
     {
         mainWin.load( args.at( i ) );
+    }
+
+    if ( x != - 1 )
+    {
+        Models::setGlobal( Fn::Property::G_SAGITTAL, x );
+    }
+
+    if ( y != - 1 )
+    {
+        Models::setGlobal( Fn::Property::G_CORONAL, y );
+    }
+
+    if ( z != - 1 )
+    {
+        Models::setGlobal( Fn::Property::G_AXIAL, z );
     }
 
     if ( runScript )
