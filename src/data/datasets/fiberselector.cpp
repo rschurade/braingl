@@ -17,9 +17,9 @@
 
 #include <math.h>
 
-FiberSelector::FiberSelector() :
-    m_numLines( 0 ),
-    m_numPoints( 0 ),
+FiberSelector::FiberSelector( int numPoints, int numLines ) :
+    m_numLines( numLines ),
+    m_numPoints( numPoints ),
     m_isInitialized( false )
 {
     m_boxMin.resize( 3 );
@@ -42,20 +42,47 @@ void FiberSelector::init( QVector< QVector< float > >& data )
     m_numLines = data.size();
     //qDebug() << "num lines:" << data.size();
     int ls = 0;
-    for ( int i = 0; i < m_numLines; ++i )
+
+    if ( m_numPoints > 0 )
     {
-        m_lineStarts.push_back( ls );
-        m_lineLengths.push_back( data[i].size() / 3 );
-        for( int k = 0; k < data[i].size() / 3; ++k )
+        try
         {
-            m_kdVerts.push_back( data[i][k * 3    ] );
-            m_kdVerts.push_back( data[i][k * 3 + 1] );
-            m_kdVerts.push_back( data[i][k * 3 + 2] );
-            m_reverseIndexes.push_back( i );
-            ++m_numPoints;
-            ++ls;
+            m_kdVerts.reserve( m_numPoints * 3 );
+            m_reverseIndexes.reserve( m_numPoints );
+            m_lineStarts.reserve( m_numLines );
+            m_lineLengths.reserve( m_numLines );
+        }
+        catch ( std::bad_alloc& )
+        {
+            qDebug() << "***error*** failed to allocate enough memory for kd tree";
+            exit ( 0 );
         }
     }
+
+    try
+    {
+        m_numPoints = 0;
+        for ( int i = 0; i < m_numLines; ++i )
+        {
+            m_lineStarts.push_back( ls );
+            m_lineLengths.push_back( data[i].size() / 3 );
+            for( int k = 0; k < data[i].size() / 3; ++k )
+            {
+                m_kdVerts.push_back( data[i][k * 3    ] );
+                m_kdVerts.push_back( data[i][k * 3 + 1] );
+                m_kdVerts.push_back( data[i][k * 3 + 2] );
+                m_reverseIndexes.push_back( i );
+                ++m_numPoints;
+                ++ls;
+            }
+        }
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "***error*** failed to allocate enough memory for kd tree";
+        exit ( 0 );
+    }
+
     m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
 
     connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );

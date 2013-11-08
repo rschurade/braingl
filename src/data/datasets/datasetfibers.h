@@ -66,6 +66,8 @@ protected:
     TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;
+    int m_numPoints;
+    int m_numLines;
 
 private slots:
     void colorChanged();

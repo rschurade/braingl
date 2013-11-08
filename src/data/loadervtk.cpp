@@ -260,7 +260,6 @@ bool LoaderVTK::open()
                 m_pointData.push_back( data );
             }
         }
-
         return true;
     }
     return false;

@@ -18,7 +18,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData )  :
+FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints )  :
     ObjectRenderer(),
     m_selector( selector ),
     vbo( 0 ),
@@ -26,7 +26,7 @@ FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float >
     m_data( data ),
     m_extraData( extraData ),
     m_numLines( data->size() ),
-    m_numPoints( 0 ),
+    m_numPoints( numPoints ),
     m_isInitialized( false )
 {
     m_colorField.resize( m_numLines );
@@ -125,9 +125,9 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
             program->setUniformValue( "u_color", m_colorField[i].redF(),
                                                    m_colorField[i].greenF(),
                                                    m_colorField[i].blueF(), 1.0 );
-            program->setUniformValue( "u_globalColor", m_globalColorField[i].x(),
-                                                         m_globalColorField[i].y(),
-                                                         m_globalColorField[i].z(), 1.0 );
+            program->setUniformValue( "u_globalColor", m_globalColors[i].x(),
+                                                         m_globalColors[i].y(),
+                                                         m_globalColors[i].z(), 1.0 );
             glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
         }
     }
@@ -182,44 +182,84 @@ void FiberRenderer::initGeometry()
         return;
     }
     qDebug() << "create fiber vbo's...";
-    int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<FiberRendererThread*> threads;
-    // create threads
-    for ( int i = 0; i < numThreads; ++i )
+    std::vector<float>verts;
+
+    try
     {
-        threads.push_back( new FiberRendererThread( m_data, i ) );
+        verts.reserve( m_numPoints * 6 );
+        m_globalColors.reserve( m_numLines * 3 );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "***error*** failed to allocate enough memory for vbo";
+        exit ( 0 );
     }
 
-    // run threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        threads[i]->start();
-    }
 
-    // wait for all threads to finish
-    for ( int i = 0; i < numThreads; ++i )
+    for ( int i = 0; i < m_data->size(); ++i )
     {
-        threads[i]->wait();
-    }
+        QVector<float> fib = m_data->at(i);
 
-    QVector<float> verts;
-    m_globalColorField.clear();
-    // combine verts from all threads
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        verts += *( threads[i]->getVerts() );
-        m_globalColorField += *( threads[i]->getGlobalColors() );
-    }
+        if ( fib.size() < 6 )
+        {
+            printf( "fib with size < 2 detected" );
+            continue;
+        }
 
-    for ( int i = 0; i < numThreads; ++i )
-    {
-        delete threads[i];
+        int numFloats = fib.size();
+        QVector3D lineStart( fib[0], fib[1], fib[2] );
+        QVector3D lineEnd( fib[numFloats-3], fib[numFloats-2], fib[numFloats-1] );
+
+        QVector3D gc( fabs( lineStart.x() - lineEnd.x() ), fabs( lineStart.y() - lineEnd.y() ), fabs( lineStart.z() - lineEnd.z() ) );
+        gc.normalize();
+        m_globalColors.push_back( gc );
+
+        // push back the first vertex, done seperately because of nomal calculation
+        verts.push_back( fib[0] );
+        verts.push_back( fib[1] );
+        verts.push_back( fib[2] );
+
+        QVector3D localColor( fabs( fib[0] - fib[3] ), fabs( fib[1] - fib[4] ), fabs( fib[2] - fib[5] ) );
+        localColor.normalize();
+
+        verts.push_back( localColor.x() );
+        verts.push_back( localColor.y() );
+        verts.push_back( localColor.z() );
+
+        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        {
+            verts.push_back( fib[k*3] );
+            verts.push_back( fib[k*3+1] );
+            verts.push_back( fib[k*3+2] );
+
+            QVector3D localColor( fabs( fib[k*3-3] - fib[k*3+3] ), fabs( fib[k*3-2] - fib[k*3+4] ), fabs( fib[k*3-1] - fib[k*3+5] ) );
+            localColor.normalize();
+
+            verts.push_back( localColor.x() );
+            verts.push_back( localColor.y() );
+            verts.push_back( localColor.z() );
+
+        }
+
+        // push back the last vertex, done seperately because of nomal calculation
+        verts.push_back( fib[numFloats-3] );
+        verts.push_back( fib[numFloats-2] );
+        verts.push_back( fib[numFloats-1] );
+
+        QVector3D localColor2( fabs( fib[numFloats-6] - fib[numFloats-3] ), fabs( fib[numFloats-5] - fib[numFloats-2] ), fabs( fib[numFloats-4] - fib[numFloats-1] ) );
+        localColor.normalize();
+
+        verts.push_back( localColor2.x() );
+        verts.push_back( localColor2.y() );
+        verts.push_back( localColor2.z() );
     }
 
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    verts.clear();
+    //verts.squeeze();
 
     m_pointsPerLine.resize( m_data->size() );
     m_startIndexes.resize( m_data->size() );

@@ -22,7 +22,7 @@ class FiberRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData );
+    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints );
     virtual ~FiberRenderer();
 
     void init();
@@ -60,7 +60,7 @@ private:
     bool m_isInitialized;
 
     QVector<QColor>m_colorField;
-    QVector<QVector3D>m_globalColorField;
+    QVector<QVector3D>m_globalColors;
 
 public slots:
     void colorChanged( QVariant color );

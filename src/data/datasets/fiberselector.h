@@ -19,7 +19,7 @@ class FiberSelector : public QObject
     Q_OBJECT
 
 public:
-    FiberSelector();
+    FiberSelector( int numPoints = 0, int numLines = 0 );
     virtual ~FiberSelector();
 
     void init( QVector< QVector< float > >& data );
