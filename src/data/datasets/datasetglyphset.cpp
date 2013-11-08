@@ -132,6 +132,14 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 
+    m_properties["maingl"]->create( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
     { "orientation", "value" }, 0, "glyphs" );
@@ -438,6 +446,31 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     if ( glyphstyle == 3 )
     {
         m_dprenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
+
+    if ( properties( target )->get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
+    {
+        if ( !m_colormapRenderer )
+        {
+            m_colormapRenderer = new ColormapRenderer();
+            m_colormapRenderer->init();
+        }
+        m_colormapRenderer->setColormap( properties( target )->get( Fn::Property::D_COLORMAP ).toInt() );
+        m_colormapRenderer->setX( properties( target )->get( Fn::Property::D_COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( properties( target )->get( Fn::Property::D_COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( properties( target )->get( Fn::Property::D_COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( properties( target )->get( Fn::Property::D_COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
+
+        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN).toFloat() );
+        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
+
+        m_colormapRenderer->draw( width, height, renderMode );
     }
 }
 
