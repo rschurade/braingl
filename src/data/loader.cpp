@@ -936,7 +936,7 @@ bool Loader::loadMRtrix()
             break;
         }
 
-        if ( isnanf( x ) )
+        if ( isnan( x ) )
         {
             fibs.push_back( fib );
             fib.clear();
