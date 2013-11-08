@@ -28,7 +28,9 @@ DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     Dataset( filename, type ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_selector( 0 )
+    m_selector( 0 ),
+    m_numPoints( 0 ),
+    m_numLines( 0 )
 {
 
 }
@@ -38,7 +40,9 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_fibs( fibs ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_selector( 0 )
+    m_selector( 0 ),
+    m_numPoints( 0 ),
+    m_numLines( 0 )
 {
     QVector<QVector<float> >data0;
     QVector<float>min0;
@@ -68,7 +72,9 @@ DatasetFibers::DatasetFibers( QDir filename,
     m_dataMaxes( maxes ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_selector( 0 )
+    m_selector( 0 ),
+    m_numPoints( 0 ),
+    m_numLines( 0 )
 {
     createProps();
 }
@@ -77,7 +83,9 @@ DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_selector( 0 )
+    m_selector( 0 ),
+    m_numPoints( 0 ),
+    m_numLines( 0 )
 {
     copyFromLoader( lv );
 
@@ -104,15 +112,14 @@ DatasetFibers::~DatasetFibers()
 
 void DatasetFibers::createProps()
 {
-    int numPoints = 0;
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
-        numPoints += m_fibs[i].size() / 3;
+        m_numPoints += m_fibs[i].size() / 3;
     }
     bool hasData =(  m_dataNames[0] != "no data" );
-    qDebug() << "num points:" << numPoints << "num lines:" << m_fibs.size();
+    qDebug() << "num points:" << m_numPoints << "num lines:" << m_fibs.size();
 
-    m_properties["maingl"]->create( Fn::Property::D_NUM_POINTS, numPoints );
+    m_properties["maingl"]->create( Fn::Property::D_NUM_POINTS, m_numPoints );
     m_properties["maingl"]->create( Fn::Property::D_NUM_LINES, m_fibs.size() );
     m_properties["maingl"]->create( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
     if ( hasData )
@@ -359,7 +366,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     }
     if ( m_selector == 0 )
     {
-        m_selector = new FiberSelector();
+        m_selector = new FiberSelector( m_numPoints );
         m_selector->init( m_fibs );
         connect( m_selector, SIGNAL( changed() ), Models::d(), SLOT( submit() ) );
     }
@@ -368,7 +375,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new FiberRenderer( m_selector, &m_fibs, &( m_data[properties( target )->get( Fn::Property::D_DATAMODE).toInt()] ) );
+            m_renderer = new FiberRenderer( m_selector, &m_fibs, &( m_data[properties( target )->get( Fn::Property::D_DATAMODE).toInt()] ), m_numPoints );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
             m_renderer->colorChanged( properties( target )->get( Fn::Property::D_COLOR ).value<QColor>() );
@@ -432,13 +439,13 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 {
     QVector<float> points = lv->getPoints();
     QVector<int> lines = lv->getLines();
-    int numLines = lv->getNumLines();
+    m_numLines = lv->getNumLines();
 
-    qDebug() << "points size:" << points.size() << "lines size:" << lines.size() << "num lines:" << numLines;
+    qDebug() << "points size:" << points.size() << "lines size:" << lines.size() << "num lines:" << m_numLines;
 
     int lc = 0;
     int pc = 0;
-    for ( int i = 0; i < numLines; ++i )
+    for ( int i = 0; i < m_numLines; ++i )
     {
         QVector<float> fib;
         int lineSize = lines[lc];
@@ -480,7 +487,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 
             int lc = 0;
             int pc = 0;
-            for ( int i = 0; i < numLines; ++i )
+            for ( int i = 0; i < m_numLines; ++i )
             {
                 QVector<float> fib;
                 int lineSize = lines[lc];

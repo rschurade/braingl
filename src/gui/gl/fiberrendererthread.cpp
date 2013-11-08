@@ -47,6 +47,16 @@ void FiberRendererThread::run()
     int begin = m_id * chunkSize;
     int end = m_id * chunkSize + chunkSize;
 
+    try
+    {
+        m_verts->reserve( chunkSize * 6 );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "***error*** failed to allocate enough memory for vbo";
+        exit ( 0 );
+    }
+
     if ( m_id == numThreads - 1 )
     {
         end = m_data->size();
