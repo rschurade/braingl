@@ -35,7 +35,10 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"]->create( Fn::Property::D_DIM, 0 );
     m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"]->create( Fn::Property::D_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
-    m_properties["maingl"]->create( Fn::Property::D_NAME, QString( "isosurface" ) );
+
+    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (isosurface)";
+
+    m_properties["maingl"]->create( Fn::Property::D_NAME, name );
 
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
     m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );

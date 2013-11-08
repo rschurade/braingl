@@ -304,7 +304,8 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
     out = tmp;
 
-    DatasetScalar* dsOut = new DatasetScalar( QDir( "distance map" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (distance map)";
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
     DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
     iso->properties()->set( Fn::Property::D_ISO_VALUE, 0.10 );
@@ -438,7 +439,8 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
 
     out = tmp;
 
-    DatasetScalar* dsOut = new DatasetScalar( QDir( "gauss" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (gauss)";
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
@@ -500,7 +502,8 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
         }
     }
 
-    DatasetScalar* dsOut = new DatasetScalar( QDir( "median" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (median)";
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
