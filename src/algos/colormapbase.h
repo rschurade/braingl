@@ -24,6 +24,7 @@ public:
     ColormapBase();
     ColormapBase( QString name, QColor c0, QColor c1 );
     ColormapBase( QString name, QVector< ColormapPair >values );
+    ColormapBase( QList<QVariant> cm );
     virtual ~ColormapBase();
 
     void insertValue( ColormapPair value );
@@ -41,6 +42,8 @@ public:
 
     QColor getColor( float value );
     QString getCode();
+
+    QList<QVariant>serialize();
 
 private:
     QString m_name;

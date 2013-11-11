@@ -42,6 +42,21 @@ ColormapBase::ColormapBase( QString name, QColor c0, QColor c1 ) :
     m_values.push_back( p1 );
 }
 
+ColormapBase::ColormapBase( QList<QVariant> cm )
+{
+    m_name = cm[0].toString();
+    cm.removeAt( 0 );
+
+    for ( int i = 0; i < cm.size() / 4; ++i )
+    {
+        ColormapPair p;
+        p.value = cm[i*4].toFloat();
+        QColor c( cm[i*4+1].toFloat() * 255, cm[i*4+2].toFloat() * 255, cm[i*4+3].toFloat() * 255 );
+        p.color = c;
+        m_values.push_back( p );
+    }
+}
+
 ColormapBase::ColormapBase( QString name, QVector< ColormapPair > values ) :
     m_name( name ),
     m_values( values )
@@ -171,4 +186,20 @@ void ColormapBase::setValue( int id, float value )
 void ColormapBase::setColor( int id, QColor color )
 {
     m_values[id].color = color;
+}
+
+QList<QVariant>ColormapBase::serialize()
+{
+    QList<QVariant>out;
+
+    out.push_back( m_name );
+    for ( int i = 0; i < m_values.size(); ++i )
+    {
+        out.push_back( m_values[i].value );
+        out.push_back( m_values[i].color.redF() );
+        out.push_back( m_values[i].color.greenF() );
+        out.push_back( m_values[i].color.blueF() );
+    }
+
+    return out;
 }

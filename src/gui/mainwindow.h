@@ -27,6 +27,7 @@ class ROIWidget;
 class ShaderEditWidget;
 class ScriptWidget;
 class FNDockWidget;
+class ColormapEditWidget;
 
 class GLWidget;
 class ToolBar;
@@ -79,6 +80,7 @@ private:
     ShaderEditWidget* m_shaderEditWidget;
     ScriptWidget* m_scriptWidget;
     FNDockWidget* m_dockDSP;
+    ColormapEditWidget* m_colormapEditWidget;
 
     QMenu* fileMenu;
     QMenu* optionMenu;
@@ -100,7 +102,12 @@ private:
     QAction* openAct;
     QAction* saveAct;
     QAction* quitAct;
+
     QAction* saveSceneAct;
+
+    QAction* exportColormapsAct;
+    QAction* importColormapsAct;
+
     QAction* newMainGLAct;
 
     QAction* lockDockTitlesAct;
@@ -139,6 +146,8 @@ private slots:
     void openRecentFile();
     void save();
     void saveScene();
+    void exportColormaps();
+    void importColormaps();
     void about();
     void resetSettings();
     void newMainGL();

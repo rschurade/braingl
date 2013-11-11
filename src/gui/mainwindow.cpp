@@ -480,6 +480,72 @@ void MainWindow::saveDataset( Dataset* ds, QString filter )
     writer.save();
 }
 
+void MainWindow::exportColormaps()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fileName = QFileDialog::getSaveFileName( this, "Export colormaps", fn );
+
+    QSettings settings( fileName, QSettings::IniFormat );
+    settings.clear();
+
+    settings.setValue( "appName", "braingl" );
+    settings.setValue( "version", "0.8.1" );
+    settings.setValue( "content", "colormaps" );
+
+    int count = ColormapFunctions::size();
+    settings.setValue( "count", count );
+    QList<QVariant>cms;
+    for ( int i = 0; i < count; ++i )
+    {
+        cms.push_back( ColormapFunctions::get( i ).serialize() );
+    }
+    settings.setValue( "colormaps", cms );
+}
+
+void MainWindow::importColormaps()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+
+    QString filter( "braingl colormaps (*.cm);;all files (*.*)" );
+
+    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn, filter );
+    for ( int i = 0; i < fileNames.size(); ++i )
+    {
+        QSettings settings( fileNames[i], QSettings::IniFormat );
+        //qDebug() << settings.status();
+
+        QVariant versionString = "0.0.0";
+        if ( settings.contains( "version" ) )
+        {
+            QVariant versionString = settings.value( "version" ).toString();
+        }
+
+        if ( settings.contains( "content" ) )
+        {
+            if ( settings.value( "content" ).toString() != "colormaps" )
+            {
+                continue;
+            }
+        }
+        else
+        {
+            continue;
+        }
+
+        QList<QVariant>cms = settings.value( "colormaps" ).toList();
+
+        for ( int k = 0; k < cms.size(); ++k )
+        {
+            ColormapBase cm( cms[k].toList() );
+            ColormapFunctions::addColormap( cm );
+        }
+    }
+    m_colormapEditWidget->update();
+
+    Models::g()->submit();
+}
+
+
 //TODO
 void MainWindow::saveScene()
 {
@@ -755,6 +821,14 @@ void MainWindow::createActions()
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
     connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
 
+    exportColormapsAct = new QAction( tr( "Export Colormaps" ), this );
+    exportColormapsAct->setStatusTip( tr( "Save current colormaps to a file" ) );
+    connect( exportColormapsAct, SIGNAL(triggered()), this, SLOT( exportColormaps()) );
+
+    importColormapsAct = new QAction( tr( "Import Colormaps" ), this );
+    importColormapsAct->setStatusTip( tr( "Loads current colormaps from a file" ) );
+    connect( importColormapsAct, SIGNAL(triggered()), this, SLOT( importColormaps()) );
+
     screenshotAct = new QAction( QIcon( ":/icons/camera.png" ), tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
     connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
@@ -846,8 +920,12 @@ void MainWindow::createMenus()
     fileMenu->addAction( openAct );
     fileMenu->addAction( saveAct );
     separatorAct = fileMenu->addSeparator();
+
     fileMenu->addAction( saveSceneAct );
-    //fileMenu->addAction( printAct );
+    separatorAct = fileMenu->addSeparator();
+
+    fileMenu->addAction( exportColormapsAct );
+    fileMenu->addAction( importColormapsAct );
     separatorAct = fileMenu->addSeparator();
 
     for ( int i = 0; i < MaxRecentFiles; ++i )
@@ -858,12 +936,7 @@ void MainWindow::createMenus()
     fileMenu->addAction( quitAct );
     updateRecentFileActions();
 
-//    optionMenu = menuBar()->addMenu( tr( "&Options" ) );
-//    optionMenu->addAction( lockDockTitlesAct );
-//    optionMenu->addAction( renderCrosshairsAct );
-
     viewMenu = menuBar()->addMenu( tr( "&Widgets" ) );
-//    viewMenu->addAction( newMainGLAct );
     viewMenu->addAction( lockDockTitlesAct );
     viewMenu->addSeparator();
 
@@ -926,8 +999,8 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), Models::d(), SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), Models::d(), SLOT( deleteItem( int ) ) );
 
-	ColormapEditWidget* colormapEditWidget = new ColormapEditWidget( this );
-    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), colormapEditWidget, this );
+	m_colormapEditWidget = new ColormapEditWidget( this );
+    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), m_colormapEditWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockCE );
     viewMenu->addAction( dockCE->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
@@ -945,7 +1018,7 @@ void MainWindow::createDockWindows()
     addDockWidget( Qt::LeftDockWidgetArea, m_dockDSP );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockDSP, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
+    connect( m_colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
     connect( m_datasetWidget->selectionModel(), SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), this, SLOT( slotDatasetSelectionChanged() ) );
 
     DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl2", this );
@@ -953,7 +1026,7 @@ void MainWindow::createDockWindows()
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
     dsProperties2->setSelectionModel( m_datasetWidget->selectionModel() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
+    connect( m_colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
     dockDSP2->hide();
 
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
@@ -1076,9 +1149,6 @@ void MainWindow::createDockWindows()
 
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
-
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
-    connect( colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
 }
 
 void MainWindow::slotToggleAxialSlice()
