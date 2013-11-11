@@ -213,6 +213,17 @@ int DatasetNifti::getId( int x, int y, int z )
     return px + py * nx + pz * nx * ny;
 }
 
+void DatasetNifti::getXYZ( int id, int &x, int &y, int &z )
+{
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+
+    x = id % nx;
+    int tempY = id % ( nx * ny );
+    y = tempY / nx;
+    z = id / ( nx * ny );
+}
+
 QList<int> DatasetNifti::getNeighbourhood3x3( int x, int y, int z )
 {
     QList<int> out;
@@ -275,3 +286,4 @@ QString DatasetNifti::getDefaultSuffix()
 {
     return QString( "nii.gz" );
 }
+

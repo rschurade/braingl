@@ -79,7 +79,8 @@ namespace Fn
         MESH_DECIMATE,
         FIBER_RESAMPLE,
         CONS_TO_GLYPHSET,
-        FIBER_BUNDLING
+        FIBER_BUNDLING,
+        CREATE_ROI
     };
 
     enum class Orient : int

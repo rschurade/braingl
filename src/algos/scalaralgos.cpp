@@ -10,6 +10,9 @@
 #include "../data/datasets/datasetisosurface.h"
 
 #include "../data/models.h"
+#include "../data/roiarea.h"
+
+#include <QQueue>
 
 ScalarAlgos::ScalarAlgos()
 {
@@ -507,5 +510,97 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
 
     QList<Dataset*> l;
     l.push_back( dsOut );
+    return l;
+}
+
+QList<Dataset*> ScalarAlgos::createROI( Dataset* ds )
+{
+    DatasetScalar* dss = static_cast<DatasetScalar*>( ds );
+
+    QVector<float>* data = dss->getData();
+    QVector<float> out( data->size(), 0.0 );
+    QVector<bool> mask( data->size(), true );
+
+    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    int dx = ds->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat();
+    int dy = ds->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat();
+    int dz = ds->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat();
+
+    int snx = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+    int sny = Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+    int snz = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+    float sdx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float sdy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    float sdz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+
+    int x = ( snx * sdx ) / dx;
+    int y = ( sny * sdy ) / dy;
+    int z = ( snz * sdz ) / dz;
+
+    float lThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float uThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    QQueue<int>queue;
+
+    if ( data->at( dss->getId( x, y, z) ) >= lThreshold && data->at( dss->getId( x, y, z) ) <= uThreshold )
+    {
+        qDebug() << "enqueue" << dss->getId( x, y, z);
+        queue.enqueue( dss->getId( x, y, z) );
+        mask[dss->getId( x, y, z)] = false;
+    }
+
+    while( !queue.empty() )
+    {
+        int current = queue.dequeue();
+
+        if ( data->at( current ) >= lThreshold && data->at( current ) <= uThreshold )
+        {
+            out[current] = data->at( current );
+
+            dss->getXYZ( current, x, y, z);
+            if ( x - 1 >= 0 && mask[dss->getId( x-1, y, z ) ] )
+            {
+                queue.enqueue( dss->getId( x-1, y, z ) );
+                mask[dss->getId( x-1, y, z)] = false;
+            }
+            if ( x + 1 < nx && mask[dss->getId( x+1, y, z ) ] )
+            {
+                queue.enqueue( dss->getId( x+1, y, z ) );
+                mask[dss->getId( x+1, y, z)] = false;
+            }
+
+            if ( y - 1 >= 0 && mask[dss->getId( x, y-1, z ) ] )
+            {
+                queue.enqueue( dss->getId( x, y-1, z ) );
+                mask[dss->getId( x, y-1, z)] = false;
+            }
+            if ( y + 1 < ny && mask[dss->getId( x, y+1, z ) ] )
+            {
+                queue.enqueue( dss->getId( x, y+1, z ) );
+                mask[dss->getId( x, y+1, z)] = false;
+            }
+
+            if ( z - 1 >= 0 && mask[dss->getId( x, y, z-1 ) ] )
+            {
+                queue.enqueue( dss->getId( x, y, z-1 ) );
+                mask[dss->getId( x, y, z-1)] = false;
+            }
+            if ( z + 1 < nz && mask[dss->getId( x, y, z+1 ) ] )
+            {
+                queue.enqueue( dss->getId( x, y, z+1 ) );
+                mask[dss->getId( x, y, z+1)] = false;
+            }
+        }
+    }
+    ROIArea* roiOut = new ROIArea( out, dss->getHeader() );
+    Models::addROIArea( roiOut );
+
+
+//    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (roi)";
+//    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+
+    QList<Dataset*> l;
+    //l.push_back( dsOut );
     return l;
 }

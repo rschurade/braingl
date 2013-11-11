@@ -67,6 +67,10 @@ void ToolBar::createActions()
     m_medianAct->setStatusTip( tr( "median filter" ) );
     connect( m_medianAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_createROIAction = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create ROI" ), this, Fn::Algo::CREATE_ROI );
+    m_createROIAction->setStatusTip( tr( "create ROI" ) );
+    connect( m_createROIAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
     m_createNewAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "create new" ), this, Fn::Algo::CREATE_NEW_DATASET );
     m_createNewAct->setStatusTip( tr( "create a new empty dataset with the dimensions of the selected dataset" ) );
     connect( m_createNewAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -276,6 +280,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::MEDIAN:
             l = ScalarAlgos::median( ds );
             break;
+        case Fn::Algo::CREATE_ROI:
+            l = ScalarAlgos::createROI( ds );
+            break;
         case Fn::Algo::CREATE_NEW_DATASET:
             l = ScalarAlgos::createNew( ds );
             break;
@@ -395,6 +402,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_distanceMapAct );
             this->addAction( m_gaussAct );
             this->addAction( m_medianAct );
+            this->addAction( m_createROIAction );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:
