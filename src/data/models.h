@@ -14,6 +14,8 @@
 
 class Dataset;
 class ROI;
+class ROIWidget;
+class ROIArea;
 
 class Models
 {
@@ -42,10 +44,14 @@ public:
 
     static QList<Dataset*>getDatasets( Fn::DatasetType filter );
 
+    static void setRoiWidget( ROIWidget* rw );
+    static void addROIArea( ROIArea* roi );
+
 private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;
     static QAbstractItemModel* m_roiModel;
+    static ROIWidget* m_roiWidget;
 
     Models() {};
     virtual ~Models() {};

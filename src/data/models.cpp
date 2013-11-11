@@ -11,13 +11,16 @@
 #include "globalpropertymodel.h"
 #include "roimodel.h"
 #include "roi.h"
+#include "roiarea.h"
 #include "vptr.h"
 
 #include "datasets/dataset.h"
+#include "../gui/widgets/roiwidget.h"
 
 QAbstractItemModel* Models::m_dataModel = 0;
 QAbstractItemModel* Models::m_globalModel = 0;
 QAbstractItemModel* Models::m_roiModel = 0;
+ROIWidget* Models::m_roiWidget = 0;
 
 void Models::init()
 {
@@ -128,4 +131,14 @@ QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
         }
     }
     return rl;
+}
+
+void Models::setRoiWidget( ROIWidget* rw )
+{
+    m_roiWidget = rw;
+}
+
+void Models::addROIArea( ROIArea* roi )
+{
+    m_roiWidget->addROIArea( roi );
 }

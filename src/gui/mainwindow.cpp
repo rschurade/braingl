@@ -1007,6 +1007,7 @@ void MainWindow::createDockWindows()
     dockCE->hide();
 
 	m_roiWidget = new ROIWidget( this );
+	Models::setRoiWidget( m_roiWidget );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
     addDockWidget( Qt::RightDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
