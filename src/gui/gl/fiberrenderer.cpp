@@ -18,6 +18,8 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
+#include "math.h"
+
 FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints )  :
     ObjectRenderer(),
     m_selector( selector ),
