@@ -53,13 +53,15 @@ private:
 signals:
     void signalUpdate();
 
+public slots:
+    void update();
+
 private slots:
     void sliderChanged( float value, int id );
     void colorChanged( QColor color, int id );
     void newEntry( int id );
     void removeEntry( int id );
     void save();
-    void update();
     void deleteCM();
     void selectionChanged( int id );
     void contUpdatingChanged( int value );
