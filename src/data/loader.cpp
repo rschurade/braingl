@@ -23,7 +23,7 @@
 #include <QVector3D>
 #include <QtGui>
 
-#include <cmath>
+#include <math.h>
 
 Loader::Loader( Dataset* selected ) :
     m_header( 0 ),
@@ -936,7 +936,7 @@ bool Loader::loadMRtrix()
             break;
         }
 
-        if ( isnan( x ) )
+        if ( std::isnan( x ) )
         {
             fibs.push_back( fib );
             fib.clear();
