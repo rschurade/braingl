@@ -141,7 +141,6 @@ bool LoaderNifti::loadNiftiScalar( QString fileName )
         return false;
     }
 
-
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     switch ( m_header->datatype )
@@ -204,15 +203,6 @@ template<typename T> void LoaderNifti::copyScalar( T* inputData )
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
 
-    size_t blockSize = dimX * dimY * dimZ;
-    try
-    {
-        m_scalarData.resize( blockSize );
-    }
-    catch ( std::bad_alloc& )
-    {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
-    }
     int index = 0;
     if ( isRadialogical() )
     {
