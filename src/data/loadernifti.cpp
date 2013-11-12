@@ -126,6 +126,22 @@ bool LoaderNifti::loadNiftiHeader( QString hdrPath )
 
 bool LoaderNifti::loadNiftiScalar( QString fileName )
 {
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+
+    size_t blockSize = dimX * dimY * dimZ;
+    try
+    {
+        m_scalarData.resize( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
+
+
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     switch ( m_header->datatype )
@@ -189,7 +205,14 @@ template<typename T> void LoaderNifti::copyScalar( T* inputData )
     int dimZ = m_header->dim[3];
 
     size_t blockSize = dimX * dimY * dimZ;
-    m_scalarData.resize( blockSize );
+    try
+    {
+        m_scalarData.resize( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+    }
     int index = 0;
     if ( isRadialogical() )
     {
@@ -221,6 +244,21 @@ template<typename T> void LoaderNifti::copyScalar( T* inputData )
 
 bool LoaderNifti::loadNiftiVector3D( QString fileName )
 {
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    size_t blockSize = dimX * dimY * dimZ;
+
+    try
+    {
+        m_vectorData.resize( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
+
     nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
 
     switch ( m_header->datatype )
@@ -277,7 +315,7 @@ template<typename T> void LoaderNifti::copyVector( T* inputData )
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
     size_t blockSize = dimX * dimY * dimZ;
-    m_vectorData.resize( blockSize );
+
     int id = 0;
     int index = 0;
     if ( isRadialogical() )
@@ -324,7 +362,16 @@ bool LoaderNifti::loadNiftiTensor( QString fileName )
     int dim = m_header->dim[4];
 
     QVector<Matrix> dataVector;
-    dataVector.reserve( blockSize );
+
+    try
+    {
+        dataVector.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -430,7 +477,16 @@ bool LoaderNifti::loadNiftiSH( QString fileName )
     }
 
     QVector<ColumnVector> dataVector;
-    dataVector.reserve( blockSize );
+
+    try
+    {
+        dataVector.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -505,7 +561,16 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
     int dim = m_header->dim[4];
 
     QVector<QVector<float> > dataVector;
-    dataVector.reserve( blockSize );
+
+    try
+    {
+        dataVector.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -580,8 +645,17 @@ bool LoaderNifti::loadNiftiFMRI( QString fileName )
     int dim = m_header->dim[4];
     qDebug() << "num images:" << dim;
 
+    QVector<float> data;
 
-    QVector<float> data( blockSize * dim );
+    try
+    {
+        data.resize( blockSize * dim );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
 
     qDebug() << "start loading data";
     switch ( m_header->datatype )
@@ -691,6 +765,16 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
 
     QVector<ColumnVector> dataVector;
 
+    try
+    {
+        dataVector.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
+
     qDebug() << "start loading data";
     switch ( m_header->datatype )
     {
@@ -703,8 +787,6 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
             inputData = reinterpret_cast<int16_t*>( filedata->data );
 
             qDebug() << "extract data ";
-
-            dataVector.reserve( blockSize );
 
             if ( isRadialogical() )
             {
@@ -809,6 +891,16 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
 
     QVector<ColumnVector> dataVector;
 
+    try
+    {
+        dataVector.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qDebug() << "*** error *** failed to allocate memory for dataset";
+        return false;
+    }
+
     qDebug() << "start loading data";
     switch ( m_header->datatype )
     {
@@ -828,8 +920,6 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
             {
                 b0data[i] = inputData[i];
             }
-
-            dataVector.reserve( blockSize );
 
             for ( int z = 0; z < dimZ; ++z )
             {
