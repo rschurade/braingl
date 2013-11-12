@@ -129,15 +129,16 @@ void ROIArea::renameVerticesAndTriangles()
 
     m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
 
-    float xOff = 0.5f;
-    float yOff = 0.5f;
-    float zOff = 0.5f;
+//    float xOff = 0.5f;
+//    float yOff = 0.5f;
+//    float zOff = 0.5f;
 
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
         ( *mapIterator ).newID = nextID++;
-        m_mesh->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
+        //m_mesh->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
+        m_mesh->addVertex( ( *mapIterator ).x, ( *mapIterator ).y, ( *mapIterator ).z );
         ++mapIterator;
     }
 
