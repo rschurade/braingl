@@ -277,7 +277,10 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
                     {
                         value = 1.0;
                     }
-
+                    if ( ( modifiers & Qt::ShiftModifier ) )
+                    {
+                        value = 0.0;
+                    }
                     m_mesh[m]->setVertexData( picked[i], value );
                 }
             }
