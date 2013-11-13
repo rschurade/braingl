@@ -676,10 +676,10 @@ void MainWindow::loadScene( QString fileName )
     QSettings settings( fileName, QSettings::IniFormat );
     //qDebug() << settings.status();
 
-    QVariant versionString = "0.0.0";
+    QString versionString = "0.0.0";
     if ( settings.contains( "version" ) )
     {
-        QVariant versionString = settings.value( "version" ).toString();
+        versionString = settings.value( "version" ).toString();
     }
 
     QList<QVariant> files = settings.value( "fileNames" ).toList();

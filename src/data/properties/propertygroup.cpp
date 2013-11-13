@@ -413,6 +413,7 @@ void PropertyGroup::setState( QList<QVariant> state )
 {
     for ( int i = 0; i < state.size() / 2; ++i )
     {
+        //qDebug() << Fn::Prop2String::s( (Fn::Property)( state[i*2].toInt() ) ) << state[i*2+1];
         set( (Fn::Property)( state[i*2].toInt() ), state[i*2+1] );
     }
 }
