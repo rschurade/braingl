@@ -105,7 +105,7 @@ void DatasetGlyphset::addSecondSurfaceSelector()
 
 void DatasetGlyphset::addProperties()
 {
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
     { "+", "-", "+/-" }, 0, "general" );
     m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
@@ -478,11 +478,11 @@ bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 {
     float v = m_correlationMatrix[i][j];
     bool include = false;
-    if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && ( roi[i] && roi[j] ) )
+    if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
     {
         include = true;
     }
-    if ( ( sign == 1 || sign == 2 ) && ( v < -threshold ) && ( v > -m_maxThreshold ) && ( roi[i] && roi[j] ) )
+    if ( ( sign == 1 || sign == 2 ) && ( v < -threshold ) && ( v > -m_maxThreshold ) && roi[i] )
     {
         include = true;
     }
