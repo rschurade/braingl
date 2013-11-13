@@ -114,9 +114,12 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
     float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
 
-    program->setUniformValue( "u_x", sx * dx + dx / 2.0f );
-    program->setUniformValue( "u_y", sy * dy + dy / 2.0f );
-    program->setUniformValue( "u_z", sz * dz + dz / 2.0f );
+    program->setUniformValue( "u_dx", dx );
+    program->setUniformValue( "u_dy", dy );
+    program->setUniformValue( "u_dz", dz );
+    program->setUniformValue( "u_x", sx * dx ); // + dx / 2.0f );
+    program->setUniformValue( "u_y", sy * dy ); // + dy / 2.0f );
+    program->setUniformValue( "u_z", sz * dz ); // + dz / 2.0f );
     program->setUniformValue( "u_cutLowerX", props->get( Fn::Property::D_MESH_CUT_LOWER_X ).toBool() );
     program->setUniformValue( "u_cutLowerY", props->get( Fn::Property::D_MESH_CUT_LOWER_Y ).toBool() );
     program->setUniformValue( "u_cutLowerZ", props->get( Fn::Property::D_MESH_CUT_LOWER_Z ).toBool() );
