@@ -83,11 +83,11 @@ void DatasetMeshTimeSeries::addData( QVector<float> data )
 
 void DatasetMeshTimeSeries::setProperties()
 {
-    m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectFrame() ) );
     connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
-    m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl2"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );

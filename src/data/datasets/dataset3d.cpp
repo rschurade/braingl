@@ -14,17 +14,17 @@ Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* heade
     m_data( data ),
     m_renderer( 0 )
 {
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, -1 );
-    m_properties["maingl"]->create( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_DIM, 3 );
-    m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, -1 );
+    m_properties["maingl"]->createBool( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 3 );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
 
@@ -55,24 +55,24 @@ void Dataset3D::examineDataset()
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
+        m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
 
-        m_properties["maingl"]->create( Fn::Property::D_MIN, 0 );
-        m_properties["maingl"]->create( Fn::Property::D_MAX, 255 );
+        m_properties["maingl"]->createInt( Fn::Property::D_MIN, 0 );
+        m_properties["maingl"]->createInt( Fn::Property::D_MAX, 255 );
     }
 
     if ( type == DT_FLOAT )
     {
-        m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
-        m_properties["maingl"]->create( Fn::Property::D_MIN, -1.0f );
-        m_properties["maingl"]->create( Fn::Property::D_MAX, 1.0f );
+        m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
+        m_properties["maingl"]->createFloat( Fn::Property::D_MIN, -1.0f );
+        m_properties["maingl"]->createFloat( Fn::Property::D_MAX, 1.0f );
     }
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
 
-    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
-    m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
+    m_properties["maingl"]->createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
+    m_properties["maingl"]->createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
 }
 

@@ -24,10 +24,10 @@ DatasetNifti::~DatasetNifti()
 
 void DatasetNifti::parseNiftiHeader()
 {
-    m_properties["maingl"]->create( Fn::Property::D_DIM, m_header->dim[4] );
-    m_properties["maingl"]->create( Fn::Property::D_NX, m_header->nx );
-    m_properties["maingl"]->create( Fn::Property::D_NY, m_header->ny );
-    m_properties["maingl"]->create( Fn::Property::D_NZ, m_header->nz );
+    m_properties["maingl"]->createInt( Fn::Property::D_DIM, m_header->dim[4] );
+    m_properties["maingl"]->createInt( Fn::Property::D_NX, m_header->nx );
+    m_properties["maingl"]->createInt( Fn::Property::D_NY, m_header->ny );
+    m_properties["maingl"]->createInt( Fn::Property::D_NZ, m_header->nz );
 
 //    m_properties["maingl"]->create( Fn::Property::NT, m_header->nt );
 //    m_properties["maingl"]->create( Fn::Property::NU, m_header->nu );
@@ -36,10 +36,10 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->create("dim", m_header->dim );
 //    m_properties["maingl"]->create( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
 //    m_properties["maingl"]->create( Fn::Property::NBYPER, m_header->nbyper );
-    m_properties["maingl"]->create( Fn::Property::D_DATATYPE, m_header->datatype );
-    m_properties["maingl"]->create( Fn::Property::D_DX, m_header->dx );
-    m_properties["maingl"]->create( Fn::Property::D_DY, m_header->dy );
-    m_properties["maingl"]->create( Fn::Property::D_DZ, m_header->dz );
+    m_properties["maingl"]->createInt( Fn::Property::D_DATATYPE, m_header->datatype );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DX, m_header->dx );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DY, m_header->dy );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, m_header->dz );
 //    m_properties["maingl"]->create( Fn::Property::DT, m_header->dt );
 //    m_properties["maingl"]->create( Fn::Property::DU, m_header->du );
 //    m_properties["maingl"]->create( Fn::Property::DV, m_header->dv );
@@ -115,8 +115,8 @@ void DatasetNifti::parseNiftiHeader()
     QMatrix4x4 qform;
 
     //m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "sform", "qform" }, 0, "transform" );
-    m_properties["maingl"]->create( Fn::Property::D_S_FORM, m_sform, "transform" );
-    m_properties["maingl"]->create( Fn::Property::D_Q_FORM, m_qform, "transform" );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_S_FORM, m_sform, "transform" );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_Q_FORM, m_qform, "transform" );
     m_properties["maingl"]->getWidget( Fn::Property::D_S_FORM )->setEnabled( false );
     m_properties["maingl"]->getWidget( Fn::Property::D_Q_FORM )->setEnabled( false );
 }

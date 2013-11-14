@@ -28,20 +28,20 @@ ROIBox::ROIBox() :
     float yMax = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat() * dy;
     float zMax = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat() * dz;
 
-    m_properties.create( Fn::Property::R_RENDER, true, "general" );
-    m_properties.create( Fn::Property::R_NEG, false, "general" );
-    m_properties.create( Fn::Property::R_SHAPE, { "ellipsoid", "sphere", "cube", "box" }, 0, "general" );
-    m_properties.create( Fn::Property::R_X, x, 0., xMax, "general" );
-    m_properties.create( Fn::Property::R_Y, y, 0., yMax, "general" );
-    m_properties.create( Fn::Property::R_Z, z, 0., zMax, "general" );
-    m_properties.create( Fn::Property::R_DX, 20., 0., xMax, "general" );
-    m_properties.create( Fn::Property::R_DY, 20., 0., yMax, "general" );
-    m_properties.create( Fn::Property::R_DZ, 20., 0., zMax, "general" );
-    m_properties.create( Fn::Property::R_TYPE, (int)Fn::ROIType::Box );
-    m_properties.create( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
-    m_properties.create( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
-    m_properties.create( Fn::Property::R_STICK_TO_CROSSHAIR, false, "general" );
-    m_properties.create( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
+    m_properties.createBool( Fn::Property::R_RENDER, true, "general" );
+    m_properties.createBool( Fn::Property::R_NEG, false, "general" );
+    m_properties.createList( Fn::Property::R_SHAPE, { "ellipsoid", "sphere", "cube", "box" }, 0, "general" );
+    m_properties.createFloat( Fn::Property::R_X, x, 0., xMax, "general" );
+    m_properties.createFloat( Fn::Property::R_Y, y, 0., yMax, "general" );
+    m_properties.createFloat( Fn::Property::R_Z, z, 0., zMax, "general" );
+    m_properties.createFloat( Fn::Property::R_DX, 20., 0., xMax, "general" );
+    m_properties.createFloat( Fn::Property::R_DY, 20., 0., yMax, "general" );
+    m_properties.createFloat( Fn::Property::R_DZ, 20., 0., zMax, "general" );
+    m_properties.createInt( Fn::Property::R_TYPE, (int)Fn::ROIType::Box );
+    m_properties.createColor( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties.createFloat( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
+    m_properties.createBool( Fn::Property::R_STICK_TO_CROSSHAIR, false, "general" );
+    m_properties.createInt( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     connect( m_properties.getProperty( Fn::Property::R_DX ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dxChanged( QVariant ) ) );

@@ -33,32 +33,32 @@ PropertyGroup::PropertyGroup( PropertyGroup& pg )
 
         if ( dynamic_cast<PropertyBool*>( prop ) )
         {
-            create( pair.first, prop->getValue().toBool(), prop->getPropertyTab() );
+            createBool( pair.first, prop->getValue().toBool(), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertyColor*>( prop ) )
         {
-            create( pair.first, prop->getValue().value<QColor>(), prop->getPropertyTab() );
+            createColor( pair.first, prop->getValue().value<QColor>(), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertyFloat*>( prop ) )
         {
-            create( pair.first, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
+            createFloat( pair.first, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertyInt*>( prop ) )
         {
-            create( pair.first, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
+            createInt( pair.first, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertyPath*>( prop ) )
         {
-            create( pair.first, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
+            createDir( pair.first, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertySelection*>( prop ) )
         {
             PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
-            create( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+            createList( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
         }
         if ( dynamic_cast<PropertyString*>( prop ) )
         {
-            create( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+            createString( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
         }
     }
 }
@@ -67,7 +67,7 @@ PropertyGroup::~PropertyGroup()
 {
 }
 
-bool PropertyGroup::create( Fn::Property name, bool value, QString tab )
+bool PropertyGroup::createBool( Fn::Property name, bool value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -83,7 +83,7 @@ bool PropertyGroup::create( Fn::Property name, bool value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, int value, QString tab )
+bool PropertyGroup::createInt( Fn::Property name, int value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -99,7 +99,7 @@ bool PropertyGroup::create( Fn::Property name, int value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, int value, int min, int max, QString tab )
+bool PropertyGroup::createInt( Fn::Property name, int value, int min, int max, QString tab )
 {
     if ( contains( name ) )
     {
@@ -115,7 +115,7 @@ bool PropertyGroup::create( Fn::Property name, int value, int min, int max, QStr
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, float value, QString tab )
+bool PropertyGroup::createFloat( Fn::Property name, float value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -131,7 +131,7 @@ bool PropertyGroup::create( Fn::Property name, float value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, float value, float min, float max, QString tab )
+bool PropertyGroup::createFloat( Fn::Property name, float value, float min, float max, QString tab )
 {
     if ( contains( name ) )
     {
@@ -144,7 +144,7 @@ bool PropertyGroup::create( Fn::Property name, float value, float min, float max
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, QString value, QString tab )
+bool PropertyGroup::createString( Fn::Property name, QString value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -160,7 +160,7 @@ bool PropertyGroup::create( Fn::Property name, QString value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, const char* value, QString tab )
+bool PropertyGroup::createCharString( Fn::Property name, const char* value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -176,7 +176,7 @@ bool PropertyGroup::create( Fn::Property name, const char* value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, QColor value, QString tab )
+bool PropertyGroup::createColor( Fn::Property name, QColor value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -192,7 +192,7 @@ bool PropertyGroup::create( Fn::Property name, QColor value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, QMatrix4x4 value, QString tab )
+bool PropertyGroup::createMatrix( Fn::Property name, QMatrix4x4 value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -208,7 +208,7 @@ bool PropertyGroup::create( Fn::Property name, QMatrix4x4 value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, QDir value, QString tab )
+bool PropertyGroup::createDir( Fn::Property name, QDir value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -224,7 +224,7 @@ bool PropertyGroup::create( Fn::Property name, QDir value, QString tab )
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
+bool PropertyGroup::createList( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -240,7 +240,7 @@ bool PropertyGroup::create( Fn::Property name, std::initializer_list<QString>opt
     return true;
 }
 
-bool PropertyGroup::create( Fn::Property name, QVector<QString> options, int value, QString tab )
+bool PropertyGroup::createList( Fn::Property name, QVector<QString> options, int value, QString tab )
 {
     if ( contains( name ) )
     {

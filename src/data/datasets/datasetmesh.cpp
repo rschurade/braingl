@@ -39,31 +39,31 @@ void DatasetMesh::initProperties()
     float min = 0.0;
     float max = 1.0;
 
-    m_properties["maingl"]->create( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general"  );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general"  );
+    m_properties["maingl"]->createList( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general"  );
+    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general"  );
 
-    m_properties["maingl"]->create( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
-    m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
+    m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
 
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
 
-    m_properties["maingl"]->create( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
-    m_properties["maingl"]->create( Fn::Property::D_PAINTSIZE, 20.f, 1.f, 1000.f, "paint" );
-    m_properties["maingl"]->create( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
-    m_properties["maingl"]->create( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );
+    m_properties["maingl"]->createList( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTSIZE, 20.f, 1.f, 1000.f, "paint" );
+    m_properties["maingl"]->createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );
 
 
-    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MIN, min );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MAX, max );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
@@ -72,47 +72,47 @@ void DatasetMesh::initProperties()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_WIREFRAME, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_WIREFRAME, false, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_LOWER_Z, false, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_X, false, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Y, false, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_CUT_HIGHER_Z, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_LOWER_Y, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_LOWER_Z, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_HIGHER_X, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_HIGHER_Y, false, "special" );
+    m_properties["maingl"]->createBool( Fn::Property::D_MESH_CUT_HIGHER_Z, false, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_ADJUST_X, 0.0f, -500.0f, 500.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_ADJUST_Y, 0.0f, -500.0f, 500.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_ADJUST_Z, 0.0f, -500.0f, 500.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, 0.0f, -500.0f, 500.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, 0.0f, -500.0f, 500.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, 0.0f, -500.0f, 500.0f, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_ROTATE_X, 0.0f, 0.0f, 360.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_ROTATE_Y, 0.0f, 0.0f, 360.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_ROTATE_Z, 0.0f, 0.0f, 360.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ROTATE_X, 0.0f, 0.0f, 360.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ROTATE_Y, 0.0f, 0.0f, 360.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ROTATE_Z, 0.0f, 0.0f, 360.0f, "special" );
 
-    m_properties["maingl"]->create( Fn::Property::D_SCALE_X, 1.0f, 0.0f, 10.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_SCALE_Y, 1.0f, 0.0f, 10.0f, "special" );
-    m_properties["maingl"]->create( Fn::Property::D_SCALE_Z, 1.0f, 0.0f, 10.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALE_X, 1.0f, 0.0f, 10.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALE_Y, 1.0f, 0.0f, 10.0f, "special" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALE_Z, 1.0f, 0.0f, 10.0f, "special" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_MESH_MAKE_PERMANENT, "special" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_MESH_MAKE_PERMANENT ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( makePermanent() ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SWITCH, true, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->create( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
+    m_properties["maingl"]->createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
 
-    m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_VERTEX, 0 );
-    m_properties["maingl"]->create( Fn::Property::D_MESH_NUM_TRIANGLES, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_MESH_NUM_VERTEX, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_MESH_NUM_TRIANGLES, 0 );
 
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, 0 );
 
-    m_properties["maingl"]->create( Fn::Property::D_START_INDEX, 0 );
-    m_properties["maingl"]->create( Fn::Property::D_END_INDEX, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_END_INDEX, 0 );
 
     if( m_mesh.size() > 0 )
     {
@@ -137,21 +137,21 @@ void DatasetMesh::finalizeProperties()
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    m_properties["maingl"]->createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
-    m_properties["maingl"]->create( Fn::Property::D_TRANSFORM, m_transform, "transform" );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
     m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
-    m_properties["maingl"]->create( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
+    m_properties["maingl"]->createBool( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
 
     transformChanged( 3 );
 }
 
 void DatasetMesh::setProperties()
 {
-    m_properties["maingl"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
     //m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 
     if( m_mesh.size() > 0 )
