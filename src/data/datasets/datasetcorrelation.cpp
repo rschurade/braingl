@@ -96,7 +96,8 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
         setPickedID( pickedID );
     }
 
-    if ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool() )
+    if ( ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool() && ( target == "maingl" ) ) ||
+        ( Models::g()->data( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS_2, 0 ) ).toBool() && ( target == "maingl2" ) ) )
     {
         if ( pickedID > -1 )
         {
