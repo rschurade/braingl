@@ -53,9 +53,9 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
 
     finalizeProperties();
 
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_DRAW_GLYPHS, false );
-    m_properties["maingl"]->create( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl2"]->createBool( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl"]->createBool( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_COLORMODE ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( colorModeChanged(QVariant) ) );
@@ -100,28 +100,26 @@ DatasetGlyphset::~DatasetGlyphset()
 
 void DatasetGlyphset::addSecondSurfaceSelector()
 {
-    m_properties["maingl2"]->create( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl2"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 }
 
 void DatasetGlyphset::addProperties()
 {
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
-    { "+", "-", "+/-" }, 0, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
-    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN, { "+", "-", "+/-" }, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE, { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
     m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
-    m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_SURFACE, true, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_DRAW_SURFACE, true, "general" );
     //m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->createBool( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
 
     m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setValue( -1 );
@@ -132,17 +130,16 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"]->createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
-    { "orientation", "value" }, 0, "glyphs" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE, { "orientation", "value" }, 0, "glyphs" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
@@ -227,14 +224,14 @@ void DatasetGlyphset::readConnectivity( QString filename )
     }
     f.close();
     qDebug() << "connectivity read";
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
+    m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::addCorrelation( float** corr )
 {
     m_correlationMatrix = corr;
     m_n = m_mesh[0]->numVerts();
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
+    m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::setMinthresh( float mt )
@@ -976,12 +973,11 @@ QList<Dataset*> DatasetGlyphset::createConnections()
 void DatasetGlyphset::setProperties()
 {
     DatasetCorrelation::setProperties();
-    m_properties["maingl"]->create( Fn::Property::D_SURFACE_GLYPH_GEOMETRY, m_displayList, 0, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
+    m_properties["maingl"]->createList( Fn::Property::D_SURFACE_GLYPH_GEOMETRY, m_displayList, 0, "glyphs" );
+    m_properties["maingl"]->createList( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
     if ( m_is_split )
     {
-        m_properties["maingl"]->create( Fn::Property::D_LEFT_RIGHT,
-        { "both", "left", "right" }, 0, "general" );
+        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT, { "both", "left", "right" }, 0, "general" );
     }
 }
 

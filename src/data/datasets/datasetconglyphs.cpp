@@ -46,11 +46,11 @@ DatasetConGlyphs::DatasetConGlyphs( QDir filename ) :
 {
     float min = -1;
     float max = 1;
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, 1, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
     addProperties();
 
@@ -65,8 +65,8 @@ DatasetConGlyphs::DatasetConGlyphs( QDir filename ) :
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
             m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_DRAW_GLYPHS, true, "general" );
-    m_properties["maingl2"]->create( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl"]->createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl2"]->createBool( Fn::Property::D_DRAW_GLYPHS, false );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHSTYLE ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( glyphStyleChanged(QVariant) ) );
@@ -107,22 +107,22 @@ void DatasetConGlyphs::setCons( Connections* cons )
 void DatasetConGlyphs::addProperties()
 {
     //TODO: stuff for symmetric thresholding / inversion?
-    m_properties["maingl"]->create( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHSTYLE,
+    m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE,
     { "points", "vectors", "pies" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl"]->create( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
     m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
-    m_properties["maingl"]->create( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->create( Fn::Property::D_GLYPH_COLORMODE,
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE,
     { "orientation", "value" }, 0, "glyphs" );
 }
 

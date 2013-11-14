@@ -20,15 +20,15 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_rendererEV( 0 ),
     m_renderGlpyhs( false )
 {
-    m_properties["maingl"]->create( Fn::Property::D_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GAMMA, 0.1f, 0.0f, 10.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_OFFSET, 0.0f, -1.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SCALING, 0.5f, 0.0f, 2.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_TENSOR_RENDERMODE, { "superquadric", "1st ev", "2nd ev", "3rd ev" }, 0, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GAMMA, 0.1f, 0.0f, 10.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0.0f, -1.0f, 1.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 0.5f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_TENSOR_RENDERMODE, { "superquadric", "1st ev", "2nd ev", "3rd ev" }, 0, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
 
@@ -56,16 +56,16 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nift
         m_data.push_back( m );
     }
 
-    m_properties["maingl"]->create( Fn::Property::D_CREATED_BY, (int)Fn::Algo::TENSORFIT );
-    m_properties["maingl"]->create( Fn::Property::D_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_GAMMA, 0.1f, 0.0f, 10.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_OFFSET, 0.0f, -0.5f, 0.5f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_SCALING, 0.5f, 0.0f, 2.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_TENSOR_RENDERMODE, 0, 0, 3, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::TENSORFIT );
+    m_properties["maingl"]->createFloat( Fn::Property::D_FA_THRESHOLD, 0.01f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_EV_THRESHOLD, 10.0f, 0.0f, 10.f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_GAMMA, 0.1f, 0.0f, 10.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5f, 0.5f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 0.5f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_TENSOR_RENDERMODE, 0, 0, 3, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     examineDataset();
 
@@ -87,14 +87,14 @@ void DatasetTensor::examineDataset()
     int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
     int size = nx * ny * nz;
 
-    m_properties["maingl"]->create( Fn::Property::D_SIZE, static_cast<int>( 9 * size * sizeof(float) ) );
+    m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( 9 * size * sizeof(float) ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
-    m_properties["maingl"]->create( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
 
-    m_properties["maingl"]->create( Fn::Property::D_RENDER_SLICE, 1 );
-    m_properties["maingl"]->create( Fn::Property::D_SCALING, 1.0f );
-    m_properties["maingl"]->create( Fn::Property::D_DIM, 9 );
+    m_properties["maingl"]->createInt( Fn::Property::D_RENDER_SLICE, 1 );
+    m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 1.0f );
+    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 9 );
 
     float min = std::numeric_limits<float>::max();
     float max = std::numeric_limits<float>::min();
@@ -115,8 +115,8 @@ void DatasetTensor::examineDataset()
         max = qMax( max, (float) m_data.at( i )( 3, 3 ) );
     }
 
-    m_properties["maingl"]->create( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->create( Fn::Property::D_MAX, max );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MIN, min );
+    m_properties["maingl"]->createFloat( Fn::Property::D_MAX, max );
 }
 
 void DatasetTensor::createTexture()

@@ -11,16 +11,16 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
 {
     PropertyGroup* props = new PropertyGroup();
     // add standard properties
-    props->create( Fn::Property::D_ACTIVE, true );
-    props->create( Fn::Property::D_LOCK_PROPS, false );
-    props->create( Fn::Property::D_FILENAME, fileName.path() );
-    props->create( Fn::Property::D_TYPE, (int)type );
-    props->create( Fn::Property::D_NAME, fileName.path().split( "/" ).last(), "general" );
-    props->create( Fn::Property::D_SIZE, -1 );
-    props->create( Fn::Property::D_CREATED_BY, (int)Fn::Algo::NONE );
+    props->createBool( Fn::Property::D_ACTIVE, true );
+    props->createBool( Fn::Property::D_LOCK_PROPS, false );
+    props->createDir( Fn::Property::D_FILENAME, fileName.path() );
+    props->createInt( Fn::Property::D_TYPE, (int)type );
+    props->createString( Fn::Property::D_NAME, fileName.path().split( "/" ).last(), "general" );
+    props->createInt( Fn::Property::D_SIZE, -1 );
+    props->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::NONE );
 
-    props->create( Fn::Property::D_HAS_TEXTURE, false );
-    props->create( Fn::Property::D_RENDER_TARGET, "maingl" );
+    props->createBool( Fn::Property::D_HAS_TEXTURE, false );
+    props->createString( Fn::Property::D_RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
 }

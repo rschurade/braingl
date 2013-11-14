@@ -27,24 +27,24 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_numNodes( 0 ),
     m_zoom( 1 )
 {
-    m_properties["maingl"]->create( Fn::Property::D_COLORMAP, -1 );
-    m_properties["maingl"]->create( Fn::Property::D_INTERPOLATION, false );
-    m_properties["maingl"]->create( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0 );
-    m_properties["maingl"]->create( Fn::Property::D_DIM, 3 );
+    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, -1 );
+    m_properties["maingl"]->createBool( Fn::Property::D_INTERPOLATION, false );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 3 );
 
-    m_properties["maingl"]->create( Fn::Property::D_TREE_SELECTED_CLUSTER, 0, 0, 0, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_TREE_SELECTED_CLUSTER, 0, 0, 0, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_SELECTED_CLUSTER ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectCluster( QVariant ) ) );
-    m_properties["maingl"]->create( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR, QColor( 255, 0, 0 ), "general" );
-    m_properties["maingl"]->create( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR, QColor( 128, 128, 128 ), "general" );
-    m_properties["maingl"]->create( Fn::Property::D_TREE_COLOR_SELECTION, { "base", "selected cluster", "user defined", "partion" }, 0, "general" );
+    m_properties["maingl"]->createColor( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties["maingl"]->createColor( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR, QColor( 128, 128, 128 ), "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_TREE_COLOR_SELECTION, { "base", "selected cluster", "user defined", "partion" }, 0, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_COLOR_SELECTION ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( colorSelectionChanged( QVariant ) ) );
-    m_properties["maingl"]->create( Fn::Property::D_TREE_USER_CLUSTER_COLOR, QColor( 0, 0, 255 ), "general" );
+    m_properties["maingl"]->createColor( Fn::Property::D_TREE_USER_CLUSTER_COLOR, QColor( 0, 0, 255 ), "general" );
     m_properties["maingl"]->createButton( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( setClusterColor() ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x biggest" }, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x biggest" }, 0, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( partitionModeChanged( QVariant ) ) );
 
@@ -52,8 +52,8 @@ DatasetTree::DatasetTree( QDir fn ) :
         connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_APPLY_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( applyPartitionMode() ) );
 
-    m_properties["maingl"]->create( Fn::Property::D_TREE_PARTITION_LEVEL, 1.0f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->create( Fn::Property::D_TREE_PARTITION_SIZE, 10, 1, 1000, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_TREE_PARTITION_LEVEL, 1.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->createInt( Fn::Property::D_TREE_PARTITION_SIZE, 10, 1, 1000, "general" );
     m_properties["maingl"]->getWidget( Fn::Property::D_TREE_PARTITION_SIZE )->setHidden( true );
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
@@ -92,12 +92,12 @@ void DatasetTree::importTree( QString dims, QVector<QString>coords, QVector<QStr
     int ny = dl[1].toInt();
     int nz = dl[2].toInt();
 
-    m_properties["maingl"]->create( Fn::Property::D_NX, nx );
-    m_properties["maingl"]->create( Fn::Property::D_NY, ny );
-    m_properties["maingl"]->create( Fn::Property::D_NZ, nz );
-    m_properties["maingl"]->create( Fn::Property::D_DX, 1.0f );
-    m_properties["maingl"]->create( Fn::Property::D_DY, 1.0f );
-    m_properties["maingl"]->create( Fn::Property::D_DZ, 1.0f );
+    m_properties["maingl"]->createInt( Fn::Property::D_NX, nx );
+    m_properties["maingl"]->createInt( Fn::Property::D_NY, ny );
+    m_properties["maingl"]->createInt( Fn::Property::D_NZ, nz );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DX, 1.0f );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DY, 1.0f );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, 1.0f );
 
     nx -= 1;
     ny -= 1;

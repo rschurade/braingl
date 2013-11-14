@@ -35,19 +35,19 @@ public:
     QVariant get( Fn::Property name ) const;
     bool set( Fn::Property name, QVariant value );
 
-    bool create( Fn::Property name, bool value, QString tab = "none" );
-    bool create( Fn::Property name, int value, QString tab = "none" );
-    bool create( Fn::Property name, int value, int min, int max, QString tab = "none" );
-    bool create( Fn::Property name, float value, QString tab = "none" );
-    bool create( Fn::Property name, float value, float min, float max, QString tab = "none" );
-    bool create( Fn::Property name, QString value, QString tab = "none" );
-    bool create( Fn::Property name, const char* value, QString tab = "none" );
-    bool create( Fn::Property name, QColor value, QString tab = "none" );
-    bool create( Fn::Property name, QDir value, QString tab = "none" );
-    bool create( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
-    bool create( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+    bool createBool( Fn::Property name, bool value, QString tab = "none" );
+    bool createInt( Fn::Property name, int value, QString tab = "none" );
+    bool createInt( Fn::Property name, int value, int min, int max, QString tab = "none" );
+    bool createFloat( Fn::Property name, float value, QString tab = "none" );
+    bool createFloat( Fn::Property name, float value, float min, float max, QString tab = "none" );
+    bool createString( Fn::Property name, QString value, QString tab = "none" );
+    bool createCharString( Fn::Property name, const char* value, QString tab = "none" );
+    bool createColor( Fn::Property name, QColor value, QString tab = "none" );
+    bool createDir( Fn::Property name, QDir value, QString tab = "none" );
+    bool createList( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
+    bool createList( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
     bool createButton( Fn::Property name, QString tab = "none" );
-    bool create( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
+    bool createMatrix( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
 
     bool setMin( Fn::Property name,  QVariant value );
     bool setMax( Fn::Property name,  QVariant value );
