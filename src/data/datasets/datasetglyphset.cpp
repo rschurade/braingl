@@ -36,6 +36,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 m_dprenderer( NULL ),
                 m_vrenderer( NULL ),
                 m_pierenderer( NULL ),
+                m_colormapRenderer( 0 ),
                 prevGeo( -1 ),
                 prevGlyph( -1 ),
                 prevCol( -1 ),
