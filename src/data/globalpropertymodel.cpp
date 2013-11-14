@@ -67,6 +67,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), "general" );
     m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), "general" );
     m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS, true, "general" );
+    m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS_2, true, "general" );
     m_properties->createColor( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
     m_properties->createBool( Fn::Property::G_SHOW_NAV_SLIDERS, true, "general" );
     m_properties->createList( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );

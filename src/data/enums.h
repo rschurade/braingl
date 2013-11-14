@@ -330,6 +330,7 @@ namespace Fn
         G_FILTER_SIZE,
         G_DECIMATE_EPSILON,
         G_MIN_COMPONENT_SIZE,
+        G_RENDER_CROSSHAIRS_2,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -580,6 +581,7 @@ namespace Fn
                 case Property::G_FILTER_SIZE: return QString( "filter size" ); break;
                 case Property::G_DECIMATE_EPSILON: return QString( "epsilon for decimate" ); break;
                 case Property::G_MIN_COMPONENT_SIZE: return QString( "min size for component extraction" ); break;
+                case Property::G_RENDER_CROSSHAIRS_2: return QString( "render crosshairs maingl2" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
