@@ -33,9 +33,13 @@ private:
     QVBoxLayout* m_layout;
     QList<QWidget*>m_visibleWidgets;
 
+    bool m_buildingTabs;
+    QString m_lastUsedTab;
+
 public slots:
     void updateWidgetVisibility();
     void clearWidget();
+    void slotTabChanged( int tab );
 };
 
 #endif /* ROIPROPERTYWIDGET_H_ */

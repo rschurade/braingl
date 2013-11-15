@@ -21,7 +21,8 @@
 #include <QtGui>
 
 ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
-    QTabWidget( parent )
+    QTabWidget( parent ),
+    m_buildingTabs( false )
 {
     m_propertyView = new ROIPropertyView( this );
 
@@ -35,6 +36,7 @@ ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
 
     connect( m_propertyView, SIGNAL( selectedChanged() ), this, SLOT( updateWidgetVisibility() ) );
     connect( m_propertyView, SIGNAL( nothingSelected() ), this, SLOT( clearWidget() ) );
+    connect( this, SIGNAL( currentChanged( int ) ), this, SLOT( slotTabChanged( int ) ) );
 }
 
 ROIPropertyWidget::~ROIPropertyWidget()
@@ -53,6 +55,7 @@ void ROIPropertyWidget::setSelectionModel( QItemSelectionModel* selectionModel )
 
 void ROIPropertyWidget::updateWidgetVisibility()
 {
+    m_buildingTabs = true;
     // clear tabs
     while ( count() > 0 )
     {
@@ -101,6 +104,15 @@ void ROIPropertyWidget::updateWidgetVisibility()
         ti.next();
         ti.value()->addStretch();
     }
+    for ( int i = 0; i < count(); ++i )
+    {
+        if ( m_lastUsedTab == tabText( i ) )
+        {
+            setCurrentIndex( i );
+            break;
+        }
+    }
+    m_buildingTabs = false;
 }
 
 void ROIPropertyWidget::clearWidget()
@@ -115,4 +127,13 @@ void ROIPropertyWidget::clearWidget()
     repaint();
 
     m_layout->addStretch();
+}
+
+void ROIPropertyWidget::slotTabChanged( int tab )
+{
+    if( m_buildingTabs )
+    {
+        return;
+    }
+    m_lastUsedTab = tabText( tab );
 }

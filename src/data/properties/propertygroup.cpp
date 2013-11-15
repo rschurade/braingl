@@ -12,6 +12,7 @@
 #include "propertyfloat.h"
 #include "propertypath.h"
 #include "propertystring.h"
+#include "propertytext.h"
 #include "propertyselection.h"
 #include "propertybutton.h"
 #include "propertymatrix.h"
@@ -59,6 +60,10 @@ PropertyGroup::PropertyGroup( PropertyGroup& pg )
         if ( dynamic_cast<PropertyString*>( prop ) )
         {
             createString( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyText*>( prop ) )
+        {
+            createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
         }
     }
 }
@@ -169,6 +174,22 @@ bool PropertyGroup::createCharString( Fn::Property name, const char* value, QStr
     else
     {
         PropertyString* prop = new PropertyString( Fn::Prop2String::s( (Fn::Property)name ), QString( value ) );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createText( Fn::Property name, QString value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyText* prop = new PropertyText( Fn::Prop2String::s( (Fn::Property)name ), value );
         prop->setPropertyTab( tab );
         m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
         connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );

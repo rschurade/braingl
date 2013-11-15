@@ -353,7 +353,8 @@ namespace Fn
         R_PICK_ID,
         R_UPDATED,
         R_THRESHOLD,
-        R_POINTER
+        R_POINTER,
+        R_DESCRIPTION
     };
 
     struct Prop2String
@@ -605,6 +606,7 @@ namespace Fn
                 case Property::R_UPDATED: return QString( "updated" ); break;
                 case Property::R_THRESHOLD: return QString( "threshold" ); break;
                 case Property::R_POINTER: return QString( "pointer" ); break;
+                case Property::R_DESCRIPTION: return QString( "description" ); break;
             }
             return QString( "property not defined" );
         }
