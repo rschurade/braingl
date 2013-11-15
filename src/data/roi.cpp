@@ -14,6 +14,7 @@ ROI::ROI( QString name )
     m_properties.createString( Fn::Property::D_NAME, name, "general" );
     m_properties.createBool( Fn::Property::D_ACTIVE, true, "general" );
     m_properties.createInt( Fn::Property::R_ID, m_count );
+    m_properties.createText( Fn::Property::R_DESCRIPTION, QString(""), "description" );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( slotPropChanged() ) );
 }

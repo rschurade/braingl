@@ -1,27 +1,27 @@
 /*
- * propertystring.h
+ * propertytext.h
  *
- * Created on: Jan 17, 2013
+ * Created on: Nov 15, 2013
  * @author Ralph Schurade
  */
 
-#ifndef PROPERTYSTRING_H_
-#define PROPERTYSTRING_H_
+#ifndef PROPERTYTEXT_H_
+#define PROPERTYTEXT_H_
 
 #include "property.h"
 
 #include <QString>
 
-class EditWithLabel;
+class TextEditWithLabel;
 class QWidget;
 
-class PropertyString : public Property
+class PropertyText : public Property
 {
     Q_OBJECT
 
 public:
-    PropertyString( QString name, QString value = ""  );
-    virtual ~PropertyString();
+    PropertyText( QString name, QString value = ""  );
+    virtual ~PropertyText();
 
 private:
 
@@ -35,4 +35,4 @@ private slots:
 
 };
 
-#endif /* PROPERTYSTRING_H_ */
+#endif /* PROPERTYTEXT_H_ */
