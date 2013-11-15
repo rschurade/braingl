@@ -32,7 +32,6 @@ void PropertyText::setValue( QVariant value )
 
 void PropertyText::widgetChanged( QString value, int id )
 {
-    qDebug() << value;
     m_value = value;
     emit( valueChanged( value ) );
 }
