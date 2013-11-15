@@ -13,7 +13,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
-#define SLIDERMULT 100000.f
+#define SLIDERMULT 100.f
 
 SliderWithEdit::SliderWithEdit( QString name,  Fn::Position editPos, int id, QWidget* parent ) :
     QFrame( parent ),
