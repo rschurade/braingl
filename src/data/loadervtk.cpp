@@ -240,12 +240,14 @@ bool LoaderVTK::open()
         {
             //the following two lines are equivalent
             //arrayNames.push_back(polydata->GetPointData()->GetArray(i)->GetName());
-            m_pointDataNames.push_back( output->GetPointData()->GetArrayName( i ) );
+
             int dataTypeID = output->GetPointData()->GetArray( i )->GetDataType();
-            qDebug() << "Array " << i << ": " << m_pointDataNames[i] << " (type: " << dataTypeID << ")";
 
             if ( dataTypeID == VTK_FLOAT )
             {
+                m_pointDataNames.push_back( output->GetPointData()->GetArrayName( i ) );
+                qDebug() << "Array " << i << ": " << m_pointDataNames.last() << " (type: " << dataTypeID << ")";
+
                 QVector<float>data( m_numPoints );
                 vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetPointData()->GetArray( i ) );
 
