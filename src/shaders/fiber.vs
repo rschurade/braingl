@@ -27,15 +27,15 @@ void main()
        frontColor =  vec4( u_color.xyz, 1.0 );
     }
     v_discard = 0.0;
-    if ( a_position.x <= ( u_x - u_dx ) || a_position.x >= ( u_x + u_dx ) || 
-         a_position.y <= ( u_y - u_dy ) || a_position.y >= ( u_y + u_dy ) ||
-         a_position.z <= ( u_z - u_dz ) || a_position.z >= ( u_z + u_dz ) )
+    if ( a_position.x <= ( u_cutx - u_cutdx ) || a_position.x >= ( u_cutx + u_cutdx ) || 
+         a_position.y <= ( u_cuty - u_cutdy ) || a_position.y >= ( u_cuty + u_cutdy ) ||
+         a_position.z <= ( u_cutz - u_cutdz ) || a_position.z >= ( u_cutz + u_cutdz ) )
     {
         v_discard = 1.0;
     } 
     
     // TODO submit the actual dims in a uniform
-    v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
+    v_texcoord = vec3( ( a_position.x + u_dx / 2.0 ) / u_dims.x , ( a_position.y + u_dy / 2.0 ) / u_dims.y, ( a_position.z + u_dz / 2.0 ) / u_dims.z );
 	
 	v_position = mvp_matrix * vec4( a_position, 1.0 );
     gl_Position = v_position;

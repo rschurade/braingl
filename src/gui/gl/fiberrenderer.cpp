@@ -115,6 +115,24 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
     program->setUniformValue( "u_materialShininess", props->get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
 
+    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
+    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
+    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
+    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
+    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+
+    program->setUniformValue( "u_dx", dx );
+    program->setUniformValue( "u_dy", dy );
+    program->setUniformValue( "u_dz", dz );
+    program->setUniformValue( "u_x", sx * dx ); // + dx / 2.0f );
+    program->setUniformValue( "u_y", sy * dy ); // + dy / 2.0f );
+    program->setUniformValue( "u_z", sz * dz ); // + dz / 2.0f );
+    program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
+
 
     glLineWidth( props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
@@ -169,12 +187,12 @@ void FiberRenderer::setShaderVars( PropertyGroup* props )
     program->setUniformValue( "u_selectedMax", props->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
     program->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
     program->setUniformValue( "u_upperThreshold", props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_dx", props->get( Fn::Property::D_DX ).toFloat() );
-    program->setUniformValue( "u_dy", props->get( Fn::Property::D_DY ).toFloat() );
-    program->setUniformValue( "u_dz", props->get( Fn::Property::D_DZ ).toFloat() );
-    program->setUniformValue( "u_x", props->get( Fn::Property::D_NX ).toFloat() / 10.f );
-    program->setUniformValue( "u_y", props->get( Fn::Property::D_NY ).toFloat() / 10.f );
-    program->setUniformValue( "u_z", props->get( Fn::Property::D_NZ ).toFloat() / 10.f );
+    program->setUniformValue( "u_cutdx", props->get( Fn::Property::D_DX ).toFloat() );
+    program->setUniformValue( "u_cutdy", props->get( Fn::Property::D_DY ).toFloat() );
+    program->setUniformValue( "u_cutdz", props->get( Fn::Property::D_DZ ).toFloat() );
+    program->setUniformValue( "u_cutx", props->get( Fn::Property::D_NX ).toFloat() / 10.f );
+    program->setUniformValue( "u_cuty", props->get( Fn::Property::D_NY ).toFloat() / 10.f );
+    program->setUniformValue( "u_cutz", props->get( Fn::Property::D_NZ ).toFloat() / 10.f );
 }
 
 void FiberRenderer::initGeometry()
