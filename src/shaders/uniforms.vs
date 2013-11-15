@@ -37,6 +37,13 @@ uniform float u_dx;
 uniform float u_dy;
 uniform float u_dz;
 
+uniform float u_cutx;
+uniform float u_cuty;
+uniform float u_cutz;
+uniform float u_cutdx;
+uniform float u_cutdy;
+uniform float u_cutdz;
+
 uniform float u_width;
 uniform float u_height;
 uniform float u_scaleX;
