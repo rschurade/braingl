@@ -103,6 +103,8 @@ void DatasetIsosurface::generateSurface()
 
     m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
     m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
+    m_properties["maingl2"]->set( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl2"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
 void DatasetIsosurface::renameVerticesAndTriangles()
