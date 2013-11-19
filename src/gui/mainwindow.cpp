@@ -451,11 +451,12 @@ bool MainWindow::save( Dataset* ds )
             dir = fi.absoluteDir();
             QString lastPath = dir.absolutePath();
             Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+            delete fd;
             return true;
         }
     }
-    return false;
     delete fd;
+    return false;
 }
 
 void MainWindow::saveFilterChanged( QString filterString )
