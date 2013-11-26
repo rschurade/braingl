@@ -428,7 +428,12 @@ bool MainWindow::save( Dataset* ds )
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
 
-    fd = new QFileDialog( this, "Save File", fn, ds->getSaveFilter() );
+    QString name =  fn + "/" + ds->properties()->get( Fn::Property::D_NAME ).toString().replace( " ", "" );
+    name.replace( "." + ds->getDefaultSuffix(), "" );
+    name += ".";
+    name += ds->getDefaultSuffix();
+
+    fd = new QFileDialog( this, "Save File", name, ds->getSaveFilter() );
     fd->setFileMode( QFileDialog::AnyFile );
     fd->setAcceptMode( QFileDialog::AcceptSave );
     fd->setDefaultSuffix( ds->getDefaultSuffix() );
