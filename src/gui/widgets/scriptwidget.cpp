@@ -58,7 +58,7 @@ ScriptWidget::ScriptWidget( GLWidget* glWidget, QWidget* parent ) :
     m_render( false ),
     m_paused( false )
 {
-    m_commandLookUp = QVector<int>( { 11, 10, 1, 2, 11, 3, 11, 0, 5, 6, 7, 8, 9, 4, 11 } );
+    m_commandLookUp << 11 << 10 << 1 << 2 << 11 << 3 << 11 << 0 << 5 << 6 << 7 << 8 << 9 << 4 << 11 ;
 
     QList<QVariant> line;
     line.push_back( true );
