@@ -27,6 +27,11 @@ ENDIF()
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 SET( BinName "braingl" )
+IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+    SET( BinName "${PROJECT_NAME}" )
+ELSE()
+    SET( BinName "braingl" )
+ENDIF()
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Setup QT4
@@ -40,6 +45,7 @@ MARK_AS_ADVANCED( FORCE QT_QMAKE_EXECUTABLE )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtGui )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtCore )
+INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtOpenGL )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtWebKit )
 
 # Libraries for linking:
@@ -99,7 +105,7 @@ include(${VTK_USE_FILE})
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
-    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x -stdlib=libc++" )
+    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++11 -stdlib=libc++" )
 ELSE()
     set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
 ENDIF()
@@ -198,12 +204,20 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     
     QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 
-    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+    #set( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
+    set( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${VERSION}" )
+    set( MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION} )
+    #set( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
+    set( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
+    set( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
+
+    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
+#    qt5_use_modules( ${BinName} Core Widgets OpenGL WebKitWidgets )
     
     ReadProjectRevisionStatus()
 
     # Some linux distributions need to explicitily link against X11. We add this lib here.
-    SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
+    #TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
+    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
 ENDIF()
 
