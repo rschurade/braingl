@@ -23,7 +23,7 @@
 #include <QVector3D>
 #include <QtGui>
 
-#include <math.h>
+#include <cmath>
 
 Loader::Loader( Dataset* selected ) :
     m_header( 0 ),

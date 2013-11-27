@@ -13,6 +13,8 @@
 
 #include "../gui/gl/glfunctions.h"
 
+#include <cmath>
+
 CorrelationThread::CorrelationThread( int id, DatasetMeshTimeSeries* ds, float* exField, float* ex2Field ) :
     m_id( id ),
     m_dataset( ds ),
@@ -61,7 +63,7 @@ void CorrelationThread::run()
                 exy += xk*yk;
             }
 
-            float corr = (ntp*exy - ex*ey) / sqrt((ntp*ex2 - ex*ex) * (ntp*ey2 - ey*ey));
+            float corr = (ntp*exy - ex*ey) / std::sqrt((ntp*ex2 - ex*ex) * (ntp*ey2 - ey*ey));
 
             //the correlation matrix is symmetric:
             //saving that value to both position i,j and j,i at once takes ~ half the time

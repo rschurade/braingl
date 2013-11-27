@@ -15,8 +15,8 @@ Tree::Tree(  int id, float value ) :
     m_texturePosition( QVector3D( 0, 0, 0 ) ),
     m_parent( 0 )
 {
-    QColor color1( 1.0, 0, 0 );
-    QColor color2( 0.5, 0.5, 0.5 );
+    QColor color1( 1, 0, 0 );
+    QColor color2( 128, 128, 128 );
 
     m_colors.push_back( color1 );
     m_colors.push_back( color2 );
