@@ -16,8 +16,10 @@
 #include <QtGui>
 #include <QDebug>
 
+#include "../core_3_2_context.h"
+
 HierarchicalTreeGLWidget::HierarchicalTreeGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-	QGLWidget( parent, shareWidget )
+    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent, shareWidget )
 {
     m_renderer = new TreeWidgetRenderer( "tree renderer" );
 

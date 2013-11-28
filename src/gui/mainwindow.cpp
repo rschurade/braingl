@@ -49,6 +49,7 @@
 #include <QtGui>
 #include <QWebView>
 #include <QGLFormat>
+#include "core_3_2_context.h"
 
 #include <iostream>
 
@@ -71,7 +72,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
     fmt.setSampleBuffers( true );
     QGLFormat::setDefaultFormat( fmt );
-    QGLWidget w;    // make effective
+    QGLWidget w(new core_3_2_context( QGLFormat::defaultFormat() ));    // make effective
     w.makeCurrent();
     // check context version
     int major = w.format().majorVersion();
@@ -80,7 +81,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     if ( major < 3 || ( major == 3 && minor < 2 ) )
     {
         std::cout << "Sorry, brainGL needs OpenGL version 3.2 or higher, quitting." << std::endl;
-        exit( 1 );
+        //exit( 1 );
     }
     w.close();
 
