@@ -6,6 +6,7 @@
  */
 
 #include "glwidget.h"
+#include "../core_3_2_context.h"
 #include "../gl/arcball.h"
 #include "../gl/camera.h"
 #include "../gl/camerabase.h"
@@ -21,7 +22,7 @@
 #include <QtGui>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( parent ),
+    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -52,7 +53,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 }
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget ),
+    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),

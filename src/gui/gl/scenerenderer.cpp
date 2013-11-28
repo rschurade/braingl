@@ -85,7 +85,7 @@ void SceneRenderer::initGL()
         qDebug() << "GL Version (integer) :" << major << "." << minor;
         qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
 
-        if ( ( major < 3 ) || ( major == 3 && minor < 3 ) )
+        if ( ( major < 3 ) || ( major == 3 && minor < 2 ) )
         {
             std::cout << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting." << std::endl;
             std::cout << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers." << std::endl;
