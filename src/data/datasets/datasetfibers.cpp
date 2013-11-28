@@ -218,8 +218,8 @@ void DatasetFibers::createProps()
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
 
-    m_properties["maingl"]->createBool( Fn::Property::D_AUTOPLAY, false, "autoplay" );
-    m_properties["maingl"]->createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
+    m_properties["maingl"]->createBool( Fn::Property::D_AUTOPLAY, false );
+    m_properties["maingl"]->createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
 
     transformChanged( 3 );
