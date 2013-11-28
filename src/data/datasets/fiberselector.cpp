@@ -101,7 +101,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 
 void FiberSelector::updatePresentRois()
 {
-    qDebug() << "updatePresentRois";
+    //qDebug() << "updatePresentRois";
     int numBranches = Models::r()->rowCount( QModelIndex() );
 
     for ( int i = 0; i < numBranches; ++i )
@@ -397,8 +397,15 @@ void FiberSelector::updateBranch( int branch )
 
 void FiberSelector::updateRoot()
 {
+    int numBranches = Models::r()->rowCount( QModelIndex() );
+    bool active = false;
+    for ( int i = 0; i < numBranches; ++i )
+    {
+        active |= Models::r()->data( createIndex( i, 0, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool();
+    }
+
     //qDebug() << "update root";
-    if ( m_branchfields.size() > 0 )
+    if ( m_branchfields.size() > 0 && active )
     {
         for ( int i = 0; i < m_numLines; ++i )
         {
@@ -416,7 +423,7 @@ void FiberSelector::updateRoot()
             }
         }
     }
-    else
+    else if ( m_branchfields.size() == 0 || !active )
     {
         for ( int i = 0; i < m_numLines; ++i )
         {
