@@ -48,6 +48,9 @@
 
 #include <QtGui>
 #include <QWebView>
+#include <QGLFormat>
+
+#include <iostream>
 
 int MainWindow::countMainGL = 2;
 
@@ -63,7 +66,25 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	loadColormaps( resetSettings );
+    QGLFormat fmt;
+    fmt.setVersion( 3, 2 );
+    fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
+    fmt.setSampleBuffers( true );
+    QGLFormat::setDefaultFormat( fmt );
+    QGLWidget w;    // make effective
+    w.makeCurrent();
+    // check context version
+    int major = w.format().majorVersion();
+    int minor = w.format().minorVersion();
+    qDebug() << "OpenGL version: major" << major << "minor" << minor;
+    if ( major < 3 || ( major == 3 && minor < 2 ) )
+    {
+        std::cout << "Sorry, brainGL needs OpenGL version 3.2 or higher, quitting." << std::endl;
+        exit( 1 );
+    }
+    w.close();
+
+    loadColormaps( resetSettings );
 
     createActions();
     createMenus();
