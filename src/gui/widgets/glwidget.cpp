@@ -21,7 +21,7 @@
 #include <QtGui>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
+    QGLWidget( parent ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
