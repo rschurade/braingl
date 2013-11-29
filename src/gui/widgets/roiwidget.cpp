@@ -102,6 +102,9 @@ void ROIWidget::itemSelectionChanged( const QItemSelection &selected )
 void ROIWidget::deleteItem()
 {
     QModelIndex id = m_treeView->selectionModel()->selectedIndexes().first();
+    QModelIndex index = Models::r()->index( id.row(), (int)Fn::Property::R_POINTER, Models::r()->parent( id ) );
+    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( index, Qt::DisplayRole ) );
+    delete roi;
     m_treeView->model()->removeRows( id.row(), 0, id.parent() );
 }
 

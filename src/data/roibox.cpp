@@ -44,31 +44,14 @@ ROIBox::ROIBox() :
     m_properties.createInt( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
-    connect( m_properties.getProperty( Fn::Property::R_DX ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dxChanged( QVariant ) ) );
-    connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
+    connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( propChanged() ) );
+
+    //qDebug() << "new ROI created: " << m_properties.get( Fn::Property::R_ID ).toInt();
 }
 
 ROIBox::~ROIBox()
 {
-}
-
-void ROIBox::globalChanged()
-{
-    if (  m_properties.get( Fn::Property::R_STICK_TO_CROSSHAIR ).toBool() )
-    {
-        float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-        float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-        float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-        float x = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * dx;
-        float y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * dy;
-        float z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * dz;
-
-        m_properties.set( Fn::Property::R_X, x );
-        m_properties.set( Fn::Property::R_Y, y );
-        m_properties.set( Fn::Property::R_Z, z );
-        m_properties.slotPropChanged();
-    }
+    //qDebug() << "ROI deleted: " << m_properties.get( Fn::Property::R_ID ).toInt();
 }
 
 void ROIBox::propChanged()
@@ -91,6 +74,10 @@ void ROIBox::propChanged()
 
     if ( shape == 1 || shape == 2 )
     {
+        float dx = m_properties.get( Fn::Property::R_DX ).toFloat();
+        m_properties.set( Fn::Property::R_DY, dx );
+        m_properties.set( Fn::Property::R_DZ, dx );
+
         m_properties.getWidget( Fn::Property::R_DY )->hide();
         m_properties.getWidget( Fn::Property::R_DZ )->hide();
     }
@@ -100,16 +87,8 @@ void ROIBox::propChanged()
         m_properties.getWidget( Fn::Property::R_DY )->show();
         m_properties.getWidget( Fn::Property::R_DZ )->show();
     }
-}
-
-void ROIBox::dxChanged( QVariant value )
-{
-    int shape = m_properties.get( Fn::Property::R_SHAPE ).toInt();
-    if ( shape == 1 || shape == 2 )
-    {
-        m_properties.set( Fn::Property::R_DY, value.toFloat() );
-        m_properties.set( Fn::Property::R_DZ, value.toFloat() );
-    }
+    //qDebug() << "emitting: " << m_properties.get( Fn::Property::R_ID ).toInt();
+    emit ( signalPropChanged( m_properties.get( Fn::Property::R_ID ).toInt() ) );
 }
 
 void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode )
