@@ -16,6 +16,10 @@
 #include <QImage>
 #include <QColor>
 
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#include "bugfixglshaderprogram.h"
+#endif
+
 class QGLShaderProgram;
 class ShapeRenderer;
 class TextRenderer;

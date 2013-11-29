@@ -28,6 +28,10 @@
 
 #include <locale.h>
 
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#include "bugfixglshaderprogram.h"
+#endif
+
 #define NUM_TEXTURES 5
 
 int GLFunctions::idealThreadCount = qMax( 1, QThread::idealThreadCount() - 1 );
@@ -286,7 +290,11 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
+#if 0 && defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+    QGLShaderProgram* program = new BugfixGLShaderProgram;
+#else
     QGLShaderProgram* program = new QGLShaderProgram;
+#endif
 
     // Overriding system locale until shaders are compiled
     setlocale( LC_NUMERIC, "C" );
