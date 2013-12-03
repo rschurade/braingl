@@ -308,6 +308,8 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         DatasetCorrelation::draw( pMatrix, mvMatrix, width, height, renderMode, target );
     }
 
+    QMatrix4x4 mvp = pMatrix * mvMatrix;
+
     if ( ( target == "maingl" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
         for ( int i = 0; i < littleBrains.size(); ++i )
@@ -336,7 +338,19 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             QMatrix4x4 zshift;
             //little brain node towards the camera from big brain node...
             zshift.translate( 0, 0, 2 );
-            littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
+
+            QVector4D test = mvp * shift2;
+
+            //1 is the viewport boundary, slightly larger value should prevent visible switching...
+            float f = 1.2;
+            if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
+            {
+                littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
+            }
+            else
+            {
+                //alternative (simpler) representation?
+            }
         }
     }
 
