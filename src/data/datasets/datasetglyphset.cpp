@@ -69,7 +69,6 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
-
 }
 
 DatasetGlyphset::~DatasetGlyphset()
