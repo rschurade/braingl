@@ -73,6 +73,7 @@ private:
     FNAction* m_consToGlyphsetAction;
     FNAction* m_fiberBundlingAction;
     FNAction* m_createROIAction;
+    FNAction* m_deleteLittleBrainsAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

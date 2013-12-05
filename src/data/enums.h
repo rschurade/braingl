@@ -80,7 +80,8 @@ namespace Fn
         FIBER_RESAMPLE,
         CONS_TO_GLYPHSET,
         FIBER_BUNDLING,
-        CREATE_ROI
+        CREATE_ROI,
+        DELETE_LITTLE_BRAINS
     };
 
     enum class Orient : int

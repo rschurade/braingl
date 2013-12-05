@@ -196,6 +196,10 @@ void ToolBar::createActions()
     m_fiberBundlingAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "fiber bundling" ), this, Fn::Algo::FIBER_BUNDLING );
     m_fiberBundlingAction->setStatusTip( tr( "fiber bundling" ) );
     connect( m_fiberBundlingAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_deleteLittleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "little brain delete" ), this, Fn::Algo::DELETE_LITTLE_BRAINS );
+    m_deleteLittleBrainsAction->setStatusTip( tr( "delete little brains" ) );
+    connect( m_deleteLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -206,6 +210,8 @@ void ToolBar::slot( Fn::Algo algo )
     QList<Dataset*>l;
     Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );
     QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+    Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
 
     switch ( algo )
     {
@@ -338,7 +344,14 @@ void ToolBar::slot( Fn::Algo algo )
             ( (DatasetGlyphset*)ds)->avgConRtoZ();
             break;
         case Fn::Algo::LITTLE_BRAINS:
-            ( (DatasetGlyphset*)ds )->makeLittleBrains();
+            if ( mods & Qt::ShiftModifier )
+            {
+                ( (DatasetGlyphset*)ds )->deleteLittleBrains();
+            }
+            else
+            {
+                ( (DatasetGlyphset*)ds )->makeLittleBrains();
+            };
             break;
         case Fn::Algo::LOOP_SUBDIVISION:
             l = MeshAlgos::loopSubdivision( ds );
@@ -378,6 +391,11 @@ void ToolBar::slot( Fn::Algo algo )
             DatasetConGlyphs* consglyphs = new DatasetConGlyphs(QDir("new_conglyphs"));
             consglyphs->setCons(cons->cons);
             l.push_back(consglyphs);
+            break;
+        }
+        case Fn::Algo::DELETE_LITTLE_BRAINS:
+        {
+            ( (DatasetGlyphset*)ds )->deleteLittleBrains();
             break;
         }
 
@@ -461,6 +479,7 @@ void ToolBar::slotSelectionChanged( int type )
             //this->addAction( m_avgConAction );
             //this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
+            //this->addAction( m_deleteLittleBrainsAction );
             break;
         }
         case Fn::DatasetType::CONS:

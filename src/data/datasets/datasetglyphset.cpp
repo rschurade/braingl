@@ -47,6 +47,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
                 littleBrains( QVector<MeshRenderer*>() ),
+                littleMeshes( QVector<TriangleMesh2*>() ),
                 shifts1( QVector<QVector3D>() ),
                 shifts2( QVector<QVector3D>() )
 {
@@ -68,6 +69,7 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
+
 }
 
 DatasetGlyphset::~DatasetGlyphset()
@@ -243,18 +245,9 @@ void DatasetGlyphset::setMinthresh( float mt )
 
 void DatasetGlyphset::makeLittleBrains()
 {
-
-    for ( int i = 0; i < littleBrains.size(); ++i )
-    {
-        delete littleBrains[i];
-    }
-    littleBrains.clear();
-    shifts1.clear();
-    shifts2.clear();
-
     for ( int i = 0; i < m_n; ++i )
     {
-        if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() )
+        if ( ( littleBrains[i] == NULL ) && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
         {
             TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
             MeshRenderer* m_renderer = new MeshRenderer( mesh );
@@ -262,7 +255,7 @@ void DatasetGlyphset::makeLittleBrains()
             m_renderer->setModel( Models::g() );
             m_renderer->init();
 
-            littleBrains << m_renderer;
+            littleBrains[i] = m_renderer;
 
             QMatrix4x4 sc;
             for ( int p = 0; p < m_n; ++p )
@@ -270,10 +263,30 @@ void DatasetGlyphset::makeLittleBrains()
                 mesh->setVertexData( p, m_correlationMatrix[i][p] );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
-            shifts1 << f1;
+            shifts1[i] = f1;
             QVector3D f2 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
-            shifts2 << f2;
+            shifts2[i] = f2;
         }
+        if ( ( littleBrains[i] != NULL )
+                && ( m_mesh[0]->getVertexColor( i ) == m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
+        {
+            delete littleBrains[i];
+            delete littleMeshes[i];
+            littleBrains[i] = NULL;
+            littleMeshes[i] = NULL;
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetGlyphset::deleteLittleBrains()
+{
+    for ( int i = 0; i < m_n; ++i )
+    {
+        delete littleBrains[i];
+        delete littleMeshes[i];
+        littleBrains[i] = NULL;
+        littleMeshes[i] = NULL;
     }
     Models::g()->submit();
 }
@@ -310,46 +323,51 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     QMatrix4x4 mvp = pMatrix * mvMatrix;
 
-    if ( ( target == "maingl" ) && ( littleBrains.size() > 0 ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
+   //qDebug() << "little brains size: " << littleBrains.size();
+
+    if ( ( target == "maingl" ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
-        for ( int i = 0; i < littleBrains.size(); ++i )
+        for ( int i = 0; i < m_n; ++i )
         {
-            QVector3D shift1 = shifts1[i];
-            QVector3D shift2 = shifts2[i];
-            QMatrix4x4 toOrigin;
-            toOrigin.translate( shift2 );
-            toOrigin.scale( properties( "maingl" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
-            //Rotation of the individual glyphs:
-            float rotx = 0;
-            float roty = 0;
-            float rotz = 0;
-            if ( properties( "maingl" )->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+            if ( littleBrains[i] != NULL )
             {
-                rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
-                roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
-                rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
-            }
-            QMatrix4x4 rotMatrix;
-            rotMatrix.rotate( rotx, 1, 0, 0 );
-            rotMatrix.rotate( roty, 0, 1, 0 );
-            rotMatrix.rotate( rotz, 0, 0, 1 );
-            toOrigin *= rotMatrix;
-            toOrigin.translate( -shift1 );
-            QMatrix4x4 zshift;
-            //little brain node towards the camera from big brain node...
-            zshift.translate( 0, 0, 2 );
+                QVector3D shift1 = shifts1[i];
+                QVector3D shift2 = shifts2[i];
+                QMatrix4x4 toOrigin;
+                toOrigin.translate( shift2 );
+                toOrigin.scale( properties( "maingl" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+                //Rotation of the individual glyphs:
+                float rotx = 0;
+                float roty = 0;
+                float rotz = 0;
+                if ( properties( "maingl" )->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+                {
+                    rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+                    roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+                    rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+                }
+                QMatrix4x4 rotMatrix;
+                rotMatrix.rotate( rotx, 1, 0, 0 );
+                rotMatrix.rotate( roty, 0, 1, 0 );
+                rotMatrix.rotate( rotz, 0, 0, 1 );
+                toOrigin *= rotMatrix;
+                toOrigin.translate( -shift1 );
+                QMatrix4x4 zshift;
+                //little brain node towards the camera from big brain node...
+                zshift.translate( 0, 0, 2 );
 
-            QVector4D test = mvp * shift2;
+                QVector4D test = mvp * shift2;
 
-            //1 is the viewport boundary, slightly larger value should prevent visible switching...
-            float f = 1.2;
-            if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
-            {
-                littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
-            }
-            else
-            {
-                //alternative (simpler) representation?
+                //1 is the viewport boundary, slightly larger value should prevent visible switching...
+                float f = 1.2;
+                if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
+                {
+                    littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
+                }
+                else
+                {
+                    //alternative (simpler) representation?
+                }
             }
         }
     }
@@ -994,6 +1012,10 @@ void DatasetGlyphset::setProperties()
     {
         m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT, { "both", "left", "right" }, 0, "general" );
     }
+    littleBrains.fill( NULL, m_n);
+    littleMeshes.fill( NULL, m_n);
+    shifts1.resize(m_n);
+    shifts2.resize(m_n);
 }
 
 void DatasetGlyphset::loadROI( QString filename )
