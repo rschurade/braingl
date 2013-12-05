@@ -60,6 +60,7 @@ public:
     void avgCon();
     void avgConRtoZ();
     void makeLittleBrains();
+    void deleteLittleBrains();
 
     int m_tris_middle;
     int m_points_middle;
@@ -91,6 +92,7 @@ private:
 
     //int pickedID;
     QVector<MeshRenderer*> littleBrains;
+    QVector<TriangleMesh2*> littleMeshes;
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
 
