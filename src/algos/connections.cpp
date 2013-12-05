@@ -240,27 +240,23 @@ void Connections::attract()
             double fsum = 0;
             QVector3D f( 0, 0, 0 );
             //for all attracting points...
-            for ( int ef = 0; ef < edges.length(); ef++ )
+            for ( int ef = 0; ef<compatibilities->idxs->at(ie)->size(); ef++)
             {
-                float c = comp( ie, ef );
-                if ( c > c_thr )
+                float c = compatibilities->comps2->at( ie )->at( ef );
+                QVector3D pe;
+                int idx = compatibilities->idxs->at(ie)->at(ef);
+                if ( e->flip( edges.at( idx ) ) )
                 {
-                    QVector3D pe;
-                    if ( e->flip( edges.at( ef ) ) )
-                    {
-                        pe = edges.at( ef )->points.at( i );
-                    }
-                    else
-                    {
-                        pe = edges.at( ef )->points.at( ( edges.at( ef )->points.length() - 1 ) - i );
-                    }
-
-                    float de = ( pe - p ).length();
-                    double weight = qExp( -( de * de ) / ( 2 * bell * bell ) );
-                    fsum += weight;
-                    f += weight * pe;
-                    QVector3D df;
+                    pe = edges.at( idx )->points.at( i );
                 }
+                else
+                {
+                    pe = edges.at( idx )->points.at( ( edges.at( idx )->points.length() - 1 ) - i );
+                }
+                float de = ( pe - p ).length();
+                double weight = qExp( -( de * de ) / ( 2 * bell * bell ) );
+                fsum += weight;
+                f += weight * pe;
             }
 
             f /= fsum;
@@ -319,17 +315,20 @@ void Connections::fullAttract()
 void Connections::calcComps()
 {
     qDebug() << "calcComps, edges.size: " << edges.size();
-    comps = new float[edges.size() * edges.size()];
+    //comps = new float[edges.size() * edges.size()];
+
+    compatibilities = new Compatibilities(edges.size());
 
 //#pragma omp parallel for num_threads (7)
     for ( int i = 0; i < edges.length(); i++ )
     {
-        //qDebug() << i;
+        if ((i%1000)==0) qDebug() << "calculating compatibilites: " << i;
         for ( int j = 0; j < edges.length(); j++ )
         {
             if ( i == j )
             {
-                comps[i + edges.size() * j] = 1;
+                //comps[i + edges.size() * j] = 1;
+                compatibilities->addComp(i,j,1);
             }
             else
             {
@@ -358,11 +357,21 @@ void Connections::calcComps()
                 if ( angle_comp * l_comp * p_comp > 0.9 )
                 {
                     double vis_comp = qMin( vis_c( ei, ej ), vis_c( ej, ei ) );
-                    comps[i + edges.size() * j] = angle_comp * l_comp * p_comp * vis_comp;
+                    //comps[i + edges.size() * j] = angle_comp * l_comp * p_comp * vis_comp;
+                    double prod = angle_comp * l_comp * p_comp * vis_comp;
+                    if (prod > c_thr)
+                    {
+                        compatibilities->addComp(i,j,prod);
+                    }
                 }
                 else
                 {
-                    comps[i + edges.size() * j] = angle_comp * l_comp * p_comp;
+                    //comps[i + edges.size() * j] = angle_comp * l_comp * p_comp;
+                    double prod = angle_comp * l_comp * p_comp;
+                    if ( prod > c_thr )
+                    {
+                        compatibilities->addComp( i, j, prod );
+                    }
                 }
 
             }
@@ -386,11 +395,6 @@ QVector3D Connections::proj( QVector3D a, QVector3D b, QVector3D p )
     QVector3D ba = b - a;
     QVector3D pa = p - a;
     return a + ba * QVector3D::dotProduct( ba, pa ) / ba.lengthSquared();
-}
-
-float Connections::comp( int i, int j )
-{
-    return comps[i + edges.size() * j];
 }
 
 void Connections::writeVTK()

@@ -12,6 +12,7 @@
 
 #include "bundlingthread.h"
 #include "attractthread.h"
+#include "compatibilities.h"
 
 #include "../data/datasets/datasetfibers.h"
 
@@ -39,8 +40,7 @@ public:
 
     void fullAttract();
     void calcComps();
-    float* comps;
-    float comp( int i, int j );
+    Compatibilities* compatibilities;
     void writeVTK();
     void writeBinaryVTK();
     void writeBinaryVTK( QString name );
