@@ -32,6 +32,11 @@
 DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxThreshold ) :
                 DatasetCorrelation( filename, minThreshold, maxThreshold, Fn::DatasetType::GLYPHSET ),
                 m_is_split( false ),
+                consArray( NULL ),
+                diffsArray( NULL ),
+                vecsArray( NULL ),
+                pieArrays( NULL ),
+                numbers( NULL ),
                 m_prenderer( NULL ),
                 m_dprenderer( NULL ),
                 m_vrenderer( NULL ),
@@ -87,6 +92,11 @@ DatasetGlyphset::~DatasetGlyphset()
     {
         delete m_pierenderer;
         m_pierenderer = NULL;
+    }
+    if ( m_dprenderer )
+    {
+        delete m_dprenderer;
+        m_dprenderer = NULL;
     }
     if ( m_correlationMatrix )
     {
@@ -395,12 +405,11 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
                     || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
-        if ( m_prenderer )
+        if ( !m_prenderer )
         {
-            delete m_prenderer;
+            m_prenderer = new PointGlyphRenderer();
+            m_prenderer->init();
         }
-        m_prenderer = new PointGlyphRenderer();
-        m_prenderer->init();
         makeCons();
         m_prenderer->initGeometry( consArray, consNumber );
     }
@@ -409,12 +418,11 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             && ( m_vrenderer == 0 || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol ) || ( prevGlyphstyle != glyphstyle )
                     || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
-        if ( m_vrenderer )
+        if ( !m_vrenderer )
         {
-            delete m_vrenderer;
+            m_vrenderer = new VectorGlyphRenderer();
+            m_vrenderer->init();
         }
-        m_vrenderer = new VectorGlyphRenderer();
-        m_vrenderer->init();
         makeVecs();
         m_vrenderer->initGeometry( vecsArray, vecsNumber );
     }
@@ -424,12 +432,11 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                     || ( prevGlyphstyle != glyphstyle ) || ( prevThresh != threshold ) || ( prevMinlength != minlength ) || ( prevLR != lr )
                     || ( prevColorMode != colorMode ) || ( prevThreshSign != sign ) ) )
     {
-        if ( m_pierenderer )
+        if ( !m_pierenderer )
         {
-            delete m_pierenderer;
+            m_pierenderer = new PieGlyphRenderer();
+            m_pierenderer->init();
         }
-        m_pierenderer = new PieGlyphRenderer();
-        m_pierenderer->init();
         makePies();
         m_pierenderer->initGeometry( pieArrays, numbers, maxNodeCount );
     }
@@ -438,12 +445,11 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
             && ( ( m_dprenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
                     || ( prevGlyphstyle != glyphstyle ) || ( prevLR != lr ) || ( prevThreshSign != sign ) ) )
     {
-        if ( m_dprenderer )
+        if ( !m_dprenderer )
         {
-            delete m_dprenderer;
+            m_dprenderer = new DiffPointGlyphRenderer();
+            m_dprenderer->init();
         }
-        m_dprenderer = new DiffPointGlyphRenderer();
-        m_dprenderer->init();
         makeDiffPoints();
         m_dprenderer->initGeometry( diffsArray, diffsNumber );
     }
@@ -545,7 +551,8 @@ bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 void DatasetGlyphset::makeCons()
 {
     qDebug() << "making consArray: " << m_minThreshold << " m_maxThreshold: " << m_maxThreshold;
-    //if (consArray) delete[] consArray;
+    if (consArray) delete[] consArray;
+    consArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
@@ -617,7 +624,8 @@ void DatasetGlyphset::makeDiffPoints()
 {
     float diffMinThresh = m_minThreshold / 3.0;
     qDebug() << "making diffPoints: " << diffMinThresh << " m_maxThreshold: " << m_maxThreshold;
-    //if (consArray) delete[] consArray;
+    if (diffsArray) delete[] diffsArray;
+    diffsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
@@ -740,7 +748,8 @@ void DatasetGlyphset::makeDiffPoints()
 void DatasetGlyphset::makeVecs()
 {
     qDebug() << "making vecsArray: " << m_minThreshold;
-//if (vecsArray) delete[] vecsArray;
+    if (vecsArray) delete[] vecsArray;
+    vecsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
@@ -859,18 +868,20 @@ void DatasetGlyphset::makePies()
 
     qDebug() << "threshold: " << threshold;
 
-    /*if ( pieArrays )
-     {
-     for ( int i = 0; i < pieArrays->size(); ++i )
-     {
-     if ( pieArrays->at( i ) != NULL )
-     delete[] (float*) pieArrays->at( i );
-     }
-     delete pieArrays;
-     pieArrays = NULL;
-     delete numbers;
-     numbers = NULL;
-     }*/
+    if ( pieArrays )
+    {
+        for ( int i = 0; i < pieArrays->size(); ++i )
+        {
+            if ( pieArrays->at( i ) != NULL )
+            {
+                delete[] (float*) pieArrays->at( i );
+            }
+        }
+        delete pieArrays;
+        pieArrays = NULL;
+        delete numbers;
+        numbers = NULL;
+    }
 
     qDebug() << "calcPies after deletion";
 
@@ -914,10 +925,9 @@ void DatasetGlyphset::makePies()
         {
             maxNodeCount = count;
         }
-//qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
+        //qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
 
-//Magic!:
-//TODO: There is some memory leakage somewhere...
+        //Magic!:
         int colorMode = m_properties["maingl"]->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
         if ( colorMode == 0 )
         {
@@ -951,6 +961,7 @@ void DatasetGlyphset::makePies()
             pieNodeArray[o + 6] = nodecount;
             pieNodeArray[o + 7] = count;
             pieNodeArray[o + 8] = v;
+            delete c;
         }
         pieArrays->replace( i, pieNodeArray );
     }
