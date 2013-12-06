@@ -9,7 +9,7 @@ uniform vec3 u_textColor;
 
 void main()
 {
-    vec4 color = texture2D( fontTex, v_texCoord );
+    vec4 color = texture( fontTex, v_texCoord );
     
     float mult = 1.0 - color.r;
     
