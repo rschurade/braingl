@@ -105,7 +105,7 @@ include(${VTK_USE_FILE})
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
-    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++11 -stdlib=libc++" )
+    set( CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++11 -stdlib=libc++" )
 ELSE()
     set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
 ENDIF()
@@ -205,20 +205,20 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     
     QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
 
-    #set( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
+    set( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
+    SET_SOURCE_FILES_PROPERTIES( ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns
+                               PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+
     set( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${VERSION}" )
     set( MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION} )
-    #set( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
+    set( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
     set( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
     set( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
 
-    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
-#    qt5_use_modules( ${BinName} Core Widgets OpenGL WebKitWidgets )
+    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS} ${MACOSX_RESOURCE_FILES} )
     
     ReadProjectRevisionStatus()
 
-    # Some linux distributions need to explicitily link against X11. We add this lib here.
-    #TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
     TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
 ENDIF()
 
