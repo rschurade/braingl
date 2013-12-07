@@ -26,7 +26,7 @@ class QGLShaderProgram : public QObject
 //    Q_OBJECT
 public:
     explicit QGLShaderProgram(QObject *parent = 0);
-    explicit QGLShaderProgram(QGLContext *context, QObject *parent = 0);
+    explicit QGLShaderProgram(const QGLContext *context, QObject *parent = 0);
     virtual ~QGLShaderProgram();
 
     bool addShader(QGLShader *shader);
@@ -248,10 +248,10 @@ private:
 
 // non-Qt additions
 protected:
-    QGLContext *m_context = 0;
+    const QGLContext *m_context = 0;
     QObject *m_parent = 0;
     bool m_isLinked = false;
-    QString m_log;
+    QString m_log = QString( "" );
     GLuint m_programId = -1;
 };
 #endif
