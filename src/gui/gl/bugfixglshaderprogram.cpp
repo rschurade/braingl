@@ -14,6 +14,8 @@
 
 #include "bugfixglshaderprogram.h"
 
+#include <QtCore>
+
 // debugging
 #include <iostream>
 #include <string>
@@ -42,31 +44,84 @@ bool _glError(const char *file, int line) {
 
 
 BugfixGLShaderProgram::BugfixGLShaderProgram(QObject *parent)
-    : m_parent(parent)
-{
-    //qDebug() << "BugfixGLShaderProgram::BugfixGLShaderProgram";
-}
-
-BugfixGLShaderProgram::BugfixGLShaderProgram(QGLContext *context, QObject *parent)
-    : m_context(context),
+    : m_context(QGLContext::currentContext()),
       m_parent(parent)
 {
-    qDebug() << "BugfixGLShaderProgram::BugfixGLShaderProgram TBD";
+    //qDebug() << "BugfixGLShaderProgram::BugfixGLShaderProgram";
+    Q_ASSERT(m_context);
+    m_programId = glCreateProgram();
+    Q_ASSERT( m_programId != 0 );
+}
+
+BugfixGLShaderProgram::BugfixGLShaderProgram(const QGLContext *context, QObject *parent)
+    : m_context(context ? context : QGLContext::currentContext()),
+      m_parent(parent)
+{
+    //qDebug() << "BugfixGLShaderProgram::BugfixGLShaderProgram";
+    Q_ASSERT(m_context);
+    if (!QGLContext::areSharing(m_context, QGLContext::currentContext()))
+    {
+        qWarning("context must be the current context or sharing with it.");
+        ((QGLContext *)m_context)->makeCurrent();
+    }
+
+    m_programId = glCreateProgram();
+    Q_ASSERT( m_programId != 0 );
 }
 
 BugfixGLShaderProgram::~BugfixGLShaderProgram()
 {
     //qDebug() << "BugfixGLShaderProgram::~BugfixGLShaderProgram";
+    glDeleteProgram( m_programId );
 }
 
 bool BugfixGLShaderProgram::addShaderFromSourceCode(QFlags<QGLShader::ShaderTypeBit> type, QString const& source)
 {
-    qDebug() << "BugfixGLShaderProgram::addShaderFromSourceCode";
-    GLuint program = glCreateProgram();
+    //qDebug() << "BugfixGLShaderProgram::addShaderFromSourceCode";
     _glCheckError();
-    GLuint shader = glCreateShader( type );
+    if (!QGLContext::areSharing(m_context, QGLContext::currentContext()))
+    {
+        qWarning("context must be the current context or sharing with it.");
+        //((QGLContext *)m_context)->makeCurrent(); // XXXX
+        return false;
+    }
+    // map type from QFlags<QGLShader::ShaderTypeBit> to GL_VERTEX_SHADER/GL_FRAGMENT_SHADER
+    GLint shtype;
+    switch (type)
+    {
+        case QGLShader::Vertex:
+                shtype = GL_VERTEX_SHADER; break;
+        case QGLShader::Fragment:
+                shtype = GL_FRAGMENT_SHADER; break;
+        case QGLShader::Geometry:
+                shtype = GL_EXT_geometry_shader4; break;
+        default:
+        m_log.append( QString( "invalid shader type %1" ).arg( type ) );
+                qCritical() << "addShaderFromSourceCode: invalid shader type" << type;
+                return false; break;
+    }
+    GLuint shader = glCreateShader( shtype );
     _glCheckError();
-    const GLchar *strarr[] = { (const char *)source.constData() };
+    QStringList codeLines = source.split( QRegExp( "\\r\\n|\\r|\\n" ) );
+    int versPos = codeLines.indexOf( QRegExp( "^\\s{0,}#\\s{0,}version.*" ) );
+    if ( versPos == -1 )
+    {
+        // no version specification found?
+        //qDebug()  << "#version not found in shader source, prepending #defines";
+        codeLines.prepend( QString( "#version 330\n#define lowp\n#define mediump\n#define highp" ) );
+    }
+    else
+    {
+        //qDebug()  << "#version found in shader source, inserting #defines at line" << versPos+1;
+        codeLines.insert( versPos+1, QString( "#define lowp\n#define mediump\n#define highp" ) );
+    }
+    // otherwise #version is not found by compiler?
+    codeLines.prepend( QString( "" ) );
+    codeLines.append( QString( "" ) );
+    QString fixedSource = codeLines.join( QString( "\n" ) );
+    //qDebug() << "shader source after fixing:" << fixedSource.toUtf8().constData();
+    const GLchar *strarr[] = { (const char *)fixedSource.toUtf8().constData() };
+
     glShaderSource( shader, 1, strarr, NULL );
     _glCheckError();
     glCompileShader( shader );
@@ -87,48 +142,65 @@ bool BugfixGLShaderProgram::addShaderFromSourceCode(QFlags<QGLShader::ShaderType
         return false;
     }
 
-    glAttachShader( program, shader );
+    glAttachShader( m_programId, shader );
     _glCheckError();
-    m_programId = program;
     return true;
 }
 
-int BugfixGLShaderProgram::attributeLocation(char const*) const
+int BugfixGLShaderProgram::attributeLocation(char const* name) const
 {
-    qDebug() << "BugfixGLShaderProgram::attributeLocation TBD";
-    return 0;
+    //qDebug() << "BugfixGLShaderProgram::attributeLocation";
+    if (isLinked()) {
+        return glGetAttribLocation(m_programId, name);
+    } else {
+        qWarning() << "QGLShaderProgram::attributeLocation(" << name
+                   << "): shader program is not linked";
+        return -1;
+    }
 }
 
 bool BugfixGLShaderProgram::bind()
 {
-    qDebug() << "BugfixGLShaderProgram::bind";
+    //qDebug() << "BugfixGLShaderProgram::bind";
     /* use program object */
+    if (m_context && !QGLContext::areSharing(m_context, QGLContext::currentContext()))
+    {
+        qWarning("bind: context must be the current context or sharing with it.");
+        return false;
+    }
+
+    if (m_programId == 0)
+    {
+        qWarning() << "binding invalid shader program, results are undefined.";
+    }
+
     if (!isLinked())
     {
         link();
+        if (!isLinked())
+            return false;
     }
     glUseProgram(m_programId);
     _glCheckError();
-    // XXX error checking
     return true;
 }
 
 void BugfixGLShaderProgram::enableAttributeArray(int location)
 {
-    qDebug() << "BugfixGLShaderProgram::enableAttributeArray";
+    //qDebug() << "BugfixGLShaderProgram::enableAttributeArray";
     if (location != -1)
          glEnableVertexAttribArray(location);
 }
 
 bool BugfixGLShaderProgram::isLinked() const
 {
-    qDebug() << "BugfixGLShaderProgram::isLinked";
+    //qDebug() << "BugfixGLShaderProgram::isLinked";
     return m_isLinked;
 }
 
 bool BugfixGLShaderProgram::link()
 {
-    qDebug() << "BugfixGLShaderProgram::link";
+    //qDebug() << "BugfixGLShaderProgram::link";
     //glBindFragDataLocation(program, 0, "fragColor");
 
     /* link  and error check */
@@ -155,7 +227,7 @@ bool BugfixGLShaderProgram::link()
 
 QString BugfixGLShaderProgram::log() const
 {
-    qDebug() << "BugfixGLShaderProgram::log";
+    //qDebug() << "BugfixGLShaderProgram::log";
     return m_log;
 }
 
@@ -164,27 +236,48 @@ GLuint BugfixGLShaderProgram::programId() const
     return m_programId;
 }
 
-void BugfixGLShaderProgram::setUniformValue(char const*, QMatrix4x4 const&)
+// XXXX check
+#define setUniformMatrix(func,location,value,cols,rows) \
+    if (location == -1) \
+        return; \
+    if (sizeof(qreal) == sizeof(GLfloat)) { \
+        func(location, 1, GL_FALSE, \
+             reinterpret_cast<const GLfloat *>(value.constData())); \
+    } else { \
+        GLfloat mat[cols * rows]; \
+        const qreal *data = value.constData(); \
+        for (int i = 0; i < cols * rows; ++i) \
+            mat[i] = data[i]; \
+        func(location, 1, GL_FALSE, mat); \
+    }
+
+void BugfixGLShaderProgram::setUniformValue(int location, QMatrix4x4 const& value)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue TBD";
+    setUniformMatrix(glUniformMatrix4fv, location, value, 4, 4);
+}
+
+void BugfixGLShaderProgram::setUniformValue(char const* name, QMatrix4x4 const& value)
+{
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    setUniformValue(uniformLocation(name), value);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, float value)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     if (location != -1)
         glUniform1fv(location, 1, &value);
 }
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, float value)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     setUniformValue(uniformLocation(name), value);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue TBD";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     if (location != -1) {
         GLfloat values[2] = {v1, v2};
         glUniform2fv(location, 1, values);
@@ -193,13 +286,13 @@ void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2)
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, float v1, float v2)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     setUniformValue(uniformLocation(name), v1, v2);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2, float v3)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     if (location != -1) {
         GLfloat values[3] = {v1, v2, v3};
         glUniform3fv(location, 1, values);
@@ -208,13 +301,13 @@ void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2, fl
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, float v1, float v2, float v3)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue TBD";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     setUniformValue(uniformLocation(name), v1, v2, v3);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2, float v3, float v4)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue TBD";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     if (location != -1) {
         GLfloat values[4] = {v1, v2, v3, v4};
         glUniform4fv(location, 1, values);
@@ -223,20 +316,20 @@ void BugfixGLShaderProgram::setUniformValue(int location, float v1, float v2, fl
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, float v1, float v2, float v3, float v4)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     setUniformValue(uniformLocation(name), v1, v2, v3, v4);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, int value)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     if (location != -1)
        glUniform1i(location, value);
 }
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, int value)
 {
-    qDebug() << "BugfixGLShaderProgram::setUniformValue";
+    //qDebug() << "BugfixGLShaderProgram::setUniformValue";
     setUniformValue(uniformLocation(name), value);
 }
 
@@ -250,107 +343,3 @@ int QGLShaderProgram::uniformLocation(const char *name) const
         return -1;
     }
 }
-
-#if 0
-GLuint GLWidget::prepareShaderProgram( const QString& vertexShaderPath,
-                                     const QString& fragmentShaderPath )
-{
-    struct Shader {
-        const QString&  filename;
-        GLenum       type;
-        GLchar*      source;
-    }  shaders[2] = {
-        { vertexShaderPath, GL_VERTEX_SHADER, NULL },
-        { fragmentShaderPath, GL_FRAGMENT_SHADER, NULL }
-    };
-
-    GLuint program = glCreateProgram();
-
-    for ( int i = 0; i < 2; ++i ) {
-        Shader& s = shaders[i];
-        QFile file( s.filename );
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-            qWarning() << "Cannot open file " << s.filename;
-            exit( EXIT_FAILURE );
-        }
-        QByteArray data = file.readAll();
-        file.close();
-        s.source = data.data();
-
-        if ( shaders[i].source == NULL ) {
-            qWarning() << "Failed to read " << s.filename;
-            exit( EXIT_FAILURE );
-        }
-        GLuint shader = glCreateShader( s.type );
-        glShaderSource( shader, 1, (const GLchar**) &s.source, NULL );
-        glCompileShader( shader );
-
-        GLint  compiled;
-        glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
-        if ( !compiled ) {
-            qWarning() << s.filename << " failed to compile:" ;
-            GLint  logSize;
-            glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logSize );
-            char* logMsg = new char[logSize];
-            glGetShaderInfoLog( shader, logSize, NULL, logMsg );
-            qWarning() << logMsg;
-            delete [] logMsg;
-
-            exit( EXIT_FAILURE );
-        }
-
-        glAttachShader( program, shader );
-    }
-
-    /* Link output */
-    glBindFragDataLocation(program, 0, "fragColor");
-
-    /* link  and error check */
-    glLinkProgram(program);
-
-    GLint  linked;
-    glGetProgramiv( program, GL_LINK_STATUS, &linked );
-    if ( !linked ) {
-        qWarning() << "Shader program failed to link";
-        GLint  logSize;
-        glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logSize);
-        char* logMsg = new char[logSize];
-        glGetProgramInfoLog( program, logSize, NULL, logMsg );
-        qWarning() << logMsg ;
-        delete [] logMsg;
-
-        exit( EXIT_FAILURE );
-    }
-
-    /* use program object */
-    glUseProgram(program);
-
-    return program;
-}
-
-void GLWidget::initializeGL()
-{
-    glSetup();
-
-    // Prepare a complete shader program...
-    m_shader = prepareShaderProgram( ":/simple.vert", ":/simple.frag" );
-
-    // Create a interleaved triangle (vec3 position, vec3 color)
-    float points[] = { -0.5f, -0.5f, 0.0f, 1.0f, 0.0, 0.0,
-                        0.5f, -0.5f, 0.0f, 0.0f, 1.0, 0.0,
-                        0.0f,  0.5f, 0.0f, 0.0f, 0.0, 1.0,  };
-    glGenVertexArrays(1, &m_vertexBuffer);
-    glBindVertexArray(m_vertexBuffer);
-    GLuint  vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, 3 * 6 * sizeof(float), points, GL_STATIC_DRAW);
-    GLuint positionAttribute = glGetAttribLocation(m_shader, "vertex");
-    GLuint colorAttribute = glGetAttribLocation(m_shader, "color");
-    glEnableVertexAttribArray(positionAttribute);
-    glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (const GLvoid *)0);
-    glEnableVertexAttribArray(colorAttribute);
-    glVertexAttribPointer(colorAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (const GLvoid *)(sizeof(float)*3));
-    glCheckError();
-}
-#endif
