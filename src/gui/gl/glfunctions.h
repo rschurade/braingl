@@ -8,7 +8,12 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
-#include "GL/glew.h"
+//#include "GL/glew.h"
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+#include <GL/glew.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 
 #include <QPoint>
 #include <QList>
@@ -45,6 +50,7 @@ public:
     static QList<int> getTextureIndexes( QString target = "maingl" );
 
     static QGLShaderProgram* getShader( QString name );
+    static bool validateShader( QString name );
 
     static void setShaderVarsSlice( QGLShaderProgram* program, QString target );
     static void setTextureUniforms( QGLShaderProgram* program, QString target );
