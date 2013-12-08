@@ -39,7 +39,12 @@ QSize CombinedNavGLWidget::sizeHint() const
 
 void CombinedNavGLWidget::initializeGL()
 {
-	m_renderer->initGL();
+    // needed per OpenGL context and so per QGLWidget
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    m_renderer->initGL();
 }
 
 void CombinedNavGLWidget::paintGL()

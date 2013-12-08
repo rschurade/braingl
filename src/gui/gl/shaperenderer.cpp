@@ -35,12 +35,16 @@ void ShapeRenderer::init()
 void ShapeRenderer::initBox()
 {
     GLushort indices[] = {
+#if 0   // 6 quads
         3, 2, 1, 0, //bottom
         0, 1, 5, 4, // front
         1, 2, 6, 5, // right
         2, 3, 7, 6, // back
         3, 0, 4, 7, // left
         4, 5, 6, 7 // top
+#else // XXX triangle strip sequence for cube
+        4, 5, 0, 1, 2, 5, 6, 4, 7, 0, 3, 2, 7, 6
+#endif  // XXX
     };
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
@@ -193,7 +197,8 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     glFrontFace( GL_CCW );
 
     // Draw cube geometry using indices from VBO 0
-    glDrawElements( GL_QUADS, 24, GL_UNSIGNED_SHORT, 0 );
+    // XXX not in Core/deprecated //glDrawElements( GL_QUADS, 24, GL_UNSIGNED_SHORT, 0 );
+    glDrawElements( GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_SHORT, 0 ); // XXX
 
     glDisable(GL_CULL_FACE);
 

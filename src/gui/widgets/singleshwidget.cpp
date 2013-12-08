@@ -5,6 +5,7 @@
  * @author Ralph Schurade
  */
 #include "singleshwidget.h"
+#include "../gl/glfunctions.h"
 
 #include "../gl/singleshrenderer.h"
 
@@ -41,6 +42,17 @@ QSize SingleSHWidget::sizeHint() const
 
 void SingleSHWidget::initializeGL()
 {
+    // needed per OpenGL context and so per QGLWidget
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+#if 0
+    GLFunctions::loadShaders();     // XXX missing initialization, usually done by GLWidget?
+    GLFunctions::initTextRenderer();
+    GLFunctions::initShapeRenderer();
+#endif //0
+
     m_renderer->initGL();
 }
 

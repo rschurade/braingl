@@ -45,7 +45,12 @@ QSize HierarchicalTreeGLWidget::sizeHint() const
 
 void HierarchicalTreeGLWidget::initializeGL()
 {
-	m_renderer->initGL();
+    // needed per OpenGL context and so per QGLWidget
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    m_renderer->initGL();
 }
 
 void HierarchicalTreeGLWidget::paintGL()

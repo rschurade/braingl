@@ -42,12 +42,12 @@ TensorRenderer::TensorRenderer( QVector<Matrix>* data, int nx, int ny, int nz, f
 
 TensorRenderer::~TensorRenderer()
 {
-    glDeleteBuffers(1, &( vboIds[ 0 ] ) );
+    glDeleteBuffers(2, &( vboIds[ 0 ] ) );
 }
 
 void TensorRenderer::init()
 {
-    glGenBuffers( 1, vboIds );
+    glGenBuffers( 2, vboIds );
 }
 
 void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -92,12 +92,15 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
     program->setUniformValue( "u_gamma", m_gamma );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
 
     GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+     // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-    glDrawArrays( GL_QUADS, 0, m_quads );
+    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, m_quads );
+    qWarning() << "TensorRenderer::draw: glDrawArrays(GL_QUADS,...) not yet replaced";
+    glDrawElements( GL_TRIANGLES, m_quads / 4 * 6, GL_UNSIGNED_SHORT, 0 );  // XXX triangle pairs
 
     GLenum error;
     int i = 0;
@@ -106,6 +109,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
         i++;
     }
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
 void TensorRenderer::setupTextures()
@@ -224,8 +228,25 @@ void TensorRenderer::initGeometry()
         }
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    // XXX should be an GL_ARRAY_BUFFER?
+    glBindBuffer( /*GL_ELEMENT_ARRAY_BUFFER*/GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( /*GL_ELEMENT_ARRAY_BUFFER*/GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    // XXX
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
+    std::vector<GLushort> triIndices;
+    // fill index vector with two triangle's indices for every quad
+    for ( int qi=0; qi<m_quads/4; qi++)
+    {
+        GLushort off = qi * 4;
+        triIndices.push_back( off );
+        triIndices.push_back( off+1 );
+        triIndices.push_back( off+3 );
+
+        triIndices.push_back( off+1 );
+        triIndices.push_back( off+2 );
+        triIndices.push_back( off+3 );
+    }
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, triIndices.size() * sizeof(GLushort), &triIndices[0], GL_STATIC_DRAW );
 }
 
 void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor )
