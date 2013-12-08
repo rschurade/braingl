@@ -8,7 +8,12 @@
 #ifndef NAVGLWIDGET_H_
 #define NAVGLWIDGET_H_
 
-#include "GL/glew.h"
+//#include "GL/glew.h"
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+#include <GL/glew.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 
 #include <QVariant>
 #include <QtOpenGL/QGLWidget>

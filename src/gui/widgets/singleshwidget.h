@@ -8,7 +8,12 @@
 #ifndef SINGLESHWIDGET_H_
 #define SINGLESHWIDGET_H_
 
-#include "GL/glew.h"
+//#include "GL/glew.h"
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+#include <GL/glew.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 #include <QtOpenGL/QGLWidget>
 
 class SingleSHRenderer;
