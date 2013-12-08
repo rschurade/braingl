@@ -45,6 +45,11 @@ void TreeRenderer::init()
 
 void TreeRenderer::initGL()
 {
+#if 0
+    GLFunctions::loadShaders();                 // XXX
+    GLFunctions::getShader( "line" )->bind();   // XXX
+    GLFunctions::validateShader( "line" );      // XXX
+#endif
 }
 
 void TreeRenderer::draw( QMatrix4x4 mvpMatrix )

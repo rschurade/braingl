@@ -21,6 +21,7 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QtOpenGL/QGLShaderProgram>
+#include <GL/glu.h>     // XXX removed in OS X 10.9
 #include <QDebug>
 
 #include <math.h>
@@ -55,9 +56,15 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::initGL()
 {
     qDebug() << "gl init " + m_renderTarget;
+    // XXX test
+    /* return to the default frame buffer */
+    GLFunctions::getAndPrintGLError( "before glBindFramebuffer" );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::getAndPrintGLError( "after glBindFramebuffer" );
 
     if ( m_renderTarget == "maingl" )
     {
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
         GLenum errorCode = glewInit();
         if ( GLEW_OK != errorCode )
         {
@@ -69,6 +76,7 @@ void SceneRenderer::initGL()
         {
             qDebug() << "OpenGL initialized.";
         }
+#endif
 
         const GLubyte *renderer = glGetString( GL_RENDERER );
         const GLubyte *vendor = glGetString( GL_VENDOR );
@@ -109,14 +117,14 @@ void SceneRenderer::initGL()
 
     glEnable( GL_DEPTH_TEST );
 
-    glShadeModel( GL_SMOOTH );
-    glEnable( GL_LIGHTING );
-    glEnable( GL_LIGHT0 );
+    //glShadeModel( GL_SMOOTH );  // XXXX invalid operation/crash XXX not in Core
+    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
+    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
 
     static GLfloat lightPosition[4] =
     { 0.5, 5.0, -3000.0, 1.0 };
-    glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
+    //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );   // XXX not in Core
 
     m_sliceRenderer->init();
 
@@ -127,10 +135,11 @@ void SceneRenderer::initGL()
 
     VertexData vertices[] =
     {
+        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-        { QVector3D( 1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( 1.0, 1.0, 0 ), QVector3D( 1.0, 1.0, 0.0 ) },
-        { QVector3D( -1.0, 1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) }
+        { QVector3D(  1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
+        { QVector3D( -1.0,  1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) },
+        { QVector3D(  1.0,  1.0, 0 ), QVector3D( 1.0, 1.0, 0.0 ) }
     };
     glGenBuffers( 1, &vbo );
     glBindBuffer( GL_ARRAY_BUFFER, vbo);
@@ -217,7 +226,48 @@ void SceneRenderer::renderScene()
     //***************************************************************************************************/
     GLFunctions::getAndPrintGLError( "before pass 1" );
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
+    GLFunctions::getAndPrintGLError( "before clear" );
+    GLenum fbstat = glCheckFramebufferStatus( GL_FRAMEBUFFER );   // XXX debug
+    if ( fbstat != GL_FRAMEBUFFER_COMPLETE )
+    {
+        /* handle an error : frame buffer incomplete */
+        QString errstr;
+        switch (fbstat) {
+        case GL_FRAMEBUFFER_UNDEFINED: errstr = QString( "GL_FRAMEBUFFER_UNDEFINED" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER" ); break;
+        case GL_FRAMEBUFFER_UNSUPPORTED: errstr = QString( " GL_FRAMEBUFFER_UNSUPPORTED" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS" ); break;
+        default: errstr = QString( fbstat ); break;
+        }
+        qDebug() << "frame buffer incomplete:" << errstr;
+    }
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLFunctions::getAndPrintGLError( "after clear" );
+    fbstat = glCheckFramebufferStatus( GL_FRAMEBUFFER );   // XXX debug
+    if ( fbstat != GL_FRAMEBUFFER_COMPLETE )
+    {
+        /* handle an error : frame buffer incomplete */
+        QString errstr;
+        switch (fbstat) {
+        case GL_FRAMEBUFFER_UNDEFINED: errstr = QString( "GL_FRAMEBUFFER_UNDEFINED" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER" ); break;
+        case GL_FRAMEBUFFER_UNSUPPORTED: errstr = QString( " GL_FRAMEBUFFER_UNSUPPORTED" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE" ); break;
+        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS" ); break;
+        default: errstr = QString( fbstat ); break;
+        }
+        qDebug() << "frame buffer incomplete:" << errstr;
+    }
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLFunctions::getAndPrintGLError( "after clear2" );
 
     clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
     clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );
@@ -366,7 +416,8 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C5", 10 );
     program->setUniformValue( "D1", 11 );
 
-    glDrawArrays( GL_QUADS, 0, 4 );
+    //glDrawArrays( GL_QUADS, 0, 4 );       // XXX not in Core
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 

@@ -106,8 +106,8 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
 
     setShaderVars( props );
 
-    glShadeModel( GL_SMOOTH );
-    glEnable( GL_POINT_SMOOTH );
+    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
+    // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
 
     if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
     {

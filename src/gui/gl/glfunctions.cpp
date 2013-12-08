@@ -4,7 +4,12 @@
  * Created on: 15.05.2012
  * @author Ralph Schurade
  */
-#include "GL/glew.h"
+//#include "GL/glew.h"
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+#include <GL/glew.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 
 #include "glfunctions.h"
 #include "colormapfunctions.h"
@@ -85,7 +90,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 4;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            // XXX not in Core //glf.glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -96,7 +101,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 3;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -107,7 +112,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 2;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -118,7 +123,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 1;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -129,8 +134,8 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 0;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE0 );
+            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             break;
@@ -160,7 +165,40 @@ void GLFunctions::setTexInterpolation( int row )
 
 QGLShaderProgram* GLFunctions::getShader( QString name )
 {
+    Q_ASSERT_X( m_shaders[ name ] != NULL, "GLFunctions::getShader", "shader not set" );
     return m_shaders[ name ];
+}
+
+bool GLFunctions::validateShader( QString name )
+{
+    qDebug() << "Validating shader program" << name;
+    QGLShaderProgram *program = m_shaders[ name ];
+    const QString log(program->log());
+    if (! log.isEmpty()) {
+        qDebug()  << "log:" << log;
+    }
+
+    glValidateProgram(program->programId());
+    GLint status;
+    glGetProgramiv(program->programId(), GL_VALIDATE_STATUS, &status);
+    if (status == GL_FALSE)
+    {
+        qCritical() << "Error validating shader program:" << name << "!";
+        QByteArray buf(1024, 0);
+        GLsizei length = 0;
+
+        glGetProgramInfoLog(program->programId(), buf.length(), &length, (char *)buf.data());
+        if (length > 0)
+        {
+            qDebug() << "program info log:" << buf;
+        }
+        return false;
+    }
+    else
+    {
+        qDebug() << "Shader program validated successfully: " << name;
+        return true;
+    }
 }
 
 QVector< QString > GLFunctions::getShaderNames()
@@ -228,6 +266,9 @@ void GLFunctions::loadShaders()
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_fs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
             GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
+            // Validate shader XXX too early, must be done after shader setup
+            //validateShader( GLFunctions::m_shaderNames[ i ] );
+
         }
 
         GLFunctions::shadersLoaded = true;
@@ -290,7 +331,7 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
-#if 0 && defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
     QGLShaderProgram* program = new BugfixGLShaderProgram;
 #else
     QGLShaderProgram* program = new QGLShaderProgram;
@@ -314,6 +355,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
         //exit( false );
     }
 
+    const QString code_vs(code);    // XXX
     code = GLFunctions::m_shaderSources[ name + "_fs" ];
     QHashIterator<QString, QString> j( GLFunctions::m_shaderIncludes );
     while (j.hasNext() )
@@ -326,13 +368,15 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->addShaderFromSourceCode( QGLShader::Fragment, code ) )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
-        //exit( false );
+        qDebug() << code;
+        /**/exit( false );
     }
 
     // Linking shader pipeline
     if ( !program->link() )
     {
         qCritical() << "Error while linking shader: " << name << "!";
+        qDebug() << "vertex shader:" << code_vs << "fragment shader:" << code;
         //exit( false );
     }
 
@@ -340,7 +384,8 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->bind() )
     {
         qCritical() << "Error while binding shader: " << name << "!";
-        //exit( false );
+        qDebug() << code;
+        /**/exit( false );
     }
 
     // Restore system locale
@@ -370,7 +415,7 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QString target 
 }
 void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target )
 {
-    program->setUniformValue( "texture0", 0 );
+    program->setUniformValue( "texture0", /*0*/ 15 );   // XXX Samplers of different types use the same texture image unit. - or - A sampler's texture unit is out of range (greater than max allowed or negative).
     program->setUniformValue( "texture1", 1 );
     program->setUniformValue( "texture2", 2 );
     program->setUniformValue( "texture3", 3 );
@@ -560,12 +605,19 @@ void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 bool GLFunctions::getAndPrintGLError( QString prefix )
 {
     GLenum errCode;
-    const GLubyte *errString;
+    const char *errString;
     bool isError = false;
-    while ( ( errCode = glGetError() ) != GL_NO_ERROR )
+    while ( 0 && /*XXXXX disabled*/ ( errCode = glGetError() ) != GL_NO_ERROR )
     {
-        errString = gluErrorString( errCode );
-        qDebug() << "OpenGL Error:" << prefix << QString( (char*) errString );
+        switch(errCode)
+        {
+            case GL_INVALID_OPERATION:              errString="INVALID_OPERATION";              break;
+            case GL_INVALID_ENUM:                   errString="INVALID_ENUM";                   break;
+            case GL_INVALID_VALUE:                  errString="INVALID_VALUE";                  break;
+            case GL_OUT_OF_MEMORY:                  errString="OUT_OF_MEMORY";                  break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:  errString="INVALID_FRAMEBUFFER_OPERATION";  break;
+        }
+        qDebug() << "OpenGL Error:" << prefix << QString( errString );
         isError = true;
     }
     return isError;

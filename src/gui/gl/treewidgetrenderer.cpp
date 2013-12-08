@@ -51,6 +51,7 @@ void TreeWidgetRenderer::initGL()
 {
     qDebug() << "gl init " << m_name << " widget";
 
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
     GLenum errorCode = glewInit();
     if ( GLEW_OK != errorCode )
     {
@@ -62,17 +63,18 @@ void TreeWidgetRenderer::initGL()
     {
         //qDebug() << "OpenGL initialized.";
     }
+#endif
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
 
-    glShadeModel( GL_SMOOTH );
-    glEnable( GL_LIGHTING );
-    glEnable( GL_LIGHT0 );
+    // XXX not in CoreProfile //glShadeModel( GL_SMOOTH );
+    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
+    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
     static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-    glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
+     // XXX not in CoreProfile; use shader //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 }
 
 void TreeWidgetRenderer::draw()
