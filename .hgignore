@@ -1,4 +1,4 @@
-syntax: blob
+#syntax: blob
 .autotools
 .project
 .cproject
