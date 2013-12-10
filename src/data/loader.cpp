@@ -36,6 +36,7 @@ Loader::Loader( Dataset* selected ) :
 Loader::~Loader()
 {
     m_dataset.clear();
+    m_dataset.squeeze();
 }
 
 void Loader::setFilename( QDir fn )
@@ -135,6 +136,7 @@ bool Loader::loadNifti()
     {
         m_dataset = ln->getDataset();
         m_datasetType = ln->getDatasetType();
+        delete ln;
         return true;
     }
     else

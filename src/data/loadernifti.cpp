@@ -30,6 +30,12 @@ LoaderNifti::LoaderNifti( QDir fileName ) :
 
 LoaderNifti::~LoaderNifti()
 {
+    m_scalarData.clear();
+    m_vectorData.clear();
+    m_dataset.clear();
+    m_scalarData.squeeze();
+    m_vectorData.squeeze();
+    m_dataset.squeeze();
 }
 
 QVector<Dataset*> LoaderNifti::getDataset()

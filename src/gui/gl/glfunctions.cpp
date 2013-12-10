@@ -15,7 +15,6 @@
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 
-
 #include "shaperenderer.h"
 #include "../text/textrenderer.h"
 
@@ -54,6 +53,17 @@ int GLFunctions::getPickIndex()
 
 bool GLFunctions::setupTextures( QString target )
 {
+    glActiveTexture( GL_TEXTURE4 );
+    glBindTexture( GL_TEXTURE_3D, 0 );
+    glActiveTexture( GL_TEXTURE3 );
+    glBindTexture( GL_TEXTURE_3D, 0 );
+    glActiveTexture( GL_TEXTURE2 );
+    glBindTexture( GL_TEXTURE_3D, 0 );
+    glActiveTexture( GL_TEXTURE1 );
+    glBindTexture( GL_TEXTURE_3D, 0 );
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_3D, 0 );
+
     QAbstractItemModel* model = Models::d();
     QList< int > tl = getTextureIndexes( target );
     if ( tl.empty() )
@@ -255,60 +265,8 @@ void GLFunctions::updateColormapShader()
     code += "    return vec4( color, 1.0 ); \n";
     code += "} \n";
 
-//    QList< int > tl = getTextureIndexes( "maingl" );
-//    code += getNthColormapShader( tl, 4 );
-//    code += getNthColormapShader( tl, 3 );
-//    code += getNthColormapShader( tl, 2 );
-//    code += getNthColormapShader( tl, 1 );
-//    code += getNthColormapShader( tl, 0 );
-
     GLFunctions::m_shaderIncludes[ "colormap_fs" ] = code;
     //qDebug() << code;
-}
-
-QString GLFunctions::getNthColormapShader( QList< int > tl, int num )
-{
-    if ( tl.size() > num )
-    {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( num ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        return ds->getColormapShader( num );
-    }
-    else
-    {
-        QString code( "" );
-        code += "vec4 colormap" + QString::number( num ) + "( vec4 inColor, float lowerThreshold, float upperThreshold, float selectedMin, float selectedMax ) \n";
-        code += "{\n";
-        code += "float value = unpackFloat( inColor );\n";
-        code += "vec3 color = vec3(0.0);\n";
-        code += "if ( value < lowerThreshold )\n";
-        code += "{\n";
-        code += "return vec4( 0.0 );\n";
-        code += "}\n";
-        code += "if ( value > upperThreshold )\n";
-        code += "{\n";
-        code += "return vec4( 0.0 );\n";
-        code += "}\n";
-        code += "value = ( value - selectedMin ) / ( selectedMax - selectedMin );\n";
-        code += "if ( value < 0.0 )\n";
-        code += "{\n";
-        code += "color = vec3( 0.01, 0.01, 0.01 );\n";
-        code += "}\n";
-        code += "if ( value >= 0.00 && value < 1.00 )\n";
-        code += "{ \n";
-        code += "float _v = ( value - 0.00 ) / 1.00;\n";
-        code += "color.r = ( 1.0 - _v ) * 0.01 + _v * 1.00 ;\n";
-        code += "color.g = ( 1.0 - _v ) * 0.01 + _v * 1.00 ;\n";
-        code += "color.b = ( 1.0 - _v ) * 0.01 + _v * 1.00 ;\n";
-        code += "}\n";
-        code += "if ( value >= 1.0 )\n";
-        code += "{\n";
-        code += "color = vec3( 1.00, 1.00, 1.00 );\n";
-        code += "}\n";
-        code += "return vec4( color, 0.0 );\n";
-        code += "} \n";
-
-        return code;
-    }
 }
 
 QString GLFunctions::copyShaderToString( QString name, QString ext )
