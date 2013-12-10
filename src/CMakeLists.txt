@@ -72,8 +72,11 @@ ENDIF()
 # REQUIRED third party libs
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-FIND_PACKAGE( GLEW REQUIRED )
-INCLUDE_DIRECTORIES( ${GLEW_INCLUDE_PATH} )
+
+IF( NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+    FIND_PACKAGE( GLEW REQUIRED )
+    INCLUDE_DIRECTORIES( ${GLEW_INCLUDE_PATH} )
+ENDIF()
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 # OpenGL, at least 1.2
@@ -219,6 +222,6 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     
     ReadProjectRevisionStatus()
 
-    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
+    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
 ENDIF()
 
