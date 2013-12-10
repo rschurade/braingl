@@ -39,9 +39,6 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_doScreenshot( false ),
     m_copyCameraMode( 0 )
 {
-    qDebug() << "GL context in GLwidget:" << context();
-    qDebug() << "QGLFormat in GLwidget:" << format();
-    Q_ASSERT(context()->isValid());
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
     m_cameraInUse = m_arcBall;
@@ -118,8 +115,6 @@ Camera* GLWidget::getCamera()
 void GLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
-    //makeCurrent();  // XXX
-    Q_ASSERT( context() && isValid() );
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);

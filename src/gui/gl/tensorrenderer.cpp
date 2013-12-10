@@ -99,7 +99,6 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
      // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, m_quads );
-    qWarning() << "TensorRenderer::draw: glDrawArrays(GL_QUADS,...) not yet replaced";
     glDrawElements( GL_TRIANGLES, m_quads / 4 * 6, GL_UNSIGNED_SHORT, 0 );  // XXX triangle pairs
 
     GLenum error;
@@ -229,8 +228,8 @@ void TensorRenderer::initGeometry()
     }
 
     // XXX should be an GL_ARRAY_BUFFER?
-    glBindBuffer( /*GL_ELEMENT_ARRAY_BUFFER*/GL_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( /*GL_ELEMENT_ARRAY_BUFFER*/GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
     // XXX
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     std::vector<GLushort> triIndices;

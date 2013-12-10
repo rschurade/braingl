@@ -47,12 +47,6 @@ void SingleSHWidget::initializeGL()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-#if 0
-    GLFunctions::loadShaders();     // XXX missing initialization, usually done by GLWidget?
-    GLFunctions::initTextRenderer();
-    GLFunctions::initShapeRenderer();
-#endif //0
-
     m_renderer->initGL();
 }
 

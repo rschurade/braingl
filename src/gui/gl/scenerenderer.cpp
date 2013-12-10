@@ -56,11 +56,6 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::initGL()
 {
     qDebug() << "gl init " + m_renderTarget;
-    // XXX test
-    /* return to the default frame buffer */
-    GLFunctions::getAndPrintGLError( "before glBindFramebuffer" );
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-    GLFunctions::getAndPrintGLError( "after glBindFramebuffer" );
 
     if ( m_renderTarget == "maingl" )
     {
@@ -248,26 +243,6 @@ void SceneRenderer::renderScene()
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     GLFunctions::getAndPrintGLError( "after clear" );
-    fbstat = glCheckFramebufferStatus( GL_FRAMEBUFFER );   // XXX debug
-    if ( fbstat != GL_FRAMEBUFFER_COMPLETE )
-    {
-        /* handle an error : frame buffer incomplete */
-        QString errstr;
-        switch (fbstat) {
-        case GL_FRAMEBUFFER_UNDEFINED: errstr = QString( "GL_FRAMEBUFFER_UNDEFINED" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER" ); break;
-        case GL_FRAMEBUFFER_UNSUPPORTED: errstr = QString( " GL_FRAMEBUFFER_UNSUPPORTED" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: errstr = QString( " GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE" ); break;
-        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS" ); break;
-        default: errstr = QString( fbstat ); break;
-        }
-        qDebug() << "frame buffer incomplete:" << errstr;
-    }
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    GLFunctions::getAndPrintGLError( "after clear2" );
 
     clearTexture( "D0", 0.0, 0.0, 0.0, 0.0 );
     clearTexture( "PICK", 0.0, 0.0, 0.0, 0.0 );

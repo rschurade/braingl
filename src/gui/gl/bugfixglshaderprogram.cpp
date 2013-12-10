@@ -82,7 +82,6 @@ bool BugfixGLShaderProgram::addShaderFromSourceCode(QFlags<QGLShader::ShaderType
     if (!QGLContext::areSharing(m_context, QGLContext::currentContext()))
     {
         qWarning("context must be the current context or sharing with it.");
-        //((QGLContext *)m_context)->makeCurrent(); // XXXX
         return false;
     }
     // map type from QFlags<QGLShader::ShaderTypeBit> to GL_VERTEX_SHADER/GL_FRAGMENT_SHADER
@@ -236,24 +235,20 @@ GLuint BugfixGLShaderProgram::programId() const
     return m_programId;
 }
 
-// XXXX check
-#define setUniformMatrix(func,location,value,cols,rows) \
-    if (location == -1) \
-        return; \
-    if (sizeof(qreal) == sizeof(GLfloat)) { \
-        func(location, 1, GL_FALSE, \
-             reinterpret_cast<const GLfloat *>(value.constData())); \
-    } else { \
-        GLfloat mat[cols * rows]; \
-        const qreal *data = value.constData(); \
-        for (int i = 0; i < cols * rows; ++i) \
-            mat[i] = data[i]; \
-        func(location, 1, GL_FALSE, mat); \
-    }
-
 void BugfixGLShaderProgram::setUniformValue(int location, QMatrix4x4 const& value)
 {
-    setUniformMatrix(glUniformMatrix4fv, location, value, 4, 4);
+    if (location == -1)
+        return;
+    if (sizeof(qreal) == sizeof(GLfloat)) {
+        glUniformMatrix4fv(location, 1, GL_FALSE,
+             reinterpret_cast<const GLfloat *>(value.constData()));
+    } else {
+        GLfloat mat[4 * 4];
+        const qreal *data = value.constData();
+        for (int i = 0; i < 4 * 4; ++i)
+            mat[i] = data[i];
+        glUniformMatrix4fv(location, 1, GL_FALSE, mat);
+    }
 }
 
 void BugfixGLShaderProgram::setUniformValue(char const* name, QMatrix4x4 const& value)
