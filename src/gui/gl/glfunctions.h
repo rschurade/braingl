@@ -76,7 +76,6 @@ private:
     virtual ~GLFunctions() {};
 
     static QString copyShaderToString( QString name, QString ext );
-    static QString getNthColormapShader( QList< int > tl, int num );
 
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;

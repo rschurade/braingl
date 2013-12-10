@@ -53,6 +53,7 @@ DatasetScalar::~DatasetScalar()
     m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
     delete m_colormapRenderer;
     m_data.clear();
+    m_data.squeeze();
     glDeleteTextures( 1, &m_textureGLuint );
 }
 
