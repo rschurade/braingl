@@ -231,45 +231,41 @@ void Connections::subdivide( int newp )
 void Connections::attract()
 {
     //for all edges...
-//#pragma omp parallel for
-    for ( int ie = 0; ie < edges.size(); ++ie )
-    {
-        Edge* e = edges.at( ie );
-        //for every point...
-        for ( int i = 1; i < e->points.length() - 1; i++ )
-        {
-            QVector3D p = e->points.at( i );
-            double fsum = 0;
-            QVector3D f( 0, 0, 0 );
-            //for all attracting points...
-            for ( int ef = 0; ef<compatibilities->idxs->at(ie)->size(); ef++)
-            {
-                //float c = compatibilities->comps2->at( ie )->at( ef );
-                QVector3D pe;
-                int idx = compatibilities->idxs->at(ie)->at(ef);
-                if ( e->flip( edges.at( idx ) ) )
-                {
-                    pe = edges.at( idx )->points.at( i );
-                }
-                else
-                {
-                    pe = edges.at( idx )->points.at( ( edges.at( idx )->points.length() - 1 ) - i );
-                }
-                float de = ( pe - p ).length();
-                double weight = qExp( -( de * de ) / ( 2 * bell * bell ) );
-                fsum += weight;
-                f += weight * pe;
-            }
+    int numThreads = GLFunctions::idealThreadCount;
 
-            f /= fsum;
-            QVector3D force = ( f - p );
-            e->forces.replace( i, force );
-        }
+    // create threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        AttractThread* t = new AttractThread( i, bell, edges, compatibilities );
+        m_athreads.push_back(t);
+        connect( t, SIGNAL( progress() ), this, SLOT( attractThreadProgress() ), Qt::QueuedConnection );
+        connect( t, SIGNAL( finished() ), this, SLOT( attractThreadFinished() ), Qt::QueuedConnection );
     }
+    //qDebug() << "start attraction iteration, m_athreads.size: " << m_athreads.size();
+
+    // run threads
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        m_athreads[i]->start();
+    }
+    for ( int i = 0; i < numThreads; ++i )
+    {
+        m_athreads[i]->wait();
+    }
+    //qDebug() << "multithreading finished";
+
+    // delete threads
+    for ( int i = 0; i < m_athreads.size(); ++i )
+    {
+        delete m_athreads[i];
+    }
+    m_athreads.clear();
+
     for ( int e = 0; e < edges.size(); e++ )
     {
         edges.at( e )->applyForces();
     }
+    //qDebug() << "iteration finished";
 }
 
 void Connections::startBundling()
@@ -316,7 +312,7 @@ void Connections::fullAttract()
 
 void Connections::calcComps()
 {
-    qDebug() << "calcComps, edges.size: " << edges.size();
+    qDebug() << "calculating compatibilities, edges.size: " << edges.size();
     //comps = new float[edges.size() * edges.size()];
 
     compatibilities = new Compatibilities(edges.size());
@@ -333,18 +329,23 @@ void Connections::calcComps()
         connect( t, SIGNAL( progress() ), this, SLOT( compThreadProgress() ), Qt::QueuedConnection );
         connect( t, SIGNAL( finished() ), this, SLOT( compThreadFinished() ), Qt::QueuedConnection );
     }
-    qDebug() << "start calculating correlation, m_compthreads.size: " << m_compthreads.size();
+    //qDebug() << "start calculating compatibilities, m_compthreads.size: " << m_compthreads.size();
     // run threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        ++m_compthreadsRunning;
         m_compthreads[i]->start();
     }
     for ( int i = 0; i < numThreads; ++i )
     {
-        ++m_compthreadsRunning;
         m_compthreads[i]->wait();
     }
+
+    // delete threads
+    for ( int i = 0; i < m_compthreads.size(); ++i )
+    {
+        delete m_compthreads[i];
+    }
+    m_compthreads.clear();
 
     qDebug() << "comp. calculated";
 }
@@ -570,6 +571,10 @@ void Connections::attractThreadFinished()
 
 }
 
+void Connections::attractThreadProgress()
+{
+
+}
 void Connections::compThreadFinished()
 {
     //qDebug() << "compthread finished";

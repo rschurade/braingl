@@ -65,10 +65,7 @@ public:
     void startBundling();
 
     QVector<AttractThread*> m_athreads;
-    int m_athreadsRunning;
-
     QVector<CompatibilitiesThread*> m_compthreads;
-    int m_compthreadsRunning;
 
     void hashEdges();
 
@@ -77,6 +74,7 @@ private slots:
     void setBell( float value, int );
     void setSmooth( int value, int );
     void attractThreadFinished();
+    void attractThreadProgress();
     void compThreadFinished();
     void compThreadProgress();
 
