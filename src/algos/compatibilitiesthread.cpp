@@ -28,7 +28,7 @@ void CompatibilitiesThread::run()
 
     for ( int i = m_id; i < m_edges.length(); i += numThreads )
     {
-        if ( ( i % 100 ) == 0 )
+        if ( ( i % 1000 ) == 0 )
         {
             qDebug() << "calculating compatibilites: " << i;
             emit( progress() );
