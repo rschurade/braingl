@@ -51,7 +51,7 @@ void TreeWidgetRenderer::initGL()
 {
     qDebug() << "gl init " << m_name << " widget";
 
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+    glewExperimental = true;
     GLenum errorCode = glewInit();
     if ( GLEW_OK != errorCode )
     {
@@ -63,7 +63,6 @@ void TreeWidgetRenderer::initGL()
     {
         //qDebug() << "OpenGL initialized.";
     }
-#endif
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 

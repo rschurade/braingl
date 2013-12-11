@@ -59,7 +59,7 @@ void SceneRenderer::initGL()
 
     if ( m_renderTarget == "maingl" )
     {
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+        glewExperimental = true;
         GLenum errorCode = glewInit();
         if ( GLEW_OK != errorCode )
         {
@@ -71,7 +71,6 @@ void SceneRenderer::initGL()
         {
             qDebug() << "OpenGL initialized.";
         }
-#endif
 
         const GLubyte *renderer = glGetString( GL_RENDERER );
         const GLubyte *vendor = glGetString( GL_VENDOR );

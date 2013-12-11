@@ -114,6 +114,15 @@ Camera* GLWidget::getCamera()
 
 void GLWidget::initializeGL()
 {
+    glewExperimental = true;
+    GLenum errorCode = glewInit();
+    if ( GLEW_OK != errorCode )
+    {
+        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
+        qDebug() << glewGetErrorString( errorCode );
+        exit( false );
+    }
+
     // needed per OpenGL context and so per QGLWidget
     GLuint vao;
     glGenVertexArrays(1, &vao);

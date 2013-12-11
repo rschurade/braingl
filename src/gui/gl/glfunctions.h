@@ -8,12 +8,7 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
-//#include "GL/glew.h"
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-#include <GL/glew.h>
-#else
-#include <OpenGL/gl3.h>
-#endif
+#include "GL/glew.h"
 
 #include <QPoint>
 #include <QList>
