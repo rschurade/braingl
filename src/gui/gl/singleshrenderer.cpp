@@ -51,7 +51,7 @@ void SingleSHRenderer::init()
 void SingleSHRenderer::initGL()
 {
     qDebug() << "gl init single sh widget";
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+    glewExperimental = true;
     GLenum errorCode = glewInit();
     if ( GLEW_OK != errorCode )
     {
@@ -63,7 +63,6 @@ void SingleSHRenderer::initGL()
     {
         //qDebug() << "OpenGL initialized.";
     }
-#endif
 
     glGenBuffers( 2, vboIds );
 
