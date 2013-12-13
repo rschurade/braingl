@@ -12,7 +12,6 @@
 
 #include "../mesh/trianglemesh2.h"
 
-#include "../../gui/gl/meshrenderer.h"
 #include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/colormapfunctions.h"
 
@@ -47,11 +46,11 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
                 prevColorMode( -1 ),
-                prevThreshSign(0),
+                prevThreshSign( 0 ),
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
-                littleBrains( QVector<MeshRenderer*>() ),
+                littleBrains( QVector<LittleBrainRenderer*>() ),
                 littleMeshes( QVector<TriangleMesh2*>() ),
                 shifts1( QVector<QVector3D>() ),
                 shifts2( QVector<QVector3D>() )
@@ -63,6 +62,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
     m_properties["maingl"]->createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
     m_properties["maingl2"]->createBool( Fn::Property::D_DRAW_GLYPHS, false );
     m_properties["maingl"]->createBool( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_LITTLE_BRAINS_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 3, "general" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_COLORMODE ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( colorModeChanged(QVariant) ) );
@@ -70,6 +71,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
             SLOT( glyphStyleChanged(QVariant) ) );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_ROTATION ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( rotationChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ), SIGNAL( valueChanged(QVariant)), this,
+            SLOT( littleBrainVisibilityChanged(QVariant) ) );
 
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
@@ -118,8 +121,10 @@ void DatasetGlyphset::addSecondSurfaceSelector()
 void DatasetGlyphset::addProperties()
 {
     m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN, { "+", "-", "+/-" }, 0, "general" );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE, { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
+    { "+", "-", "+/-" }, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE,
+    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
     m_properties["maingl"]->createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
     m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
@@ -151,7 +156,8 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE, { "orientation", "value" }, 0, "glyphs" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE,
+    { "orientation", "value" }, 0, "glyphs" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
@@ -206,6 +212,18 @@ void DatasetGlyphset::rotationChanged( QVariant qv )
     }
 }
 
+void DatasetGlyphset::littleBrainVisibilityChanged( QVariant qv )
+{
+    if ( !qv.toBool() )
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_LITTLE_BRAINS_COLORMODE )->setHidden( true );
+    }
+    else
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_LITTLE_BRAINS_COLORMODE )->setHidden( false );
+    }
+}
+
 void DatasetGlyphset::readConnectivity( QString filename )
 {
     QFile f( filename );
@@ -256,10 +274,11 @@ void DatasetGlyphset::makeLittleBrains()
 {
     for ( int i = 0; i < m_n; ++i )
     {
-        if ( ( littleBrains[i] == NULL ) && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
+        if ( ( littleBrains[i] == NULL )
+                && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
         {
             TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
-            MeshRenderer* m_renderer = new MeshRenderer( mesh );
+            LittleBrainRenderer* m_renderer = new LittleBrainRenderer( mesh );
 
             m_renderer->setModel( Models::g() );
             m_renderer->init();
@@ -332,7 +351,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     QMatrix4x4 mvp = pMatrix * mvMatrix;
 
-   //qDebug() << "little brains size: " << littleBrains.size();
+    //qDebug() << "little brains size: " << littleBrains.size();
 
     if ( ( target == "maingl" ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
@@ -371,6 +390,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                 float f = 1.2;
                 if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
                 {
+                    littleBrains[i]->m_LB_colormode = properties( "maingl" )->get( Fn::Property::D_LITTLE_BRAINS_COLORMODE ).toInt();
                     littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
                 }
                 else
@@ -498,12 +518,12 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
         m_colormapRenderer->setTextColor( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
 
-        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN).toFloat() );
-        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN ).toFloat() );
+        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX ).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
 
         m_colormapRenderer->draw( width, height, renderMode );
     }
@@ -551,7 +571,8 @@ bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 void DatasetGlyphset::makeCons()
 {
     qDebug() << "making consArray: " << m_minThreshold << " m_maxThreshold: " << m_maxThreshold;
-    if (consArray) delete[] consArray;
+    if ( consArray )
+        delete[] consArray;
     consArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -624,7 +645,8 @@ void DatasetGlyphset::makeDiffPoints()
 {
     float diffMinThresh = m_minThreshold / 3.0;
     qDebug() << "making diffPoints: " << diffMinThresh << " m_maxThreshold: " << m_maxThreshold;
-    if (diffsArray) delete[] diffsArray;
+    if ( diffsArray )
+        delete[] diffsArray;
     diffsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -748,7 +770,8 @@ void DatasetGlyphset::makeDiffPoints()
 void DatasetGlyphset::makeVecs()
 {
     qDebug() << "making vecsArray: " << m_minThreshold;
-    if (vecsArray) delete[] vecsArray;
+    if ( vecsArray )
+        delete[] vecsArray;
     vecsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -1020,12 +1043,13 @@ void DatasetGlyphset::setProperties()
     m_properties["maingl"]->createList( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
     if ( m_is_split )
     {
-        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT, { "both", "left", "right" }, 0, "general" );
+        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT,
+        { "both", "left", "right" }, 0, "general" );
     }
-    littleBrains.fill( NULL, m_n);
-    littleMeshes.fill( NULL, m_n);
-    shifts1.resize(m_n);
-    shifts2.resize(m_n);
+    littleBrains.fill( NULL, m_n );
+    littleMeshes.fill( NULL, m_n );
+    shifts1.resize( m_n );
+    shifts2.resize( m_n );
 }
 
 void DatasetGlyphset::loadROI( QString filename )

@@ -11,7 +11,7 @@
 #include "../../gui/gl/diffpointglyphrenderer.h"
 #include "../../gui/gl/vectorglyphrenderer.h"
 #include "../../gui/gl/pieglyphrenderer.h"
-
+#include "../../gui/gl/littlebrainrenderer.h"
 #include "../../gui/gl/colormaprenderer.h"
 
 #include "../../gui/gl/meshrenderer.h"
@@ -91,7 +91,7 @@ private:
     QString m_colors_name;
 
     //int pickedID;
-    QVector<MeshRenderer*> littleBrains;
+    QVector<LittleBrainRenderer*> littleBrains;
     QVector<TriangleMesh2*> littleMeshes;
     QVector<QVector3D> shifts1;
     QVector<QVector3D> shifts2;
@@ -102,6 +102,7 @@ private slots:
     void colorModeChanged( QVariant qv );
     void glyphStyleChanged( QVariant qv );
     void rotationChanged( QVariant qv );
+    void littleBrainVisibilityChanged( QVariant qv );
     void slotCopyColors();
 };
 
