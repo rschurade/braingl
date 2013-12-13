@@ -14,6 +14,8 @@
 
 #include "bugfixglshaderprogram.h"
 
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+
 #include <QtCore>
 
 // debugging
@@ -338,3 +340,4 @@ int QGLShaderProgram::uniformLocation(const char *name) const
         return -1;
     }
 }
+#endif
