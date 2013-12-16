@@ -260,7 +260,17 @@ void MainWindow::open()
 
     QString filter( "all files (*.*);;niftii (*.nii *.nii.gz);;fib files (*.fib *.vtk *.asc);;surfaces (*.vtk *.asc)" );
 
-    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn, filter );
+    fd = new QFileDialog( this, "Open File", fn, filter );
+    fd->setFileMode( QFileDialog::ExistingFiles );
+    fd->setAcceptMode( QFileDialog::AcceptOpen );
+
+    QStringList fileNames;
+    if ( fd->exec() )
+    {
+        fileNames = fd->selectedFiles();
+    }
+    delete fd;
+
     for ( int i = 0; i < fileNames.size(); ++i )
     {
         load( fileNames[i] );
@@ -438,7 +448,7 @@ bool MainWindow::save( Dataset* ds )
     fd->setAcceptMode( QFileDialog::AcceptSave );
     fd->setDefaultSuffix( ds->getDefaultSuffix() );
 
-    connect(fd, SIGNAL(filterSelected(QString)), this, SLOT(saveFilterChanged(QString)));
+    connect( fd, SIGNAL( filterSelected( QString ) ), this, SLOT( saveFilterChanged( QString ) ) );
 
     if ( fd->exec() )
     {
@@ -468,10 +478,10 @@ void MainWindow::saveFilterChanged( QString filterString )
 {
     //filter strings contain (*.xxx *.xxx *.xxx) with suffixes
     //this sets the first suffix in the first () as default suffix:
-    int i = filterString.indexOf("(*.");
-    QString suffix = filterString.remove(0,i+3);
-    suffix = suffix.left(suffix.indexOf(" "));
-    suffix = suffix.left(suffix.indexOf(")"));
+    int i = filterString.indexOf( "(*." );
+    QString suffix = filterString.remove( 0, i + 3 );
+    suffix = suffix.left( suffix.indexOf( " " ) );
+    suffix = suffix.left( suffix.indexOf( ")" ) );
     if ( suffix != "*" )
     {
         qDebug() << "set default suffix: " << suffix;
