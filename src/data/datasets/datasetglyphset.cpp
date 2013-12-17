@@ -246,18 +246,11 @@ void DatasetGlyphset::readConnectivity( QString filename )
 
     for ( int i = 0; i < m_n; i++ )
     {
-        if ( roi[i] )
+        for ( int j = 0; j < m_n; j++ )
         {
-            for ( int j = 0; j < m_n; j++ )
-            {
-                ins >> m_correlationMatrix[i][j];
-                m_correlationMatrix[j][i] = m_correlationMatrix[i][j];
-                //qDebug() << i << j << conn[i][j];
-            }
-        }
-        else
-        {
-            ins.skipRawData( m_n * 4 ); //4 byte float32
+            ins >> m_correlationMatrix[i][j];
+            m_correlationMatrix[j][i] = m_correlationMatrix[i][j];
+            //qDebug() << i << j << conn[i][j];
         }
     }
     f.close();
