@@ -589,11 +589,14 @@ void DatasetGlyphset::makeCons()
     //TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                ++consNumber;
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    ++consNumber;
+                }
             }
         }
     }
@@ -603,39 +606,43 @@ void DatasetGlyphset::makeCons()
     consNumber = 0;
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
+
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
+                float v = m_correlationMatrix[i][j];
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
-                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
-                QVector3D dg = tg - fg;
+                    QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                    QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                    QVector3D dg = tg - fg;
 
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
 
-                consArray[offset * consNumber] = f.x();
-                consArray[offset * consNumber + 1] = f.y();
-                consArray[offset * consNumber + 2] = f.z();
-                consArray[offset * consNumber + 3] = v;
-                consArray[offset * consNumber + 4] = t.x();
-                consArray[offset * consNumber + 5] = t.y();
-                consArray[offset * consNumber + 6] = t.z();
+                    consArray[offset * consNumber] = f.x();
+                    consArray[offset * consNumber + 1] = f.y();
+                    consArray[offset * consNumber + 2] = f.z();
+                    consArray[offset * consNumber + 3] = v;
+                    consArray[offset * consNumber + 4] = t.x();
+                    consArray[offset * consNumber + 5] = t.y();
+                    consArray[offset * consNumber + 6] = t.z();
 
-                consArray[offset * consNumber + 7] = dg.x();
-                consArray[offset * consNumber + 8] = dg.y();
-                consArray[offset * consNumber + 9] = dg.z();
+                    consArray[offset * consNumber + 7] = dg.x();
+                    consArray[offset * consNumber + 8] = dg.y();
+                    consArray[offset * consNumber + 9] = dg.z();
 
-                consArray[offset * consNumber + 10] = dc.x();
-                consArray[offset * consNumber + 11] = dc.y();
-                consArray[offset * consNumber + 12] = dc.z();
+                    consArray[offset * consNumber + 10] = dc.x();
+                    consArray[offset * consNumber + 11] = dc.y();
+                    consArray[offset * consNumber + 12] = dc.z();
 
-                ++consNumber;
+                    ++consNumber;
+                }
             }
         }
     }
@@ -788,11 +795,14 @@ void DatasetGlyphset::makeVecs()
 //TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                ++vecsNumber;
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    ++vecsNumber;
+                }
             }
         }
     }
@@ -802,59 +812,62 @@ void DatasetGlyphset::makeVecs()
     vecsNumber = 0;
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
+                float v = m_correlationMatrix[i][j];
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
-                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
-                QVector3D dg = tg - fg;
+                    QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                    QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                    QVector3D dg = tg - fg;
 
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
 
-                vecsArray[offset * vecsNumber] = f.x();
-                vecsArray[offset * vecsNumber + 1] = f.y();
-                vecsArray[offset * vecsNumber + 2] = f.z();
-                vecsArray[offset * vecsNumber + 3] = t.x();
-                vecsArray[offset * vecsNumber + 4] = t.y();
-                vecsArray[offset * vecsNumber + 5] = t.z();
+                    vecsArray[offset * vecsNumber] = f.x();
+                    vecsArray[offset * vecsNumber + 1] = f.y();
+                    vecsArray[offset * vecsNumber + 2] = f.z();
+                    vecsArray[offset * vecsNumber + 3] = t.x();
+                    vecsArray[offset * vecsNumber + 4] = t.y();
+                    vecsArray[offset * vecsNumber + 5] = t.z();
 
-                vecsArray[offset * vecsNumber + 6] = v;
-                vecsArray[offset * vecsNumber + 7] = 1;
+                    vecsArray[offset * vecsNumber + 6] = v;
+                    vecsArray[offset * vecsNumber + 7] = 1;
 
-                vecsArray[offset * vecsNumber + 8] = dg.x();
-                vecsArray[offset * vecsNumber + 9] = dg.y();
-                vecsArray[offset * vecsNumber + 10] = dg.z();
+                    vecsArray[offset * vecsNumber + 8] = dg.x();
+                    vecsArray[offset * vecsNumber + 9] = dg.y();
+                    vecsArray[offset * vecsNumber + 10] = dg.z();
 
-                vecsArray[offset * vecsNumber + 11] = dc.x();
-                vecsArray[offset * vecsNumber + 12] = dc.y();
-                vecsArray[offset * vecsNumber + 13] = dc.z();
+                    vecsArray[offset * vecsNumber + 11] = dc.x();
+                    vecsArray[offset * vecsNumber + 12] = dc.y();
+                    vecsArray[offset * vecsNumber + 13] = dc.z();
 
-                vecsArray[offset * vecsNumber + 14] = t.x();
-                vecsArray[offset * vecsNumber + 15] = t.y();
-                vecsArray[offset * vecsNumber + 16] = t.z();
-                vecsArray[offset * vecsNumber + 17] = f.x();
-                vecsArray[offset * vecsNumber + 18] = f.y();
-                vecsArray[offset * vecsNumber + 19] = f.z();
+                    vecsArray[offset * vecsNumber + 14] = t.x();
+                    vecsArray[offset * vecsNumber + 15] = t.y();
+                    vecsArray[offset * vecsNumber + 16] = t.z();
+                    vecsArray[offset * vecsNumber + 17] = f.x();
+                    vecsArray[offset * vecsNumber + 18] = f.y();
+                    vecsArray[offset * vecsNumber + 19] = f.z();
 
-                vecsArray[offset * vecsNumber + 20] = v;
-                vecsArray[offset * vecsNumber + 21] = -1;
+                    vecsArray[offset * vecsNumber + 20] = v;
+                    vecsArray[offset * vecsNumber + 21] = -1;
 
-                vecsArray[offset * vecsNumber + 22] = -dg.x();
-                vecsArray[offset * vecsNumber + 23] = -dg.y();
-                vecsArray[offset * vecsNumber + 24] = -dg.z();
+                    vecsArray[offset * vecsNumber + 22] = -dg.x();
+                    vecsArray[offset * vecsNumber + 23] = -dg.y();
+                    vecsArray[offset * vecsNumber + 24] = -dg.z();
 
-                vecsArray[offset * vecsNumber + 25] = -dc.x();
-                vecsArray[offset * vecsNumber + 26] = -dc.y();
-                vecsArray[offset * vecsNumber + 27] = -dc.z();
+                    vecsArray[offset * vecsNumber + 25] = -dc.x();
+                    vecsArray[offset * vecsNumber + 26] = -dc.y();
+                    vecsArray[offset * vecsNumber + 27] = -dc.z();
 
-                ++vecsNumber;
+                    ++vecsNumber;
+                }
             }
         }
     }
@@ -923,23 +936,25 @@ void DatasetGlyphset::makePies()
         int count = 0;
 
         QList<Connection*> sortlist;
-
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, threshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
-                QVector3D gdiff = t - f;
-
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
-
-                if ( gdiff.length() > minlength )
+                if ( filter( i, j, lr, threshold, sign ) )
                 {
-                    sortlist.push_back( new Connection( f, dc, m_correlationMatrix[i][j] ) );
-                    ++count;
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
+                    QVector3D gdiff = t - f;
+
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
+
+                    if ( gdiff.length() > minlength )
+                    {
+                        sortlist.push_back( new Connection( f, dc, m_correlationMatrix[i][j] ) );
+                        ++count;
+                    }
                 }
             }
         }
@@ -1009,21 +1024,24 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     Connections* cons = new Connections();
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = i + 1; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
+            for ( int j = i + 1; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
-
-                Edge* aedge = new Edge( f, t, v );
-
-                if ( aedge->length() > minlength )
+                float v = m_correlationMatrix[i][j];
+                if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
                 {
-                    cons->nodes << f;
-                    cons->nodes << t;
-                    cons->edges << aedge;
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
+
+                    Edge* aedge = new Edge( f, t, v );
+
+                    if ( aedge->length() > minlength )
+                    {
+                        cons->nodes << f;
+                        cons->nodes << t;
+                        cons->edges << aedge;
+                    }
                 }
             }
         }
