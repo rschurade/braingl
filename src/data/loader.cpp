@@ -546,13 +546,6 @@ bool Loader::loadGlyphset()
         }
     }
 
-    //3: load connectivity: put this into seperate loader / dataset / here
-    qDebug() << "loading connectivity";
-    dataset->readConnectivity( connectivityName );
-
-    //TODO: init conn.-crap...
-    //dataset->setMinthresh( mt );
-
     //fourth thing on the line: name of roi...
     if ( sl2.length() > 3 )
     {
@@ -563,8 +556,16 @@ bool Loader::loadGlyphset()
     else
     {
         qDebug() << "no ROI defined...";
+        //ROI = all nodes
         dataset->initROI();
     }
+
+    //3: load connectivity: put this into seperate loader / dataset / here
+    qDebug() << "loading connectivity";
+    dataset->readConnectivity( connectivityName );
+
+    //TODO: init conn.-crap...
+    //dataset->setMinthresh( mt );
 
     dataset->setProperties();
     dataset->addSecondSurfaceSelector();
