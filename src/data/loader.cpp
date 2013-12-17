@@ -376,10 +376,19 @@ bool Loader::loadGlyphset()
     gnl = gts.readLine();
     QStringList sl2 = gnl.split( " " );
 
-    QString connectivityName = trunk + QDir::separator() + sl2.at(0);
-    float mt = sl2.at( 1 ).toFloat();
+    QString connectivityName = trunk + QDir::separator() + sl2.at( 0 );
+    float mt = 0.8;
+    if ( sl2.length() > 1 )
+    {
+        mt = sl2.at( 1 ).toFloat();
+        qDebug() << "minimum threshold: " << mt;
+    }
+    else
+    {
+        qDebug() << "no minimum threshold in glyphset file, default of " << mt << " used.";
+    }
     float maxt = 1.0;
-    if (sl2.length() > 2)
+    if ( sl2.length() > 2 )
     {
         maxt = sl2.at( 2 ).toFloat();
     }
@@ -387,10 +396,10 @@ bool Loader::loadGlyphset()
     DatasetGlyphset* dataset = new DatasetGlyphset( glyphsetname, mt, maxt );
 
     qDebug() << "loading glyph set: " << datasetName;
-    if (two)
+    if ( two )
     {
         qDebug() << "...and loading glyph set: " << datasetNames.at( 1 );
-        if (datasetNames.length() > 2)
+        if ( datasetNames.length() > 2 )
         {
             qDebug() << "only two hemispheres supported";
         }
@@ -407,7 +416,7 @@ bool Loader::loadGlyphset()
     QString onl;
     QTextStream* ots;
     QVector<QString> others;
-    if (two)
+    if ( two )
     {
         QFile othersetfile( trunk + QDir::separator() + datasetNames.at( 1 ) );
         if ( !othersetfile.open( QIODevice::ReadOnly ) )
@@ -419,7 +428,7 @@ bool Loader::loadGlyphset()
         while ( !ots->atEnd() )
         {
             onl = ots->readLine();
-            others.push_back(onl);
+            others.push_back( onl );
         }
 
     }
@@ -429,9 +438,9 @@ bool Loader::loadGlyphset()
     {
         nl = ts.readLine();
         qDebug() << "!" << nl;
-        if (two)
+        if ( two )
         {
-            onl = others.at(k);
+            onl = others.at( k );
             qDebug() << onl;
             k++;
         }
@@ -469,8 +478,8 @@ bool Loader::loadGlyphset()
             int onumTriangles = 0;
             QVector<float> opoints;
             QVector<int> otriangles;
-            QVector3D* os = new QVector3D(0,0,0);
-            if (two)
+            QVector3D* os = new QVector3D( 0, 0, 0 );
+            if ( two )
             {
                 QStringList osl;
                 osl = onl.split( " " );
@@ -513,7 +522,7 @@ bool Loader::loadGlyphset()
                 mesh->addTriangle( triangles[i * 3], triangles[i * 3 + 2], triangles[i * 3 + 1] );
             }
 
-            if (two)
+            if ( two )
             {
                 dataset->m_tris_middle = numTriangles;
                 dataset->m_points_middle = numPoints;
@@ -527,7 +536,7 @@ bool Loader::loadGlyphset()
                 for ( int i = 0; i < onumTriangles; ++i )
                 {
                     //TODO: Check orientation change (0,2,1)...
-                    mesh->addTriangle( otriangles[i * 3]+onumPoints, otriangles[i * 3 + 2]+onumPoints, otriangles[i * 3 + 1]+onumPoints );
+                    mesh->addTriangle( otriangles[i * 3] + onumPoints, otriangles[i * 3 + 2] + onumPoints, otriangles[i * 3 + 1] + onumPoints );
                 }
             }
 
@@ -545,12 +554,14 @@ bool Loader::loadGlyphset()
     //dataset->setMinthresh( mt );
 
     //fourth thing on the line: name of roi...
-    if (sl2.length() > 3)
+    if ( sl2.length() > 3 )
     {
-        QString roiname = trunk + QDir::separator() +sl2.at( 3 );
+        QString roiname = trunk + QDir::separator() + sl2.at( 3 );
         qDebug() << "loading ROI: " << roiname;
-        dataset->loadROI(roiname);
-    } else {
+        dataset->loadROI( roiname );
+    }
+    else
+    {
         qDebug() << "no ROI defined...";
         dataset->initROI();
     }
@@ -566,7 +577,7 @@ bool Loader::loadCons()
 {
     QString filename = m_fileName.path();
     DatasetCons* dataset = new DatasetCons( filename );
-    m_dataset.push_back(dataset);
+    m_dataset.push_back( dataset );
     return true;
 }
 
