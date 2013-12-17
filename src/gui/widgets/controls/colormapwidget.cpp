@@ -68,13 +68,12 @@ QImage* ColormapWidget::createImage( int width )
         QColor c;
         ColormapBase cmap = ColormapFunctions::getColormap( m_colormap );
 
-        float value = ( ( (float)i / (float)width ) - m_selectedMin ) / ( m_selectedMax - m_selectedMin );
-        value = value * ( m_upperThreshold - m_lowerThreshold  ) + m_lowerThreshold;
-        c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
+        float value = ( (float) i / (float) width ) * ( m_upperThreshold - m_lowerThreshold ) + m_lowerThreshold; //mapped to (lower_t, upper_t)
+        float value2 = ( value - m_selectedMin ) / ( m_selectedMax - m_selectedMin ); //mapped so that s_min = 0, s_max=1
 
-        float compare = ( (float)i / (float)width ) * ( m_upperThreshold - m_lowerThreshold  ) + m_lowerThreshold;
-        if ( ( compare > m_selectedMin - 0.005 && compare < m_selectedMin ) ||
-             ( compare > m_selectedMax && compare < m_selectedMax + 0.005 ) )
+        c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value2 ) ) );
+
+        if ( ( value > m_selectedMin - 0.005 && value < m_selectedMin ) || ( value > m_selectedMax && value < m_selectedMax + 0.005 ) )
         {
             c = getInverseColor( c );
         }
