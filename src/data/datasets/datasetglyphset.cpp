@@ -246,10 +246,18 @@ void DatasetGlyphset::readConnectivity( QString filename )
 
     for ( int i = 0; i < m_n; i++ )
     {
-        for ( int j = 0; j < m_n; j++ )
+        if ( roi[i] )
         {
-            ins >> m_correlationMatrix[i][j];
-            //qDebug() << i << j << conn[i][j];
+            for ( int j = 0; j < m_n; j++ )
+            {
+                ins >> m_correlationMatrix[i][j];
+                m_correlationMatrix[j][i] = m_correlationMatrix[i][j];
+                //qDebug() << i << j << conn[i][j];
+            }
+        }
+        else
+        {
+            ins.skipRawData( m_n * 4 ); //4 byte float32
         }
     }
     f.close();
@@ -1107,7 +1115,7 @@ void DatasetGlyphset::loadROI( QString filename )
         while ( !in.atEnd() )
         {
             QString line = in.readLine();
-            qDebug() << line << " " << ids.size();
+            //qDebug() << line << " " << ids.size();
             QStringList sl = line.split( " " );
             ids.append( sl.at( 0 ).toInt() );
         }
