@@ -26,9 +26,11 @@ DatasetCorrelation::DatasetCorrelation( QDir fileName, float minThreshold, float
 
     m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setValue( -1 );
+    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMin( -1 );
 
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
     m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
+    m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( -1 );
 
     m_properties["maingl"]->set( Fn::Property::D_COLORMODE, 3 );
 
