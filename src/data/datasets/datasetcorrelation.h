@@ -10,6 +10,8 @@
 
 #include "datasetmesh.h"
 
+#include "correlationmatrix.h"
+
 class TriangleMesh2;
 class MeshRenderer;
 
@@ -33,7 +35,9 @@ protected:
     float m_minThreshold;
     float m_maxThreshold;
 
-    float** m_correlationMatrix; //square connectivity matrix
+    //float** m_correlationMatrix; //square connectivity matrix
+
+    CorrelationMatrix* m_correlations;
 
     QVector<int> m_picked;
     int m_prevPickedID;
