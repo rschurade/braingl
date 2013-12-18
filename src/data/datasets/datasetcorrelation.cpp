@@ -18,7 +18,7 @@ DatasetCorrelation::DatasetCorrelation( QDir fileName, float minThreshold, float
     DatasetMesh( fileName, type ),
     m_minThreshold( minThreshold ),
     m_maxThreshold( maxThreshold ),
-    m_correlationMatrix( 0 ),
+    m_correlations( NULL ),
     m_prevPickedID( -1 )
 {
     m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( -1 );
@@ -43,7 +43,16 @@ DatasetCorrelation::~DatasetCorrelation()
 
 void DatasetCorrelation::setCorrelationMatrix( float** matrix )
 {
-    m_correlationMatrix = matrix;
+    //TODO: test if this works, think about data duplication
+    delete m_correlations;
+    m_correlations = new CorrelationMatrix( getMesh()->numVerts() );
+    for ( int i = 0; i < getMesh()->numVerts(); ++i )
+    {
+        for ( int j = 0; j < getMesh()->numVerts(); ++j )
+        {
+            m_correlations->setValue( i, j, m_correlations->getValue( i, j ) );
+        }
+    }
 }
 
 bool DatasetCorrelation::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
@@ -71,7 +80,7 @@ void DatasetCorrelation::setPickedID( int pickedID )
         {
             for ( int m = 0; m < m_mesh.size(); m++ )
             {
-                m_mesh[m]->setVertexData( i, m_correlationMatrix[pickedID][i] );
+                m_mesh[m]->setVertexData( i, m_correlations->getValue( pickedID, i ) );
             }
         }
     }

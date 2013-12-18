@@ -101,15 +101,10 @@ DatasetGlyphset::~DatasetGlyphset()
         delete m_dprenderer;
         m_dprenderer = NULL;
     }
-    if ( m_correlationMatrix )
+    if ( m_correlations )
     {
-        for ( int i = 0; i < m_n; i++ )
-        {
-            delete[] m_correlationMatrix[i];
-            m_correlationMatrix[i] = NULL;
-        }
-        delete[] m_correlationMatrix;
-        m_correlationMatrix = NULL;
+        delete m_correlations;
+        m_correlations = NULL;
     }
 }
 
@@ -226,41 +221,16 @@ void DatasetGlyphset::littleBrainVisibilityChanged( QVariant qv )
 
 void DatasetGlyphset::readConnectivity( QString filename )
 {
-    QFile f( filename );
-    if ( !f.open( QIODevice::ReadOnly ) )
-        qDebug() << "binary connectivity unreadable: " << filename;
-
-    //This assumes a square matrix of float32...
-    m_n = qSqrt( f.size() / 4 );
-    qDebug() << "connectivity matrix size: " << m_n;
-    m_correlationMatrix = new float*[m_n];
-    for ( int i = 0; i < m_n; i++ )
-    {
-        m_correlationMatrix[i] = new float[m_n];
-    }
-
-    QDataStream ins( &f );
-    ins.setByteOrder( QDataStream::LittleEndian );
-    ins.setFloatingPointPrecision( QDataStream::SinglePrecision );
-    qDebug() << "reading binary connectivity between " << m_n << " nodes...";
-
-    for ( int i = 0; i < m_n; i++ )
-    {
-        for ( int j = 0; j < m_n; j++ )
-        {
-            ins >> m_correlationMatrix[i][j];
-            m_correlationMatrix[j][i] = m_correlationMatrix[i][j];
-            //qDebug() << i << j << conn[i][j];
-        }
-    }
-    f.close();
+    m_correlations = new CorrelationMatrix( filename );
+    m_n = m_correlations->getN();
+    //m_n = 0;
     qDebug() << "connectivity read";
     m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::addCorrelation( float** corr )
 {
-    m_correlationMatrix = corr;
+    DatasetCorrelation::setCorrelationMatrix( corr );
     m_n = m_mesh[0]->numVerts();
     m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
@@ -289,7 +259,7 @@ void DatasetGlyphset::makeLittleBrains()
             QMatrix4x4 sc;
             for ( int p = 0; p < m_n; ++p )
             {
-                mesh->setVertexData( p, m_correlationMatrix[i][p] );
+                mesh->setVertexData( p, m_correlations->getValue(i,p) );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
             shifts1[i] = f1;
@@ -532,7 +502,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
 bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 {
-    float v = m_correlationMatrix[i][j];
+    float v = m_correlations->getValue( i, j );
     bool include = false;
     if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
     {
@@ -612,7 +582,7 @@ void DatasetGlyphset::makeCons()
             for ( int j = 0; j < m_n; ++j )
 
             {
-                float v = m_correlationMatrix[i][j];
+                float v =  m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -729,8 +699,8 @@ void DatasetGlyphset::makeDiffPoints()
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
                 //if ( ( v > diffMinThresh ) && ( v < m_maxThreshold ) )
                 //TODO: What treshold do we use?
-                float v1 = m_correlationMatrix[i1][j];
-                float v2 = m_correlationMatrix[i2][j];
+                float v1 = m_correlations->getValue( i1, j );
+                float v2 = m_correlations->getValue( i2, j );
                 if ( filter( i1, j, lr, m_minThreshold, sign ) && filter( i2, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
@@ -817,7 +787,7 @@ void DatasetGlyphset::makeVecs()
         {
             for ( int j = 0; j < m_n; ++j )
             {
-                float v = m_correlationMatrix[i][j];
+                float v =  m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -953,7 +923,7 @@ void DatasetGlyphset::makePies()
 
                     if ( gdiff.length() > minlength )
                     {
-                        sortlist.push_back( new Connection( f, dc, m_correlationMatrix[i][j] ) );
+                        sortlist.push_back( new Connection( f, dc,  m_correlations->getValue( i, j ) ) );
                         ++count;
                     }
                 }
@@ -1029,7 +999,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
         {
             for ( int j = i + 1; j < m_n; ++j )
             {
-                float v = m_correlationMatrix[i][j];
+                float v =  m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -1206,7 +1176,7 @@ void DatasetGlyphset::avgCon()
                 }
                 else
                 {
-                    v += m_correlationMatrix[r][i];
+                    v +=  m_correlations->getValue( r, i );
                 }
                 ++nroi;
             }
@@ -1235,7 +1205,7 @@ void DatasetGlyphset::avgConRtoZ()
                 }
                 else
                 {
-                    double v1 = m_correlationMatrix[r][i];
+                    double v1 =  m_correlations->getValue( r, i );
                     double z = 0.5 * qLn( ( 1 + v1 ) / ( 1 - v1 ) );
                     v += z;
                 }
@@ -1265,7 +1235,7 @@ void DatasetGlyphset::slotCopyColors()
     {
         ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 
-        float value = ( m_correlationMatrix[m_prevPickedID][i] - selectedMin ) / ( selectedMax - selectedMin );
+        float value = (  m_correlations->getValue( m_prevPickedID, i ) - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
 
         mesh->setVertexColor( i, color );
