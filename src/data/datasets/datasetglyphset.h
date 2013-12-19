@@ -105,6 +105,8 @@ private slots:
     void rotationChanged( QVariant qv );
     void littleBrainVisibilityChanged( QVariant qv );
     void slotCopyColors();
+    void thresholdChanged( QVariant v );
+    void thresholdPercChanged( QVariant v );
 };
 
 #endif /* DATASETGLYPHSET_H_ */

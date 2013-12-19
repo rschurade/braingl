@@ -51,6 +51,42 @@ CorrelationMatrix::~CorrelationMatrix()
     m_file->close();
 }
 
+void CorrelationMatrix::makeHistogram(bool* roi)
+{
+    m_nbins = 2000;
+    m_histogram = new int[m_nbins];
+    m_perc_histogram = new float[m_nbins];
+    for ( int i = 0; i < m_nbins; i++ )
+    {
+        m_histogram[i] = 0;
+    }
+    for ( int i = 0; i < m_n; ++i )
+    {
+        if ( roi[i] )
+        {
+            for ( int j = 0; j < m_n; ++j )
+            {
+                float v = getValue( i, j );
+                int bin = qFloor( m_nbins * ( v + 1 ) / 2  );
+                if (!isnan(v)) m_histogram[bin]++;
+            }
+        }
+    }
+    for (int i = m_nbins-1; i > 0; i--)
+    {
+        m_histogram[i - 1] += m_histogram[i];
+    }
+
+    for ( int i = 0; i < m_nbins; i++ )
+    {
+        m_perc_histogram[i] = m_histogram[i]/(float)m_histogram[0];
+    }
+    for ( int i = 0; i < m_nbins; i++ )
+    {
+        //qDebug() << (2*i/(float)m_nbins)-1 << ": " << m_perc_histogram[i];
+    }
+}
+
 void CorrelationMatrix::loadEverything()
 {
     qDebug() << "reading binary connectivity between " << m_n << " nodes...";
@@ -154,4 +190,26 @@ void CorrelationMatrix::load( int i )
         setValue( i, j, v );
     }
     m_loaded[i] = true;
+}
+
+float CorrelationMatrix::percFromThresh( float t )
+{
+    int bin = qFloor( m_nbins * ( t + 1 ) / 2 );
+    //qDebug() << bin << " " << m_perc_histogram[bin];
+    return m_perc_histogram[bin];
+}
+
+float CorrelationMatrix::threshFromPerc( float p )
+{
+    int bin = 0;
+    for ( int i = 0; i < m_nbins; ++i )
+    {
+        if ( m_perc_histogram[i] > p )
+        {
+            bin = i;
+        }
+    }
+    float thr = ( 2 * bin / (float) m_nbins ) - 1;
+    //qDebug() << "bin: " << bin << " thr: " << thr;
+    return thr;
 }
