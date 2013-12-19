@@ -116,6 +116,7 @@ void DatasetGlyphset::addSecondSurfaceSelector()
 void DatasetGlyphset::addProperties()
 {
     m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD_PERC, 0.5f, 0.0f, 1.0f, "general" );
     m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
     { "+", "-", "+/-" }, 0, "general" );
     m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE,
@@ -151,11 +152,17 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
+    ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD_PERC ) )->setDigits( 4 );
     m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE,
     { "orientation", "value" }, 0, "glyphs" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD ), SIGNAL( valueChanged( QVariant ) ), this,
+            SLOT( thresholdChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD_PERC ), SIGNAL( valueChanged( QVariant ) ), this,
+            SLOT( thresholdPercChanged(QVariant) ) );
 }
 
 void DatasetGlyphset::colorModeChanged( QVariant qv )
@@ -222,6 +229,7 @@ void DatasetGlyphset::littleBrainVisibilityChanged( QVariant qv )
 void DatasetGlyphset::readConnectivity( QString filename )
 {
     m_correlations = new CorrelationMatrix( filename );
+    m_correlations->makeHistogram(roi);
     m_n = m_correlations->getN();
     //m_n = 0;
     qDebug() << "connectivity read";
@@ -231,6 +239,7 @@ void DatasetGlyphset::readConnectivity( QString filename )
 void DatasetGlyphset::addCorrelation( float** corr )
 {
     DatasetCorrelation::setCorrelationMatrix( corr );
+    m_correlations->makeHistogram(roi);
     m_n = m_mesh[0]->numVerts();
     m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
@@ -1292,4 +1301,16 @@ void DatasetGlyphset::slotCopyColors()
 
         mesh->setVertexColor( i, color );
     }
+}
+
+void DatasetGlyphset::thresholdChanged( QVariant v )
+{
+    float f = v.toFloat();
+    m_properties["maingl"]->set( Fn::Property::D_THRESHOLD_PERC, m_correlations->percFromThresh( f ) );
+}
+
+void DatasetGlyphset::thresholdPercChanged( QVariant v )
+{
+    float f = v.toFloat();
+    m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, m_correlations->threshFromPerc( f ) );
 }

@@ -25,6 +25,11 @@ public:
     void setValue( int i, int j, float v );
     float getValue( int i, int j );
 
+    void makeHistogram(bool* roi);
+
+    float percFromThresh(float t);
+    float threshFromPerc(float p);
+
 private:
     void loadEverything();
     bool* m_loaded;
@@ -34,6 +39,10 @@ private:
     QDataStream* m_instream;
     void load(int i);
     QString m_filename;
+
+    int* m_histogram;
+    float* m_perc_histogram;
+    int m_nbins;
 };
 
 #endif /* CORRELATIONMATRIX_H_ */
