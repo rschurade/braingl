@@ -60,6 +60,7 @@ public:
     void avgCon();
     void avgConRtoZ();
     void makeLittleBrains();
+    void colorLittleBrains();
     void deleteLittleBrains();
 
     int m_tris_middle;

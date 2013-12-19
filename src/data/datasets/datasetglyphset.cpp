@@ -255,11 +255,12 @@ void DatasetGlyphset::makeLittleBrains()
             m_renderer->init();
 
             littleBrains[i] = m_renderer;
+            littleMeshes[i] = mesh;
 
             QMatrix4x4 sc;
             for ( int p = 0; p < m_n; ++p )
             {
-                mesh->setVertexData( p, m_correlations->getValue(i,p) );
+                mesh->setVertexData( p, m_correlations->getValue( i, p ) );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
             shifts1[i] = f1;
@@ -275,6 +276,57 @@ void DatasetGlyphset::makeLittleBrains()
             littleMeshes[i] = NULL;
         }
     }
+    Models::g()->submit();
+}
+
+void DatasetGlyphset::colorLittleBrains()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ) ).toString();
+
+    QString filter( "RGB color file (*.rgb)" );
+
+    QFileDialog fd( NULL, "Open File", fn, filter );
+    fd.setFileMode( QFileDialog::ExistingFile );
+    fd.setAcceptMode( QFileDialog::AcceptOpen );
+    if ( fd.exec() )
+    {
+        QStringList filenames = fd.selectedFiles();
+        if ( filenames.length() > 0 )
+        {
+            QString filename = filenames.at( 0 );
+            qDebug() << "loading: " << filename;
+            QFile file( filename );
+            if ( !file.open( QIODevice::ReadOnly ) )
+            {
+                qDebug() << "error reading: " << filename;
+                return;
+            }
+            QTextStream in( &file );
+
+            for ( int p = 0; p < m_n; p++ )
+            {
+                float r, g, b;
+                in >> r >> g >> b;
+                //qDebug() << "color: " << r << " " << g << " " << b;
+                for ( int i = 0; i < m_n; i++ )
+                {
+                    if ( littleBrains[i] != NULL )
+                    {
+                        littleBrains[i]->beginUpdateColor();
+                        littleBrains[i]->updateColor( p, r, g, b, 1.0 );
+                        littleMeshes[i]->setVertexColor( p, r, g, b, 1.0 );
+                        littleBrains[i]->endUpdateColor();
+                    }
+                }
+            }
+            file.close();
+        }
+    }
+    else
+    {
+        qDebug() << "no file selected";
+    }
+    GLFunctions::reloadShaders();
     Models::g()->submit();
 }
 
@@ -582,7 +634,7 @@ void DatasetGlyphset::makeCons()
             for ( int j = 0; j < m_n; ++j )
 
             {
-                float v =  m_correlations->getValue( i, j );
+                float v = m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -787,7 +839,7 @@ void DatasetGlyphset::makeVecs()
         {
             for ( int j = 0; j < m_n; ++j )
             {
-                float v =  m_correlations->getValue( i, j );
+                float v = m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -923,7 +975,7 @@ void DatasetGlyphset::makePies()
 
                     if ( gdiff.length() > minlength )
                     {
-                        sortlist.push_back( new Connection( f, dc,  m_correlations->getValue( i, j ) ) );
+                        sortlist.push_back( new Connection( f, dc, m_correlations->getValue( i, j ) ) );
                         ++count;
                     }
                 }
@@ -999,7 +1051,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
         {
             for ( int j = i + 1; j < m_n; ++j )
             {
-                float v =  m_correlations->getValue( i, j );
+                float v = m_correlations->getValue( i, j );
                 if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
                 {
                     QVector3D f = m_mesh.at( geo )->getVertex( i );
@@ -1176,7 +1228,7 @@ void DatasetGlyphset::avgCon()
                 }
                 else
                 {
-                    v +=  m_correlations->getValue( r, i );
+                    v += m_correlations->getValue( r, i );
                 }
                 ++nroi;
             }
@@ -1205,7 +1257,7 @@ void DatasetGlyphset::avgConRtoZ()
                 }
                 else
                 {
-                    double v1 =  m_correlations->getValue( r, i );
+                    double v1 = m_correlations->getValue( r, i );
                     double z = 0.5 * qLn( ( 1 + v1 ) / ( 1 - v1 ) );
                     v += z;
                 }
@@ -1235,7 +1287,7 @@ void DatasetGlyphset::slotCopyColors()
     {
         ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 
-        float value = (  m_correlations->getValue( m_prevPickedID, i ) - selectedMin ) / ( selectedMax - selectedMin );
+        float value = ( m_correlations->getValue( m_prevPickedID, i ) - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
 
         mesh->setVertexColor( i, color );
