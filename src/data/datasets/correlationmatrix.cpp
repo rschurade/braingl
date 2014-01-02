@@ -10,6 +10,8 @@
 #include "qdebug.h"
 #include "qmath.h"
 
+#include <cmath>
+
 CorrelationMatrix::CorrelationMatrix( int i )
 {
     init( i );
@@ -68,7 +70,10 @@ void CorrelationMatrix::makeHistogram(bool* roi)
             {
                 float v = getValue( i, j );
                 int bin = qFloor( m_nbins * ( v + 1 ) / 2  );
-                if (!isnan(v)) m_histogram[bin]++;
+                if ( !std::isnan( v ) )
+                {
+                    m_histogram[bin]++;
+                }
             }
         }
     }
@@ -134,7 +139,7 @@ void CorrelationMatrix::init( int n )
 
 void CorrelationMatrix::setValue( int i, int j, float v )
 {
-    if ( isnan( v ) )
+    if ( std::isnan( v ) )
     {
         //v = 0;
         //qDebug() << i << " " << j;
