@@ -69,6 +69,13 @@ protected:
     int m_numPoints;
     int m_numLines;
 
+    bool m_morphable;
+    float m_morphValue;
+    void makeMorphable();
+    void morph(float i);
+    QVector< QVector< float > > m_orig_fibs;
+    QVector< QVector< float > > m_straight_fibs;
+
 private slots:
     void colorChanged();
     void dataModeChanged();

@@ -30,7 +30,8 @@ DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     m_tubeRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
-    m_numLines( 0 )
+    m_numLines( 0 ),
+    m_morphValue( 1.0f)
 {
 
 }
@@ -42,7 +43,8 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_tubeRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
-    m_numLines( 0 )
+    m_numLines( 0 ),
+    m_morphValue( 1.0f)
 {
     QVector<QVector<float> >data0;
     QVector<float>min0;
@@ -74,7 +76,8 @@ DatasetFibers::DatasetFibers( QDir filename,
     m_tubeRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
-    m_numLines( 0 )
+    m_numLines( 0 ),
+    m_morphValue( 1.0f)
 {
     createProps();
 }
@@ -85,7 +88,8 @@ DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
     m_tubeRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
-    m_numLines( 0 )
+    m_numLines( 0 ),
+    m_morphValue( 1.0f)
 {
     copyFromLoader( lv );
 
@@ -98,6 +102,10 @@ DatasetFibers::~DatasetFibers()
     m_properties["maingl2"]->set( Fn::Property::D_ACTIVE, false );
     m_fibs.clear();
     m_fibs.squeeze();
+    m_orig_fibs.clear();
+    m_orig_fibs.squeeze();
+    m_straight_fibs.clear();
+    m_straight_fibs.squeeze();
     if ( m_renderer != 0 )
     {
         delete m_renderer;
@@ -160,6 +168,8 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->createInt( Fn::Property::D_NX, 800, 0, 1600, "special" );
     m_properties["maingl"]->createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
     m_properties["maingl"]->createInt( Fn::Property::D_NZ, 800, 0, 1600, "special" );
+
+    m_properties["maingl"]->createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
 
     m_properties["maingl"]->createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
     m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.2f, 0.0f, 1.0f, "light" );
@@ -363,6 +373,16 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
+    }
+    float morphValue = properties( target )->get( Fn::Property::D_FIBER_MORPH ).toFloat();
+    if ( morphValue != m_morphValue )
+    {
+        if ( !m_morphable )
+        {
+            makeMorphable();
+        }
+        qDebug() << "morphing fibers to: " << morphValue;
+        morph( morphValue );
     }
     if ( m_selector == 0 )
     {
@@ -664,4 +684,74 @@ void DatasetFibers::applyTransform()
     delete m_selector;
     m_selector = 0;
     Models::d()->submit();
+}
+
+void DatasetFibers::makeMorphable()
+{
+    //copy fibs to m_original_fibs
+    //calculate straightened fibs
+    //set morphable true
+
+    m_orig_fibs.resize( m_fibs.size() );
+    m_straight_fibs.resize( m_fibs.size() );
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        QVector<float> fib = m_fibs[i];
+        m_orig_fibs.replace( i, fib );
+
+        QVector<float> s_fib = m_fibs[i];
+        int n = fib.size() / 3;
+
+        QVector3D start( fib[0], fib[1], fib[2] );
+        QVector3D end( fib[( n - 1 ) * 3], fib[( n - 1 ) * 3 + 1], fib[( n - 1 ) * 3 + 2] );
+        for ( int k = 0; k < fib.size() / 3; ++k )
+        {
+            QVector3D vert = start + ( end - start ) * ( k / (float) n );
+            s_fib[k * 3] = vert.x();
+            s_fib[k * 3 + 1] = vert.y();
+            s_fib[k * 3 + 2] = vert.z();
+        }
+
+        m_straight_fibs.replace( i, s_fib );
+    }
+    m_morphable = true;
+}
+
+void DatasetFibers::morph(float value)
+{
+    qDebug() << "starting morph";
+
+    //replace fibs with interpolated fibs
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        QVector<float> fib = m_fibs[i];
+        QVector<float> o_fib = m_orig_fibs[i];
+        QVector<float> s_fib = m_straight_fibs[i];
+
+        for ( int k = 0; k < o_fib.size() / 3; ++k )
+        {
+            QVector3D o_vert( o_fib[k * 3], o_fib[k * 3 + 1], o_fib[k * 3 + 2] );
+            QVector3D s_vert( s_fib[k * 3], s_fib[k * 3 + 1], s_fib[k * 3 + 2] );
+            //qDebug() << o_vert << " " << s_vert;
+            QVector3D vert = o_vert * value + s_vert * ( 1 - value );
+            fib[k * 3] = vert.x();
+            fib[k * 3 + 1] = vert.y();
+            fib[k * 3 + 2] = vert.z();
+        }
+        m_fibs.replace( i, fib );
+    }
+
+    m_morphValue = value;
+
+    qDebug() << "midmorph";
+
+    //make change known to the world?
+    //no models-> submit, since called from draw routine
+    //TODO: there might be nicer ways to do this...
+    delete m_renderer;
+    m_renderer = 0;
+    delete m_tubeRenderer;
+    m_tubeRenderer = 0;
+    delete m_selector;
+    m_selector = 0;
 }

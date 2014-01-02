@@ -256,6 +256,7 @@ namespace Fn
         D_GLYPH_THRESHOLD_SIGN,
         D_LITTLE_BRAINS_COLORMODE,
         D_THRESHOLD_PERC,
+        D_FIBER_MORPH,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -511,6 +512,7 @@ namespace Fn
                 case Property::D_GLYPH_THRESHOLD_SIGN: return QString( "threshold interpretation" ); break;
                 case Property::D_LITTLE_BRAINS_COLORMODE: return QString( "little brains color mode" ); break;
                 case Property::D_THRESHOLD_PERC: return QString( "threshold as percentage" ); break;
+                case Property::D_FIBER_MORPH: return QString( "interpolation btw. straight line and data" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
