@@ -34,8 +34,9 @@ public:
 protected:
     void setupTextures();
     void setShaderVars();
-    void setRenderParams( PropertyGroup* props );
+    virtual void setRenderParams( PropertyGroup* props );
     void initGeometry();
+    int m_colorMode;
 
 private:
     int m_tris;
@@ -49,7 +50,6 @@ private:
     bool m_dirty;
 
     int m_renderMode;
-    int m_colorMode;
     int m_colormap;
     float m_selectedMin;
     float m_selectedMax;

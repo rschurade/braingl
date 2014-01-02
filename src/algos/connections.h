@@ -13,6 +13,7 @@
 #include "bundlingthread.h"
 #include "attractthread.h"
 #include "compatibilities.h"
+#include "compatibilitiesthread.h"
 
 #include "../data/datasets/datasetfibers.h"
 
@@ -64,7 +65,7 @@ public:
     void startBundling();
 
     QVector<AttractThread*> m_athreads;
-    int m_athreadsRunning;
+    QVector<CompatibilitiesThread*> m_compthreads;
 
     void hashEdges();
 
@@ -73,6 +74,9 @@ private slots:
     void setBell( float value, int );
     void setSmooth( int value, int );
     void attractThreadFinished();
+    void attractThreadProgress();
+    void compThreadFinished();
+    void compThreadProgress();
 
 signals:
     void progress();
