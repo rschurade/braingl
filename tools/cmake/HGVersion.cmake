@@ -9,7 +9,8 @@ message(STATUS "GETTING HG VERSION")
 exec_program( hg ${PROJECT_SOURCE_DIR} ARGS tip --template='{rev}:{node|short}\n' OUTPUT_VARIABLE __HGTIP__ )
 message(STATUS "__HGTIP__=${__HGTIP__}")
 
-SET( CHANGESET  "\"" ${__HGTIP__} "\"" )
+#SET( CHANGESET  "\"" ${__HGTIP__} "\"" )
+SET( CHANGESET  "\""  "\"" )
 
 #string( REPLACE "\n" ";" __HGTIP__ ${__HGTIP__} )
 #foreach(HGTIP ${__HGTIP__})
