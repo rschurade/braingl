@@ -74,6 +74,7 @@ private:
     FNAction* m_fiberBundlingAction;
     FNAction* m_createROIAction;
     FNAction* m_deleteLittleBrainsAction;
+    FNAction* m_colorLittleBrainsAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

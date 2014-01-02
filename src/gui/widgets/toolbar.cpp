@@ -200,6 +200,10 @@ void ToolBar::createActions()
     m_deleteLittleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "little brain delete" ), this, Fn::Algo::DELETE_LITTLE_BRAINS );
     m_deleteLittleBrainsAction->setStatusTip( tr( "delete little brains" ) );
     connect( m_deleteLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_colorLittleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "load rgb on little brains" ), this, Fn::Algo::COLOR_LITTLE_BRAINS );
+    m_colorLittleBrainsAction->setStatusTip( tr( "color little brains" ) );
+    connect( m_colorLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -398,6 +402,11 @@ void ToolBar::slot( Fn::Algo algo )
             ( (DatasetGlyphset*)ds )->deleteLittleBrains();
             break;
         }
+        case Fn::Algo::COLOR_LITTLE_BRAINS:
+        {
+            ( (DatasetGlyphset*)ds )->colorLittleBrains();
+            break;
+        }
 
     }
     qDebug() << "adding " << l.size() << " datasets";
@@ -475,6 +484,7 @@ void ToolBar::slotSelectionChanged( int type )
         }
         case Fn::DatasetType::GLYPHSET:
         {
+            this->addAction( m_colorLittleBrainsAction );
             this->addAction( m_makeConsAction );
             //this->addAction( m_avgConAction );
             //this->addAction( m_avgConRZAction );

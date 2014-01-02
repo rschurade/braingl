@@ -22,13 +22,13 @@
 
 MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
     ObjectRenderer(),
+    m_colorMode( 0 ),
     m_tris( 0 ),
     vboIds( new GLuint[ 3 ] ),
     m_pickId( GLFunctions::getPickIndex() ),
     m_mesh( mesh ),
     m_dirty( true ),
     m_renderMode( 0 ),
-    m_colorMode( 0 ),
     m_colormap( 1 ),
     m_selectedMin( 0.0 ),
     m_selectedMax( 1.0 ),

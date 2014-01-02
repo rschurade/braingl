@@ -12,7 +12,6 @@
 
 #include "../mesh/trianglemesh2.h"
 
-#include "../../gui/gl/meshrenderer.h"
 #include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/colormapfunctions.h"
 
@@ -47,11 +46,11 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevCol( -1 ),
                 prevGlyphstyle( -1 ),
                 prevColorMode( -1 ),
-                prevThreshSign(0),
+                prevThreshSign( 0 ),
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
-                littleBrains( QVector<MeshRenderer*>() ),
+                littleBrains( QVector<LittleBrainRenderer*>() ),
                 littleMeshes( QVector<TriangleMesh2*>() ),
                 shifts1( QVector<QVector3D>() ),
                 shifts2( QVector<QVector3D>() )
@@ -63,6 +62,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
     m_properties["maingl"]->createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
     m_properties["maingl2"]->createBool( Fn::Property::D_DRAW_GLYPHS, false );
     m_properties["maingl"]->createBool( Fn::Property::D_LITTLE_BRAIN_VISIBILITY, true, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_LITTLE_BRAINS_COLORMODE,
+    { "per mesh", "mri", "per vertex", "vertex data" }, 3, "general" );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_COLORMODE ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( colorModeChanged(QVariant) ) );
@@ -70,6 +71,8 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
             SLOT( glyphStyleChanged(QVariant) ) );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_ROTATION ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( rotationChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ), SIGNAL( valueChanged(QVariant)), this,
+            SLOT( littleBrainVisibilityChanged(QVariant) ) );
 
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
     m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
@@ -98,15 +101,10 @@ DatasetGlyphset::~DatasetGlyphset()
         delete m_dprenderer;
         m_dprenderer = NULL;
     }
-    if ( m_correlationMatrix )
+    if ( m_correlations )
     {
-        for ( int i = 0; i < m_n; i++ )
-        {
-            delete[] m_correlationMatrix[i];
-            m_correlationMatrix[i] = NULL;
-        }
-        delete[] m_correlationMatrix;
-        m_correlationMatrix = NULL;
+        delete m_correlations;
+        m_correlations = NULL;
     }
 }
 
@@ -118,8 +116,11 @@ void DatasetGlyphset::addSecondSurfaceSelector()
 void DatasetGlyphset::addProperties()
 {
     m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, m_minThreshold, m_minThreshold, 1.0f, "general" );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN, { "+", "-", "+/-" }, 0, "general" );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE, { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
+    m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD_PERC, 0.5f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_THRESHOLD_SIGN,
+    { "+", "-", "+/-" }, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE,
+    { "points", "vectors", "pies", "diffpoints" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
     m_properties["maingl"]->createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
     m_properties["maingl"]->createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
     m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
@@ -151,10 +152,17 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"]->createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
 
     ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE, { "orientation", "value" }, 0, "glyphs" );
+    ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD_PERC ) )->setDigits( 4 );
+    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE,
+    { "orientation", "value" }, 0, "glyphs" );
 
     m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD ), SIGNAL( valueChanged( QVariant ) ), this,
+            SLOT( thresholdChanged(QVariant) ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_THRESHOLD_PERC ), SIGNAL( valueChanged( QVariant ) ), this,
+            SLOT( thresholdPercChanged(QVariant) ) );
 }
 
 void DatasetGlyphset::colorModeChanged( QVariant qv )
@@ -206,42 +214,32 @@ void DatasetGlyphset::rotationChanged( QVariant qv )
     }
 }
 
+void DatasetGlyphset::littleBrainVisibilityChanged( QVariant qv )
+{
+    if ( !qv.toBool() )
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_LITTLE_BRAINS_COLORMODE )->setHidden( true );
+    }
+    else
+    {
+        m_properties["maingl"]->getWidget( Fn::Property::D_LITTLE_BRAINS_COLORMODE )->setHidden( false );
+    }
+}
+
 void DatasetGlyphset::readConnectivity( QString filename )
 {
-    QFile f( filename );
-    if ( !f.open( QIODevice::ReadOnly ) )
-        qDebug() << "binary connectivity unreadable: " << filename;
-
-    //This assumes a square matrix of float32...
-    m_n = qSqrt( f.size() / 4 );
-    qDebug() << "connectivity matrix size: " << m_n;
-    m_correlationMatrix = new float*[m_n];
-    for ( int i = 0; i < m_n; i++ )
-    {
-        m_correlationMatrix[i] = new float[m_n];
-    }
-
-    QDataStream ins( &f );
-    ins.setByteOrder( QDataStream::LittleEndian );
-    ins.setFloatingPointPrecision( QDataStream::SinglePrecision );
-    qDebug() << "reading binary connectivity between " << m_n << " nodes...";
-
-    for ( int i = 0; i < m_n; i++ )
-    {
-        for ( int j = 0; j < m_n; j++ )
-        {
-            ins >> m_correlationMatrix[i][j];
-            //qDebug() << i << j << conn[i][j];
-        }
-    }
-    f.close();
+    m_correlations = new CorrelationMatrix( filename );
+    m_correlations->makeHistogram(roi);
+    m_n = m_correlations->getN();
+    //m_n = 0;
     qDebug() << "connectivity read";
     m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
 
 void DatasetGlyphset::addCorrelation( float** corr )
 {
-    m_correlationMatrix = corr;
+    DatasetCorrelation::setCorrelationMatrix( corr );
+    m_correlations->makeHistogram(roi);
     m_n = m_mesh[0]->numVerts();
     m_properties["maingl"]->createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" ); //TODO: Change the limits later?
 }
@@ -256,20 +254,22 @@ void DatasetGlyphset::makeLittleBrains()
 {
     for ( int i = 0; i < m_n; ++i )
     {
-        if ( ( littleBrains[i] == NULL ) && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
+        if ( ( littleBrains[i] == NULL )
+                && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>() ) )
         {
             TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
-            MeshRenderer* m_renderer = new MeshRenderer( mesh );
+            LittleBrainRenderer* m_renderer = new LittleBrainRenderer( mesh );
 
             m_renderer->setModel( Models::g() );
             m_renderer->init();
 
             littleBrains[i] = m_renderer;
+            littleMeshes[i] = mesh;
 
             QMatrix4x4 sc;
             for ( int p = 0; p < m_n; ++p )
             {
-                mesh->setVertexData( p, m_correlationMatrix[i][p] );
+                mesh->setVertexData( p, m_correlations->getValue( i, p ) );
             }
             QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
             shifts1[i] = f1;
@@ -285,6 +285,57 @@ void DatasetGlyphset::makeLittleBrains()
             littleMeshes[i] = NULL;
         }
     }
+    Models::g()->submit();
+}
+
+void DatasetGlyphset::colorLittleBrains()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ) ).toString();
+
+    QString filter( "RGB color file (*.rgb)" );
+
+    QFileDialog fd( NULL, "Open File", fn, filter );
+    fd.setFileMode( QFileDialog::ExistingFile );
+    fd.setAcceptMode( QFileDialog::AcceptOpen );
+    if ( fd.exec() )
+    {
+        QStringList filenames = fd.selectedFiles();
+        if ( filenames.length() > 0 )
+        {
+            QString filename = filenames.at( 0 );
+            qDebug() << "loading: " << filename;
+            QFile file( filename );
+            if ( !file.open( QIODevice::ReadOnly ) )
+            {
+                qDebug() << "error reading: " << filename;
+                return;
+            }
+            QTextStream in( &file );
+
+            for ( int p = 0; p < m_n; p++ )
+            {
+                float r, g, b;
+                in >> r >> g >> b;
+                //qDebug() << "color: " << r << " " << g << " " << b;
+                for ( int i = 0; i < m_n; i++ )
+                {
+                    if ( littleBrains[i] != NULL )
+                    {
+                        littleBrains[i]->beginUpdateColor();
+                        littleBrains[i]->updateColor( p, r, g, b, 1.0 );
+                        littleMeshes[i]->setVertexColor( p, r, g, b, 1.0 );
+                        littleBrains[i]->endUpdateColor();
+                    }
+                }
+            }
+            file.close();
+        }
+    }
+    else
+    {
+        qDebug() << "no file selected";
+    }
+    GLFunctions::reloadShaders();
     Models::g()->submit();
 }
 
@@ -332,7 +383,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     QMatrix4x4 mvp = pMatrix * mvMatrix;
 
-   //qDebug() << "little brains size: " << littleBrains.size();
+    //qDebug() << "little brains size: " << littleBrains.size();
 
     if ( ( target == "maingl" ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
@@ -371,6 +422,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                 float f = 1.2;
                 if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
                 {
+                    littleBrains[i]->m_LB_colormode = properties( "maingl" )->get( Fn::Property::D_LITTLE_BRAINS_COLORMODE ).toInt();
                     littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
                 }
                 else
@@ -498,12 +550,12 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
         m_colormapRenderer->setTextColor( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
 
-        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN).toFloat() );
-        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN ).toFloat() );
+        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX ).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
 
         m_colormapRenderer->draw( width, height, renderMode );
     }
@@ -511,7 +563,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
 bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 {
-    float v = m_correlationMatrix[i][j];
+    float v = m_correlations->getValue( i, j );
     bool include = false;
     if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
     {
@@ -551,7 +603,8 @@ bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 void DatasetGlyphset::makeCons()
 {
     qDebug() << "making consArray: " << m_minThreshold << " m_maxThreshold: " << m_maxThreshold;
-    if (consArray) delete[] consArray;
+    if ( consArray )
+        delete[] consArray;
     consArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -568,11 +621,14 @@ void DatasetGlyphset::makeCons()
     //TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                ++consNumber;
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    ++consNumber;
+                }
             }
         }
     }
@@ -582,39 +638,43 @@ void DatasetGlyphset::makeCons()
     consNumber = 0;
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
+
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
+                float v = m_correlations->getValue( i, j );
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
-                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
-                QVector3D dg = tg - fg;
+                    QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                    QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                    QVector3D dg = tg - fg;
 
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
 
-                consArray[offset * consNumber] = f.x();
-                consArray[offset * consNumber + 1] = f.y();
-                consArray[offset * consNumber + 2] = f.z();
-                consArray[offset * consNumber + 3] = v;
-                consArray[offset * consNumber + 4] = t.x();
-                consArray[offset * consNumber + 5] = t.y();
-                consArray[offset * consNumber + 6] = t.z();
+                    consArray[offset * consNumber] = f.x();
+                    consArray[offset * consNumber + 1] = f.y();
+                    consArray[offset * consNumber + 2] = f.z();
+                    consArray[offset * consNumber + 3] = v;
+                    consArray[offset * consNumber + 4] = t.x();
+                    consArray[offset * consNumber + 5] = t.y();
+                    consArray[offset * consNumber + 6] = t.z();
 
-                consArray[offset * consNumber + 7] = dg.x();
-                consArray[offset * consNumber + 8] = dg.y();
-                consArray[offset * consNumber + 9] = dg.z();
+                    consArray[offset * consNumber + 7] = dg.x();
+                    consArray[offset * consNumber + 8] = dg.y();
+                    consArray[offset * consNumber + 9] = dg.z();
 
-                consArray[offset * consNumber + 10] = dc.x();
-                consArray[offset * consNumber + 11] = dc.y();
-                consArray[offset * consNumber + 12] = dc.z();
+                    consArray[offset * consNumber + 10] = dc.x();
+                    consArray[offset * consNumber + 11] = dc.y();
+                    consArray[offset * consNumber + 12] = dc.z();
 
-                ++consNumber;
+                    ++consNumber;
+                }
             }
         }
     }
@@ -624,7 +684,8 @@ void DatasetGlyphset::makeDiffPoints()
 {
     float diffMinThresh = m_minThreshold / 3.0;
     qDebug() << "making diffPoints: " << diffMinThresh << " m_maxThreshold: " << m_maxThreshold;
-    if (diffsArray) delete[] diffsArray;
+    if ( diffsArray )
+        delete[] diffsArray;
     diffsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -699,8 +760,8 @@ void DatasetGlyphset::makeDiffPoints()
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
                 //if ( ( v > diffMinThresh ) && ( v < m_maxThreshold ) )
                 //TODO: What treshold do we use?
-                float v1 = m_correlationMatrix[i1][j];
-                float v2 = m_correlationMatrix[i2][j];
+                float v1 = m_correlations->getValue( i1, j );
+                float v2 = m_correlations->getValue( i2, j );
                 if ( filter( i1, j, lr, m_minThreshold, sign ) && filter( i2, j, lr, m_minThreshold, sign ) )
                 {
                     QVector3D f1 = m_mesh.at( geo )->getVertex( i1 );
@@ -748,7 +809,8 @@ void DatasetGlyphset::makeDiffPoints()
 void DatasetGlyphset::makeVecs()
 {
     qDebug() << "making vecsArray: " << m_minThreshold;
-    if (vecsArray) delete[] vecsArray;
+    if ( vecsArray )
+        delete[] vecsArray;
     vecsArray = NULL;
     int geo = m_properties["maingl"]->get( Fn::Property::D_SURFACE ).toInt();
     int glyph = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
@@ -765,11 +827,14 @@ void DatasetGlyphset::makeVecs()
 //TODO: Parallelize, protect from renderthread interruptions?...
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                ++vecsNumber;
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    ++vecsNumber;
+                }
             }
         }
     }
@@ -779,59 +844,62 @@ void DatasetGlyphset::makeVecs()
     vecsNumber = 0;
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, m_minThreshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
+                float v = m_correlations->getValue( i, j );
+                if ( filter( i, j, lr, m_minThreshold, sign ) )
+                {
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
 
-                QVector3D fg = m_mesh.at( glyph )->getVertex( i );
-                QVector3D tg = m_mesh.at( glyph )->getVertex( j );
-                QVector3D dg = tg - fg;
+                    QVector3D fg = m_mesh.at( glyph )->getVertex( i );
+                    QVector3D tg = m_mesh.at( glyph )->getVertex( j );
+                    QVector3D dg = tg - fg;
 
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
 
-                vecsArray[offset * vecsNumber] = f.x();
-                vecsArray[offset * vecsNumber + 1] = f.y();
-                vecsArray[offset * vecsNumber + 2] = f.z();
-                vecsArray[offset * vecsNumber + 3] = t.x();
-                vecsArray[offset * vecsNumber + 4] = t.y();
-                vecsArray[offset * vecsNumber + 5] = t.z();
+                    vecsArray[offset * vecsNumber] = f.x();
+                    vecsArray[offset * vecsNumber + 1] = f.y();
+                    vecsArray[offset * vecsNumber + 2] = f.z();
+                    vecsArray[offset * vecsNumber + 3] = t.x();
+                    vecsArray[offset * vecsNumber + 4] = t.y();
+                    vecsArray[offset * vecsNumber + 5] = t.z();
 
-                vecsArray[offset * vecsNumber + 6] = v;
-                vecsArray[offset * vecsNumber + 7] = 1;
+                    vecsArray[offset * vecsNumber + 6] = v;
+                    vecsArray[offset * vecsNumber + 7] = 1;
 
-                vecsArray[offset * vecsNumber + 8] = dg.x();
-                vecsArray[offset * vecsNumber + 9] = dg.y();
-                vecsArray[offset * vecsNumber + 10] = dg.z();
+                    vecsArray[offset * vecsNumber + 8] = dg.x();
+                    vecsArray[offset * vecsNumber + 9] = dg.y();
+                    vecsArray[offset * vecsNumber + 10] = dg.z();
 
-                vecsArray[offset * vecsNumber + 11] = dc.x();
-                vecsArray[offset * vecsNumber + 12] = dc.y();
-                vecsArray[offset * vecsNumber + 13] = dc.z();
+                    vecsArray[offset * vecsNumber + 11] = dc.x();
+                    vecsArray[offset * vecsNumber + 12] = dc.y();
+                    vecsArray[offset * vecsNumber + 13] = dc.z();
 
-                vecsArray[offset * vecsNumber + 14] = t.x();
-                vecsArray[offset * vecsNumber + 15] = t.y();
-                vecsArray[offset * vecsNumber + 16] = t.z();
-                vecsArray[offset * vecsNumber + 17] = f.x();
-                vecsArray[offset * vecsNumber + 18] = f.y();
-                vecsArray[offset * vecsNumber + 19] = f.z();
+                    vecsArray[offset * vecsNumber + 14] = t.x();
+                    vecsArray[offset * vecsNumber + 15] = t.y();
+                    vecsArray[offset * vecsNumber + 16] = t.z();
+                    vecsArray[offset * vecsNumber + 17] = f.x();
+                    vecsArray[offset * vecsNumber + 18] = f.y();
+                    vecsArray[offset * vecsNumber + 19] = f.z();
 
-                vecsArray[offset * vecsNumber + 20] = v;
-                vecsArray[offset * vecsNumber + 21] = -1;
+                    vecsArray[offset * vecsNumber + 20] = v;
+                    vecsArray[offset * vecsNumber + 21] = -1;
 
-                vecsArray[offset * vecsNumber + 22] = -dg.x();
-                vecsArray[offset * vecsNumber + 23] = -dg.y();
-                vecsArray[offset * vecsNumber + 24] = -dg.z();
+                    vecsArray[offset * vecsNumber + 22] = -dg.x();
+                    vecsArray[offset * vecsNumber + 23] = -dg.y();
+                    vecsArray[offset * vecsNumber + 24] = -dg.z();
 
-                vecsArray[offset * vecsNumber + 25] = -dc.x();
-                vecsArray[offset * vecsNumber + 26] = -dc.y();
-                vecsArray[offset * vecsNumber + 27] = -dc.z();
+                    vecsArray[offset * vecsNumber + 25] = -dc.x();
+                    vecsArray[offset * vecsNumber + 26] = -dc.y();
+                    vecsArray[offset * vecsNumber + 27] = -dc.z();
 
-                ++vecsNumber;
+                    ++vecsNumber;
+                }
             }
         }
     }
@@ -900,23 +968,25 @@ void DatasetGlyphset::makePies()
         int count = 0;
 
         QList<Connection*> sortlist;
-
-        for ( int j = 0; j < m_n; ++j )
+        if ( roi[i] )
         {
-            if ( filter( i, j, lr, threshold, sign ) )
+            for ( int j = 0; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
-                QVector3D gdiff = t - f;
-
-                QVector3D fc = m_mesh.at( col )->getVertex( i );
-                QVector3D tc = m_mesh.at( col )->getVertex( j );
-                QVector3D dc = tc - fc;
-
-                if ( gdiff.length() > minlength )
+                if ( filter( i, j, lr, threshold, sign ) )
                 {
-                    sortlist.push_back( new Connection( f, dc, m_correlationMatrix[i][j] ) );
-                    ++count;
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
+                    QVector3D gdiff = t - f;
+
+                    QVector3D fc = m_mesh.at( col )->getVertex( i );
+                    QVector3D tc = m_mesh.at( col )->getVertex( j );
+                    QVector3D dc = tc - fc;
+
+                    if ( gdiff.length() > minlength )
+                    {
+                        sortlist.push_back( new Connection( f, dc, m_correlations->getValue( i, j ) ) );
+                        ++count;
+                    }
                 }
             }
         }
@@ -986,21 +1056,24 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     Connections* cons = new Connections();
     for ( int i = 0; i < m_n; ++i )
     {
-        for ( int j = i + 1; j < m_n; ++j )
+        if ( roi[i] )
         {
-            float v = m_correlationMatrix[i][j];
-            if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
+            for ( int j = i + 1; j < m_n; ++j )
             {
-                QVector3D f = m_mesh.at( geo )->getVertex( i );
-                QVector3D t = m_mesh.at( geo )->getVertex( j );
-
-                Edge* aedge = new Edge( f, t, v );
-
-                if ( aedge->length() > minlength )
+                float v = m_correlations->getValue( i, j );
+                if ( filter( i, j, lr, threshold, sign ) || filter( j, i, lr, threshold, sign ) )
                 {
-                    cons->nodes << f;
-                    cons->nodes << t;
-                    cons->edges << aedge;
+                    QVector3D f = m_mesh.at( geo )->getVertex( i );
+                    QVector3D t = m_mesh.at( geo )->getVertex( j );
+
+                    Edge* aedge = new Edge( f, t, v );
+
+                    if ( aedge->length() > minlength )
+                    {
+                        cons->nodes << f;
+                        cons->nodes << t;
+                        cons->edges << aedge;
+                    }
                 }
             }
         }
@@ -1020,12 +1093,13 @@ void DatasetGlyphset::setProperties()
     m_properties["maingl"]->createList( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
     if ( m_is_split )
     {
-        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT, { "both", "left", "right" }, 0, "general" );
+        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT,
+        { "both", "left", "right" }, 0, "general" );
     }
-    littleBrains.fill( NULL, m_n);
-    littleMeshes.fill( NULL, m_n);
-    shifts1.resize(m_n);
-    shifts2.resize(m_n);
+    littleBrains.fill( NULL, m_n );
+    littleMeshes.fill( NULL, m_n );
+    shifts1.resize( m_n );
+    shifts2.resize( m_n );
 }
 
 void DatasetGlyphset::loadROI( QString filename )
@@ -1065,7 +1139,7 @@ void DatasetGlyphset::loadROI( QString filename )
         while ( !in.atEnd() )
         {
             QString line = in.readLine();
-            qDebug() << line << " " << ids.size();
+            //qDebug() << line << " " << ids.size();
             QStringList sl = line.split( " " );
             ids.append( sl.at( 0 ).toInt() );
         }
@@ -1163,7 +1237,7 @@ void DatasetGlyphset::avgCon()
                 }
                 else
                 {
-                    v += m_correlationMatrix[r][i];
+                    v += m_correlations->getValue( r, i );
                 }
                 ++nroi;
             }
@@ -1192,7 +1266,7 @@ void DatasetGlyphset::avgConRtoZ()
                 }
                 else
                 {
-                    double v1 = m_correlationMatrix[r][i];
+                    double v1 = m_correlations->getValue( r, i );
                     double z = 0.5 * qLn( ( 1 + v1 ) / ( 1 - v1 ) );
                     v += z;
                 }
@@ -1222,9 +1296,21 @@ void DatasetGlyphset::slotCopyColors()
     {
         ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 
-        float value = ( m_correlationMatrix[m_prevPickedID][i] - selectedMin ) / ( selectedMax - selectedMin );
+        float value = ( m_correlations->getValue( m_prevPickedID, i ) - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
 
         mesh->setVertexColor( i, color );
     }
+}
+
+void DatasetGlyphset::thresholdChanged( QVariant v )
+{
+    float f = v.toFloat();
+    m_properties["maingl"]->set( Fn::Property::D_THRESHOLD_PERC, m_correlations->percFromThresh( f ) );
+}
+
+void DatasetGlyphset::thresholdPercChanged( QVariant v )
+{
+    float f = v.toFloat();
+    m_properties["maingl"]->set( Fn::Property::D_THRESHOLD, m_correlations->threshFromPerc( f ) );
 }
