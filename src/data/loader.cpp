@@ -192,7 +192,7 @@ bool Loader::loadVTK()
         QVector<QVector<float> > values = lv->getPointData();
 
         float min = std::numeric_limits<float>().max();
-        float max = std::numeric_limits<float>().min();
+        float max = -std::numeric_limits<float>().max();
 
         if ( values.size() > 0 )
         {
@@ -221,8 +221,11 @@ bool Loader::loadVTK()
 
         mesh->finalize();
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
-        dataset->properties()->set( Fn::Property::D_MIN, min );
-        dataset->properties()->set( Fn::Property::D_MAX, max );
+        if ( min != max )
+        {
+            dataset->properties()->set( Fn::Property::D_MIN, min );
+            dataset->properties()->set( Fn::Property::D_MAX, max );
+        }
         m_dataset.push_back( dataset );
         delete lv;
         return true;
