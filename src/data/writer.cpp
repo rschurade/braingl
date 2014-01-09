@@ -19,6 +19,8 @@
 #include "datasets/datasetcons.h"
 #include "mesh/trianglemesh2.h"
 
+#include "../algos/fmath.h"
+
 #include <QDebug>
 
 Writer::Writer( Dataset* dataset, QString fileName, QString filter ) :
@@ -280,6 +282,11 @@ bool Writer::save()
         }
             break;
         case Fn::DatasetType::FIBERS:
+        {
+            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName, m_filter );
+            vtkWriter->save();
+        }
+            break;
         case Fn::DatasetType::MESH_BINARY:
         case Fn::DatasetType::MESH_ISOSURFACE:
         case Fn::DatasetType::MESH_TIME_SERIES :
@@ -296,6 +303,10 @@ bool Writer::save()
             else if ( m_filter.endsWith( "(*.roi)" ) )
             {
                 saveROI();
+            }
+            else if ( m_filter.endsWith( "(*.obj)" ) )
+            {
+                saveOBJ();
             }
             else
             {
@@ -467,5 +478,128 @@ void Writer::saveConnexels()
             out << edge->fn.x() << " " << edge->fn.y() << " " << edge->fn.z() << " " << edge->tn.x() << " " << edge->tn.y() << " " << edge->tn.z() << " " << edge->m_value << endl;
         }
         file.close();
+    }
+}
+
+void Writer::saveOBJ()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile objFile( m_fileName );
+        if ( !objFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &objFile );
+        // save obj
+        out << "# Alias OBJ Model File" << endl;
+        out << "# Exported from brainGL, (c) 2012-2014 Ralph Schurade" << endl;
+        out << "# File units = millimeters" << endl;
+        out << endl;
+
+        QString mtlFN( m_fileName );
+        mtlFN.replace( mtlFN.size() - 3, 3, "mtl" );
+
+        out << "mtllib " << mtlFN << endl;
+        out << endl;
+
+        out << "g Mesh1 Group1 Model" << endl;
+        out << endl;
+
+        out << "# vertices" << endl;
+
+        int numVerts = dsm->getMesh()->numVerts();
+
+        for ( int i = 0; i < numVerts; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertex( i );
+            out << "v " << vert.x() << " " << vert.y() << " " << vert.z() << endl;
+        }
+        out << endl;
+
+        out << "# vertex normals" << endl;
+
+        for ( int i = 0; i < numVerts; ++i )
+        {
+            QVector3D normal = dsm->getMesh()->getVertexNormal( i );
+            out << "vn " << normal.x() << " " << normal.y() << " " << normal.z() << endl;
+        }
+        out << endl;
+
+        out << "# triangle faces" << endl;
+
+        int numTris = dsm->getMesh()->numTris();
+        int texSize = FMath::pow2roundup( sqrt( numTris * 4 ) );
+        float texSizeF =  2 * texSize;
+        qDebug() << numTris << texSize << texSizeF;
+        QImage* image = new QImage( texSize * 2, texSize * 2, QImage::Format_RGB32 );
+
+        for ( int i = 0; i < numTris; ++i )
+        {
+            float column = i % texSize;
+            float row =  i / texSize;
+
+            Triangle t = dsm->getMesh()->getTriangle2( i );
+            float col2 = column * 2;
+            float row2 = row * 2;
+            image->setPixel( col2    , row2    , dsm->getMesh()->getVertexColor( t.v0 ).rgba() );
+            image->setPixel( col2 + 1, row2    , dsm->getMesh()->getVertexColor( t.v2 ).rgba() );
+            image->setPixel( col2    , row2 + 1, dsm->getMesh()->getVertexColor( t.v1 ).rgba() );
+            image->setPixel( col2 + 1, row2 + 1, dsm->getMesh()->getVertexColor( t.v1 ).rgba() );
+
+            float offset = 0.5 / texSizeF;
+
+            float x = 2 * column / texSizeF + offset;
+            float y = 2 * row    / texSizeF + offset;
+            out << "vt " << x << " " << ( 1.0 - y ) << endl;
+
+            x = ( 2 * column + 1 ) / texSizeF + offset;
+            out << "vt " << x << " " << ( 1.0 - y ) << endl;
+
+            x = ( 2 * column + 1 ) / texSizeF + offset;
+            y = ( 2 * row + 1 )    / texSizeF + offset;
+            out << "vt " << x << " " << ( 1.0 - y ) << endl;
+
+            out << "f " << t.v0 + 1 << "/" << 3 * i + 1 << "/" << t.v0 + 1 << " "
+                        << t.v2 + 1 << "/" << 3 * i + 2 << "/" << t.v2 + 1 << " "
+                        << t.v1 + 1 << "/" << 3 * i + 3 << "/" << t.v1 + 1 << endl;
+        }
+
+        objFile.close();
+
+        QString texFN( m_fileName );
+        texFN.replace( texFN.size() - 3, 3, "png" );
+
+        // save mtl
+        QFile mtlFile( mtlFN );
+        if ( !mtlFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out2( &mtlFile );
+
+        out2 << "#" << endl;
+        out2 << "## Alias OBJ Material File" << endl;
+        out2 << "# Exported from brainGL, (c) 2012-2014 Ralph Schurade" << endl;
+        out2 << endl;
+        out2 << "newmtl texture" << endl;
+        out2 << "Ka 1.000000 1.000000 1.000000" << endl;
+        out2 << "Kd 1.000000 1.000000 1.000000" << endl;
+        out2 << "Ks 0.000000 0.000000 0.000000" << endl;
+
+        out2 << "map_Kd " << texFN << endl;
+        out2 << endl;
+        out2 << "newmtl ForegroundColor" << endl;
+        out2 << "Ka 1.000000 1.000000 1.000000" << endl;
+        out2 << "Kd 1.000000 1.000000 1.000000" << endl;
+        out2 << "Ks 0.000000 0.000000 0.000000" << endl;
+        out2 << endl;
+
+        mtlFile.close();
+        // save texture
+
+        image->save(  texFN, "PNG" );
+        delete image;
     }
 }

@@ -5,8 +5,10 @@
  * @author Ralph Schurade
  */
 #include "datasetmesh.h"
+#include "datasetscalar.h"
 
 #include "../models.h"
+#include "../vptr.h"
 
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
@@ -48,6 +50,8 @@ void DatasetMesh::initProperties()
 
     m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 255, 255, 255 ), "general" );
     m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
+    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 
     m_properties["maingl"]->createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
     m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
@@ -356,7 +360,7 @@ void DatasetMesh::makePermanent()
 
 QString DatasetMesh::getSaveFilter()
 {
-    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; all files (*.*)" );
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh obj (*.obj);; all files (*.*)" );
 }
 
 QString DatasetMesh::getDefaultSuffix()
@@ -465,4 +469,47 @@ void DatasetMesh::applyTransform()
     delete m_renderer;
     m_renderer = 0;
     Models::d()->submit();
+}
+
+void DatasetMesh::slotCopyColors()
+{
+    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+    QList<DatasetScalar*> texList;
+    for ( int k = 0; k < dsl.size(); ++k )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( dsl[k] );
+        if ( ds->properties()->get( Fn::Property::D_ACTIVE ).toBool() && ds->properties()->get( Fn::Property::D_HAS_TEXTURE ).toBool() )
+        {
+            texList.push_back( VPtr<DatasetScalar>::asPtr( dsl[k] ) );
+            if ( texList.size() == 5 )
+            {
+                break;
+            }
+        }
+    }
+
+    if ( texList.empty() )
+    {
+        return;
+    }
+
+    TriangleMesh2* mesh = getMesh();
+    m_renderer->beginUpdateColor();
+    for ( int i = 0; i < mesh->numVerts(); ++i )
+    {
+        QColor c = texList[0]->getColorAtPos( mesh->getVertex( i ) );
+        for ( int k = 1; k < texList.size(); ++k )
+        {
+            QColor c2 = texList[k]->getColorAtPos( mesh->getVertex( i ) );
+            c.setRedF( ( 1.0 - c2.alphaF() ) * c.redF() + c2.alphaF() * c2.redF() );
+            c.setGreenF( ( 1.0 - c2.alphaF() ) * c.greenF() + c2.alphaF() * c2.greenF() );
+            c.setBlueF( ( 1.0 - c2.alphaF() ) * c.blueF() + c2.alphaF() * c2.blueF() );
+        }
+
+
+        mesh->setVertexColor( i, c );
+        //qDebug() << texDS->getColorAtPos( mesh->getVertex( i ) );
+    }
+    m_renderer->endUpdateColor();
 }

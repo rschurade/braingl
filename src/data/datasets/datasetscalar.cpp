@@ -7,6 +7,7 @@
 #include "datasetscalar.h"
 #include "../models.h"
 
+#include "../../gui/gl/colormapfunctions.h"
 #include "../../gui/gl/colormaprenderer.h"
 
 #include <QDebug>
@@ -229,4 +230,69 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
     }
 
     return true;
+}
+
+float DatasetScalar::getInterpolatedValueAtPos( QVector3D pos )
+{
+    float x = pos.x() / m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
+    float y = pos.y() / m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
+    float z = pos.z() / m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+
+    int x0 = (int) x;
+    int y0 = (int) y;
+    int z0 = (int) z;
+
+    float xd = x - x0;
+    float yd = y - y0;
+    float zd = z - z0;
+
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+
+    int blockSize = nx * ny * nz;
+
+    int id = getIdFromPos( pos.x(), pos.y(), pos.z() );
+    int id_x0y0z0 = id;
+    int id_x1y0z0 = qMin( blockSize - 1, id + 1 );
+    int id_x0y1z0 = qMin( blockSize - 1, id + nx );
+    int id_x1y1z0 = qMin( blockSize - 1, id + nx + 1 );
+    int id_x0y0z1 = qMin( blockSize - 1, id + nx * ny );
+    int id_x1y0z1 = qMin( blockSize - 1, id + nx * ny + 1 );
+    int id_x0y1z1 = qMin( blockSize - 1, id + nx * ny + nx );
+    int id_x1y1z1 = qMin( blockSize - 1, id + nx * ny + nx + 1 );
+
+    float i1;
+    float i2;
+    float j1;
+    float j2;
+    float w1;
+    float w2;
+    float iv;
+
+    i1 = m_data[ id_x0y0z0 ] * ( 1.0 - zd ) + m_data[ id_x0y0z1 ] * zd;
+    i2 = m_data[ id_x0y1z0 ] * ( 1.0 - zd ) + m_data[ id_x0y1z1 ] * zd;
+    j1 = m_data[ id_x1y0z0 ] * ( 1.0 - zd ) + m_data[ id_x1y0z1 ] * zd;
+    j2 = m_data[ id_x1y1z0 ] * ( 1.0 - zd ) + m_data[ id_x1y1z1 ] * zd;
+
+    w1 = i1 * ( 1.0 - yd ) + i2 * yd;
+    w2 = j1 * ( 1.0 - yd ) + j2 * yd;
+
+    iv = w1 * ( 1.0 - xd ) + w2 * xd;
+
+    return iv;
+}
+
+QColor DatasetScalar::getColorAtPos( QVector3D pos )
+{
+    float value = getInterpolatedValueAtPos( pos );
+
+    float colormapID = m_properties["maingl"]->get( Fn::Property::D_COLORMAP ).toInt();
+    float min = m_properties["maingl"]->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float max = m_properties["maingl"]->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float lower_t = m_properties["maingl"]->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float upper_t = m_properties["maingl"]->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    float alpha =  m_properties["maingl"]->get( Fn::Property::D_ALPHA ).toFloat();
+    QColor c = ColormapFunctions::getColor( colormapID, value, min, max, lower_t, upper_t, alpha );
+    return c;
 }

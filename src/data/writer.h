@@ -36,7 +36,7 @@ private:
     void save1D();
     void saveROI();
     void saveConnexels();
-
+    void saveOBJ();
 };
 
 #endif /* WRITER_H_ */

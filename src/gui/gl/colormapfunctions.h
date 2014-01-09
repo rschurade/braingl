@@ -24,6 +24,8 @@ public:
 
     static void deleteColormap( int id );
 
+    static QColor getColor( int colormapID, float value, float min, float max, float lowerThreshold, float upperThreshold, float alpha );
+
 private:
     ColormapFunctions() {}
     virtual ~ColormapFunctions() {}
