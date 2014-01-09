@@ -4,22 +4,14 @@ macro ( ReadProjectRevisionStatus )
 message(STATUS "GETTING HG VERSION")
 #message( STATUS PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} )
 
-#exec_program( hg ${PROJECT_SOURCE_DIR} ARGS paths OUTPUT_VARIABLE ${PROJECT_NAME}_HGPATHS )
-#message( STATUS "${PROJECT_NAME}_HGPATHS=${${PROJECT_NAME}_HGPATHS}}" )
-exec_program( hg ${PROJECT_SOURCE_DIR} ARGS tip --template='{rev}:{node|short}\n' OUTPUT_VARIABLE __HGTIP__ )
+execute_process(
+    COMMAND hg tip --template "{rev}:{node|short}"
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE __HGTIP__
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "__HGTIP__=${__HGTIP__}")
 
-#SET( CHANGESET  "\"" ${__HGTIP__} "\"" )
-SET( CHANGESET  "\""  "\"" )
-
-#string( REPLACE "\n" ";" __HGTIP__ ${__HGTIP__} )
-#foreach(HGTIP ${__HGTIP__})
-#    string(SUBSTRING "${HGTIP}" 0 11 HGTIPSTART)
-#    if (HGTIPSTART MATCHES "changeset: ")
-#        SET( CHANGESET  "\"" ${HGTIP} "\"" )
-#        message(STATUS "${HGTIP}")
-#    endif()
-#endforeach()
+SET( CHANGESET  "\"" ${__HGTIP__} "\"" )
 
 add_custom_target(buildheader ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h)
 file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/buildtime.h )
