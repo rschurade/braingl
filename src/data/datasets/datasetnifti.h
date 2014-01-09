@@ -43,6 +43,8 @@ public:
     QString getSaveFilter();
     QString getDefaultSuffix();
 
+    virtual QColor getColorAtPos( float x, float y, float z );
+
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;

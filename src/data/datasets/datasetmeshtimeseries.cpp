@@ -89,8 +89,8 @@ void DatasetMeshTimeSeries::setProperties()
     connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
     m_properties["maingl2"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 
-    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+//    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
+//    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
 void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )

@@ -287,3 +287,7 @@ QString DatasetNifti::getDefaultSuffix()
     return QString( "nii.gz" );
 }
 
+QColor DatasetNifti::getColorAtPos( float x, float y, float z )
+{
+    return QColor( 0, 0, 0 ,0 );
+}
