@@ -7,6 +7,8 @@
 
 #include "colormapfunctions.h"
 
+#include <QDebug>
+
 QVector<ColormapBase>ColormapFunctions::m_colormaps;
 
 void ColormapFunctions::addColormap( ColormapBase colormap )
@@ -42,4 +44,28 @@ void ColormapFunctions::setName( int id, QString name )
 void ColormapFunctions::deleteColormap( int id )
 {
     ColormapFunctions::m_colormaps.remove( id );
+}
+
+QColor ColormapFunctions::getColor( int colormapID, float value, float min, float max, float lowerThreshold, float upperThreshold, float alpha )
+{
+    ColormapBase cmap = getColormap( colormapID );
+    //qDebug() << value << min << max << lowerThreshold << upperThreshold;
+    float value1 = value;
+    if ( value < lowerThreshold || value > upperThreshold )
+    {
+        value1 = 0;
+    }
+    float value2 = ( value1 - min ) / ( max - min ); //mapped so that s_min = 0, s_max=1
+
+    //qDebug() << value2 << cmap.getColor( qMax( 0.0f, qMin( 1.0f, value2 ) ) );
+    if ( value1 > 0 )
+    {
+        QColor c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value2 ) ) );
+        c.setAlphaF( alpha );
+        return c;
+    }
+    else
+    {
+        return QColor( 0, 0, 0, 0 );
+    }
 }
