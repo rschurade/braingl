@@ -430,8 +430,12 @@ QString MainWindow::strippedName( const QString &fullFileName )
 
 void MainWindow::save()
 {
-    Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
-    save( ds );
+    int selected = m_datasetWidget->getSelected();
+    if ( selected != -1 )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selected, (int)Fn::Property::D_DATASET_POINTER) ) );
+        save( ds );
+    }
 }
 
 bool MainWindow::save( Dataset* ds )
