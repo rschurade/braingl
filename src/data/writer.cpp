@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-Writer::Writer( Dataset* dataset, QString fileName, QString filter ) :
+Writer::Writer( Dataset* dataset, QFileInfo fileName, QString filter ) :
     m_dataset( dataset ),
     m_fileName( fileName ),
     m_filter( filter )
@@ -45,7 +45,7 @@ bool Writer::save()
             QVector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
 
             out->data = data->data();
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -85,7 +85,7 @@ bool Writer::save()
             }
             out->data = &( outData[0] );
 
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -126,7 +126,7 @@ bool Writer::save()
             }
             out->data = &( outData[0] );
 
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -167,7 +167,7 @@ bool Writer::save()
             }
             out->data = &( outData[0] );
 
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -208,7 +208,7 @@ bool Writer::save()
             }
             out->data = &( outData[0] );
 
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -270,7 +270,7 @@ bool Writer::save()
             }
             out->data = &( outData[0] );
 
-            if ( nifti_set_filenames( out, m_fileName.toStdString().c_str(), 0, 1 ) )
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
                 qDebug() << "NIfTI filename Problem" << endl;
             }
@@ -283,7 +283,7 @@ bool Writer::save()
             break;
         case Fn::DatasetType::FIBERS:
         {
-            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName, m_filter );
+            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
             vtkWriter->save();
         }
             break;
@@ -308,9 +308,13 @@ bool Writer::save()
             {
                 saveOBJ();
             }
+            else if ( m_filter.endsWith( "(*.wrl)" ) )
+            {
+                saveVRML();
+            }
             else
             {
-                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName, m_filter );
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
                 vtkWriter->save();
             }
             break;
@@ -401,7 +405,7 @@ void Writer::saveRGB()
     if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
     {
         DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
-        QFile file( m_fileName );
+        QFile file( m_fileName.absoluteFilePath() );
         if ( !file.open( QIODevice::WriteOnly ) )
         {
             return;
@@ -421,7 +425,7 @@ void Writer::save1D()
     if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
     {
         DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
-        QFile file( m_fileName );
+        QFile file( m_fileName.absoluteFilePath() );
         if ( !file.open( QIODevice::WriteOnly ) )
         {
             return;
@@ -441,7 +445,7 @@ void Writer::saveROI()
     if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
     {
         DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
-        QFile file( m_fileName );
+        QFile file( m_fileName.absoluteFilePath() );
         if ( !file.open( QIODevice::WriteOnly ) )
         {
             return;
@@ -464,7 +468,7 @@ void Writer::saveConnexels()
     if ( dynamic_cast<DatasetCons*>( m_dataset ) )
     {
         DatasetCons* dsc = dynamic_cast<DatasetCons*>( m_dataset );
-        QFile file( m_fileName );
+        QFile file( m_fileName.absoluteFilePath() );
         if ( !file.open( QIODevice::WriteOnly ) )
         {
             return;
@@ -486,7 +490,8 @@ void Writer::saveOBJ()
     if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
     {
         DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
-        QFile objFile( m_fileName );
+        QFile objFile( m_fileName.absoluteFilePath() );
+
         if ( !objFile.open( QIODevice::WriteOnly ) )
         {
             return;
@@ -498,13 +503,14 @@ void Writer::saveOBJ()
         out << "# File units = millimeters" << endl;
         out << endl;
 
-        QString mtlFN( m_fileName );
+        QString mtlFN( m_fileName.absoluteFilePath() );
         mtlFN.replace( mtlFN.size() - 3, 3, "mtl" );
+        QFileInfo fi( mtlFN );
 
-        out << "mtllib " << mtlFN << endl;
+        out << "mtllib " << fi.fileName() << endl;
         out << endl;
 
-        out << "g Mesh1 Group1 Model" << endl;
+        out << "g Mesh1 Group1 Model " << endl;
         out << endl;
 
         out << "# vertices" << endl;
@@ -568,8 +574,9 @@ void Writer::saveOBJ()
 
         objFile.close();
 
-        QString texFN( m_fileName );
+        QString texFN( m_fileName.absoluteFilePath() );
         texFN.replace( texFN.size() - 3, 3, "png" );
+        QFileInfo tfi( texFN );
 
         // save mtl
         QFile mtlFile( mtlFN );
@@ -588,7 +595,7 @@ void Writer::saveOBJ()
         out2 << "Kd 1.000000 1.000000 1.000000" << endl;
         out2 << "Ks 0.000000 0.000000 0.000000" << endl;
 
-        out2 << "map_Kd " << texFN << endl;
+        out2 << "map_Kd " << tfi.fileName() << endl;
         out2 << endl;
         out2 << "newmtl ForegroundColor" << endl;
         out2 << "Ka 1.000000 1.000000 1.000000" << endl;
@@ -601,5 +608,84 @@ void Writer::saveOBJ()
 
         image->save(  texFN, "PNG" );
         delete image;
+    }
+}
+
+void Writer::saveVRML()
+{
+    /*
+    Shape {
+      geometry IndexedFaceSet {
+         coordIndex  [ 0, 1, 3, -1, 0, 2, 5, -1, ...]
+         coord       Coordinate        { point [0.0 5.0 3.0, ...] }
+         color       Color             { rgb [ 0.2 0.7 0.8, ...] }
+         normal      Normal            { vector [0.0 1.0 0.0, ...] }
+         texCoord    TextureCoordinate { point [0 1.0, ...] }
+      }
+      appearance Appearance { material Material { transparency 1.0 } }
+    }
+    */
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile wrlFile( m_fileName.absoluteFilePath() );
+        if ( !wrlFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &wrlFile );
+
+        out << "#VRML V2.0 utf8" << endl;
+        out << "Shape {" << endl;
+        out << "  geometry IndexedFaceSet {" << endl;
+        out << "    coordIndex  [ ";
+        int numTris = dsm->getMesh()->numTris();
+
+        for ( int i = 0; i < numTris - 1; ++i )
+        {
+            Triangle t = dsm->getMesh()->getTriangle2( i );
+            out << t.v0 << ", " << t.v2 << ", " << t.v1 << ", -1, ";// << endl;
+        }
+        Triangle t = dsm->getMesh()->getTriangle2( numTris - 1 );
+        out << t.v0 << ", " << t.v2 << ", " << t.v1 << ", -1 ]" << endl;;
+
+        int numVerts = dsm->getMesh()->numVerts();
+        out << "    coord     Coordinate { point [ ";
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertex( i );
+            out << vert.x() << " " << vert.y() << " " << vert.z() << ", ";// << endl;
+        }
+        QVector3D vert = dsm->getMesh()->getVertex( numVerts - 1 );
+        out << vert.x() << " " << vert.y() << " " << vert.z();// << endl;
+        out << " ] }" << endl;
+
+        out << "    color     Color { color [ ";
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QColor col = dsm->getMesh()->getVertexColor( i );
+            out << col.redF() << " " << col.greenF() << " " << col.blueF() << ", ";// << endl;
+        }
+        QColor col = dsm->getMesh()->getVertexColor( numVerts - 1 );
+        out << col.redF() << " " << col.greenF() << " " << col.blueF();// << endl;
+        out << " ] }" << endl;
+
+        out << "    normal    Normal { vector [ ";
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertexNormal( i );
+            out << vert.x() << " " << vert.y() << " " << vert.z() << ", ";// << endl;
+        }
+        QVector3D vert2 = dsm->getMesh()->getVertexNormal( numVerts - 1 );
+        out << vert2.x() << " " << vert2.y() << " " << vert2.z();// << endl;
+        out << " ] }" << endl;
+
+
+        out << "  }" << endl;
+        out << "  appearance Appearance { material Material { transparency 1.0 } }" << endl;
+        out << "}";
+
+
+        wrlFile.close();
     }
 }
