@@ -496,7 +496,7 @@ void MainWindow::saveFilterChanged( QString filterString )
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
     QString fileName = ds->properties()->get( Fn::Property::D_FILENAME ).toString();
-    Writer writer( ds, fileName, filter );
+    Writer writer( ds, QFileInfo( fileName ), filter );
     writer.save();
 }
 
