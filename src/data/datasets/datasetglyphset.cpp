@@ -1132,6 +1132,25 @@ void DatasetGlyphset::loadROI( QString filename )
             }
         }
     }
+    else if ( filename.endsWith( ".rgb" ) )
+    {
+        //File with node rgb values
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            float r, g, b;
+            in >> r >> g >> b;
+            //qDebug() << r << g << b;
+            //if color is not white, assume point is in ROI...
+            if ( (r < 1.0) || (g < 1.0) || (b < 1.0) )
+            {
+                roi[i] = true;
+            }
+            else
+            {
+                roi[i] = false;
+            }
+        }
+    }
     else
     {
 //File with node ids
