@@ -312,6 +312,10 @@ bool Writer::save()
             {
                 saveVRML();
             }
+            else if ( m_filter.endsWith( "(*.json)" ) )
+            {
+                saveMeshJson();
+            }
             else
             {
                 WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
@@ -647,7 +651,7 @@ void Writer::saveVRML()
             out << t.v0 << ", " << t.v2 << ", " << t.v1 << ", -1, ";// << endl;
         }
         Triangle t = dsm->getMesh()->getTriangle2( numTris - 1 );
-        out << t.v0 << ", " << t.v2 << ", " << t.v1 << ", -1 ]" << endl;;
+        out << t.v0 << ", " << t.v2 << ", " << t.v1 << ", -1 ]" << endl;
 
         int numVerts = dsm->getMesh()->numVerts();
         out << "    coord     Coordinate { point [ ";
@@ -687,5 +691,78 @@ void Writer::saveVRML()
 
 
         wrlFile.close();
+    }
+}
+
+void Writer::saveMeshJson()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile outFile( m_fileName.absoluteFilePath() );
+        if ( !outFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &outFile );
+
+        out << "{" << endl;
+        out << "  \"vertices\" :" << endl;
+        out << "[";
+
+        int numVerts = dsm->getMesh()->numVerts();
+
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertex( i );
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+        QVector3D vert = dsm->getMesh()->getVertex( numVerts - 1 );
+        out << vert.x() << "," << vert.y() << "," << vert.z();// << endl;
+
+        out << "]," << endl;
+
+        out << "  \"normals\" :" << endl;
+        out << "[";
+
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertexNormal( i );
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+        vert = dsm->getMesh()->getVertex( numVerts - 1 );
+        out << vert.x() << "," << vert.y() << "," << vert.z();// << endl;
+
+        out << "]," << endl;
+
+        out << "  \"indices\" :" << endl;
+        out << "[";
+
+        int numTris = dsm->getMesh()->numTris();
+        for ( int i = 0; i < numTris - 1; ++i )
+        {
+            Triangle t = dsm->getMesh()->getTriangle2( i );
+            out << t.v0 << "," << t.v1 << "," << t.v2 << ",";// << endl;
+        }
+        Triangle t = dsm->getMesh()->getTriangle2( numTris - 1 );
+        out << t.v0 << "," << t.v1 << "," << t.v2;
+
+        out << "]," << endl;
+
+        out << "  \"colors\" :" << endl;
+        out << "[";
+        for ( int i = 0; i < numVerts - 1; ++i )
+        {
+            QColor col = dsm->getMesh()->getVertexColor( i );
+            out << col.redF() << "," << col.greenF() << "," << col.blueF() << ",1,";// << endl;
+        }
+        QColor col = dsm->getMesh()->getVertexColor( numVerts - 1 );
+        out << col.redF() << "," << col.greenF() << "," << col.blueF() << ",1";// << endl;
+        out << "]," << endl;
+
+        out << "  \"correction\" : [ 0.0, 0.0, 0.0 ]" << endl;
+        out << "}";
+
+        outFile.close();
     }
 }
