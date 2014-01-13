@@ -39,6 +39,7 @@ private:
     void saveConnexels();
     void saveOBJ();
     void saveVRML();
+    void saveMeshJson();
 };
 
 #endif /* WRITER_H_ */
