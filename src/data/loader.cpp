@@ -550,17 +550,20 @@ bool Loader::loadGlyphset()
     }
 
     //fourth thing on the line: name of roi...
+    //no roi: initialize all nodes true
+    dataset->initROI();
     if ( sl2.length() > 3 )
     {
+
         QString roiname = trunk + QDir::separator() + sl2.at( 3 );
         qDebug() << "loading ROI: " << roiname;
         dataset->loadROI( roiname );
-    }
-    else
-    {
-        qDebug() << "no ROI defined...";
-        //ROI = all nodes
-        dataset->initROI();
+        if ( sl2.length() > 4 )
+        {
+            QString roiname2 = trunk + QDir::separator() + sl2.at( 4 );
+            qDebug() << "loading ROI2: " << roiname2;
+            dataset->loadROI2( roiname2 );
+        }
     }
 
     //3: load connectivity: put this into seperate loader / dataset / here
