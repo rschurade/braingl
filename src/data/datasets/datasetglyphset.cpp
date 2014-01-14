@@ -565,11 +565,11 @@ bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
 {
     float v = m_correlations->getValue( i, j );
     bool include = false;
-    if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] )
+    if ( ( sign == 0 || sign == 2 ) && ( v > threshold ) && ( v < m_maxThreshold ) && roi[i] && roi2[j] )
     {
         include = true;
     }
-    if ( ( sign == 1 || sign == 2 ) && ( v < -threshold ) && ( v > -m_maxThreshold ) && roi[i] )
+    if ( ( sign == 1 || sign == 2 ) && ( v < -threshold ) && ( v > -m_maxThreshold ) && roi[i] && roi2[j] )
     {
         include = true;
     }
@@ -1056,8 +1056,8 @@ QList<Dataset*> DatasetGlyphset::createConnections()
     Connections* cons = new Connections();
     for ( int i = 0; i < m_n; ++i )
     {
-        if ( roi[i] )
-        {
+        //if ( roi[i] )
+        //{
             for ( int j = i + 1; j < m_n; ++j )
             {
                 float v = m_correlations->getValue( i, j );
@@ -1076,7 +1076,7 @@ QList<Dataset*> DatasetGlyphset::createConnections()
                     }
                 }
             }
-        }
+        //}
     }
     QList<Dataset*> l;
     if ( cons->edges.size() > 0 )
@@ -1112,9 +1112,6 @@ void DatasetGlyphset::loadROI( QString filename )
         return;
     }
     QTextStream in( &file );
-    qDebug() << "m_mesh.size(): " << m_mesh.size();
-    roi = new bool[m_mesh.at( 0 )->numVerts()];
-
     if ( filename.endsWith( ".1D" ) )
     {
 //List of as many values as mesh nodes
@@ -1123,6 +1120,25 @@ void DatasetGlyphset::loadROI( QString filename )
             float v;
             in >> v;
             if ( v > 0.5 )
+            {
+                roi[i] = true;
+            }
+            else
+            {
+                roi[i] = false;
+            }
+        }
+    }
+    else if ( filename.endsWith( ".rgb" ) )
+    {
+        //File with node rgb values
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            float r, g, b;
+            in >> r >> g >> b;
+            //qDebug() << r << g << b;
+            //if color is not white, assume point is in ROI...
+            if ( (r < 1.0) || (g < 1.0) || (b < 1.0) )
             {
                 roi[i] = true;
             }
@@ -1156,12 +1172,84 @@ void DatasetGlyphset::loadROI( QString filename )
     file.close();
 }
 
+void DatasetGlyphset::loadROI2( QString filename )
+{
+    qDebug() << "loading roi2: " << filename;
+    QFile file( filename );
+    if ( !file.open( QIODevice::ReadOnly ) )
+    {
+        qDebug() << "something went wrong opening ROI file: " << filename;
+        return;
+    }
+    QTextStream in( &file );
+    if ( filename.endsWith( ".1D" ) )
+    {
+//List of as many values as mesh nodes
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            float v;
+            in >> v;
+            if ( v > 0.5 )
+            {
+                roi2[i] = true;
+            }
+            else
+            {
+                roi2[i] = false;
+            }
+        }
+    }
+    else if ( filename.endsWith( ".rgb" ) )
+    {
+        //File with node rgb values
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            float r, g, b;
+            in >> r >> g >> b;
+            //qDebug() << r << g << b;
+            //if color is not white, assume point is in ROI...
+            if ( (r < 1.0) || (g < 1.0) || (b < 1.0) )
+            {
+                roi2[i] = true;
+            }
+            else
+            {
+                roi2[i] = false;
+            }
+        }
+    }
+    else
+    {
+//File with node ids
+        QVector<int> ids;
+        while ( !in.atEnd() )
+        {
+            QString line = in.readLine();
+            //qDebug() << line << " " << ids.size();
+            QStringList sl = line.split( " " );
+            ids.append( sl.at( 0 ).toInt() );
+        }
+
+        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        {
+            roi2[i] = false;
+            if ( ids.contains( i ) )
+            {
+                roi2[i] = true;
+            }
+        }
+    }
+    file.close();
+}
+
 void DatasetGlyphset::initROI()
 {
     roi = new bool[m_mesh.at( 0 )->numVerts()];
+    roi2 = new bool[m_mesh.at( 0 )->numVerts()];
     for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
     {
         roi[i] = true;
+        roi2[i] = true;
     }
 }
 
