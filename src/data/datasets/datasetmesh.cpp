@@ -12,6 +12,7 @@
 
 #include "../mesh/trianglemesh2.h"
 #include "../../gui/gl/meshrenderer.h"
+#include "../../gui/gl/colormapfunctions.h"
 
 #include <QFile>
 #include <QFileDialog>
@@ -473,43 +474,68 @@ void DatasetMesh::applyTransform()
 
 void DatasetMesh::slotCopyColors()
 {
-    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
 
-    QList<DatasetScalar*> texList;
-    for ( int k = 0; k < dsl.size(); ++k )
+    if( m_properties["maingl"]->get( Fn::Property::D_COLORMODE ).toInt() == 3 )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( dsl[k] );
-        if ( ds->properties()->get( Fn::Property::D_ACTIVE ).toBool() && ds->properties()->get( Fn::Property::D_HAS_TEXTURE ).toBool() )
+
+        QColor color;
+
+        float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
+        float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+
+        m_renderer->beginUpdateColor();
+        for ( int i = 0; i < mesh->numVerts(); ++i )
         {
-            texList.push_back( VPtr<DatasetScalar>::asPtr( dsl[k] ) );
-            if ( texList.size() == 5 )
+            ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+
+            float value = ( mesh->getVertexData( i ) - selectedMin ) / ( selectedMax - selectedMin );
+            color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
+
+            mesh->setVertexColor( i, color );
+        }
+        m_renderer->endUpdateColor();
+    }
+    else
+    {
+        QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+        QList<DatasetScalar*> texList;
+        for ( int k = 0; k < dsl.size(); ++k )
+        {
+            Dataset* ds = VPtr<Dataset>::asPtr( dsl[k] );
+            if ( ds->properties()->get( Fn::Property::D_ACTIVE ).toBool() && ds->properties()->get( Fn::Property::D_HAS_TEXTURE ).toBool() )
             {
-                break;
+                texList.push_back( VPtr<DatasetScalar>::asPtr( dsl[k] ) );
+                if ( texList.size() == 5 )
+                {
+                    break;
+                }
             }
         }
-    }
 
-    if ( texList.empty() )
-    {
-        return;
-    }
-
-    TriangleMesh2* mesh = getMesh();
-    m_renderer->beginUpdateColor();
-    for ( int i = 0; i < mesh->numVerts(); ++i )
-    {
-        QColor c = texList[0]->getColorAtPos( mesh->getVertex( i ) );
-        for ( int k = 1; k < texList.size(); ++k )
+        if ( texList.empty() )
         {
-            QColor c2 = texList[k]->getColorAtPos( mesh->getVertex( i ) );
-            c.setRedF( ( 1.0 - c2.alphaF() ) * c.redF() + c2.alphaF() * c2.redF() );
-            c.setGreenF( ( 1.0 - c2.alphaF() ) * c.greenF() + c2.alphaF() * c2.greenF() );
-            c.setBlueF( ( 1.0 - c2.alphaF() ) * c.blueF() + c2.alphaF() * c2.blueF() );
+            return;
         }
 
+        //TriangleMesh2* mesh = getMesh();
+        m_renderer->beginUpdateColor();
+        for ( int i = 0; i < mesh->numVerts(); ++i )
+        {
+            QColor c = texList[0]->getColorAtPos( mesh->getVertex( i ) );
+            for ( int k = 1; k < texList.size(); ++k )
+            {
+                QColor c2 = texList[k]->getColorAtPos( mesh->getVertex( i ) );
+                c.setRedF( ( 1.0 - c2.alphaF() ) * c.redF() + c2.alphaF() * c2.redF() );
+                c.setGreenF( ( 1.0 - c2.alphaF() ) * c.greenF() + c2.alphaF() * c2.greenF() );
+                c.setBlueF( ( 1.0 - c2.alphaF() ) * c.blueF() + c2.alphaF() * c2.blueF() );
+            }
 
-        mesh->setVertexColor( i, c );
-        //qDebug() << texDS->getColorAtPos( mesh->getVertex( i ) );
+            mesh->setVertexColor( i, c );
+            //qDebug() << texDS->getColorAtPos( mesh->getVertex( i ) );
+        }
+        m_renderer->endUpdateColor();
     }
-    m_renderer->endUpdateColor();
 }
