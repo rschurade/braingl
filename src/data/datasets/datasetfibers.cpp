@@ -81,6 +81,7 @@ DatasetFibers::DatasetFibers( QDir filename,
     m_morphValue( 1.0f)
 {
     createProps();
+    m_customColors.resize( m_numLines );
 }
 
 DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
