@@ -54,6 +54,8 @@ void DatasetCons::init()
     m_data.push_back( data0 );
     m_dataNames.push_back( "no data" );
 
+    m_customColors.resize( consNumber );
+
     /* // add standard properties
      m_properties["maingl"]->create( Fn::Property::D_ACTIVE, true );
     m_properties["maingl"]->create( Fn::Property::D_SIZE, -1 );
