@@ -449,8 +449,12 @@ QString MainWindow::strippedName( const QString &fullFileName )
 
 void MainWindow::save()
 {
-    Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( m_datasetWidget->getSelected(), (int)Fn::Property::D_DATASET_POINTER) ) );
-    save( ds );
+    int selected = m_datasetWidget->getSelected();
+    if ( selected != -1 )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selected, (int)Fn::Property::D_DATASET_POINTER) ) );
+        save( ds );
+    }
 }
 
 bool MainWindow::save( Dataset* ds )
@@ -511,7 +515,7 @@ void MainWindow::saveFilterChanged( QString filterString )
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
     QString fileName = ds->properties()->get( Fn::Property::D_FILENAME ).toString();
-    Writer writer( ds, fileName, filter );
+    Writer writer( ds, QFileInfo( fileName ), filter );
     writer.save();
 }
 

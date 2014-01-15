@@ -73,6 +73,7 @@ public:
     int closestVertexIndex( QVector3D pos );
 
     QVector3D getVertex(int id);
+    QVector3D getVertexNormal(int id);
     QVector<int> getTriangle( int id );
     Triangle getTriangle2( int id );
 

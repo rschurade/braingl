@@ -52,6 +52,7 @@ private slots:
     void makePermanent();
     void transformChanged( QVariant value );
     void applyTransform();
+    virtual void slotCopyColors();
 
 };
 

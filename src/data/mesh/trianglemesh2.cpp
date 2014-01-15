@@ -220,6 +220,17 @@ QVector3D TriangleMesh2::getVertex( int id )
     return vert;
 }
 
+QVector3D TriangleMesh2::getVertexNormal( int id )
+{
+    if ( id > m_numVerts )
+    {
+        qDebug() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
+        exit( 0 );
+    }
+    QVector3D normal( m_vertices[id * m_bufferSize + 3], m_vertices[id * m_bufferSize + 4], m_vertices[id * m_bufferSize + 5]);
+    return normal;
+}
+
 void TriangleMesh2::setTriangle( int id, int v0, int v1, int v2 )
 {
     m_triangles[ id * 3     ] = v0;
