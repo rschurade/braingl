@@ -395,10 +395,10 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new FiberRenderer( m_selector, &m_fibs, &( m_data[properties( target )->get( Fn::Property::D_DATAMODE).toInt()] ), m_numPoints );
+            m_renderer = new FiberRenderer( m_selector, &m_fibs, &m_customColors, &( m_data[properties( target )->get( Fn::Property::D_DATAMODE).toInt()] ), m_numPoints );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
-            m_renderer->colorChanged( properties( target )->get( Fn::Property::D_COLOR ).value<QColor>() );
+            //m_renderer->colorChanged( properties( target )->get( Fn::Property::D_COLOR ).value<QColor>() );
             connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged( QVariant ) ) );
         }
 
@@ -476,6 +476,20 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
         }
         lc += lineSize + 1;
         m_fibs.push_back( fib );
+    }
+
+    QVector<unsigned char> colors = lv->getPrimitiveColors();
+    m_customColors.resize( m_numLines );
+    if ( colors.size() == m_numLines * 3 )
+    {
+        for ( int i = 0; i < m_numLines; ++i )
+        {
+            m_customColors[i] = QColor( ( (float)colors[i * 3] ),
+                                        ( (float)colors[i * 3 + 1] ),
+                                        ( (float)colors[i * 3 + 2] ), 255 );
+
+            qDebug() << m_customColors[i];
+        }
     }
 
     QVector<QVector<float> > pointData = lv->getPointData();
@@ -754,4 +768,9 @@ void DatasetFibers::morph(float value)
     m_tubeRenderer = 0;
     delete m_selector;
     m_selector = 0;
+}
+
+QColor DatasetFibers::getCustomColor( int fiber )
+{
+    return m_customColors[fiber];
 }

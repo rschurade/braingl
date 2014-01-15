@@ -22,13 +22,14 @@ class FiberRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints );
+    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector<QColor>* fiberColors, QVector< QVector< float > >* extraData, int numPoints );
     virtual ~FiberRenderer();
 
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
     void updateExtraData( QVector< QVector< float > >* extraData );
+
 protected:
     void setupTextures();
     void setShaderVars( PropertyGroup* props );
@@ -47,19 +48,19 @@ private:
     GLuint indexVbo;
 
     QVector< QVector< float > >* m_data;
+    QVector<QColor>* m_colorField;
     QVector< QVector< float > >* m_extraData;
     QVector< QVector< float > >* m_indexData;
 
+
     int m_numLines;
     int m_numPoints;
-
 
     QVector<int>m_pointsPerLine;
     QVector<int>m_startIndexes;
 
     bool m_isInitialized;
 
-    QVector<QColor>m_colorField;
     QVector<QVector3D>m_globalColors;
 
 public slots:

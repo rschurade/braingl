@@ -15,6 +15,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
@@ -85,6 +86,10 @@ QVector<unsigned char> LoaderVTK::getPointColors()
     return m_pointColors;
 }
 
+QVector<unsigned char> LoaderVTK::getPrimitiveColors()
+{
+    return m_primitiveColors;
+}
 
 QVector<QString>LoaderVTK::getPointDataNames()
 {
@@ -203,8 +208,27 @@ bool LoaderVTK::open()
                 }
             }
 
+            ///////// Get cell colors ///////////
+            vtkSmartPointer<vtkUnsignedCharArray> array = vtkUnsignedCharArray::SafeDownCast( output->GetCellData()->GetArray("CellColors" ) );
+            if ( array )
+            {
+                m_primitiveColors.reserve( m_numLines *3 );
+                for ( int i = 0; i < m_numLines * 3; ++i )
+                {
+                    m_primitiveColors.push_back( array->GetValue( i ) );
+                }
+                m_hasPrimitiveColors = true;
+            } //end if(array)
+            else
+            {
+                m_primitiveColors.resize( m_numLines * 3 );
+                for ( int i = 0; i < m_primitiveColors.size(); ++i )
+                {
+                    m_primitiveColors[i] = 255;
+                }
+                qDebug() << "no cell color array.";
+            }
         }
-
         ///////// Get point colors ///////////
         vtkSmartPointer<vtkUnsignedCharArray> array = vtkUnsignedCharArray::SafeDownCast( output->GetPointData()->GetArray("Colors" ) );
 
@@ -224,7 +248,7 @@ bool LoaderVTK::open()
             {
                 m_pointColors[i] = 255;
             }
-            qDebug() << "no color array.";
+            qDebug() << "no point color array.";
         }
 
         unsigned int numberOfArrays = output->GetPointData()->GetNumberOfArrays();

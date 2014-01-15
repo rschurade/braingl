@@ -23,6 +23,7 @@
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkCellArray.h>
+#include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyLine.h>
@@ -85,64 +86,81 @@ bool WriterVTK::save()
 
 void WriterVTK::saveFibs( QString filename, bool binary )
 {
-    QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
-    QVector< QVector< QVector<float> > >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData();
-    QVector< QString >dataNames = dynamic_cast<DatasetFibers*>( m_dataset )->getDataNames();
+    DatasetFibers* ds = dynamic_cast<DatasetFibers*>( m_dataset );
+    QVector< QVector<float> >fibs = ds->getFibs();
+    QVector< QVector< QVector<float> > >data = ds->getData();
+    QVector< QString >dataNames = ds->getDataNames();
 
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newLines = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
     vtkIdType pointId = 0;
 
+    vtkSmartPointer<vtkUnsignedCharArray> colorArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    colorArray->SetNumberOfComponents(3);
+    colorArray->SetName ("CellColors");
+
+    unsigned char rgb[3];
+
     for ( int i = 0; i < fibs.size(); ++i )
     {
         QVector<float>fib = fibs[i];
         vtkSmartPointer<vtkPolyLine> newLine = vtkSmartPointer<vtkPolyLine>::New();
+        QColor color = ds->getCustomColor( i );
+
+        rgb[0] = color.redF() * 255;
+        rgb[1] = color.greenF() * 255;
+        rgb[2] = color.blueF() * 255;
+
+        colorArray->InsertNextTupleValue( rgb );
+
         for (int k = 0; k < fib.size() / 3; ++k )
         {
             newPoints->InsertNextPoint( fib[k*3], fib[k*3+1], fib[k*3+2] );
             newLine->GetPointIds()->InsertNextId( pointId );
             ++pointId;
         }
-         newLines->InsertNextCell( newLine );
+        newLines->InsertNextCell( newLine );
     }
-     // add points and lines to new polydata
-     newPolyData->SetPoints( newPoints );
-     newPolyData->SetLines( newLines );
 
-     if ( dataNames[0] != "no data" )
-     {
-         for ( int i = 0; i < data.size(); ++i )
-         {
-             vtkSmartPointer<vtkFloatArray> dataArray = vtkSmartPointer<vtkFloatArray>::New();
-             dataArray->SetNumberOfComponents( 1 );
-             dataArray->SetName( dataNames[i].toStdString().c_str() );
+    // add points and lines to new polydata
+    newPolyData->SetPoints( newPoints );
+    newPolyData->SetLines( newLines );
+    newPolyData->GetCellData()->AddArray( colorArray );
 
-             QVector< QVector<float> >dataField = data[i];
-             for( int k = 0; k < dataField.size(); ++k )
-             {
-                 QVector<float>fib = dataField[k];
-                 for( int l = 0; l < fib.size(); ++l )
-                 {
-                     dataArray->InsertNextValue( fib[l] );
-                 }
-             }
-             newPolyData->GetPointData()->AddArray( dataArray );
-         }
-     }
+    if ( dataNames[0] != "no data" )
+    {
+        for ( int i = 0; i < data.size(); ++i )
+        {
+            vtkSmartPointer<vtkFloatArray> dataArray = vtkSmartPointer<vtkFloatArray>::New();
+            dataArray->SetNumberOfComponents( 1 );
+            dataArray->SetName( dataNames[i].toStdString().c_str() );
 
-     qDebug() << "Writing "  << filename;
-     vtkSmartPointer<vtkPolyDataWriter> writer = vtkPolyDataWriter::New();
-     writer->SetFileName( filename.toStdString().c_str() );
+            QVector<QVector<float> > dataField = data[i];
+            for ( int k = 0; k < dataField.size(); ++k )
+            {
+                QVector<float> fib = dataField[k];
+                for ( int l = 0; l < fib.size(); ++l )
+                {
+                    dataArray->InsertNextValue( fib[l] );
+                }
+            }
+            newPolyData->GetPointData()->AddArray( dataArray );
+        }
+    }
 
-     if ( binary )
-     {
-         writer->SetFileTypeToBinary();
-     }
-     else
-     {
-         writer->SetFileTypeToASCII();
-     }
+    qDebug() << "Writing " << filename;
+    vtkSmartPointer<vtkPolyDataWriter> writer = vtkPolyDataWriter::New();
+    writer->SetFileName( filename.toStdString().c_str() );
+
+    if ( binary )
+    {
+        writer->SetFileTypeToBinary();
+    }
+    else
+    {
+        writer->SetFileTypeToASCII();
+    }
 
 #if VTK_MAJOR_VERSION < 6
     writer->SetInput( newPolyData );
