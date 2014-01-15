@@ -150,6 +150,15 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
                                                          m_globalColors[i].z(), 1.0 );
             glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
         }
+        else
+        {
+            if ( Models::getGlobal( Fn::Property::G_UNSELECTED_FIBERS_GREY ).toBool() )
+            {
+                program->setUniformValue( "u_color", .4f, .4f, .4f, 1.0 );
+                program->setUniformValue( "u_globalColor", .4f, .4f, .4f, 1.0 );
+                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+            }
+        }
     }
 
 
