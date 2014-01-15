@@ -30,6 +30,7 @@ public:
     QVector<QString>getPointDataNames();
 
     QVector<unsigned char> getPointColors();
+    QVector<unsigned char> getPrimitiveColors();
 
     int getNumPoints();
     int getNumLines();
@@ -62,7 +63,7 @@ private:
     QVector<QString>m_primitiveDataNames;
 
     QVector<unsigned char>m_pointColors;
-    QVector<float>m_primitiveColors;
+    QVector<unsigned char>m_primitiveColors;
 };
 
 #endif /* LOADERVTK_H_ */

@@ -20,18 +20,22 @@
 
 #include "math.h"
 
-FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints )  :
+FiberRenderer::FiberRenderer( FiberSelector* selector,
+                                  QVector< QVector< float > >* data,
+                                  QVector<QColor>* fiberColors,
+                                  QVector< QVector< float > >* extraData,
+                                  int numPoints )  :
     ObjectRenderer(),
     m_selector( selector ),
     vbo( 0 ),
     dataVbo( 0 ),
     m_data( data ),
+    m_colorField( fiberColors ),
     m_extraData( extraData ),
     m_numLines( data->size() ),
     m_numPoints( numPoints ),
     m_isInitialized( false )
 {
-    m_colorField.resize( m_numLines );
 }
 
 FiberRenderer::~FiberRenderer()
@@ -142,9 +146,9 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     {
         if ( selected->at( i ) )
         {
-            program->setUniformValue( "u_color", m_colorField[i].redF(),
-                                                   m_colorField[i].greenF(),
-                                                   m_colorField[i].blueF(), 1.0 );
+            program->setUniformValue( "u_color", m_colorField->at( i ).redF(),
+                                                   m_colorField->at( i ).greenF(),
+                                                   m_colorField->at( i ).blueF(), 1.0 );
             program->setUniformValue( "u_globalColor", m_globalColors[i].x(),
                                                          m_globalColors[i].y(),
                                                          m_globalColors[i].z(), 1.0 );
@@ -317,7 +321,7 @@ void FiberRenderer::colorChanged( QVariant color )
     {
         if ( selected->at( i ) )
         {
-            m_colorField.replace( i, color.value<QColor>() );
+            m_colorField->replace( i, color.value<QColor>() );
         }
     }
 }

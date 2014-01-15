@@ -42,6 +42,7 @@ public:
     QVector< QVector< QVector< float > > >getData();
     QVector< QVector< float > > getData( int id );
     QVector< QVector< float > > getSelectedFibs();
+    QColor getCustomColor( int fiber );
     QVector<QString>getDataNames();
     QVector< QVector< QVector< float > > > getSelectedData();
     QVector<float> getDataMins();
@@ -58,6 +59,7 @@ protected:
     QVector< QVector< float > > m_fibs;
     QVector< QVector< QVector< float > > >m_data;
     QVector<QString>m_dataNames;
+    QVector<QColor>m_customColors;
 
     QVector<float> m_dataMins;
     QVector<float> m_dataMaxes;
