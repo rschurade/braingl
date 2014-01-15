@@ -58,6 +58,7 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_dataNames.push_back( "no data" );
 
     createProps();
+    m_customColors.resize( m_numLines );
 }
 
 DatasetFibers::DatasetFibers( QDir filename,
@@ -120,6 +121,7 @@ DatasetFibers::~DatasetFibers()
 
 void DatasetFibers::createProps()
 {
+    m_numLines = m_fibs.size();
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
         m_numPoints += m_fibs[i].size() / 3;
@@ -487,8 +489,6 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
             m_customColors[i] = QColor( ( (float)colors[i * 3] ),
                                         ( (float)colors[i * 3 + 1] ),
                                         ( (float)colors[i * 3 + 2] ), 255 );
-
-            qDebug() << m_customColors[i];
         }
     }
 
