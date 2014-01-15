@@ -56,6 +56,7 @@ public:
 
     void exportColors();
     void loadROI( QString filename );
+    void loadROI2( QString filename );
     void initROI();
     void avgCon();
     void avgConRtoZ();
@@ -69,6 +70,7 @@ public:
 
 private:
     bool* roi;
+    bool* roi2;
 
     int m_n;  //number of vertices, has to match size of matrix
 

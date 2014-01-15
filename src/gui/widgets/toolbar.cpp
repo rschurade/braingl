@@ -487,7 +487,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_colorLittleBrainsAction );
             this->addAction( m_makeConsAction );
             //this->addAction( m_avgConAction );
-            //this->addAction( m_avgConRZAction );
+            this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
             //this->addAction( m_deleteLittleBrainsAction );
             break;

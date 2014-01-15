@@ -25,6 +25,9 @@ public:
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
+    float getInterpolatedValueAtPos( QVector3D pos );
+    QColor getColorAtPos( QVector3D pos );
+
 private:
     QVector<float> m_data;
 

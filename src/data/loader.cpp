@@ -192,7 +192,7 @@ bool Loader::loadVTK()
         QVector<QVector<float> > values = lv->getPointData();
 
         float min = std::numeric_limits<float>().max();
-        float max = std::numeric_limits<float>().min();
+        float max = -std::numeric_limits<float>().max();
 
         if ( values.size() > 0 )
         {
@@ -221,8 +221,11 @@ bool Loader::loadVTK()
 
         mesh->finalize();
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
-        dataset->properties()->set( Fn::Property::D_MIN, min );
-        dataset->properties()->set( Fn::Property::D_MAX, max );
+        if ( min != max )
+        {
+            dataset->properties()->set( Fn::Property::D_MIN, min );
+            dataset->properties()->set( Fn::Property::D_MAX, max );
+        }
         m_dataset.push_back( dataset );
         delete lv;
         return true;
@@ -547,17 +550,20 @@ bool Loader::loadGlyphset()
     }
 
     //fourth thing on the line: name of roi...
+    //no roi: initialize all nodes true
+    dataset->initROI();
     if ( sl2.length() > 3 )
     {
+
         QString roiname = trunk + QDir::separator() + sl2.at( 3 );
         qDebug() << "loading ROI: " << roiname;
         dataset->loadROI( roiname );
-    }
-    else
-    {
-        qDebug() << "no ROI defined...";
-        //ROI = all nodes
-        dataset->initROI();
+        if ( sl2.length() > 4 )
+        {
+            QString roiname2 = trunk + QDir::separator() + sl2.at( 4 );
+            qDebug() << "loading ROI2: " << roiname2;
+            dataset->loadROI2( roiname2 );
+        }
     }
 
     //3: load connectivity: put this into seperate loader / dataset / here
