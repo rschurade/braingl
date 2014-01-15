@@ -4,7 +4,11 @@
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+
+SET( CMAKE_DISABLE_SOURCE_CHANGES ON )
+SET( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
+
 PROJECT( brainGL )
 
 # where to find our utils and cmake modules?
@@ -109,55 +113,38 @@ ENDIF()
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-int-to-pointer-cast -Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
 
+SET ( CMAKE_AUTOMOC TRUE )
+
+# Collect the compile-files for this target
+COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
+
+QT4_AUTOMOC( ${TARGET_CPP_FILES} )    
+# This is needed since the mocs will be generated there
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
+QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
+
+ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS})
+
+ReadProjectRevisionStatus()
+
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
     ADD_DEFINITIONS( -D__LINUX__ )
     ADD_DEFINITIONS( -D__cplusplus )
-	# Collect the compile-files for this target
-	COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
-
-    SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
-
-    # This is needed since the mocs will be generated there
-    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
     
-    QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
-    
-    QT4_WRAP_CPP(FNAV_HEADERS_MOC ${GUI_QT4_MOC_HDRS} )
-
-    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
-    
-    ReadProjectRevisionStatus()
-
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${VTK_LIBRARIES} GLU )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-    SET ( CMAKE_AUTOMOC TRUE )
     ADD_DEFINITIONS( -D__WINDOWS__ )
     
-     #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows") 
-     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ")
+    OPTION( SURPRESS_CMD_WINDOW "No cmd window" OFF )
+    IF ( SURPRESS_CMD_WINDOW MATCHES ON )
+        SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
+    ENDIF()
     
-    # Collect the compile-files for this target
-    COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
-
-    SET( GUI_QT4_MOC_HDRS ${TARGET_H_FILES} )
-
-	QT4_AUTOMOC( ${TARGET_CPP_FILES} )
-
-    # This is needed since the mocs will be generated there
-    INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
-    
-    QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
-
-    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
-    
-    ReadProjectRevisionStatus()
-
 	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
-	#TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} z glu32 opengl32 )
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
@@ -200,8 +187,6 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
 
     ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS})
     
-    ReadProjectRevisionStatus()
-
     # Some linux distributions need to explicitily link against X11. We add this lib here.
     SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
     TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
