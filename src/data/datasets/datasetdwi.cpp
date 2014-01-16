@@ -10,7 +10,7 @@
 
 #include <QDebug>
 
-DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
+DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ),
     m_data( data ),
     m_b0Data( b0Data ),
@@ -43,12 +43,12 @@ QVector<ColumnVector>* DatasetDWI::getData()
     return &m_data;
 }
 
-QVector<float>* DatasetDWI::getB0Data()
+std::vector<float>* DatasetDWI::getB0Data()
 {
     return &m_b0Data;
 }
 
-QVector<float> DatasetDWI::getBvals()
+std::vector<float> DatasetDWI::getBvals()
 {
     return m_bvals;
 }

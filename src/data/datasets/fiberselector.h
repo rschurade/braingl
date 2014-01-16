@@ -22,7 +22,7 @@ public:
     FiberSelector( int numPoints = 0, int numLines = 0 );
     virtual ~FiberSelector();
 
-    void init( QVector< QVector< float > >& data );
+    void init( QVector< std::vector<float> >& data );
 
     QVector<bool>* getSelection();
     QModelIndex createIndex( int branch, int pos, int column );
@@ -36,7 +36,7 @@ private:
     bool m_isInitialized;
 
     KdTree* m_kdTree;
-    QVector<float>m_kdVerts;
+    std::vector<float>m_kdVerts;
     QVector<int>m_reverseIndexes;
     QVector<int>m_lineStarts;
     QVector<int>m_lineLengths;
@@ -45,8 +45,8 @@ private:
     QList<QVector<bool> >m_branchfields;
     QList<QList<QVector<bool> > >m_bitfields;
 
-    QVector<float> m_boxMin;
-    QVector<float> m_boxMax;
+    std::vector<float> m_boxMin;
+    std::vector<float> m_boxMax;
 
     float m_x;
     float m_y;

@@ -21,7 +21,7 @@ public:
     CorrelationThread( int id, DatasetMeshTimeSeries* ds, float* exField, float* ex2Field );
     virtual ~CorrelationThread();
 
-    QVector< QVector<float> >* getResult();
+    QVector< std::vector<float> >* getResult();
 
 private:
     void run();
@@ -31,7 +31,7 @@ private:
     float* m_exField;
     float* m_ex2Field;
 
-    QVector< QVector<float> >m_result;
+    QVector< std::vector<float> >m_result;
 
 signals:
     void progress();

@@ -12,11 +12,11 @@
 
 #include <math.h>
 
-FiberRendererThread::FiberRendererThread( QVector< QVector< float > >* data, int id ) :
+FiberRendererThread::FiberRendererThread( QVector< std::vector<float> >* data, int id ) :
     m_data( data ),
     m_id( id )
 {
-    m_verts = new QVector<float>();
+    m_verts = new std::vector<float>();
     m_globalColors = new QVector<QVector3D>;
 }
 
@@ -24,11 +24,10 @@ FiberRendererThread::~FiberRendererThread()
 {
     m_verts->clear();
     m_globalColors->clear();
-    m_verts->squeeze();
     m_globalColors->squeeze();
 }
 
-QVector<float>* FiberRendererThread::getVerts()
+std::vector<float>* FiberRendererThread::getVerts()
 {
     return m_verts;
 }
@@ -65,7 +64,7 @@ void FiberRendererThread::run()
     // for all voxels:
     for ( int i = begin; i < end; ++i )
     {
-        QVector<float> fib = m_data->at(i);
+        std::vector<float> fib = m_data->at(i);
 
         if ( fib.size() < 6 )
         {
@@ -93,7 +92,7 @@ void FiberRendererThread::run()
         m_verts->push_back( localColor.y() );
         m_verts->push_back( localColor.z() );
 
-        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        for ( unsigned int k = 1; k < fib.size() / 3 - 1; ++k )
         {
             m_verts->push_back( fib[k*3] );
             m_verts->push_back( fib[k*3+1] );

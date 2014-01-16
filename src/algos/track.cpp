@@ -55,12 +55,12 @@ Track::~Track()
 {
 }
 
-QVector< QVector< float > > Track::getFibs()
+QVector< std::vector<float> > Track::getFibs()
 {
     return fibs;
 }
 
-QVector< QVector< float > > Track::getExtras()
+QVector< std::vector<float> > Track::getExtras()
 {
     return extras;
 }

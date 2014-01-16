@@ -115,13 +115,13 @@ CrossingTrackWidget::~CrossingTrackWidget()
 QList<Dataset*> CrossingTrackWidget::getFibs()
 {
     QList<Dataset*> l;
-    QVector< QVector<QVector<float> > >data;
+    QVector< QVector<std::vector<float> > >data;
     data.push_back( m_tracker->getExtras() );
     QVector<QString>names;
     names.push_back( "FA" );
-    QVector<float>mins;
+    std::vector<float>mins;
     mins.push_back( 0.0 );
-    QVector<float>maxes;
+    std::vector<float>maxes;
     maxes.push_back( 1.0 );
     DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers" ), m_tracker->getFibs(), data, names, mins, maxes );
     l.push_back( fibs );

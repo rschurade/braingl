@@ -44,16 +44,15 @@ SHRendererThread::SHRendererThread( int id, QVector<ColumnVector>* data, int nx,
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {
-    m_verts = new QVector<float>();
+    m_verts = new std::vector<float>();
 }
 
 SHRendererThread::~SHRendererThread()
 {
     m_verts->clear();
-    m_verts->squeeze();
 }
 
-QVector<float>* SHRendererThread::getVerts()
+std::vector<float>* SHRendererThread::getVerts()
 {
     return m_verts;
 }

@@ -110,9 +110,9 @@ QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
 QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
 {
     QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
-    QVector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
+    std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
     QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
-    QVector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
+    std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     QVector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
@@ -130,14 +130,14 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
 QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
 {
     QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
-    QVector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
+    std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
     QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
-    QVector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
+    std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     QVector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
-    QVector<float> fa;
+    std::vector<float> fa;
     FMath::fa( tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
@@ -153,9 +153,9 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
 QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 {
     QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
-    QVector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
+    std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
     QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
-    QVector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
+    std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     QVector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
@@ -163,17 +163,17 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
     int blockSize = tensors.size();
 
     QVector<QVector3D> evec1( blockSize );
-    QVector<float> eval1( blockSize );
+    std::vector<float> eval1( blockSize );
 
     QVector<QVector3D> evec2( blockSize );
-    QVector<float> eval2( blockSize );
+    std::vector<float> eval2( blockSize );
 
     QVector<QVector3D> evec3( blockSize );
-    QVector<float> eval3( blockSize );
+    std::vector<float> eval3( blockSize );
 
     FMath::evecs( tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
-    QVector<float> fa;
+    std::vector<float> fa;
     FMath::fa( tensors, fa );
 
     for ( int i = 0; i < evec1.size(); ++i )
@@ -202,7 +202,7 @@ QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
 {
     QVector<Matrix>* tensors = dynamic_cast<DatasetTensor*>( ds )->getData();
 
-    QVector<float> fa;
+    std::vector<float> fa;
     FMath::fa( *tensors, fa );
 
     DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
@@ -222,17 +222,17 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
     int blockSize = tensors->size();
 
     QVector<QVector3D> evec1( blockSize );
-    QVector<float> eval1( blockSize );
+    std::vector<float> eval1( blockSize );
 
     QVector<QVector3D> evec2( blockSize );
-    QVector<float> eval2( blockSize );
+    std::vector<float> eval2( blockSize );
 
     QVector<QVector3D> evec3( blockSize );
-    QVector<float> eval3( blockSize );
+    std::vector<float> eval3( blockSize );
 
     FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
 
-    QVector<float> fa;
+    std::vector<float> fa;
     FMath::fa( *tensors, fa );
 
     for ( int i = 0; i < evec1.size(); ++i )

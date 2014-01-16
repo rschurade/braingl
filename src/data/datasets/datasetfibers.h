@@ -23,13 +23,13 @@ class DatasetFibers: public Dataset
 
 public:
     DatasetFibers( QDir filename, Fn::DatasetType type );
-    DatasetFibers( QDir filename, QVector< QVector< float > > fibs );
+    DatasetFibers( QDir filename, QVector< std::vector<float> > fibs );
     DatasetFibers( QDir filename,
-                     QVector< QVector< float > > fibs,
-                     QVector<QVector< QVector< float > > >data,
+                     QVector< std::vector<float> > fibs,
+                     QVector<QVector< std::vector<float> > >data,
                      QVector<QString> dataNames,
-                     QVector< float > mins,
-                     QVector<float> maxes );
+                     std::vector<float> mins,
+                     std::vector<float> maxes );
 
     DatasetFibers( QDir filename, LoaderVTK* lv );
 
@@ -38,15 +38,15 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
 
-    QVector< QVector< float > > getFibs();
-    QVector< QVector< QVector< float > > >getData();
-    QVector< QVector< float > > getData( int id );
-    QVector< QVector< float > > getSelectedFibs();
+    QVector< std::vector<float> > getFibs();
+    QVector< QVector< std::vector<float> > >getData();
+    QVector< std::vector<float> > getData( int id );
+    QVector< std::vector<float> > getSelectedFibs();
     QColor getCustomColor( int fiber );
     QVector<QString>getDataNames();
-    QVector< QVector< QVector< float > > > getSelectedData();
-    QVector<float> getDataMins();
-    QVector<float> getDataMaxes();
+    QVector< QVector< std::vector<float> > > getSelectedData();
+    std::vector<float> getDataMins();
+    std::vector<float> getDataMaxes();
 
     QString getSaveFilter();
     QString getDefaultSuffix();
@@ -56,27 +56,27 @@ protected:
     void createProps();
 
     void copyFromLoader( LoaderVTK* lv );
-    QVector< QVector< float > > m_fibs;
-    QVector< QVector< QVector< float > > >m_data;
+    QVector< std::vector<float> > m_fibs;
+    QVector< QVector< std::vector<float> > >m_data;
     QVector<QString>m_dataNames;
     QVector<QColor>m_customColors;
 
-    QVector<float> m_dataMins;
-    QVector<float> m_dataMaxes;
+    std::vector<float> m_dataMins;
+    std::vector<float> m_dataMaxes;
 
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;
-    int m_numPoints;
-    int m_numLines;
+    unsigned int m_numPoints;
+    unsigned int m_numLines;
 
     bool m_morphable;
     float m_morphValue;
     void makeMorphable();
     void morph(float i);
-    QVector< QVector< float > > m_orig_fibs;
-    QVector< QVector< float > > m_straight_fibs;
+    QVector< std::vector<float> > m_orig_fibs;
+    QVector< std::vector<float> > m_straight_fibs;
 
 private slots:
     void colorChanged();

@@ -29,22 +29,22 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
 
     QVector<QVector3D> newVertexPositions( m_numVerts );
 
-    for ( int i = 0; i < m_numVerts; ++i )
+    for ( unsigned int i = 0; i < m_numVerts; ++i )
     {
         newVertexPositions[i] = calcNewPosition( i );
     }
 
-    for ( int i = 0; i < m_numTris; ++i )
+    for ( unsigned int i = 0; i < m_numTris; ++i )
     {
         insertCenterTriangle( i );
     }
 
-    for ( int i = 0; i < m_numTris; ++i )
+    for ( unsigned int i = 0; i < m_numTris; ++i )
     {
         insertCornerTriangles( i );
     }
 
-    for ( int i = 0; i < m_numVerts; ++i )
+    for ( unsigned int i = 0; i < m_numVerts; ++i )
     {
         m_mesh->setVertex( i, newVertexPositions[i] );
     }
@@ -61,18 +61,18 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
 
 }
 
-QVector3D LoopSubdivision::calcNewPosition( int vertNum )
+QVector3D LoopSubdivision::calcNewPosition( unsigned int vertNum )
 {
-    QVector<int> starP = m_mesh->getStar( vertNum );
-    int starSize = starP.size();
+    std::vector<unsigned int> starP = m_mesh->getStar( vertNum );
+    unsigned int starSize = starP.size();
 
     QVector3D oldPos = m_mesh->getVertex( vertNum );
     double alpha = getAlpha( starSize );
     oldPos *= ( 1.0 - ( (double) starSize * alpha ) );
 
     QVector3D newPos;
-    int edgeV = 0;
-    for ( int i = 0; i < starSize; i++ )
+    unsigned int edgeV = 0;
+    for ( unsigned int i = 0; i < starSize; i++ )
     {
         edgeV = m_mesh->getNextVertex( starP[i], vertNum );
         newPos += m_mesh->getVertex( edgeV );
@@ -82,20 +82,20 @@ QVector3D LoopSubdivision::calcNewPosition( int vertNum )
     return oldPos + newPos;
 }
 
-void LoopSubdivision::insertCenterTriangle( int triNum )
+void LoopSubdivision::insertCenterTriangle( unsigned int triNum )
 {
 
-    QVector<int> intP = m_mesh->getTriangle( triNum );
-    int edgeVerts[3];
+    std::vector<unsigned int> intP = m_mesh->getTriangle( triNum );
+    unsigned int edgeVerts[3];
 
-    for ( int i = 0; i < 3; ++i )
+    for ( unsigned int i = 0; i < 3; ++i )
     {
         edgeVerts[i] = calcEdgeVert( triNum, intP[i], intP[( i + 1 ) % 3], intP[( i + 2 ) % 3] );
     }
     m_mesh->addTriangle( edgeVerts[0], edgeVerts[1], edgeVerts[2] );
 }
 
-void LoopSubdivision::insertCornerTriangles( int triNum )
+void LoopSubdivision::insertCornerTriangles( unsigned int triNum )
 {
 
     // comment:     center are twisted from the orignal vertices.
@@ -105,21 +105,21 @@ void LoopSubdivision::insertCornerTriangles( int triNum )
     // addTris:     1, b, a
     // addTris:     2, c, b
     //
-    QVector<int> originalTri = m_mesh->getTriangle( triNum );
-    QVector<int> centerTri = m_mesh->getTriangle( triNum + m_numTris );
+    std::vector<unsigned int> originalTri = m_mesh->getTriangle( triNum );
+    std::vector<unsigned int> centerTri = m_mesh->getTriangle( triNum + m_numTris );
 
     m_mesh->addTriangle( originalTri[1], centerTri[1], centerTri[0] );
     m_mesh->addTriangle( originalTri[2], centerTri[2], centerTri[1] );
     m_mesh->setTriangle( triNum, originalTri[0], centerTri[0], centerTri[2] );
 }
 
-int LoopSubdivision::calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 )
+unsigned int LoopSubdivision::calcEdgeVert( unsigned int triNum, unsigned int edgeV1, unsigned int edgeV2, unsigned int V3 )
 {
 
-    int vertNum = -1;
+    unsigned int vertNum = 0;
 
-    int neighborVert = -1;
-    int neighborFaceNum = -1;
+    unsigned  neighborVert = 0;
+    unsigned  neighborFaceNum = 0;
     QVector3D edgeVert;
 
     neighborFaceNum = m_mesh->getNeighbor( edgeV1, edgeV2, triNum );
@@ -144,8 +144,8 @@ int LoopSubdivision::calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 )
     }
     else
     {
-        QVector<int> neighborCenterP = m_mesh->getTriangle( neighborFaceNum + m_numTris );
-        QVector<int> neighborP = m_mesh->getTriangle( neighborFaceNum );
+        std::vector<unsigned int> neighborCenterP = m_mesh->getTriangle( neighborFaceNum + m_numTris );
+        std::vector<unsigned int> neighborP = m_mesh->getTriangle( neighborFaceNum );
 
         if ( neighborP[0] == edgeV2 )
         {
@@ -163,7 +163,7 @@ int LoopSubdivision::calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 )
     return vertNum;
 }
 
-double LoopSubdivision::getAlpha( int n )
+double LoopSubdivision::getAlpha( unsigned int n )
 {
     double answer;
     if ( n > 3 )

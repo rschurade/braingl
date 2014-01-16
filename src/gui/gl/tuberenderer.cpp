@@ -16,7 +16,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData )  :
+TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< std::vector<float> >* data, QVector< std::vector<float> >* extraData )  :
     ObjectRenderer(),
     m_selector( selector ),
     vboIds( new GLuint[ 4 ] ),
@@ -189,12 +189,12 @@ void TubeRenderer::initGeometry()
         threads[i]->wait();
     }
 
-    QVector<float> verts;
+    std::vector<float> verts;
     // combine verts from all threads
     m_globalColorField.clear();
     for ( int i = 0; i < numThreads; ++i )
     {
-        verts += *( threads[i]->getVerts() );
+        verts.insert( verts.end(), threads[i]->getVerts()->begin(), threads[i]->getVerts()->end() );
         m_globalColorField += *( threads[i]->getGlobalColors() );
     }
 
@@ -239,15 +239,15 @@ void TubeRenderer::colorChanged( QVariant color )
     }
 }
 
-void TubeRenderer::updateExtraData( QVector< QVector< float > >* extraData )
+void TubeRenderer::updateExtraData( QVector< std::vector<float> >* extraData )
 {
     m_extraData = extraData;
-    QVector<float>data;
-    QVector<float>indexes;
+    std::vector<float>data;
+    std::vector<float>indexes;
     for ( int i = 0; i < extraData->size(); ++i )
     {
-        QVector<float>fib = extraData->at(i);
-        for ( int k = 0; k < fib.size(); ++k )
+        std::vector<float>fib = extraData->at(i);
+        for ( unsigned int k = 0; k < fib.size(); ++k )
         {
             data.push_back( fib[k]);
             data.push_back( fib[k]);

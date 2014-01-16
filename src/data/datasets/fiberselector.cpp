@@ -36,7 +36,7 @@ QVector<bool>* FiberSelector::getSelection()
 }
 
 
-void FiberSelector::init( QVector< QVector< float > >& data )
+void FiberSelector::init( QVector< std::vector<float> >& data )
 {
     qDebug() << "start creating kdtree";
     m_numLines = data.size();
@@ -66,7 +66,7 @@ void FiberSelector::init( QVector< QVector< float > >& data )
         {
             m_lineStarts.push_back( ls );
             m_lineLengths.push_back( data[i].size() / 3 );
-            for( int k = 0; k < data[i].size() / 3; ++k )
+            for( unsigned int k = 0; k < data[i].size() / 3; ++k )
             {
                 m_kdVerts.push_back( data[i][k * 3    ] );
                 m_kdVerts.push_back( data[i][k * 3 + 1] );
@@ -209,7 +209,7 @@ void FiberSelector::updateROI( int branch, int pos )
         {
             ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
             float threshold = roi->properties()->get( Fn::Property::R_THRESHOLD ).toFloat();
-            QVector<float>* data = roi->data();
+            std::vector<float>* data = roi->data();
             int nx = roi->properties()->get( Fn::Property::R_NX ).toInt();
             int ny = roi->properties()->get( Fn::Property::R_NY ).toInt();
             int nz = roi->properties()->get( Fn::Property::R_NZ ).toInt();
@@ -220,7 +220,7 @@ void FiberSelector::updateROI( int branch, int pos )
             {
                 m_bitfields[branch][pos][i] = false;
             }
-            for ( int i = 0; i < m_kdVerts.size() / 3; ++i )
+            for ( unsigned int i = 0; i < m_kdVerts.size() / 3; ++i )
             {
                 float x = m_kdVerts[i*3];
                 float y = m_kdVerts[i*3+1];

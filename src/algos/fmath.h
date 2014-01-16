@@ -47,15 +47,15 @@ public:
 
     static Matrix pseudoInverse( const Matrix& A );
 
-    static void fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals, QVector<Matrix>& out );
+    static void fitTensors( QVector<ColumnVector>& data, std::vector<float>& b0Images, QVector<QVector3D>& bvecs, std::vector<float>& bvals, QVector<Matrix>& out );
 
-    static void fa( QVector<Matrix>& tensors, QVector<float>& faOut );
+    static void fa( QVector<Matrix>& tensors, std::vector<float>& faOut );
     static float fa( Matrix tensor );
 
     static void evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 );
-    static void evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
-                                                 QVector<QVector3D>& evec2, QVector<float>& eval2,
-                                                 QVector<QVector3D>& evec3, QVector<float>& eval3 );
+    static void evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, std::vector<float>& eval1,
+                                                 QVector<QVector3D>& evec2, std::vector<float>& eval2,
+                                                 QVector<QVector3D>& evec3, std::vector<float>& eval3 );
 
     static bool linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord);
 

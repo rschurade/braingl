@@ -48,7 +48,7 @@ void SharpQBallThread::run()
     }
 
     QVector<ColumnVector>* data = m_ds->getData();
-    QVector<float>* b0Data = m_ds->getB0Data();
+    std::vector<float>* b0Data = m_ds->getB0Data();
 
     m_qBallVector.clear();
 

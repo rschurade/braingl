@@ -32,7 +32,7 @@ private:
     void generateSurface();
     void renameVerticesAndTriangles();
 
-    QVector<float> m_scalarField;
+    std::vector<float> m_scalarField;
 
     float m_oldIsoValue;
 

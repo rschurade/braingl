@@ -28,10 +28,10 @@ public:
 private:
     DatasetFibers* m_dataset;
 
-    float getFiberDist( QVector< float >& lhs, QVector< float >& rhs );
+    float getFiberDist( std::vector<float>& lhs, std::vector<float>& rhs );
     float getDist( float x1, float y1, float z1, float x2, float y2, float z2 );
 
-    QVector<float> mergeFibs( QVector< float >& lhs, QVector< float >& rhs );
+    std::vector<float> mergeFibs( std::vector<float>& lhs, std::vector<float>& rhs );
 
     int m_nx;
     int m_ny;

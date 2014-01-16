@@ -20,7 +20,7 @@ class BundleThread : public QThread
     Q_OBJECT
 
 public:
-    BundleThread( int id, QVector< QVector< float > >* fibs, KdTree* kdTree, QVector<float>* kdVerts, QVector<int>* revInd, int numPoints );
+    BundleThread( int id, QVector< std::vector<float> >* fibs, KdTree* kdTree, std::vector<float>* kdVerts, QVector<int>* revInd, int numPoints );
 
     virtual ~BundleThread();
 
@@ -37,14 +37,14 @@ private:
 
     int m_id;
 
-    QVector< QVector< float > >* m_fibs;
+    QVector< std::vector<float> >* m_fibs;
     QVector< QVector3D > m_forces;
     KdTree* m_kdTree;
-    QVector<float>* m_kdVerts;
+    std::vector<float>* m_kdVerts;
     QVector<int>* m_revInd;
 
-    QVector<float> m_boxMin;
-    QVector<float> m_boxMax;
+    std::vector<float> m_boxMin;
+    std::vector<float> m_boxMax;
     float m_radius;
     int m_numPoints;
     float m_iterations;

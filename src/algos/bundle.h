@@ -23,7 +23,7 @@ public:
     Bundle( DatasetFibers* ds );
     virtual ~Bundle();
 
-    QVector< QVector< float > >getFibs();
+    QVector< std::vector<float> >getFibs();
 
     void start();
     void startLoop();
@@ -39,8 +39,8 @@ private:
     float m_radius;
     float m_smoothRange;
 
-    QVector< QVector< float > >m_fibs;
-    QVector<float> m_kdVerts;
+    QVector< std::vector<float> >m_fibs;
+    std::vector<float> m_kdVerts;
     QVector<int>m_reverseIndexes;
 
 private slots:

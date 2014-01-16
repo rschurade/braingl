@@ -46,9 +46,9 @@ void DatasetCorrelation::setCorrelationMatrix( float** matrix )
     //TODO: test if this works, think about data duplication
     delete m_correlations;
     m_correlations = new CorrelationMatrix( getMesh()->numVerts() );
-    for ( int i = 0; i < getMesh()->numVerts(); ++i )
+    for ( unsigned int i = 0; i < getMesh()->numVerts(); ++i )
     {
-        for ( int j = 0; j < getMesh()->numVerts(); ++j )
+        for ( unsigned int j = 0; j < getMesh()->numVerts(); ++j )
         {
             m_correlations->setValue( i, j, m_correlations->getValue( i, j ) );
         }
@@ -74,7 +74,7 @@ void DatasetCorrelation::setPickedID( int pickedID )
 {
     m_prevPickedID = pickedID;
 
-    for ( int i = 0; i < getMesh()->numVerts(); ++i )
+    for ( unsigned int i = 0; i < getMesh()->numVerts(); ++i )
     {
         if ( pickedID != -1 )
         {

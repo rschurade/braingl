@@ -481,7 +481,7 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-void FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals, QVector<Matrix>& out )
+void FMath::fitTensors( QVector<ColumnVector>& data, std::vector<float>& b0Images, QVector<QVector3D>& bvecs, std::vector<float>& bvals, QVector<Matrix>& out )
 {
     int N = bvecs.size();
 
@@ -577,13 +577,13 @@ void FMath::fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, Q
     }
 }
 
-void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
+void FMath::fa( QVector<Matrix>& tensors, std::vector<float>& faOut )
 {
     int blockSize = tensors.size();
 
     faOut.resize( blockSize );
 
-    QVector<float> trace( blockSize );
+    std::vector<float> trace( blockSize );
     float value = 0;
     for ( int i = 0; i < blockSize; ++i )
     {
@@ -593,7 +593,7 @@ void FMath::fa( QVector<Matrix>& tensors, QVector<float>& faOut )
         trace[i] = value / 3.0;
     }
 
-    QVector<float> fa( blockSize );
+    std::vector<float> fa( blockSize );
 
     double xx, xy, xz, yy, yz, zz, tr, AA, DD;
 
@@ -722,9 +722,9 @@ void FMath::evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 )
     }
 }
 
-void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
-                                               QVector<QVector3D>& evec2, QVector<float>& eval2,
-                                               QVector<QVector3D>& evec3, QVector<float>& eval3 )
+void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, std::vector<float>& eval1,
+                                               QVector<QVector3D>& evec2, std::vector<float>& eval2,
+                                               QVector<QVector3D>& evec3, std::vector<float>& eval3 )
 {
 #if 1
     int blockSize = tensors.size();

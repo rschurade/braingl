@@ -97,11 +97,11 @@ void Correlation::slotThreadFinished()
 
         for ( int i = 0; i < m_threads.size(); ++i )
         {
-            QVector<QVector<float> >* corr = m_threads[i]->getResult();
+            QVector<std::vector<float> >* corr = m_threads[i]->getResult();
 
             for ( int k = 0; k < corr->size(); ++k )
             {
-                for( int l = 0; l < corr->at( k ).size(); ++l )
+                for( unsigned int l = 0; l < corr->at( k ).size(); ++l )
                 {
                     m_result[k * numThreads + i][(k * numThreads + i)+l] = corr->at( k ).at( l );
                     m_result[(k * numThreads + i)+l][k * numThreads + i] = corr->at( k ).at( l );

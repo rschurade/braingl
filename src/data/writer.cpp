@@ -42,7 +42,7 @@ bool Writer::save()
         {
             nifti_image* out = createHeader( 1 );
 
-            QVector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
+            std::vector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
 
             out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
@@ -64,7 +64,7 @@ bool Writer::save()
 
             int dim = 3;
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_vec3" );
@@ -103,7 +103,7 @@ bool Writer::save()
             QVector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-            QVector<float> outData( img->nx * img->ny * img->nz * 6 );
+            std::vector<float> outData( img->nx * img->ny * img->nz * 6 );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_tensor" );
@@ -145,7 +145,7 @@ bool Writer::save()
 
             int dim = data->at( 0 ).Nrows();
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_qball" );
@@ -180,13 +180,13 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_BINGHAM:
         {
-            QVector<QVector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
+            QVector<std::vector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = data->at( 0 ).size();
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_bingham" );
@@ -197,7 +197,7 @@ bool Writer::save()
                 {
                     for ( int x = 0; x < img->nx; ++x )
                     {
-                        QVector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        std::vector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
 
                         for ( int i = 0; i < dim; ++i )
                         {
@@ -222,18 +222,18 @@ bool Writer::save()
         case Fn::DatasetType::NIFTI_DWI:
         {
             QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
-            QVector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
+            std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = data->at( 0 ).Nrows() + 1;
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
-            QVector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
+            std::vector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
             QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
-            QVector<float> bvalOut;
-            for ( int i = 0; i < bvals.size(); ++i )
+            std::vector<float> bvalOut;
+            for ( unsigned int i = 0; i < bvals.size(); ++i )
             {
                 bvalOut.push_back( bvals[i] );
             }
@@ -416,7 +416,7 @@ void Writer::saveRGB()
         }
         QTextStream out( &file );
         float* c = dsm->getMesh()->getVertexColors();
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             out << c[i * 4] << " " << c[i * 4 + 1] << " " << c[i * 4 + 2] << endl;
         }
@@ -435,7 +435,7 @@ void Writer::save1D()
             return;
         }
         QTextStream out( &file );
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             float c = dsm->getMesh()->getVertexData(i);
             out << c << endl;
@@ -455,7 +455,7 @@ void Writer::saveROI()
             return;
         }
         QTextStream out( &file );
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             float c = dsm->getMesh()->getVertexData( i );
             if ( c > 0 )

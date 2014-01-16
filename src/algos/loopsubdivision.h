@@ -21,17 +21,17 @@ public:
     TriangleMesh2* getMesh() { return m_mesh; };
 
 private:
-    int calcEdgeVert( int triNum, int edgeV1, int edgeV2, int V3 );
-    QVector3D calcNewPosition( int vertNum );
-    void insertCenterTriangle( int triNum );
-    void insertCornerTriangles( int triNum );
-    double getAlpha( int n );
+    unsigned int calcEdgeVert( unsigned int triNum, unsigned int edgeV1, unsigned int edgeV2, unsigned int V3 );
+    QVector3D calcNewPosition( unsigned int vertNum );
+    void insertCenterTriangle( unsigned int triNum );
+    void insertCornerTriangles( unsigned int triNum );
+    double getAlpha( unsigned int n );
 
     TriangleMesh2* m_mesh;
     TriangleMesh2* m_newMesh;
 
-    int m_numVerts;
-    int m_numTris;
+    unsigned int m_numVerts;
+    unsigned int m_numTris;
 };
 
 #endif /* LOOPSUBDIVISION_H_ */

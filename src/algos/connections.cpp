@@ -416,15 +416,15 @@ QList<Dataset*> Connections::createDatasetFibers()
     int n = edges.size();
     //int m = edges.at( 0 )->points.size();
 
-    QVector<QVector<float> > fibers;
-    QVector<QVector<float> > values;
+    QVector<std::vector<float> > fibers;
+    QVector<std::vector<float> > values;
     for ( int e = 0; e < n; e++ )
     {
         Edge* ed = edges.at( e );
         float v = ed->m_value;
 
-        QVector<float> line;
-        QVector<float> lineValues;
+        std::vector<float> line;
+        std::vector<float> lineValues;
         for ( int p = 0; p < ed->points.size(); p++ )
         {
             QVector3D po = ed->points.at( p );
@@ -436,12 +436,12 @@ QList<Dataset*> Connections::createDatasetFibers()
         fibers.push_back( line );
         values.push_back( lineValues );
     }
-    QVector<QVector<QVector<float> > > allValues;
+    QVector<QVector<std::vector<float> > > allValues;
     allValues.push_back( values );
     QVector<QString> value_names;
     value_names.push_back( "connectivity" );
-    QVector<float> mins;
-    QVector<float> maxs;
+    std::vector<float> mins;
+    std::vector<float> maxs;
     mins.push_back( -1 );
     maxs.push_back( 1 );
 

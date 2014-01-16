@@ -16,19 +16,19 @@
 class FiberRendererThread : public QThread
 {
 public:
-    FiberRendererThread( QVector< QVector< float > >* data, int id );
+    FiberRendererThread( QVector< std::vector<float> >* data, int id );
     virtual ~FiberRendererThread();
 
-    QVector<float>* getVerts();
+    std::vector<float>* getVerts();
     QVector<QVector3D>* getGlobalColors();
 
 private:
     void run();
 
-    QVector< QVector< float > >* m_data;
+    QVector< std::vector<float> >* m_data;
     int m_id;
 
-    QVector<float>* m_verts;
+    std::vector<float>* m_verts;
     QVector<QVector3D>*m_globalColors;
 
 };

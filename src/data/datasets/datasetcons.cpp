@@ -34,7 +34,7 @@ void DatasetCons::init()
         Edge* e = cons->edges.at( i );
         QVector3D f = e->fn;
         QVector3D t = e->tn;
-        QVector<float> fib;
+        std::vector<float> fib;
         fib.push_back( f.x() );
         fib.push_back( f.y() );
         fib.push_back( f.z() );
@@ -43,13 +43,13 @@ void DatasetCons::init()
         fib.push_back( t.z() );
         m_fibs.push_back( fib );
     }
-    QVector<QVector<float> > data0;
-    QVector<float> min0;
-    QVector<float> max0;
+    QVector<std::vector<float> > data0;
+    std::vector<float> min0;
+    std::vector<float> max0;
     data0.reserve( m_fibs.size() );
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
-        data0.push_back( QVector<float>( m_fibs[i].size() / 3 ) );
+        data0.push_back( std::vector<float>( m_fibs[i].size() / 3 ) );
     }
     m_data.push_back( data0 );
     m_dataNames.push_back( "no data" );

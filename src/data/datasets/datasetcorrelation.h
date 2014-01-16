@@ -39,7 +39,7 @@ protected:
 
     CorrelationMatrix* m_correlations;
 
-    QVector<int> m_picked;
+    std::vector<unsigned int> m_picked;
     int m_prevPickedID;
 
 };

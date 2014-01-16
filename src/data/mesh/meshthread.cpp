@@ -8,7 +8,7 @@
 
 #include "../../gui/gl/glfunctions.h"
 
-MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int bufferSize, int id ) :
+MeshThread::MeshThread( std::vector<float>* vertices, std::vector<unsigned int>* triangles, unsigned int numTris, unsigned int bufferSize, int id ) :
     m_vertices( vertices ),
     m_triangles( triangles ),
     m_numTris( numTris ),
@@ -20,10 +20,9 @@ MeshThread::MeshThread( QVector<float>* vertices, QVector<int>* triangles, int n
 MeshThread::~MeshThread()
 {
     m_triNormals.clear();
-    m_triNormals.squeeze();
 }
 
-QVector<QVector3D>* MeshThread::getTriNormals()
+std::vector<QVector3D>* MeshThread::getTriNormals()
 {
     return &m_triNormals;
 }

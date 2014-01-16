@@ -16,7 +16,7 @@
 
 #include <QAbstractItemModel>
 
-ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
+ROIArea::ROIArea( std::vector<float> data, nifti_image* header ) :
     ROI( QString("new roi") + QString::number( ROI::m_count++ ) ),
     m_data( data ),
     m_header( header ),
@@ -24,7 +24,7 @@ ROIArea::ROIArea( QVector<float> data, nifti_image* header ) :
     m_mesh( 0 )
 {
     m_max = 0;
-    for ( int i = 0; i < data.size(); ++i )
+    for ( unsigned int i = 0; i < data.size(); ++i )
     {
         m_max = qMax( m_max, data[i] );
     }
@@ -90,7 +90,7 @@ ROIArea::~ROIArea()
 {
 }
 
-QVector<float>* ROIArea::data()
+std::vector<float>* ROIArea::data()
 {
     return &m_data;
 }

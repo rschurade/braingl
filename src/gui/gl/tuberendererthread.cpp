@@ -12,11 +12,11 @@
 
 #include <math.h>
 
-TubeRendererThread::TubeRendererThread( QVector< QVector< float > >* data, int id ) :
+TubeRendererThread::TubeRendererThread( QVector< std::vector<float> >* data, int id ) :
     m_data( data ),
     m_id( id )
 {
-    m_verts = new QVector<float>();
+    m_verts = new std::vector<float>();
     m_globalColors = new QVector<QVector3D>();
 }
 
@@ -24,11 +24,10 @@ TubeRendererThread::~TubeRendererThread()
 {
     m_verts->clear();
     m_globalColors->clear();
-    m_verts->squeeze();
     m_globalColors->squeeze();
 }
 
-QVector<float>* TubeRendererThread::getVerts()
+std::vector<float>* TubeRendererThread::getVerts()
 {
     return m_verts;
 }
@@ -55,7 +54,7 @@ void TubeRendererThread::run()
     // for all voxels:
     for ( int i = begin; i < end; ++i )
     {
-        QVector<float> fib = m_data->at( i );
+        std::vector<float> fib = m_data->at( i );
 
         if ( fib.size() < 6 )
         {
@@ -91,7 +90,7 @@ void TubeRendererThread::run()
         m_verts->push_back( localColor.z() );
         m_verts->push_back( -1.0 );
 
-        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        for ( unsigned int k = 1; k < fib.size() / 3 - 1; ++k )
         {
             QVector3D localColor( fib[k*3-3] - fib[k*3+3], fib[k*3-2] - fib[k*3+4], fib[k*3-1] - fib[k*3+5] );
             localColor.normalize();

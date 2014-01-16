@@ -700,9 +700,9 @@ void DatasetGlyphset::makeDiffPoints()
     int offset = 14;
     //TODO: ROIs?
     //for each triangle
-    QVector<int> tris = m_mesh.at( geo )->getTriangles();
+    std::vector<unsigned int> tris = m_mesh.at( geo )->getTriangles();
     QVector<int> idPairs;
-    for ( int tri = 0; tri < tris.size(); tri += 3 )
+    for ( unsigned int tri = 0; tri < tris.size(); tri += 3 )
     {
 // all three edges
 //qDebug() << "tri: " << tri;
@@ -1115,7 +1115,7 @@ void DatasetGlyphset::loadROI( QString filename )
     if ( filename.endsWith( ".1D" ) )
     {
 //List of as many values as mesh nodes
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -1132,7 +1132,7 @@ void DatasetGlyphset::loadROI( QString filename )
     else if ( filename.endsWith( ".rgb" ) )
     {
         //File with node rgb values
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -1160,7 +1160,7 @@ void DatasetGlyphset::loadROI( QString filename )
             ids.append( sl.at( 0 ).toInt() );
         }
 
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             roi[i] = false;
             if ( ids.contains( i ) )
@@ -1185,7 +1185,7 @@ void DatasetGlyphset::loadROI2( QString filename )
     if ( filename.endsWith( ".1D" ) )
     {
 //List of as many values as mesh nodes
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -1202,7 +1202,7 @@ void DatasetGlyphset::loadROI2( QString filename )
     else if ( filename.endsWith( ".rgb" ) )
     {
         //File with node rgb values
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -1230,7 +1230,7 @@ void DatasetGlyphset::loadROI2( QString filename )
             ids.append( sl.at( 0 ).toInt() );
         }
 
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             roi2[i] = false;
             if ( ids.contains( i ) )
@@ -1246,7 +1246,7 @@ void DatasetGlyphset::initROI()
 {
     roi = new bool[m_mesh.at( 0 )->numVerts()];
     roi2 = new bool[m_mesh.at( 0 )->numVerts()];
-    for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+    for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
     {
         roi[i] = true;
         roi2[i] = true;
@@ -1263,7 +1263,7 @@ void DatasetGlyphset::exportColors()
     QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".col_" );
 
     QSet<QColor>* colors = new QSet<QColor>();
-    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+    for ( unsigned int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
     {
         QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
         QColor erasecolor = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
@@ -1291,7 +1291,7 @@ void DatasetGlyphset::exportColors()
         }
         QTextStream out( &file );
         QTextStream out2( &file2 );
-        for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
         {
             QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
             if ( vcolor == c )

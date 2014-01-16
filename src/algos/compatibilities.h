@@ -18,7 +18,7 @@ public:
 
     void addComp(int i, int j, float c);
     QVector< QVector<int>* >* idxs;
-    QVector< QVector<float>* >* comps2;
+    QVector< std::vector<float>* >* comps2;
 
 private:
     int nedges;

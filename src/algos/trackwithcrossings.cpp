@@ -63,12 +63,12 @@ TrackWithCrossings::~TrackWithCrossings()
 {
 }
 
-QVector< QVector< float > > TrackWithCrossings::getFibs()
+QVector< std::vector<float> > TrackWithCrossings::getFibs()
 {
     return fibs;
 }
 
-QVector< QVector< float > > TrackWithCrossings::getExtras()
+QVector< std::vector<float> > TrackWithCrossings::getExtras()
 {
     return extras;
 }
@@ -98,7 +98,7 @@ void TrackWithCrossings::startTracking()
 
 void TrackWithCrossings::trackWholeBrain()
 {
-    QVector<float>* mask = m_mask->getData();
+    std::vector<float>* mask = m_mask->getData();
     QVector<Matrix>* tensors1 = m_ds1->getData();
     QVector<Matrix>* logtensors1 = m_ds1->getLogData();
     QVector<Matrix>* tensors2 = m_ds2->getData();

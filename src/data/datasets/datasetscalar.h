@@ -15,10 +15,10 @@ class ColormapRenderer;
 class DatasetScalar: public DatasetNifti
 {
 public:
-    DatasetScalar( QDir filename, QVector<float> data, nifti_image* header );
+    DatasetScalar( QDir filename, std::vector<float> data, nifti_image* header );
     virtual ~DatasetScalar();
 
-    QVector<float>* getData();
+    std::vector<float>* getData();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
@@ -29,7 +29,7 @@ public:
     QColor getColorAtPos( QVector3D pos );
 
 private:
-    QVector<float> m_data;
+    std::vector<float> m_data;
 
     ColormapRenderer* m_colormapRenderer;
 

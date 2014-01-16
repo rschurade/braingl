@@ -23,7 +23,7 @@ class TWCThread : public QThread
 
 public:
     TWCThread( int id,
-                QVector<float>* mask,
+                std::vector<float>* mask,
                 QVector<Matrix>* logtensors1,
                 QVector<Matrix>* logtensors2,
                 QVector<Matrix>* logtensors3,
@@ -33,13 +33,13 @@ public:
                 int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~TWCThread();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    QVector< std::vector<float> >getFibs();
+    QVector< std::vector<float> >getExtras();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
+    void track( int id, bool negDir, std::vector<float>& result, std::vector<float>& extraResult );
 
     float getInterpolatedFA( int &id, float &inx, float &iny, float &inz );
     Matrix getInterpolatedTensor( int &id, float &inx, float &iny, float &inz, float &dirX, float &dirY, float &dirZ );
@@ -48,7 +48,7 @@ private:
 
     int m_id;
 
-    QVector<float>* m_mask;
+    std::vector<float>* m_mask;
     QVector<QVector<Matrix>*>m_logTensors;
     QVector<QVector<QVector3D>*> m_evecs;
 
@@ -60,14 +60,14 @@ private:
     float m_dz;
     int m_blockSize;
 
-    int m_minLength;
+    unsigned int m_minLength;
     float m_stepSize;
     float m_diag;
     int maxStepsInVoxel;
     float m_smoothness;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    QVector< std::vector<float> >fibs;
+    QVector< std::vector<float> >extras;
 
 signals:
     void progress();

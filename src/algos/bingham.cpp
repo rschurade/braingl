@@ -60,12 +60,12 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         threads[i]->wait();
     }
 
-    QVector<QVector<float> > out;
+    QVector<std::vector<float> > out;
     out.resize( data->size() );
 
     // combine fibs from all threads
     qDebug() << "combining results";
-    QVector<float> v( 27, 0 );
+    std::vector<float> v( 27, 0 );
     for ( int i = 0; i < data->size(); ++i )
     {
         out.replace( i, v );
@@ -74,7 +74,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 
     for ( int i = 0; i < numThreads; ++i )
     {
-        QVector<QVector<float> > result = threads[i]->getResultVector();
+        QVector<std::vector<float> > result = threads[i]->getResultVector();
         qDebug() << i << result.size();
         for ( int k = 0, l = i; k < result.size(); ++k, l += numThreads )
         {
@@ -96,7 +96,7 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
 {
     qDebug() << "start bingham to dwi";
-    QVector< QVector<float> >* data = ds->getData();
+    QVector< std::vector<float> >* data = ds->getData();
 
     QVector<ColumnVector> signals1;
     QVector<ColumnVector> signals2;
@@ -133,7 +133,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
 
     //****************************************************************************
     QVector<QVector3D>bvecs;
-    QVector<float>bvals;
+    std::vector<float>bvals;
 
     const int max_ord = 10; //((-3+static_cast<int>(sqrt(8*((*sh.get(0,0,0)).size())+1)))/2);
 
@@ -226,7 +226,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
         }
     }
 
-    QVector<float> b0Data( data->size(), 220 );
+    std::vector<float> b0Data( data->size(), 220 );
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {

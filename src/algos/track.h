@@ -27,8 +27,8 @@ public:
 
     void startTracking();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    QVector< std::vector<float> >getFibs();
+    QVector< std::vector<float> >getExtras();
     int getNumPoints();
     int getNumLines();
 
@@ -40,13 +40,13 @@ private:
     QVector<Matrix>* m_tensors;
     QVector<Matrix>* m_logTensors;
     // calculated fa and eigen vectors
-    QVector<float> m_fa;
+    std::vector<float> m_fa;
     QVector<QVector3D> m_evec1;
 
     QVector<TrackThread*> m_threads;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    QVector< std::vector<float> >fibs;
+    QVector< std::vector<float> >extras;
 
     int m_nx;
     int m_ny;

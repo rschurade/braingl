@@ -53,7 +53,7 @@ QList<Dataset*> FiberAlgos::tractColor( Dataset* ds )
 QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
 {
     DatasetFibers* f = dynamic_cast<DatasetFibers*>( ds );
-    QVector<QVector<float> >selected = f->getSelectedFibs();
+    QVector<std::vector<float> >selected = f->getSelectedFibs();
 
     QVector<QString>dataNames = f->getDataNames();
 

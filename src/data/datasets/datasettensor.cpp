@@ -37,7 +37,7 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
-DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nifti_image* header ) :
+DatasetTensor::DatasetTensor( QDir filename, QVector<std::vector<float> > data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
 {
     for ( int i = 0; i < data.size(); ++i )
@@ -145,13 +145,13 @@ void DatasetTensor::createLogTensors()
     m_logData.resize( blockSize );
 
     QVector<QVector3D> evec1( blockSize );
-    QVector<float> eval1( blockSize );
+    std::vector<float> eval1( blockSize );
 
     QVector<QVector3D> evec2( blockSize );
-    QVector<float> eval2( blockSize );
+    std::vector<float> eval2( blockSize );
 
     QVector<QVector3D> evec3( blockSize );
-    QVector<float> eval3( blockSize );
+    std::vector<float> eval3( blockSize );
 
     FMath::evecs( m_data, evec1, eval1, evec2, eval2, evec3, eval3 );
 

@@ -29,8 +29,8 @@ public:
     void setDatasets( DatasetScalar* mask, DatasetTensor* ds1, DatasetTensor* ds2, DatasetTensor* ds3 );
     void startTracking();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    QVector< std::vector<float> >getFibs();
+    QVector< std::vector<float> >getExtras();
     int getNumPoints();
     int getNumLines();
 
@@ -44,8 +44,8 @@ private:
 
     QVector<TWCThread*> m_threads;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    QVector< std::vector<float> >fibs;
+    QVector< std::vector<float> >extras;
 
     int m_nx;
     int m_ny;

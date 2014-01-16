@@ -14,7 +14,7 @@
 #include "math.h"
 
 TWCThread::TWCThread( int id,
-                        QVector<float>* mask,
+                        std::vector<float>* mask,
                         QVector<Matrix>* logtensors1,
                         QVector<Matrix>* logtensors2,
                         QVector<Matrix>* logtensors3,
@@ -50,12 +50,12 @@ TWCThread::~TWCThread()
 {
 }
 
-QVector< QVector< float > > TWCThread::getFibs()
+QVector< std::vector<float> > TWCThread::getFibs()
 {
     return fibs;
 }
 
-QVector< QVector< float > > TWCThread::getExtras()
+QVector< std::vector<float> > TWCThread::getExtras()
 {
     return extras;
 }
@@ -79,13 +79,13 @@ void TWCThread::run()
             continue;
         }
 
-        QVector<float> fib1;
-        QVector<float> fib2;
-        QVector<float> fib2r;
+        std::vector<float> fib1;
+        std::vector<float> fib2;
+        std::vector<float> fib2r;
 
-        QVector<float> extra1;
-        QVector<float> extra2;
-        QVector<float> extra2r;
+        std::vector<float> extra1;
+        std::vector<float> extra2;
+        std::vector<float> extra2r;
 
         track( i, false, fib1, extra1 );
         track( i, true, fib2, extra2 );
@@ -97,7 +97,7 @@ void TWCThread::run()
         {
             fib2r.resize( fib2.size() );
             extra2r.resize( extra2.size() );
-            for ( int i = 0; i < fib2.size() / 3; ++i )
+            for ( unsigned int i = 0; i < fib2.size() / 3; ++i )
             {
                 j = i * 3;
                 fib2r[j] = fib2[( fib2.size() - 1 ) - ( j + 2 )];
@@ -109,12 +109,10 @@ void TWCThread::run()
 
             if ( fib1.size() > 3 )
             {
-                fib1.remove( 0 );
-                fib1.remove( 0 );
-                fib1.remove( 0 );
-                extra1.remove( 0 );
-                fib2r += fib1;
-                extra2r += extra1;
+                fib1.erase( fib1.begin(), fib1.begin() + 3 );
+                extra1.erase( extra1.begin() );
+                fib2r.insert( fib2r.end(), fib1.begin(), fib1.end() );
+                extra2r.insert( extra2r.end(), extra1.begin(), extra1.end() );
             }
 
             fibs.push_back( fib2r );
@@ -124,7 +122,7 @@ void TWCThread::run()
     emit( finished() );
 }
 
-void TWCThread::track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult )
+void TWCThread::track( int id, bool negDir, std::vector<float>& result, std::vector<float>& extraResult )
 {
     int xs = 0;
     int ys = 0;

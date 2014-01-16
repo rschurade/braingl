@@ -22,7 +22,7 @@ class TrackThread : public QThread
 public:
     TrackThread(  QVector<Matrix>* tensors,
                   QVector<Matrix>* logTensors,
-                  QVector<float>* fa,
+                  std::vector<float>* fa,
                   QVector<QVector3D>* evec1,
                   int nx,
                   int ny,
@@ -39,13 +39,13 @@ public:
 
     virtual ~TrackThread();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    QVector< std::vector<float> >getFibs();
+    QVector< std::vector<float> >getExtras();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
+    void track( int id, bool negDir, std::vector<float>& result, std::vector<float>& extraResult );
 
     int getID( float x, float y, float z );
     void getXYZ( int id, int &x, int &y, int &z );
@@ -55,7 +55,7 @@ private:
     QVector<Matrix>* m_tensors;
     QVector<Matrix>* m_logTensors;
     // calculated fa and eigen vectors
-    QVector<float>* m_fa;
+    std::vector<float>* m_fa;
     QVector<QVector3D>* m_evec1;
 
     int m_nx;
@@ -67,7 +67,7 @@ private:
 
     int m_id;
 
-    int m_minLength;
+    unsigned int m_minLength;
     float m_minFA;
     float m_minStartFA;
     float m_stepSize;
@@ -76,8 +76,8 @@ private:
     float m_smoothness;
     int m_blockSize;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    QVector< std::vector<float> >fibs;
+    QVector< std::vector<float> >extras;
 
 signals:
     void progress();

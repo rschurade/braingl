@@ -22,11 +22,11 @@ class TubeRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    TubeRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData );
+    TubeRenderer( FiberSelector* selector, QVector< std::vector<float> >* data, QVector< std::vector<float> >* extraData );
     virtual ~TubeRenderer();
 
     void init();
-    void updateExtraData( QVector< QVector< float > >* extraData );
+    void updateExtraData( QVector< std::vector<float> >* extraData );
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
 
@@ -44,9 +44,9 @@ private:
     FiberSelector* m_selector;
     GLuint *vboIds;
 
-    QVector< QVector< float > >* m_data;
-    QVector< QVector< float > >* m_extraData;
-    QVector< QVector< float > >* m_indexData;
+    QVector< std::vector<float> >* m_data;
+    QVector< std::vector<float> >* m_extraData;
+    QVector< std::vector<float> >* m_indexData;
 
     int m_numLines;
     int m_numPoints;

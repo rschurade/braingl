@@ -26,7 +26,7 @@ public:
                                                      QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     virtual ~SHRendererThread();
 
-    QVector<float>* getVerts();
+    std::vector<float>* getVerts();
 
 private:
     void run();
@@ -55,7 +55,7 @@ private:
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_mvMatrix;
 
-    QVector<float>* m_verts;
+    std::vector<float>* m_verts;
 };
 
 #endif /* SHRENDERERTHREAD_H_ */

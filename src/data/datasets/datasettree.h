@@ -46,7 +46,7 @@ private:
     int m_numLeaves;
     int m_numNodes;
 
-    QVector<float>m_textureData;
+    std::vector<float>m_textureData;
 
     int m_width;
     int m_height;

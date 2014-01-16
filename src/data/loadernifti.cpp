@@ -33,7 +33,6 @@ LoaderNifti::~LoaderNifti()
     m_scalarData.clear();
     m_vectorData.clear();
     m_dataset.clear();
-    m_scalarData.squeeze();
     m_vectorData.squeeze();
     m_dataset.squeeze();
 }
@@ -198,7 +197,6 @@ bool LoaderNifti::loadNiftiScalar( QString fileName )
     nifti_image_free( filedata );
     DatasetScalar* dataset = new DatasetScalar( fileName, m_scalarData, m_header );
     m_scalarData.clear();
-    m_scalarData.squeeze();
     m_dataset.push_back( dataset );
     return true;
 }
@@ -556,7 +554,7 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
     size_t blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
 
-    QVector<QVector<float> > dataVector;
+    QVector<std::vector<float> > dataVector;
 
     try
     {
@@ -583,7 +581,7 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
                     {
                         for ( int x = dimX - 1; x >= 0; --x )
                         {
-                            QVector<float> v( dim );
+                            std::vector<float> v( dim );
                             int id = x + y * dimX + z * dimX * dimY;
                             for ( int j = 0; j < dim; ++j )
                             {
@@ -602,7 +600,7 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
                     {
                         for ( int x = 0; x < dimX; ++x )
                         {
-                            QVector<float> v( dim );
+                            std::vector<float> v( dim );
                             int id = x + y * dimX + z * dimX * dimY;
                             for ( int j = 0; j < dim; ++j )
                             {
@@ -641,7 +639,7 @@ bool LoaderNifti::loadNiftiFMRI( QString fileName )
     int dim = m_header->dim[4];
     qDebug() << "num images:" << dim;
 
-    QVector<float> data;
+    std::vector<float> data;
 
     try
     {
@@ -715,16 +713,16 @@ bool LoaderNifti::loadNiftiFMRI( QString fileName )
 
 bool LoaderNifti::loadNiftiDWI( QString fileName )
 {
-    QVector<float> bvals = loadBvals( fileName );
+    std::vector<float> bvals = loadBvals( fileName );
 
-    if ( bvals.size() == 0 || bvals.size() != m_header->dim[4] )
+    if ( (int)bvals.size() == 0 || (int)bvals.size() != m_header->dim[4] )
     {
         qDebug() << "*** ERROR *** while loading dwi dataset, count bvals doesn't match nifti image dim!";
         return false;
     }
     int numB0 = 0;
-    QVector<float> bvals2;
-    for ( int i = 0; i < bvals.size(); ++i )
+    std::vector<float> bvals2;
+    for ( unsigned int i = 0; i < bvals.size(); ++i )
     {
         if ( bvals[i] > 100 )
         {
@@ -753,7 +751,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     int numData = dim - numB0;
     qDebug() << "num data:" << numData;
 
-    if ( numData > dim || bvals2.size() != bvecs.size() )
+    if ( numData > dim || (int)bvals2.size() != bvecs.size() )
     {
         qDebug() << "*** ERROR *** parsing bval and bvec files!";
         return false;
@@ -776,7 +774,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     {
         case NIFTI_TYPE_INT16:
         {
-            QVector<float> b0data( blockSize );
+            std::vector<float> b0data( blockSize );
             qDebug() << "block size: " << blockSize;
             int16_t* inputData;
 
@@ -902,7 +900,7 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
     {
         case NIFTI_TYPE_FLOAT32:
         {
-            QVector<float> b0data( blockSize );
+            std::vector<float> b0data( blockSize );
             qDebug() << "block size: " << blockSize;
             float* inputData;
 
@@ -951,7 +949,7 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
 
             nifti_image* dsHdr = nifti_copy_nim_info( m_header );
 
-            QVector<float> bvals2;
+            std::vector<float> bvals2;
             QVector<QVector3D> bvecs;
 
             float* extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
@@ -977,10 +975,10 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
     return false;
 }
 
-QVector<float> LoaderNifti::loadBvals( QString fileName )
+std::vector<float> LoaderNifti::loadBvals( QString fileName )
 {
     QStringList slBvals;
-    QVector<float> bvals;
+    std::vector<float> bvals;
 
     QString fn = m_fileName.path();
     fn.replace( ".nii.gz", ".bval" );
@@ -1040,7 +1038,7 @@ QVector<float> LoaderNifti::loadBvals( QString fileName )
     }
 }
 
-QVector<QVector3D> LoaderNifti::loadBvecs( QString fileName, QVector<float> bvals )
+QVector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<float> bvals )
 {
     QString fn = m_fileName.path();
     fn.replace( ".nii.gz", ".bvec" );
@@ -1083,7 +1081,7 @@ QVector<QVector3D> LoaderNifti::loadBvecs( QString fileName, QVector<float> bval
         QStringList slZ = sZ.split( " ", QString::SkipEmptyParts );
 
         //qDebug() << "count bvals" << bvals.size() << bvals;
-        if ( bvals.size() != slX.size() || bvals.size() != slY.size() || bvals.size() != slZ.size() )
+        if ( (int)bvals.size() != slX.size() || (int)bvals.size() != slY.size() || (int)bvals.size() != slZ.size() )
         {
             QMessageBox msgBox;
             msgBox.setText( "Error! While loading dwi dataset, bvals don't match bvecs!" );

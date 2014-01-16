@@ -36,7 +36,7 @@ DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
 
 }
 
-DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) :
+DatasetFibers::DatasetFibers( QDir filename, QVector< std::vector<float> > fibs ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_renderer( 0 ),
@@ -46,13 +46,13 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
     m_numLines( 0 ),
     m_morphValue( 1.0f)
 {
-    QVector<QVector<float> >data0;
-    QVector<float>min0;
-    QVector<float>max0;
+    QVector<std::vector<float> >data0;
+    std::vector<float>min0;
+    std::vector<float>max0;
     data0.reserve( fibs.size() );
     for ( int i = 0; i < fibs.size(); ++i )
     {
-        data0.push_back( QVector<float>( fibs[i].size() / 3 ) );
+        data0.push_back( std::vector<float>( fibs[i].size() / 3 ) );
     }
     m_data.push_back( data0 );
     m_dataNames.push_back( "no data" );
@@ -62,11 +62,11 @@ DatasetFibers::DatasetFibers( QDir filename, QVector< QVector< float > > fibs ) 
 }
 
 DatasetFibers::DatasetFibers( QDir filename,
-                                 QVector< QVector< float > > fibs,
-                                 QVector< QVector< QVector< float > > >data,
+                                 QVector< std::vector<float> > fibs,
+                                 QVector< QVector< std::vector<float> > >data,
                                  QVector<QString>dataNames,
-                                 QVector< float > mins,
-                                 QVector<float> maxes ) :
+                                 std::vector<float> mins,
+                                 std::vector<float> maxes ) :
     Dataset( filename, Fn::DatasetType::FIBERS ),
     m_fibs( fibs ),
     m_data( data ),
@@ -183,7 +183,7 @@ void DatasetFibers::createProps()
     m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
     m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
 
-    int maxLength = 0;
+    size_t maxLength = 0;
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
         maxLength = qMax( maxLength, m_fibs[i].size() / 3 );
@@ -238,22 +238,22 @@ void DatasetFibers::createProps()
     transformChanged( 3 );
 }
 
-QVector< QVector< float > > DatasetFibers::getFibs()
+QVector< std::vector<float> > DatasetFibers::getFibs()
 {
     return m_fibs;
 }
 
-QVector< QVector< QVector< float > > > DatasetFibers::getData()
+QVector< QVector< std::vector<float> > > DatasetFibers::getData()
 {
     return m_data;
 }
 
-QVector< QVector< float > > DatasetFibers::getData( int id )
+QVector< std::vector<float> > DatasetFibers::getData( int id )
 {
     return m_data[id];
 }
 
-QVector< QVector< float > > DatasetFibers::getSelectedFibs()
+QVector< std::vector<float> > DatasetFibers::getSelectedFibs()
 {
     if ( m_renderer == 0 )
     {
@@ -262,7 +262,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     else
     {
         QVector<bool>*selected = m_selector->getSelection();
-        QVector<QVector<float> >out;
+        QVector<std::vector<float> >out;
         int first = 0;
         for ( int i = 0; i < selected->size(); ++i )
         {
@@ -272,7 +272,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
                 break;
             }
         }
-        QVector<float>f0;
+        std::vector<float>f0;
         f0 = m_fibs[first];
         QVector3D start;
         if ( Models::r()->rowCount()  > 0 )
@@ -300,7 +300,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
         {
             if ( selected->at( i ) )
             {
-                QVector<float>f = m_fibs[i];
+                std::vector<float>f = m_fibs[i];
                 QVector3D s1( f[0], f[1], f[2] );
                 int size = f.size();
                 QVector3D s2( f[size - 3], f[size - 2], f[size - 1] );
@@ -312,13 +312,13 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
                 else
                 {
                     // flip fiber
-                    QVector<float>f = m_fibs[i];
-                    QVector<float>newfib;
-                    for ( int k = 0; k < f.size() / 3; ++k )
+                    std::vector<float>f = m_fibs[i];
+                    std::vector<float>newfib;
+                    for ( int k = f.size() / 3 - 1; k >= 0; ++k )
                     {
-                        newfib.push_front( f[k*3+2] );
-                        newfib.push_front( f[k*3+1] );
-                        newfib.push_front( f[k*3] );
+                        newfib.push_back( f[k*3] );
+                        newfib.push_back( f[k*3+1] );
+                        newfib.push_back( f[k*3+2] );
                     }
                     out.push_back( newfib );
                 }
@@ -328,7 +328,7 @@ QVector< QVector< float > > DatasetFibers::getSelectedFibs()
     }
 }
 
-QVector< QVector< QVector< float > > > DatasetFibers::getSelectedData()
+QVector< QVector< std::vector<float> > > DatasetFibers::getSelectedData()
 {
     if ( m_renderer == 0 )
     {
@@ -337,12 +337,12 @@ QVector< QVector< QVector< float > > > DatasetFibers::getSelectedData()
     else
     {
         QVector<bool>*selected = m_selector->getSelection();
-        QVector< QVector<QVector<float> > >out;
+        QVector< QVector<std::vector<float> > >out;
 
         for ( int k = 0; k < m_data.size(); ++k )
         {
-            QVector<QVector<float> > data = m_data[k];
-            QVector<QVector<float> > dataOut;
+            QVector<std::vector<float> > data = m_data[k];
+            QVector<std::vector<float> > dataOut;
             for ( int i = 0; i < selected->size(); ++i )
             {
                 if ( selected->at( i ) )
@@ -356,12 +356,12 @@ QVector< QVector< QVector< float > > > DatasetFibers::getSelectedData()
     }
 }
 
-QVector<float> DatasetFibers::getDataMins()
+std::vector<float> DatasetFibers::getDataMins()
 {
     return m_dataMins;
 }
 
-QVector<float> DatasetFibers::getDataMaxes()
+std::vector<float> DatasetFibers::getDataMaxes()
 {
     return m_dataMaxes;
 }
@@ -460,17 +460,17 @@ void DatasetFibers::dataModeChanged()
 
 void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 {
-    QVector<float> points = lv->getPoints();
-    QVector<int> lines = lv->getLines();
+    std::vector<float> points = lv->getPoints();
+    std::vector<int> lines = lv->getLines();
     m_numLines = lv->getNumLines();
 
     qDebug() << "points size:" << points.size() << "lines size:" << lines.size() << "num lines:" << m_numLines;
 
     int lc = 0;
     int pc = 0;
-    for ( int i = 0; i < m_numLines; ++i )
+    for ( unsigned int i = 0; i < m_numLines; ++i )
     {
-        QVector<float> fib;
+        std::vector<float> fib;
         int lineSize = lines[lc];
 
         for ( int k = 0; k < lineSize * 3; ++k )
@@ -481,11 +481,11 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
         m_fibs.push_back( fib );
     }
 
-    QVector<unsigned char> colors = lv->getPrimitiveColors();
+    std::vector<unsigned char> colors = lv->getPrimitiveColors();
     m_customColors.resize( m_numLines );
     if ( colors.size() == m_numLines * 3 )
     {
-        for ( int i = 0; i < m_numLines; ++i )
+        for ( unsigned int i = 0; i < m_numLines; ++i )
         {
             m_customColors[i] = QColor( ( (float)colors[i * 3] ),
                                         ( (float)colors[i * 3 + 1] ),
@@ -493,19 +493,19 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
         }
     }
 
-    QVector<QVector<float> > pointData = lv->getPointData();
+    std::vector<std::vector<float> > pointData = lv->getPointData();
     m_dataNames = lv->getPointDataNames();
 
     if ( pointData.size() > 0 )
     {
         qDebug() << pointData.size() << "point data fields found";
-        for ( int curField = 0; curField < pointData.size(); ++curField )
+        for ( unsigned int curField = 0; curField < pointData.size(); ++curField )
         {
-            QVector<float> field = pointData[curField];
+            std::vector<float> field = pointData[curField];
             float min = std::numeric_limits<float>::max();
             float max = std::numeric_limits<float>::min();
 
-            for ( int i = 0; i < field.size(); ++i )
+            for ( unsigned int i = 0; i < field.size(); ++i )
             {
                 float value = field[i];
                 min = qMin( min, value );
@@ -514,17 +514,17 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
             m_dataMins.push_back( min );
             m_dataMaxes.push_back( max );
         }
-        for ( int curField = 0; curField < pointData.size(); ++curField )
+        for ( unsigned int curField = 0; curField < pointData.size(); ++curField )
         {
-            QVector<float> field = pointData[curField];
+            std::vector<float> field = pointData[curField];
 
-            QVector<QVector<float> > dataField;
+            QVector<std::vector<float> > dataField;
 
             int lc = 0;
             int pc = 0;
-            for ( int i = 0; i < m_numLines; ++i )
+            for ( unsigned int i = 0; i < m_numLines; ++i )
             {
-                QVector<float> fib;
+                std::vector<float> fib;
                 int lineSize = lines[lc];
                 for ( int k = 0; k < lineSize; ++k )
                 {
@@ -539,13 +539,13 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
     }
     else
     {
-        QVector<QVector<float> >data0;
-        QVector<float>min0;
-        QVector<float>max0;
+        QVector<std::vector<float> >data0;
+        std::vector<float>min0;
+        std::vector<float>max0;
         data0.reserve( m_fibs.size() );
         for ( int i = 0; i < m_fibs.size(); ++i )
         {
-            data0.push_back( QVector<float>( m_fibs[i].size() / 3 ) );
+            data0.push_back( std::vector<float>( m_fibs[i].size() / 3 ) );
         }
         m_data.push_back( data0 );
         m_dataNames.push_back( "no data" );
@@ -638,8 +638,8 @@ void DatasetFibers::applyTransform()
         {
             for ( int i = 0; i < m_fibs.size(); ++i )
             {
-                QVector<float>fib = m_fibs[i];
-                for ( int k = 0; k < fib.size() / 3; ++k )
+                std::vector<float>fib = m_fibs[i];
+                for ( unsigned int k = 0; k < fib.size() / 3; ++k )
                 {
                     QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
                     vert = m_transform * vert;
@@ -656,8 +656,8 @@ void DatasetFibers::applyTransform()
         {
             for ( int i = 0; i < m_fibs.size(); ++i )
             {
-                QVector<float>fib = m_fibs[i];
-                for ( int k = 0; k < fib.size() / 3; ++k )
+                std::vector<float>fib = m_fibs[i];
+                for ( unsigned int k = 0; k < fib.size() / 3; ++k )
                 {
                     QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
                     vert.setX( vert.x() / dx );
@@ -677,8 +677,8 @@ void DatasetFibers::applyTransform()
         {
             for ( int i = 0; i < m_fibs.size(); ++i )
             {
-                QVector<float>fib = m_fibs[i];
-                for ( int k = 0; k < fib.size() / 3; ++k )
+                std::vector<float>fib = m_fibs[i];
+                for ( unsigned int k = 0; k < fib.size() / 3; ++k )
                 {
                     QVector3D vert( fib[k*3], fib[k*3+1], fib[k*3+2] );
                     vert = m_transform * vert;
@@ -711,15 +711,15 @@ void DatasetFibers::makeMorphable()
     m_straight_fibs.resize( m_fibs.size() );
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
-        QVector<float> fib = m_fibs[i];
+        std::vector<float> fib = m_fibs[i];
         m_orig_fibs.replace( i, fib );
 
-        QVector<float> s_fib = m_fibs[i];
+        std::vector<float> s_fib = m_fibs[i];
         int n = fib.size() / 3;
 
         QVector3D start( fib[0], fib[1], fib[2] );
         QVector3D end( fib[( n - 1 ) * 3], fib[( n - 1 ) * 3 + 1], fib[( n - 1 ) * 3 + 2] );
-        for ( int k = 0; k < fib.size() / 3; ++k )
+        for ( unsigned int k = 0; k < fib.size() / 3; ++k )
         {
             QVector3D vert = start + ( end - start ) * ( k / (float) n );
             s_fib[k * 3] = vert.x();
@@ -739,11 +739,11 @@ void DatasetFibers::morph(float value)
     //replace fibs with interpolated fibs
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
-        QVector<float> fib = m_fibs[i];
-        QVector<float> o_fib = m_orig_fibs[i];
-        QVector<float> s_fib = m_straight_fibs[i];
+        std::vector<float> fib = m_fibs[i];
+        std::vector<float> o_fib = m_orig_fibs[i];
+        std::vector<float> s_fib = m_straight_fibs[i];
 
-        for ( int k = 0; k < o_fib.size() / 3; ++k )
+        for ( unsigned int k = 0; k < o_fib.size() / 3; ++k )
         {
             QVector3D o_vert( o_fib[k * 3], o_fib[k * 3 + 1], o_fib[k * 3 + 2] );
             QVector3D s_vert( s_fib[k * 3], s_fib[k * 3 + 1], s_fib[k * 3 + 2] );

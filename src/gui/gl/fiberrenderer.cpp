@@ -21,9 +21,9 @@
 #include "math.h"
 
 FiberRenderer::FiberRenderer( FiberSelector* selector,
-                                  QVector< QVector< float > >* data,
+                                  QVector< std::vector<float> >* data,
                                   QVector<QColor>* fiberColors,
-                                  QVector< QVector< float > >* extraData,
+                                  QVector< std::vector<float> >* extraData,
                                   int numPoints )  :
     ObjectRenderer(),
     m_selector( selector ),
@@ -232,7 +232,7 @@ void FiberRenderer::initGeometry()
 
     for ( int i = 0; i < m_data->size(); ++i )
     {
-        QVector<float> fib = m_data->at(i);
+        std::vector<float> fib = m_data->at(i);
 
         if ( fib.size() < 6 )
         {
@@ -260,7 +260,7 @@ void FiberRenderer::initGeometry()
         verts.push_back( localColor.y() );
         verts.push_back( localColor.z() );
 
-        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        for ( unsigned int k = 1; k < fib.size() / 3 - 1; ++k )
         {
             verts.push_back( fib[k*3] );
             verts.push_back( fib[k*3+1] );
@@ -292,7 +292,6 @@ void FiberRenderer::initGeometry()
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     verts.clear();
-    //verts.squeeze();
 
     m_pointsPerLine.resize( m_data->size() );
     m_startIndexes.resize( m_data->size() );
@@ -326,15 +325,15 @@ void FiberRenderer::colorChanged( QVariant color )
     }
 }
 
-void FiberRenderer::updateExtraData( QVector< QVector< float > >* extraData )
+void FiberRenderer::updateExtraData( QVector< std::vector<float> >* extraData )
 {
     m_extraData = extraData;
-    QVector<float>data;
-    QVector<float>indexes;
+    std::vector<float>data;
+    std::vector<float>indexes;
     for ( int i = 0; i < extraData->size(); ++i )
     {
-        QVector<float>fib = extraData->at(i);
-        for ( int k = 0; k < fib.size(); ++k )
+        std::vector<float>fib = extraData->at(i);
+        for ( unsigned int k = 0; k < fib.size(); ++k )
         {
             data.push_back( fib[k] );
             indexes.push_back( k );

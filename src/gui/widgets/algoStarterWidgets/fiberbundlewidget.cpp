@@ -95,9 +95,9 @@ QList<Dataset*> FiberBundleWidget::getFibs()
 
     QVector<QString>names;
     names.push_back( "FA" );
-    QVector<float>mins;
+    std::vector<float>mins;
     mins.push_back( 0.0 );
-    QVector<float>maxes;
+    std::vector<float>maxes;
     maxes.push_back( 1.0 );
     DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers" ), m_bundler->getFibs() );
     l.push_back( fibs );

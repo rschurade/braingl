@@ -38,9 +38,9 @@ DatasetFibers* Fibers::thinOut()
     bool merged = true;
     bool currentMerged = false;
     int iteration = 1;
-    QVector< QVector< float > > fibs = m_dataset->getFibs();
-    QVector< QVector< float > > mergedFibs;
-    QVector< QVector< float > > unmergedFibs;
+    QVector< std::vector<float> > fibs = m_dataset->getFibs();
+    QVector< std::vector<float> > mergedFibs;
+    QVector< std::vector<float> > unmergedFibs;
 
     while ( merged )
     {
@@ -55,7 +55,7 @@ DatasetFibers* Fibers::thinOut()
         {
             if ( i % 1000 == 0 ) qDebug() << i << fibs.size() << mergedFibs.size() << unmergedFibs.size();
             currentMerged = false;
-            QVector< float > currentFib = fibs[ i ];
+            std::vector<float> currentFib = fibs[ i ];
             for( int k = i + 1; k < fibs.size(); ++k )
             {
                 if ( currentFib.size() == fibs[k].size() )
@@ -83,30 +83,30 @@ DatasetFibers* Fibers::thinOut()
     return new DatasetFibers( QDir( "new fibers" ), fibs + unmergedFibs );
 }
 
-QVector<float> Fibers::mergeFibs( QVector< float >& lhs, QVector< float >& rhs )
+std::vector<float> Fibers::mergeFibs( std::vector<float>& lhs, std::vector<float>& rhs )
 {
-    QVector<float> out( lhs.size() );
-    for ( int i = 0; i < lhs.size(); ++i )
+    std::vector<float> out( lhs.size() );
+    for ( unsigned int i = 0; i < lhs.size(); ++i )
     {
         out[i] = ( lhs[i] + rhs[i] ) / 2;
     }
     return out;
 }
 
-float Fibers::getFiberDist( QVector< float >& lhs, QVector< float >& rhs )
+float Fibers::getFiberDist( std::vector<float>& lhs, std::vector<float>& rhs )
 {
     float distSum = 0;
     float minSum;
     float lhsx;
     float lhsy;
     float lhsz;
-    for ( int i = 0; i < lhs.size(); i += 3 )
+    for ( unsigned int i = 0; i < lhs.size(); i += 3 )
     {
         minSum = std::numeric_limits<float>::max();
         lhsx = lhs.at( i );
         lhsy = lhs.at( i + 1 );
         lhsz = lhs.at( i + 2 );
-        for( int k = 0; k < rhs.size(); k += 3 )
+        for( unsigned int k = 0; k < rhs.size(); k += 3 )
         {
             minSum = qMin( minSum, getDist( lhsx, lhsy, lhsz, rhs.at( i ), rhs.at( i + 1 ), rhs.at( i + 2 ) ) );
         }
@@ -134,15 +134,15 @@ DatasetScalar* Fibers::tractDensity()
     m_dy = 1.0;
     m_dz = 1.0;
     m_blockSize = m_nx * m_ny * m_nz;
-    QVector<float> data( m_blockSize, 0 );
-    QVector< QVector< float > > fibs = m_dataset->getSelectedFibs();
+    std::vector<float> data( m_blockSize, 0 );
+    QVector< std::vector<float> > fibs = m_dataset->getSelectedFibs();
     int x, y, z;
     QVector3D p3;
     for ( int i = 0; i < fibs.size(); ++i )
     {
-        QVector<float> fibdata( m_blockSize, 0 );
+        std::vector<float> fibdata( m_blockSize, 0 );
 
-        for( int k = 0; k < ( fibs[i].size() / 3 ) - 1; ++k )
+        for( unsigned int k = 0; k < ( fibs[i].size() / 3 ) - 1; ++k )
         {
             QVector3D p1( fibs[i].at( k * 3     ) + 0.5, fibs[i].at( k * 3 + 1 ) + 0.5, fibs[i].at( k * 3 + 2 ) + 0.5 );
             QVector3D p2( fibs[i].at( k * 3 + 3 ) + 0.5, fibs[i].at( k * 3 + 4 ) + 0.5, fibs[i].at( k * 3 + 5 ) + 0.5 );
@@ -184,13 +184,13 @@ Dataset3D* Fibers::tractColor()
     m_blockSize = m_nx * m_ny * m_nz;
     QVector<QVector3D> data( m_blockSize );
     QVector<int> count( m_blockSize, 0 );
-    QVector< QVector< float > > fibs = m_dataset->getSelectedFibs();
+    QVector< std::vector<float> > fibs = m_dataset->getSelectedFibs();
     float x, y, z;
     QSet<int> visited;
     int id = 0;
     for ( int i = 0; i < fibs.size(); ++i )
     {
-        QVector<float> fib = fibs[i];
+        std::vector<float> fib = fibs[i];
         visited.clear();
 
         QVector3D localColor( fabs( fib[0] - fib[3] ), fabs( fib[1] - fib[4] ), fabs( fib[2] - fib[5] ) );
@@ -206,7 +206,7 @@ Dataset3D* Fibers::tractColor()
             visited.insert( id );
         }
 
-        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        for ( unsigned int k = 1; k < fib.size() / 3 - 1; ++k )
         {
             QVector3D localColor( fabs( fib[k*3-3] - fib[k*3+3] ), fabs( fib[k*3-2] - fib[k*3+4] ), fabs( fib[k*3-1] - fib[k*3+5] ) );
             localColor.normalize();
@@ -262,17 +262,17 @@ Dataset3D* Fibers::tractColor()
 
 DatasetFibers* Fibers::resample()
 {
-    QVector< QVector< float > > fibs = m_dataset->getFibs();
-    QVector< QVector< float > > newFibs;
+    QVector< std::vector<float> > fibs = m_dataset->getFibs();
+    QVector< std::vector<float> > newFibs;
 
     for ( int i = 0; i < fibs.size();++i )
     {
-        QVector<float> fib = fibs[i];
-        QVector<float> newFib;
+        std::vector<float> fib = fibs[i];
+        std::vector<float> newFib;
 
         if ( fib.size() > 6 )
         {
-            for ( int k = 0; k < fib.size() / 3; k += 2 )
+            for ( unsigned int k = 0; k < fib.size() / 3; k += 2 )
             {
                 newFib.push_back( fib[k*3] );
                 newFib.push_back( fib[k*3+1] );

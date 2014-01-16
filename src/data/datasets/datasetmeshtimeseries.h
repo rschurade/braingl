@@ -22,7 +22,7 @@ public:
     virtual ~DatasetMeshTimeSeries();
 
     void addMesh( TriangleMesh2* tm, QString displayString = "unknown mesh" );
-    void addData( QVector<float> data );
+    void addData( std::vector<float> data );
 
     int getNumDataPoints();
     float getData( int id, int dataPoint );
@@ -34,7 +34,7 @@ public:
 
 private:
     QVector<QString> m_displayList;
-    QVector<QVector<float> >m_data;
+    QVector<std::vector<float> >m_data;
 
     float m_dataMin;
     float m_dataMax;

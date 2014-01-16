@@ -165,8 +165,8 @@ bool Loader::loadVTK()
 
     if ( lv->getPrimitiveType() == 1 )
     {
-        QVector<float> points = lv->getPoints();
-        QVector<int> triangles = lv->getPolys();
+        std::vector<float> points = lv->getPoints();
+        std::vector<int> triangles = lv->getPolys();
 
         if ( triangles[0] != 3 )
         {
@@ -174,32 +174,32 @@ bool Loader::loadVTK()
             return false;
         }
 
-        int numPoints = lv->getNumPoints();
-        int numTriangles = lv->getNumPolys();
+        unsigned int numPoints = lv->getNumPoints();
+        unsigned int numTriangles = lv->getNumPolys();
 
         TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
 
-        for ( int i = 0; i < numPoints; ++i )
+        for ( unsigned int i = 0; i < numPoints; ++i )
         {
             mesh->addVertex( points[i * 3], points[i * 3 + 1], points[i * 3 + 2] );
         }
 
-        for ( int i = 0; i < numTriangles; ++i )
+        for ( unsigned int i = 0; i < numTriangles; ++i )
         {
             mesh->addTriangle( triangles[i * 4 + 1], triangles[i * 4 + 2], triangles[i * 4 + 3] );
         }
 
-        QVector<QVector<float> > values = lv->getPointData();
+        std::vector<std::vector<float> > values = lv->getPointData();
 
         float min = std::numeric_limits<float>().max();
         float max = -std::numeric_limits<float>().max();
 
         if ( values.size() > 0 )
         {
-            QVector<float> data = values[0];
+            std::vector<float> data = values[0];
             if ( data.size() == numPoints )
             {
-                for ( int i = 0; i < numPoints; ++i )
+                for ( unsigned int i = 0; i < numPoints; ++i )
                 {
                     min = qMin( min, data[i] );
                     max = qMax( max, data[i] );
@@ -208,10 +208,10 @@ bool Loader::loadVTK()
             }
         }
 
-        QVector<unsigned char> colors = lv->getPointColors();
+        std::vector<unsigned char> colors = lv->getPointColors();
         if ( colors.size() == points.size() )
         {
-            for ( int i = 0; i < numPoints; ++i )
+            for ( unsigned int i = 0; i < numPoints; ++i )
             {
                 mesh->setVertexColor( i, ( (float)colors[i * 3] ) /255.,
                                          ( (float)colors[i * 3 + 1] ) /255.,
@@ -256,8 +256,8 @@ bool Loader::loadASC( QVector3D offset )
         return false;
     }
 
-    QVector<float> points = lf->getPoints();
-    QVector<int> triangles = lf->getTriangles();
+    std::vector<float> points = lf->getPoints();
+    std::vector<int> triangles = lf->getTriangles();
     int numPoints = points.size() / 3;
     int numTriangles = triangles.size() / 3;
 
@@ -322,8 +322,8 @@ bool Loader::loadSet()
                 return false;
             }
 
-            QVector<float> points = lf.getPoints();
-            QVector<int> triangles = lf.getTriangles();
+            std::vector<float> points = lf.getPoints();
+            std::vector<int> triangles = lf.getTriangles();
             int numPoints = points.size() / 3;
             int numTriangles = triangles.size() / 3;
 
@@ -472,15 +472,15 @@ bool Loader::loadGlyphset()
             if ( sl.length() > 3 )
                 z = sl.at( 3 ).toFloat();
             QVector3D s( x, y, z );
-            QVector<float> points = lf.getPoints();
-            QVector<int> triangles = lf.getTriangles();
+            std::vector<float> points = lf.getPoints();
+            std::vector<int> triangles = lf.getTriangles();
             int numPoints = points.size() / 3;
             int numTriangles = triangles.size() / 3;
 
             int onumPoints = 0;
             int onumTriangles = 0;
-            QVector<float> opoints;
-            QVector<int> otriangles;
+            std::vector<float> opoints;
+            std::vector<int> otriangles;
             QVector3D* os = new QVector3D( 0, 0, 0 );
             if ( two )
             {
@@ -631,7 +631,7 @@ bool Loader::loadMEG()
                         qDebug() << "data file unreadable, skipping"  << numberString + ".txt";
                         continue;
                     }
-                    QVector<float>data;
+                    std::vector<float>data;
                     QTextStream ds( &dataFile );
                     while( !ds.atEnd() )
                     {
@@ -678,8 +678,8 @@ bool Loader::loadMEG()
             QVector3D s( x, y, z );
 
             TriangleMesh2* mesh;
-            QVector<float> points;
-            QVector<int> triangles;
+            std::vector<float> points;
+            std::vector<int> triangles;
 
             if ( fullname.endsWith( ".asc" ) )
             {
@@ -832,7 +832,7 @@ bool Loader::loadRGB()
     {
         DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
 
-        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < sds->getMesh()->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -865,7 +865,7 @@ bool Loader::load1D()
     {
         DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
 
-        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < sds->getMesh()->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -931,8 +931,8 @@ bool Loader::loadMRtrix()
 
     float x,y,z;
 
-    QVector<QVector<float> >fibs;
-    QVector<float>fib;
+    QVector<std::vector<float> >fibs;
+    std::vector<float>fib;
 
     union {
       float f;

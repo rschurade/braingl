@@ -20,14 +20,14 @@ class DatasetDWI: public DatasetNifti
     Q_OBJECT
 
 public:
-    DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QDir filename, QVector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
 
     QVector<ColumnVector>* getData();
 
-    QVector<float>* getB0Data();
+    std::vector<float>* getB0Data();
 
-    QVector<float> getBvals();
+    std::vector<float> getBvals();
 
     QVector<QVector3D> getBvecs();
 
@@ -39,8 +39,8 @@ private:
     void createTexture();
 
     QVector<ColumnVector> m_data;
-    QVector<float> m_b0Data;
-    QVector<float> m_bvals;
+    std::vector<float> m_b0Data;
+    std::vector<float> m_bvals;
     QVector<QVector3D> m_bvecs;
 
 private slots:

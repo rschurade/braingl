@@ -16,7 +16,7 @@
 class BinghamRendererThread : public QThread
 {
 public:
-    BinghamRendererThread( int id, QVector<QVector<float> >* data,
+    BinghamRendererThread( int id, QVector<std::vector<float> >* data,
             int m_nx, int m_ny, int m_nz,
             float m_dx, float m_dy, float m_dz,
             int xi, int yi, int zi,
@@ -24,13 +24,13 @@ public:
             QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
     virtual ~BinghamRendererThread();
 
-    QVector<float>* getVerts();
+    std::vector<float>* getVerts();
 
 private:
     void run();
 
     int m_id;
-    QVector<QVector<float> >* m_data;
+    QVector<std::vector<float> >* m_data;
 
     int m_nx;
     int m_ny;
@@ -52,7 +52,7 @@ private:
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_mvMatrix;
 
-    QVector<float>* m_verts;
+    std::vector<float>* m_verts;
 };
 
 #endif /* BinghamRendererThread_H_ */

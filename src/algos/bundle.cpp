@@ -33,7 +33,7 @@ Bundle::~Bundle()
     m_fibs.squeeze();
 }
 
-QVector< QVector< float > >Bundle::getFibs()
+QVector< std::vector<float> >Bundle::getFibs()
 {
     return m_fibs;
 }
@@ -55,7 +55,7 @@ void Bundle::startLoop()
     m_reverseIndexes.clear();
     for ( int i = 0; i < m_fibs.size(); ++i )
     {
-        for( int k = 0; k < m_fibs[i].size() / 3; ++k )
+        for( unsigned int k = 0; k < m_fibs[i].size() / 3; ++k )
         {
             m_kdVerts.push_back( m_fibs[i][k * 3    ] );
             m_kdVerts.push_back( m_fibs[i][k * 3 + 1] );
@@ -98,10 +98,10 @@ void Bundle::applyLoopResult()
         QVector< QVector3D > forces = m_threads[i]->getForces();
         for( int k = i; k < m_fibs.size(); k += m_threads.size() )
         {
-            QVector<float>fib = m_fibs[k];
+            std::vector<float>fib = m_fibs[k];
             float size = fib.size() / 3 - 1;
 
-            for ( int l = 1; l < fib.size()/3 - 1; ++l )
+            for ( unsigned int l = 1; l < fib.size()/3 - 1; ++l )
             {
                 QVector3D force = forces[pc++] / ( m_iterations * 0.50 );
 

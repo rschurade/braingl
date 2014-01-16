@@ -26,7 +26,7 @@ BinghamThread::~BinghamThread()
     m_resultVector.clear();
 }
 
-QVector<QVector<float> > BinghamThread::getResultVector()
+QVector<std::vector<float> > BinghamThread::getResultVector()
 {
     return m_resultVector;
 }
@@ -71,7 +71,7 @@ void BinghamThread::run()
     const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     Matrix base = ( FMath::sh_base( ( *vertices ), order ) );
 
-    QVector<float> bv( 3 * 9, 0 );
+    std::vector<float> bv( 3 * 9, 0 );
 
     m_resultVector.reserve( data->size() / numThreads + numThreads );
 
@@ -80,14 +80,14 @@ void BinghamThread::run()
     for ( int i = m_id ; i < data->size(); i += numThreads )
     {
         {
-            QVector<float> v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
+            std::vector<float> v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
             m_resultVector.push_back( v );
             ++done;
         }
     }
 }
 
-QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
+std::vector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
                                                   const Matrix& tess,
                                                   const QVector<QSet<int> >& adj,
                                                   const Matrix& base,
@@ -96,7 +96,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 {
     unsigned int mod = 9;
     // reserve memory:
-    QVector<float> result( 27, 0 );
+    std::vector<float> result( 27, 0 );
 
 
     // if no CSD no fit necessary.
@@ -108,8 +108,8 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
     // get maxima:
     ColumnVector radius = base * sh_data;
 
-    QVector<float> qfRadius( radius.Nrows() );
-    for ( int i = 0; i < qfRadius.size(); ++i )
+    std::vector<float> qfRadius( radius.Nrows() );
+    for ( unsigned int i = 0; i < qfRadius.size(); ++i )
     {
         qfRadius[i] = radius( i + 1 );
     }
@@ -121,7 +121,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
     }
 
     QVector<int> maxima;
-    for ( int i = 0; i < qfRadius.size(); ++i )
+    for ( unsigned int i = 0; i < qfRadius.size(); ++i )
     {
         QSet<int> n = adj[i];
         float r = qfRadius[i];

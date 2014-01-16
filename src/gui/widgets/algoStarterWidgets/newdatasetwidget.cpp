@@ -121,7 +121,7 @@ void NewDatasetWidget::createDataset()
             float dx = m_dX->getValue();
             float dy = m_dY->getValue();
             float dz = m_dZ->getValue();
-            QVector<float> data( nx * ny * nz );
+            std::vector<float> data( nx * ny * nz );
             data[0] = 255;
             int dims[8] = { 3, nx, ny, nz, 1, 1, 1 };
             nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
@@ -138,8 +138,8 @@ void NewDatasetWidget::createDataset()
         {
             DatasetScalar* ds = static_cast<DatasetScalar*>( VPtr<Dataset>::asPtr( m_sourceSelect->getSelectedItemData() ) );
 
-            QVector<float>* data = ds->getData();
-            QVector<float> out( data->size() );
+            std::vector<float>* data = ds->getData();
+            std::vector<float> out( data->size() );
 
             float min = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
             float max = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
@@ -148,7 +148,7 @@ void NewDatasetWidget::createDataset()
             float lowerThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
             float upperThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
 
-            for ( int i = 0; i < data->size(); ++i )
+            for ( unsigned int i = 0; i < data->size(); ++i )
             {
                 float value = data->at( i );
                 if ( value < lowerThreshold || value > upperThreshold )
@@ -176,8 +176,8 @@ void NewDatasetWidget::createDataset()
         {
             DatasetScalar* ds = static_cast<DatasetScalar*>( VPtr<Dataset>::asPtr( m_sourceSelect->getSelectedItemData() ) );
 
-            QVector<float>* data = ds->getData();
-            QVector<float> out( data->size() );
+            std::vector<float>* data = ds->getData();
+            std::vector<float> out( data->size() );
 
             copyWithRois( ds, out );
 
@@ -196,8 +196,8 @@ void NewDatasetWidget::createROI()
 {
     DatasetScalar* ds = static_cast<DatasetScalar*>( VPtr<Dataset>::asPtr( m_sourceSelect->getSelectedItemData() ) );
 
-    QVector<float>* data = ds->getData();
-    QVector<float> out( data->size() );
+    std::vector<float>* data = ds->getData();
+    std::vector<float> out( data->size() );
 
     copyWithRois( ds, out );
 
@@ -252,7 +252,7 @@ QModelIndex NewDatasetWidget::createIndex( int branch, int pos, int column )
     return Models::r()->index( row, column, parent );
 }
 
-void NewDatasetWidget::copyWithRois( DatasetScalar* source, QVector<float> &target )
+void NewDatasetWidget::copyWithRois( DatasetScalar* source, std::vector<float> &target )
 {
     int numBranches = Models::r()->rowCount( QModelIndex() );
 
@@ -269,14 +269,14 @@ void NewDatasetWidget::copyWithRois( DatasetScalar* source, QVector<float> &targ
     }
 }
 
-void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, QVector<float> &target )
+void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, std::vector<float> &target )
 {
     if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt() > 4 )
     {
         return;
     }
 
-    QVector<float>* s = source->getData();
+    std::vector<float>* s = source->getData();
 
     int ds_nx = source->properties()->get( Fn::Property::D_NX ).toInt();
     int ds_ny = source->properties()->get( Fn::Property::D_NY ).toInt();

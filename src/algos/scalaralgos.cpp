@@ -32,8 +32,8 @@ QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds )
 
 QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 {
-    QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
-    QVector<float> out( data->size() );
+    std::vector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
+    std::vector<float> out( data->size() );
 
     int b, r, c, bb, rr, r0, b0, c0;
     int i, istart, iend;
@@ -233,7 +233,7 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
     d = n / 2;
     float* float_pp;
-    QVector<float> tmp( npixels );
+    std::vector<float> tmp( npixels );
     int c1, cc;
 
     for ( int i = 0; i < npixels; ++i )
@@ -322,10 +322,10 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
 QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
 {
-    QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
-    QVector<float> out( data->size() );
+    std::vector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
+    std::vector<float> out( data->size() );
 
-    for ( int i = 0; i < data->size(); ++i )
+    for ( unsigned int i = 0; i < data->size(); ++i )
     {
         out[i] = data->at( i );
     }
@@ -368,7 +368,7 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
 
     int d = n / 2;
     float* float_pp;
-    QVector<float> tmp( npixels );
+    std::vector<float> tmp( npixels );
     int c1, cc;
 
     for ( int i = 0; i < npixels; ++i )
@@ -460,8 +460,8 @@ double ScalarAlgos::xxgauss(double x, double sigma)
 
 QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
 {
-    QVector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
-    QVector<float> out( data->size() );
+    std::vector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
+    std::vector<float> out( data->size() );
 
     float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
     out[0] = max;
@@ -477,8 +477,8 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
 {
     DatasetScalar* dss = static_cast<DatasetScalar*>( ds );
 
-    QVector<float>* data = dss->getData();
-    QVector<float> out( data->size() );
+    std::vector<float>* data = dss->getData();
+    std::vector<float> out( data->size() );
 
     int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
     int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
@@ -517,8 +517,8 @@ QList<Dataset*> ScalarAlgos::createROI( Dataset* ds )
 {
     DatasetScalar* dss = static_cast<DatasetScalar*>( ds );
 
-    QVector<float>* data = dss->getData();
-    QVector<float> out( data->size(), 0.0 );
+    std::vector<float>* data = dss->getData();
+    std::vector<float> out( data->size(), 0.0 );
     QVector<bool> mask( data->size(), true );
 
     int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();

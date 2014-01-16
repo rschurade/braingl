@@ -93,11 +93,11 @@ void SHRendererThread2::run()
         threads[i]->wait();
     }
 
-    QVector<float> verts;
+    std::vector<float> verts;
     // combine verts from all threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        verts += *( threads[i]->getVerts() );
+        verts.insert( verts.end(), threads[i]->getVerts()->begin(), threads[i]->getVerts()->end() );
         delete threads[i];
     }
 
@@ -114,7 +114,7 @@ void SHRendererThread2::run()
         float offsetX, offsetY, offsetZ;
         float radius;
 
-        for ( int i = 0; i < verts.size() / 7; ++i )
+        for ( unsigned int i = 0; i < verts.size() / 7; ++i )
         {
             posX = verts[i*7];
             posY = verts[i*7+1];
@@ -140,7 +140,6 @@ void SHRendererThread2::run()
         }
 
         verts.clear();
-        verts.squeeze();
 
         for ( int currentBall = 0; currentBall < numBalls; ++currentBall )
         {

@@ -42,13 +42,13 @@ QList<Dataset*> MeshAlgos::meshTimeSeries( Dataset* ds, TriangleMesh2* mesh )
         int ny = fmri->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
         int nz = fmri->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
         int dim = fmri->properties( "maingl" )->get( Fn::Property::D_DIM ).toInt();
-        QVector<float>* data = fmri->getData();
+        std::vector<float>* data = fmri->getData();
 
         int numVerts = mesh->numVerts();
 
         for ( int k = 0; k < dim; ++k )
         {
-            QVector<float>timeStep;
+            std::vector<float>timeStep;
             int offset = nx * ny * nz * k;
             for ( int i = 0; i < numVerts; ++i )
             {
@@ -90,13 +90,13 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
         {
             int currentTri = queue.dequeue();
             component.push_back( currentTri );
-            QVector<int>tri = mesh->getTriangle( currentTri );
+            std::vector<unsigned int>tri = mesh->getTriangle( currentTri );
 
-            for( int i = 0; i < tri.size(); ++i )
+            for( unsigned int i = 0; i < tri.size(); ++i )
             {
                 int vert = tri[i];
-                QVector<int>star = mesh->getStar( vert );
-                for ( int k = 0; k < star.size(); ++k )
+                std::vector<unsigned int>star = mesh->getStar( vert );
+                for ( unsigned int k = 0; k < star.size(); ++k )
                 {
                     int nextTri = star[k];
                     if ( todo.contains( nextTri ) )
@@ -140,8 +140,8 @@ TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, QVector<int>component 
 
     for( int k = 0; k < component.size(); ++k )
     {
-        QVector<int>tri = mesh->getTriangle( component[k] );
-        for( int l = 0; l < tri.size(); ++l )
+        std::vector<unsigned int>tri = mesh->getTriangle( component[k] );
+        for( unsigned int l = 0; l < tri.size(); ++l )
         {
             if ( !newVertIds.contains( tri[l] ) )
             {
@@ -165,7 +165,7 @@ TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, QVector<int>component 
 
     for( int k = 0; k < component.size(); ++k )
     {
-        QVector<int>tri = mesh->getTriangle( component[k] );
+        std::vector<unsigned int>tri = mesh->getTriangle( component[k] );
         newMesh->addTriangle( newVertIds[tri[0]], newVertIds[tri[1]], newVertIds[tri[2]] );
     }
 
@@ -188,7 +188,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
 
     // put verts into cells of diameter epsilon
     int x,y,z;
-    for ( int i = 0; i < mesh->numVerts(); ++i )
+    for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
     {
         QVector3D vert = mesh->getVertex( i );
         x = vert.x() / epsilon;
@@ -238,7 +238,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
     QVector<Triangle>newTriangles;
 
     // remove degenerative triangles
-    for ( int i = 0; i < mesh->numTris(); ++i )
+    for ( unsigned int i = 0; i < mesh->numTris(); ++i )
     {
         Triangle t = mesh->getTriangle2( i );
         QString key0 = keys[t.v0];
