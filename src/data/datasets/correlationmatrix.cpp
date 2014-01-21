@@ -53,6 +53,14 @@ CorrelationMatrix::~CorrelationMatrix()
     m_file->close();
 }
 
+void CorrelationMatrix::setInitialized(bool b)
+{
+    for ( int i = 0; i < m_n; i++ )
+    {
+        m_loaded[i] = b;
+    }
+}
+
 void CorrelationMatrix::makeHistogram(bool* roi)
 {
     m_nbins = 2000;

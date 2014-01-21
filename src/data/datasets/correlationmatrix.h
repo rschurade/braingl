@@ -29,6 +29,7 @@ public:
 
     float percFromThresh(float t);
     float threshFromPerc(float p);
+    void setInitialized(bool b);
 
 private:
     void loadEverything();
