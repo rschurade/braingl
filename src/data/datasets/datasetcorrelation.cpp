@@ -50,9 +50,10 @@ void DatasetCorrelation::setCorrelationMatrix( float** matrix )
     {
         for ( int j = 0; j < getMesh()->numVerts(); ++j )
         {
-            m_correlations->setValue( i, j, m_correlations->getValue( i, j ) );
+            m_correlations->setValue( i, j, matrix[i][j] );
         }
     }
+    m_correlations->setInitialized(true);
 }
 
 bool DatasetCorrelation::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
