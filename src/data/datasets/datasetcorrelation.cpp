@@ -43,7 +43,7 @@ DatasetCorrelation::~DatasetCorrelation()
 
 void DatasetCorrelation::setCorrelationMatrix( float** matrix )
 {
-    //TODO: test if this works, think about data duplication
+    //TODO: think about data duplication
     delete m_correlations;
     m_correlations = new CorrelationMatrix( getMesh()->numVerts() );
     for ( int i = 0; i < getMesh()->numVerts(); ++i )
@@ -140,7 +140,7 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
 
 QString DatasetCorrelation::getSaveFilter()
 {
-    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; all files (*.*)" );
+    return QString( "Mesh binary (*.vtk);; Mesh ascii (*.vtk);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh roi data (*.roi);; Binary connectivity matrix (*.bin);; all files (*.*)" );
 }
 
 QString DatasetCorrelation::getDefaultSuffix()
@@ -148,3 +148,7 @@ QString DatasetCorrelation::getDefaultSuffix()
     return QString( "vtk" );
 }
 
+void DatasetCorrelation::saveBinaryMatrix( QString filename )
+{
+    m_correlations->save( filename );
+}

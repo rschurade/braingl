@@ -17,6 +17,7 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetmesh.h"
 #include "datasets/datasetcons.h"
+#include "datasets/datasetcorrelation.h"
 #include "mesh/trianglemesh2.h"
 
 #include "../algos/fmath.h"
@@ -291,6 +292,7 @@ bool Writer::save()
         case Fn::DatasetType::MESH_ISOSURFACE:
         case Fn::DatasetType::MESH_TIME_SERIES :
         case Fn::DatasetType::GLYPHSET :
+        case Fn::DatasetType::MESH_CORRELATION:
         {
             if ( m_filter.endsWith( "(*.1D)" ) )
             {
@@ -315,6 +317,14 @@ bool Writer::save()
             else if ( m_filter.endsWith( "(*.json)" ) )
             {
                 saveMeshJson();
+            }
+            else if ( m_filter.endsWith( "(*.asc)" ) )
+            {
+                saveMeshAsc();
+            }
+            else if ( m_filter.endsWith( "(*.bin)" ) )
+            {
+                saveBinaryConnectivity();
             }
             else
             {
@@ -764,5 +774,47 @@ void Writer::saveMeshJson()
         out << "}";
 
         outFile.close();
+    }
+}
+
+void Writer::saveMeshAsc()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile outFile( m_fileName.absoluteFilePath() );
+        if ( !outFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &outFile );
+
+        out << "#!ascii version of " << m_fileName.absoluteFilePath() << endl;
+
+        int numVerts = dsm->getMesh()->numVerts();
+        int numTris = dsm->getMesh()->numTris();
+
+        out << numVerts << " " << numTris << endl;
+
+        for ( int i = 0; i < numVerts; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertex( i );
+            out << vert.x() << " " << vert.y() << " " << vert.z() << " 0" << endl;
+        }        for ( int i = 0; i < numTris; ++i )
+        {
+            Triangle t = dsm->getMesh()->getTriangle2( i );
+            out << t.v0 << " " << t.v1 << " " << t.v2 << " 0" << endl;
+        }
+        outFile.close();
+    }
+}
+
+void Writer::saveBinaryConnectivity()
+{
+    if ( dynamic_cast<DatasetCorrelation*>( m_dataset ) )
+    {
+        DatasetCorrelation* dsc = dynamic_cast<DatasetCorrelation*>( m_dataset );
+        qDebug() << "saving binary connectivity matrix";
+        dsc->saveBinaryMatrix( m_fileName.absoluteFilePath() );
     }
 }
