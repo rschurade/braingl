@@ -9,6 +9,7 @@
 
 #include "qdebug.h"
 #include "qmath.h"
+#include "qfile.h"
 
 #include <cmath>
 
@@ -105,25 +106,31 @@ void CorrelationMatrix::loadEverything()
     qDebug() << "reading binary connectivity between " << m_n << " nodes...";
     m_file->seek( 0 );
 
-    /*float v;
-    for ( int i = 0; i < m_n; i++ )
-    {
-        //qDebug() << i;
-        m_instream->skipRawData( 4 * i );
-        for ( int j = i; j < m_n; j++ )
-        {
-            *m_instream >> v;
-            //setValue( i, j, v );
-            m_values[j][i] = v;
-            //qDebug() << i << j << getValue(i,j);
-        }
-        m_loaded[i] = true;
-    }*/
-
     for (int i = 0; i < m_n; ++i)
     {
         load(i);
     }
+}
+
+void CorrelationMatrix::save( QString filename )
+{
+    QFile file( filename );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        qDebug() << "error writing binary connectivity:" << filename;
+    }
+    QDataStream outstream( &file );
+    outstream.setByteOrder( QDataStream::LittleEndian );
+    outstream.setFloatingPointPrecision( QDataStream::SinglePrecision );
+
+    for ( int i = 0; i < m_n; i++ )
+    {
+        for ( int j = 0; j < m_n; j++ )
+        {
+            outstream << getValue( i, j );
+        }
+    }
+    file.close();
 }
 
 int CorrelationMatrix::getN()
