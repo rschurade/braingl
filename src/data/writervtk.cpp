@@ -48,8 +48,9 @@ bool WriterVTK::save()
         switch ( (Fn::DatasetType)( m_dataset->properties()->get( Fn::Property::D_TYPE ).toInt() ) )
         {
             case Fn::DatasetType::FIBERS:
+            case Fn::DatasetType::CONS:
             {
-                if ( m_filter.startsWith( "fib files ascii") )
+                if ( m_filter.startsWith( "fib files ascii" ) )
                 {
                     qDebug() << "save ascii";
                     saveFibs( m_fileName, false );

@@ -335,7 +335,15 @@ bool Writer::save()
         }
         case Fn::DatasetType::CONS :
         {
-            saveConnexels();
+            if ( m_filter.endsWith( "(*.cxls)" ) )
+            {
+                saveConnexels();
+            }
+            else
+            {
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
+                vtkWriter->save();
+            }
             break;
         }
         default:
