@@ -379,7 +379,15 @@ bool Loader::loadGlyphset()
     gnl = gts.readLine();
     QStringList sl2 = gnl.split( " " );
 
-    QString connectivityName = trunk + QDir::separator() + sl2.at( 0 );
+    QString connectivityName;
+    if ( sl2.at( 0 ).startsWith( "http" ) )
+    {
+        connectivityName = sl2.at( 0 );
+    }
+    else
+    {
+        connectivityName = trunk + QDir::separator() + sl2.at( 0 );
+    }
     float mt = 0.8;
     if ( sl2.length() > 1 )
     {
