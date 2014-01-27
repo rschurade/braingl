@@ -229,6 +229,10 @@ void DatasetGlyphset::littleBrainVisibilityChanged( QVariant qv )
 void DatasetGlyphset::readConnectivity( QString filename )
 {
     m_correlations = new CorrelationMatrix( filename );
+
+    //TODO: remove this after remote thingy
+    //loadROI("/SCR/data/remoteHCP/Lroi.rgb");
+
     m_correlations->makeHistogram(roi);
     m_n = m_correlations->getN();
     //m_n = 0;
