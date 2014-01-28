@@ -58,7 +58,7 @@ Connections* DatasetCons::getCons()
 
 QString DatasetCons::getSaveFilter()
 {
-    return QString( "Connexels ascii (*.cxls)" );
+    return QString( "Connexels ascii (*.cxls);;fib files binary(*.fib *.vtk );;fib files ascii (*.fib *.vtk);;all files (*.*)" );
 }
 
 QString DatasetCons::getDefaultSuffix()

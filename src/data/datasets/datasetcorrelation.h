@@ -30,6 +30,7 @@ public:
 
     virtual QString getSaveFilter();
     virtual QString getDefaultSuffix();
+    void saveBinaryMatrix( QString filename );
 
 protected:
     float m_minThreshold;

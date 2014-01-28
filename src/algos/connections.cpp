@@ -84,7 +84,7 @@ Connections::Connections( QString fib )
 {
     params();
     prefix = fib;
-    if ( fib.endsWith( ".fib" ) )
+    if ( fib.endsWith( ".fib" ) || fib.endsWith( ".cons" ) )
     {
         loadFib( fib );
     }

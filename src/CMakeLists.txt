@@ -45,12 +45,16 @@ INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtGui )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtCore )
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtWebKit )
+INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtNetwork )
+INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtXml )
 
 # Libraries for linking:
 SET( QT_LIBS ${QT_QTCORE_LIBRARY}
                  ${QT_QTGUI_LIBRARY}
                  ${QT_QTOPENGL_LIBRARY} 
-                 ${QT_QTWEBKIT_LIBRARY} )
+                 ${QT_QTWEBKIT_LIBRARY}
+                 ${QT_QTNETWORK_LIBRARY}
+                 ${QT_QTXML_LIBRARY} )
 
 # Resources
 SET(QtIcon_RCCS resources.qrc)

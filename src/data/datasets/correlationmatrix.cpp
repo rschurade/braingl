@@ -9,17 +9,46 @@
 
 #include "qdebug.h"
 #include "qmath.h"
+#include "qfile.h"
+#include "qurl.h"
+#include "qthread.h"
+#include "qapplication.h"
+#include "qdom.h"
+#include "qstringlist.h"
+#include "qinputdialog.h"
 
 #include <cmath>
 
-CorrelationMatrix::CorrelationMatrix( int i )
+CorrelationMatrix::CorrelationMatrix( int i ) :
+        m_remote( false )
 {
     init( i );
 }
 
-CorrelationMatrix::CorrelationMatrix( QString filename )
+CorrelationMatrix::CorrelationMatrix( QString filename ) :
+        m_remote( false )
 {
     m_filename = filename;
+
+    qDebug() << "m_filename in correlation_matrix" << m_filename;
+
+    if (filename.startsWith("http"))
+    {
+        qDebug() << "special remote mode initiated!";
+        m_remote = true;
+
+        m_id = QInputDialog::getText(NULL, "ID: ", "ID: " );
+        qDebug() << "ID: " << m_id;
+
+        m_passwd = QInputDialog::getText(NULL, "Password: ", "Password: ");
+        qDebug() << "Password: " << m_passwd;
+
+        networkManager = new QNetworkAccessManager();
+        connect( networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(serviceRequestFinished(QNetworkReply*)) );
+        loadMetaData();
+        init( m_n );
+        return;
+    }
 
     m_file = new QFile( filename );
     if ( !m_file->open( QIODevice::ReadOnly ) )
@@ -33,11 +62,6 @@ CorrelationMatrix::CorrelationMatrix( QString filename )
     m_instream = new QDataStream( m_file );
     m_instream->setByteOrder( QDataStream::LittleEndian );
     m_instream->setFloatingPointPrecision( QDataStream::SinglePrecision );
-
-    //loadEverything();
-
-    //qDebug() << "finishedReading";
-
 }
 
 CorrelationMatrix::~CorrelationMatrix()
@@ -51,6 +75,14 @@ CorrelationMatrix::~CorrelationMatrix()
     m_values = NULL;
 
     m_file->close();
+}
+
+void CorrelationMatrix::setInitialized(bool b)
+{
+    for ( int i = 0; i < m_n; i++ )
+    {
+        m_loaded[i] = b;
+    }
 }
 
 void CorrelationMatrix::makeHistogram(bool* roi)
@@ -97,25 +129,31 @@ void CorrelationMatrix::loadEverything()
     qDebug() << "reading binary connectivity between " << m_n << " nodes...";
     m_file->seek( 0 );
 
-    /*float v;
-    for ( int i = 0; i < m_n; i++ )
-    {
-        //qDebug() << i;
-        m_instream->skipRawData( 4 * i );
-        for ( int j = i; j < m_n; j++ )
-        {
-            *m_instream >> v;
-            //setValue( i, j, v );
-            m_values[j][i] = v;
-            //qDebug() << i << j << getValue(i,j);
-        }
-        m_loaded[i] = true;
-    }*/
-
     for (int i = 0; i < m_n; ++i)
     {
         load(i);
     }
+}
+
+void CorrelationMatrix::save( QString filename )
+{
+    QFile file( filename );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        qDebug() << "error writing binary connectivity:" << filename;
+    }
+    QDataStream outstream( &file );
+    outstream.setByteOrder( QDataStream::LittleEndian );
+    outstream.setFloatingPointPrecision( QDataStream::SinglePrecision );
+
+    for ( int i = 0; i < m_n; i++ )
+    {
+        for ( int j = 0; j < m_n; j++ )
+        {
+            outstream << getValue( i, j );
+        }
+    }
+    file.close();
 }
 
 int CorrelationMatrix::getN()
@@ -157,6 +195,7 @@ void CorrelationMatrix::setValue( int i, int j, float v )
 
 float CorrelationMatrix::getValue( int i, int j )
 {
+
     if ( !m_loaded[i] )
     {
         load( i );
@@ -175,7 +214,13 @@ float CorrelationMatrix::getValue( int i, int j )
 
 void CorrelationMatrix::load( int i )
 {
-    qint64 p = (qint64)4 * (qint64)m_n * (qint64)i;
+    if ( m_remote )
+    {
+        loadRemote( i );
+        return;
+    }
+
+    qint64 p = (qint64) 4 * (qint64) m_n * (qint64) i;
     bool success = m_file->seek( p );
 
     delete m_instream;
@@ -193,6 +238,123 @@ void CorrelationMatrix::load( int i )
     {
         *m_instream >> v;
         setValue( i, j, v );
+    }
+    m_loaded[i] = true;
+}
+void CorrelationMatrix::loadMetaData()
+{
+    QUrl serviceUrl = QUrl( m_filename + "&metadata=true");
+    QUrl postData;
+    QNetworkRequest request( serviceUrl );
+    request.setHeader( QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded" );
+    // HTTP Basic authentication header value: base64(username:password)
+    QString concatenated = m_id+":"+m_passwd;
+    QByteArray data = concatenated.toLocal8Bit().toBase64();
+    QString headerData = "Basic " + data;
+    request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
+    QNetworkReply* reply = networkManager->post( request, postData.encodedQuery() );
+
+    while ( !reply->isFinished() )
+    {
+        QApplication::processEvents();
+    }
+    QByteArray array = reply->readAll();
+    QDomDocument dom( "dom" );
+    dom.setContent( array );
+    QDomElement docElem = dom.documentElement();
+    qDebug() << docElem.tagName();    // << " " << docElem.text();
+
+    QDomElement n = docElem.firstChildElement( "Matrix" );
+    QDomElement n2 = n.firstChildElement( "MatrixIndicesMap" );
+    QDomElement n3 = n2.firstChildElement( "BrainModel" );
+
+    QVector<QDomElement> structures;
+    QStringList structure_names;
+    for ( ; !n3.isNull(); n3 = n3.nextSiblingElement() )
+    {
+        QString structure = n3.attribute( "BrainStructure" );
+        structure_names << structure;
+        structures.push_back(n3);
+        qDebug() << structure;
+    }
+    qDebug() << structure_names.size();
+    QString item = QInputDialog::getItem( NULL, "Structure", "Structure name", structure_names );
+
+    qDebug() << "picked item: " << item;
+    n3 = n2.firstChildElement( "BrainModel" );
+    QDomElement picked = n3;
+    for ( ; !n3.isNull(); n3 = n3.nextSiblingElement() )
+    {
+        QString structure = n3.attribute( "BrainStructure" );
+        if ( QString::compare( structure, item ) == 0 )
+        {
+            picked = n3;
+        }
+    }
+    int offset = picked.attribute( "IndexOffset" ).toInt();
+    int count = picked.attribute( "IndexCount" ).toInt();
+    m_n = picked.attribute( "SurfaceNumberOfNodes" ).toInt();
+
+    QDomElement n4 = picked.firstChildElement( "NodeIndices" );
+    QStringList sl = n4.text().split( " " );
+    qDebug() << sl.size();
+    m_index = new int[m_n];
+    for ( int l = 0; l < m_n; ++l)
+    {
+        m_index[l] = -1;
+    }
+    for ( int l = 0; l < sl.size(); ++l )
+    {
+        int v = sl.at( l ).toInt();
+        m_index[v] = l + 1 + offset;
+        //qDebug() << "setting index: " << v << " to: " << m_index[v];
+    }
+}
+
+void CorrelationMatrix::loadRemote( int i )
+{
+    qDebug() << "loading: " << i << "index: " << m_index[i];
+    if ( m_index[i] == -1 )
+    {
+        for ( int j = 0; j < m_n; j++ )
+        {
+            setValue( i, j, 0 );
+        }
+        m_loaded[i] = true;
+        return;
+    }
+    QString id = QString::number( m_index[i] - 1 );
+    QUrl serviceUrl = QUrl( m_filename + "&row-index=" + id );
+    QUrl postData;
+    QNetworkRequest request( serviceUrl );
+    request.setHeader( QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded" );
+    // HTTP Basic authentication header value: base64(username:password)
+    QString concatenated = m_id+":"+m_passwd;
+    QByteArray data = concatenated.toLocal8Bit().toBase64();
+    QString headerData = "Basic " + data;
+    request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
+    QNetworkReply* reply = networkManager->post( request, postData.encodedQuery() );
+    while ( !reply->isFinished() )
+    {
+        QApplication::processEvents();
+    }
+    qDebug() << "finished";
+    QByteArray array = reply->readAll();
+    qDebug() << array.size();
+
+    float values[array.size() / 4];
+    QDataStream stream( array );
+    stream.setByteOrder( QDataStream::LittleEndian );
+    stream.setFloatingPointPrecision( QDataStream::SinglePrecision );
+    for ( int k = 0; k < array.size() / 4; ++k )
+    {
+        stream >> values[k];
+        //qDebug() << "i: " << i << " k: " << k << " value: " << values[k];
+    }
+
+    for ( int j = 0; j < m_n; j++ )
+    {
+        setValue( i, j, values[m_index[j]] );
     }
     m_loaded[i] = true;
 }
@@ -217,4 +379,9 @@ float CorrelationMatrix::threshFromPerc( float p )
     float thr = ( 2 * bin / (float) m_nbins ) - 1;
     //qDebug() << "bin: " << bin << " thr: " << thr;
     return thr;
+}
+
+void CorrelationMatrix::serviceRequestFinished(QNetworkReply* reply)
+{
+    //qDebug() << "service request finished!";
 }
