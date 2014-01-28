@@ -34,7 +34,7 @@ DatasetMeshTimeSeries::~DatasetMeshTimeSeries()
 void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
 {
     m_mesh.push_back( tm );
-    m_displayList << displayString;
+    m_displayList.push_back( displayString );
 
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
@@ -42,13 +42,13 @@ void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
     m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
-void DatasetMeshTimeSeries::addData( QVector<float> data )
+void DatasetMeshTimeSeries::addData( std::vector<float> data )
 {
     if ( data.size() == m_mesh[0]->numVerts() )
     {
         m_data.push_back( data );
 
-        for ( int i = 0; i < data.size(); ++i )
+        for ( unsigned int i = 0; i < data.size(); ++i )
         {
             m_dataMin = qMin( m_dataMin, data[i] );
             m_dataMax = qMax( m_dataMax, data[i] );
@@ -119,8 +119,8 @@ void DatasetMeshTimeSeries::selectFrame()
     int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
-    QVector<float>data = m_data[frame];
-    for ( int i = 0; i < data.size(); ++i )
+    std::vector<float>data = m_data[frame];
+    for ( unsigned int i = 0; i < data.size(); ++i )
     {
         mesh->setVertexData( i, data[i] );
     }
@@ -139,14 +139,14 @@ void DatasetMeshTimeSeries::slotCopyColors()
     int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
-    QVector<float>data = m_data[frame];
+    std::vector<float>data = m_data[frame];
 
     QColor color;
 
     float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
     float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
 
-    for ( int i = 0; i < data.size(); ++i )
+    for ( unsigned int i = 0; i < data.size(); ++i )
     {
         ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 

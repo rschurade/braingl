@@ -12,7 +12,7 @@
 #include "../../gui/gl/tensorrenderer.h"
 #include "../../gui/gl/tensorrendererev.h"
 
-DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* header ) :
+DatasetTensor::DatasetTensor( QDir filename, std::vector<Matrix> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_TENSOR, header ),
     m_data( data ),
     m_logData( 0 ),
@@ -37,10 +37,10 @@ DatasetTensor::DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* 
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
-DatasetTensor::DatasetTensor( QDir filename, QVector<QVector<float> > data, nifti_image* header ) :
+DatasetTensor::DatasetTensor( QDir filename, std::vector<std::vector<float> > data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_TENSOR, header ), m_renderer( 0 ), m_rendererEV( 0 ), m_renderGlpyhs( false )
 {
-    for ( int i = 0; i < data.size(); ++i )
+    for ( unsigned int i = 0; i < data.size(); ++i )
     {
         Matrix m( 3, 3 );
         m( 1, 1 ) = data.at( i )[0];
@@ -123,12 +123,12 @@ void DatasetTensor::createTexture()
 {
 }
 
-QVector<Matrix>* DatasetTensor::getData()
+std::vector<Matrix>* DatasetTensor::getData()
 {
     return &m_data;
 }
 
-QVector<Matrix>* DatasetTensor::getLogData()
+std::vector<Matrix>* DatasetTensor::getLogData()
 {
     if ( m_logData.empty() )
     {
@@ -144,14 +144,14 @@ void DatasetTensor::createLogTensors()
     int blockSize = m_data.size();
     m_logData.resize( blockSize );
 
-    QVector<QVector3D> evec1( blockSize );
-    QVector<float> eval1( blockSize );
+    std::vector<QVector3D> evec1( blockSize );
+    std::vector<float> eval1( blockSize );
 
-    QVector<QVector3D> evec2( blockSize );
-    QVector<float> eval2( blockSize );
+    std::vector<QVector3D> evec2( blockSize );
+    std::vector<float> eval2( blockSize );
 
-    QVector<QVector3D> evec3( blockSize );
-    QVector<float> eval3( blockSize );
+    std::vector<QVector3D> evec3( blockSize );
+    std::vector<float> eval3( blockSize );
 
     FMath::evecs( m_data, evec1, eval1, evec2, eval2, evec3, eval3 );
 
@@ -160,7 +160,7 @@ void DatasetTensor::createLogTensors()
     Matrix U(3,3);
     DiagonalMatrix D(3);
     Matrix logM(3,3);
-    for ( int i = 0; i < m_logData.size(); ++i )
+    for ( unsigned int i = 0; i < m_logData.size(); ++i )
     {
         U( 1, 1 ) = evec1[i].x();
         U( 2, 1 ) = evec1[i].y();
@@ -177,7 +177,7 @@ void DatasetTensor::createLogTensors()
 
         logM = U*D*U.t();
 
-        m_logData.replace( i, logM );
+        m_logData[i] = logM;
     }
     qDebug() << "create log tensors done!";
 }

@@ -50,10 +50,10 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 prevThresh( -1 ),
                 prevMinlength( -1 ),
                 m_colors_name( "" ),
-                littleBrains( QVector<LittleBrainRenderer*>() ),
-                littleMeshes( QVector<TriangleMesh2*>() ),
-                shifts1( QVector<QVector3D>() ),
-                shifts2( QVector<QVector3D>() )
+                littleBrains( std::vector<LittleBrainRenderer*>() ),
+                littleMeshes( std::vector<TriangleMesh2*>() ),
+                shifts1( std::vector<QVector3D>() ),
+                shifts2( std::vector<QVector3D>() )
 {
     addProperties();
 
@@ -704,24 +704,24 @@ void DatasetGlyphset::makeDiffPoints()
     int offset = 14;
     //TODO: ROIs?
     //for each triangle
-    QVector<int> tris = m_mesh.at( geo )->getTriangles();
-    QVector<int> idPairs;
-    for ( int tri = 0; tri < tris.size(); tri += 3 )
+    std::vector<unsigned int> tris = m_mesh.at( geo )->getTriangles();
+    std::vector<int> idPairs;
+    for ( unsigned int tri = 0; tri < tris.size(); tri += 3 )
     {
 // all three edges
 //qDebug() << "tri: " << tri;
-        idPairs.append( tris.at( tri ) );
-        idPairs.append( tris.at( tri + 1 ) );
+        idPairs.push_back( tris.at( tri ) );
+        idPairs.push_back( tris.at( tri + 1 ) );
 
-        idPairs.append( tris.at( tri + 1 ) );
-        idPairs.append( tris.at( tri + 2 ) );
+        idPairs.push_back( tris.at( tri + 1 ) );
+        idPairs.push_back( tris.at( tri + 2 ) );
 
-        idPairs.append( tris.at( tri + 2 ) );
-        idPairs.append( tris.at( tri ) );
+        idPairs.push_back( tris.at( tri + 2 ) );
+        idPairs.push_back( tris.at( tri ) );
     }
     qDebug() << "idPairs done, size: " << idPairs.size();
     diffsNumber = 0;
-    for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
+    for ( unsigned int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
 //get two point ids i1,i2
         int i1 = idPairs.at( idpair );
@@ -744,7 +744,7 @@ void DatasetGlyphset::makeDiffPoints()
     diffsArray = new float[offset * diffsNumber];
     qDebug() << "diffs: " << diffsNumber;
     diffsNumber = 0;
-    for ( int idpair = 0; idpair < idPairs.size(); idpair += 2 )
+    for ( unsigned int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
 //get two point ids i1,i2
 
@@ -942,7 +942,7 @@ void DatasetGlyphset::makePies()
 
     if ( pieArrays )
     {
-        for ( int i = 0; i < pieArrays->size(); ++i )
+        for ( unsigned int i = 0; i < pieArrays->size(); ++i )
         {
             if ( pieArrays->at( i ) != NULL )
             {
@@ -961,8 +961,8 @@ void DatasetGlyphset::makePies()
     int col = m_properties["maingl"]->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
 
     m_n = m_mesh.at( geo )->numVerts();
-    pieArrays = new QVector<float*>( m_n, NULL );
-    numbers = new QVector<int>( m_n );
+    pieArrays = new std::vector<float*>( m_n, NULL );
+    numbers = new std::vector<int>( m_n );
 
 //for all nodes in the current surface...
 //count first and throw super-threshold connections in sortable list, then create arrays...
@@ -994,7 +994,7 @@ void DatasetGlyphset::makePies()
                 }
             }
         }
-        numbers->replace( i, count );
+        numbers->at( i ) = count;
         if ( count > maxNodeCount )
         {
             maxNodeCount = count;
@@ -1037,7 +1037,7 @@ void DatasetGlyphset::makePies()
             pieNodeArray[o + 8] = v;
             delete c;
         }
-        pieArrays->replace( i, pieNodeArray );
+        pieArrays->at( i ) = pieNodeArray;
     }
 }
 
@@ -1100,8 +1100,10 @@ void DatasetGlyphset::setProperties()
         m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT,
         { "both", "left", "right" }, 0, "general" );
     }
-    littleBrains.fill( NULL, m_n );
-    littleMeshes.fill( NULL, m_n );
+    littleBrains.clear();
+    littleMeshes.clear();
+    littleBrains.resize( m_n, NULL );
+    littleMeshes.resize( m_n, NULL );
     shifts1.resize( m_n );
     shifts2.resize( m_n );
 }
@@ -1119,7 +1121,7 @@ void DatasetGlyphset::loadROI( QString filename )
     if ( filename.endsWith( ".1D" ) )
     {
 //List of as many values as mesh nodes
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -1136,7 +1138,7 @@ void DatasetGlyphset::loadROI( QString filename )
     else if ( filename.endsWith( ".rgb" ) )
     {
         //File with node rgb values
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -1155,21 +1157,24 @@ void DatasetGlyphset::loadROI( QString filename )
     else
     {
 //File with node ids
-        QVector<int> ids;
+        std::vector<unsigned int> ids;
         while ( !in.atEnd() )
         {
             QString line = in.readLine();
             //qDebug() << line << " " << ids.size();
             QStringList sl = line.split( " " );
-            ids.append( sl.at( 0 ).toInt() );
+            ids.push_back( sl.at( 0 ).toInt() );
         }
 
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             roi[i] = false;
-            if ( ids.contains( i ) )
+            for ( unsigned int k = 0; k < ids.size(); ++k )
             {
-                roi[i] = true;
+                if ( ids[k] == i )
+                {
+                    roi[i] = true;
+                }
             }
         }
     }
@@ -1189,7 +1194,7 @@ void DatasetGlyphset::loadROI2( QString filename )
     if ( filename.endsWith( ".1D" ) )
     {
 //List of as many values as mesh nodes
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -1206,7 +1211,7 @@ void DatasetGlyphset::loadROI2( QString filename )
     else if ( filename.endsWith( ".rgb" ) )
     {
         //File with node rgb values
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -1225,21 +1230,24 @@ void DatasetGlyphset::loadROI2( QString filename )
     else
     {
 //File with node ids
-        QVector<int> ids;
+        std::vector<unsigned int> ids;
         while ( !in.atEnd() )
         {
             QString line = in.readLine();
             //qDebug() << line << " " << ids.size();
             QStringList sl = line.split( " " );
-            ids.append( sl.at( 0 ).toInt() );
+            ids.push_back( sl.at( 0 ).toInt() );
         }
 
-        for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
         {
             roi2[i] = false;
-            if ( ids.contains( i ) )
+            for ( unsigned int k = 0; k < ids.size(); ++k )
             {
-                roi2[i] = true;
+                if ( ids[k] == i )
+                {
+                    roi2[i] = true;
+                }
             }
         }
     }
@@ -1250,7 +1258,7 @@ void DatasetGlyphset::initROI()
 {
     roi = new bool[m_mesh.at( 0 )->numVerts()];
     roi2 = new bool[m_mesh.at( 0 )->numVerts()];
-    for ( int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
+    for ( unsigned int i = 0; i < m_mesh.at( 0 )->numVerts(); i++ )
     {
         roi[i] = true;
         roi2[i] = true;
@@ -1267,7 +1275,7 @@ void DatasetGlyphset::exportColors()
     QString filename = QFileDialog::getSaveFileName( NULL, "save 1D file", m_colors_name + ".col_" );
 
     QSet<QColor>* colors = new QSet<QColor>();
-    for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+    for ( unsigned int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
     {
         QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
         QColor erasecolor = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
@@ -1295,7 +1303,7 @@ void DatasetGlyphset::exportColors()
         }
         QTextStream out( &file );
         QTextStream out2( &file2 );
-        for ( int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
+        for ( unsigned int i = 0; i < m_mesh.at( prevGeo )->numVerts(); i++ )
         {
             QColor vcolor = m_mesh.at( prevGeo )->getVertexColor( i );
             if ( vcolor == c )
@@ -1334,7 +1342,7 @@ void DatasetGlyphset::avgCon()
                 ++nroi;
             }
         }
-        for ( int m = 0; m < m_mesh.size(); m++ )
+        for ( unsigned int m = 0; m < m_mesh.size(); m++ )
         {
             m_mesh[m]->setVertexData( i, v / (double) nroi );
         }
@@ -1365,7 +1373,7 @@ void DatasetGlyphset::avgConRtoZ()
                 ++nroi;
             }
         }
-        for ( int m = 0; m < m_mesh.size(); m++ )
+        for ( unsigned int m = 0; m < m_mesh.size(); m++ )
         {
             double v1 = v / (double) nroi;
             m_mesh[m]->setVertexData( i, ( qExp( 2 * v1 ) - 1 ) / ( qExp( 2 * v1 ) + 1 ) );

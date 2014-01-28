@@ -10,6 +10,8 @@
 
 #include "objectrenderer.h"
 
+#include "../../algos/fib.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
@@ -22,13 +24,15 @@ class FiberRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector<QColor>* fiberColors, QVector< QVector< float > >* extraData, int numPoints );
+    FiberRenderer( FiberSelector* selector, std::vector<Fib>* fibs, int numPoints );
     virtual ~FiberRenderer();
 
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
-    void updateExtraData( QVector< QVector< float > >* extraData );
+    void selectData( unsigned int dataId );
+
+    void updateExtraData( unsigned int dataFieldId );
 
 protected:
     void setupTextures();
@@ -47,24 +51,18 @@ private:
     GLuint dataVbo;
     GLuint indexVbo;
 
-    QVector< QVector< float > >* m_data;
-    QVector<QColor>* m_colorField;
-    QVector< QVector< float > >* m_extraData;
-    QVector< QVector< float > >* m_indexData;
+    std::vector<Fib>* m_fibs;
 
+    unsigned int m_numLines;
+    unsigned int m_numPoints;
 
-    int m_numLines;
-    int m_numPoints;
-
-    QVector<int>m_pointsPerLine;
-    QVector<int>m_startIndexes;
+    std::vector<unsigned int>m_pointsPerLine;
+    std::vector<unsigned int>m_startIndexes;
 
     bool m_isInitialized;
 
-    QVector<QVector3D>m_globalColors;
-
 public slots:
-    void colorChanged( QVariant color );
+    void colorChanged();
 
 private slots:
 };

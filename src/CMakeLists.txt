@@ -115,8 +115,10 @@ ENDIF()
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-int-to-pointer-cast -Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
-
+SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp PROPERTY COMPILE_FLAGS "-Wno-write-strings -Wno-sign-compare -Wno-unused-but-set-variable")
+SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cnifti/CiftiXMLReader.cxx PROPERTY COMPILE_FLAGS "-Wstrict-overflow")
+SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/data/writervtk.cpp PROPERTY COMPILE_FLAGS "-Wno-deprecated" )
+SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/data/loadervtk.cpp PROPERTY COMPILE_FLAGS "-Wno-deprecated" )
 SET ( CMAKE_AUTOMOC TRUE )
 
 # Collect the compile-files for this target

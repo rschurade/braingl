@@ -8,6 +8,8 @@
 #ifndef TRACKTHREAD_H_
 #define TRACKTHREAD_H_
 
+#include "fib.h"
+
 #include "../thirdparty/newmat10/newmat.h"
 
 #include <QDebug>
@@ -20,10 +22,10 @@ class TrackThread : public QThread
     Q_OBJECT
 
 public:
-    TrackThread(  QVector<Matrix>* tensors,
-                  QVector<Matrix>* logTensors,
-                  QVector<float>* fa,
-                  QVector<QVector3D>* evec1,
+    TrackThread(  std::vector<Matrix>* tensors,
+                  std::vector<Matrix>* logTensors,
+                  std::vector<float>* fa,
+                  std::vector<QVector3D>* evec1,
                   int nx,
                   int ny,
                   int nz,
@@ -39,24 +41,23 @@ public:
 
     virtual ~TrackThread();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    std::vector<Fib>*getFibs();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
+    void track( int id, bool negDir, Fib& result );
 
     int getID( float x, float y, float z );
     void getXYZ( int id, int &x, int &y, int &z );
     float getInterpolatedFA( int id, float inx, float iny, float inz );
     Matrix getInterpolatedTensor( int id, float inx, float iny, float inz );
 
-    QVector<Matrix>* m_tensors;
-    QVector<Matrix>* m_logTensors;
+    std::vector<Matrix>* m_tensors;
+    std::vector<Matrix>* m_logTensors;
     // calculated fa and eigen vectors
-    QVector<float>* m_fa;
-    QVector<QVector3D>* m_evec1;
+    std::vector<float>* m_fa;
+    std::vector<QVector3D>* m_evec1;
 
     int m_nx;
     int m_ny;
@@ -67,7 +68,7 @@ private:
 
     int m_id;
 
-    int m_minLength;
+    unsigned int m_minLength;
     float m_minFA;
     float m_minStartFA;
     float m_stepSize;
@@ -76,8 +77,7 @@ private:
     float m_smoothness;
     int m_blockSize;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    std::vector<Fib>m_fibs;
 
 signals:
     void progress();

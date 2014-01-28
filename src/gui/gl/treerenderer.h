@@ -52,8 +52,8 @@ private:
     int m_width;
     int m_height;
 
-    QVector<float>m_verts;
-    QVector<float>m_colors;
+    std::vector<float>m_verts;
+    std::vector<float>m_colors;
 
 
     bool m_dirty;

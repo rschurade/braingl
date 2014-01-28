@@ -15,19 +15,19 @@
 class MeshThread : public QThread
 {
 public:
-    MeshThread( QVector<float>* vertices, QVector<int>* triangles, int numTris, int bufferSize, int id );
+    MeshThread( std::vector<float>* vertices, std::vector<unsigned int>* triangles, unsigned int numTris, unsigned int bufferSize, int id );
     virtual ~MeshThread();
 
-    QVector<QVector3D>* getTriNormals();
+    std::vector<QVector3D>* getTriNormals();
 
 private:
     void run();
 
-    QVector<float>* m_vertices;
-    QVector<int>* m_triangles;
-    QVector<QVector3D> m_triNormals;
-    int m_numTris;
-    int m_bufferSize;
+    std::vector<float>* m_vertices;
+    std::vector<unsigned int>* m_triangles;
+    std::vector<QVector3D> m_triNormals;
+    unsigned int m_numTris;
+    unsigned int m_bufferSize;
     int m_id;
 };
 

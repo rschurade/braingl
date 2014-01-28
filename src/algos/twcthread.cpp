@@ -14,13 +14,13 @@
 #include "math.h"
 
 TWCThread::TWCThread( int id,
-                        QVector<float>* mask,
-                        QVector<Matrix>* logtensors1,
-                        QVector<Matrix>* logtensors2,
-                        QVector<Matrix>* logtensors3,
-                        QVector<QVector3D>* evec1,
-                        QVector<QVector3D>* evec2,
-                        QVector<QVector3D>* evec3,
+                        std::vector<float>* mask,
+                        std::vector<Matrix>* logtensors1,
+                        std::vector<Matrix>* logtensors2,
+                        std::vector<Matrix>* logtensors3,
+                        std::vector<QVector3D>* evec1,
+                        std::vector<QVector3D>* evec2,
+                        std::vector<QVector3D>* evec3,
                         int nx, int ny, int nz, float dx, float dy, float dz ) :
     m_id( id ),
     m_mask( mask ),
@@ -50,14 +50,9 @@ TWCThread::~TWCThread()
 {
 }
 
-QVector< QVector< float > > TWCThread::getFibs()
+std::vector<Fib>* TWCThread::getFibs()
 {
-    return fibs;
-}
-
-QVector< QVector< float > > TWCThread::getExtras()
-{
-    return extras;
+    return &m_fibs;
 }
 
 void TWCThread::run()
@@ -79,52 +74,28 @@ void TWCThread::run()
             continue;
         }
 
-        QVector<float> fib1;
-        QVector<float> fib2;
-        QVector<float> fib2r;
+        Fib fib1;
+        Fib fib2;
 
-        QVector<float> extra1;
-        QVector<float> extra2;
-        QVector<float> extra2r;
+        track( i, false, fib1 );
+        track( i, true, fib2 );
 
-        track( i, false, fib1, extra1 );
-        track( i, true, fib2, extra2 );
-
-        int j = 0;
-
-
-        if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
+        if ( ( fib1.length() + fib2.length() ) >= m_minLength )
         {
-            fib2r.resize( fib2.size() );
-            extra2r.resize( extra2.size() );
-            for ( int i = 0; i < fib2.size() / 3; ++i )
-            {
-                j = i * 3;
-                fib2r[j] = fib2[( fib2.size() - 1 ) - ( j + 2 )];
-                fib2r[j + 1] = fib2[( fib2.size() - 1 ) - ( j + 1 )];
-                fib2r[j + 2] = fib2[( fib2.size() - 1 ) - j];
+            // invert fib2;
+            fib2.invert();
 
-                extra2r[ j / 3 ] = extra2[( extra2.size() - 1 ) - j/3];
-            }
+            // delete last element of fib2
+            fib2.deleteLastVert();
 
-            if ( fib1.size() > 3 )
-            {
-                fib1.remove( 0 );
-                fib1.remove( 0 );
-                fib1.remove( 0 );
-                extra1.remove( 0 );
-                fib2r += fib1;
-                extra2r += extra1;
-            }
-
-            fibs.push_back( fib2r );
-            extras.push_back( extra2r );
+            // add fib2 + fib1
+            m_fibs.push_back( fib2 + fib1 );
         }
     }
     emit( finished() );
 }
 
-void TWCThread::track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult )
+void TWCThread::track( int id, bool negDir, Fib& result )
 {
     int xs = 0;
     int ys = 0;
@@ -169,11 +140,7 @@ void TWCThread::track( int id, bool negDir, QVector<float>& result, QVector<floa
 
         if ( curFA > 0.2 && ( x == x ) && ( y == y ) && ( z == z ) )
         {
-            result.push_back( x );
-            result.push_back( y );
-            result.push_back( z );
-
-            extraResult.push_back( FMath::fa( getInterpolatedTensor( id, x, y, z, dirX, dirY, dirZ ) ) );
+            result.addVert( x, y, z, curFA );
         }
         else
         {
@@ -296,14 +263,14 @@ Matrix TWCThread::getInterpolatedTensor( int &id, float &inx, float &iny, float 
     int id_x0y1z1 = min( m_blockSize - 1, id + m_nx * m_ny + m_nx );
     int id_x1y1z1 = min( m_blockSize - 1, id + m_nx * m_ny + m_nx + 1 );
 
-    QVector<Matrix>* lt_x0y0z0 = testAngle( id_x0y0z0, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x1y0z0 = testAngle( id_x1y0z0, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x0y1z0 = testAngle( id_x0y1z0, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x1y1z0 = testAngle( id_x1y1z0, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x0y0z1 = testAngle( id_x0y0z1, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x1y0z1 = testAngle( id_x1y0z1, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x0y1z1 = testAngle( id_x0y1z1, dirX, dirY, dirZ );
-    QVector<Matrix>* lt_x1y1z1 = testAngle( id_x1y1z1, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x0y0z0 = testAngle( id_x0y0z0, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x1y0z0 = testAngle( id_x1y0z0, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x0y1z0 = testAngle( id_x0y1z0, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x1y1z0 = testAngle( id_x1y1z0, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x0y0z1 = testAngle( id_x0y0z1, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x1y0z1 = testAngle( id_x1y0z1, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x0y1z1 = testAngle( id_x0y1z1, dirX, dirY, dirZ );
+    std::vector<Matrix>* lt_x1y1z1 = testAngle( id_x1y1z1, dirX, dirY, dirZ );
 
     Matrix i1( 3, 3 );
     Matrix i2( 3, 3 );
@@ -344,7 +311,7 @@ Matrix TWCThread::getInterpolatedTensor( int &id, float &inx, float &iny, float 
     return FMath::expT( iv );
 }
 
-QVector<Matrix>* TWCThread::testAngle( int &id, float &dirX, float &dirY, float &dirZ )
+std::vector<Matrix>* TWCThread::testAngle( int &id, float &dirX, float &dirY, float &dirZ )
 {
     float dotP0= fabs( dirX * m_evecs[0]->at( id ).x() + dirY * m_evecs[0]->at( id ).y() + dirZ * m_evecs[0]->at( id ).z() );
     float dotP1= fabs( dirX * m_evecs[1]->at( id ).x() + dirY * m_evecs[1]->at( id ).y() + dirZ * m_evecs[1]->at( id ).z() );

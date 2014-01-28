@@ -261,7 +261,23 @@ bool PropertyGroup::createList( Fn::Property name, std::initializer_list<QString
     return true;
 }
 
-bool PropertyGroup::createList( Fn::Property name, QVector<QString> options, int value, QString tab )
+bool PropertyGroup::createList( Fn::Property name, std::vector<QString> options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertySelection* prop = new PropertySelection( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createList( Fn::Property name, QList<QString> options, int value, QString tab )
 {
     if ( contains( name ) )
     {
@@ -295,7 +311,7 @@ bool PropertyGroup::createButton( Fn::Property name, QString tab )
 
 bool PropertyGroup::contains( Fn::Property name ) const
 {
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == name )
         {
@@ -307,7 +323,7 @@ bool PropertyGroup::contains( Fn::Property name ) const
 
 QVariant PropertyGroup::get( Fn::Property name ) const
 {
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == name )
         {
@@ -319,7 +335,7 @@ QVariant PropertyGroup::get( Fn::Property name ) const
 
 bool PropertyGroup::set( Fn::Property name, QVariant value )
 {
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == name )
         {
@@ -330,7 +346,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
     }
 
     QString propName("");
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == Fn::Property::D_NAME )
         {
@@ -345,7 +361,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
 
 QWidget* PropertyGroup::getWidget( Fn::Property name )
 {
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == name )
         {
@@ -368,7 +384,7 @@ int PropertyGroup::size() const
 
 Property* PropertyGroup::getProperty( Fn::Property name )
 {
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         if ( m_properties[i].first == name )
         {
@@ -380,7 +396,7 @@ Property* PropertyGroup::getProperty( Fn::Property name )
 
 Property* PropertyGroup::getNthProperty( int n )
 {
-    if ( n < 0 || n >= m_properties.size() )
+    if ( n < 0 || n >= (int)m_properties.size() )
     {
         qDebug() << "***ERROR*** getNthProperty index out of range";
         exit( 0 );
@@ -390,7 +406,7 @@ Property* PropertyGroup::getNthProperty( int n )
 
 QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n )
 {
-    if ( n < 0 || n >= m_properties.size() )
+    if ( n < 0 || n >= (int)m_properties.size() )
     {
         qDebug() << "***ERROR*** getNthPropertyPair index out of range";
         exit( 0 );
@@ -421,7 +437,7 @@ bool PropertyGroup::setMax( Fn::Property name, QVariant value )
 QList<QVariant>PropertyGroup::getState()
 {
     QList<QVariant> state;
-    for ( int i = 0; i < m_properties.size(); ++i )
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
     {
         state.push_back( (int)m_properties[i].first );
         state.push_back( m_properties[i].second->getValue() );

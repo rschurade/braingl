@@ -1,8 +1,8 @@
 /*
  * datasetfibers.h
  *
- * Created on: Dec 12, 2012
- * @author Ralph Schurade
+ *  Created on: Jan 16, 2014
+ *      Author: schurade
  */
 
 #ifndef DATASETFIBERS_H_
@@ -10,6 +10,10 @@
 
 #include "dataset.h"
 
+#include "../../algos/fib.h"
+
+#include <QDir>
+#include <QList>
 #include <QString>
 
 class FiberRenderer;
@@ -17,71 +21,54 @@ class TubeRenderer;
 class FiberSelector;
 class LoaderVTK;
 
-class DatasetFibers: public Dataset
+class DatasetFibers : public Dataset
 {
     Q_OBJECT
 
 public:
     DatasetFibers( QDir filename, Fn::DatasetType type );
-    DatasetFibers( QDir filename, QVector< QVector< float > > fibs );
-    DatasetFibers( QDir filename,
-                     QVector< QVector< float > > fibs,
-                     QVector<QVector< QVector< float > > >data,
-                     QVector<QString> dataNames,
-                     QVector< float > mins,
-                     QVector<float> maxes );
-
+    DatasetFibers( QDir name, std::vector<Fib> fibs, QList<QString> dataNames = QList<QString>() );
     DatasetFibers( QDir filename, LoaderVTK* lv );
-
     virtual ~DatasetFibers();
 
-    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
-    QString getValueAsString( int x, int y, int z );
+    std::vector<Fib>* getFibs();
+    std::vector<Fib> getSelectedFibs();
 
-    QVector< QVector< float > > getFibs();
-    QVector< QVector< QVector< float > > >getData();
-    QVector< QVector< float > > getData( int id );
-    QVector< QVector< float > > getSelectedFibs();
-    QColor getCustomColor( int fiber );
-    QVector<QString>getDataNames();
-    QVector< QVector< QVector< float > > > getSelectedData();
-    QVector<float> getDataMins();
-    QVector<float> getDataMaxes();
-
+    QList<QString> getDataNames();
     QString getSaveFilter();
     QString getDefaultSuffix();
 
+    std::vector<float>getDataMins();
+    std::vector<float>getDataMaxes();
+    void setDataMins( std::vector<float> mins );
+    void setDataMaxes( std::vector<float> maxes );
+
+    void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
+
 protected:
-    void createTexture() {};
+    void copyFromLoader( LoaderVTK* lv );
     void createProps();
 
-    void copyFromLoader( LoaderVTK* lv );
-    QVector< QVector< float > > m_fibs;
-    QVector< QVector< QVector< float > > >m_data;
-    QVector<QString>m_dataNames;
-    QVector<QColor>m_customColors;
+    std::vector<Fib>m_fibs;
+    QList<QString>m_dataNames;
 
-    QVector<float> m_dataMins;
-    QVector<float> m_dataMaxes;
+    std::vector<float>* m_kdVerts;
+
+    std::vector<float> m_dataMins;
+    std::vector<float> m_dataMaxes;
 
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;
-    int m_numPoints;
-    int m_numLines;
+    unsigned int m_numPoints;
+    unsigned int m_numLines;
 
-    bool m_morphable;
-    float m_morphValue;
-    void makeMorphable();
-    void morph(float i);
-    QVector< QVector< float > > m_orig_fibs;
-    QVector< QVector< float > > m_straight_fibs;
+private:
 
 private slots:
     void colorChanged();
     void dataModeChanged();
-    void autoplay();
     void transformChanged( QVariant value );
     void applyTransform();
 };

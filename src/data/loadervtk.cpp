@@ -36,19 +36,12 @@ LoaderVTK::LoaderVTK( QString fn ) :
 
 LoaderVTK::~LoaderVTK()
 {
-    m_points.clear();
+    //m_points->clear();
     m_lines.clear();
     m_polys.clear();
     m_pointData.clear();
     m_pointDataNames.clear();
     m_pointColors.clear();
-
-    m_points.squeeze();
-    m_lines.squeeze();
-    m_polys.squeeze();
-    m_pointData.squeeze();
-    m_pointDataNames.squeeze();
-    m_pointColors.squeeze();
 }
 
 QStringList LoaderVTK::getStatus()
@@ -61,37 +54,37 @@ int LoaderVTK::getPrimitiveType()
     return m_primitiveType;
 }
 
-QVector<float> LoaderVTK::getPoints()
+std::vector<float>* LoaderVTK::getPoints()
 {
     return m_points;
 }
 
-QVector<int> LoaderVTK::getLines()
+std::vector<int> LoaderVTK::getLines()
 {
     return m_lines;
 }
 
-QVector<int> LoaderVTK::getPolys()
+std::vector<int> LoaderVTK::getPolys()
 {
     return m_polys;
 }
 
-QVector<QVector<float> > LoaderVTK::getPointData()
+std::vector<std::vector<float> > LoaderVTK::getPointData()
 {
     return m_pointData;
 }
 
-QVector<unsigned char> LoaderVTK::getPointColors()
+std::vector<unsigned char> LoaderVTK::getPointColors()
 {
     return m_pointColors;
 }
 
-QVector<unsigned char> LoaderVTK::getPrimitiveColors()
+std::vector<unsigned char> LoaderVTK::getPrimitiveColors()
 {
     return m_primitiveColors;
 }
 
-QVector<QString>LoaderVTK::getPointDataNames()
+QList<QString>LoaderVTK::getPointDataNames()
 {
     return m_pointDataNames;
 }
@@ -172,13 +165,14 @@ bool LoaderVTK::open()
         }
 
         double p[3];
-        m_points.reserve( m_numPoints * 3 );
+        m_points = new std::vector<float>();
+        m_points->reserve( m_numPoints * 3 );
         for ( vtkIdType i = 0; i < output->GetNumberOfPoints(); ++i )
         {
             output->GetPoint( i, p );
-            m_points.push_back( p[0] );
-            m_points.push_back( p[1] );
-            m_points.push_back( p[2] );
+            m_points->push_back( p[0] );
+            m_points->push_back( p[1] );
+            m_points->push_back( p[2] );
         }
         if ( m_numPolys > 0 )
         {
@@ -222,7 +216,7 @@ bool LoaderVTK::open()
             else
             {
                 m_primitiveColors.resize( m_numLines * 3 );
-                for ( int i = 0; i < m_primitiveColors.size(); ++i )
+                for ( unsigned int i = 0; i < m_primitiveColors.size(); ++i )
                 {
                     m_primitiveColors[i] = 255;
                 }
@@ -244,7 +238,7 @@ bool LoaderVTK::open()
         else
         {
             m_pointColors.resize( m_numPoints * 3 );
-            for ( int i = 0; i < m_pointColors.size(); ++i )
+            for ( unsigned int i = 0; i < m_pointColors.size(); ++i )
             {
                 m_pointColors[i] = 255;
             }
@@ -270,9 +264,9 @@ bool LoaderVTK::open()
             if ( dataTypeID == VTK_FLOAT )
             {
                 m_pointDataNames.push_back( output->GetPointData()->GetArrayName( i ) );
-                qDebug() << "Array " << i << ": " << m_pointDataNames.last() << " (type: " << dataTypeID << ")";
+                qDebug() << "Array " << i << ": " << m_pointDataNames.back() << " (type: " << dataTypeID << ")";
 
-                QVector<float>data( m_numPoints );
+                std::vector<float>data( m_numPoints );
                 vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetPointData()->GetArray( i ) );
 
                 if ( dataArray )

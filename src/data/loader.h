@@ -49,7 +49,7 @@ private:
     QDir m_fileName;
 
     Fn::DatasetType m_datasetType;
-    QVector<Dataset*> m_dataset;
+    std::vector<Dataset*> m_dataset;
     Dataset* m_selectedDataset;
 
     bool m_success;

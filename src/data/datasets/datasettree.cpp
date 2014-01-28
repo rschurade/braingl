@@ -84,7 +84,7 @@ void DatasetTree::drawTree( QMatrix4x4 mvpMatrix, int width, int height )
     m_renderer->draw( mvpMatrix );
 }
 
-void DatasetTree::importTree( QString dims, QVector<QString>coords, QVector<QString>clusters )
+void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters )
 {
     QStringList dl = dims.split( " " );
 
@@ -109,8 +109,8 @@ void DatasetTree::importTree( QString dims, QVector<QString>coords, QVector<QStr
         vista = true;
     }
 
-    QVector<Tree*>nodes;
-    QVector<Tree*>leaves( coords.size() );
+    std::vector<Tree*>nodes;
+    std::vector<Tree*>leaves( coords.size() );
 
     m_numLeaves = coords.size();
     m_numNodes = clusters.size();

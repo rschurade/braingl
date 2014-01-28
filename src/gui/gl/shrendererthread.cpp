@@ -14,7 +14,7 @@
 #include <math.h>
 #include <limits>
 
-SHRendererThread::SHRendererThread( int id, QVector<ColumnVector>* data, int nx, int ny, int nz,
+SHRendererThread::SHRendererThread( int id, std::vector<ColumnVector>* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
                                                                 int lod,
@@ -44,16 +44,15 @@ SHRendererThread::SHRendererThread( int id, QVector<ColumnVector>* data, int nx,
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {
-    m_verts = new QVector<float>();
+    m_verts = new std::vector<float>();
 }
 
 SHRendererThread::~SHRendererThread()
 {
     m_verts->clear();
-    m_verts->squeeze();
 }
 
-QVector<float>* SHRendererThread::getVerts()
+std::vector<float>* SHRendererThread::getVerts()
 {
     return m_verts;
 }

@@ -53,29 +53,22 @@ QList<Dataset*> FiberAlgos::tractColor( Dataset* ds )
 QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
 {
     DatasetFibers* f = dynamic_cast<DatasetFibers*>( ds );
-    QVector<QVector<float> >selected = f->getSelectedFibs();
+    std::vector<Fib>selected = f->getSelectedFibs();
 
-    QVector<QString>dataNames = f->getDataNames();
+    QList<QString>dataNames = f->getDataNames();
 
     QList<Dataset*> l;
 
-    if ( dataNames.size() == 1 && dataNames[0] == "no data" )
-    {
-        DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), selected );
-        l.push_back( out );
-    }
-    else
-    {
-        DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), selected, f->getSelectedData(), dataNames, f->getDataMins(), f->getDataMaxes() );
-        l.push_back( out );
-    }
+    DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), selected, dataNames );
+    l.push_back( out );
+
     return l;
 }
 
-QList<Dataset*> FiberAlgos::resample( Dataset* ds )
+QList<Dataset*> FiberAlgos::downSample( Dataset* ds )
 {
     Fibers* fa = new Fibers( dynamic_cast<DatasetFibers*>( ds ) );
-    DatasetFibers* out = fa->resample();
+    DatasetFibers* out = fa->downSample();
     QList<Dataset*> l;
     l.push_back( out );
     return l;

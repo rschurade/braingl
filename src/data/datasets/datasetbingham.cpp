@@ -9,7 +9,7 @@
 
 #include "../../gui/gl/binghamrenderer.h"
 
-DatasetBingham::DatasetBingham( QDir filename, QVector<QVector<float> > data, nifti_image* header ) :
+DatasetBingham::DatasetBingham( QDir filename, std::vector<std::vector<float> > data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_BINGHAM, header ),
     m_data( data ),
     m_renderer( 0 )
@@ -38,7 +38,7 @@ DatasetBingham::~DatasetBingham()
     delete m_renderer;
 }
 
-QVector<QVector<float> >* DatasetBingham::getData()
+std::vector<std::vector<float> >* DatasetBingham::getData()
 {
     return &m_data;
 }
@@ -92,7 +92,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
 QString DatasetBingham::getValueAsString( int x, int y, int z )
 {
-    QVector<float> data = m_data[ getId( x, y, z ) ];
+    std::vector<float> data = m_data[ getId( x, y, z ) ];
     return QString::number( data[0] ) + ", " + QString::number( data[1] ) + ", " + QString::number( data[2] ) + ", " + QString::number( data[3] ) +
      ", " + QString::number( data[4] ) + ", " + QString::number( data[5] ) + ", " + QString::number( data[6] ) + ", " + QString::number( data[7] ) +
      ", " + QString::number( data[8] );

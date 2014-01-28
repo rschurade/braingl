@@ -56,11 +56,11 @@ void SD::slotThreadFinished()
     {
         qDebug() << "all threads finished";
         // combine fibs from all threads
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
         }
 
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
             delete m_threads[i];
         }

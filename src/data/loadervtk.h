@@ -22,15 +22,15 @@ public:
     bool load();
     QStringList getStatus();
     int getPrimitiveType();
-    QVector<float> getPoints();
-    QVector<int>getLines();
-    QVector<int>getPolys();
+    std::vector<float>* getPoints();
+    std::vector<int>getLines();
+    std::vector<int>getPolys();
 
-    QVector<QVector<float> >getPointData();
-    QVector<QString>getPointDataNames();
+    std::vector<std::vector<float> >getPointData();
+    QList<QString>getPointDataNames();
 
-    QVector<unsigned char> getPointColors();
-    QVector<unsigned char> getPrimitiveColors();
+    std::vector<unsigned char> getPointColors();
+    std::vector<unsigned char> getPrimitiveColors();
 
     int getNumPoints();
     int getNumLines();
@@ -52,18 +52,18 @@ private:
     bool m_hasPointColors;
     bool m_hasPrimitiveColors;
 
-    QVector<float>m_points;
-    QVector<int>m_lines;
-    QVector<int>m_polys;
+    std::vector<float>* m_points;
+    std::vector<int>m_lines;
+    std::vector<int>m_polys;
 
-    QVector<QVector<float> >m_pointData;
-    QVector<QString>m_pointDataNames;
+    std::vector<std::vector<float> >m_pointData;
+    QList<QString>m_pointDataNames;
 
-    QVector<QVector<float> >m_primitiveData;
-    QVector<QString>m_primitiveDataNames;
+    std::vector<std::vector<float> >m_primitiveData;
+    std::vector<QString>m_primitiveDataNames;
 
-    QVector<unsigned char>m_pointColors;
-    QVector<unsigned char>m_primitiveColors;
+    std::vector<unsigned char>m_pointColors;
+    std::vector<unsigned char>m_primitiveColors;
 };
 
 #endif /* LOADERVTK_H_ */

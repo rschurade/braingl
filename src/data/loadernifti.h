@@ -22,7 +22,7 @@ public:
 
     bool load();
 
-    QVector<Dataset*> getDataset();
+    std::vector<Dataset*> getDataset();
     Fn::DatasetType getDatasetType();
 
 private:
@@ -36,8 +36,8 @@ private:
     bool loadNiftiFMRI( QString fileName );
     bool loadNiftiDWI( QString fileName );
     bool loadNiftiDWI_FNAV2( QString fileName );
-    QVector<float> loadBvals( QString fileName );
-    QVector<QVector3D> loadBvecs( QString fileName, QVector<float> bvals );
+    std::vector<float> loadBvals( QString fileName );
+    std::vector<QVector3D> loadBvecs( QString fileName, std::vector<float> bvals );
 
     bool isRadialogical();
     void flipX();
@@ -47,10 +47,10 @@ private:
 
     QDir m_fileName;
     nifti_image* m_header;
-    QVector<float>m_scalarData;
-    QVector<QVector3D>m_vectorData;
+    std::vector<float>m_scalarData;
+    std::vector<QVector3D>m_vectorData;
     Fn::DatasetType m_datasetType;
-    QVector<Dataset*> m_dataset;
+    std::vector<Dataset*> m_dataset;
 };
 
 #endif /* LOADERNIFTI_H_ */
