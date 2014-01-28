@@ -123,7 +123,7 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
 
     ColormapBase cmap = ColormapFunctions::getColormap( 2 );
 
-    for( int i = 0; i < clusters.size(); ++i )
+    for( unsigned int i = 0; i < clusters.size(); ++i )
     {
         QStringList cl = clusters[i].split( " " );
         float value = cl[0].toFloat();
@@ -138,7 +138,7 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
             int id = cl[k+1].toInt();
             if( isNode )
             {
-                if( id < nodes.size() )
+                if( id < (int)nodes.size() )
                 {
                     nodes[id]->setParent( m_tree );
                     m_tree->addChild( nodes[id] );
@@ -170,7 +170,7 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
         }
     }
 
-    for( int i = 0; i < leaves.size(); ++i )
+    for( unsigned int i = 0; i < leaves.size(); ++i )
     {
         float v = ( (float)i/(float)m_numLeaves );
         QColor c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, v ) ) );

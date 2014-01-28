@@ -221,16 +221,8 @@ void TubeRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void TubeRenderer::colorChanged( QVariant color )
+void TubeRenderer::colorChanged()
 {
-//    std::vector<bool>*selected = m_selector->getSelection();
-//    for ( int i = 0; i < m_numLines; ++i )
-//    {
-//        if ( selected->at( i ) )
-//        {
-//            m_colorField[i] = color.value<QColor>();
-//        }
-//    }
 }
 
 void TubeRenderer::updateExtraData( unsigned int dataFieldId )

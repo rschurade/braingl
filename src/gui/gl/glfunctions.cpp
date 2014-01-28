@@ -178,7 +178,7 @@ void GLFunctions::setShaderCode( QString name, QString source )
 void GLFunctions::reloadShaders()
 {
     updateColormapShader();
-    for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+    for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
         GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
     }
@@ -219,7 +219,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "pies" );
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
 
-        for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+        for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_fs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );

@@ -15,7 +15,7 @@
 
 #include <QDebug>
 #include <QColor>
-#include <qmath.h>
+#include <QtCore>
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
@@ -132,7 +132,7 @@ SymmetricMatrix FMath::moment_of_inertia( const ColumnVector& values, const std:
     result = 0.0;
 
     double sum( 0.0 );
-    for ( int i = 0; i < points.size(); ++i )
+    for ( unsigned int i = 0; i < points.size(); ++i )
     {
         double x( points[i]( 1 ) );
         double y( points[i]( 2 ) );
@@ -523,7 +523,7 @@ void FMath::fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0I
     Matrix blank( 3, 3 );
     blank = 0.0;
 
-    for ( int i = 0; i < data.size(); ++i )
+    for ( unsigned int i = 0; i < data.size(); ++i )
     {
         s0 = b0Images.at( i );
 
