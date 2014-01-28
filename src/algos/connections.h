@@ -64,8 +64,8 @@ public:
 
     void startBundling();
 
-    QVector<AttractThread*> m_athreads;
-    QVector<CompatibilitiesThread*> m_compthreads;
+    std::vector<AttractThread*> m_athreads;
+    std::vector<CompatibilitiesThread*> m_compthreads;
 
     void hashEdges();
 

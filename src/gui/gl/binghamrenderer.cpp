@@ -28,7 +28,7 @@
 #include <limits>
 #include <stdint.h>
 
-BinghamRenderer::BinghamRenderer( QVector<std::vector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
+BinghamRenderer::BinghamRenderer( std::vector<std::vector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris1( 0 ),
     vboIds( new GLuint[ 2 ] ),
@@ -174,7 +174,7 @@ void BinghamRenderer::initGeometry()
 
     int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<BinghamRendererThread*> threads;
+    std::vector<BinghamRendererThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {

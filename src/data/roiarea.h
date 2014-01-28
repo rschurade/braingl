@@ -64,7 +64,7 @@ private:
     int m_nPointsInSlice;
 
     int m_numThreads;
-    QVector<IsoSurfaceThread*> m_threads;
+    std::vector<IsoSurfaceThread*> m_threads;
 
 private slots:
     void globalChanged();

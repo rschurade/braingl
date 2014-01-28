@@ -11,7 +11,7 @@
 
 #include "../../gui/gl/shrenderer.h"
 
-DatasetSH::DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* header ) :
+DatasetSH::DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties["maingl"]->createInt( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
@@ -85,7 +85,7 @@ void DatasetSH::createTexture()
 {
 }
 
-QVector<ColumnVector>* DatasetSH::getData()
+std::vector<ColumnVector>* DatasetSH::getData()
 {
     return &m_data;
 }

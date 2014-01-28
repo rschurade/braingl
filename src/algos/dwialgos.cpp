@@ -42,10 +42,10 @@ DWIAlgos::~DWIAlgos()
 QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
 {
     qDebug() << "start calculating qBall";
-    QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
+    std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
 
     Matrix gradients( bvecs.size(), 3 );
-    for ( int i = 0; i < bvecs.size(); ++i )
+    for ( unsigned int i = 0; i < bvecs.size(); ++i )
     {
         gradients( i + 1, 1 ) = bvecs.at( i ).x();
         gradients( i + 1, 2 ) = bvecs.at( i ).y();
@@ -56,11 +56,11 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
     int order = 4;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, order );
 
-    QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
 
-    QVector<ColumnVector> qBallVector;
+    std::vector<ColumnVector> qBallVector;
 
-    for ( int i = 0; i < data->size(); ++i )
+    for ( unsigned int i = 0; i < data->size(); ++i )
     {
         qBallVector.push_back( qBallBase * data->at( i ) );
     }
@@ -84,7 +84,7 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
 {
-    QVector<ColumnVector> qBallVector;
+    std::vector<ColumnVector> qBallVector;
     QBall::sharpQBall( dynamic_cast<DatasetDWI*>( ds ), order, qBallVector );
     qDebug() << "create dataset";
 
@@ -109,12 +109,12 @@ QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
 
 QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
 {
-    QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
+    std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
-    QVector<Matrix> tensors;
+    std::vector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     DatasetTensor* out = new DatasetTensor( QDir( ds->properties( "maingl" )->get( Fn::Property::D_FILENAME ).toString() ), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
@@ -129,12 +129,12 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
 {
-    QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
+    std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
-    QVector<Matrix> tensors;
+    std::vector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     std::vector<float> fa;
@@ -152,23 +152,23 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 {
-    QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
+    std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
-    QVector<Matrix> tensors;
+    std::vector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
     int blockSize = tensors.size();
 
-    QVector<QVector3D> evec1( blockSize );
+    std::vector<QVector3D> evec1( blockSize );
     std::vector<float> eval1( blockSize );
 
-    QVector<QVector3D> evec2( blockSize );
+    std::vector<QVector3D> evec2( blockSize );
     std::vector<float> eval2( blockSize );
 
-    QVector<QVector3D> evec3( blockSize );
+    std::vector<QVector3D> evec3( blockSize );
     std::vector<float> eval3( blockSize );
 
     FMath::evecs( tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
@@ -176,7 +176,7 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
     std::vector<float> fa;
     FMath::fa( tensors, fa );
 
-    for ( int i = 0; i < evec1.size(); ++i )
+    for ( unsigned int i = 0; i < evec1.size(); ++i )
     {
         evec2[i] = evec1[i] * fa[i] * 1.5;
     }
@@ -200,7 +200,7 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
 {
-    QVector<Matrix>* tensors = dynamic_cast<DatasetTensor*>( ds )->getData();
+    std::vector<Matrix>* tensors = dynamic_cast<DatasetTensor*>( ds )->getData();
 
     std::vector<float> fa;
     FMath::fa( *tensors, fa );
@@ -217,17 +217,17 @@ QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
 {
-    QVector<Matrix>* tensors = dynamic_cast<DatasetTensor*>( ds )->getData();
+    std::vector<Matrix>* tensors = dynamic_cast<DatasetTensor*>( ds )->getData();
 
     int blockSize = tensors->size();
 
-    QVector<QVector3D> evec1( blockSize );
+    std::vector<QVector3D> evec1( blockSize );
     std::vector<float> eval1( blockSize );
 
-    QVector<QVector3D> evec2( blockSize );
+    std::vector<QVector3D> evec2( blockSize );
     std::vector<float> eval2( blockSize );
 
-    QVector<QVector3D> evec3( blockSize );
+    std::vector<QVector3D> evec3( blockSize );
     std::vector<float> eval3( blockSize );
 
     FMath::evecs( *tensors, evec1, eval1, evec2, eval2, evec3, eval3 );
@@ -235,7 +235,7 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
     std::vector<float> fa;
     FMath::fa( *tensors, fa );
 
-    for ( int i = 0; i < evec1.size(); ++i )
+    for ( unsigned int i = 0; i < evec1.size(); ++i )
     {
         evec2[i] = evec1[i] * fa[i] * 1.5f;
     }

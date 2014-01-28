@@ -18,7 +18,7 @@
 #include <math.h>
 #include <limits>
 
-SHRendererThread2::SHRendererThread2( int id, QVector<ColumnVector>* data,
+SHRendererThread2::SHRendererThread2( int id, std::vector<ColumnVector>* data,
                                                                 int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
@@ -72,7 +72,7 @@ void SHRendererThread2::run()
 
     int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<SHRendererThread*> threads;
+    std::vector<SHRendererThread*> threads;
     // create threads
 
     for ( int i = 0; i < numThreads; ++i )

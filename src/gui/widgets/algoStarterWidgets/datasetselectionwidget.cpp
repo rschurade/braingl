@@ -11,12 +11,12 @@
 #include "../../../data/datasets/dataset.h"
 #include "../../../data/vptr.h"
 
-DatasetSelectionWidget::DatasetSelectionWidget( QVector< QPair<QString, QList<Fn::DatasetType> > >&filter, QList<QVariant> &dsl, QWidget* parent ) :
+DatasetSelectionWidget::DatasetSelectionWidget( std::vector< QPair<QString, QList<Fn::DatasetType> > >&filter, QList<QVariant> &dsl, QWidget* parent ) :
     QWidget( parent )
 {
     m_layout = new QVBoxLayout();
 
-    for ( int i = 0; i < filter.size(); ++i )
+    for ( unsigned int i = 0; i < filter.size(); ++i )
     {
         SelectWithLabel* sel = new SelectWithLabel( filter[i].first, i );
         m_selectList.push_back( sel );

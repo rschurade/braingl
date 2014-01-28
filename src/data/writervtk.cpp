@@ -87,9 +87,8 @@ bool WriterVTK::save()
 void WriterVTK::saveFibs( QString filename, bool binary )
 {
     DatasetFibers* ds = dynamic_cast<DatasetFibers*>( m_dataset );
-    QVector< std::vector<float> >fibs = ds->getFibs();
-    QVector< QVector< std::vector<float> > >data = ds->getData();
-    QVector< QString >dataNames = ds->getDataNames();
+    std::vector< Fib >* fibs = ds->getFibs();
+    QList< QString >dataNames = ds->getDataNames();
 
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newLines = vtkSmartPointer<vtkCellArray>::New();
@@ -102,11 +101,11 @@ void WriterVTK::saveFibs( QString filename, bool binary )
 
     unsigned char rgb[3];
 
-    for ( int i = 0; i < fibs.size(); ++i )
+    for ( unsigned int i = 0; i < fibs->size(); ++i )
     {
-        std::vector<float>fib = fibs[i];
+        Fib fib = fibs->at( i );
         vtkSmartPointer<vtkPolyLine> newLine = vtkSmartPointer<vtkPolyLine>::New();
-        QColor color = ds->getCustomColor( i );
+        QColor color = fib.customColor();
 
         rgb[0] = color.redF() * 255;
         rgb[1] = color.greenF() * 255;
@@ -114,9 +113,9 @@ void WriterVTK::saveFibs( QString filename, bool binary )
 
         colorArray->InsertNextTupleValue( rgb );
 
-        for ( unsigned int k = 0; k < fib.size() / 3; ++k )
+        for ( unsigned int k = 0; k < fib.length(); ++k )
         {
-            newPoints->InsertNextPoint( fib[k*3], fib[k*3+1], fib[k*3+2] );
+            newPoints->InsertNextPoint( fib[k].x(), fib[k].y(), fib[k].z() );
             newLine->GetPointIds()->InsertNextId( pointId );
             ++pointId;
         }
@@ -130,19 +129,18 @@ void WriterVTK::saveFibs( QString filename, bool binary )
 
     if ( dataNames[0] != "no data" )
     {
-        for ( int i = 0; i < data.size(); ++i )
+        for ( int i = 0; i < dataNames.size(); ++i )
         {
             vtkSmartPointer<vtkFloatArray> dataArray = vtkSmartPointer<vtkFloatArray>::New();
             dataArray->SetNumberOfComponents( 1 );
             dataArray->SetName( dataNames[i].toStdString().c_str() );
 
-            QVector<std::vector<float> > dataField = data[i];
-            for ( int k = 0; k < dataField.size(); ++k )
+            for ( unsigned int k = 0; k < fibs->size(); ++k )
             {
-                std::vector<float> fib = dataField[k];
-                for ( unsigned int l = 0; l < fib.size(); ++l )
+                Fib fib = fibs->at( k );
+                for ( unsigned int l = 0; l < fib.length(); ++l )
                 {
-                    dataArray->InsertNextValue( fib[l] );
+                    dataArray->InsertNextValue( fib.getData( k, l ) );
                 }
             }
             newPolyData->GetPointData()->AddArray( dataArray );

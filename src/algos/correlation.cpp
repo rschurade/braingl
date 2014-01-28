@@ -95,11 +95,11 @@ void Correlation::slotThreadFinished()
             m_result[i] = new float[m_n];
         }
 
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
-            QVector<std::vector<float> >* corr = m_threads[i]->getResult();
+            std::vector<std::vector<float> >* corr = m_threads[i]->getResult();
 
-            for ( int k = 0; k < corr->size(); ++k )
+            for ( unsigned int k = 0; k < corr->size(); ++k )
             {
                 for( unsigned int l = 0; l < corr->at( k ).size(); ++l )
                 {
@@ -109,7 +109,7 @@ void Correlation::slotThreadFinished()
             }
         }
 
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
             delete m_threads[i];
         }

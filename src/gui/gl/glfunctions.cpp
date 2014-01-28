@@ -42,7 +42,7 @@ QHash<QString,float> GLFunctions::sliceAlpha;
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
-QVector< QString > GLFunctions::m_shaderNames;
+std::vector< QString > GLFunctions::m_shaderNames;
 
 ROI* GLFunctions::roi = 0;
 
@@ -159,7 +159,7 @@ QGLShaderProgram* GLFunctions::getShader( QString name )
     return m_shaders[ name ];
 }
 
-QVector< QString > GLFunctions::getShaderNames()
+std::vector< QString > GLFunctions::getShaderNames()
 {
     return m_shaderNames;
 }

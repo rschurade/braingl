@@ -9,6 +9,7 @@
 #define TRACK_H_
 
 #include "fmath.h"
+#include "fib.h"
 
 #include <QDebug>
 #include <QVector>
@@ -27,8 +28,8 @@ public:
 
     void startTracking();
 
-    QVector< std::vector<float> >getFibs();
-    QVector< std::vector<float> >getExtras();
+    std::vector<Fib>getFibs();
+
     int getNumPoints();
     int getNumLines();
 
@@ -37,16 +38,15 @@ private:
 
     DatasetTensor* m_dataset;
 
-    QVector<Matrix>* m_tensors;
-    QVector<Matrix>* m_logTensors;
+    std::vector<Matrix>* m_tensors;
+    std::vector<Matrix>* m_logTensors;
     // calculated fa and eigen vectors
     std::vector<float> m_fa;
-    QVector<QVector3D> m_evec1;
+    std::vector<QVector3D> m_evec1;
 
-    QVector<TrackThread*> m_threads;
+    std::vector<TrackThread*> m_threads;
 
-    QVector< std::vector<float> >fibs;
-    QVector< std::vector<float> >extras;
+    std::vector<Fib>m_fibs;
 
     int m_nx;
     int m_ny;

@@ -167,7 +167,7 @@ void SingleSHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    QVector<ColumnVector>* data = m_dataset->getData();
+    std::vector<ColumnVector>* data = m_dataset->getData();
 
     Matrix m = base * data->at( 0 );
 

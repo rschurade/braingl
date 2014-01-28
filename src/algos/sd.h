@@ -27,7 +27,7 @@ public:
 private:
     DatasetDWI* m_dataset;
 
-    QVector<SDThread*> m_threads;
+    std::vector<SDThread*> m_threads;
     int m_threadsRunning;
 
 

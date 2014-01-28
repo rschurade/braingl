@@ -20,7 +20,7 @@
 
 #include <limits>
 
-EVRenderer::EVRenderer( QVector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
+EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),
     m_vertCount( 0 ),
     vbo( 0 ),

@@ -45,7 +45,7 @@ public:
     static void setShaderVarsSlice( QGLShaderProgram* program, QString target );
     static void setTextureUniforms( QGLShaderProgram* program, QString target );
 
-    static QVector<QString> getShaderNames();
+    static std::vector<QString> getShaderNames();
     static QString getShaderCode( QString name );
     static void setShaderCode( QString name,  QString source );
 
@@ -83,7 +83,7 @@ private:
     static QHash< QString, QString >m_shaderIncludes;
     static QHash< QString, QString >m_shaderSources;
     static QHash< QString, QGLShaderProgram* >m_shaders;
-    static QVector<QString>m_shaderNames;
+    static std::vector<QString>m_shaderNames;
 
     static bool shadersLoaded;
     static unsigned int pickIndex;

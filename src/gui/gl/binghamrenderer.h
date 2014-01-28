@@ -19,7 +19,7 @@ class PropertyGroup;
 class BinghamRenderer : public ObjectRenderer
 {
 public:
-    BinghamRenderer( QVector<std::vector<float> >* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    BinghamRenderer( std::vector<std::vector<float> >* data, int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~BinghamRenderer();
 
     void init();
@@ -40,7 +40,7 @@ private:
 
     GLuint *vboIds;
 
-    QVector<std::vector<float> >* m_data;
+    std::vector<std::vector<float> >* m_data;
 
     int m_nx;
     int m_ny;

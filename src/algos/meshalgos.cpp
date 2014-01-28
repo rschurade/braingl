@@ -79,11 +79,11 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
         todo.insert( i, i );
     }
     QQueue<int>queue;
-    QVector<QVector<int> >components;
+    std::vector<std::vector<int> >components;
     int sumTris = 0;
     do
     {
-        QVector<int>component;
+        std::vector<int>component;
         int item = todo.take( todo.begin().value() );
         queue.enqueue( item );
         while( !queue.empty() )
@@ -115,9 +115,9 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
 
     QList<Dataset*> l;
 
-    for ( int i = 0; i < components.size(); ++i )
+    for ( unsigned int i = 0; i < components.size(); ++i )
     {
-        if ( components[i].size() < Models::getGlobal( Fn::Property::G_MIN_COMPONENT_SIZE ).toInt() )
+        if ( (int)components[i].size() < Models::getGlobal( Fn::Property::G_MIN_COMPONENT_SIZE ).toInt() )
         {
             continue;
         }
@@ -134,11 +134,11 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
    return l;
 }
 
-TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, QVector<int>component )
+TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, std::vector<int>component )
 {
     QMap<int, int>newVertIds;
 
-    for( int k = 0; k < component.size(); ++k )
+    for( unsigned int k = 0; k < component.size(); ++k )
     {
         std::vector<unsigned int>tri = mesh->getTriangle( component[k] );
         for( unsigned int l = 0; l < tri.size(); ++l )
@@ -163,7 +163,7 @@ TriangleMesh2* MeshAlgos::pruneMesh( TriangleMesh2* mesh, QVector<int>component 
     }
 
 
-    for( int k = 0; k < component.size(); ++k )
+    for( unsigned int k = 0; k < component.size(); ++k )
     {
         std::vector<unsigned int>tri = mesh->getTriangle( component[k] );
         newMesh->addTriangle( newVertIds[tri[0]], newVertIds[tri[1]], newVertIds[tri[2]] );
@@ -183,8 +183,8 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
 
     float epsilon = Models::getGlobal( Fn::Property::G_DECIMATE_EPSILON).toFloat();
 
-    QMap<QString, QVector<int> >cells;
-    QVector<QString>keys( mesh->numVerts() );
+    QMap<QString, std::vector<int> >cells;
+    std::vector<QString>keys( mesh->numVerts() );
 
     // put verts into cells of diameter epsilon
     int x,y,z;
@@ -203,7 +203,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
         }
         else
         {
-            QVector<int> entry;
+            std::vector<int> entry;
             entry.push_back( i );
             cells.insert( key, entry );
         }
@@ -211,7 +211,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
 
     // for each cell compute representative vertex
 
-    QMap<QString, QVector<int> >::iterator mapIterator = cells.begin();
+    QMap<QString, std::vector<int> >::iterator mapIterator = cells.begin();
 
     QMap<QString, Point>newVerts;
 
@@ -219,10 +219,10 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
 
     while( mapIterator != cells.end() )
     {
-        QVector<int>verts = mapIterator.value();
+        std::vector<int>verts = mapIterator.value();
 
         QVector3D newVert( 0, 0, 0 );
-        for ( int i = 0; i < verts.size(); ++i )
+        for ( unsigned int i = 0; i < verts.size(); ++i )
         {
             newVert += mesh->getVertex( verts[i] );
         }
@@ -235,7 +235,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
         ++mapIterator;
     }
 
-    QVector<Triangle>newTriangles;
+    std::vector<Triangle>newTriangles;
 
     // remove degenerative triangles
     for ( unsigned int i = 0; i < mesh->numTris(); ++i )
@@ -264,7 +264,7 @@ QList<Dataset*> MeshAlgos::decimate( Dataset* ds )
         newMesh->setVertex( vertIterator.value().newID, vertIterator.value().pos );
         ++vertIterator;
     }
-    for ( int i = 0; i < newTriangles.size(); ++i )
+    for ( unsigned int i = 0; i < newTriangles.size(); ++i )
     {
         newMesh->setTriangle( i, newTriangles[i] );
     }

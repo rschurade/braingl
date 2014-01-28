@@ -16,17 +16,15 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QDebug>
 
-TubeRenderer::TubeRenderer( FiberSelector* selector, QVector< std::vector<float> >* data, QVector< std::vector<float> >* extraData )  :
+TubeRenderer::TubeRenderer( FiberSelector* selector, std::vector<Fib>* fibs )  :
     ObjectRenderer(),
     m_selector( selector ),
     vboIds( new GLuint[ 4 ] ),
-    m_data( data ),
-    m_extraData( extraData ),
-    m_numLines( data->size() ),
+    m_fibs( fibs ),
+    m_numLines( fibs->size() ),
     m_numPoints( 0 ),
     m_isInitialized( false )
 {
-    m_colorField.resize( m_numLines );
 }
 
 TubeRenderer::~TubeRenderer()
@@ -101,17 +99,15 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    QVector<bool>*selected = m_selector->getSelection();
-    for ( int i = 0; i < m_data->size(); ++i )
+    std::vector<bool>*selected = m_selector->getSelection();
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
         if ( selected->at( i ) )
         {
-            program->setUniformValue( "u_color", m_colorField[i].redF(),
-                                                   m_colorField[i].greenF(),
-                                                   m_colorField[i].blueF(), 1.0 );
-            program->setUniformValue( "u_globalColor", m_globalColorField[i].x(),
-                                                         m_globalColorField[i].y(),
-                                                         m_globalColorField[i].z(), 1.0 );
+            QColor c = m_fibs->at( i ).customColor();
+            program->setUniformValue( "u_color", c.redF(), c.greenF(), c.blueF(), 1.0 );
+            c = m_fibs->at( i ).globalColor();
+            program->setUniformValue( "u_globalColor", c.redF(), c.greenF(), c.blueF(), 1.0 );
             glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
         }
     }
@@ -170,11 +166,11 @@ void TubeRenderer::initGeometry()
     qDebug() << "create tube vbo's...";
     int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<TubeRendererThread*> threads;
+    std::vector<TubeRendererThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new TubeRendererThread( m_data, i ) );
+        threads.push_back( new TubeRendererThread( m_fibs, i ) );
     }
 
     // run threads
@@ -191,11 +187,9 @@ void TubeRenderer::initGeometry()
 
     std::vector<float> verts;
     // combine verts from all threads
-    m_globalColorField.clear();
     for ( int i = 0; i < numThreads; ++i )
     {
         verts.insert( verts.end(), threads[i]->getVerts()->begin(), threads[i]->getVerts()->end() );
-        m_globalColorField += *( threads[i]->getGlobalColors() );
     }
 
     for ( int i = 0; i < numThreads; ++i )
@@ -207,18 +201,18 @@ void TubeRenderer::initGeometry()
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    m_pointsPerLine.resize( m_data->size() );
-    m_startIndexes.resize( m_data->size() );
+    m_pointsPerLine.resize( m_fibs->size() );
+    m_startIndexes.resize( m_fibs->size() );
 
     int currentStart = 0;
-    for ( int i = 0; i < m_data->size(); ++i )
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
-        m_pointsPerLine[i] = m_data->at( i ).size() / 3;
+        m_pointsPerLine[i] = m_fibs->at( i ).length();
         m_startIndexes[i] = currentStart;
         currentStart += m_pointsPerLine[i];
     }
 
-    updateExtraData( m_extraData );
+    updateExtraData( 0 );
 
     qDebug() << "create tube vbo's done";
 
@@ -229,33 +223,31 @@ void TubeRenderer::initGeometry()
 
 void TubeRenderer::colorChanged( QVariant color )
 {
-    QVector<bool>*selected = m_selector->getSelection();
-    for ( int i = 0; i < m_numLines; ++i )
-    {
-        if ( selected->at( i ) )
-        {
-            m_colorField.replace( i, color.value<QColor>() );
-        }
-    }
+//    std::vector<bool>*selected = m_selector->getSelection();
+//    for ( int i = 0; i < m_numLines; ++i )
+//    {
+//        if ( selected->at( i ) )
+//        {
+//            m_colorField[i] = color.value<QColor>();
+//        }
+//    }
 }
 
-void TubeRenderer::updateExtraData( QVector< std::vector<float> >* extraData )
+void TubeRenderer::updateExtraData( unsigned int dataFieldId )
 {
-    m_extraData = extraData;
     std::vector<float>data;
-    std::vector<float>indexes;
-    for ( int i = 0; i < extraData->size(); ++i )
-    {
-        std::vector<float>fib = extraData->at(i);
-        for ( unsigned int k = 0; k < fib.size(); ++k )
+        std::vector<float>indexes;
+        for ( unsigned int i = 0; i < m_fibs->size(); ++i )
         {
-            data.push_back( fib[k]);
-            data.push_back( fib[k]);
-            indexes.push_back( k );
-            indexes.push_back( k );
+            Fib fib = m_fibs->at(i);
+            for ( unsigned int k = 0; k < fib.length(); ++k )
+            {
+                data.push_back( fib.getData( dataFieldId, k ) );
+                data.push_back( fib.getData( dataFieldId, k ) );
+                indexes.push_back( k );
+                indexes.push_back( k );
+            }
         }
-    }
-
     glDeleteBuffers( 1, &vboIds[2] );
     glGenBuffers( 1, &vboIds[2] );
 

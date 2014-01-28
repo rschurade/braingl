@@ -26,7 +26,7 @@ CorrelationThread::~CorrelationThread()
 
 }
 
-QVector< std::vector<float> >* CorrelationThread::getResult()
+std::vector< std::vector<float> >* CorrelationThread::getResult()
 {
     return &m_result;
 }

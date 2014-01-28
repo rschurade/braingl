@@ -34,7 +34,7 @@ DatasetMeshTimeSeries::~DatasetMeshTimeSeries()
 void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
 {
     m_mesh.push_back( tm );
-    m_displayList << displayString;
+    m_displayList.push_back( displayString );
 
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
     m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );

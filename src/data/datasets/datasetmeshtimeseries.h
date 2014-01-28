@@ -33,8 +33,8 @@ public:
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
 private:
-    QVector<QString> m_displayList;
-    QVector<std::vector<float> >m_data;
+    std::vector<QString> m_displayList;
+    std::vector<std::vector<float> >m_data;
 
     float m_dataMin;
     float m_dataMax;

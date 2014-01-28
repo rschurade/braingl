@@ -26,29 +26,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget
     connect( m_tracker, SIGNAL( finished() ), this, SLOT( slotFinished() ) );
 
     m_layout = new QVBoxLayout();
-/*
-    SelectWithLabel* sel = new SelectWithLabel( QString( "optional: mask (not yet implemented)" ), 1 );
-    sel->insertItem( 0, QString("none") );
-    for ( int k = 0; k < dsl.size(); ++k )
-    {
-        if ( dsl[k]->properties()->get( Fn::Property::D_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
-        {
-            sel->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::D_NAME ).toString() );
-        }
-    }
-    m_layout->addWidget( sel );
 
-    SelectWithLabel* sel2 = new SelectWithLabel( QString( "optional: roi (not yet implemented)" ), 1 );
-    sel2->insertItem( 0, QString("none") );
-    for ( int k = 0; k < dsl.size(); ++k )
-    {
-        if ( dsl[k]->properties()->get( Fn::Property::D_TYPE ).toInt() == FNDT_NIFTI_SCALAR )
-        {
-            sel2->insertItem( k+1, dsl[k]->properties()->get( Fn::Property::D_NAME ).toString() );
-        }
-    }
-    m_layout->addWidget( sel2 );
-*/
     QHBoxLayout* hLayout = new QHBoxLayout();
     m_startButton = new QPushButton( tr("Start") );
     connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
@@ -119,15 +97,10 @@ QList<Dataset*> TensorTrackWidget::getFibs()
 {
     QList<Dataset*> l;
 
-    QVector< QVector<std::vector<float> > >data;
-    data.push_back( m_tracker->getExtras() );
-    QVector<QString>names;
+    QList<QString>names;
     names.push_back( "FA" );
-    std::vector<float>mins;
-    mins.push_back( 0.0 );
-    std::vector<float>maxes;
-    maxes.push_back( 1.0 );
-    DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers" ), m_tracker->getFibs(), data, names, mins, maxes );
+
+    DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers" ), m_tracker->getFibs(), names );
     l.push_back( fibs );
     return l;
 }

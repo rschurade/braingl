@@ -58,7 +58,7 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_VECTOR:
         {
-            QVector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
+            std::vector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
@@ -100,7 +100,7 @@ bool Writer::save()
         {
             nifti_image* out = createHeader( 6 );
 
-            QVector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
+            std::vector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
             std::vector<float> outData( img->nx * img->ny * img->nz * 6 );
@@ -139,7 +139,7 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_SH:
         {
-            QVector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
+            std::vector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
@@ -180,7 +180,7 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_BINGHAM:
         {
-            QVector<std::vector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
+            std::vector<std::vector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
@@ -221,7 +221,7 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_DWI:
         {
-            QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
+            std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
             std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
@@ -231,13 +231,13 @@ bool Writer::save()
             std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             std::vector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
-            QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
+            std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
             std::vector<float> bvalOut;
             for ( unsigned int i = 0; i < bvals.size(); ++i )
             {
                 bvalOut.push_back( bvals[i] );
             }
-            for ( int i = 0; i < bvecs.size(); ++i )
+            for ( unsigned int i = 0; i < bvecs.size(); ++i )
             {
                 bvalOut.push_back( bvecs[i].x() );
                 bvalOut.push_back( bvecs[i].y() );

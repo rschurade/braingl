@@ -16,7 +16,7 @@ Sorts::~Sorts()
 {
 }
 
-void Sorts::quickFindFirstK( QVector<int>& ids, std::vector<float>& vals, int left, int right, int k )
+void Sorts::quickFindFirstK( std::vector<int>& ids, std::vector<float>& vals, int left, int right, int k )
 {
     //qDebug() << "qffk: " << left << right;
     if ( right > left )
@@ -32,7 +32,7 @@ void Sorts::quickFindFirstK( QVector<int>& ids, std::vector<float>& vals, int le
     }
 }
 
-int Sorts::partition( QVector<int>& ids, std::vector<float>& vals, int left, int right, int pivotIndex )
+int Sorts::partition( std::vector<int>& ids, std::vector<float>& vals, int left, int right, int pivotIndex )
 {
     int pivotValue = vals.at( ids.at( pivotIndex ) );
 
@@ -51,14 +51,14 @@ int Sorts::partition( QVector<int>& ids, std::vector<float>& vals, int left, int
     return storeIndex;
 }
 
-void Sorts::swap( QVector<int>& ids, int id1, int id2 )
+void Sorts::swap( std::vector<int>& ids, int id1, int id2 )
 {
     int tmp = ids.at( id1 );
-    ids.replace( id1, ids.at( id2 ) );
-    ids.replace( id2, tmp );
+    ids[id1] = ids.at( id2 );
+    ids[id2] = tmp;
 }
 
-void Sorts::quickSort( QVector<int>& ids, std::vector<float>& vals, int left, int right )
+void Sorts::quickSort( std::vector<int>& ids, std::vector<float>& vals, int left, int right )
 {
     int i = left, j = right;
     int tmp;
@@ -74,8 +74,8 @@ void Sorts::quickSort( QVector<int>& ids, std::vector<float>& vals, int left, in
         if ( i <= j )
         {
             tmp = ids.at( i );
-            ids.replace(  i, ids.at( j ) );
-            ids.replace(  j, tmp );
+            ids[i] = ids.at( j );
+            ids[j] = tmp;
             ++i;
             --j;
         }

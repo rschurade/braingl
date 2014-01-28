@@ -42,9 +42,9 @@ public:
     virtual QString getDefaultSuffix();
 
 protected:
-    QVector<TriangleMesh2*> m_mesh;
+    std::vector<TriangleMesh2*> m_mesh;
     MeshRenderer* m_renderer;
-    QVector<QString> m_displayList;
+    std::vector<QString> m_displayList;
     QMatrix4x4 m_transform;
 
 private slots:

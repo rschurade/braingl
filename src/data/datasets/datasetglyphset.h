@@ -78,8 +78,8 @@ private:
     float* diffsArray;
     float* vecsArray;
 
-    QVector<float*>* pieArrays;
-    QVector<int>* numbers;
+    std::vector<float*>* pieArrays;
+    std::vector<int>* numbers;
 
     PointGlyphRenderer* m_prenderer;
     DiffPointGlyphRenderer* m_dprenderer;
@@ -94,10 +94,10 @@ private:
     QString m_colors_name;
 
     //int pickedID;
-    QVector<LittleBrainRenderer*> littleBrains;
-    QVector<TriangleMesh2*> littleMeshes;
-    QVector<QVector3D> shifts1;
-    QVector<QVector3D> shifts2;
+    std::vector<LittleBrainRenderer*> littleBrains;
+    std::vector<TriangleMesh2*> littleMeshes;
+    std::vector<QVector3D> shifts1;
+    std::vector<QVector3D> shifts2;
 
     bool filter( int i, int j, int lr, float threshold, int sign );
 

@@ -12,19 +12,18 @@
 
 #include <math.h>
 
-FiberRendererThread::FiberRendererThread( QVector< std::vector<float> >* data, int id ) :
+FiberRendererThread::FiberRendererThread( std::vector< std::vector<float> >* data, int id ) :
     m_data( data ),
     m_id( id )
 {
     m_verts = new std::vector<float>();
-    m_globalColors = new QVector<QVector3D>;
+    m_globalColors = new std::vector<QVector3D>;
 }
 
 FiberRendererThread::~FiberRendererThread()
 {
     m_verts->clear();
     m_globalColors->clear();
-    m_globalColors->squeeze();
 }
 
 std::vector<float>* FiberRendererThread::getVerts()
@@ -32,7 +31,7 @@ std::vector<float>* FiberRendererThread::getVerts()
     return m_verts;
 }
 
-QVector<QVector3D>* FiberRendererThread::getGlobalColors()
+std::vector<QVector3D>* FiberRendererThread::getGlobalColors()
 {
     return m_globalColors;
 }

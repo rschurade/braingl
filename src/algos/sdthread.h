@@ -32,9 +32,9 @@ private:
     int m_id;
     int m_blockSize;
 
-    QVector<ColumnVector>* m_dwi;
+    std::vector<ColumnVector>* m_dwi;
     std::vector<float> m_bvals;
-    QVector<QVector3D> m_bvecs;
+    std::vector<QVector3D> m_bvecs;
 
 
 

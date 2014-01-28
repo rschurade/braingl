@@ -214,7 +214,7 @@ void MainWindow::loadColormaps( bool resetSettings )
         for ( int i = 0; i < countColormaps; ++i )
         {
             QString name;
-            QVector< ColormapPair >values;
+            std::vector< ColormapPair >values;
             in >> name;
             int cmapSize;
             in >> cmapSize;

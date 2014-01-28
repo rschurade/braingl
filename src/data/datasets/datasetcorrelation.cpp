@@ -78,7 +78,7 @@ void DatasetCorrelation::setPickedID( int pickedID )
     {
         if ( pickedID != -1 )
         {
-            for ( int m = 0; m < m_mesh.size(); m++ )
+            for ( unsigned int m = 0; m < m_mesh.size(); m++ )
             {
                 m_mesh[m]->setVertexData( i, m_correlations->getValue( pickedID, i ) );
             }
