@@ -205,7 +205,7 @@ TriangleMesh2* DatasetMesh::getMesh()
 
 TriangleMesh2* DatasetMesh::getMesh( int id )
 {
-    if ( m_mesh.size() > id )
+    if ( (int)m_mesh.size() > id )
     {
         return m_mesh[id];
     }
@@ -265,7 +265,7 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
         for ( unsigned int i = 0; i < picked.size(); ++i )
         {
             m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-            for ( int m = 0; m < m_mesh.size(); m++ )
+            for ( unsigned int m = 0; m < m_mesh.size(); m++ )
             {
                 if ( paintMode == 1 ) //paint color
                 {

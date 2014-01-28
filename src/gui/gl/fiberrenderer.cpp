@@ -307,14 +307,6 @@ void FiberRenderer::initGeometry()
 
 void FiberRenderer::colorChanged()
 {
-//    std::vector<bool>*selected = m_selector->getSelection();
-//    for ( int i = 0; i < m_numLines; ++i )
-//    {
-//        if ( selected->at( i ) )
-//        {
-//            m_colorField->at( i ) = color.value<QColor>();
-//        }
-//    }
 }
 
 void FiberRenderer::updateExtraData( unsigned int dataFieldId )

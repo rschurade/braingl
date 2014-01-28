@@ -279,7 +279,6 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
             m_renderer = new FiberRenderer( m_selector, &m_fibs, m_numPoints );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
-            //m_renderer->colorChanged( properties( target )->get( Fn::Property::D_COLOR ).value<QColor>() );
             connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
         }
 
@@ -292,8 +291,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
             m_tubeRenderer = new TubeRenderer( m_selector, &m_fibs );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
-            m_tubeRenderer->colorChanged( properties( target )->get( Fn::Property::D_COLOR ).value<QColor>() );
-            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged( QVariant ) ) );
+            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
         }
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
@@ -514,7 +512,22 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 
 void DatasetFibers::colorChanged()
 {
-
+    std::vector<bool>*selected = m_selector->getSelection();
+    for ( int i = 0; i < m_numLines; ++i )
+    {
+        if ( selected->at( i ) )
+        {
+            m_fibs[ i ].setCustomColor( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+        }
+    }
+    if ( m_renderer != 0 )
+    {
+        m_renderer->colorChanged();
+    }
+    if ( m_tubeRenderer != 0 )
+    {
+        m_tubeRenderer->colorChanged();
+    }
 }
 
 void DatasetFibers::dataModeChanged()

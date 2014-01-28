@@ -7,15 +7,15 @@
 
 #include "correlationmatrix.h"
 
-#include "qdebug.h"
-#include "qmath.h"
-#include "qfile.h"
-#include "qurl.h"
-#include "qthread.h"
-#include "qapplication.h"
-#include "qdom.h"
-#include "qstringlist.h"
-#include "qinputdialog.h"
+#include <QDebug>
+#include <QtCore>
+#include <QFile>
+#include <QUrl>
+#include <QThread>
+#include <QApplication>
+#include <QDomDocument>
+#include <QStringList>
+#include <QInputDialog>
 
 #include <cmath>
 
@@ -292,7 +292,7 @@ void CorrelationMatrix::loadMetaData()
         }
     }
     int offset = picked.attribute( "IndexOffset" ).toInt();
-    int count = picked.attribute( "IndexCount" ).toInt();
+    //int count = picked.attribute( "IndexCount" ).toInt();
     m_n = picked.attribute( "SurfaceNumberOfNodes" ).toInt();
 
     QDomElement n4 = picked.firstChildElement( "NodeIndices" );

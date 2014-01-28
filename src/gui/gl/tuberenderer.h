@@ -59,7 +59,7 @@ private:
     bool m_isInitialized;
 
 public slots:
-    void colorChanged( QVariant color );
+    void colorChanged();
 
 private slots:
 };
