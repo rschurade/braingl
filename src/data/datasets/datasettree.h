@@ -27,7 +27,7 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     void drawTree( QMatrix4x4 mvpMatrix, int width, int height );
 
-    void importTree( QString dims, QVector<QString>coords, QVector<QString>clusters );
+    void importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters );
 
     Tree* getTree() { return m_tree; };
 

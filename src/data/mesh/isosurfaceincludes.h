@@ -22,7 +22,7 @@ struct TRIANGLE {
     unsigned int pointID[3];
 };
 
-typedef QVector<TRIANGLE> TRIANGLEVECTOR;
+typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
 
 
 const unsigned int edgeTable[256] =

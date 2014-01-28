@@ -18,7 +18,7 @@
 class SHRendererThread : public QThread
 {
 public:
-    SHRendererThread( int id, QVector<ColumnVector>* data, int   m_nx,   int m_ny,   int m_nz,
+    SHRendererThread( int id, std::vector<ColumnVector>* data, int   m_nx,   int m_ny,   int m_nz,
                                                      float m_dx, float m_dy, float m_dz,
                                                      int   xi,     int yi,       int zi,
                                                      int lod, int order, int orient, bool scaling,
@@ -33,7 +33,7 @@ private:
 
     int m_id;
 
-    QVector<ColumnVector>* m_data;
+    std::vector<ColumnVector>* m_data;
 
     int m_nx;
     int m_ny;

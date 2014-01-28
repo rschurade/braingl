@@ -17,7 +17,7 @@ class PropertyGroup;
 class TensorRendererEV : public ObjectRenderer
 {
 public:
-    TensorRendererEV( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    TensorRendererEV( std::vector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~TensorRendererEV();
 
     void init();
@@ -37,7 +37,7 @@ private:
 
     GLuint *vboIds;
 
-    QVector<Matrix>* m_data;
+    std::vector<Matrix>* m_data;
 
     int m_nx;
     int m_ny;

@@ -126,7 +126,7 @@ double FMath::sh_base_function( int order, int degree, double theta, double phi 
 #endif
 }
 
-SymmetricMatrix FMath::moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points )
+SymmetricMatrix FMath::moment_of_inertia( const ColumnVector& values, const std::vector<ColumnVector>& points )
 {
     SymmetricMatrix result( 3 );
     result = 0.0;
@@ -187,7 +187,7 @@ ColumnVector FMath::cprod( const ColumnVector& v1, const ColumnVector& v2 )
 }
 
 
-void FMath::evd3x3( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals )
+void FMath::evd3x3( ColumnVector tensor, std::vector<ColumnVector>& vecs, ColumnVector& vals )
 {
     double i1, i2, i3, v, s, phi, l1, l2, l3;
     double ev1_x, ev1_y, ev1_z, ev2_x, ev2_y, ev2_z, ev3_x, ev3_y, ev3_z, vec_norm;
@@ -481,7 +481,7 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-void FMath::fitTensors( QVector<ColumnVector>& data, std::vector<float>& b0Images, QVector<QVector3D>& bvecs, std::vector<float>& bvals, QVector<Matrix>& out )
+void FMath::fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out )
 {
     int N = bvecs.size();
 
@@ -577,7 +577,7 @@ void FMath::fitTensors( QVector<ColumnVector>& data, std::vector<float>& b0Image
     }
 }
 
-void FMath::fa( QVector<Matrix>& tensors, std::vector<float>& faOut )
+void FMath::fa( std::vector<Matrix>& tensors, std::vector<float>& faOut )
 {
     int blockSize = tensors.size();
 
@@ -656,7 +656,7 @@ float FMath::fa( Matrix tensor )
     return fa;
 }
 
-void FMath::evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 )
+void FMath::evec1( std::vector<Matrix>& tensors, std::vector<QVector3D>& evec1 )
 {
     int blockSize = tensors.size();
 
@@ -722,9 +722,9 @@ void FMath::evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 )
     }
 }
 
-void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, std::vector<float>& eval1,
-                                               QVector<QVector3D>& evec2, std::vector<float>& eval2,
-                                               QVector<QVector3D>& evec3, std::vector<float>& eval3 )
+void FMath::evecs( std::vector<Matrix>& tensors, std::vector<QVector3D>& evec1, std::vector<float>& eval1,
+                                               std::vector<QVector3D>& evec2, std::vector<float>& eval2,
+                                               std::vector<QVector3D>& evec3, std::vector<float>& eval3 )
 {
 #if 1
     int blockSize = tensors.size();
@@ -844,7 +844,7 @@ void FMath::evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, std::vec
     eval2.resize( blockSize );
     eval3.resize( blockSize );
 
-    QVector<ColumnVector> vecs;
+    std::vector<ColumnVector> vecs;
     ColumnVector vals( 3 );
 
     Matrix V(3,3);
@@ -987,7 +987,7 @@ Matrix FMath::expT( Matrix& t )
     return expM;
 }
 
-void FMath::evd3x3_2( Matrix &A, ColumnVector &val, QVector<ColumnVector> &vec )
+void FMath::evd3x3_2( Matrix &A, ColumnVector &val, std::vector<ColumnVector> &vec )
 {
 
     // calculate the eigenvalues:

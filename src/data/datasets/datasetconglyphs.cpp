@@ -385,8 +385,8 @@ void DatasetConGlyphs::makePies()
 
     m_n = hedges.uniqueKeys().size();
     //qDebug() << "m_n: " << m_n;
-    pieArrays = new QVector<float*>( m_n, NULL );
-    numbers = new QVector<int>( m_n );
+    pieArrays = new std::vector<float*>( m_n, NULL );
+    numbers = new std::vector<int>( m_n );
     int i = 0;
     foreach (const QVector3D &node, hedges.uniqueKeys())
     {
@@ -398,7 +398,7 @@ void DatasetConGlyphs::makePies()
         //qDebug() << sortlist.size() << " edges for node: " << node;
         int count = hedges.values(node).size();
         //qDebug() << "count: " << count;
-        numbers->replace( i, count );
+        numbers->at( i ) = count;
         if ( count > maxNodeCount )
         {
             maxNodeCount = count;
@@ -436,7 +436,7 @@ void DatasetConGlyphs::makePies()
             pieNodeArray[o + 7] = count;
             pieNodeArray[o + 8] = v;
         }
-        pieArrays->replace( i, pieNodeArray );
+        pieArrays->at( i ) = pieNodeArray;
         i++;
     }
 }

@@ -8,6 +8,8 @@
 #ifndef BUNDLE_H_
 #define BUNDLE_H_
 
+#include "fib.h"
+
 #include <QDebug>
 #include <QVector>
 
@@ -23,7 +25,7 @@ public:
     Bundle( DatasetFibers* ds );
     virtual ~Bundle();
 
-    QVector< std::vector<float> >getFibs();
+    std::vector<Fib>getFibs();
 
     void start();
     void startLoop();
@@ -32,16 +34,16 @@ public:
 
 private:
     DatasetFibers* m_sourceDataset;
-    QVector<BundleThread*> m_threads;
+    std::vector<BundleThread*> m_threads;
     int m_threadsRunning;
     int m_currentLoop;
     int m_iterations;
     float m_radius;
     float m_smoothRange;
 
-    QVector< std::vector<float> >m_fibs;
+    std::vector<Fib> m_fibs;
     std::vector<float> m_kdVerts;
-    QVector<int>m_reverseIndexes;
+    std::vector<unsigned int>m_reverseIndexes;
 
 private slots:
     void slotProgress();

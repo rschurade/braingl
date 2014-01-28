@@ -19,7 +19,7 @@
 
 #include <limits>
 
-TensorRendererEV::TensorRendererEV( QVector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
+TensorRendererEV::TensorRendererEV( std::vector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),
     m_quads( 0 ),
     vboIds( new GLuint[ 1 ] ),

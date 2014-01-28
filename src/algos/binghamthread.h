@@ -23,14 +23,14 @@ public:
     BinghamThread( DatasetSH* ds, int lod, int id );
     virtual ~BinghamThread();
 
-    QVector<std::vector<float> > getResultVector();
+    std::vector<std::vector<float> > getResultVector();
 
 private:
     void run();
 
     std::vector<float> fit_bingham( const ColumnVector& sh_data,
                                   const Matrix& tess,
-                                  const QVector<QSet<int> >& adj,
+                                  const std::vector<QSet<int> >& adj,
                                   const Matrix& base,
                                   const int neighborhood,
                                   const int num_max );
@@ -41,7 +41,7 @@ private:
 
     int m_id;
 
-    QVector<std::vector<float> > m_resultVector;
+    std::vector<std::vector<float> > m_resultVector;
 };
 
 #endif /* BINGHAMTHREAD_H_ */

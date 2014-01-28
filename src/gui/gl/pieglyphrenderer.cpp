@@ -163,7 +163,7 @@ void PieGlyphRenderer::setShaderVars( PropertyGroup* props )
     offset += sizeof(float) * 1;
 }
 
-void PieGlyphRenderer::initGeometry( QVector<float*>* pieArrays, QVector<int>* numbers, int maxNodeCount )
+void PieGlyphRenderer::initGeometry( std::vector<float*>* pieArrays, std::vector<int>* numbers, int maxNodeCount )
 {
     m_numbers = numbers;
     m_maxNodeCount = maxNodeCount;

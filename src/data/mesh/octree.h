@@ -26,7 +26,7 @@ private:
 
     QVector3D m_center;
     float m_size;
-    QVector<OcTree*>m_leafs;
+    std::vector<OcTree*>m_leafs;
 
     int m_id;
     QVector3D m_pos;

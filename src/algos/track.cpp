@@ -55,14 +55,9 @@ Track::~Track()
 {
 }
 
-QVector< std::vector<float> > Track::getFibs()
+std::vector<Fib> Track::getFibs()
 {
-    return fibs;
-}
-
-QVector< std::vector<float> > Track::getExtras()
-{
-    return extras;
+    return m_fibs;
 }
 
 int Track::getNumPoints()
@@ -127,17 +122,16 @@ void Track::slotThreadFinished()
     {
         qDebug() << "all threads finished";
         // combine fibs from all threads
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
-            fibs += m_threads[i]->getFibs();
-            extras += m_threads[i]->getExtras();
+            m_fibs.insert( m_fibs.end(), m_threads[i]->getFibs()->begin(), m_threads[i]->getFibs()->end() );
         }
 
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
             delete m_threads[i];
         }
-        qDebug() << "tracked " << fibs.size() << " fibers";
+        qDebug() << "tracked " << m_fibs.size() << " fibers";
         qDebug() << "finished tracking";
         emit( finished() );
     }

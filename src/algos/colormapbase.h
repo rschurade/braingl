@@ -23,7 +23,7 @@ class ColormapBase
 public:
     ColormapBase();
     ColormapBase( QString name, QColor c0, QColor c1 );
-    ColormapBase( QString name, QVector< ColormapPair >values );
+    ColormapBase( QString name, std::vector< ColormapPair >values );
     ColormapBase( QList<QVariant> cm );
     virtual ~ColormapBase();
 
@@ -47,7 +47,7 @@ public:
 
 private:
     QString m_name;
-    QVector< ColormapPair >m_values;
+    std::vector< ColormapPair >m_values;
 
 };
 

@@ -17,7 +17,7 @@ class PropertyGroup;
 class EVRenderer : public ObjectRenderer
 {
 public:
-    EVRenderer( QVector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~EVRenderer();
 
     void init();
@@ -36,7 +36,7 @@ private:
 
     GLuint vbo;
 
-    QVector<QVector3D>* m_data;
+    std::vector<QVector3D>* m_data;
 
     int m_nx;
     int m_ny;

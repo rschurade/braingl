@@ -77,7 +77,7 @@ namespace Fn
         MESH_CORRELATION,
         MESH_BIGGEST_COMPONENT,
         MESH_DECIMATE,
-        FIBER_RESAMPLE,
+        FIBER_DOWNSAMPLE,
         CONS_TO_GLYPHSET,
         FIBER_BUNDLING,
         CREATE_ROI,

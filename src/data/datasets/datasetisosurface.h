@@ -56,7 +56,7 @@ private:
     int m_nPointsInSlice;
 
     int m_numThreads;
-    QVector<IsoSurfaceThread*> m_threads;
+    std::vector<IsoSurfaceThread*> m_threads;
 };
 
 #endif /* DATASETISOSURFACE_H_ */

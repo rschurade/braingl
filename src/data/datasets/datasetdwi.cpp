@@ -10,7 +10,7 @@
 
 #include <QDebug>
 
-DatasetDWI::DatasetDWI( QDir filename, QVector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header ) :
+DatasetDWI::DatasetDWI( QDir filename, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ),
     m_data( data ),
     m_b0Data( b0Data ),
@@ -38,7 +38,7 @@ DatasetDWI::~DatasetDWI()
     m_bvecs.clear();
 }
 
-QVector<ColumnVector>* DatasetDWI::getData()
+std::vector<ColumnVector>* DatasetDWI::getData()
 {
     return &m_data;
 }
@@ -53,7 +53,7 @@ std::vector<float> DatasetDWI::getBvals()
     return m_bvals;
 }
 
-QVector<QVector3D> DatasetDWI::getBvecs()
+std::vector<QVector3D> DatasetDWI::getBvecs()
 {
     return m_bvecs;
 }
@@ -88,7 +88,7 @@ void DatasetDWI::examineDataset()
         max = -32767;
         min = 32768;
 
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( unsigned int i = 0; i < m_data.size(); ++i )
         {
             for ( int k = 1; k < dim + 1; ++k )
             {
@@ -107,7 +107,7 @@ void DatasetDWI::examineDataset()
         max = -32767;
         min = 32768;
 
-        for ( int i = 0; i < m_data.size(); ++i )
+        for ( unsigned int i = 0; i < m_data.size(); ++i )
         {
             for ( int k = 1; k < dim + 1; ++k )
             {

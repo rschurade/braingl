@@ -14,15 +14,15 @@
 
 LoaderFreesurfer::LoaderFreesurfer()
 {
-
+    m_points = new std::vector<float>();
 }
 
 LoaderFreesurfer::~LoaderFreesurfer()
 {
-    // TODO Auto-generated destructor stub
+    m_points->clear();
 }
 
-std::vector<float> LoaderFreesurfer::getPoints()
+std::vector<float>* LoaderFreesurfer::getPoints()
 {
     return m_points;
 }
@@ -53,9 +53,9 @@ bool LoaderFreesurfer::loadASC( QString fn )
     {
         nl = ns.readLine();
         QStringList vals = nl.split( " ", QString::SkipEmptyParts );
-        m_points.push_back( vals.at( 0 ).toFloat() );
-        m_points.push_back( vals.at( 1 ).toFloat() );
-        m_points.push_back( vals.at( 2 ).toFloat() );
+        m_points->push_back( vals.at( 0 ).toFloat() );
+        m_points->push_back( vals.at( 1 ).toFloat() );
+        m_points->push_back( vals.at( 2 ).toFloat() );
     }
 
     //TRIANGLES

@@ -12,10 +12,10 @@
 #include "time.h"
 #include "math.h"
 
-TrackThread::TrackThread( QVector<Matrix>* tensors,
-                          QVector<Matrix>* logTensors,
+TrackThread::TrackThread( std::vector<Matrix>* tensors,
+                          std::vector<Matrix>* logTensors,
                           std::vector<float>* fa,
-                          QVector<QVector3D>* evec1,
+                          std::vector<QVector3D>* evec1,
                           int nx,
                           int ny,
                           int nz,
@@ -55,17 +55,12 @@ TrackThread::TrackThread( QVector<Matrix>* tensors,
 
 TrackThread::~TrackThread()
 {
-    fibs.clear();
+    m_fibs.clear();
 }
 
-QVector< std::vector<float> > TrackThread::getFibs()
+std::vector<Fib>* TrackThread::getFibs()
 {
-    return fibs;
-}
-
-QVector< std::vector<float> > TrackThread::getExtras()
-{
-    return extras;
+    return &m_fibs;
 }
 
 void TrackThread::run()
@@ -75,42 +70,22 @@ void TrackThread::run()
 
     for ( int i = m_id; i < m_blockSize;  i += numThreads )
     {
-        std::vector<float> fib1;
-        std::vector<float> fib2;
-        std::vector<float> fib2r;
+        Fib fib1;
+        Fib fib2;
 
-        std::vector<float> extra1;
-        std::vector<float> extra2;
-        std::vector<float> extra2r;
+        track( i, false, fib1 );
+        track( i, true, fib2 );
 
-        track( i, false, fib1, extra1 );
-        track( i, true, fib2, extra2 );
-
-        int j = 0;
-        if ( ( fib1.size() + fib2.size() ) / 3 >= m_minLength )
+        if ( ( fib1.length() + fib2.length() ) >= m_minLength )
         {
-            fib2r.resize( fib2.size() );
-            extra2r.resize( extra2.size() );
-            for ( unsigned int i = 0; i < fib2.size() / 3; ++i )
-            {
-                j = i * 3;
-                fib2r[j] = fib2[( fib2.size() - 1 ) - ( j + 2 )];
-                fib2r[j + 1] = fib2[( fib2.size() - 1 ) - ( j + 1 )];
-                fib2r[j + 2] = fib2[( fib2.size() - 1 ) - j];
+            // invert fib2;
+            fib2.invert();
 
-                extra2r[ j / 3 ] = extra2[( extra2.size() - 1 ) - j/3];
-            }
+            // delete last element of fib2
+            fib2.deleteLastVert();
 
-            if ( fib1.size() > 3 )
-            {
-                fib1.erase( fib1.begin(), fib1.begin() + 3 );
-                extra1.erase( extra1.begin() );
-                fib2r.insert( fib2r.end(), fib1.begin(), fib1.end() );
-                extra2r.insert( extra2r.end(), extra1.begin(), extra1.end() );
-            }
-
-            fibs.push_back( fib2r );
-            extras.push_back( extra2r );
+            // add fib2 + fib1
+            m_fibs.push_back( fib2 + fib1 );
         }
         ++progressCounter;
         if ( progressCounter == 100 )
@@ -122,7 +97,7 @@ void TrackThread::run()
     emit( finished() );
 }
 
-void TrackThread::track( int id, bool negDir, std::vector<float>& result, std::vector<float>& extraResult )
+void TrackThread::track( int id, bool negDir, Fib& result )
 {
     int xs = 0;
     int ys = 0;
@@ -174,11 +149,7 @@ void TrackThread::track( int id, bool negDir, std::vector<float>& result, std::v
 
         if ( curFA > m_minFA && ( x == x ) && ( y == y ) && ( z == z ) )
         {
-            result.push_back( x );
-            result.push_back( y );
-            result.push_back( z );
-
-            extraResult.push_back( curFA );
+            result.addVert( x, y, z, curFA );
         }
         else
         {

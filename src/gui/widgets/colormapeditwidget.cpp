@@ -302,13 +302,13 @@ void ColormapEditWidget::sliderChanged( float value, int id )
     pix.convertFromImage( *image );
     m_cLabel->setPixmap( pix );
 
-    for ( int i = 1; i < m_sliders.size() - 1; ++i )
+    for ( unsigned int i = 1; i < m_sliders.size() - 1; ++i )
     {
         m_sliders[i]->setMin( m_colormap.get( i - 1 ).value );
         m_sliders[i]->setMax( m_colormap.get( i + 1 ).value );
     }
-    m_sliders.first()->setMax( m_colormap.get( 1 ).value );
-    m_sliders.last()->setMin( m_colormap.get( m_colormap.size() - 2 ).value );
+    m_sliders.front()->setMax( m_colormap.get( 1 ).value );
+    m_sliders.back()->setMin( m_colormap.get( m_colormap.size() - 2 ).value );
 
     repaint();
 

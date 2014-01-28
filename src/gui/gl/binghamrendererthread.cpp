@@ -14,7 +14,7 @@
 
 #include "math.h"
 
-BinghamRendererThread::BinghamRendererThread( int id, QVector<std::vector<float> >* data, int nx, int ny, int nz,
+BinghamRendererThread::BinghamRendererThread( int id, std::vector<std::vector<float> >* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
                                                                 int lod,

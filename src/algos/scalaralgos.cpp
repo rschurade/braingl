@@ -519,7 +519,7 @@ QList<Dataset*> ScalarAlgos::createROI( Dataset* ds )
 
     std::vector<float>* data = dss->getData();
     std::vector<float> out( data->size(), 0.0 );
-    QVector<bool> mask( data->size(), true );
+    std::vector<bool> mask( data->size(), true );
 
     int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
     int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();

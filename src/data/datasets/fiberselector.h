@@ -8,6 +8,7 @@
 #ifndef FIBERSELECTOR_H_
 #define FIBERSELECTOR_H_
 
+#include "../../algos/fib.h"
 #include "../../algos/kdtree.h"
 
 #include <QVector>
@@ -20,11 +21,12 @@ class FiberSelector : public QObject
 
 public:
     FiberSelector( int numPoints = 0, int numLines = 0 );
+    FiberSelector( std::vector<float>* kdVerts, int numPoints = 0, int numLines = 0 );
     virtual ~FiberSelector();
 
-    void init( QVector< std::vector<float> >& data );
+    void init( std::vector<Fib>& fibs );
 
-    QVector<bool>* getSelection();
+    std::vector<bool>* getSelection();
     QModelIndex createIndex( int branch, int pos, int column );
 
 private:
@@ -36,14 +38,14 @@ private:
     bool m_isInitialized;
 
     KdTree* m_kdTree;
-    std::vector<float>m_kdVerts;
-    QVector<int>m_reverseIndexes;
-    QVector<int>m_lineStarts;
-    QVector<int>m_lineLengths;
+    std::vector<float>* m_kdVerts;
+    std::vector<int>m_reverseIndexes;
+    std::vector<int>m_lineStarts;
+    std::vector<int>m_lineLengths;
 
-    QVector<bool>m_rootfield;
-    QList<QVector<bool> >m_branchfields;
-    QList<QList<QVector<bool> > >m_bitfields;
+    std::vector<bool>m_rootfield;
+    QList<std::vector<bool> >m_branchfields;
+    QList<QList<std::vector<bool> > >m_bitfields;
 
     std::vector<float> m_boxMin;
     std::vector<float> m_boxMax;
@@ -61,8 +63,8 @@ private slots:
     void roiDeleted( const QModelIndex &parent, int start, int end );
 
     void updateROI( int branch, int pos );
-    void boxTest( QVector<bool>& workfield, int left, int right, int axis );
-    void sphereTest( QVector<bool>& workfield );
+    void boxTest( std::vector<bool>& workfield, int left, int right, int axis );
+    void sphereTest( std::vector<bool>& workfield );
 
     void updateBranch( int branch );
     void updateRoot();

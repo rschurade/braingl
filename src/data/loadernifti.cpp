@@ -33,11 +33,9 @@ LoaderNifti::~LoaderNifti()
     m_scalarData.clear();
     m_vectorData.clear();
     m_dataset.clear();
-    m_vectorData.squeeze();
-    m_dataset.squeeze();
 }
 
-QVector<Dataset*> LoaderNifti::getDataset()
+std::vector<Dataset*> LoaderNifti::getDataset()
 {
     return m_dataset;
 }
@@ -298,7 +296,6 @@ bool LoaderNifti::loadNiftiVector3D( QString fileName )
     nifti_image_free( filedata );
     Dataset3D* dataset = new Dataset3D( fileName, m_vectorData, m_header );
     m_vectorData.clear();
-    m_vectorData.squeeze();
     m_dataset.push_back( dataset );
     return true;
 }
@@ -355,7 +352,7 @@ bool LoaderNifti::loadNiftiTensor( QString fileName )
     size_t blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
 
-    QVector<Matrix> dataVector;
+    std::vector<Matrix> dataVector;
 
     try
     {
@@ -470,7 +467,7 @@ bool LoaderNifti::loadNiftiSH( QString fileName )
         order = 8;
     }
 
-    QVector<ColumnVector> dataVector;
+    std::vector<ColumnVector> dataVector;
 
     try
     {
@@ -554,7 +551,7 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
     size_t blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
 
-    QVector<std::vector<float> > dataVector;
+    std::vector<std::vector<float> > dataVector;
 
     try
     {
@@ -735,7 +732,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     }
     qDebug() << "num b0:" << numB0;
 
-    QVector<QVector3D> bvecs = loadBvecs( fileName, bvals );
+    std::vector<QVector3D> bvecs = loadBvecs( fileName, bvals );
     if ( bvecs.size() == 0 )
     {
         qDebug() << "*** ERROR *** while loading bvecs!";
@@ -751,13 +748,13 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     int numData = dim - numB0;
     qDebug() << "num data:" << numData;
 
-    if ( numData > dim || (int)bvals2.size() != bvecs.size() )
+    if ( numData > dim || bvals2.size() != bvecs.size() )
     {
         qDebug() << "*** ERROR *** parsing bval and bvec files!";
         return false;
     }
 
-    QVector<ColumnVector> dataVector;
+    std::vector<ColumnVector> dataVector;
 
     try
     {
@@ -810,7 +807,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
                     }
                 }
 
-                for ( int i = 0; i < bvecs.size(); ++i )
+                for ( unsigned int i = 0; i < bvecs.size(); ++i )
                 {
                     bvecs[i].setX( bvecs[i].x() * -1.0 );
                 }
@@ -883,7 +880,7 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
 
     qDebug() << "num data:" << dim;
 
-    QVector<ColumnVector> dataVector;
+    std::vector<ColumnVector> dataVector;
 
     try
     {
@@ -950,7 +947,7 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
             nifti_image* dsHdr = nifti_copy_nim_info( m_header );
 
             std::vector<float> bvals2;
-            QVector<QVector3D> bvecs;
+            std::vector<QVector3D> bvecs;
 
             float* extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
             for ( int i = 0; i < dim; ++i )
@@ -1038,14 +1035,14 @@ std::vector<float> LoaderNifti::loadBvals( QString fileName )
     }
 }
 
-QVector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<float> bvals )
+std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<float> bvals )
 {
     QString fn = m_fileName.path();
     fn.replace( ".nii.gz", ".bvec" );
     fn.replace( ".nii", ".bvec" );
     QDir dir2( fn );
 
-    QVector<QVector3D> bvecs;
+    std::vector<QVector3D> bvecs;
 
     while ( !dir2.exists( dir2.absolutePath() ) )
     {

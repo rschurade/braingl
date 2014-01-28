@@ -19,11 +19,11 @@ public:
 
     bool loadASC( QString fn );
 
-    std::vector<float> getPoints();
+    std::vector<float>* getPoints();
     std::vector<int> getTriangles();
 
 private:
-    std::vector<float> m_points;
+    std::vector<float>* m_points;
     std::vector<int> m_triangles;
 };
 

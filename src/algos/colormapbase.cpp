@@ -57,7 +57,7 @@ ColormapBase::ColormapBase( QList<QVariant> cm )
     }
 }
 
-ColormapBase::ColormapBase( QString name, QVector< ColormapPair > values ) :
+ColormapBase::ColormapBase( QString name, std::vector< ColormapPair > values ) :
     m_name( name ),
     m_values( values )
 {
@@ -80,11 +80,11 @@ QString ColormapBase::getName()
 
 void ColormapBase::insertValue( ColormapPair pair )
 {
-    for ( int i = 1; i < m_values.size(); ++i )
+    for ( unsigned int i = 1; i < m_values.size(); ++i )
     {
         if ( m_values[i-1].value <= pair.value &&  m_values[i].value > pair.value )
         {
-            m_values.insert( i, pair );
+            m_values.insert( m_values.begin() + i, 1, pair );
             break;
         }
     }
@@ -102,7 +102,7 @@ void ColormapBase::removeValue( int index )
 {
     if ( index > 0 && index < ( m_values.size() - 1 ) )
     {
-        m_values.remove( index, 1 );
+        m_values.erase( m_values.begin() + index );
     }
 }
 
@@ -113,7 +113,7 @@ QColor ColormapBase::getColor( float value )
     float value1 = 0.0;
     float value2 = 1.0;
 
-    for ( int i = 1; i < m_values.size(); ++i )
+    for ( unsigned int i = 1; i < m_values.size(); ++i )
     {
         if ( value >=m_values[i-1].value &&  value <= m_values[i].value )
         {
@@ -141,7 +141,7 @@ QString ColormapBase::getCode()
                                                                 QString::number( c0.greenF(), 'f', 2 ) + ", " +
                                                                 QString::number( c0.blueF(), 'f', 2 ) + " ); \n";
     code += "    }\n";
-    for( int i = 1; i < m_values.size(); ++i )
+    for( unsigned int i = 1; i < m_values.size(); ++i )
     {
         QColor c1 = m_values[i-1].color;
         float v1 = m_values[i-1].value;
@@ -156,7 +156,7 @@ QString ColormapBase::getCode()
         code += "    } \n";
     }
 
-    c0 = m_values.last().color;
+    c0 = m_values.back().color;
     code += "    if ( value >= 1.0 )\n";
     code += "    { \n";
     code += "        color = vec3( " + QString::number( c0.redF(), 'f', 2 ) + ", " +
@@ -174,7 +174,7 @@ int ColormapBase::size()
 
 ColormapPair ColormapBase::get( int id )
 {
-    id = qMax( 0, qMin( m_values.size() - 1, id ) );
+    id = qMax( 0, qMin( (int)m_values.size() - 1, id ) );
     return m_values[id];
 }
 
@@ -193,7 +193,7 @@ QList<QVariant>ColormapBase::serialize()
     QList<QVariant>out;
 
     out.push_back( m_name );
-    for ( int i = 0; i < m_values.size(); ++i )
+    for ( unsigned int i = 0; i < m_values.size(); ++i )
     {
         out.push_back( m_values[i].value );
         out.push_back( m_values[i].color.redF() );
