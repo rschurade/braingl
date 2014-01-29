@@ -60,6 +60,8 @@ QList<Dataset*> FiberAlgos::cutSelecteded( Dataset* ds )
     QList<Dataset*> l;
 
     DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), selected, dataNames );
+    out->setDataMins( f->getDataMins() );
+    out->setDataMaxes( f->getDataMaxes() );
     l.push_back( out );
 
     return l;

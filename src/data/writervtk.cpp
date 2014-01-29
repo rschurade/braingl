@@ -141,7 +141,7 @@ void WriterVTK::saveFibs( QString filename, bool binary )
                 Fib fib = fibs->at( k );
                 for ( unsigned int l = 0; l < fib.length(); ++l )
                 {
-                    dataArray->InsertNextValue( fib.getData( k, l ) );
+                    dataArray->InsertNextValue( fib.getData( i, l ) );
                 }
             }
             newPolyData->GetPointData()->AddArray( dataArray );

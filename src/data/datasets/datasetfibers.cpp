@@ -513,7 +513,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 void DatasetFibers::colorChanged()
 {
     std::vector<bool>*selected = m_selector->getSelection();
-    for ( int i = 0; i < m_numLines; ++i )
+    for ( unsigned int i = 0; i < m_numLines; ++i )
     {
         if ( selected->at( i ) )
         {
