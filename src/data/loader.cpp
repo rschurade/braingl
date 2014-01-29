@@ -565,16 +565,16 @@ bool Loader::loadGlyphset()
 
         QString roiname = trunk + QDir::separator() + sl2.at( 3 );
         qDebug() << "loading ROI: " << roiname;
-        dataset->loadROI( roiname );
+        dataset->loadROI( roiname, dataset->roi );
         if ( sl2.length() > 4 )
         {
             QString roiname2 = trunk + QDir::separator() + sl2.at( 4 );
             qDebug() << "loading ROI2: " << roiname2;
-            dataset->loadROI2( roiname2 );
+            dataset->loadROI( roiname2, dataset->roi2 );
         }
     }
 
-    //3: load connectivity: put this into seperate loader / dataset / here
+    //3: load connectivity
     qDebug() << "loading connectivity";
     dataset->readConnectivity( connectivityName );
 
