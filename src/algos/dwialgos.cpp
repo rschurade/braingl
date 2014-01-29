@@ -281,7 +281,9 @@ QList<Dataset*> DWIAlgos::tensorTrack( Dataset* ds )
     QList<Dataset*> l;
     if ( tracker->getFibs().size() > 0 )
     {
-        DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers"  ), tracker->getFibs() );
+        QList<QString>dataNames;
+        dataNames.push_back( "fa" );
+        DatasetFibers* fibs = new DatasetFibers( QDir( "new fibers"  ), tracker->getFibs(), dataNames );
         l.push_back( fibs );
     }
     return l;

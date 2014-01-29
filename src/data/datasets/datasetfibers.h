@@ -27,7 +27,7 @@ class DatasetFibers : public Dataset
 
 public:
     DatasetFibers( QDir filename, Fn::DatasetType type );
-    DatasetFibers( QDir name, std::vector<Fib> fibs, QList<QString> dataNames = QList<QString>() );
+    DatasetFibers( QDir name, std::vector<Fib> fibs, QList<QString> dataNames );
     DatasetFibers( QDir filename, LoaderVTK* lv );
     virtual ~DatasetFibers();
 
