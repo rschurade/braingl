@@ -976,6 +976,7 @@ bool Loader::loadMRtrix()
         {
             fibs.push_back( fib );
             fib.clear();
+            fib.addDataField();
             continue;
         }
 
@@ -985,7 +986,9 @@ bool Loader::loadMRtrix()
     qba.squeeze();
 
     QString fn = m_fileName.path();
-    DatasetFibers* dataset = new DatasetFibers( fn, fibs );
+    QList<QString>dataNames;
+    dataNames.push_back( "no data" );
+    DatasetFibers* dataset = new DatasetFibers( fn, fibs, dataNames );
     m_dataset.push_back( dataset );
 
     return true;
