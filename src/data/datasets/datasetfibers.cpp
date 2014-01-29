@@ -31,7 +31,6 @@ DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     m_numPoints( 0 ),
     m_numLines( 0 )
 {
-    createProps();
 }
 
 DatasetFibers::DatasetFibers( QDir filename, std::vector<Fib> fibs, QList<QString> dataNames ) :

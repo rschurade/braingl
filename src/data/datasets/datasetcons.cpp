@@ -17,7 +17,8 @@ DatasetCons::DatasetCons( QString fileName ) :
 }
 
 DatasetCons::DatasetCons( Connections* cons ) :
-    DatasetFibers( QString( "new" ), Fn::DatasetType::CONS ), cons( cons )
+    DatasetFibers( QString( "new" ), Fn::DatasetType::CONS ),
+    cons( cons )
 {
     init();
 }
@@ -37,10 +38,12 @@ void DatasetCons::init()
         Fib fib;
         fib.addVert( f.x(), f.y(), f.z() );
         fib.addVert( t.x(), t.y(), t.z() );
+        fib.setData( 0, 0, e->m_value );
+        fib.setData( 0, 1, e->m_value );
         m_fibs.push_back( fib );
     }
 
-    m_dataNames.push_back( "no data" );
+    m_dataNames.push_back( "value" );
 
     createProps();
 
