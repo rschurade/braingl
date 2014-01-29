@@ -204,6 +204,10 @@ void ToolBar::createActions()
     m_colorLittleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "load rgb on little brains" ), this, Fn::Algo::COLOR_LITTLE_BRAINS );
     m_colorLittleBrainsAction->setStatusTip( tr( "color little brains" ) );
     connect( m_colorLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_applyROIAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "apply surface color as ROI" ), this, Fn::Algo::APPLY_ROI_BRAINS );
+    m_applyROIAction->setStatusTip( tr( "apply color as ROI" ) );
+    connect( m_applyROIAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -404,7 +408,12 @@ void ToolBar::slot( Fn::Algo algo )
         }
         case Fn::Algo::COLOR_LITTLE_BRAINS:
         {
-            ( (DatasetGlyphset*)ds )->colorLittleBrains();
+            ( (DatasetGlyphset*) ds )->colorLittleBrains();
+            break;
+        }
+        case Fn::Algo::APPLY_ROI_BRAINS:
+        {
+            ( (DatasetGlyphset*) ds )->applyROI();
             break;
         }
 
@@ -490,6 +499,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
             //this->addAction( m_deleteLittleBrainsAction );
+            this->addAction( m_applyROIAction );
             break;
         }
         case Fn::DatasetType::CONS:
