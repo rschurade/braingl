@@ -20,6 +20,7 @@
 #include "datasets/datasetcorrelation.h"
 #include "mesh/trianglemesh2.h"
 
+#include "../algos/fib.h"
 #include "../algos/fmath.h"
 
 #include <QDebug>
@@ -284,8 +285,15 @@ bool Writer::save()
             break;
         case Fn::DatasetType::FIBERS:
         {
-            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
-            vtkWriter->save();
+            if ( m_filter.endsWith( "(*.json)" ) )
+            {
+                saveFibJson();
+            }
+            else
+            {
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
+                vtkWriter->save();
+            }
         }
             break;
         case Fn::DatasetType::MESH_BINARY:
@@ -824,5 +832,102 @@ void Writer::saveBinaryConnectivity()
         DatasetCorrelation* dsc = dynamic_cast<DatasetCorrelation*>( m_dataset );
         qDebug() << "saving binary connectivity matrix";
         dsc->saveBinaryMatrix( m_fileName.absoluteFilePath() );
+    }
+}
+
+void Writer::saveFibJson()
+{
+    if ( dynamic_cast<DatasetFibers*>( m_dataset ) )
+    {
+        DatasetFibers* dsf = dynamic_cast<DatasetFibers*>( m_dataset );
+        QFile outFile( m_fileName.absoluteFilePath() );
+        if ( !outFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &outFile );
+
+        unsigned int numVerts = dsf->numVerts();
+        unsigned int numLines = dsf->numLines();
+        std::vector<Fib>* fibs = dsf->getFibs();
+        QVector3D vert;
+
+        out << "{" << endl;
+        out << "  \"vertices\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                vert = fibs->at( i )[k];
+                out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+            }
+        }
+
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+            vert = fibs->back()[k];
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+
+        vert = fibs->back().lastVert();
+        out << vert.x() << "," << vert.y() << "," << vert.z();// << endl;
+
+        out << "]," << endl;
+
+        out << "  \"normals\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                vert = fibs->at( i ).getTangent( k );
+                out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+            }
+        }
+
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+            vert = fibs->back().getTangent( k );
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+
+        vert = fibs->back().getTangent( fibs->back().length() - 1 );
+        out << vert.x() << "," << vert.y() << "," << vert.z() << "]," << endl;
+
+        out << "  \"colors\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            QColor col = fibs->at( i ).customColor();
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0,";
+            }
+        }
+
+        QColor col = fibs->back().customColor();
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+
+            out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0,";
+        }
+        out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0]," << endl;;
+
+        out << "  \"indices\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1; ++i )
+        {
+            out << fibs->at( i ).length() << ",";
+        }
+        out << fibs->back().length() << "]" << endl;
+
+        out << "}";
+
+        outFile.close();
     }
 }

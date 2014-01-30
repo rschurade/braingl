@@ -186,7 +186,7 @@ QVector3D Fib::getTangent( const unsigned int& id ) const
     {
         unsigned int p1 = qMin( 0u, qMax( 0u, id - 1 ) );
         unsigned int p2 = qMax( id + 1, (unsigned int)m_verts.size() - 1 );
-        QVector3D t = ( m_verts[p1] -m_verts[p2] ).normalized();
+        QVector3D t = ( m_verts[p1] - m_verts[p2] ).normalized();
         return t;
     }
     else

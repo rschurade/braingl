@@ -34,6 +34,9 @@ public:
     std::vector<Fib>* getFibs();
     std::vector<Fib> getSelectedFibs();
 
+    unsigned int numVerts();
+    unsigned int numLines();
+
     QList<QString> getDataNames();
     QString getSaveFilter();
     QString getDefaultSuffix();
