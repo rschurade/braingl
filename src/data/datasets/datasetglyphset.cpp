@@ -1079,8 +1079,7 @@ void DatasetGlyphset::setProperties()
     m_properties["maingl"]->createList( Fn::Property::D_SURFACE_GLYPH_COLOR, m_displayList, 0, "glyphs" );
     if ( m_is_split )
     {
-        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT,
-        { "both", "left", "right" }, 0, "general" );
+        m_properties["maingl"]->createList( Fn::Property::D_LEFT_RIGHT, { "both", "left", "right" }, 0, "general" );
     }
     littleBrains.clear();
     littleMeshes.clear();
@@ -1108,6 +1107,11 @@ void DatasetGlyphset::applyROI()
     }
     glyphsChanged = true;
     m_correlations->makeHistogram( roi );
+}
+
+void DatasetGlyphset::switchGlyphsOff()
+{
+    m_properties["maingl"]->set( Fn::Property::D_GLYPHSTYLE, 4 );
 }
 
 void DatasetGlyphset::loadROI( QString filename, bool* roin )

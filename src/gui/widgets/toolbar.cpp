@@ -412,10 +412,15 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         }
         case Fn::Algo::APPLY_ROI_BRAINS:
-        {
-            ( (DatasetGlyphset*) ds )->applyROI();
-            break;
-        }
+            if ( mods & Qt::ShiftModifier )
+            {
+                ( (DatasetGlyphset*) ds )->switchGlyphsOff();
+            }
+            else
+            {
+                ( (DatasetGlyphset*) ds )->applyROI();
+                break;
+            }
 
     }
     qDebug() << "adding " << l.size() << " datasets";
