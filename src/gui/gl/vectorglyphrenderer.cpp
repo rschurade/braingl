@@ -102,19 +102,22 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     float scale = ( mv_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-
-    setShaderVars( props );
-
-    glShadeModel( GL_SMOOTH );
-    glEnable( GL_POINT_SMOOTH );
-
-    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool()  && (np > 0) )
+    if ( np > 0 )
     {
-        glDrawArrays( GL_LINES, 0, np * 2 );
-    }
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        setShaderVars( props );
+
+        glShadeModel( GL_SMOOTH );
+        glEnable( GL_POINT_SMOOTH );
+
+        if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+        {
+            glDrawArrays( GL_LINES, 0, np * 2 );
+        }
+
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
 }
 
 void VectorGlyphRenderer::setupTextures()
@@ -175,9 +178,12 @@ void VectorGlyphRenderer::initGeometry( float* points, int number )
 
     qDebug() << np * 2 * ao * sizeof(GLfloat);
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-    //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
-    glBufferData( GL_ARRAY_BUFFER, np * 2 * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
+    if ( np > 0 )
+    {
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
+        //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
+        glBufferData( GL_ARRAY_BUFFER, np * 2 * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
+    }
 }
 
 void VectorGlyphRenderer::setRenderParams( PropertyGroup* props )
