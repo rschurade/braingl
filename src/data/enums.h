@@ -82,7 +82,8 @@ namespace Fn
         FIBER_BUNDLING,
         CREATE_ROI,
         DELETE_LITTLE_BRAINS,
-        COLOR_LITTLE_BRAINS
+        COLOR_LITTLE_BRAINS,
+        APPLY_ROI_BRAINS
     };
 
     enum class Orient : int

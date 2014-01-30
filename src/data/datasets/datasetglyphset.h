@@ -34,7 +34,6 @@ public:
 
     void readConnectivity( QString filename );
     void addCorrelation( float** corr );
-    void setMinthresh( float mt );
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
@@ -55,23 +54,23 @@ public:
     QList<Dataset*> createConnections();
 
     void exportColors();
-    void loadROI( QString filename );
-    void loadROI2( QString filename );
+    void loadROI( QString filename, bool* roin );
     void initROI();
     void avgCon();
     void avgConRtoZ();
     void makeLittleBrains();
     void colorLittleBrains();
     void deleteLittleBrains();
+    void applyROI();
 
     int m_tris_middle;
     int m_points_middle;
     bool m_is_split;
 
-private:
     bool* roi;
     bool* roi2;
 
+private:
     int m_n;  //number of vertices, has to match size of matrix
 
     float* consArray;
@@ -90,10 +89,10 @@ private:
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode, prevThreshSign;
     float prevThresh, prevMinlength;
+    bool glyphsChanged;
 
     QString m_colors_name;
 
-    //int pickedID;
     std::vector<LittleBrainRenderer*> littleBrains;
     std::vector<TriangleMesh2*> littleMeshes;
     std::vector<QVector3D> shifts1;
