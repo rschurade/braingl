@@ -61,6 +61,7 @@ public:
     void makeLittleBrains();
     void colorLittleBrains();
     void deleteLittleBrains();
+    void switchGlyphsOff();
     void applyROI();
 
     int m_tris_middle;
