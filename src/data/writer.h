@@ -42,6 +42,7 @@ private:
     void saveMeshJson();
     void saveMeshAsc();
     void saveBinaryConnectivity();
+    void saveFibJson();
 };
 
 #endif /* WRITER_H_ */

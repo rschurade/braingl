@@ -429,7 +429,7 @@ void DatasetFibers::applyTransform()
 
 QString DatasetFibers::getSaveFilter()
 {
-    return QString( "fib files binary(*.fib *.vtk );;fib files ascii (*.fib *.vtk);;all files (*.*)" );
+    return QString( "fib files binary(*.fib *.vtk);;fib files ascii (*.fib *.vtk);;fib files json (*.json);;all files (*.*)" );
 }
 
 QString DatasetFibers::getDefaultSuffix()
@@ -586,4 +586,14 @@ void DatasetFibers::setDataMins( std::vector<float> mins )
 void DatasetFibers::setDataMaxes( std::vector<float> maxes )
 {
     m_dataMaxes = maxes;
+}
+
+unsigned int DatasetFibers::numVerts()
+{
+    return m_numPoints;
+}
+
+unsigned int DatasetFibers::numLines()
+{
+    return m_numLines;
 }
