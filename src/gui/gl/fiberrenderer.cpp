@@ -244,7 +244,7 @@ void FiberRenderer::initGeometry()
 
         QVector3D secondVert = fib.getVert( 1 );
 
-        QVector3D localColor( fabs( lineStart.x() - secondVert.x() ), fabs( lineStart.y() - secondVert.y() ), fabs( lineStart.z() - secondVert.z() ) );
+        QVector3D localColor( lineStart.x() - secondVert.x(), lineStart.y() - secondVert.y(), lineStart.z() - secondVert.z() );
         localColor.normalize();
 
         verts.push_back( localColor.x() );
@@ -257,7 +257,7 @@ void FiberRenderer::initGeometry()
             verts.push_back( fib[k].y() );
             verts.push_back( fib[k].z() );
 
-            QVector3D localColor( fabs( fib[k-1].x() - fib[k+1].x() ), fabs( fib[k-1].y() - fib[k+1].y() ), fabs( fib[k-1].z() - fib[k+1].z() ) );
+            QVector3D localColor( fib[k-1].x() - fib[k+1].x(), fib[k-1].y() - fib[k+1].y(), fib[k-1].z() - fib[k+1].z() );
             localColor.normalize();
 
             verts.push_back( localColor.x() );
@@ -272,7 +272,7 @@ void FiberRenderer::initGeometry()
         verts.push_back( lineEnd.z() );
 
         QVector3D sec2last = fib[ fib.length() - 2 ];
-        QVector3D localColor2( fabs( sec2last.x() - lineEnd.x() ), fabs( sec2last.y() - lineEnd.y() ), fabs( sec2last.z() - lineEnd.z() ) );
+        QVector3D localColor2( sec2last.x() - lineEnd.x(), sec2last.y() - lineEnd.y(), sec2last.z() - lineEnd.z() );
         localColor.normalize();
 
         verts.push_back( localColor2.x() );
