@@ -94,7 +94,7 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     glShadeModel( GL_FLAT );
 
     int start = 0;
-    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() && (np > 0) )
     {
         for ( int i = 0; i < n; i++ )
         {
