@@ -491,13 +491,12 @@ bool Loader::loadGlyphset()
             std::vector<float>* opoints;
             std::vector<int> otriangles;
             QVector3D* os = new QVector3D( 0, 0, 0 );
+            LoaderFreesurfer olf;
             if ( two )
             {
                 QStringList osl;
                 osl = onl.split( " " );
                 QString ofullname = trunk + QDir::separator() + osl.at( 0 );
-
-                LoaderFreesurfer olf;
 
                 if ( !olf.loadASC( ofullname ) )
                 {
