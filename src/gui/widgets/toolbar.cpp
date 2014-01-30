@@ -205,7 +205,7 @@ void ToolBar::createActions()
     m_colorLittleBrainsAction->setStatusTip( tr( "color little brains" ) );
     connect( m_colorLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_applyROIAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "apply surface color as ROI" ), this, Fn::Algo::APPLY_ROI_BRAINS );
+    m_applyROIAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "create glyphs" ), this, Fn::Algo::APPLY_ROI_BRAINS );
     m_applyROIAction->setStatusTip( tr( "apply color as ROI" ) );
     connect( m_applyROIAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }

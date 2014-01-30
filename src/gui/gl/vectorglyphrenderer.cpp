@@ -109,7 +109,7 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
     glShadeModel( GL_SMOOTH );
     glEnable( GL_POINT_SMOOTH );
 
-    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool()  && (np > 0) )
     {
         glDrawArrays( GL_LINES, 0, np * 2 );
     }
