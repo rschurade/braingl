@@ -411,6 +411,19 @@ void DatasetFibers::applyTransform()
     m_tubeRenderer = 0;
     delete m_selector;
     m_selector = 0;
+    m_kdVerts->clear();
+    m_kdVerts->reserve( m_numPoints * 3 );
+    for ( int i = 0; i < m_fibs.size(); ++i )
+    {
+        for ( int k = 0; k < m_fibs[i].length(); ++k )
+        {
+            m_kdVerts->push_back( m_fibs[i][k].x() );
+            m_kdVerts->push_back( m_fibs[i][k].y() );
+            m_kdVerts->push_back( m_fibs[i][k].z() );
+        }
+
+    }
+
     Models::d()->submit();
 }
 

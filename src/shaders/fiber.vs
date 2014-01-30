@@ -9,6 +9,7 @@ out float v_discard;
 void main()
 {
 	v_normal = normalize( a_normal );
+	
 	v_extra = a_extra;
 	v_index = a_indexes;
 	
@@ -37,7 +38,7 @@ void main()
 	}
 	else if ( u_colorMode == 1 )
 	{
-	   frontColor = vec4( abs( v_normal ), 1.0 );
+	   frontColor = vec4( abs( a_normal ), 1.0 );
 	}
 	else
     {
