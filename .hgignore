@@ -7,3 +7,6 @@ syntax: regexp
 ^build$
 syntax: regexp
 ^tmp$
+
+syntax: regexp
+^build2$

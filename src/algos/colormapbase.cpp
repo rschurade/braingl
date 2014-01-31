@@ -100,7 +100,7 @@ void ColormapBase::insertValue( float value, QColor color )
 
 void ColormapBase::removeValue( int index )
 {
-    if ( index > 0 && index < ( m_values.size() - 1 ) )
+    if ( index > 0 && index < (int)( m_values.size() - 1 ) )
     {
         m_values.erase( m_values.begin() + index );
     }
