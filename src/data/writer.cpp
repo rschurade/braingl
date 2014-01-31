@@ -847,7 +847,7 @@ void Writer::saveFibJson()
         }
         QTextStream out( &outFile );
 
-        unsigned int numVerts = dsf->numVerts();
+        //unsigned int numVerts = dsf->numVerts();
         unsigned int numLines = dsf->numLines();
         std::vector<Fib>* fibs = dsf->getFibs();
         QVector3D vert;
