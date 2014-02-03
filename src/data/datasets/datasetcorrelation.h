@@ -10,7 +10,7 @@
 
 #include "datasetmesh.h"
 
-#include "correlationmatrix.h"
+#include "../../algos/correlationmatrix.h"
 
 class TriangleMesh2;
 class MeshRenderer;

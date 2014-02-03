@@ -488,7 +488,7 @@ bool Loader::loadGlyphset()
 
             int onumPoints = 0;
             int onumTriangles = 0;
-            std::vector<float>* opoints;
+            std::vector<float>* opoints = new std::vector<float>();
             std::vector<int> otriangles;
             QVector3D* os = new QVector3D( 0, 0, 0 );
             LoaderFreesurfer olf;
