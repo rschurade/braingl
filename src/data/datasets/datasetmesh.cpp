@@ -273,7 +273,8 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
                 }
                 else if ( paintMode == 2 ) //paint values
                 {
-                    float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    //float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    float value = m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
                     if ( value < 0.0 )
                     {
                         value = 0.0;
