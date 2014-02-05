@@ -30,8 +30,7 @@ LoaderNifti::LoaderNifti( QDir fileName ) :
 
 LoaderNifti::~LoaderNifti()
 {
-    m_scalarData.clear();
-    m_vectorData.clear();
+    m_data.clear();
     m_dataset.clear();
 }
 
@@ -59,52 +58,80 @@ bool LoaderNifti::load()
         return false;
     }
 
-    if ( m_header->dim[4] == 1 || m_header->dim[4] == 0 )
+    if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) )
     {
-        m_datasetType = Fn::DatasetType::NIFTI_SCALAR;
-        return loadNiftiScalar( fn );
+        qDebug() << "braingl dwi dataset found";
+        m_datasetType = Fn::DatasetType::NIFTI_DWI;
+        return loadNiftiDWI_FNAV2( fn );
     }
-    else if ( m_header->dim[4] == 3 )
+
+    if ( !loadData( fn ) )
     {
-        m_datasetType = Fn::DatasetType::NIFTI_VECTOR;
-        return loadNiftiVector3D( fn );
+        return false;
     }
-    else if ( m_header->dim[4] == 6 )
+
+    int dim = m_header->dim[4];
+
+    if ( dim > 1 && askTimeSeries( dim ) )
     {
-        m_datasetType = Fn::DatasetType::NIFTI_TENSOR;
-        return loadNiftiTensor( fn );
+        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
+        return loadNiftiFMRI();
     }
-    else if ( m_header->dim[4] == 27 )
+
+    switch ( dim )
     {
-        m_datasetType = Fn::DatasetType::NIFTI_BINGHAM;
-        return loadNiftiBingham( fn );
-    }
-    else if ( m_header->dim[4] == 15 || m_header->dim[4] == 28 || m_header->dim[4] == 45 )
-    {
-        m_datasetType = Fn::DatasetType::NIFTI_SH;
-        return loadNiftiSH( fn );
-    }
-    else if ( m_header->dim[4] > 3 )
-    {
-        if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) )
+        case 0:
+        case 1 :
+            m_datasetType = Fn::DatasetType::NIFTI_SCALAR;
+            return loadNiftiScalar();
+            break;
+        case 3:
         {
-            qDebug() << "fnav2 dwi dataset found";
-            m_datasetType = Fn::DatasetType::NIFTI_DWI;
-            return loadNiftiDWI_FNAV2( fn );
+            m_datasetType = Fn::DatasetType::NIFTI_VECTOR;
+            return loadNiftiVector3D();
         }
-        else if ( m_header->datatype == 16 )
+        case 6:
         {
-            qDebug() << "fmri dataset found";
-            m_datasetType = Fn::DatasetType::NIFTI_FMRI;
-            return loadNiftiFMRI( fn );
+            m_datasetType = Fn::DatasetType::NIFTI_TENSOR;
+            return loadNiftiTensor();
         }
-        else
+        case 27:
+        {
+            m_datasetType = Fn::DatasetType::NIFTI_BINGHAM;
+            return loadNiftiBingham();
+        }
+        case 15:
+        case 28:
+        case 45:
+        {
+                m_datasetType = Fn::DatasetType::NIFTI_SH;
+                return loadNiftiSH();
+        }
+        default:
         {
             m_datasetType = Fn::DatasetType::NIFTI_DWI;
             return loadNiftiDWI( fn );
         }
     }
     return false;
+}
+
+bool LoaderNifti::askTimeSeries( int dim )
+{
+    QMessageBox msgBox;
+    msgBox.setText( "Found " + QString::number( dim ) + " images in nifti file." );
+    msgBox.setInformativeText( "Interpret as fmri time series?" );
+    msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    msgBox.setDefaultButton( QMessageBox::Yes );
+    int ret = msgBox.exec();
+    if ( ret == QMessageBox::Yes )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool LoaderNifti::loadNiftiHeader( QString hdrPath )
@@ -127,16 +154,19 @@ bool LoaderNifti::loadNiftiHeader( QString hdrPath )
     }
 }
 
-bool LoaderNifti::loadNiftiScalar( QString fileName )
+bool LoaderNifti::loadData( QString fileName )
 {
+    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     int dimX = m_header->dim[1];
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
+    int blockSize = dimX * dimY * dimZ;
+    int dim = qMax( 1, m_header->dim[4] );
+    qDebug() << "num images:" << dim;
 
-    size_t blockSize = dimX * dimY * dimZ;
     try
     {
-        m_scalarData.resize( blockSize );
+        m_data.resize( blockSize * dim );
     }
     catch ( std::bad_alloc& )
     {
@@ -144,213 +174,143 @@ bool LoaderNifti::loadNiftiScalar( QString fileName )
         return false;
     }
 
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
+    qDebug() << "start loading data";
 
     switch ( m_header->datatype )
     {
         case NIFTI_TYPE_UINT8:
         {
             uint8_t* inputData = reinterpret_cast<uint8_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_INT16:
         {
             int16_t* inputData = reinterpret_cast<int16_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_INT32:
         {
             int32_t* inputData = reinterpret_cast<int32_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_UINT32:
         {
             uint32_t* inputData = reinterpret_cast<uint32_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_FLOAT32:
         {
             float* inputData = reinterpret_cast<float*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_INT8:
         {
             int8_t* inputData = reinterpret_cast<int8_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
         case NIFTI_TYPE_UINT16:
         {
             uint16_t* inputData = reinterpret_cast<uint16_t*>( filedata->data );
-            copyScalar( inputData );
+            copyData( inputData );
             break;
         }
     }
-
     nifti_image_free( filedata );
-    DatasetScalar* dataset = new DatasetScalar( fileName, m_scalarData, m_header );
-    m_scalarData.clear();
-    m_dataset.push_back( dataset );
     return true;
 }
 
-template<typename T> void LoaderNifti::copyScalar( T* inputData )
+template<typename T> void LoaderNifti::copyData( T* inputData )
 {
     int dimX = m_header->dim[1];
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
-
-    int index = 0;
-    if ( isRadialogical() )
-    {
-        for ( int z = 0; z < dimZ; ++z )
-        {
-            for ( int y = 0; y < dimY; ++y )
-            {
-                for ( int x = dimX - 1; x >= 0; --x )
-                {
-                    m_scalarData[index++] = static_cast<float>( inputData[x + y * dimX + z * dimX * dimY] );
-                }
-            }
-        }
-    }
-    else
-    {
-        for ( int z = 0; z < dimZ; ++z )
-        {
-            for ( int y = 0; y < dimY; ++y )
-            {
-                for ( int x = 0; x < dimX; ++x )
-                {
-                    m_scalarData[index++] = static_cast<float>( inputData[x + y * dimX + z * dimX * dimY] );
-                }
-            }
-        }
-    }
-}
-
-bool LoaderNifti::loadNiftiVector3D( QString fileName )
-{
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    size_t blockSize = dimX * dimY * dimZ;
-
-    try
-    {
-        m_vectorData.resize( blockSize );
-    }
-    catch ( std::bad_alloc& )
-    {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
-        return false;
-    }
-
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-
-    switch ( m_header->datatype )
-    {
-        case NIFTI_TYPE_UINT8:
-        {
-            uint8_t* inputData = reinterpret_cast<uint8_t*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-        case NIFTI_TYPE_INT16:
-        {
-            int16_t* inputData = reinterpret_cast<int16_t*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-        case NIFTI_TYPE_INT32:
-        {
-            int32_t* inputData = reinterpret_cast<int32_t*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-        case NIFTI_TYPE_FLOAT32:
-        {
-            float* inputData = reinterpret_cast<float*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-        case NIFTI_TYPE_INT8:
-        {
-            int8_t* inputData = reinterpret_cast<int8_t*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-        case NIFTI_TYPE_UINT16:
-        {
-            uint16_t* inputData = reinterpret_cast<uint16_t*>( filedata->data );
-            copyVector( inputData );
-            break;
-        }
-    }
-
-    nifti_image_free( filedata );
-    Dataset3D* dataset = new Dataset3D( fileName, m_vectorData, m_header );
-    m_vectorData.clear();
-    m_dataset.push_back( dataset );
-    return true;
-}
-
-template<typename T> void LoaderNifti::copyVector( T* inputData )
-{
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    size_t blockSize = dimX * dimY * dimZ;
-
-    int id = 0;
-    int index = 0;
-    if ( isRadialogical() )
-    {
-        for ( int z = 0; z < dimZ; ++z )
-        {
-            for ( int y = 0; y < dimY; ++y )
-            {
-                for ( int x = dimX - 1; x >= 0; --x )
-                {
-                    id = x + y * dimX + z * dimX * dimY;
-                    m_vectorData[index].setX( inputData[id] );
-                    m_vectorData[index].setY( inputData[blockSize + id] );
-                    m_vectorData[index++].setZ( inputData[2 * blockSize + id] );
-                }
-            }
-        }
-    }
-    else
-    {
-        for ( int z = 0; z < dimZ; ++z )
-        {
-            for ( int y = 0; y < dimY; ++y )
-            {
-                for ( int x = 0; x < dimX; ++x )
-                {
-                    id = x + y * dimX + z * dimX * dimY;
-                    m_vectorData[index].setX( inputData[id] );
-                    m_vectorData[index].setY( inputData[blockSize + id] );
-                    m_vectorData[index++].setZ( inputData[2 * blockSize + id] );
-                }
-            }
-        }
-    }
-}
-
-bool LoaderNifti::loadNiftiTensor( QString fileName )
-{
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    size_t blockSize = dimX * dimY * dimZ;
+    int blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
+
+    int index = 0;
+
+    if ( isRadialogical() )
+    {
+
+        for ( int z = 0; z < dimZ; ++z )
+        {
+            for ( int y = 0; y < dimY; ++y )
+            {
+                for ( int x = dimX - 1; x >= 0; --x )
+                {
+                    int id = x + y * dimX + z * dimX * dimY;
+                    for ( int i = 0; i < dim; ++i )
+                    {
+                        m_data[i*blockSize+index] = inputData[i*blockSize+id];
+                    }
+                    ++index;
+                }
+            }
+        }
+    }
+    else
+    {
+        for ( int z = 0; z < dimZ; ++z )
+        {
+            for ( int y = 0; y < dimY; ++y )
+            {
+                for ( int x = 0; x < dimX; ++x )
+                {
+                    int id = x + y * dimX + z * dimX * dimY;
+                    for ( int i = 0; i < dim; ++i )
+                    {
+                        m_data[i*blockSize+index] = inputData[i*blockSize+id];
+                    }
+                    ++index;
+                }
+            }
+        }
+    }
+}
+
+
+bool LoaderNifti::loadNiftiScalar()
+{
+    DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
+    m_data.clear();
+    m_dataset.push_back( dataset );
+    return true;
+}
+
+bool LoaderNifti::loadNiftiVector3D()
+{
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    size_t blockSize = dimX * dimY * dimZ;
+
+    std::vector<QVector3D>vectorData( blockSize );
+
+    for ( unsigned int i = 0; i < blockSize; ++i )
+    {
+        vectorData[i].setX( m_data[i] );
+        vectorData[i].setY( m_data[i + blockSize] );
+        vectorData[i].setZ( m_data[i + 2 * blockSize] );
+    }
+
+    Dataset3D* dataset = new Dataset3D( m_fileName.path(), vectorData, m_header );
+    m_data.clear();
+    m_dataset.push_back( dataset );
+    return true;
+}
+
+bool LoaderNifti::loadNiftiTensor()
+{
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    size_t blockSize = dimX * dimY * dimZ;
 
     std::vector<Matrix> dataVector;
 
@@ -364,90 +324,29 @@ bool LoaderNifti::loadNiftiTensor( QString fileName )
         return false;
     }
 
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
+    for ( unsigned int i = 0; i < blockSize; ++i )
     {
-        case NIFTI_TYPE_FLOAT32:
-        {
-            float* inputData = reinterpret_cast<float*>( filedata->data );
-
-            if ( isRadialogical() )
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = dimX - 1; x >= 0; --x )
-                        {
-                            ColumnVector v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v( j + 1 ) = inputData[j * blockSize + id];
-                            }
-                            Matrix m( 3, 3 );
-                            m( 1, 1 ) = v( 1 );
-                            m( 1, 2 ) = v( 2 );
-                            m( 1, 3 ) = v( 3 );
-                            m( 2, 1 ) = v( 2 );
-                            m( 2, 2 ) = v( 4 );
-                            m( 2, 3 ) = v( 5 );
-                            m( 3, 1 ) = v( 3 );
-                            m( 3, 2 ) = v( 5 );
-                            m( 3, 3 ) = v( 6 );
-
-                            dataVector.push_back( m );
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = 0; x < dimX; ++x )
-                        {
-                            ColumnVector v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v( j + 1 ) = inputData[j * blockSize + id];
-                            }
-                            Matrix m( 3, 3 );
-                            m( 1, 1 ) = v( 1 );
-                            m( 1, 2 ) = v( 2 );
-                            m( 1, 3 ) = v( 3 );
-                            m( 2, 1 ) = v( 2 );
-                            m( 2, 2 ) = v( 4 );
-                            m( 2, 3 ) = v( 5 );
-                            m( 3, 1 ) = v( 3 );
-                            m( 3, 2 ) = v( 5 );
-                            m( 3, 3 ) = v( 6 );
-
-                            dataVector.push_back( m );
-                        }
-                    }
-                }
-            }
-
-            nifti_image_free( filedata );
-
-            DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
-            m_dataset.push_back( dataset );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
-        }
+        Matrix m( 3, 3 );
+        m( 1, 1 ) = m_data[i];
+        m( 1, 2 ) = m_data[i + blockSize];
+        m( 1, 3 ) = m_data[i + 2 * blockSize];
+        m( 2, 1 ) = m_data[i + blockSize];
+        m( 2, 2 ) = m_data[i + 3 * blockSize];
+        m( 2, 3 ) = m_data[i + 4 * blockSize];
+        m( 3, 1 ) = m_data[i + 2 * blockSize];
+        m( 3, 2 ) = m_data[i + 4 * blockSize];
+        m( 3, 3 ) = m_data[i + 5 * blockSize];
+        dataVector.push_back( m );
     }
-    return false;
+    DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
+    m_dataset.push_back( dataset );
+    m_data.clear();
+
+    return true;
 }
 
-bool LoaderNifti::loadNiftiSH( QString fileName )
+bool LoaderNifti::loadNiftiSH()
 {
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     int dimX = m_header->dim[1];
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
@@ -479,72 +378,30 @@ bool LoaderNifti::loadNiftiSH( QString fileName )
         return false;
     }
 
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
+    for ( unsigned int i = 0; i < blockSize; ++i )
     {
-        case NIFTI_TYPE_FLOAT32:
+        ColumnVector v( dim );
+
+        for ( int j = 0; j < dim; ++j )
         {
-            float* inputData = reinterpret_cast<float*>( filedata->data );
-
-            if ( isRadialogical() )
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = dimX - 1; x >= 0; --x )
-                        {
-                            ColumnVector v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v( j + 1 ) = inputData[j * blockSize + id];
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = 0; x < dimX; ++x )
-                        {
-                            ColumnVector v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v( j + 1 ) = inputData[j * blockSize + id];
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
-            }
-            nifti_image_free( filedata );
-
-            DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
-            out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::QBALL );
-            out->properties()->set( Fn::Property::D_LOD, 2 );
-            out->properties()->set( Fn::Property::D_ORDER, order );
-            out->properties()->set( Fn::Property::D_RENDER_SLICE, 1 );
-
-            m_dataset.push_back( out );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
+            v( j + 1 ) = m_data[j * blockSize + i];
         }
+        dataVector.push_back( v );
     }
-    return false;
+    m_data.clear();
+
+    DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
+    out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::QBALL );
+    out->properties()->set( Fn::Property::D_LOD, 2 );
+    out->properties()->set( Fn::Property::D_ORDER, order );
+    out->properties()->set( Fn::Property::D_RENDER_SLICE, 1 );
+
+    m_dataset.push_back( out );
+    return true;
 }
 
-bool LoaderNifti::loadNiftiBingham( QString fileName )
+bool LoaderNifti::loadNiftiBingham()
 {
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     int dimX = m_header->dim[1];
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
@@ -563,149 +420,34 @@ bool LoaderNifti::loadNiftiBingham( QString fileName )
         return false;
     }
 
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
+    for ( unsigned int i = 0; i < blockSize; ++i )
     {
-        case NIFTI_TYPE_FLOAT32:
+        std::vector<float> v( dim );
+
+        for ( int j = 0; j < dim; ++j )
         {
-            float* inputData = reinterpret_cast<float*>( filedata->data );
-
-            if ( isRadialogical() )
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = dimX - 1; x >= 0; --x )
-                        {
-                            std::vector<float> v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v[ j ] = inputData[j * blockSize + id];
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = 0; x < dimX; ++x )
-                        {
-                            std::vector<float> v( dim );
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                v[ j ] = inputData[j * blockSize + id];
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
-            }
-
-
-            nifti_image_free( filedata );
-
-            DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
-            out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::BINGHAM );
-            out->properties()->set( Fn::Property::D_LOD, 2 );
-
-            m_dataset.push_back( out );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
+            v[j] = m_data[j * blockSize + i];
         }
+        dataVector.push_back( v );
     }
-    return false;
+    m_data.clear();
+
+    DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
+    out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::BINGHAM );
+    out->properties()->set( Fn::Property::D_LOD, 2 );
+
+    m_dataset.push_back( out );
+
+    return true;
 }
 
-bool LoaderNifti::loadNiftiFMRI( QString fileName )
+bool LoaderNifti::loadNiftiFMRI()
 {
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    int blockSize = dimX * dimY * dimZ;
-    int dim = m_header->dim[4];
-    qDebug() << "num images:" << dim;
-
-    std::vector<float> data;
-
-    try
-    {
-        data.resize( blockSize * dim );
-    }
-    catch ( std::bad_alloc& )
-    {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
-        return false;
-    }
-
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
-    {
-        case NIFTI_TYPE_FLOAT32:
-        {
-            float* inputData = reinterpret_cast<float*>( filedata->data );
-
-            int index = 0;
-
-            if ( isRadialogical() )
-            {
-
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = dimX - 1; x >= 0; --x )
-                        {
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int i = 0; i < dim; ++i )
-                            {
-                                data[i*blockSize+index] = inputData[i*blockSize+id];
-                            }
-                            index++;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = 0; x < dimX; ++x )
-                        {
-                            int id = x + y * dimX + z * dimX * dimY;
-                            for ( int i = 0; i < dim; ++i )
-                            {
-                                data[i*blockSize+index] = inputData[i*blockSize+id];
-                            }
-                            index++;
-                        }
-                    }
-                }
-            }
-            nifti_image_free( filedata );
-
-            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
-            DatasetFMRI* dataset = new DatasetFMRI( m_fileName.path(), data, dsHdr );
-            m_dataset.push_back( dataset );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
-        }
-    }
-    return false;
+    nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+    DatasetFMRI* dataset = new DatasetFMRI( m_fileName.path(), m_data, dsHdr );
+    m_dataset.push_back( dataset );
+    m_data.clear();
+    return true;
 }
 
 bool LoaderNifti::loadNiftiDWI( QString fileName )
@@ -739,11 +481,10 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
         return false;
     }
 
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
     int dimX = m_header->dim[1];
     int dimY = m_header->dim[2];
     int dimZ = m_header->dim[3];
-    int blockSize = dimX * dimY * dimZ;
+    unsigned int blockSize = dimX * dimY * dimZ;
     int dim = m_header->dim[4];
     int numData = dim - numB0;
     qDebug() << "num data:" << numData;
@@ -766,107 +507,47 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
         return false;
     }
 
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
+    std::vector<float> b0data( blockSize );
+    for ( unsigned int i = 0; i < blockSize; ++i )
     {
-        case NIFTI_TYPE_INT16:
+        ColumnVector v( numData );
+
+        int dataIndex = 1;
+        for ( int j = 0; j < dim; ++j )
         {
-            std::vector<float> b0data( blockSize );
-            qDebug() << "block size: " << blockSize;
-            int16_t* inputData;
-
-            inputData = reinterpret_cast<int16_t*>( filedata->data );
-
-            qDebug() << "extract data ";
-
-            if ( isRadialogical() )
+            if ( bvals[j] > 100 )
             {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = dimX - 1; x >= 0; --x )
-                        {
-                            ColumnVector v( numData );
-                            int dataIndex = 1;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                if ( bvals[j] > 100 )
-                                {
-                                    v( dataIndex ) = inputData[j * blockSize + x + y * dimX + z * dimX * dimY];
-                                    ++dataIndex;
-                                }
-                                else
-                                {
-                                    b0data[( dimX - x - 1 ) + y * dimX + z * dimX * dimY] += inputData[j * blockSize + x + y * dimX + z * dimX * dimY]
-                                            / numB0;
-                                }
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
-
-                for ( unsigned int i = 0; i < bvecs.size(); ++i )
-                {
-                    bvecs[i].setX( bvecs[i].x() * -1.0 );
-                }
+                v( dataIndex ) = m_data[j * blockSize + i];
+                ++dataIndex;
             }
             else
             {
-                for ( int z = 0; z < dimZ; ++z )
-                {
-                    for ( int y = 0; y < dimY; ++y )
-                    {
-                        for ( int x = 0; x < dimX; ++x )
-                        {
-                            ColumnVector v( numData );
-                            int dataIndex = 1;
-                            for ( int j = 0; j < dim; ++j )
-                            {
-                                if ( bvals[j] > 100 )
-                                {
-                                    v( dataIndex ) = inputData[j * blockSize + x + y * dimX + z * dimX * dimY];
-                                    ++dataIndex;
-                                }
-                                else
-                                {
-                                    b0data[x + y * dimX + z * dimX * dimY] += inputData[j * blockSize + x + y * dimX + z * dimX * dimY] / numB0;
-                                }
-                            }
-                            dataVector.push_back( v );
-                        }
-                    }
-                }
+                b0data[i] += m_data[j * blockSize + i] / numB0;
             }
-
-            qDebug() << "extract data done";
-            nifti_image_free( filedata );
-
-            QString b0fn = m_fileName.path();
-            if ( m_fileName.path().endsWith( ".nii.gz" ) )
-            {
-                b0fn.replace( ".nii.gz", "_b0.nii.gz" );
-            }
-            if ( m_fileName.path().endsWith( ".nii" ) )
-            {
-                b0fn.replace( ".nii.gz", "_b0.nii" );
-            }
-
-            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
-            DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
-            m_dataset.push_back( datasetB0 );
-
-            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
-            m_dataset.push_back( dataset );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
         }
+        dataVector.push_back( v );
     }
-    return false;
+
+    QString b0fn = m_fileName.path();
+    if ( m_fileName.path().endsWith( ".nii.gz" ) )
+    {
+        b0fn.replace( ".nii.gz", "_b0.nii.gz" );
+    }
+    if ( m_fileName.path().endsWith( ".nii" ) )
+    {
+        b0fn.replace( ".nii.gz", "_b0.nii" );
+    }
+    m_data.clear();
+
+    nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+    DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
+    m_dataset.push_back( datasetB0 );
+
+    nifti_image* dsHdr = nifti_copy_nim_info( m_header );
+    DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
+    m_dataset.push_back( dataset );
+
+    return true;
 }
 
 bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
