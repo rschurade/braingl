@@ -494,6 +494,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
                 min = qMin( min, value );
                 max = qMax( max, value );
             }
+            qDebug() << m_dataNames[curField] << min << " " << max;
             m_dataMins.push_back( min );
             m_dataMaxes.push_back( max );
         }
