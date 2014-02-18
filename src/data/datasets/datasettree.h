@@ -10,11 +10,22 @@
 
 #include "dataset.h"
 
+#include "../../algos/tree.h"
+
 #include <QString>
 #include <QVector>
 
-class Tree;
 class TreeRenderer;
+
+
+struct PtrGreater // public std::binary_function<bool, const T*, const T*>
+{
+  bool operator()( Tree* a, Tree* b )
+  {
+    // may want to check that the pointers aren't zero...
+    return ( a->getValue() > b->getValue() );
+  }
+};
 
 class DatasetTree : public Dataset
 {

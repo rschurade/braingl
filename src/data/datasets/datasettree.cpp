@@ -13,9 +13,6 @@
 #include "../../gui/gl/treerenderer.h"
 #include "../../algos/colormapbase.h"
 
-
-#include "../../algos/tree.h"
-
 #include <QDebug>
 #include <QQueue>
 
@@ -44,7 +41,7 @@ DatasetTree::DatasetTree( QDir fn ) :
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( setClusterColor() ) );
 
-    m_properties["maingl"]->createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x biggest" }, 0, "general" );
+    m_properties["maingl"]->createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x clusters" }, 0, "general" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_TREE_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( partitionModeChanged( QVariant ) ) );
 
@@ -408,6 +405,42 @@ void DatasetTree::applyPartitionMode()
         }
         case 1:
         {
+            int targetCount = m_properties["maingl"]->get( Fn::Property::D_TREE_PARTITION_SIZE ).toInt();
+            QList<int>parts;
+            QQueue<Tree*>todo;
+            todo.enqueue( m_tree );
+
+            QColor unselectedColor = m_properties["maingl"]->get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
+            m_tree->setColor( 3, unselectedColor , false, true );
+
+            while( !todo.empty() )
+            {
+                if ( todo.size() >= targetCount )
+                {
+                    break;
+                }
+                else
+                {
+                    // order current partitions by size
+                    qSort( todo.begin(), todo.end(), PtrGreater() );
+                    // take highest
+                    Tree* current = todo.dequeue();
+                    // enqueue children
+                    QList<Tree*> childs = current->getChildren();
+                    for ( int i = 0; i < childs.size(); ++i )
+                    {
+                        todo.enqueue( childs[i] );
+                    }
+                }
+
+                ColormapBase cmap = ColormapFunctions::getColormap( 2 );
+                for ( int i = 0; i < todo.size(); ++i )
+                {
+                    float v = ( (float)i/(float)todo.size() );
+                    QColor c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, v ) ) );
+                    m_tree->setColor( todo[i]->getId(), 3, c );
+                }
+            }
             break;
         }
     }
