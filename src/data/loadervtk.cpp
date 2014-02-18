@@ -280,6 +280,44 @@ bool LoaderVTK::open()
                 m_pointData.push_back( data );
             }
         }
+
+        numberOfArrays = output->GetCellData()->GetNumberOfArrays();
+        qDebug() << "NumCellArrays: " << numberOfArrays;
+
+        for ( unsigned int i = 0; i < numberOfArrays; ++i )
+        {
+            //the following two lines are equivalent
+            //arrayNames.push_back(polydata->GetPointData()->GetArray(i)->GetName());
+
+            int dataTypeID = output->GetCellData()->GetArray( i )->GetDataType();
+
+            if ( dataTypeID == VTK_FLOAT )
+            {
+                m_pointDataNames.push_back( output->GetCellData()->GetArrayName( i ) );
+                qDebug() << "Array " << i << ": " << m_pointDataNames.back() << " (type: " << dataTypeID << ")";
+
+                std::vector<float>data;
+                data.reserve( m_numPoints );
+                vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetCellData()->GetArray( i ) );
+
+                if ( dataArray )
+                {
+                    int lc = 0;
+                    for ( int k = 0; k < m_numLines; ++k )
+                    {
+                        int lineSize = m_lines[lc];
+                        for ( int l = 0; l < lineSize; ++l )
+                        {
+                            data.push_back( dataArray->GetValue( k ) );
+                        }
+                        lc += lineSize + 1;
+                    }
+                    m_hasPointData = true;
+                }
+                m_pointData.push_back( data );
+            }
+        }
+
         return true;
     }
     return false;
