@@ -9,6 +9,7 @@
 #include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/dataset3d.h"
+#include "../data/models.h"
 
 #include <QSet>
 #include <QVector3D>
@@ -107,12 +108,12 @@ Fib Fibers::mergeFibs( Fib& lhs, Fib& rhs )
 
 DatasetScalar* Fibers::tractDensity()
 {
-    m_nx = 160;
-    m_ny = 200;
-    m_nz = 160;
-    m_dx = 1.0;
-    m_dy = 1.0;
-    m_dz = 1.0;
+    m_dx = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
+    m_dy = m_dx;
+    m_dz = m_dx;
+    m_nx = 160 / m_dx;
+    m_ny = 200 / m_dy;
+    m_nz = 160 / m_dz;
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<float> data( m_blockSize, 0 );
     std::vector<Fib> fibs = m_dataset->getSelectedFibs();
@@ -155,12 +156,13 @@ DatasetScalar* Fibers::tractDensity()
 
 Dataset3D* Fibers::tractColor()
 {
-    m_nx = 320;
-    m_ny = 400;
-    m_nz = 320;
-    m_dx = 0.5;
-    m_dy = 0.5;
-    m_dz = 0.5;
+    m_dx = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
+    m_dy = m_dx;
+    m_dz = m_dx;
+    m_nx = 160 / m_dx;
+    m_ny = 200 / m_dy;
+    m_nz = 160 / m_dz;
+    int source = Models::getGlobal( Fn::Property::G_TRACT_TEXT_SOURCE ).toInt();
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<QVector3D> data( m_blockSize );
     std::vector<int> count( m_blockSize, 0 );
@@ -168,39 +170,112 @@ Dataset3D* Fibers::tractColor()
 
     QSet<int> visited;
     int id = 0;
-    for ( unsigned int i = 0; i < fibs.size(); ++i )
-    {
-        Fib fib = fibs[i];
-        visited.clear();
 
-        for ( unsigned int k = 0; k < fib.length(); ++k )
+    switch ( source )
+    {
+        case 0:
         {
-            QVector3D localColor = fib.getTangent( k );
-            localColor.setX( fabs( localColor.x() ) );
-            localColor.setX( fabs( localColor.y() ) );
-            localColor.setX( fabs( localColor.z() ) );
-            localColor.normalize();
-
-            id = getID( fib[k].x(), fib[k].y(), fib[k].z() );
-            if ( !visited.contains( id) )
+            for ( unsigned int i = 0; i < fibs.size(); ++i )
             {
-                ++count[ id ];
-                data[ id ] += localColor;
-                visited.insert( id );
-            }
-        }
-    }
+                Fib fib = fibs[i];
+                visited.clear();
 
-    for ( int i = 0; i < m_blockSize; ++i )
-    {
-        data[i] /= count[i];
-        count[i] = qMin( count[i], 10 );
-    }
-    float div;
-    for ( int i = 0; i < m_blockSize; ++i )
-    {
-        div = ( (float)count[i] / 20. ) + 0.5;
-        data[i] *= div;
+                for ( unsigned int k = 0; k < fib.length(); ++k )
+                {
+                    QVector3D localColor = fib.getTangent( k );
+                    localColor.setX( fabs( localColor.x() ) );
+                    localColor.setY( fabs( localColor.y() ) );
+                    localColor.setZ( fabs( localColor.z() ) );
+                    localColor.normalize();
+
+                    id = getID( fib[k].x(), fib[k].y(), fib[k].z() );
+                    if ( !visited.contains( id) )
+                    {
+                        ++count[ id ];
+                        data[ id ] += localColor;
+                        visited.insert( id );
+                    }
+                }
+            }
+
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                data[i] /= count[i];
+                count[i] = qMin( count[i], 10 );
+            }
+            float div;
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                div = ( (float)count[i] / 20. ) + 0.5;
+                data[i] *= div;
+            }
+            break;
+        }
+        case 1:
+        {
+            for ( unsigned int i = 0; i < fibs.size(); ++i )
+            {
+                Fib fib = fibs[i];
+                visited.clear();
+
+                QColor localColor = fib.globalColor();
+                QVector3D colVec( localColor.redF(), localColor.greenF(), localColor.blue() );
+
+                for ( unsigned int k = 0; k < fib.length(); ++k )
+                {
+                    id = getID( fib[k].x(), fib[k].y(), fib[k].z() );
+                    if ( !visited.contains( id) )
+                    {
+                        ++count[ id ];
+                        data[ id ] += colVec;
+                        visited.insert( id );
+                    }
+                }
+            }
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                data[i] /= count[i];
+                count[i] = qMin( count[i], 10 );
+            }
+            float div;
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                div = ( (float)count[i] / 20. ) + 0.5;
+                data[i] *= div;
+            }
+            break;
+        }
+        case 2:
+        {
+            for ( unsigned int i = 0; i < fibs.size(); ++i )
+            {
+                Fib fib = fibs[i];
+                visited.clear();
+
+                QColor localColor = fib.customColor();
+                QVector3D colVec( localColor.redF(), localColor.greenF(), localColor.blue() );
+
+                for ( unsigned int k = 0; k < fib.length(); ++k )
+                {
+                    id = getID( fib[k].x(), fib[k].y(), fib[k].z() );
+                    if ( !visited.contains( id) )
+                    {
+                        ++count[ id ];
+                        data[ id ] += colVec;
+                        visited.insert( id );
+                    }
+                }
+            }
+
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                data[i] /= count[i];
+            }
+
+            break;
+        }
+        default:
+            break;
     }
 
     int dims[8] = { 3, m_nx, m_ny, m_nz, 3, 1, 1 };
