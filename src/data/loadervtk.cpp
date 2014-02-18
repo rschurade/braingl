@@ -261,24 +261,24 @@ bool LoaderVTK::open()
 
             int dataTypeID = output->GetPointData()->GetArray( i )->GetDataType();
 
-            if ( dataTypeID == VTK_FLOAT )
-            {
+//            if ( dataTypeID == VTK_FLOAT )
+//            {
                 m_pointDataNames.push_back( output->GetPointData()->GetArrayName( i ) );
                 qDebug() << "Array " << i << ": " << m_pointDataNames.back() << " (type: " << dataTypeID << ")";
 
                 std::vector<float>data( m_numPoints );
-                vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetPointData()->GetArray( i ) );
-
+                //vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetPointData()->GetArray( i ) );
+                vtkSmartPointer<vtkDataArray> dataArray = output->GetPointData()->GetArray( i );
                 if ( dataArray )
                 {
                     for ( int k = 0; k < m_numPoints; ++k )
                     {
-                        data[k] = dataArray->GetValue( k );
+                        data[k] = dataArray->GetVariantValue( k ).ToFloat();
                     }
                     m_hasPointData = true;
                 }
                 m_pointData.push_back( data );
-            }
+ //           }
         }
 
         numberOfArrays = output->GetCellData()->GetNumberOfArrays();
@@ -291,15 +291,15 @@ bool LoaderVTK::open()
 
             int dataTypeID = output->GetCellData()->GetArray( i )->GetDataType();
 
-            if ( dataTypeID == VTK_FLOAT )
-            {
+//            if ( dataTypeID == VTK_FLOAT )
+//            {
                 m_pointDataNames.push_back( output->GetCellData()->GetArrayName( i ) );
                 qDebug() << "Array " << i << ": " << m_pointDataNames.back() << " (type: " << dataTypeID << ")";
 
                 std::vector<float>data;
                 data.reserve( m_numPoints );
-                vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetCellData()->GetArray( i ) );
-
+                //vtkSmartPointer<vtkFloatArray> dataArray = vtkFloatArray::SafeDownCast( output->GetCellData()->GetArray( i ) );
+                vtkSmartPointer<vtkDataArray> dataArray = output->GetCellData()->GetArray( i );
                 if ( dataArray )
                 {
                     int lc = 0;
@@ -308,14 +308,14 @@ bool LoaderVTK::open()
                         int lineSize = m_lines[lc];
                         for ( int l = 0; l < lineSize; ++l )
                         {
-                            data.push_back( dataArray->GetValue( k ) );
+                            data.push_back( dataArray->GetVariantValue( k ).ToFloat() );
                         }
-                        lc += lineSize + 1;
                     }
+
                     m_hasPointData = true;
                 }
                 m_pointData.push_back( data );
-            }
+//            }
         }
 
         return true;
