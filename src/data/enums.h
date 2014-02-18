@@ -338,6 +338,8 @@ namespace Fn
         G_MIN_COMPONENT_SIZE,
         G_RENDER_CROSSHAIRS_2,
         G_UNSELECTED_FIBERS_GREY,
+        G_TRACT_TEX_RESOLUTION,
+        G_TRACT_TEXT_SOURCE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         R_X = 1000,
@@ -594,6 +596,8 @@ namespace Fn
                 case Property::G_MIN_COMPONENT_SIZE: return QString( "min size for component extraction" ); break;
                 case Property::G_RENDER_CROSSHAIRS_2: return QString( "render crosshairs maingl2" ); break;
                 case Property::G_UNSELECTED_FIBERS_GREY: return QString( "render hidden fibers grey" ); break;
+                case Property::G_TRACT_TEX_RESOLUTION: return QString( "resolution of tract textures" ); break;
+                case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::R_X: return QString( "x" ); break;
