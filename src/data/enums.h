@@ -591,7 +591,7 @@ namespace Fn
                 case Property::G_LIGHT_SWITCH: return QString( "toggle light" ); break;
                 case Property::G_LIGHT_AMBIENT: return QString( "light ambient" ); break;
                 case Property::G_LIGHT_DIFFUSE: return QString( "light diffuse" ); break;
-                case Property::G_FILTER_SIZE: return QString( "filter size" ); break;
+                case Property::G_FILTER_SIZE: return QString( "filter size (voxel)" ); break;
                 case Property::G_DECIMATE_EPSILON: return QString( "epsilon for decimate" ); break;
                 case Property::G_MIN_COMPONENT_SIZE: return QString( "min size for component extraction" ); break;
                 case Property::G_RENDER_CROSSHAIRS_2: return QString( "render crosshairs maingl2" ); break;
