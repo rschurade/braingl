@@ -5,7 +5,7 @@ message(STATUS "GETTING HG VERSION")
 #message( STATUS PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} )
 
 execute_process(
-    COMMAND hg tip --template "{rev}:{node|short}"
+    COMMAND hg parents --template "{rev}:{node|short} "
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     OUTPUT_VARIABLE __HGTIP__
     OUTPUT_STRIP_TRAILING_WHITESPACE)
