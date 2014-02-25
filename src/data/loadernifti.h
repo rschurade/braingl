@@ -21,36 +21,35 @@ public:
     virtual ~LoaderNifti();
 
     bool load();
+    bool askTimeSeries( int dim );
 
-    QVector<Dataset*> getDataset();
+    std::vector<Dataset*> getDataset();
     Fn::DatasetType getDatasetType();
 
 private:
     bool loadNiftiHeader( QString hdrPath );
+    bool loadData( QString fileName );
+    template<typename T> void copyData( T* inputData );
 
-    bool loadNiftiScalar( QString fileName );
-    bool loadNiftiVector3D( QString fileName );
-    bool loadNiftiTensor( QString fileName );
-    bool loadNiftiSH( QString fileName );
-    bool loadNiftiBingham( QString fileName );
-    bool loadNiftiFMRI( QString fileName );
+    bool loadNiftiScalar();
+    bool loadNiftiVector3D();
+    bool loadNiftiTensor();
+    bool loadNiftiSH();
+    bool loadNiftiBingham();
+    bool loadNiftiFMRI();
     bool loadNiftiDWI( QString fileName );
     bool loadNiftiDWI_FNAV2( QString fileName );
-    QVector<float> loadBvals( QString fileName );
-    QVector<QVector3D> loadBvecs( QString fileName, QVector<float> bvals );
+    std::vector<float> loadBvals( QString fileName );
+    std::vector<QVector3D> loadBvecs( QString fileName, std::vector<float> bvals );
 
     bool isRadialogical();
     void flipX();
 
-    template<typename T> void copyScalar( T* inputData );
-    template<typename T> void copyVector( T* inputData );
-
     QDir m_fileName;
     nifti_image* m_header;
-    QVector<float>m_scalarData;
-    QVector<QVector3D>m_vectorData;
+    std::vector<float>m_data;
     Fn::DatasetType m_datasetType;
-    QVector<Dataset*> m_dataset;
+    std::vector<Dataset*> m_dataset;
 };
 
 #endif /* LOADERNIFTI_H_ */

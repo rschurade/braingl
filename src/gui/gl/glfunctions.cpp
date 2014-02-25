@@ -46,7 +46,7 @@ QHash<QString,float> GLFunctions::sliceAlpha;
 QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
-QVector< QString > GLFunctions::m_shaderNames;
+std::vector< QString > GLFunctions::m_shaderNames;
 
 ROI* GLFunctions::roi = 0;
 
@@ -196,7 +196,7 @@ bool GLFunctions::validateShader( QString name )
     }
 }
 
-QVector< QString > GLFunctions::getShaderNames()
+std::vector< QString > GLFunctions::getShaderNames()
 {
     return m_shaderNames;
 }
@@ -215,7 +215,7 @@ void GLFunctions::setShaderCode( QString name, QString source )
 void GLFunctions::reloadShaders()
 {
     updateColormapShader();
-    for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+    for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
         GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
     }
@@ -256,7 +256,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "pies" );
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
 
-        for ( int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
+        for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_fs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );

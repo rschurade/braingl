@@ -40,6 +40,9 @@ private:
     void saveOBJ();
     void saveVRML();
     void saveMeshJson();
+    void saveMeshAsc();
+    void saveBinaryConnectivity();
+    void saveFibJson();
 };
 
 #endif /* WRITER_H_ */

@@ -23,6 +23,7 @@
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkCellArray.h>
+#include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyLine.h>
@@ -47,8 +48,9 @@ bool WriterVTK::save()
         switch ( (Fn::DatasetType)( m_dataset->properties()->get( Fn::Property::D_TYPE ).toInt() ) )
         {
             case Fn::DatasetType::FIBERS:
+            case Fn::DatasetType::CONS:
             {
-                if ( m_filter.startsWith( "fib files ascii") )
+                if ( m_filter.startsWith( "fib files ascii" ) )
                 {
                     qDebug() << "save ascii";
                     saveFibs( m_fileName, false );
@@ -85,64 +87,79 @@ bool WriterVTK::save()
 
 void WriterVTK::saveFibs( QString filename, bool binary )
 {
-    QVector< QVector<float> >fibs = dynamic_cast<DatasetFibers*>( m_dataset )->getFibs();
-    QVector< QVector< QVector<float> > >data = dynamic_cast<DatasetFibers*>( m_dataset )->getData();
-    QVector< QString >dataNames = dynamic_cast<DatasetFibers*>( m_dataset )->getDataNames();
+    DatasetFibers* ds = dynamic_cast<DatasetFibers*>( m_dataset );
+    std::vector< Fib >* fibs = ds->getFibs();
+    QList< QString >dataNames = ds->getDataNames();
 
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newLines = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
     vtkIdType pointId = 0;
 
-    for ( int i = 0; i < fibs.size(); ++i )
+    vtkSmartPointer<vtkUnsignedCharArray> colorArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    colorArray->SetNumberOfComponents(3);
+    colorArray->SetName ("CellColors");
+
+    unsigned char rgb[3];
+
+    for ( unsigned int i = 0; i < fibs->size(); ++i )
     {
-        QVector<float>fib = fibs[i];
+        Fib fib = fibs->at( i );
         vtkSmartPointer<vtkPolyLine> newLine = vtkSmartPointer<vtkPolyLine>::New();
-        for (int k = 0; k < fib.size() / 3; ++k )
+        QColor color = fib.customColor();
+
+        rgb[0] = color.redF() * 255;
+        rgb[1] = color.greenF() * 255;
+        rgb[2] = color.blueF() * 255;
+
+        colorArray->InsertNextTupleValue( rgb );
+
+        for ( unsigned int k = 0; k < fib.length(); ++k )
         {
-            newPoints->InsertNextPoint( fib[k*3], fib[k*3+1], fib[k*3+2] );
+            newPoints->InsertNextPoint( fib[k].x(), fib[k].y(), fib[k].z() );
             newLine->GetPointIds()->InsertNextId( pointId );
             ++pointId;
         }
-         newLines->InsertNextCell( newLine );
+        newLines->InsertNextCell( newLine );
     }
-     // add points and lines to new polydata
-     newPolyData->SetPoints( newPoints );
-     newPolyData->SetLines( newLines );
 
-     if ( dataNames[0] != "no data" )
-     {
-         for ( int i = 0; i < data.size(); ++i )
-         {
-             vtkSmartPointer<vtkFloatArray> dataArray = vtkSmartPointer<vtkFloatArray>::New();
-             dataArray->SetNumberOfComponents( 1 );
-             dataArray->SetName( dataNames[i].toStdString().c_str() );
+    // add points and lines to new polydata
+    newPolyData->SetPoints( newPoints );
+    newPolyData->SetLines( newLines );
+    newPolyData->GetCellData()->AddArray( colorArray );
 
-             QVector< QVector<float> >dataField = data[i];
-             for( int k = 0; k < dataField.size(); ++k )
-             {
-                 QVector<float>fib = dataField[k];
-                 for( int l = 0; l < fib.size(); ++l )
-                 {
-                     dataArray->InsertNextValue( fib[l] );
-                 }
-             }
-             newPolyData->GetPointData()->AddArray( dataArray );
-         }
-     }
+    if ( dataNames[0] != "no data" )
+    {
+        for ( int i = 0; i < dataNames.size(); ++i )
+        {
+            vtkSmartPointer<vtkFloatArray> dataArray = vtkSmartPointer<vtkFloatArray>::New();
+            dataArray->SetNumberOfComponents( 1 );
+            dataArray->SetName( dataNames[i].toStdString().c_str() );
 
-     qDebug() << "Writing "  << filename;
-     vtkSmartPointer<vtkPolyDataWriter> writer = vtkPolyDataWriter::New();
-     writer->SetFileName( filename.toStdString().c_str() );
+            for ( unsigned int k = 0; k < fibs->size(); ++k )
+            {
+                Fib fib = fibs->at( k );
+                for ( unsigned int l = 0; l < fib.length(); ++l )
+                {
+                    dataArray->InsertNextValue( fib.getData( i, l ) );
+                }
+            }
+            newPolyData->GetPointData()->AddArray( dataArray );
+        }
+    }
 
-     if ( binary )
-     {
-         writer->SetFileTypeToBinary();
-     }
-     else
-     {
-         writer->SetFileTypeToASCII();
-     }
+    qDebug() << "Writing " << filename;
+    vtkSmartPointer<vtkPolyDataWriter> writer = vtkPolyDataWriter::New();
+    writer->SetFileName( filename.toStdString().c_str() );
+
+    if ( binary )
+    {
+        writer->SetFileTypeToBinary();
+    }
+    else
+    {
+        writer->SetFileTypeToASCII();
+    }
 
 #if VTK_MAJOR_VERSION < 6
     writer->SetInput( newPolyData );
@@ -154,32 +171,30 @@ void WriterVTK::saveFibs( QString filename, bool binary )
      {
          qDebug() << "Error writing " << filename;
      }
-
-
 }
 
 void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
 {
     int bufferSize = mesh->bufferSize();
     float* points = mesh->getVertices();
-    int* indexes = mesh->getIndexes();
+    unsigned int* indexes = mesh->getIndexes();
     float* colors = mesh->getVertexColors();
 
-    int numPoints = mesh->numVerts();
-    int numTris = mesh->numTris();
+    unsigned int numPoints = mesh->numVerts();
+    unsigned int numTris = mesh->numTris();
 
     vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
 
-    for ( int i = 0; i < numPoints; ++i )
+    for ( unsigned int i = 0; i < numPoints; ++i )
     {
         newPoints->InsertNextPoint( points[i*bufferSize], points[i*bufferSize+1], points[i*bufferSize+2] );
     }
 
     if ( m_dataset->properties()->get( Fn::Property::D_INVERT_VERTEX_ORDER ).toBool() )
     {
-        for( int i = 0; i < numTris; ++i )
+        for( unsigned int i = 0; i < numTris; ++i )
         {
             polys->InsertNextCell(3);
             polys->InsertCellPoint( indexes[i*3] );
@@ -190,7 +205,7 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
     }
     else
     {
-        for( int i = 0; i < numTris; ++i )
+        for( unsigned int i = 0; i < numTris; ++i )
         {
             polys->InsertNextCell(3);
             polys->InsertCellPoint( indexes[i*3] );
@@ -206,7 +221,7 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
 
     unsigned char rgb[3];
 
-    for ( int i = 0; i < numPoints; ++i )
+    for ( unsigned int i = 0; i < numPoints; ++i )
     {
         rgb[0] = colors[4*i]   * 255;
         rgb[1] = colors[4*i+1] * 255;
@@ -224,7 +239,7 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
     dataArray->SetNumberOfComponents( 1 );
     dataArray->SetName( "data" );
 
-    for ( int i = 0; i < numPoints; ++i )
+    for ( unsigned int i = 0; i < numPoints; ++i )
     {
         dataArray->InsertNextValue( points[i*bufferSize+6] );
     }

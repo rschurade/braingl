@@ -13,8 +13,14 @@
 #include "qfile.h"
 #include "qdatastream.h"
 
-class CorrelationMatrix
+#include "qobject.h"
+#include "qnetworkaccessmanager.h"
+#include "qnetworkreply.h"
+
+class CorrelationMatrix : public QObject
 {
+    Q_OBJECT
+
 public:
     CorrelationMatrix( int i );
     CorrelationMatrix( QString filename );
@@ -29,6 +35,11 @@ public:
 
     float percFromThresh(float t);
     float threshFromPerc(float p);
+    void setInitialized(bool b);
+    void save(QString filename);
+
+public slots:
+    void serviceRequestFinished(QNetworkReply* reply);
 
 private:
     void loadEverything();
@@ -43,6 +54,13 @@ private:
     int* m_histogram;
     float* m_perc_histogram;
     int m_nbins;
+    bool m_remote;
+    QNetworkAccessManager *networkManager;
+    void loadMetaData();
+    void loadRemote( int i );
+    int* m_index;
+    QString m_id;
+    QString m_passwd;
 };
 
 #endif /* CORRELATIONMATRIX_H_ */

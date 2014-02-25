@@ -8,6 +8,8 @@
 #ifndef FIBERS_H_
 #define FIBERS_H_
 
+#include "fib.h"
+
 #include <QVector>
 
 class DatasetFibers;
@@ -23,15 +25,12 @@ public:
     DatasetFibers* thinOut();
     DatasetScalar* tractDensity();
     Dataset3D* tractColor();
-    DatasetFibers* resample();
+    DatasetFibers* downSample();
 
 private:
     DatasetFibers* m_dataset;
 
-    float getFiberDist( QVector< float >& lhs, QVector< float >& rhs );
-    float getDist( float x1, float y1, float z1, float x2, float y2, float z2 );
-
-    QVector<float> mergeFibs( QVector< float >& lhs, QVector< float >& rhs );
+    Fib mergeFibs( Fib& lhs, Fib& rhs );
 
     int m_nx;
     int m_ny;

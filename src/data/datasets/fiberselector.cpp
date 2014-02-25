@@ -20,7 +20,18 @@
 FiberSelector::FiberSelector( int numPoints, int numLines ) :
     m_numLines( numLines ),
     m_numPoints( numPoints ),
-    m_isInitialized( false )
+    m_isInitialized( false ),
+    m_kdVerts( 0 )
+{
+    m_boxMin.resize( 3 );
+    m_boxMax.resize( 3 );
+}
+
+FiberSelector::FiberSelector( std::vector<float>* kdVerts, int numPoints, int numLines ) :
+    m_numLines( numLines ),
+    m_numPoints( numPoints ),
+    m_isInitialized( false ),
+    m_kdVerts( kdVerts )
 {
     m_boxMin.resize( 3 );
     m_boxMax.resize( 3 );
@@ -30,16 +41,16 @@ FiberSelector::~FiberSelector()
 {
 }
 
-QVector<bool>* FiberSelector::getSelection()
+std::vector<bool>* FiberSelector::getSelection()
 {
     return &m_rootfield;
 }
 
 
-void FiberSelector::init( QVector< QVector< float > >& data )
+void FiberSelector::init( std::vector<Fib>& fibs )
 {
     qDebug() << "start creating kdtree";
-    m_numLines = data.size();
+    m_numLines = fibs.size();
     //qDebug() << "num lines:" << data.size();
     int ls = 0;
 
@@ -47,7 +58,6 @@ void FiberSelector::init( QVector< QVector< float > >& data )
     {
         try
         {
-            m_kdVerts.reserve( m_numPoints * 3 );
             m_reverseIndexes.reserve( m_numPoints );
             m_lineStarts.reserve( m_numLines );
             m_lineLengths.reserve( m_numLines );
@@ -61,19 +71,39 @@ void FiberSelector::init( QVector< QVector< float > >& data )
 
     try
     {
-        m_numPoints = 0;
-        for ( int i = 0; i < m_numLines; ++i )
+        if ( m_kdVerts == 0 )
         {
-            m_lineStarts.push_back( ls );
-            m_lineLengths.push_back( data[i].size() / 3 );
-            for( int k = 0; k < data[i].size() / 3; ++k )
+            qDebug() << "copy kdVerts";
+            m_kdVerts = new std::vector<float>();
+            m_kdVerts->reserve( m_numPoints * 3 );
+            //m_numPoints = 0;
+            for ( int i = 0; i < m_numLines; ++i )
             {
-                m_kdVerts.push_back( data[i][k * 3    ] );
-                m_kdVerts.push_back( data[i][k * 3 + 1] );
-                m_kdVerts.push_back( data[i][k * 3 + 2] );
-                m_reverseIndexes.push_back( i );
-                ++m_numPoints;
-                ++ls;
+                m_lineStarts.push_back( ls );
+                m_lineLengths.push_back( fibs[i].length() );
+                for( unsigned int k = 0; k < fibs[i].length(); ++k )
+                {
+                    m_kdVerts->push_back( fibs[i][k].x() );
+                    m_kdVerts->push_back( fibs[i][k].y() );
+                    m_kdVerts->push_back( fibs[i][k].z() );
+                    m_reverseIndexes.push_back( i );
+                    //++m_numPoints;
+                    ++ls;
+                }
+            }
+        }
+        else
+        {
+            qDebug() << "copy kdVerts 2";
+            for ( int i = 0; i < m_numLines; ++i )
+            {
+                m_lineStarts.push_back( ls );
+                m_lineLengths.push_back( fibs[i].length() );
+                for( unsigned int k = 0; k < fibs[i].length(); ++k )
+                {
+                    m_reverseIndexes.push_back( i );
+                    ++ls;
+                }
             }
         }
     }
@@ -83,7 +113,8 @@ void FiberSelector::init( QVector< QVector< float > >& data )
         exit ( 0 );
     }
 
-    m_kdTree = new KdTree( m_numPoints, m_kdVerts.data() );
+    m_kdTree = new KdTree( m_numPoints, m_kdVerts->data() );
+    qDebug() << "end creating kdTree";
 
     connect( Models::r(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( roiChanged( QModelIndex, QModelIndex ) ) );
     connect( Models::r(), SIGNAL( rowsInserted( QModelIndex, int, int ) ), this, SLOT( roiInserted( QModelIndex, int, int ) ) );
@@ -106,8 +137,8 @@ void FiberSelector::updatePresentRois()
 
     for ( int i = 0; i < numBranches; ++i )
     {
-        QList<QVector<bool> >newBranch;
-        QVector<bool>newLeaf( m_numLines );
+        QList<std::vector<bool> >newBranch;
+        std::vector<bool>newLeaf( m_numLines );
         newBranch.push_back( newLeaf );
         m_branchfields.push_back( newLeaf );
         m_bitfields.push_back( newBranch );
@@ -118,7 +149,7 @@ void FiberSelector::updatePresentRois()
         for ( int k = 0; k < leafCount; ++k )
         {
             // inserted child roi
-            QVector<bool>newLeaf( m_numLines );
+            std::vector<bool>newLeaf( m_numLines );
             m_bitfields[i].push_back( newLeaf );
             updateROI( i, k + 1 );
         }
@@ -152,8 +183,8 @@ void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
     if ( parent.row() == -1 )
     {
         // inserted top level roi
-        QList<QVector<bool> >newBranch;
-        QVector<bool>newLeaf( m_numLines );
+        QList<std::vector<bool> >newBranch;
+        std::vector<bool>newLeaf( m_numLines );
         newBranch.push_back( newLeaf );
         m_branchfields.push_back( newLeaf );
         m_bitfields.push_back( newBranch );
@@ -162,7 +193,7 @@ void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
     else
     {
         // inserted child roi
-        QVector<bool>newLeaf( m_numLines );
+        std::vector<bool>newLeaf( m_numLines );
         m_bitfields[parent.row()].push_back( newLeaf );
         updateROI( parent.row(), m_bitfields[parent.row()].size() - 1 );
     }
@@ -209,7 +240,7 @@ void FiberSelector::updateROI( int branch, int pos )
         {
             ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
             float threshold = roi->properties()->get( Fn::Property::R_THRESHOLD ).toFloat();
-            QVector<float>* data = roi->data();
+            std::vector<float>* data = roi->data();
             int nx = roi->properties()->get( Fn::Property::R_NX ).toInt();
             int ny = roi->properties()->get( Fn::Property::R_NY ).toInt();
             int nz = roi->properties()->get( Fn::Property::R_NZ ).toInt();
@@ -220,11 +251,11 @@ void FiberSelector::updateROI( int branch, int pos )
             {
                 m_bitfields[branch][pos][i] = false;
             }
-            for ( int i = 0; i < m_kdVerts.size() / 3; ++i )
+            for ( unsigned int i = 0; i < m_kdVerts->size() / 3; ++i )
             {
-                float x = m_kdVerts[i*3];
-                float y = m_kdVerts[i*3+1];
-                float z = m_kdVerts[i*3+2];
+                float x = m_kdVerts->at( i*3 );
+                float y = m_kdVerts->at( i*3+1 );
+                float z = m_kdVerts->at( i*3+2 );
 
                 int px = x / dx;
                 int py = y / dy;
@@ -256,14 +287,11 @@ void FiberSelector::updateROI( int branch, int pos )
             m_boxMax[1] = m_y + m_dy;
             m_boxMin[2] = m_z - m_dz;
             m_boxMax[2] = m_z + m_dz;
-
             for ( int i = 0; i < m_numLines; ++i )
             {
                 m_bitfields[branch][pos][i] = false;
             }
-
             boxTest( m_bitfields[branch][pos], 0, m_numPoints - 1, 0 );
-
             if ( shape == 0 || shape == 1 )
             {
                 sphereTest( m_bitfields[branch][pos] );
@@ -285,7 +313,7 @@ void FiberSelector::updateROI( int branch, int pos )
     }
 }
 
-void FiberSelector::boxTest( QVector<bool>& workfield, int left, int right, int axis )
+void FiberSelector::boxTest( std::vector<bool>& workfield, int left, int right, int axis )
 {
     // abort condition
     if ( left > right )
@@ -295,20 +323,20 @@ void FiberSelector::boxTest( QVector<bool>& workfield, int left, int right, int 
     int axis1 = ( axis + 1 ) % 3;
     int pointIndex = m_kdTree->m_tree[root] * 3;
 
-    if ( m_kdVerts[pointIndex + axis] < m_boxMin[axis] )
+    if ( m_kdVerts->at( pointIndex + axis ) < m_boxMin[axis] )
     {
         boxTest( workfield, root + 1, right, axis1 );
     }
-    else if ( m_kdVerts[pointIndex + axis] > m_boxMax[axis] )
+    else if ( m_kdVerts->at( pointIndex + axis ) > m_boxMax[axis] )
     {
         boxTest( workfield, left, root - 1, axis1 );
     }
     else
     {
         int axis2 = ( axis + 2 ) % 3;
-        if ( m_kdVerts[pointIndex + axis1] <= m_boxMax[axis1] && m_kdVerts[pointIndex + axis1]
-                >= m_boxMin[axis1] && m_kdVerts[pointIndex + axis2] <= m_boxMax[axis2]
-                && m_kdVerts[pointIndex + axis2] >= m_boxMin[axis2] )
+        if ( m_kdVerts->at( pointIndex + axis1 ) <= m_boxMax[axis1] && m_kdVerts->at( pointIndex + axis1 )
+                >= m_boxMin[axis1] && m_kdVerts->at( pointIndex + axis2 ) <= m_boxMax[axis2]
+                && m_kdVerts->at( pointIndex + axis2 ) >= m_boxMin[axis2] )
         {
             workfield[m_reverseIndexes[ m_kdTree->m_tree[root] ]] = true;
         }
@@ -317,7 +345,7 @@ void FiberSelector::boxTest( QVector<bool>& workfield, int left, int right, int 
     }
 }
 
-void FiberSelector::sphereTest( QVector<bool>& workfield )
+void FiberSelector::sphereTest( std::vector<bool>& workfield )
 {
     float vx,vy,vz;
     bool hit;
@@ -329,9 +357,9 @@ void FiberSelector::sphereTest( QVector<bool>& workfield )
             hit = false;
             for ( int k = 0; k < m_lineLengths[i]; ++k )
             {
-                vx = ( m_kdVerts[ ls + k*3    ] - m_x ) / m_dx;
-                vy = ( m_kdVerts[ ls + k*3 + 1] - m_y ) / m_dy;
-                vz = ( m_kdVerts[ ls + k*3 + 2] - m_z ) / m_dz;
+                vx = ( m_kdVerts->at(  ls + k*3     ) - m_x ) / m_dx;
+                vy = ( m_kdVerts->at(  ls + k*3 + 1 ) - m_y ) / m_dy;
+                vz = ( m_kdVerts->at(  ls + k*3 + 2 ) - m_z ) / m_dz;
                 float r = sqrt( vx * vx + vy * vy + vz * vz );
                 if ( r < 1.0 )
                 {
@@ -375,14 +403,14 @@ void FiberSelector::updateBranch( int branch )
             {
                 for ( int k = 0; k < m_numLines; ++k )
                 {
-                    m_branchfields[branch][k] &= !m_bitfields[branch][current][k];
+                    m_branchfields[branch][k] = m_branchfields[branch][k] & !m_bitfields[branch][current][k];
                 }
             }
             else
             {
                 for ( int k = 0; k < m_numLines; ++k )
                 {
-                    m_branchfields[branch][k] &= m_bitfields[branch][current][k];
+                    m_branchfields[branch][k] = m_branchfields[branch][k] & m_bitfields[branch][current][k];
                 }
             }
             ++current;
@@ -418,7 +446,7 @@ void FiberSelector::updateRoot()
             {
                 for ( int k = 0; k < m_numLines; ++k )
                 {
-                    m_rootfield[k] |= m_branchfields[i][k];
+                    m_rootfield[k] = m_rootfield[k] | m_branchfields[i][k];
                 }
             }
         }

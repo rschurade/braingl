@@ -34,14 +34,14 @@ Bingham::~Bingham()
 QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int neighbourhood, const int num_max )
 {
     QList<Dataset*> dsout;
-    QVector<ColumnVector>* data = sh->getData();
+    std::vector<ColumnVector>* data = sh->getData();
 
     const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     qDebug() << "calculated order from sh: " << order;
 
     int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<BinghamThread*> threads;
+    std::vector<BinghamThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
@@ -60,25 +60,25 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         threads[i]->wait();
     }
 
-    QVector<QVector<float> > out;
+    std::vector<std::vector<float> > out;
     out.resize( data->size() );
 
     // combine fibs from all threads
     qDebug() << "combining results";
-    QVector<float> v( 27, 0 );
-    for ( int i = 0; i < data->size(); ++i )
+    std::vector<float> v( 27, 0 );
+    for ( unsigned int i = 0; i < data->size(); ++i )
     {
-        out.replace( i, v );
+        out[i] = v;
     }
 
 
     for ( int i = 0; i < numThreads; ++i )
     {
-        QVector<QVector<float> > result = threads[i]->getResultVector();
+        std::vector<std::vector<float> > result = threads[i]->getResultVector();
         qDebug() << i << result.size();
-        for ( int k = 0, l = i; k < result.size(); ++k, l += numThreads )
+        for ( unsigned int k = 0, l = i; k < result.size(); ++k, l += numThreads )
         {
-            out.replace( l, result.at( k) );
+            out[l] = result.at( k);
         }
     }
 
@@ -96,11 +96,11 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
 QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
 {
     qDebug() << "start bingham to dwi";
-    QVector< QVector<float> >* data = ds->getData();
+    std::vector< std::vector<float> >* data = ds->getData();
 
-    QVector<ColumnVector> signals1;
-    QVector<ColumnVector> signals2;
-    QVector<ColumnVector> signals3;
+    std::vector<ColumnVector> signals1;
+    std::vector<ColumnVector> signals2;
+    std::vector<ColumnVector> signals3;
 
     signals1.resize( data->size() );
     signals2.resize( data->size() );
@@ -113,14 +113,14 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
 
     ColumnVector v( gradientsSize );
     v = 0.0;
-    for ( int i = 0; i < data->size(); ++i )
+    for ( unsigned int i = 0; i < data->size(); ++i )
     {
-        signals1.replace( i, v );
-        signals2.replace( i, v );
-        signals3.replace( i, v );
+        signals1[i] = v;
+        signals2[i] = v;
+        signals3[i] = v;
     }
 
-    QVector< QVector<ColumnVector>* > sigs;
+    std::vector< std::vector<ColumnVector>* > sigs;
     sigs.push_back( &signals1 );
     sigs.push_back( &signals2 );
     sigs.push_back( &signals3 );
@@ -132,8 +132,8 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     float f0;
 
     //****************************************************************************
-    QVector<QVector3D>bvecs;
-    QVector<float>bvals;
+    std::vector<QVector3D>bvecs;
+    std::vector<float>bvals;
 
     const int max_ord = 10; //((-3+static_cast<int>(sqrt(8*((*sh.get(0,0,0)).size())+1)))/2);
 
@@ -163,7 +163,7 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     Matrix base( FMath::sh_base( gradients, max_ord ) );
     Matrix inv_base( FMath::pseudoInverse( FMath::sh_base( tessGradients, max_ord ) ) );
 
-    for ( int i = 0; i < data->size(); ++i ) // for all voxels
+    for ( unsigned int i = 0; i < data->size(); ++i ) // for all voxels
     {
         for ( int k = 0; k < 3; ++k ) // for all 3 bingham peaks
         {
@@ -220,13 +220,13 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
                         tmp( ii + 1 ) = 1.0;
                     }
                 }
-                sigs[k]->replace( i, tmp1 );
+                sigs[k]->at( i ) = tmp1;
             }
 
         }
     }
 
-    QVector<float> b0Data( data->size(), 220 );
+    std::vector<float> b0Data( data->size(), 220 );
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {

@@ -25,18 +25,18 @@ class ROIArea : public ROI
     Q_OBJECT
 
 public:
-    ROIArea( QVector<float> data, nifti_image* header );
+    ROIArea( std::vector<float> data, nifti_image* header );
     virtual ~ROIArea();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
 
-    QVector<float>* data();
+    std::vector<float>* data();
 
 private:
     void generateSurface();
     void renameVerticesAndTriangles();
 
-    QVector<float> m_data;
+    std::vector<float> m_data;
     nifti_image* m_header;
 
     MeshRenderer* m_renderer;
@@ -64,7 +64,7 @@ private:
     int m_nPointsInSlice;
 
     int m_numThreads;
-    QVector<IsoSurfaceThread*> m_threads;
+    std::vector<IsoSurfaceThread*> m_threads;
 
 private slots:
     void globalChanged();

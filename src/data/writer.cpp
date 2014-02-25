@@ -17,8 +17,10 @@
 #include "datasets/datasetsh.h"
 #include "datasets/datasetmesh.h"
 #include "datasets/datasetcons.h"
+#include "datasets/datasetcorrelation.h"
 #include "mesh/trianglemesh2.h"
 
+#include "../algos/fib.h"
 #include "../algos/fmath.h"
 
 #include <QDebug>
@@ -42,7 +44,7 @@ bool Writer::save()
         {
             nifti_image* out = createHeader( 1 );
 
-            QVector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
+            std::vector<float>* data = dynamic_cast<DatasetScalar*>( m_dataset )->getData();
 
             out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
@@ -58,13 +60,13 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_VECTOR:
         {
-            QVector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
+            std::vector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = 3;
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_vec3" );
@@ -100,10 +102,10 @@ bool Writer::save()
         {
             nifti_image* out = createHeader( 6 );
 
-            QVector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
+            std::vector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-            QVector<float> outData( img->nx * img->ny * img->nz * 6 );
+            std::vector<float> outData( img->nx * img->ny * img->nz * 6 );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_tensor" );
@@ -139,13 +141,13 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_SH:
         {
-            QVector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
+            std::vector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = data->at( 0 ).Nrows();
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_qball" );
@@ -180,13 +182,13 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_BINGHAM:
         {
-            QVector<QVector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
+            std::vector<std::vector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = data->at( 0 ).size();
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
             int blockSize = img->nx * img->ny * img->nz;
             setDescrip( out, "fnav2_bingham" );
@@ -197,7 +199,7 @@ bool Writer::save()
                 {
                     for ( int x = 0; x < img->nx; ++x )
                     {
-                        QVector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        std::vector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
 
                         for ( int i = 0; i < dim; ++i )
                         {
@@ -221,23 +223,23 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_DWI:
         {
-            QVector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
-            QVector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
+            std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
+            std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
             nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
 
             int dim = data->at( 0 ).Nrows() + 1;
             nifti_image* out = createHeader( dim );
-            QVector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
 
-            QVector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
-            QVector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
-            QVector<float> bvalOut;
-            for ( int i = 0; i < bvals.size(); ++i )
+            std::vector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
+            std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
+            std::vector<float> bvalOut;
+            for ( unsigned int i = 0; i < bvals.size(); ++i )
             {
                 bvalOut.push_back( bvals[i] );
             }
-            for ( int i = 0; i < bvecs.size(); ++i )
+            for ( unsigned int i = 0; i < bvecs.size(); ++i )
             {
                 bvalOut.push_back( bvecs[i].x() );
                 bvalOut.push_back( bvecs[i].y() );
@@ -283,14 +285,22 @@ bool Writer::save()
             break;
         case Fn::DatasetType::FIBERS:
         {
-            WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
-            vtkWriter->save();
+            if ( m_filter.endsWith( "(*.json)" ) )
+            {
+                saveFibJson();
+            }
+            else
+            {
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
+                vtkWriter->save();
+            }
         }
             break;
         case Fn::DatasetType::MESH_BINARY:
         case Fn::DatasetType::MESH_ISOSURFACE:
         case Fn::DatasetType::MESH_TIME_SERIES :
         case Fn::DatasetType::GLYPHSET :
+        case Fn::DatasetType::MESH_CORRELATION:
         {
             if ( m_filter.endsWith( "(*.1D)" ) )
             {
@@ -316,6 +326,14 @@ bool Writer::save()
             {
                 saveMeshJson();
             }
+            else if ( m_filter.endsWith( "(*.asc)" ) )
+            {
+                saveMeshAsc();
+            }
+            else if ( m_filter.endsWith( "(*.bin)" ) )
+            {
+                saveBinaryConnectivity();
+            }
             else
             {
                 WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
@@ -325,7 +343,15 @@ bool Writer::save()
         }
         case Fn::DatasetType::CONS :
         {
-            saveConnexels();
+            if ( m_filter.endsWith( "(*.cxls)" ) )
+            {
+                saveConnexels();
+            }
+            else
+            {
+                WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
+                vtkWriter->save();
+            }
             break;
         }
         default:
@@ -416,7 +442,7 @@ void Writer::saveRGB()
         }
         QTextStream out( &file );
         float* c = dsm->getMesh()->getVertexColors();
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             out << c[i * 4] << " " << c[i * 4 + 1] << " " << c[i * 4 + 2] << endl;
         }
@@ -435,7 +461,7 @@ void Writer::save1D()
             return;
         }
         QTextStream out( &file );
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             float c = dsm->getMesh()->getVertexData(i);
             out << c << endl;
@@ -455,7 +481,7 @@ void Writer::saveROI()
             return;
         }
         QTextStream out( &file );
-        for ( int i = 0; i < dsm->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < dsm->getMesh()->numVerts(); ++i )
         {
             float c = dsm->getMesh()->getVertexData( i );
             if ( c > 0 )
@@ -761,6 +787,145 @@ void Writer::saveMeshJson()
         out << "]," << endl;
 
         out << "  \"correction\" : [ 0.0, 0.0, 0.0 ]" << endl;
+        out << "}";
+
+        outFile.close();
+    }
+}
+
+void Writer::saveMeshAsc()
+{
+    if ( dynamic_cast<DatasetMesh*>( m_dataset ) )
+    {
+        DatasetMesh* dsm = dynamic_cast<DatasetMesh*>( m_dataset );
+        QFile outFile( m_fileName.absoluteFilePath() );
+        if ( !outFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &outFile );
+
+        out << "#!ascii version of " << m_fileName.absoluteFilePath() << endl;
+
+        int numVerts = dsm->getMesh()->numVerts();
+        int numTris = dsm->getMesh()->numTris();
+
+        out << numVerts << " " << numTris << endl;
+
+        for ( int i = 0; i < numVerts; ++i )
+        {
+            QVector3D vert = dsm->getMesh()->getVertex( i );
+            out << vert.x() << " " << vert.y() << " " << vert.z() << " 0" << endl;
+        }        for ( int i = 0; i < numTris; ++i )
+        {
+            Triangle t = dsm->getMesh()->getTriangle2( i );
+            out << t.v0 << " " << t.v1 << " " << t.v2 << " 0" << endl;
+        }
+        outFile.close();
+    }
+}
+
+void Writer::saveBinaryConnectivity()
+{
+    if ( dynamic_cast<DatasetCorrelation*>( m_dataset ) )
+    {
+        DatasetCorrelation* dsc = dynamic_cast<DatasetCorrelation*>( m_dataset );
+        qDebug() << "saving binary connectivity matrix";
+        dsc->saveBinaryMatrix( m_fileName.absoluteFilePath() );
+    }
+}
+
+void Writer::saveFibJson()
+{
+    if ( dynamic_cast<DatasetFibers*>( m_dataset ) )
+    {
+        DatasetFibers* dsf = dynamic_cast<DatasetFibers*>( m_dataset );
+        QFile outFile( m_fileName.absoluteFilePath() );
+        if ( !outFile.open( QIODevice::WriteOnly ) )
+        {
+            return;
+        }
+        QTextStream out( &outFile );
+
+        //unsigned int numVerts = dsf->numVerts();
+        unsigned int numLines = dsf->numLines();
+        std::vector<Fib>* fibs = dsf->getFibs();
+        QVector3D vert;
+
+        out << "{" << endl;
+        out << "  \"vertices\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                vert = fibs->at( i )[k];
+                out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+            }
+        }
+
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+            vert = fibs->back()[k];
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+
+        vert = fibs->back().lastVert();
+        out << vert.x() << "," << vert.y() << "," << vert.z();// << endl;
+
+        out << "]," << endl;
+
+        out << "  \"normals\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                vert = fibs->at( i ).getTangent( k );
+                out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+            }
+        }
+
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+            vert = fibs->back().getTangent( k );
+            out << vert.x() << "," << vert.y() << "," << vert.z() << ",";// << endl;
+        }
+
+        vert = fibs->back().getTangent( fibs->back().length() - 1 );
+        out << vert.x() << "," << vert.y() << "," << vert.z() << "]," << endl;
+
+        out << "  \"colors\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1 ; ++i )
+        {
+            QColor col = fibs->at( i ).customColor();
+            for ( unsigned int k = 0; k < fibs->at( i ).length();++k )
+            {
+                out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0,";
+            }
+        }
+
+        QColor col = fibs->back().customColor();
+        for ( unsigned int k = 0; k < fibs->back().length() - 1;++k )
+        {
+
+            out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0,";
+        }
+        out << col.redF() << "," << col.greenF() << "," << col.blueF() << "," << "1.0]," << endl;;
+
+        out << "  \"indices\" :" << endl;
+        out << "[";
+
+        for ( unsigned int i = 0; i < numLines - 1; ++i )
+        {
+            out << fibs->at( i ).length() << ",";
+        }
+        out << fibs->back().length() << "]" << endl;
+
         out << "}";
 
         outFile.close();

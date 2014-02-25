@@ -18,6 +18,8 @@
 
 #include "mesh/trianglemesh2.h"
 
+#include "../algos/fib.h"
+
 #include <QDebug>
 #include <QDataStream>
 #include <QVector3D>
@@ -36,7 +38,6 @@ Loader::Loader( Dataset* selected ) :
 Loader::~Loader()
 {
     m_dataset.clear();
-    m_dataset.squeeze();
 }
 
 void Loader::setFilename( QDir fn )
@@ -165,8 +166,8 @@ bool Loader::loadVTK()
 
     if ( lv->getPrimitiveType() == 1 )
     {
-        QVector<float> points = lv->getPoints();
-        QVector<int> triangles = lv->getPolys();
+        std::vector<float>* points = lv->getPoints();
+        std::vector<int> triangles = lv->getPolys();
 
         if ( triangles[0] != 3 )
         {
@@ -174,32 +175,32 @@ bool Loader::loadVTK()
             return false;
         }
 
-        int numPoints = lv->getNumPoints();
-        int numTriangles = lv->getNumPolys();
+        unsigned int numPoints = lv->getNumPoints();
+        unsigned int numTriangles = lv->getNumPolys();
 
         TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
 
-        for ( int i = 0; i < numPoints; ++i )
+        for ( unsigned int i = 0; i < numPoints; ++i )
         {
-            mesh->addVertex( points[i * 3], points[i * 3 + 1], points[i * 3 + 2] );
+            mesh->addVertex( points->at( i * 3 ), points->at( i * 3 + 1 ), points->at( i * 3 + 2 ) );
         }
 
-        for ( int i = 0; i < numTriangles; ++i )
+        for ( unsigned int i = 0; i < numTriangles; ++i )
         {
             mesh->addTriangle( triangles[i * 4 + 1], triangles[i * 4 + 2], triangles[i * 4 + 3] );
         }
 
-        QVector<QVector<float> > values = lv->getPointData();
+        std::vector<std::vector<float> > values = lv->getPointData();
 
         float min = std::numeric_limits<float>().max();
         float max = -std::numeric_limits<float>().max();
 
         if ( values.size() > 0 )
         {
-            QVector<float> data = values[0];
+            std::vector<float> data = values[0];
             if ( data.size() == numPoints )
             {
-                for ( int i = 0; i < numPoints; ++i )
+                for ( unsigned int i = 0; i < numPoints; ++i )
                 {
                     min = qMin( min, data[i] );
                     max = qMax( max, data[i] );
@@ -208,10 +209,10 @@ bool Loader::loadVTK()
             }
         }
 
-        QVector<unsigned char> colors = lv->getPointColors();
-        if ( colors.size() == points.size() )
+        std::vector<unsigned char> colors = lv->getPointColors();
+        if ( colors.size() == points->size() )
         {
-            for ( int i = 0; i < numPoints; ++i )
+            for ( unsigned int i = 0; i < numPoints; ++i )
             {
                 mesh->setVertexColor( i, ( (float)colors[i * 3] ) /255.,
                                          ( (float)colors[i * 3 + 1] ) /255.,
@@ -256,15 +257,15 @@ bool Loader::loadASC( QVector3D offset )
         return false;
     }
 
-    QVector<float> points = lf->getPoints();
-    QVector<int> triangles = lf->getTriangles();
-    int numPoints = points.size() / 3;
+    std::vector<float>* points = lf->getPoints();
+    std::vector<int> triangles = lf->getTriangles();
+    int numPoints = points->size() / 3;
     int numTriangles = triangles.size() / 3;
 
     TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
     for ( int i = 0; i < numPoints; ++i )
     {
-        mesh->addVertex( points[i * 3] + offset.x(), points[i * 3 + 1] + offset.y(), points[i * 3 + 2] + offset.z() );
+        mesh->addVertex( points->at( i * 3 ) + offset.x(), points->at( i * 3 + 1 ) + offset.y(), points->at( i * 3 + 2 ) + offset.z() );
     }
     for ( int i = 0; i < numTriangles; ++i )
     {
@@ -322,15 +323,15 @@ bool Loader::loadSet()
                 return false;
             }
 
-            QVector<float> points = lf.getPoints();
-            QVector<int> triangles = lf.getTriangles();
-            int numPoints = points.size() / 3;
+            std::vector<float>* points = lf.getPoints();
+            std::vector<int> triangles = lf.getTriangles();
+            int numPoints = points->size() / 3;
             int numTriangles = triangles.size() / 3;
 
             TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
             for ( int i = 0; i < numPoints; ++i )
             {
-                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+                mesh->addVertex( points->at( i * 3 ) + s.x(), points->at( i * 3 + 1 ) + s.y(), points->at( i * 3 + 2 ) + s.z() );
             }
             for ( int i = 0; i < numTriangles; ++i )
             {
@@ -379,7 +380,15 @@ bool Loader::loadGlyphset()
     gnl = gts.readLine();
     QStringList sl2 = gnl.split( " " );
 
-    QString connectivityName = trunk + QDir::separator() + sl2.at( 0 );
+    QString connectivityName;
+    if ( sl2.at( 0 ).startsWith( "http" ) )
+    {
+        connectivityName = sl2.at( 0 );
+    }
+    else
+    {
+        connectivityName = trunk + QDir::separator() + sl2.at( 0 );
+    }
     float mt = 0.8;
     if ( sl2.length() > 1 )
     {
@@ -418,7 +427,7 @@ bool Loader::loadGlyphset()
 
     QString onl;
     QTextStream* ots;
-    QVector<QString> others;
+    std::vector<QString> others;
     if ( two )
     {
         QFile othersetfile( trunk + QDir::separator() + datasetNames.at( 1 ) );
@@ -472,23 +481,22 @@ bool Loader::loadGlyphset()
             if ( sl.length() > 3 )
                 z = sl.at( 3 ).toFloat();
             QVector3D s( x, y, z );
-            QVector<float> points = lf.getPoints();
-            QVector<int> triangles = lf.getTriangles();
-            int numPoints = points.size() / 3;
+            std::vector<float>* points = lf.getPoints();
+            std::vector<int> triangles = lf.getTriangles();
+            int numPoints = points->size() / 3;
             int numTriangles = triangles.size() / 3;
 
             int onumPoints = 0;
             int onumTriangles = 0;
-            QVector<float> opoints;
-            QVector<int> otriangles;
+            std::vector<float>* opoints = new std::vector<float>();
+            std::vector<int> otriangles;
             QVector3D* os = new QVector3D( 0, 0, 0 );
+            LoaderFreesurfer olf;
             if ( two )
             {
                 QStringList osl;
                 osl = onl.split( " " );
                 QString ofullname = trunk + QDir::separator() + osl.at( 0 );
-
-                LoaderFreesurfer olf;
 
                 if ( !olf.loadASC( ofullname ) )
                 {
@@ -509,7 +517,7 @@ bool Loader::loadGlyphset()
                 os = new QVector3D( ox, oy, oz );
                 opoints = olf.getPoints();
                 otriangles = olf.getTriangles();
-                onumPoints = opoints.size() / 3;
+                onumPoints = opoints->size() / 3;
                 onumTriangles = otriangles.size() / 3;
             }
 
@@ -517,7 +525,7 @@ bool Loader::loadGlyphset()
 
             for ( int i = 0; i < numPoints; ++i )
             {
-                mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+                mesh->addVertex( points->at( i * 3 ) + s.x(), points->at( i * 3 + 1 ) + s.y(), points->at( i * 3 + 2 ) + s.z() );
             }
             for ( int i = 0; i < numTriangles; ++i )
             {
@@ -534,7 +542,7 @@ bool Loader::loadGlyphset()
                 for ( int i = 0; i < onumPoints; ++i )
 
                 {
-                    mesh->addVertex( opoints[i * 3] + os->x(), opoints[i * 3 + 1] + os->y(), opoints[i * 3 + 2] + os->z() );
+                    mesh->addVertex( opoints->at( i * 3 ) + os->x(), opoints->at( i * 3 + 1 ) + os->y(), opoints->at( i * 3 + 2 ) + os->z() );
                 }
                 for ( int i = 0; i < onumTriangles; ++i )
                 {
@@ -557,16 +565,16 @@ bool Loader::loadGlyphset()
 
         QString roiname = trunk + QDir::separator() + sl2.at( 3 );
         qDebug() << "loading ROI: " << roiname;
-        dataset->loadROI( roiname );
+        dataset->loadROI( roiname, dataset->roi );
         if ( sl2.length() > 4 )
         {
             QString roiname2 = trunk + QDir::separator() + sl2.at( 4 );
             qDebug() << "loading ROI2: " << roiname2;
-            dataset->loadROI2( roiname2 );
+            dataset->loadROI( roiname2, dataset->roi2 );
         }
     }
 
-    //3: load connectivity: put this into seperate loader / dataset / here
+    //3: load connectivity
     qDebug() << "loading connectivity";
     dataset->readConnectivity( connectivityName );
 
@@ -631,7 +639,7 @@ bool Loader::loadMEG()
                         qDebug() << "data file unreadable, skipping"  << numberString + ".txt";
                         continue;
                     }
-                    QVector<float>data;
+                    std::vector<float>data;
                     QTextStream ds( &dataFile );
                     while( !ds.atEnd() )
                     {
@@ -678,8 +686,8 @@ bool Loader::loadMEG()
             QVector3D s( x, y, z );
 
             TriangleMesh2* mesh;
-            QVector<float> points;
-            QVector<int> triangles;
+            std::vector<float>* points;
+            std::vector<int> triangles;
 
             if ( fullname.endsWith( ".asc" ) )
             {
@@ -694,7 +702,7 @@ bool Loader::loadMEG()
                 points = lf.getPoints();
                 triangles = lf.getTriangles();
 
-                int numPoints = points.size() / 3;
+                int numPoints = points->size() / 3;
                 int numTriangles = triangles.size() / 3;
 
 
@@ -703,7 +711,7 @@ bool Loader::loadMEG()
                     mesh = new TriangleMesh2( numPoints, numTriangles );
                     for ( int i = 0; i < numPoints; ++i )
                     {
-                        mesh->addVertex( points[i * 3] + s.x(), points[i * 3 + 1] + s.y(), points[i * 3 + 2] + s.z() );
+                        mesh->addVertex( points->at( i * 3 ) + s.x(), points->at( i * 3 + 1 ) + s.y(), points->at( i * 3 + 2 ) + s.z() );
                     }
                     for ( int i = 0; i < numTriangles; ++i )
                     {
@@ -744,7 +752,7 @@ bool Loader::loadMEG()
                         mesh = new TriangleMesh2( numPoints, numTriangles );
                         for ( int i = 0; i < numPoints; ++i )
                         {
-                            mesh->addVertex( points[i * 3], points[i * 3 + 1], points[i * 3 + 2] );
+                            mesh->addVertex( points->at( i * 3 ), points->at( i * 3 + 1 ), points->at( i * 3 + 2 ) );
                         }
 
                         for ( int i = 0; i < numTriangles; ++i )
@@ -783,8 +791,8 @@ bool Loader::loadTree()
     QString nl;
 
     QString dims;
-    QVector<QString>coordinates;
-    QVector<QString>clusters;
+    std::vector<QString>coordinates;
+    std::vector<QString>clusters;
 
     while ( !ts.atEnd() )
     {
@@ -832,7 +840,7 @@ bool Loader::loadRGB()
     {
         DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
 
-        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < sds->getMesh()->numVerts(); i++ )
         {
             float r, g, b;
             in >> r >> g >> b;
@@ -865,7 +873,7 @@ bool Loader::load1D()
     {
         DatasetMesh* sds = dynamic_cast<DatasetMesh*>( m_selectedDataset );
 
-        for ( int i = 0; i < sds->getMesh()->numVerts(); i++ )
+        for ( unsigned int i = 0; i < sds->getMesh()->numVerts(); i++ )
         {
             float v;
             in >> v;
@@ -931,8 +939,8 @@ bool Loader::loadMRtrix()
 
     float x,y,z;
 
-    QVector<QVector<float> >fibs;
-    QVector<float>fib;
+    std::vector<Fib> fibs;
+    Fib fib;
 
     union {
       float f;
@@ -967,18 +975,19 @@ bool Loader::loadMRtrix()
         {
             fibs.push_back( fib );
             fib.clear();
+            fib.addDataField();
             continue;
         }
 
-        fib.push_back( x );
-        fib.push_back( y );
-        fib.push_back( z );
+        fib.addVert( x,y ,z );
     }
     qba.clear();
     qba.squeeze();
 
     QString fn = m_fileName.path();
-    DatasetFibers* dataset = new DatasetFibers( fn, fibs );
+    QList<QString>dataNames;
+    dataNames.push_back( "no data" );
+    DatasetFibers* dataset = new DatasetFibers( fn, fibs, dataNames );
     m_dataset.push_back( dataset );
 
     return true;

@@ -48,7 +48,7 @@ private:
 
     QWidget* m_buttonPanel;
 
-    QVector< SliderWithEdit*>m_sliders;
+    std::vector< SliderWithEdit*>m_sliders;
 
 signals:
     void signalUpdate();

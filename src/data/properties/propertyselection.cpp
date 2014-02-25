@@ -24,10 +24,32 @@ PropertySelection::PropertySelection( QString name, std::initializer_list<QStrin
     m_widget = widget;
 }
 
-PropertySelection::PropertySelection( QString name, QVector<QString>options, int value ) :
+PropertySelection::PropertySelection( QString name, std::vector<QString>options, int value ) :
     Property( name, value ),
     m_options( options )
 {
+    SelectWithLabel* widget = new SelectWithLabel( name, 0 );
+    int index = 0;
+    for ( unsigned int  i = 0; i < options.size(); ++i )
+    {
+        widget->insertItem( index++, options[i] );
+    }
+
+    widget->setCurrentIndex( value );
+
+    connect( widget, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( widgetChanged( int) ) );
+    m_widget = widget;
+
+}
+
+PropertySelection::PropertySelection( QString name, QList<QString>options, int value ) :
+    Property( name, value )
+{
+    for ( int i = 0; i < options.size(); ++i )
+    {
+        m_options.push_back( options[i] );
+    }
+
     SelectWithLabel* widget = new SelectWithLabel( name, 0 );
     int index = 0;
     for ( int  i = 0; i < options.size(); ++i )
@@ -41,6 +63,7 @@ PropertySelection::PropertySelection( QString name, QVector<QString>options, int
     m_widget = widget;
 
 }
+
 PropertySelection::~PropertySelection()
 {
 }
@@ -57,7 +80,7 @@ void PropertySelection::widgetChanged( int value )
     emit( valueChanged( value ) );
 }
 
-QVector<QString> PropertySelection::getOptions()
+std::vector<QString> PropertySelection::getOptions()
 {
     return m_options;
 }

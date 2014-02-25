@@ -10,11 +10,22 @@
 
 #include "dataset.h"
 
+#include "../../algos/tree.h"
+
 #include <QString>
 #include <QVector>
 
-class Tree;
 class TreeRenderer;
+
+
+struct PtrGreater // public std::binary_function<bool, const T*, const T*>
+{
+  bool operator()( Tree* a, Tree* b )
+  {
+    // may want to check that the pointers aren't zero...
+    return ( a->getValue() > b->getValue() );
+  }
+};
 
 class DatasetTree : public Dataset
 {
@@ -27,7 +38,7 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     void drawTree( QMatrix4x4 mvpMatrix, int width, int height );
 
-    void importTree( QString dims, QVector<QString>coords, QVector<QString>clusters );
+    void importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters );
 
     Tree* getTree() { return m_tree; };
 
@@ -46,7 +57,7 @@ private:
     int m_numLeaves;
     int m_numNodes;
 
-    QVector<float>m_textureData;
+    std::vector<float>m_textureData;
 
     int m_width;
     int m_height;

@@ -29,7 +29,7 @@
 
 #include <limits>
 
-SHRenderer::SHRenderer( QVector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
+SHRenderer::SHRenderer( std::vector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
     ObjectRenderer(),
     m_tris( 0 ),
     vboIds( new GLuint[ 3 ] ),

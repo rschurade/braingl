@@ -10,7 +10,7 @@
 
 #include <QTimer>
 
-DatasetFMRI::DatasetFMRI( QDir filename, QVector<float> data, nifti_image* header ) :
+DatasetFMRI::DatasetFMRI( QDir filename, std::vector<float> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_FMRI, header ),
     m_data( data )
 {
@@ -33,14 +33,12 @@ DatasetFMRI::DatasetFMRI( QDir filename, QVector<float> data, nifti_image* heade
 
 DatasetFMRI::~DatasetFMRI()
 {
-    // TODO Auto-generated destructor stub
 }
 
-QVector<float>* DatasetFMRI::getData()
+std::vector<float>* DatasetFMRI::getData()
 {
     return &m_data;
 }
-
 
 void DatasetFMRI::examineDataset()
 {
@@ -50,7 +48,7 @@ void DatasetFMRI::examineDataset()
     int dim = m_properties["maingl"]->get( Fn::Property::D_DIM ).toInt();
 
     float min = std::numeric_limits<float>::max();
-    float max = 0;
+    float max = -std::numeric_limits<float>::max();
 
     int size = nx * ny * nz * dim;
     for ( int i = 0; i < size; ++i )

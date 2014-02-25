@@ -12,7 +12,7 @@
 
 #include <QDebug>
 
-DatasetScalar::DatasetScalar( QDir filename, QVector<float> data, nifti_image* header ) :
+DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_image* header ) :
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
         m_colormapRenderer( 0 )
 {
@@ -54,11 +54,10 @@ DatasetScalar::~DatasetScalar()
     m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
     delete m_colormapRenderer;
     m_data.clear();
-    m_data.squeeze();
     glDeleteTextures( 1, &m_textureGLuint );
 }
 
-QVector<float>* DatasetScalar::getData()
+std::vector<float>* DatasetScalar::getData()
 {
     return &m_data;
 }

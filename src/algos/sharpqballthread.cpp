@@ -30,25 +30,25 @@ SharpQBallThread::~SharpQBallThread()
     m_qBallVector.clear();
 }
 
-QVector<ColumnVector> SharpQBallThread::getQBallVector()
+std::vector<ColumnVector> SharpQBallThread::getQBallVector()
 {
     return m_qBallVector;
 }
 
 void SharpQBallThread::run()
 {
-    QVector<QVector3D> bvecs = m_ds->getBvecs();
+    std::vector<QVector3D> bvecs = m_ds->getBvecs();
 
     Matrix gradients( bvecs.size(), 3 );
-    for ( int i = 0; i < bvecs.size(); ++i )
+    for ( unsigned int i = 0; i < bvecs.size(); ++i )
     {
         gradients( i + 1, 1 ) = bvecs.at( i ).x();
         gradients( i + 1, 2 ) = bvecs.at( i ).y();
         gradients( i + 1, 3 ) = bvecs.at( i ).z();
     }
 
-    QVector<ColumnVector>* data = m_ds->getData();
-    QVector<float>* b0Data = m_ds->getB0Data();
+    std::vector<ColumnVector>* data = m_ds->getData();
+    std::vector<float>* b0Data = m_ds->getB0Data();
 
     m_qBallVector.clear();
 

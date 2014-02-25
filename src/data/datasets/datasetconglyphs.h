@@ -58,8 +58,8 @@ private:
     float* diffsArray;
     float* vecsArray;
 
-    QVector<float*>* pieArrays;
-    QVector<int>* numbers;
+    std::vector<float*>* pieArrays;
+    std::vector<int>* numbers;
 
     PointGlyphRenderer* m_prenderer;
     VectorGlyphRenderer* m_vrenderer;

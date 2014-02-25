@@ -17,8 +17,8 @@ public:
     virtual ~Compatibilities();
 
     void addComp(int i, int j, float c);
-    QVector< QVector<int>* >* idxs;
-    QVector< QVector<float>* >* comps2;
+    std::vector< std::vector<int>* >* idxs;
+    std::vector< std::vector<float>* >* comps2;
 
 private:
     int nedges;

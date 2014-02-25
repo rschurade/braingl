@@ -63,14 +63,9 @@ TrackWithCrossings::~TrackWithCrossings()
 {
 }
 
-QVector< QVector< float > > TrackWithCrossings::getFibs()
+std::vector<Fib> TrackWithCrossings::getFibs()
 {
-    return fibs;
-}
-
-QVector< QVector< float > > TrackWithCrossings::getExtras()
-{
-    return extras;
+    return m_fibs;
 }
 
 int TrackWithCrossings::getNumPoints()
@@ -98,17 +93,17 @@ void TrackWithCrossings::startTracking()
 
 void TrackWithCrossings::trackWholeBrain()
 {
-    QVector<float>* mask = m_mask->getData();
-    QVector<Matrix>* tensors1 = m_ds1->getData();
-    QVector<Matrix>* logtensors1 = m_ds1->getLogData();
-    QVector<Matrix>* tensors2 = m_ds2->getData();
-    QVector<Matrix>* logtensors2 = m_ds2->getLogData();
-    QVector<Matrix>* tensors3 = m_ds3->getData();
-    QVector<Matrix>* logtensors3 = m_ds3->getLogData();
+    std::vector<float>* mask = m_mask->getData();
+    std::vector<Matrix>* tensors1 = m_ds1->getData();
+    std::vector<Matrix>* logtensors1 = m_ds1->getLogData();
+    std::vector<Matrix>* tensors2 = m_ds2->getData();
+    std::vector<Matrix>* logtensors2 = m_ds2->getLogData();
+    std::vector<Matrix>* tensors3 = m_ds3->getData();
+    std::vector<Matrix>* logtensors3 = m_ds3->getLogData();
 
-    QVector<QVector3D>* evec1 = new QVector<QVector3D>();
-    QVector<QVector3D>* evec2 = new QVector<QVector3D>();
-    QVector<QVector3D>* evec3 = new QVector<QVector3D>();
+    std::vector<QVector3D>* evec1 = new std::vector<QVector3D>();
+    std::vector<QVector3D>* evec2 = new std::vector<QVector3D>();
+    std::vector<QVector3D>* evec3 = new std::vector<QVector3D>();
     qDebug() << "create evecs";
     FMath::evec1( *tensors1, *evec1 );
     FMath::evec1( *tensors2, *evec2 );
@@ -146,17 +141,16 @@ void TrackWithCrossings::slotThreadFinished()
     {
         qDebug() << "all threads finished";
         // combine fibs from all threads
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
-            fibs += m_threads[i]->getFibs();
-            extras += m_threads[i]->getExtras();
+            m_fibs.insert( m_fibs.end(), m_threads[i]->getFibs()->begin(), m_threads[i]->getFibs()->end() );
         }
 
-        for ( int i = 0; i < m_threads.size(); ++i )
+        for ( unsigned int i = 0; i < m_threads.size(); ++i )
         {
             delete m_threads[i];
         }
-        qDebug() << "tracked " << fibs.size() << " fibers";
+        qDebug() << "tracked " << m_fibs.size() << " fibers";
         qDebug() << "finished tracking";
         emit( finished() );
     }

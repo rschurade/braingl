@@ -13,7 +13,12 @@
 #include "time.h"
 #include "math.h"
 
-BundleThread::BundleThread( int id, QVector< QVector< float > >* fibs, KdTree* kdTree, QVector<float>* kdVerts, QVector<int>* revInd, int numPoints ) :
+BundleThread::BundleThread( int id,
+                               std::vector<Fib>* fibs,
+                               KdTree* kdTree,
+                               std::vector<float>* kdVerts,
+                               std::vector<unsigned int>* revInd,
+                               int numPoints ) :
     m_id( id ),
     m_fibs( fibs ),
     m_kdTree( kdTree ),
@@ -30,10 +35,9 @@ BundleThread::BundleThread( int id, QVector< QVector< float > >* fibs, KdTree* k
 BundleThread::~BundleThread()
 {
     m_forces.clear();
-    m_forces.squeeze();
 }
 
-QVector< QVector3D > BundleThread::getForces()
+std::vector< QVector3D > BundleThread::getForces()
 {
     return m_forces;
 }
@@ -49,34 +53,34 @@ void BundleThread::run()
 void BundleThread::calculateForces()
 {
     int numThreads = GLFunctions::idealThreadCount;
-    for ( int i = m_id; i < m_fibs->size(); i += numThreads )
+    for ( unsigned int i = m_id; i < m_fibs->size(); i += numThreads )
     {
-        QVector<float>fib = m_fibs->at( i );
-        for( int k = 1; k < fib.size() / 3 - 1; ++k )
+        Fib fib = m_fibs->at( i );
+        for( unsigned int k = 1; k < fib.length() - 1; ++k )
         {
-            QVector3D start( fib[0], fib[1], fib[2] );
-            QVector3D end( fib[fib.size()-3], fib[fib.size()-2], fib[fib.size()-1] );
+            QVector3D start = fib.firstVert();
+            QVector3D end = fib.lastVert();
 
-            QVector3D point( fib[k*3], fib[k*3+1], fib[k*3+2] );
+            QVector3D point = fib[k];
             m_boxMin[0] = point.x() - m_radius;
             m_boxMax[0] = point.x() + m_radius;
             m_boxMin[1] = point.y() - m_radius;
             m_boxMax[1] = point.y() + m_radius;
             m_boxMin[2] = point.z() - m_radius;
             m_boxMax[2] = point.z() + m_radius;
-            QVector<QVector3D>result;
-            QVector<int>revInds;
+            std::vector<QVector3D>result;
+            std::vector<unsigned int>revInds;
 
             boxTest( result, revInds, 0, m_numPoints - 1, 0 );
             QVector3D center( 0, 0, 0 );
 
             int countIn = 0;
-            for(int l = 0; l < result.size(); ++l )
+            for( unsigned int l = 0; l < result.size(); ++l )
             {
                 int curFib = revInds[l];
-                QVector<float>fib1 = m_fibs->at( curFib );
-                QVector3D start1( fib1[0], fib1[1], fib1[2] );
-                QVector3D end1( fib1[fib1.size()-3], fib1[fib1.size()-2], fib1[fib1.size()-1] );
+                Fib fib1 = m_fibs->at( curFib );
+                QVector3D start1 = fib1.firstVert();
+                QVector3D end1 = fib1.lastVert();
 
                 if ( ( start - start1 ).length() < 20 ||
                      ( start - end1 ).length()   < 20 ||
@@ -94,11 +98,13 @@ void BundleThread::calculateForces()
     }
 }
 
-void BundleThread::boxTest( QVector<QVector3D>& result, QVector<int>& revInds, int left, int right, int axis )
+void BundleThread::boxTest( std::vector<QVector3D>& result, std::vector<unsigned int>& revInds, unsigned int left, unsigned int right, int axis )
 {
     // abort condition
-    if ( left > right )
+    if ( left > right || right == std::numeric_limits<unsigned int>::max() )
+    {
         return;
+    }
 
     int root = left + ( ( right - left ) / 2 );
     int axis1 = ( axis + 1 ) % 3;

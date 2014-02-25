@@ -18,11 +18,11 @@ ShaderEditWidget::ShaderEditWidget( QWidget* parent ) :
     QVBoxLayout* buttonlayout = new QVBoxLayout();
 
 
-    QVector<QString>names = GLFunctions::getShaderNames();
+    std::vector<QString>names = GLFunctions::getShaderNames();
 
     QButtonGroup* buttonGroup = new QButtonGroup(this);
 
-    for ( int i = 0; i < names.size(); ++i )
+    for ( unsigned int i = 0; i < names.size(); ++i )
     {
         QPushButton* button = new QPushButton( names[i] + "_vs", this );
         buttonlayout->addWidget( button );

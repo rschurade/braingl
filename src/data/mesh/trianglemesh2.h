@@ -28,87 +28,87 @@ struct Triangle {
 class TriangleMesh2
 {
 public:
-    TriangleMesh2( int numVerts, int numTris );
+    TriangleMesh2( unsigned int numVerts, unsigned int numTris );
     TriangleMesh2( TriangleMesh2* trim );
     virtual ~TriangleMesh2();
 
-    void resize( int numVerts, int numTris );
+    void resize( unsigned int numVerts, unsigned int numTris );
 
-    void setVertex( int id, float x, float y, float z );
-    void setVertex( int id, QVector3D pos );
+    void setVertex( unsigned int id, float x, float y, float z );
+    void setVertex( unsigned int id, QVector3D pos );
     bool addVertex( float x, float y, float z );
 
-    void setTriangle( int id, int v0, int v1, int v2 );
-    void setTriangle( int id, Triangle tri );
-    void addTriangle( int v0, int v1, int v2 );
+    void setTriangle( unsigned int id, unsigned int v0, unsigned int v1, unsigned int v2 );
+    void setTriangle( unsigned int id, Triangle tri );
+    void addTriangle( unsigned int v0, unsigned int v1, unsigned int v2 );
     void addTriangle( Triangle tri );
 
-    void setVertexColor( int id, QColor color );
-    void setVertexColor( int id, float r, float g, float b, float a );
+    void setVertexColor( unsigned int id, QColor color );
+    void setVertexColor( unsigned int id, float r, float g, float b, float a );
 
-    void setVertexData( int id, float value );
-    float getVertexData( int id );
+    void setVertexData( unsigned int id, float value );
+    float getVertexData( unsigned int id );
 
-    QVector<int> getStar( int id );
-    int getNextVertex( int triNum, int vertNum );
-    int getNeighbor( int coVert1, int coVert2, int triangleNum );
-    int getThirdVert( int coVert1, int coVert2, int triangleNum );
+    std::vector<unsigned int> getStar( unsigned int id );
+    unsigned int getNextVertex( unsigned int triNum, unsigned int vertNum );
+    unsigned int getNeighbor( unsigned int coVert1, unsigned int coVert2, unsigned int triangleNum );
+    unsigned int getThirdVert( unsigned int coVert1, unsigned int coVert2, unsigned int triangleNum );
 
     void finalize();
 
     float* getVertices();
-    QColor getVertexColor(int i);
+    QColor getVertexColor( unsigned int i );
     float* getVertexColors();
-    int* getIndexes();
+    unsigned int* getIndexes();
 
-    int numVerts() { return m_numVerts; };
-    int numTris() { return m_numTris; };
+    unsigned int numVerts() { return m_numVerts; };
+    unsigned int numTris() { return m_numTris; };
 
-    int currentNumVerts() { return m_vertexInsertId / m_bufferSize; };
-    int currenNumTris() { return m_triangleInsertId / 3; };
+    unsigned int currentNumVerts() { return m_vertexInsertId / m_bufferSize; };
+    unsigned int currenNumTris() { return m_triangleInsertId / 3; };
 
-    int bufferSize();
+    unsigned int bufferSize();
 
-    QVector<int> pick( QVector3D pos, float radius );
-    int closestVertexIndex( QVector3D pos );
+    std::vector<unsigned int> pick( QVector3D pos, float radius );
+    unsigned int closestVertexIndex( QVector3D pos );
 
-    QVector3D getVertex(int id);
-    QVector3D getVertexNormal(int id);
-    QVector<int> getTriangle( int id );
-    Triangle getTriangle2( int id );
+    QVector3D getVertex( unsigned int id );
+    QVector3D getVertexNormal( unsigned int id );
+    std::vector<unsigned int> getTriangle( unsigned int id );
+    Triangle getTriangle2( unsigned int id );
 
-    QVector<int> getTriangles() { return m_triangles; };
+    std::vector<unsigned int> getTriangles() { return m_triangles; };
 
 private:
     void calcTriNormals();
     void calcVertNormals();
 
     void buildOcTree();
-    void collapseVertex( int toId, int toRemoveId );
+    void collapseVertex( unsigned int toId, unsigned int toRemoveId );
 
-    int m_bufferSize;
+    unsigned int m_bufferSize;
 
-    int m_numVerts;
-    int m_numTris;
+    unsigned int m_numVerts;
+    unsigned int m_numTris;
 
-    QVector<float>m_vertices;
-    QVector<float>m_vertexColors;
+    std::vector<float>m_vertices;
+    std::vector<float>m_vertexColors;
 
-    QVector<QVector<int> >m_vertIsInTriangle;
-    QVector<QVector<int> >m_vertNeighbors;
+    std::vector<std::vector<unsigned int> >m_vertIsInTriangle;
+    std::vector<std::vector<unsigned int> >m_vertNeighbors;
 
-    QVector<int>m_triangles;
-    QVector<QVector3D>m_triNormals;
+    std::vector<unsigned int>m_triangles;
+    std::vector<QVector3D>m_triNormals;
 
     int m_numThreads;
-    QVector<MeshThread*> m_threads;
+    std::vector<MeshThread*> m_threads;
 
-    int m_vertexInsertId;
-    int m_colorInsertId;
-    int m_triangleInsertId;
+    unsigned int m_vertexInsertId;
+    unsigned int m_colorInsertId;
+    unsigned int m_triangleInsertId;
 
     OcTree* m_ocTree;
-    QVector<int>m_toRemove;
+    std::vector<unsigned int>m_toRemove;
 };
 
 #endif /* TRIANGLEMESH2_H_ */

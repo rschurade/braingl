@@ -104,20 +104,23 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
     program->setUniformValue( "u_pickColor", red, green, blue, pAlpha );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-
-    setShaderVars( props );
-
-    glEnable( GL_BLEND );
-    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
-    // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
-
-    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    if ( np > 0 )
     {
-        glDrawArrays( GL_POINTS, 0, np );
-    }
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        setShaderVars( props );
+
+        glEnable( GL_BLEND );
+        //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
+        //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
+
+        if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+        {
+            glDrawArrays( GL_POINTS, 0, np );
+        }
+
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
 }
 
 void PointGlyphRenderer::setRenderParams( PropertyGroup* props )
@@ -183,7 +186,10 @@ void PointGlyphRenderer::initGeometry( float* points, int number )
 
     qDebug() << np * ao * sizeof(GLfloat);
 
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-    //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
-    glBufferData( GL_ARRAY_BUFFER, np * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
+    if ( np > 0 )
+    {
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
+        //for more than ~50 mio. points (threshold < 0.2), this seems to crash the x-server on the institute workstation...
+        glBufferData( GL_ARRAY_BUFFER, np * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
+    }
 }

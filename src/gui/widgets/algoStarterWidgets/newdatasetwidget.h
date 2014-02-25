@@ -56,8 +56,8 @@ private slots:
     void createROI();
     void modeChanged( int mode );
 
-    void copyWithRois( DatasetScalar* source, QVector<float> &target );
-    void copy( int branch, int pos, DatasetScalar* source, QVector<float> &target );
+    void copyWithRois( DatasetScalar* source, std::vector<float> &target );
+    void copy( int branch, int pos, DatasetScalar* source, std::vector<float> &target );
 
 signals:
 };

@@ -21,10 +21,10 @@ class TriangleMesh2;
 class DatasetSH: public DatasetNifti
 {
 public:
-    DatasetSH( QDir filename, QVector<ColumnVector> data, nifti_image* header );
+    DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image* header );
     virtual ~DatasetSH();
 
-    QVector<ColumnVector>* getData();
+    std::vector<ColumnVector>* getData();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
@@ -35,7 +35,7 @@ private:
     void createTexture();
     void examineDataset();
 
-    QVector<ColumnVector> m_data;
+    std::vector<ColumnVector> m_data;
 
     SHRenderer* m_renderer;
 };

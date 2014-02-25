@@ -9,7 +9,7 @@
 
 #include <QDebug>
 
-QVector<ColormapBase>ColormapFunctions::m_colormaps;
+std::vector<ColormapBase>ColormapFunctions::m_colormaps;
 
 void ColormapFunctions::addColormap( ColormapBase colormap )
 {
@@ -18,12 +18,12 @@ void ColormapFunctions::addColormap( ColormapBase colormap )
 
 void ColormapFunctions::updateColormap( int id, ColormapBase colormap )
 {
-    ColormapFunctions::m_colormaps.replace( id, colormap );
+    ColormapFunctions::m_colormaps[id] = colormap;
 }
 
 ColormapBase ColormapFunctions::getColormap( int id )
 {
-    return ColormapFunctions::m_colormaps[ qMax( 0, qMin( id, ColormapFunctions::m_colormaps.size() - 1 ) ) ];
+    return ColormapFunctions::m_colormaps[ qMax( 0, qMin( id, (int)ColormapFunctions::m_colormaps.size() - 1 ) ) ];
 }
 
 int ColormapFunctions::size()
@@ -43,7 +43,7 @@ void ColormapFunctions::setName( int id, QString name )
 
 void ColormapFunctions::deleteColormap( int id )
 {
-    ColormapFunctions::m_colormaps.remove( id );
+    ColormapFunctions::m_colormaps.erase( ColormapFunctions::m_colormaps.begin() + id );
 }
 
 QColor ColormapFunctions::getColor( int colormapID, float value, float min, float max, float lowerThreshold, float upperThreshold, float alpha )

@@ -45,7 +45,8 @@ public:
     bool createColor( Fn::Property name, QColor value, QString tab = "none" );
     bool createDir( Fn::Property name, QDir value, QString tab = "none" );
     bool createList( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
-    bool createList( Fn::Property name, QVector<QString> options, int value = 0, QString tab = "none" );
+    bool createList( Fn::Property name, QList<QString> options, int value = 0, QString tab = "none" );
+    bool createList( Fn::Property name, std::vector<QString> options, int value = 0, QString tab = "none" );
     bool createButton( Fn::Property name, QString tab = "none" );
     bool createMatrix( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
     bool createText( Fn::Property name, QString value, QString tab = "none" );
@@ -65,7 +66,7 @@ public:
     void setState( QList<QVariant> state );
 
 private:
-    QVector<QPair<Fn::Property, Property*> >m_properties;
+    std::vector<QPair<Fn::Property, Property*> >m_properties;
 
 public slots:
     void slotPropChanged();

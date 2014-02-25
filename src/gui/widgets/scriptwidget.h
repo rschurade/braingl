@@ -97,7 +97,7 @@ private:
     SliderWithEditInt* m_endSlider;
 
     QList<QList<QVariant> >m_script;
-    QVector<int>m_commandLookUp;
+    std::vector<int>m_commandLookUp;
 
     QScrollArea* m_scrollArea;
     QWidget* m_scriptPanel;
