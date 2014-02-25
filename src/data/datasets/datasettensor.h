@@ -21,12 +21,12 @@ class TensorRendererEV;
 class DatasetTensor: public DatasetNifti
 {
 public:
-    DatasetTensor( QDir filename, QVector<Matrix> data, nifti_image* header );
-    DatasetTensor( QDir filename, QVector<QVector<float> > data, nifti_image* header );
+    DatasetTensor( QDir filename, std::vector<Matrix> data, nifti_image* header );
+    DatasetTensor( QDir filename, std::vector<std::vector<float> > data, nifti_image* header );
     virtual ~DatasetTensor();
 
-    QVector<Matrix>* getData();
-    QVector<Matrix>* getLogData();
+    std::vector<Matrix>* getData();
+    std::vector<Matrix>* getLogData();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
@@ -37,8 +37,8 @@ private:
 
     void createLogTensors();
 
-    QVector<Matrix> m_data;
-    QVector<Matrix> m_logData;
+    std::vector<Matrix> m_data;
+    std::vector<Matrix> m_logData;
 
     TensorRenderer* m_renderer;
     TensorRendererEV* m_rendererEV;

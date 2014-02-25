@@ -9,7 +9,7 @@
 
 #include "../../gui/gl/evrenderer.h"
 
-Dataset3D::Dataset3D( QDir filename, QVector<QVector3D> data, nifti_image* header ) :
+Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ),
     m_data( data ),
     m_renderer( 0 )
@@ -40,7 +40,6 @@ Dataset3D::~Dataset3D()
     m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
     glDeleteTextures( 1, &m_textureGLuint );
     m_data.clear();
-    m_data.squeeze();
 
     delete m_renderer;
 }
@@ -114,7 +113,7 @@ void Dataset3D::createTexture()
 
 }
 
-QVector<QVector3D>* Dataset3D::getData()
+std::vector<QVector3D>* Dataset3D::getData()
 {
     return &m_data;
 }

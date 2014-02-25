@@ -29,7 +29,7 @@ public:
 private:
     DatasetMeshTimeSeries* m_dataset;
 
-    QVector<CorrelationThread*> m_threads;
+    std::vector<CorrelationThread*> m_threads;
     int m_threadsRunning;
 
     float* m_exField;

@@ -5,7 +5,6 @@
  * @author Ralph Schurade
  */
 #include "fiberrenderer.h"
-#include "fiberrendererthread.h"
 
 #include "glfunctions.h"
 
@@ -20,18 +19,19 @@
 
 #include "math.h"
 
-FiberRenderer::FiberRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData, int numPoints )  :
+FiberRenderer::FiberRenderer( FiberSelector* selector,
+                                  std::vector<Fib>* fibs,
+                                  int numPoints )  :
     ObjectRenderer(),
     m_selector( selector ),
     vbo( 0 ),
     dataVbo( 0 ),
-    m_data( data ),
-    m_extraData( extraData ),
-    m_numLines( data->size() ),
+    indexVbo( 0 ),
+    m_fibs( fibs ),
+    m_numLines( fibs->size() ),
     m_numPoints( numPoints ),
     m_isInitialized( false )
 {
-    m_colorField.resize( m_numLines );
 }
 
 FiberRenderer::~FiberRenderer()
@@ -81,6 +81,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+    program->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
 
     initGeometry();
 
@@ -136,19 +137,26 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     glLineWidth( props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
-    QVector<bool>*selected = m_selector->getSelection();
+    std::vector<bool>*selected = m_selector->getSelection();
 
-    for ( int i = 0; i < m_data->size(); ++i )
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
         if ( selected->at( i ) )
         {
-            program->setUniformValue( "u_color", m_colorField[i].redF(),
-                                                   m_colorField[i].greenF(),
-                                                   m_colorField[i].blueF(), 1.0 );
-            program->setUniformValue( "u_globalColor", m_globalColors[i].x(),
-                                                         m_globalColors[i].y(),
-                                                         m_globalColors[i].z(), 1.0 );
+            QColor c = m_fibs->at( i ).customColor();
+            program->setUniformValue( "u_color", c.redF(), c.greenF(), c.blueF(), 1.0 );
+            c = m_fibs->at( i ).globalColor();
+            program->setUniformValue( "u_globalColor", c.redF(), c.greenF(), c.blueF(), 1.0 );
             glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+        }
+        else
+        {
+            if ( Models::getGlobal( Fn::Property::G_UNSELECTED_FIBERS_GREY ).toBool() )
+            {
+                program->setUniformValue( "u_color", .4f, .4f, .4f, 1.0 );
+                program->setUniformValue( "u_globalColor", .4f, .4f, .4f, 1.0 );
+                glDrawArrays( GL_LINE_STRIP, m_startIndexes[i], m_pointsPerLine[i] );
+            }
         }
     }
 
@@ -208,7 +216,6 @@ void FiberRenderer::initGeometry()
     try
     {
         verts.reserve( m_numPoints * 6 );
-        m_globalColors.reserve( m_numLines * 3 );
     }
     catch ( std::bad_alloc& )
     {
@@ -217,43 +224,40 @@ void FiberRenderer::initGeometry()
     }
 
 
-    for ( int i = 0; i < m_data->size(); ++i )
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
-        QVector<float> fib = m_data->at(i);
+        Fib fib = m_fibs->at(i);
 
-        if ( fib.size() < 6 )
+        if ( fib.length() < 2 )
         {
             printf( "fib with size < 2 detected" );
             continue;
         }
 
-        int numFloats = fib.size();
-        QVector3D lineStart( fib[0], fib[1], fib[2] );
-        QVector3D lineEnd( fib[numFloats-3], fib[numFloats-2], fib[numFloats-1] );
-
-        QVector3D gc( fabs( lineStart.x() - lineEnd.x() ), fabs( lineStart.y() - lineEnd.y() ), fabs( lineStart.z() - lineEnd.z() ) );
-        gc.normalize();
-        m_globalColors.push_back( gc );
+        QVector3D lineStart = fib.firstVert();
+        QVector3D lineEnd = fib.lastVert();
 
         // push back the first vertex, done seperately because of nomal calculation
-        verts.push_back( fib[0] );
-        verts.push_back( fib[1] );
-        verts.push_back( fib[2] );
+        verts.push_back( lineStart.x() );
+        verts.push_back( lineStart.y() );
+        verts.push_back( lineStart.z() );
 
-        QVector3D localColor( fabs( fib[0] - fib[3] ), fabs( fib[1] - fib[4] ), fabs( fib[2] - fib[5] ) );
+        QVector3D secondVert = fib.getVert( 1 );
+
+        QVector3D localColor( lineStart.x() - secondVert.x(), lineStart.y() - secondVert.y(), lineStart.z() - secondVert.z() );
         localColor.normalize();
 
         verts.push_back( localColor.x() );
         verts.push_back( localColor.y() );
         verts.push_back( localColor.z() );
 
-        for ( int k = 1; k < fib.size() / 3 - 1; ++k )
+        for ( unsigned int k = 1; k < fib.length() - 1; ++k )
         {
-            verts.push_back( fib[k*3] );
-            verts.push_back( fib[k*3+1] );
-            verts.push_back( fib[k*3+2] );
+            verts.push_back( fib[k].x() );
+            verts.push_back( fib[k].y() );
+            verts.push_back( fib[k].z() );
 
-            QVector3D localColor( fabs( fib[k*3-3] - fib[k*3+3] ), fabs( fib[k*3-2] - fib[k*3+4] ), fabs( fib[k*3-1] - fib[k*3+5] ) );
+            QVector3D localColor( fib[k-1].x() - fib[k+1].x(), fib[k-1].y() - fib[k+1].y(), fib[k-1].z() - fib[k+1].z() );
             localColor.normalize();
 
             verts.push_back( localColor.x() );
@@ -263,11 +267,12 @@ void FiberRenderer::initGeometry()
         }
 
         // push back the last vertex, done seperately because of nomal calculation
-        verts.push_back( fib[numFloats-3] );
-        verts.push_back( fib[numFloats-2] );
-        verts.push_back( fib[numFloats-1] );
+        verts.push_back( lineEnd.x() );
+        verts.push_back( lineEnd.y() );
+        verts.push_back( lineEnd.z() );
 
-        QVector3D localColor2( fabs( fib[numFloats-6] - fib[numFloats-3] ), fabs( fib[numFloats-5] - fib[numFloats-2] ), fabs( fib[numFloats-4] - fib[numFloats-1] ) );
+        QVector3D sec2last = fib[ fib.length() - 2 ];
+        QVector3D localColor2( sec2last.x() - lineEnd.x(), sec2last.y() - lineEnd.y(), sec2last.z() - lineEnd.z() );
         localColor.normalize();
 
         verts.push_back( localColor2.x() );
@@ -279,20 +284,19 @@ void FiberRenderer::initGeometry()
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     verts.clear();
-    //verts.squeeze();
 
-    m_pointsPerLine.resize( m_data->size() );
-    m_startIndexes.resize( m_data->size() );
+    m_pointsPerLine.resize( m_fibs->size() );
+    m_startIndexes.resize( m_fibs->size() );
 
     int currentStart = 0;
-    for ( int i = 0; i < m_data->size(); ++i )
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
-        m_pointsPerLine[i] = m_data->at( i ).size() / 3;
+        m_pointsPerLine[i] = m_fibs->at( i ).length();
         m_startIndexes[i] = currentStart;
         currentStart += m_pointsPerLine[i];
     }
 
-    updateExtraData( m_extraData );
+    updateExtraData( 0 );
 
     qDebug() << "create fiber vbo's done";
 
@@ -301,29 +305,20 @@ void FiberRenderer::initGeometry()
     m_isInitialized = true;
 }
 
-void FiberRenderer::colorChanged( QVariant color )
+void FiberRenderer::colorChanged()
 {
-    QVector<bool>*selected = m_selector->getSelection();
-    for ( int i = 0; i < m_numLines; ++i )
-    {
-        if ( selected->at( i ) )
-        {
-            m_colorField.replace( i, color.value<QColor>() );
-        }
-    }
 }
 
-void FiberRenderer::updateExtraData( QVector< QVector< float > >* extraData )
+void FiberRenderer::updateExtraData( unsigned int dataFieldId )
 {
-    m_extraData = extraData;
-    QVector<float>data;
-    QVector<float>indexes;
-    for ( int i = 0; i < extraData->size(); ++i )
+    std::vector<float>data;
+    std::vector<float>indexes;
+    for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
-        QVector<float>fib = extraData->at(i);
-        for ( int k = 0; k < fib.size(); ++k )
+        Fib fib = m_fibs->at(i);
+        for ( unsigned int k = 0; k < fib.length(); ++k )
         {
-            data.push_back( fib[k] );
+            data.push_back( fib.getData( dataFieldId, k ) );
             indexes.push_back( k );
         }
     }

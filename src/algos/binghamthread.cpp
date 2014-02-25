@@ -26,7 +26,7 @@ BinghamThread::~BinghamThread()
     m_resultVector.clear();
 }
 
-QVector<QVector<float> > BinghamThread::getResultVector()
+std::vector<std::vector<float> > BinghamThread::getResultVector()
 {
     return m_resultVector;
 }
@@ -34,7 +34,7 @@ QVector<QVector<float> > BinghamThread::getResultVector()
 void BinghamThread::run()
 {
     int numThreads = GLFunctions::idealThreadCount;
-    QVector<ColumnVector>* data = m_ds->getData();
+    std::vector<ColumnVector>* data = m_ds->getData();
 
     int num_max = 3;
     int neighbourhood = 3;
@@ -44,7 +44,7 @@ void BinghamThread::run()
     int numVerts = tess::n_vertices( m_lod );
     int numTris = tess::n_faces( m_lod );
 
-    QVector<QSet<int> > neighs;
+    std::vector<QSet<int> > neighs;
 
     QSet<int> v;
     for ( int i = 0; i < numVerts; ++i )
@@ -71,32 +71,32 @@ void BinghamThread::run()
     const int order( ( -3 + static_cast<int>( sqrt( 8 * data->at( 0 ).Nrows() + 1 ) ) ) / 2 );
     Matrix base = ( FMath::sh_base( ( *vertices ), order ) );
 
-    QVector<float> bv( 3 * 9, 0 );
+    std::vector<float> bv( 3 * 9, 0 );
 
     m_resultVector.reserve( data->size() / numThreads + numThreads );
 
 // For all voxels:
     int done = 0;
-    for ( int i = m_id ; i < data->size(); i += numThreads )
+    for ( unsigned int i = m_id ; i < data->size(); i += numThreads )
     {
         {
-            QVector<float> v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
+            std::vector<float> v = fit_bingham( data->at( i ), *vertices, neighs, base, neighbourhood, num_max );
             m_resultVector.push_back( v );
             ++done;
         }
     }
 }
 
-QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
+std::vector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
                                                   const Matrix& tess,
-                                                  const QVector<QSet<int> >& adj,
+                                                  const std::vector<QSet<int> >& adj,
                                                   const Matrix& base,
                                                   const int neighborhood,
                                                   const int num_max )
 {
     unsigned int mod = 9;
     // reserve memory:
-    QVector<float> result( 27, 0 );
+    std::vector<float> result( 27, 0 );
 
 
     // if no CSD no fit necessary.
@@ -108,20 +108,20 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
     // get maxima:
     ColumnVector radius = base * sh_data;
 
-    QVector<float> qfRadius( radius.Nrows() );
-    for ( int i = 0; i < qfRadius.size(); ++i )
+    std::vector<float> qfRadius( radius.Nrows() );
+    for ( unsigned int i = 0; i < qfRadius.size(); ++i )
     {
         qfRadius[i] = radius( i + 1 );
     }
 
-    QVector<int> qiRadius( radius.Nrows() );
-    for ( int i = 0; i < qiRadius.size(); ++i )
+    std::vector<int> qiRadius( radius.Nrows() );
+    for ( unsigned int i = 0; i < qiRadius.size(); ++i )
     {
         qiRadius[i] = i;
     }
 
-    QVector<int> maxima;
-    for ( int i = 0; i < qfRadius.size(); ++i )
+    std::vector<int> maxima;
+    for ( unsigned int i = 0; i < qfRadius.size(); ++i )
     {
         QSet<int> n = adj[i];
         float r = qfRadius[i];
@@ -154,7 +154,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 //    }
 
     // For all maxima:
-    for ( int n_max = 0; ( n_max < maxima.size() / 2 ) && ( n_max < num_max ); ++n_max )
+    for ( int n_max = 0; ( n_max < (int)maxima.size() / 2 ) && ( n_max < num_max ); ++n_max )
     {
         // add all maxima and their surrounding points within range of (neighborhood) to the vector gv
         QSet<int> g; // = adj[maxima[2 * n_max]];
@@ -182,11 +182,16 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         }
         g.unite( g2 );
 
-        QVector<int> gv = g.toList().toVector();
+        QVector<int>g1 =  g.toList().toVector();
+        std::vector<int> gv;
+        for ( int i = 0; i < g1.size(); ++i )
+        {
+            gv.push_back( g1[i] );
+        }
 
         // testing if there is a neighbor with a negative value, skipping that maximum if true
         bool negNeigh = false;
-        for ( int i = 0; i < gv.size(); ++i )
+        for ( unsigned int i = 0; i < gv.size(); ++i )
         {
             if ( qfRadius[gv[i]] < 0 )
             {
@@ -210,7 +215,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 
         // preprocessing for moment of inertia matrix:
         ColumnVector values( gv.size() );
-        QVector<ColumnVector> points;
+        std::vector<ColumnVector> points;
         ColumnVector maxV( 3 );
 
         maxV( 1 ) = tess( gv[0] + 1, 1 );
@@ -219,7 +224,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 
         double f0 = qfRadius[gv[0]];
 
-        for ( int i = 0, j = 0; i < gv.size(); ++i )
+        for ( unsigned int i = 0, j = 0; i < gv.size(); ++i )
         {
             ColumnVector cur( 3 );
             cur( 1 ) = tess( gv[i] + 1, 1 );
@@ -246,7 +251,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         Matrix m_inertiaEvecs( 3, 3 );
         EigenValues( m_inertia, m_inertiaEvals, m_inertiaEvecs );
 
-        QVector<ColumnVector> vecs;
+        std::vector<ColumnVector> vecs;
         ColumnVector vals( 3 );
 
         for ( int i = 1; i < 4; ++i )
@@ -292,9 +297,9 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
             ColumnVector index( gv.size() );
             index = 0.0;
 
-            int size( 0 );
+            unsigned int size( 0 );
             // build matrix for least square solution:
-            for ( int i = 0; i < gv.size(); ++i )
+            for ( unsigned int i = 0; i < gv.size(); ++i )
             {
                 ColumnVector cur( 3 );
                 cur( 1 ) = tess( gv[i] + 1, 1 );
@@ -319,7 +324,7 @@ QVector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
             if ( size != gv.size() )
             {
                 size = 0;
-                for ( int i = 0; i < gv.size(); ++i )
+                for ( unsigned int i = 0; i < gv.size(); ++i )
                 {
                     if ( index( i + 1 ) != 0.0 )
                     {

@@ -9,6 +9,7 @@
 #define TRACKWITHCROSSINGS_H_
 
 #include "fmath.h"
+#include "fib.h"
 
 #include <QDebug>
 #include <QVector>
@@ -29,8 +30,8 @@ public:
     void setDatasets( DatasetScalar* mask, DatasetTensor* ds1, DatasetTensor* ds2, DatasetTensor* ds3 );
     void startTracking();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    std::vector<Fib>getFibs();
+
     int getNumPoints();
     int getNumLines();
 
@@ -42,10 +43,9 @@ private:
     DatasetTensor* m_ds2;
     DatasetTensor* m_ds3;
 
-    QVector<TWCThread*> m_threads;
+    std::vector<TWCThread*> m_threads;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    std::vector<Fib>m_fibs;
 
     int m_nx;
     int m_ny;

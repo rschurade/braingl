@@ -10,7 +10,7 @@
 
 #include "datasetmesh.h"
 
-#include "correlationmatrix.h"
+#include "../../algos/correlationmatrix.h"
 
 class TriangleMesh2;
 class MeshRenderer;
@@ -30,6 +30,7 @@ public:
 
     virtual QString getSaveFilter();
     virtual QString getDefaultSuffix();
+    void saveBinaryMatrix( QString filename );
 
 protected:
     float m_minThreshold;
@@ -39,7 +40,7 @@ protected:
 
     CorrelationMatrix* m_correlations;
 
-    QVector<int> m_picked;
+    std::vector<unsigned int> m_picked;
     int m_prevPickedID;
 
 };

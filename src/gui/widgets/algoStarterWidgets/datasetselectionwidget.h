@@ -20,7 +20,7 @@ class DatasetSelectionWidget : public QWidget
     Q_OBJECT
 
 public:
-    DatasetSelectionWidget( QVector< QPair<QString, QList<Fn::DatasetType > > >&filter, QList<QVariant> &dsl, QWidget* parent = 0 );
+    DatasetSelectionWidget( std::vector< QPair<QString, QList<Fn::DatasetType > > >&filter, QList<QVariant> &dsl, QWidget* parent = 0 );
     virtual ~DatasetSelectionWidget();
 
 private:

@@ -14,20 +14,20 @@
 
 LoaderFreesurfer::LoaderFreesurfer()
 {
-
+    m_points = new std::vector<float>();
 }
 
 LoaderFreesurfer::~LoaderFreesurfer()
 {
-    // TODO Auto-generated destructor stub
+    m_points->clear();
 }
 
-QVector<float> LoaderFreesurfer::getPoints()
+std::vector<float>* LoaderFreesurfer::getPoints()
 {
     return m_points;
 }
 
-QVector<int> LoaderFreesurfer::getTriangles()
+std::vector<int> LoaderFreesurfer::getTriangles()
 {
     return m_triangles;
 }
@@ -53,9 +53,9 @@ bool LoaderFreesurfer::loadASC( QString fn )
     {
         nl = ns.readLine();
         QStringList vals = nl.split( " ", QString::SkipEmptyParts );
-        m_points << vals.at( 0 ).toFloat();
-        m_points << vals.at( 1 ).toFloat();
-        m_points << vals.at( 2 ).toFloat();
+        m_points->push_back( vals.at( 0 ).toFloat() );
+        m_points->push_back( vals.at( 1 ).toFloat() );
+        m_points->push_back( vals.at( 2 ).toFloat() );
     }
 
     //TRIANGLES
@@ -63,9 +63,9 @@ bool LoaderFreesurfer::loadASC( QString fn )
     {
         nl = ns.readLine();
         QStringList vals = nl.split( " ", QString::SkipEmptyParts );
-        m_triangles << vals.at( 0 ).toInt();
-        m_triangles << vals.at( 1 ).toInt();
-        m_triangles << vals.at( 2 ).toInt();
+        m_triangles.push_back( vals.at( 0 ).toInt() );
+        m_triangles.push_back( vals.at( 1 ).toInt() );
+        m_triangles.push_back( vals.at( 2 ).toInt() );
     }
     return true;
 }

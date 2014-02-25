@@ -9,8 +9,26 @@ out float v_discard;
 void main()
 {
 	v_normal = normalize( a_normal );
+	
 	v_extra = a_extra;
 	v_index = a_indexes;
+	
+	//vec3 tangent = normalize( ( mv_matrixTI * vec4( v_normal, 1.0 ) ).xyz );
+	vec3 tangent = normalize( ( vec4( v_normal, 1.0 ) ).xyz );
+    vec3 view = vec3( 0.0, 0.0, -1.0 );
+    vec3 offsetNN = cross( tangent, view );
+    vec3 offset = normalize( offsetNN );
+    
+    if ( dot( v_normal, view ) < 0.0 )
+    {
+        v_normal = cross( v_normal, offset );
+    }
+    else
+    {
+        v_normal = cross( v_normal, offset );
+        v_normal *= -1.0;
+    }
+
 	
 	prepareLight();
 	
@@ -20,7 +38,7 @@ void main()
 	}
 	else if ( u_colorMode == 1 )
 	{
-	   frontColor = vec4( abs( v_normal ), 1.0 );
+	   frontColor = vec4( abs( a_normal ), 1.0 );
 	}
 	else
     {

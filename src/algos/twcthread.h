@@ -8,6 +8,8 @@
 #ifndef TWCTHREAD_H_
 #define TWCTHREAD_H_
 
+#include "fib.h"
+
 #include "../thirdparty/newmat10/newmat.h"
 
 #include <QDebug>
@@ -23,34 +25,33 @@ class TWCThread : public QThread
 
 public:
     TWCThread( int id,
-                QVector<float>* mask,
-                QVector<Matrix>* logtensors1,
-                QVector<Matrix>* logtensors2,
-                QVector<Matrix>* logtensors3,
-                QVector<QVector3D>* evec1,
-                QVector<QVector3D>* evec2,
-                QVector<QVector3D>* evec3,
+                std::vector<float>* mask,
+                std::vector<Matrix>* logtensors1,
+                std::vector<Matrix>* logtensors2,
+                std::vector<Matrix>* logtensors3,
+                std::vector<QVector3D>* evec1,
+                std::vector<QVector3D>* evec2,
+                std::vector<QVector3D>* evec3,
                 int nx, int ny, int nz, float dx, float dy, float dz );
     virtual ~TWCThread();
 
-    QVector< QVector< float > >getFibs();
-    QVector< QVector< float > >getExtras();
+    std::vector<Fib>* getFibs();
 
 private:
     void run();
 
-    void track( int id, bool negDir, QVector<float>& result, QVector<float>& extraResult );
+    void track( int id, bool negDir, Fib& result );
 
     float getInterpolatedFA( int &id, float &inx, float &iny, float &inz );
     Matrix getInterpolatedTensor( int &id, float &inx, float &iny, float &inz, float &dirX, float &dirY, float &dirZ );
 
-    QVector<Matrix>* testAngle( int &id, float &dirX, float &dirY, float &dirZ );
+    std::vector<Matrix>* testAngle( int &id, float &dirX, float &dirY, float &dirZ );
 
     int m_id;
 
-    QVector<float>* m_mask;
-    QVector<QVector<Matrix>*>m_logTensors;
-    QVector<QVector<QVector3D>*> m_evecs;
+    std::vector<float>* m_mask;
+    std::vector<std::vector<Matrix>*>m_logTensors;
+    std::vector<std::vector<QVector3D>*> m_evecs;
 
     int m_nx;
     int m_ny;
@@ -60,14 +61,14 @@ private:
     float m_dz;
     int m_blockSize;
 
-    int m_minLength;
+    unsigned int m_minLength;
     float m_stepSize;
     float m_diag;
     int maxStepsInVoxel;
     float m_smoothness;
 
-    QVector< QVector< float > >fibs;
-    QVector< QVector< float > >extras;
+    std::vector<Fib>m_fibs;
+
 
 signals:
     void progress();

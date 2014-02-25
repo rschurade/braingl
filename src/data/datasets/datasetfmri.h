@@ -15,10 +15,10 @@ class DatasetFMRI: public DatasetNifti
     Q_OBJECT
 
 public:
-    DatasetFMRI( QDir filename, QVector<float> data, nifti_image* header );
+    DatasetFMRI( QDir filename, std::vector<float> data, nifti_image* header );
     virtual ~DatasetFMRI();
 
-    QVector<float>* getData();
+    std::vector<float>* getData();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
@@ -26,7 +26,7 @@ public:
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
 private:
-    QVector<float> m_data;
+    std::vector<float> m_data;
 
 //    ColormapRenderer* m_colormapRenderer;
 

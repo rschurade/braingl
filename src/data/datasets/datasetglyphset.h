@@ -34,7 +34,6 @@ public:
 
     void readConnectivity( QString filename );
     void addCorrelation( float** corr );
-    void setMinthresh( float mt );
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
@@ -55,31 +54,32 @@ public:
     QList<Dataset*> createConnections();
 
     void exportColors();
-    void loadROI( QString filename );
-    void loadROI2( QString filename );
+    void loadROI( QString filename, bool* roin );
     void initROI();
     void avgCon();
     void avgConRtoZ();
     void makeLittleBrains();
     void colorLittleBrains();
     void deleteLittleBrains();
+    void switchGlyphsOff();
+    void applyROI();
 
     int m_tris_middle;
     int m_points_middle;
     bool m_is_split;
 
-private:
     bool* roi;
     bool* roi2;
 
+private:
     int m_n;  //number of vertices, has to match size of matrix
 
     float* consArray;
     float* diffsArray;
     float* vecsArray;
 
-    QVector<float*>* pieArrays;
-    QVector<int>* numbers;
+    std::vector<float*>* pieArrays;
+    std::vector<int>* numbers;
 
     PointGlyphRenderer* m_prenderer;
     DiffPointGlyphRenderer* m_dprenderer;
@@ -90,14 +90,14 @@ private:
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode, prevThreshSign;
     float prevThresh, prevMinlength;
+    bool glyphsChanged;
 
     QString m_colors_name;
 
-    //int pickedID;
-    QVector<LittleBrainRenderer*> littleBrains;
-    QVector<TriangleMesh2*> littleMeshes;
-    QVector<QVector3D> shifts1;
-    QVector<QVector3D> shifts2;
+    std::vector<LittleBrainRenderer*> littleBrains;
+    std::vector<TriangleMesh2*> littleMeshes;
+    std::vector<QVector3D> shifts1;
+    std::vector<QVector3D> shifts2;
 
     bool filter( int i, int j, int lr, float threshold, int sign );
 

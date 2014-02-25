@@ -28,7 +28,7 @@ CorrelationThread::~CorrelationThread()
 
 }
 
-QVector< QVector<float> >* CorrelationThread::getResult()
+std::vector< std::vector<float> >* CorrelationThread::getResult()
 {
     return &m_result;
 }
@@ -44,7 +44,7 @@ void CorrelationThread::run()
 
     for ( int i = m_id; i < nroi; i += numThreads )
     {
-        QVector<float> corVec;
+        std::vector<float> corVec;
         for ( int j = i; j < nroi; ++j )
         {
             //calculate correlation btw. timeseries at i and j...

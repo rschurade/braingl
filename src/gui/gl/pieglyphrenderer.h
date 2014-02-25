@@ -20,7 +20,7 @@ public:
 
     void init();
 
-    void initGeometry( QVector<float*>* pieArrays, QVector<int>* numbers, int maxNodeCount );
+    void initGeometry( std::vector<float*>* pieArrays, std::vector<int>* numbers, int maxNodeCount );
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
 
@@ -32,7 +32,7 @@ private:
     GLuint *vboIds;
 
     float* pies;
-    QVector<int>* m_numbers;
+    std::vector<int>* m_numbers;
     int m_maxNodeCount;
     int np;
     int ao;

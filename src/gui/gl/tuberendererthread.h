@@ -8,6 +8,8 @@
 #ifndef TUBERENDERERTHREAD_H_
 #define TUBERENDERERTHREAD_H_
 
+#include "../../algos/fib.h"
+
 #include <QDebug>
 #include <QThread>
 #include <QVector>
@@ -16,21 +18,18 @@
 class TubeRendererThread : public QThread
 {
 public:
-    TubeRendererThread( QVector< QVector< float > >* data, int id );
+    TubeRendererThread( std::vector<Fib>* fibs, int id );
     virtual ~TubeRendererThread();
 
-    QVector<float>* getVerts();
-    QVector<QVector3D>* getGlobalColors();
+    std::vector<float>* getVerts();
 
 private:
     void run();
 
-    QVector< QVector< float > >* m_data;
+    std::vector<Fib>* m_fibs;
     int m_id;
 
-    QVector<float>* m_verts;
-    QVector<QVector3D>* m_globalColors;
-
+    std::vector<float>* m_verts;
 };
 
 #endif /* TUBERENDERERTHREAD_H_ */

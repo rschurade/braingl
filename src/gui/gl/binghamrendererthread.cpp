@@ -14,7 +14,7 @@
 
 #include "math.h"
 
-BinghamRendererThread::BinghamRendererThread( int id, QVector<QVector<float> >* data, int nx, int ny, int nz,
+BinghamRendererThread::BinghamRendererThread( int id, std::vector<std::vector<float> >* data, int nx, int ny, int nz,
                                                                 float dx, float dy, float dz,
                                                                 int xi, int yi, int zi,
                                                                 int lod,
@@ -44,7 +44,7 @@ BinghamRendererThread::BinghamRendererThread( int id, QVector<QVector<float> >* 
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {
-    m_verts = new QVector<float>();
+    m_verts = new std::vector<float>();
 }
 
 BinghamRendererThread::~BinghamRendererThread()
@@ -52,7 +52,7 @@ BinghamRendererThread::~BinghamRendererThread()
     m_verts->clear();
 }
 
-QVector<float>* BinghamRendererThread::getVerts()
+std::vector<float>* BinghamRendererThread::getVerts()
 {
     return m_verts;
 }

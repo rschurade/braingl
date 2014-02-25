@@ -24,16 +24,15 @@ Bundle::Bundle( DatasetFibers* ds ) :
     m_radius( 10.0 ),
     m_smoothRange( 10.0 )
 {
-    m_fibs = m_sourceDataset->getFibs();
+    m_fibs = *( m_sourceDataset->getFibs() );
 }
 
 Bundle::~Bundle()
 {
     m_fibs.clear();
-    m_fibs.squeeze();
 }
 
-QVector< QVector< float > >Bundle::getFibs()
+std::vector<Fib>Bundle::getFibs()
 {
     return m_fibs;
 }
@@ -53,15 +52,15 @@ void Bundle::startLoop()
     int numPoints = 0;
     m_kdVerts.clear();
     m_reverseIndexes.clear();
-    for ( int i = 0; i < m_fibs.size(); ++i )
+    for ( unsigned int i = 0; i < m_fibs.size(); ++i )
     {
-        for( int k = 0; k < m_fibs[i].size() / 3; ++k )
+        numPoints += m_fibs[i].length();
+        for( unsigned int k = 0; k < m_fibs[i].length(); ++k )
         {
-            m_kdVerts.push_back( m_fibs[i][k * 3    ] );
-            m_kdVerts.push_back( m_fibs[i][k * 3 + 1] );
-            m_kdVerts.push_back( m_fibs[i][k * 3 + 2] );
+            m_kdVerts.push_back( m_fibs[i].getVert( k ).x() );
+            m_kdVerts.push_back( m_fibs[i].getVert( k ).y() );
+            m_kdVerts.push_back( m_fibs[i].getVert( k ).z() );
             m_reverseIndexes.push_back( i );
-            ++numPoints;
         }
     }
     KdTree* kdTree = new KdTree( numPoints, m_kdVerts.data() );
@@ -92,47 +91,48 @@ void Bundle::applyLoopResult()
 {
     qDebug() << "apply";
     // apply movement to fibs
-    for ( int i = 0; i < m_threads.size(); ++i )
+    for ( unsigned int i = 0; i < m_threads.size(); ++i )
     {
         int pc = 0;
-        QVector< QVector3D > forces = m_threads[i]->getForces();
-        for( int k = i; k < m_fibs.size(); k += m_threads.size() )
+        std::vector< QVector3D > forces = m_threads[i]->getForces();
+        for( unsigned int k = i; k < m_fibs.size(); k += m_threads.size() )
         {
-            QVector<float>fib = m_fibs[k];
-            float size = fib.size() / 3 - 1;
+            Fib fib = m_fibs[k];
+            float size = fib.length() - 1;
 
-            for ( int l = 1; l < fib.size()/3 - 1; ++l )
+            for ( unsigned int l = 1; l < fib.length() - 1; ++l )
             {
                 QVector3D force = forces[pc++] / ( m_iterations * 0.50 );
 
                 if ( l < ( ( size / 100 ) * m_smoothRange ) )
                 {
                     float v = static_cast<float>( l ) / ( ( size / 100 ) * m_smoothRange );
-                    fib[l*3] = fib[l*3] + force.x() * v;
-                    fib[l*3+1] = fib[l*3+1] + force.y() * v;
-                    fib[l*3+2] = fib[l*3+2] + force.z() * v;
+                    fib[l].setX( fib[l].x() + force.x() * v );
+                    fib[l].setY( fib[l].y() + force.y() * v );
+                    fib[l].setZ( fib[l].z() + force.z() * v );
+
                 }
                 else if ( l > ( ( size / 100 ) * ( 100. - m_smoothRange ) ) )
                 {
                     float v = static_cast<float>( size - l ) / ( ( size / 100 ) * m_smoothRange );
-                    fib[l*3] = fib[l*3] + force.x() * v;
-                    fib[l*3+1] = fib[l*3+1] + force.y() * v;
-                    fib[l*3+2] = fib[l*3+2] + force.z() * v;
+                    fib[l].setX( fib[l].x() + force.x() * v );
+                    fib[l].setY( fib[l].y() + force.y() * v );
+                    fib[l].setZ( fib[l].z() + force.z() * v );
                 }
                 else
                 {
-                    fib[l*3] = fib[l*3] + force.x();
-                    fib[l*3+1] = fib[l*3+1] + force.y();
-                    fib[l*3+2] = fib[l*3+2] + force.z();
+                    fib[l].setX( fib[l].x() + force.x() );
+                    fib[l].setY( fib[l].y() + force.y() );
+                    fib[l].setZ( fib[l].z() + force.z() );
                 }
             }
-            m_fibs.replace( k, fib );
+            m_fibs[k] = fib;
         }
     }
 
 
     // delete threads
-    for ( int i = 0; i < m_threads.size(); ++i )
+    for ( unsigned int i = 0; i < m_threads.size(); ++i )
     {
         delete m_threads[i];
     }

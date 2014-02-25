@@ -31,6 +31,10 @@ void main()
     }
     else if ( u_colorMode == 4 )
     {
+        if ( v_extra > u_upperThreshold || v_extra < u_lowerThreshold )
+        {
+            discard;
+        }
         color = colormap( v_extra, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax ).rgb;
     }
     else

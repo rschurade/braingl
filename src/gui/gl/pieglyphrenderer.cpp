@@ -84,31 +84,33 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
     program->setUniformValue( "u_pickColor", red, green, blue, pAlpha );
 
-    float scale = (p_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
+    float scale = ( p_matrix * QVector4D( 1, 0, 0, 1 ) ).length();
     program->setUniformValue( "u_scale", scale );
-
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-
-    setShaderVars( props );
-
-    glShadeModel( GL_FLAT );
-
-    int start = 0;
-    if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+    if ( np > 0 )
     {
-        for ( int i = 0; i < n; i++ )
-        {
-            int number = m_numbers->at( i );
-            if ( number != 0 )
-            {
-                number += 2;
-                glDrawArrays( GL_TRIANGLE_FAN, start, number );
-            }
-            start += number;
-        }
-    }
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        setShaderVars( props );
+
+        glShadeModel( GL_FLAT );
+
+        int start = 0;
+        if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+        {
+            for ( int i = 0; i < n; i++ )
+            {
+                int number = m_numbers->at( i );
+                if ( number != 0 )
+                {
+                    number += 2;
+                    glDrawArrays( GL_TRIANGLE_FAN, start, number );
+                }
+                start += number;
+            }
+        }
+
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
 }
 
 void PieGlyphRenderer::init()
@@ -163,7 +165,7 @@ void PieGlyphRenderer::setShaderVars( PropertyGroup* props )
     offset += sizeof(float) * 1;
 }
 
-void PieGlyphRenderer::initGeometry( QVector<float*>* pieArrays, QVector<int>* numbers, int maxNodeCount )
+void PieGlyphRenderer::initGeometry( std::vector<float*>* pieArrays, std::vector<int>* numbers, int maxNodeCount )
 {
     m_numbers = numbers;
     m_maxNodeCount = maxNodeCount;
@@ -229,11 +231,14 @@ void PieGlyphRenderer::initGeometry( QVector<float*>* pieArrays, QVector<int>* n
             numPoints += np + 2;
         }
     }
-    qDebug() << "pre-bind";
-    glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
-    //two points for every connection, each with value and +1/-1 flag for node / other node:
-    qDebug() << "pre-bufferData";
-    glBufferData( GL_ARRAY_BUFFER, numPoints * elementSize * sizeof(GLfloat), pies, GL_STATIC_DRAW );
-    qDebug() << "post-bufferData";
+    if ( np > 0 )
+    {
+        qDebug() << "pre-bind";
+        glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
+        //two points for every connection, each with value and +1/-1 flag for node / other node:
+        qDebug() << "pre-bufferData";
+        glBufferData( GL_ARRAY_BUFFER, numPoints * elementSize * sizeof(GLfloat), pies, GL_STATIC_DRAW );
+        qDebug() << "post-bufferData";
+    }
 }
 

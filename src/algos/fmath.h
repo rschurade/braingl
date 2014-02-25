@@ -26,13 +26,13 @@ public:
     static Matrix sh_base( Matrix g, int max_order );
     static double sh_base_function( int order, int degree, double theta, double phi );
 
-    static SymmetricMatrix moment_of_inertia( const ColumnVector& values, const QVector<ColumnVector>& points );
+    static SymmetricMatrix moment_of_inertia( const ColumnVector& values, const std::vector<ColumnVector>& points );
     static double iprod( const ColumnVector& v1, const ColumnVector& v2 );
     static ColumnVector cprod( const ColumnVector& v1, const ColumnVector& v2 );
 
-    static void evd3x3( ColumnVector tensor, QVector<ColumnVector>& vecs, ColumnVector& vals );
-//    void evd3x3_2( const ColumnVector &d, ColumnVector &val, QVector<ColumnVector> &vec );
-    static void evd3x3_2( Matrix &A, ColumnVector &val, QVector<ColumnVector> &vec );
+    static void evd3x3( ColumnVector tensor, std::vector<ColumnVector>& vecs, ColumnVector& vals );
+//    void evd3x3_2( const ColumnVector &d, ColumnVector &val, std::vector<ColumnVector> &vec );
+    static void evd3x3_2( Matrix &A, ColumnVector &val, std::vector<ColumnVector> &vec );
 
     static ColumnVector cart2sphere( const ColumnVector& input );
     static ColumnVector sphere2cart( const ColumnVector& input );
@@ -47,15 +47,15 @@ public:
 
     static Matrix pseudoInverse( const Matrix& A );
 
-    static void fitTensors( QVector<ColumnVector>& data, QVector<float>& b0Images, QVector<QVector3D>& bvecs, QVector<float>& bvals, QVector<Matrix>& out );
+    static void fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out );
 
-    static void fa( QVector<Matrix>& tensors, QVector<float>& faOut );
+    static void fa( std::vector<Matrix>& tensors, std::vector<float>& faOut );
     static float fa( Matrix tensor );
 
-    static void evec1( QVector<Matrix>& tensors, QVector<QVector3D>& evec1 );
-    static void evecs( QVector<Matrix>& tensors, QVector<QVector3D>& evec1, QVector<float>& eval1,
-                                                 QVector<QVector3D>& evec2, QVector<float>& eval2,
-                                                 QVector<QVector3D>& evec3, QVector<float>& eval3 );
+    static void evec1( std::vector<Matrix>& tensors, std::vector<QVector3D>& evec1 );
+    static void evecs( std::vector<Matrix>& tensors, std::vector<QVector3D>& evec1, std::vector<float>& eval1,
+                                                 std::vector<QVector3D>& evec2, std::vector<float>& eval2,
+                                                 std::vector<QVector3D>& evec3, std::vector<float>& eval3 );
 
     static bool linePlaneIntersection( QVector3D& contact, QVector3D ray, QVector3D rayOrigin, QVector3D normal, QVector3D coord);
 

@@ -16,7 +16,7 @@
 class IsoSurfaceThread : public QThread
 {
 public:
-    IsoSurfaceThread( QVector<float>* scalarField, QMutex* mutex, ID2POINT3DID* i2pt3idVertices, TRIANGLEVECTOR* trivecTriangles,
+    IsoSurfaceThread( std::vector<float>* scalarField, QMutex* mutex, ID2POINT3DID* i2pt3idVertices, TRIANGLEVECTOR* trivecTriangles,
                       int nx, int ny, int nz, float dx, float dy, float dz, int id );
     virtual ~IsoSurfaceThread();
 
@@ -32,7 +32,7 @@ private:
 
     void getXYZ( int id, int &x, int &y, int &z );
 
-    QVector<float>* m_scalarField;
+    std::vector<float>* m_scalarField;
     QMutex* m_mutex;
 
     // List of POINT3Ds which form the isosurface.

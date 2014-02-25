@@ -30,7 +30,7 @@ private:
     ColormapFunctions() {}
     virtual ~ColormapFunctions() {}
 
-    static QVector<ColormapBase>m_colormaps;
+    static std::vector<ColormapBase>m_colormaps;
 };
 
 #endif /* COLORMAPFUNCTIONS_H_ */

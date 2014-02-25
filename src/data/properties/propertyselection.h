@@ -20,12 +20,13 @@ class PropertySelection : public Property
 
 public:
     PropertySelection( QString name, std::initializer_list<QString> options, int value = 0 );
-    PropertySelection( QString name, QVector<QString> options, int value = 0 );
+    PropertySelection( QString name, std::vector<QString> options, int value = 0 );
+    PropertySelection( QString name, QList<QString> options, int value = 0 );
     virtual ~PropertySelection();
 
-    QVector<QString> getOptions();
+    std::vector<QString> getOptions();
 private:
-    QVector<QString>m_options;
+    std::vector<QString>m_options;
 
 public slots:
     void setValue( QVariant value );

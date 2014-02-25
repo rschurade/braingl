@@ -221,7 +221,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
-    for ( int i = 0; i < m_labels.size(); ++i )
+    for ( unsigned int i = 0; i < m_labels.size(); ++i )
     {
         QString label = QString::number( m_labels[i].z(), 'f', 2 );
         float xOffset = ( ( label.size() - 3 )  * ( ( (float)m_textSize / 4 ) / (float)width ) ) * (float)width +

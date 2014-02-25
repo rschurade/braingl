@@ -39,7 +39,7 @@ void AttractThread::run()
             double fsum = 0;
             QVector3D f( 0, 0, 0 );
             //for all attracting points...
-            for ( int ef = 0; ef < m_compatibilities->idxs->at( ie )->size(); ef++ )
+            for ( unsigned int ef = 0; ef < m_compatibilities->idxs->at( ie )->size(); ef++ )
             {
                 QVector3D pe;
                 int idx = m_compatibilities->idxs->at( ie )->at( ef );

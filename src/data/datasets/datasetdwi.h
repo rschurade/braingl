@@ -20,16 +20,16 @@ class DatasetDWI: public DatasetNifti
     Q_OBJECT
 
 public:
-    DatasetDWI( QDir filename, QVector<ColumnVector> data, QVector<float> b0Data, QVector<float> bvals, QVector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QDir filename, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
 
-    QVector<ColumnVector>* getData();
+    std::vector<ColumnVector>* getData();
 
-    QVector<float>* getB0Data();
+    std::vector<float>* getB0Data();
 
-    QVector<float> getBvals();
+    std::vector<float> getBvals();
 
-    QVector<QVector3D> getBvecs();
+    std::vector<QVector3D> getBvecs();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
@@ -38,10 +38,10 @@ private:
     void examineDataset();
     void createTexture();
 
-    QVector<ColumnVector> m_data;
-    QVector<float> m_b0Data;
-    QVector<float> m_bvals;
-    QVector<QVector3D> m_bvecs;
+    std::vector<ColumnVector> m_data;
+    std::vector<float> m_b0Data;
+    std::vector<float> m_bvals;
+    std::vector<QVector3D> m_bvecs;
 
 private slots:
     void selectTexture();

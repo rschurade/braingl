@@ -13,6 +13,7 @@
 #include <QtDebug>
 #include <QStringList>
 #include "qmath.h"
+#include "fib.h"
 
 #include "../gui/gl/glfunctions.h"
 
@@ -83,7 +84,7 @@ Connections::Connections( QString fib )
 {
     params();
     prefix = fib;
-    if ( fib.endsWith( ".fib" ) )
+    if ( fib.endsWith( ".fib" ) || fib.endsWith( ".cons" ) )
     {
         loadFib( fib );
     }
@@ -255,7 +256,7 @@ void Connections::attract()
     //qDebug() << "multithreading finished";
 
     // delete threads
-    for ( int i = 0; i < m_athreads.size(); ++i )
+    for ( unsigned int i = 0; i < m_athreads.size(); ++i )
     {
         delete m_athreads[i];
     }
@@ -341,7 +342,7 @@ void Connections::calcComps()
     }
 
     // delete threads
-    for ( int i = 0; i < m_compthreads.size(); ++i )
+    for ( unsigned int i = 0; i < m_compthreads.size(); ++i )
     {
         delete m_compthreads[i];
     }
@@ -416,42 +417,32 @@ QList<Dataset*> Connections::createDatasetFibers()
     int n = edges.size();
     //int m = edges.at( 0 )->points.size();
 
-    QVector<QVector<float> > fibers;
-    QVector<QVector<float> > values;
+    std::vector<Fib> fibers;
     for ( int e = 0; e < n; e++ )
     {
         Edge* ed = edges.at( e );
         float v = ed->m_value;
+        Fib fib;
 
-        QVector<float> line;
-        QVector<float> lineValues;
         for ( int p = 0; p < ed->points.size(); p++ )
         {
             QVector3D po = ed->points.at( p );
-            line.push_back( po.x() );
-            line.push_back( po.y() );
-            line.push_back( po.z() );
-            lineValues.push_back( v );
+            fib.addVert( po.x(), po.y(), po.z(), v );
         }
-        fibers.push_back( line );
-        values.push_back( lineValues );
+        fibers.push_back( fib );
+
     }
-    QVector<QVector<QVector<float> > > allValues;
-    allValues.push_back( values );
-    QVector<QString> value_names;
+
+    QList<QString> value_names;
     value_names.push_back( "connectivity" );
-    QVector<float> mins;
-    QVector<float> maxs;
-    mins.push_back( -1 );
-    maxs.push_back( 1 );
 
     //out << "LINES " << n << " " << n * ( m + 1 ) << endl;
 
     /*int i = 0;
-     QVector<QVector<int> > lines;
+     std::vector<std::vector<int> > lines;
      for ( int e = 0; e < n; e++ )
      {
-     QVector<int> line;
+     std::vector<int> line;
      for ( int p = 0; p < m; p++ )
      {
      line.push_back( i++ );
@@ -459,7 +450,7 @@ QList<Dataset*> Connections::createDatasetFibers()
      lines.push_back(line);
      }*/
 
-    DatasetFibers* ds = new DatasetFibers( QString( "new" ), fibers, allValues, value_names, mins, maxs );
+    DatasetFibers* ds = new DatasetFibers( QString( "new" ), fibers, value_names );
     QList<Dataset*> l;
     l.push_back( ds );
     return l;

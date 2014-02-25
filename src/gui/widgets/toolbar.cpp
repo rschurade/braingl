@@ -185,7 +185,7 @@ void ToolBar::createActions()
     m_meshDecimateAction->setStatusTip( tr( "decimate" ) );
     connect( m_meshDecimateAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_fiberResampleAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "resample" ), this, Fn::Algo::FIBER_RESAMPLE );
+    m_fiberResampleAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "resample" ), this, Fn::Algo::FIBER_DOWNSAMPLE );
     m_fiberResampleAction->setStatusTip( tr( "resample" ) );
     connect( m_fiberResampleAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
@@ -204,6 +204,10 @@ void ToolBar::createActions()
     m_colorLittleBrainsAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "load rgb on little brains" ), this, Fn::Algo::COLOR_LITTLE_BRAINS );
     m_colorLittleBrainsAction->setStatusTip( tr( "color little brains" ) );
     connect( m_colorLittleBrainsAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_applyROIAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "create glyphs" ), this, Fn::Algo::APPLY_ROI_BRAINS );
+    m_applyROIAction->setStatusTip( tr( "apply color as ROI" ) );
+    connect( m_applyROIAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -299,8 +303,8 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::FIBER_THINNING:
             l = FiberAlgos::thinOut( ds );
             break;
-        case Fn::Algo::FIBER_RESAMPLE:
-            l = FiberAlgos::resample( ds );
+        case Fn::Algo::FIBER_DOWNSAMPLE:
+            l = FiberAlgos::downSample( ds );
             break;
         case Fn::Algo::FIBER_BUNDLING:
             m_fbw = new FiberBundleWidget( ds, this->parentWidget() );
@@ -368,7 +372,7 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::MESH_TIME_SERIES:
         {
-            QVector< QPair<QString, QList<Fn::DatasetType> > >filter;
+            std::vector< QPair<QString, QList<Fn::DatasetType> > >filter;
             QList<Fn::DatasetType>types;
             types.push_back(Fn::DatasetType::MESH_BINARY );
             types.push_back(Fn::DatasetType::MESH_ASCII );
@@ -404,9 +408,19 @@ void ToolBar::slot( Fn::Algo algo )
         }
         case Fn::Algo::COLOR_LITTLE_BRAINS:
         {
-            ( (DatasetGlyphset*)ds )->colorLittleBrains();
+            ( (DatasetGlyphset*) ds )->colorLittleBrains();
             break;
         }
+        case Fn::Algo::APPLY_ROI_BRAINS:
+            if ( mods & Qt::ShiftModifier )
+            {
+                ( (DatasetGlyphset*) ds )->switchGlyphsOff();
+            }
+            else
+            {
+                ( (DatasetGlyphset*) ds )->applyROI();
+                break;
+            }
 
     }
     qDebug() << "adding " << l.size() << " datasets";
@@ -490,6 +504,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_avgConRZAction );
             this->addAction( m_littleBrainsAction );
             //this->addAction( m_deleteLittleBrainsAction );
+            this->addAction( m_applyROIAction );
             break;
         }
         case Fn::DatasetType::CONS:

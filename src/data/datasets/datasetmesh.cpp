@@ -125,8 +125,19 @@ void DatasetMesh::initProperties()
         m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
         m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
         m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
-
     }
+
+    m_properties["maingl"]->createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( transformChanged( QVariant ) ) );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
+    m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+                SLOT( applyTransform() ) );
+    m_properties["maingl"]->createBool( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
+
+    transformChanged( 3 );
+
 }
 
 void DatasetMesh::finalizeProperties()
@@ -141,17 +152,6 @@ void DatasetMesh::finalizeProperties()
             m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
     connect( m_properties["maingl2"]->getProperty( Fn::Property::D_PAINTMODE ), SIGNAL( valueChanged( QVariant ) ), this,
             SLOT( paintModeChanged( QVariant ) ) );
-
-    m_properties["maingl"]->createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
-                SLOT( transformChanged( QVariant ) ) );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
-    m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
-                SLOT( applyTransform() ) );
-    m_properties["maingl"]->createBool( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
-
-    transformChanged( 3 );
 }
 
 void DatasetMesh::setProperties()
@@ -177,7 +177,7 @@ void DatasetMesh::addMesh( TriangleMesh2* tm, QString displayString )
 {
     if ( m_mesh.size() > 0 )
     {
-        int numVerts = m_mesh[0]->numVerts();
+        unsigned int numVerts = m_mesh[0]->numVerts();
         if ( numVerts != tm->numVerts() )
         {
             return;
@@ -205,7 +205,7 @@ TriangleMesh2* DatasetMesh::getMesh()
 
 TriangleMesh2* DatasetMesh::getMesh( int id )
 {
-    if ( m_mesh.size() > id )
+    if ( (int)m_mesh.size() > id )
     {
         return m_mesh[id];
     }
@@ -257,15 +257,15 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
         return false;
     }
 
-    QVector<int> picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
+    std::vector<unsigned int> picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     if ( picked.size() > 0 )
     {
         m_renderer->beginUpdateColor();
-        for ( int i = 0; i < picked.size(); ++i )
+        for ( unsigned int i = 0; i < picked.size(); ++i )
         {
             m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-            for ( int m = 0; m < m_mesh.size(); m++ )
+            for ( unsigned int m = 0; m < m_mesh.size(); m++ )
             {
                 if ( paintMode == 1 ) //paint color
                 {
@@ -273,7 +273,8 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
                 }
                 else if ( paintMode == 2 ) //paint values
                 {
-                    float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    //float value = m_mesh[0]->getVertexData( picked[i] ) + m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+                    float value = m_properties[target]->get( Fn::Property::D_PAINTVALUE ).toFloat();
                     if ( value < 0.0 )
                     {
                         value = 0.0;
@@ -428,7 +429,7 @@ void DatasetMesh::applyTransform()
     {
         case 0:
         {
-            for ( int i = 0; i < mesh->numVerts(); ++i )
+            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
             {
                 QVector3D vert = mesh->getVertex( i );
                 vert = m_transform * vert;
@@ -439,7 +440,7 @@ void DatasetMesh::applyTransform()
         case 1:
         case 2:
         {
-            for ( int i = 0; i < mesh->numVerts(); ++i )
+            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
             {
                 QVector3D vert = mesh->getVertex( i );
                 vert.setX( vert.x() / dx );
@@ -453,7 +454,7 @@ void DatasetMesh::applyTransform()
         case 3:
         case 4:
         {
-            for ( int i = 0; i < mesh->numVerts(); ++i )
+            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
             {
                 QVector3D vert = mesh->getVertex( i );
                 vert = m_transform * vert;
@@ -486,7 +487,7 @@ void DatasetMesh::slotCopyColors()
         float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
 
         m_renderer->beginUpdateColor();
-        for ( int i = 0; i < mesh->numVerts(); ++i )
+        for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
         {
             ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
 
@@ -522,7 +523,7 @@ void DatasetMesh::slotCopyColors()
 
         //TriangleMesh2* mesh = getMesh();
         m_renderer->beginUpdateColor();
-        for ( int i = 0; i < mesh->numVerts(); ++i )
+        for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
         {
             QColor c = texList[0]->getColorAtPos( mesh->getVertex( i ) );
             for ( int k = 1; k < texList.size(); ++k )

@@ -97,11 +97,11 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
  *
  */
 
-void QBall::sharpQBall( DatasetDWI* ds, int order, QVector<ColumnVector>& out )
+void QBall::sharpQBall( DatasetDWI* ds, int order, std::vector<ColumnVector>& out )
 {
     int numThreads = GLFunctions::idealThreadCount;
 
-    QVector<SharpQBallThread*> threads;
+    std::vector<SharpQBallThread*> threads;
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
@@ -124,7 +124,7 @@ void QBall::sharpQBall( DatasetDWI* ds, int order, QVector<ColumnVector>& out )
     // combine fibs from all threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        out += threads[i]->getQBallVector();
+        out.insert( out.end(), threads[i]->getQBallVector().begin(), threads[i]->getQBallVector().end() );
     }
 
     for ( int i = 0; i < numThreads; ++i )

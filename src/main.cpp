@@ -64,7 +64,7 @@ int main( int argc, char *argv[] )
     hg.replace( " ","" );
 
     qDebug() << "brainGL development version" << hg << BUILDDATE << BUILDTIME;
-    qDebug() << "(c) 2012, 2013 Ralph Schurade, Joachim Boettger";
+    qDebug() << "(c) 2012, 2014 Ralph Schurade, Joachim Boettger";
     qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
 
 

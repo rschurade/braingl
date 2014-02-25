@@ -42,7 +42,7 @@ public:
 private:
     int m_id;
     float m_value;   // some value, may be interpreted as height of the node, thus leafs have 0.0 and the root <= 1.0
-    QVector<QColor> m_colors; // color that is assigned at the beginning based on leaf id
+    std::vector<QColor> m_colors; // color that is assigned at the beginning based on leaf id
     QVector3D m_texturePosition;
 
     Tree* m_parent;

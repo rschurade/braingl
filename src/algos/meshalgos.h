@@ -8,6 +8,7 @@
 #ifndef MESHALGOS_H_
 #define MESHALGOS_H_
 
+#include <vector>
 #include <QList>
 
 class Dataset;
@@ -19,7 +20,7 @@ public:
     static QList<Dataset*> loopSubdivision( Dataset* ds );
     static QList<Dataset*> meshTimeSeries( Dataset* ds, TriangleMesh2* mesh );
     static QList<Dataset*> biggestComponent( Dataset* ds );
-    static TriangleMesh2* pruneMesh( TriangleMesh2* mesh, QVector<int>component );
+    static TriangleMesh2* pruneMesh( TriangleMesh2* mesh, std::vector<int>component );
     static QList<Dataset*> decimate( Dataset* ds );
 
 private:

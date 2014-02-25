@@ -10,6 +10,8 @@
 
 #include "objectrenderer.h"
 
+#include "../../algos/fib.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
@@ -22,11 +24,11 @@ class TubeRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    TubeRenderer( FiberSelector* selector, QVector< QVector< float > >* data, QVector< QVector< float > >* extraData );
+    TubeRenderer( FiberSelector* selector, std::vector<Fib>* data );
     virtual ~TubeRenderer();
 
     void init();
-    void updateExtraData( QVector< QVector< float > >* extraData );
+    void updateExtraData( unsigned int dataFieldId );
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
 
@@ -44,24 +46,20 @@ private:
     FiberSelector* m_selector;
     GLuint *vboIds;
 
-    QVector< QVector< float > >* m_data;
-    QVector< QVector< float > >* m_extraData;
-    QVector< QVector< float > >* m_indexData;
+    std::vector<Fib>* m_fibs;
+    std::vector< std::vector<float> >* m_indexData;
 
     int m_numLines;
     int m_numPoints;
 
 
-    QVector<int>m_pointsPerLine;
-    QVector<int>m_startIndexes;
+    std::vector<int>m_pointsPerLine;
+    std::vector<int>m_startIndexes;
 
     bool m_isInitialized;
 
-    QVector<QColor>m_colorField;
-    QVector<QVector3D>m_globalColorField;
-
 public slots:
-    void colorChanged( QVariant color );
+    void colorChanged();
 
 private slots:
 };
