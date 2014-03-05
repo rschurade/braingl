@@ -411,6 +411,10 @@ void DatasetFibers::applyTransform()
     m_tubeRenderer = 0;
     delete m_selector;
     m_selector = 0;
+    if ( !m_kdVerts )
+    {
+        m_kdVerts = new std::vector<float>();
+    }
     m_kdVerts->clear();
     m_kdVerts->reserve( m_numPoints * 3 );
     for ( unsigned int i = 0; i < m_fibs.size(); ++i )
