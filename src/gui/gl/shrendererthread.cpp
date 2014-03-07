@@ -85,8 +85,8 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( xx + yy * m_nx + m_zi * m_nx * m_ny );
                     if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        float locX = xx * m_dx + m_dx / 2;
-                        float locY = yy * m_dy + m_dy / 2;
+                        float locX = xx * m_dx; // + m_dx / 2;
+                        float locY = yy * m_dy; // + m_dy / 2;
 
                         pos.setX( locX );
                         pos.setY( locY );
@@ -140,8 +140,8 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( xx + m_yi * m_nx + zz * m_nx * m_ny );
                     if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        float locX = xx * m_dx + m_dx / 2;
-                        float locZ = zz * m_dz + m_dz / 2;
+                        float locX = xx * m_dx; // + m_dx / 2;
+                        float locZ = zz * m_dz; // + m_dz / 2;
 
                         pos.setX( locX );
                         pos.setZ( locZ );
@@ -197,8 +197,8 @@ void SHRendererThread::run()
                     ColumnVector dv = m_data->at( m_xi + yy * m_nx + zz * m_nx * m_ny );
                     if ( ( fabs( dv(1) ) > 0.0001 ) )
                     {
-                        float locY = yy * m_dy + m_dy / 2;
-                        float locZ = zz * m_dz + m_dz / 2;
+                        float locY = yy * m_dy; // + m_dy / 2;
+                        float locZ = zz * m_dz; // + m_dz / 2;
 
                         pos.setY( locY );
                         pos.setZ( locZ );
