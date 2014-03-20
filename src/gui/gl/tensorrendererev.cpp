@@ -172,8 +172,8 @@ void TensorRendererEV::initGeometry()
             {
                 Matrix tensor = m_data->at( xx + yy * m_nx + zi * m_nx * m_ny ) * 1000;
 
-                float locX = xx * m_dx + m_dx / 2;
-                float locY = yy * m_dy + m_dy / 2;
+                float locX = xx * m_dx; // + m_dx / 2;
+                float locY = yy * m_dy; // + m_dy / 2;
 
                 addGlyph( &verts, locX, locY, z - m_offset * m_dz , tensor );
                 m_quads += 2;
@@ -188,8 +188,8 @@ void TensorRendererEV::initGeometry()
             {
                 Matrix tensor = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny ) * 1000;
 
-                float locX = xx * m_dx + m_dx / 2;
-                float locZ = zz * m_dz + m_dz / 2;
+                float locX = xx * m_dx; // + m_dx / 2;
+                float locZ = zz * m_dz; // + m_dz / 2;
 
                 addGlyph( &verts, locX, y + m_offset * m_dy, locZ, tensor );
                 m_quads += 2;
@@ -203,8 +203,8 @@ void TensorRendererEV::initGeometry()
             for ( int zz = 0; zz < m_nz; ++zz )
             {
                 Matrix tensor = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny ) * 1000;
-                float locY = yy * m_dy + m_dy / 2;
-                float locZ = zz * m_dz + m_dz / 2;
+                float locY = yy * m_dy; // + m_dy / 2;
+                float locZ = zz * m_dz; // + m_dz / 2;
 
                 addGlyph( &verts, x + m_offset * m_dx, locY, locZ, tensor );
                 m_quads += 2;
