@@ -48,7 +48,7 @@ void ShapeRenderer::initBox()
     };
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 24 * sizeof(GLushort), indices, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 14 * sizeof(GLushort), indices, GL_STATIC_DRAW );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
@@ -192,8 +192,8 @@ void ShapeRenderer::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     program->setUniformValue( "u_dy", dy / 2 );
     program->setUniformValue( "u_dz", dz / 2 );
 
-    glEnable(GL_CULL_FACE);
-    glCullFace( GL_BACK );
+    //glEnable(GL_CULL_FACE);
+//    glCullFace( GL_BACK );
     glFrontFace( GL_CCW );
 
     // Draw cube geometry using indices from VBO 0
