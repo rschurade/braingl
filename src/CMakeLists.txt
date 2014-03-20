@@ -30,7 +30,6 @@ ENDIF()
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-SET( BinName "braingl" )
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET( BinName "${PROJECT_NAME}" )
 ELSE()
@@ -206,14 +205,29 @@ IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     # XXX ditto
     ReadProjectRevisionStatus()
 
-    message(STATUS "__HGTIP__=${__HGTIP__}")
     SET( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${__HGTIP__}" )
-    message(STATUS "MACOSX_BUNDLE_INFO_STRING=${MACOSX_BUNDLE_INFO_STRING}")
+    # XXX value should be formed like 1.2.3
     SET( MACOSX_BUNDLE_BUNDLE_VERSION ${__HGTIP__} )
     SET( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
     SET( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
     SET( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
 
     TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
+
+    SET( BUNDLED_DIR ${CMAKE_CURRENT_BINARY_DIR}/selfcontained )
+
+    # create self-contained application bundle with embedded Frameworks
+    # and dylibs
+    INSTALL( CODE "
+      INCLUDE( BundleUtilities )
+      FILE( REMOVE_RECURSE ${BUNDLED_DIR} )
+      COPY_AND_FIXUP_BUNDLE( ${BinName}.app ${BUNDLED_DIR}/${BinName}.app \"\" \"\" ) 
+    ")
+
+    # create distribution disk image (`package´ build target)
+    SET( CPACK_GENERATOR "DragNDrop" )
+    SET( CPACK_INSTALLED_DIRECTORIES ${BUNDLED_DIR} . )
+    INCLUDE( CPack )
+
 ENDIF()
 
