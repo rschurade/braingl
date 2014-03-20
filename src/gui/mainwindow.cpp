@@ -78,7 +78,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     createActions();
     createMenus();
     createToolBars();
-    this->show();   // XXX work around "invalid drawable"?
+    //this->show();   // XXX work around "invalid drawable"?
     createDockWindows();
 
 
@@ -1096,7 +1096,7 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
 
-    this->show();   // XXX work around "invalid drawable"?
+    //this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
@@ -1120,15 +1120,6 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
-
-    Q_ASSERT_X(QGLContext::areSharing(mainGLWidget->context(),
-                                      mainGLWidget2->context()),
-               "mainwindow",
-               "maingl and maingl2 widgets are not sharing a GL context");
-    Q_ASSERT_X(mainGLWidget->context()->isValid()
-               && mainGLWidget2->context()->isValid(),
-               "mainwindow",
-               "maingl or maingl2 GL context not valid");
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
