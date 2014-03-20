@@ -11,9 +11,10 @@
 #include "../gl/combinednavrenderer.h"
 
 #include <QtGui>
+#include "../core_3_2_context.h"
 
 CombinedNavGLWidget::CombinedNavGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-	QGLWidget( parent, shareWidget ),
+    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent, shareWidget ),
 	m_visible( true )
 {
     m_renderer = new CombinedNavRenderer( name );
@@ -38,7 +39,12 @@ QSize CombinedNavGLWidget::sizeHint() const
 
 void CombinedNavGLWidget::initializeGL()
 {
-	m_renderer->initGL();
+    // needed per OpenGL context and so per QGLWidget
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    m_renderer->initGL();
 }
 
 void CombinedNavGLWidget::paintGL()

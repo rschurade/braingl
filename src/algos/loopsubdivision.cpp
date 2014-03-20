@@ -11,6 +11,8 @@
 
 #include <QDebug>
 
+#include <cmath>
+
 LoopSubdivision::~LoopSubdivision()
 {
 }
@@ -166,7 +168,7 @@ double LoopSubdivision::getAlpha( unsigned int n )
     double answer;
     if ( n > 3 )
     {
-        double center = ( 0.375 + ( 0.25 * cos( ( 2.0 * 3.14159265358979 ) / (double) n ) ) );
+        double center = ( 0.375 + ( 0.25 * std::cos( ( 2.0 * 3.14159265358979 ) / (double) n ) ) );
         answer = ( 0.625 - ( center * center ) ) / (double) n;
     }
     else

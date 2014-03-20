@@ -37,4 +37,5 @@ void main()
     gl_Position = v_position;  
 
     out_value = a_value;
+    v_discard = 0.0; // XXX missing?
 }

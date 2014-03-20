@@ -48,6 +48,10 @@
 
 #include <QtGui>
 #include <QWebView>
+#include <QGLFormat>
+#include "core_3_2_context.h"
+
+#include <iostream>
 
 int MainWindow::countMainGL = 2;
 
@@ -63,11 +67,23 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	loadColormaps( resetSettings );
+    QGLFormat fmt;
+    fmt.setVersion( 3, 2 );
+    fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
+    fmt.setSampleBuffers( true );
+    QGLFormat::setDefaultFormat( fmt );
+    QGLWidget w(new core_3_2_context( QGLFormat::defaultFormat() ));    // make effective
+    w.makeCurrent();
+    // XXX check context version
+    //w.hide();   // XXX keep Open GL around?
+    w.close();
+
+    loadColormaps( resetSettings );
 
     createActions();
     createMenus();
     createToolBars();
+    this->show();   // XXX work around "invalid drawable"?
     createDockWindows();
 
 
@@ -78,13 +94,14 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 
     setWindowTitle( tr( "brainGL" ) );
 
-    QIcon logo( ":/logo_blue_orange_64.png" );
+    QIcon logo( ":/icons/logo_blue_orange_64.png" );
     setWindowIcon( logo );
 
     setUnifiedTitleAndToolBarOnMac( true );
 
     if ( !resetSettings )
     {
+        mainGLWidget->makeCurrent();    // need GL context for this XXXX
         loadSettings();
     }
 }
@@ -289,6 +306,7 @@ void MainWindow::openRecentFile()
 
 bool MainWindow::load( QString fileName )
 {
+    mainGLWidget->makeCurrent();    // XXX load* needs GL context
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -328,6 +346,7 @@ bool MainWindow::load( QString fileName )
 
 bool MainWindow::load( QString fileName, QList<QVariant> state )
 {
+    mainGLWidget->makeCurrent();    // XXX load* needs GL context
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -1082,6 +1101,7 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
 
+    this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
@@ -1105,6 +1125,15 @@ void MainWindow::createDockWindows()
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
+
+    Q_ASSERT_X(QGLContext::areSharing(mainGLWidget->context(),
+                                      mainGLWidget2->context()),
+               "mainwindow",
+               "maingl and maingl2 widgets are not sharing a GL context");
+    Q_ASSERT_X(mainGLWidget->context()->isValid()
+               && mainGLWidget2->context()->isValid(),
+               "mainwindow",
+               "maingl or maingl2 GL context not valid");
 
     DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
     FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );

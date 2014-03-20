@@ -8,6 +8,8 @@
 #ifndef FIB_H_
 #define FIB_H_
 
+#include <vector>
+
 #include <QColor>
 #include <QVector3D>
 

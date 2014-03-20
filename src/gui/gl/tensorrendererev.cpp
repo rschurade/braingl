@@ -88,7 +88,7 @@ void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     setShaderVars();
 
     GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+     // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     glDrawArrays( GL_LINES, 0, m_quads );
 
