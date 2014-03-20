@@ -13,10 +13,10 @@
 
 #include <QtGui>
 
-#include "../core_3_2_context.h"
+#include "../core_3_3_context.h"
 
 SingleSHWidget::SingleSHWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent, shareWidget ),
+    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_visible( false )
 {
     m_renderer = new SingleSHRenderer();

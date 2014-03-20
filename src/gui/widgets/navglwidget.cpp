@@ -16,10 +16,10 @@
 #include <QtGui>
 #include <QDebug>
 
-#include "../core_3_2_context.h"
+#include "../core_3_3_context.h"
 
 NavGLWidget::NavGLWidget( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_2_context(QGLFormat::defaultFormat()), parent, shareWidget )
+    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget )
 {
     switch( orient )
     {
