@@ -54,13 +54,6 @@ void MeshRenderer::setMesh( TriangleMesh2* mesh )
 void MeshRenderer::init()
 {
     glGenBuffers( 3, vboIds );
-
-    // prepare for validation XXX
-    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
-    program->bind();
-    GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
-    GLFunctions::validateShader( "mesh" );
 }
 
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
