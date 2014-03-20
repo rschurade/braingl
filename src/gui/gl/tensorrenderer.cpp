@@ -99,7 +99,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
      // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, m_quads );
-    glDrawElements( GL_TRIANGLES, m_quads / 4 * 6, GL_UNSIGNED_SHORT, 0 );  // XXX triangle pairs
+    glDrawElements( GL_TRIANGLES, m_quads, GL_UNSIGNED_INT, 0 );  // XXX triangle pairs
 
     GLenum error;
     int i = 0;
@@ -191,7 +191,7 @@ void TensorRenderer::initGeometry()
                 float locY = yy * m_dy; // + m_dy / 2;
 
                 addGlyph( verts, locX, locY, z - m_offset * m_dz , tensor );
-                m_quads += 24;
+                m_quads += 36;
             }
         }
     }
@@ -207,7 +207,7 @@ void TensorRenderer::initGeometry()
                 float locZ = zz * m_dz; // + m_dz / 2;
 
                 addGlyph( verts, locX, y + m_offset * m_dy, locZ, tensor );
-                m_quads += 24;
+                m_quads += 36;
             }
         }
     }
@@ -222,7 +222,7 @@ void TensorRenderer::initGeometry()
                 float locZ = zz * m_dz; // + m_dz / 2;
 
                 addGlyph( verts, x + m_offset * m_dx, locY, locZ, tensor );
-                m_quads += 24;
+                m_quads += 36;
             }
         }
     }
@@ -232,11 +232,11 @@ void TensorRenderer::initGeometry()
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
     // XXX
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    std::vector<GLushort> triIndices;
+    std::vector<unsigned int> triIndices;
     // fill index vector with two triangle's indices for every quad
-    for ( int qi=0; qi<m_quads/4; qi++)
+    for ( int qi = 0; qi < m_quads / 4; ++qi )
     {
-        GLushort off = qi * 4;
+        unsigned int off = qi * 4;
         triIndices.push_back( off );
         triIndices.push_back( off+1 );
         triIndices.push_back( off+3 );
@@ -245,7 +245,7 @@ void TensorRenderer::initGeometry()
         triIndices.push_back( off+2 );
         triIndices.push_back( off+3 );
     }
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, triIndices.size() * sizeof(GLushort), &triIndices[0], GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, triIndices.size() * sizeof(unsigned int), &triIndices[0], GL_STATIC_DRAW );
 }
 
 void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor )
