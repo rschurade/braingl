@@ -49,7 +49,7 @@
 #include <QtGui>
 #include <QWebView>
 #include <QGLFormat>
-#include "core_3_2_context.h"
+#include "core_3_3_context.h"
 
 #include <iostream>
 
@@ -68,15 +68,10 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	setCentralWidget( m_centralWidget );
 
     QGLFormat fmt;
-    fmt.setVersion( 3, 2 );
+    fmt.setVersion( 3, 3 );
     fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
     fmt.setSampleBuffers( true );
     QGLFormat::setDefaultFormat( fmt );
-    QGLWidget w(new core_3_2_context( QGLFormat::defaultFormat() ));    // make effective
-    w.makeCurrent();
-    // XXX check context version
-    //w.hide();   // XXX keep Open GL around?
-    w.close();
 
     loadColormaps( resetSettings );
 
