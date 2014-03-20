@@ -338,7 +338,7 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
     int npixels = nz * ny * nx;
 
     // create the filter kernel
-    double sigma = Models::getGlobal( Fn::Property::G_FILTER_SIZE ).toInt();
+    double sigma = Models::getGlobal( Fn::Property::G_FILTER_SIZE ).toFloat();
 
     int dim = (int) ( sigma + 1 );
     int n = 2 * dim + 1;
@@ -454,7 +454,7 @@ double ScalarAlgos::xxgauss(double x, double sigma)
 {
     double y, z, a = 2.506628273;
     z = x / sigma;
-    y = exp((double) -z * z * 0.5) / (sigma * a);
+    y = exp( (double) -z * z * 0.5 ) / ( sigma * a );
     return y;
 }
 

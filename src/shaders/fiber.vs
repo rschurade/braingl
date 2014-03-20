@@ -15,7 +15,7 @@ void main()
 	
 	//vec3 tangent = normalize( ( mv_matrixTI * vec4( v_normal, 1.0 ) ).xyz );
 	vec3 tangent = normalize( ( vec4( v_normal, 1.0 ) ).xyz );
-    vec3 view = vec3( 0.0, 0.0, -1.0 );
+    vec3 view = normalize( ( mv_matrixInvert * vec4( vec3( 0.0, 0.0, -1.0 ), 1.0 ) ).xyz );
     vec3 offsetNN = cross( tangent, view );
     vec3 offset = normalize( offsetNN );
     

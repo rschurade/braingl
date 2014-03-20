@@ -198,9 +198,9 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
 
     int brushSize = m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toInt() - 1;
 
-    int x = pos.x() / dx;
-    int y = pos.y() / dy;
-    int z = pos.z() / dz;
+    int x = pos.x() / dx + 0.5 * dx;
+    int y = pos.y() / dy + 0.5 * dy;
+    int z = pos.z() / dz + 0.5 * dz;
 
     m_data[ getId( x, y, z ) ] = paintValue;
 
