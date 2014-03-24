@@ -41,6 +41,7 @@ public:
 
     void closeEvent( QCloseEvent *event );
     bool load( QString fileName );
+    bool loadRoi( QString fileName );
 
     void saveScene( QString fileName );
     void loadScene( QString fileName );
@@ -103,6 +104,7 @@ private:
     QAction* saveAct;
     QAction* quitAct;
 
+    QAction* loadRoiAct;
     QAction* saveSceneAct;
 
     QAction* exportColormapsAct;
@@ -145,6 +147,7 @@ private slots:
     void open();
     void openRecentFile();
     void save();
+    void loadRoi();
     void saveScene();
     void exportColormaps();
     void importColormaps();

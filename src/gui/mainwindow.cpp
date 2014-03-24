@@ -44,7 +44,10 @@
 #include "../data/models.h"
 #include "../data/globalpropertymodel.h"
 #include "../data/roi.h"
+#include "../data/roiarea.h"
 #include "../data/roibox.h"
+
+#include "../data/datasets/datasetscalar.h"
 
 #include <QtGui>
 #include <QWebView>
@@ -286,6 +289,67 @@ void MainWindow::openRecentFile()
         load( action->data().toString() );
     }
 }
+
+void MainWindow::loadRoi()
+{
+    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+
+    QString filter( "all files (*.*);;niftii (*.nii *.nii.gz)" );
+
+    fd = new QFileDialog( this, "Open File", fn, filter );
+    fd->setFileMode( QFileDialog::ExistingFiles );
+    fd->setAcceptMode( QFileDialog::AcceptOpen );
+
+    QStringList fileNames;
+    if ( fd->exec() )
+    {
+        fileNames = fd->selectedFiles();
+    }
+    delete fd;
+
+    for ( int i = 0; i < fileNames.size(); ++i )
+    {
+        loadRoi( fileNames[i] );
+    }
+}
+
+bool MainWindow::loadRoi( QString fileName )
+{
+    if ( !fileName.isEmpty() )
+    {
+        if ( fileName.endsWith( "nii" ) || fileName.endsWith( "nii.gz" )  )
+        {
+            Loader loader( selectedDataset() );
+            loader.setFilename( QDir( fileName ) );
+            if ( loader.load() )
+            {
+                for ( int k = 0; k < loader.getNumDatasets(); ++k )
+                {
+                    DatasetScalar* dss = static_cast<DatasetScalar*>( loader.getDataset( k ) );
+                    std::vector<float>* data = dss->getData();
+                    std::vector<float> out( data->size(), 0.0 );
+
+                    for ( unsigned int i = 0; i < data->size(); ++i )
+                    {
+                        out[i] = data->at( i );
+                    }
+
+                    ROIArea* roiOut = new ROIArea( out, dss->getHeader() );
+                    Models::addROIArea( roiOut );
+                }
+                QFileInfo fi( fileName );
+                QDir dir = fi.absoluteDir();
+                QString lastPath = dir.absolutePath();
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+                setCurrentFile( fileName );
+
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 bool MainWindow::load( QString fileName )
 {
@@ -837,6 +901,10 @@ void MainWindow::createActions()
     quitAct->setStatusTip( tr( "Quit the application" ) );
     connect( quitAct, SIGNAL(triggered()), this, SLOT(close()) );
 
+    loadRoiAct = new QAction( tr( "Load ROI" ), this );
+    loadRoiAct->setStatusTip( tr( "Load a ROI from a Nifti file " ) );
+    connect( loadRoiAct, SIGNAL(triggered()), this, SLOT( loadRoi() ) );
+
     saveSceneAct = new QAction( tr( "Save Scene" ), this );
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
     connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
@@ -939,6 +1007,9 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu( tr( "&File" ) );
     fileMenu->addAction( openAct );
     fileMenu->addAction( saveAct );
+    separatorAct = fileMenu->addSeparator();
+
+    fileMenu->addAction( loadRoiAct );
     separatorAct = fileMenu->addSeparator();
 
     fileMenu->addAction( saveSceneAct );
