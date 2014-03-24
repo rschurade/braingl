@@ -14,6 +14,7 @@
 #include "../widgets/algoStarterWidgets/datasetselectionwidget.h"
 #include "../widgets/algoStarterWidgets/bundlingwidget.h"
 #include "../widgets/algoStarterWidgets/fiberbundlewidget.h"
+#include "../widgets/algoStarterWidgets/mathwidget.h"
 
 #include "../../algos/dwialgos.h"
 #include "../../algos/scalaralgos.h"
@@ -22,6 +23,7 @@
 #include "../../data/vptr.h"
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasetscalar.h"
 #include "../../data/datasets/datasetcons.h"
 #include "../../data/datasets/datasetglyphset.h"
 #include "../../data/datasets/datasetconglyphs.h"
@@ -208,6 +210,10 @@ void ToolBar::createActions()
     m_applyROIAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "create glyphs" ), this, Fn::Algo::APPLY_ROI_BRAINS );
     m_applyROIAction->setStatusTip( tr( "apply color as ROI" ) );
     connect( m_applyROIAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_brainglMathAction = new FNAction( QIcon( ":/icons/calc.png" ), tr( "braingl math" ), this, Fn::Algo::BRAINGL_MATH );
+    m_brainglMathAction->setStatusTip( tr( "math" ) );
+    connect( m_brainglMathAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -220,7 +226,6 @@ void ToolBar::slot( Fn::Algo algo )
     QList<QVariant>dsList =  m_toolBarView->model()->data( m_toolBarView->model()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
 
     Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
-
     switch ( algo )
     {
         case Fn::Algo::QBALL4:
@@ -296,6 +301,10 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::CREATE_ROI:
             l = ScalarAlgos::createROI( ds );
+            break;
+        case Fn::Algo::BRAINGL_MATH:
+            m_mw = new MathWidget( dynamic_cast<DatasetScalar*>( ds ), this->parentWidget() );
+            m_mw->show();
             break;
         case Fn::Algo::CREATE_NEW_DATASET:
             l = ScalarAlgos::createNew( ds );
@@ -423,7 +432,7 @@ void ToolBar::slot( Fn::Algo algo )
             }
 
     }
-    qDebug() << "adding " << l.size() << " datasets";
+    //qDebug() << "adding " << l.size() << " datasets";
     for ( int i = 0; i < l.size(); ++i )
     {
         index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
@@ -444,6 +453,7 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_gaussAct );
             this->addAction( m_medianAct );
             this->addAction( m_createROIAction );
+            this->addAction( m_brainglMathAction );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:

@@ -21,6 +21,7 @@ class CrossingTrackWidget;
 class SDWidget;
 class BundlingWidget;
 class FiberBundleWidget;
+class MathWidget;
 
 class ToolBar : public QToolBar
 {
@@ -76,6 +77,7 @@ private:
     FNAction* m_deleteLittleBrainsAction;
     FNAction* m_colorLittleBrainsAction;
     FNAction* m_applyROIAction;
+    FNAction* m_brainglMathAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
@@ -83,6 +85,7 @@ private:
     CorrelationWidget* m_cw;
     BundlingWidget* m_bw;
     FiberBundleWidget* m_fbw;
+    MathWidget* m_mw;
 
     void createActions();
 
