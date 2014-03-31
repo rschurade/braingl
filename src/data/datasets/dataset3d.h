@@ -40,6 +40,7 @@ private:
 
 private slots:
     void switchRenderSticks();
+    void scalingChanged();
 };
 
 #endif /* DATASET3D_H_ */
