@@ -6,6 +6,7 @@
  */
 
 #include "glwidget.h"
+#include "../core_3_3_context.h"
 #include "../gl/arcball.h"
 #include "../gl/camera.h"
 #include "../gl/camerabase.h"
@@ -21,7 +22,7 @@
 #include <QtGui>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
+    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -52,7 +53,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 }
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( parent, shareWidget ),
+    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -113,6 +114,21 @@ Camera* GLWidget::getCamera()
 
 void GLWidget::initializeGL()
 {
+    glewExperimental = true;
+    GLenum errorCode = glewInit();
+    if ( GLEW_OK != errorCode )
+    {
+        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
+        qDebug() << glewGetErrorString( errorCode );
+        exit( false );
+    }
+
+    // needed per OpenGL context and so per QGLWidget
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    Q_ASSERT( m_sceneRenderer );
     m_sceneRenderer->initGL();
     GLFunctions::initTextRenderer();
     GLFunctions::initShapeRenderer();

@@ -28,12 +28,12 @@ ColormapRenderer::ColormapRenderer() :
 
 ColormapRenderer::~ColormapRenderer()
 {
-    glDeleteBuffers( 2, &( vboIds[ 0 ] ) );
+    glDeleteBuffers( 3, &( vboIds[ 0 ] ) );
 }
 
 void ColormapRenderer::init()
 {
-    glGenBuffers( 2, vboIds );
+    glGenBuffers( 3, vboIds );
 
     initGeometry();
 }
@@ -44,13 +44,14 @@ void ColormapRenderer::initGeometry()
     float z = -0.5f;
     VertexData vertices[] =
     {
+        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         { QVector3D( m_x,        m_y - m_dy, z ), QVector3D( 0.0, 0.0, 0.0 ) },
         { QVector3D( m_x + m_dx, m_y - m_dy, z ), QVector3D( 1.0, 0.0, 0.0 ) },
-        { QVector3D( m_x + m_dx, m_y,        z ), QVector3D( 1.0, 1.0, 0.0 ) },
-        { QVector3D( m_x,        m_y,        z ), QVector3D( 0.0, 1.0, 0.0 ) }
+        { QVector3D( m_x,        m_y,        z ), QVector3D( 0.0, 1.0, 0.0 ) },
+        { QVector3D( m_x + m_dx, m_y,        z ), QVector3D( 1.0, 1.0, 0.0 ) }
     };
 
-    // Transfer vertex data to VBO 1
+    // Transfer vertex data to VBO 0
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
 
@@ -111,6 +112,21 @@ void ColormapRenderer::initGeometry()
     // Transfer vertex data to VBO 1
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, 72 * sizeof(float), scaleVertices, GL_STATIC_DRAW );
+
+    // XXX
+    GLushort scaleTriangleIndices[] = // XXX quad-equivalent triangle-pair indices
+    {
+             0,  1,  3,     1,  2,  3,
+             4,  5,  7,     5,  6,  7,
+             8,  9, 11,     9, 10, 11,
+            12, 13, 15,    13, 14, 15,
+            16, 17, 19,    17, 18, 19,
+            20, 21, 23,    21, 22, 23
+    };
+    // Transfer index data to VBO 2
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 6 * 2 * 3 * sizeof(GLushort), scaleTriangleIndices, GL_STATIC_DRAW );
+
 }
 
 void ColormapRenderer::setShaderVars()
@@ -169,11 +185,13 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
 
     // Draw cube geometry using indices from VBO 0
     //glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
-    glDrawArrays( GL_QUADS, 0, 4 );
+    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 2 ] );
 
     program = GLFunctions::getShader( "colormapscale" );
     program->bind();
@@ -197,9 +215,11 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
-    glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
+    // XXXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
+    glDrawElements( GL_TRIANGLES, 6*2*3, GL_UNSIGNED_SHORT, 0 );    // XXX
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     for ( unsigned int i = 0; i < m_labels.size(); ++i )
     {

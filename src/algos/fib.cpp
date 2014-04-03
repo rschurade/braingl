@@ -6,6 +6,7 @@
  */
 
 #include "fib.h"
+#include <cmath>
 
 #include <QDebug>
 

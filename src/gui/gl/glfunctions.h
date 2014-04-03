@@ -16,6 +16,10 @@
 #include <QImage>
 #include <QColor>
 
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#include "bugfixglshaderprogram.h"
+#endif
+
 class QGLShaderProgram;
 class ShapeRenderer;
 class TextRenderer;
@@ -41,6 +45,7 @@ public:
     static QList<int> getTextureIndexes( QString target = "maingl" );
 
     static QGLShaderProgram* getShader( QString name );
+    static bool validateShader( QString name );
 
     static void setShaderVarsSlice( QGLShaderProgram* program, QString target );
     static void setTextureUniforms( QGLShaderProgram* program, QString target );

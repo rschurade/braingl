@@ -441,8 +441,8 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     int sign = properties( "maingl" )->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     glEnable( GL_BLEND );
-    glShadeModel( GL_SMOOTH );
-    glEnable( GL_POINT_SMOOTH );
+    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
+    // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
     glPointSize( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
     glLineWidth( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
 

@@ -15,14 +15,14 @@ in vec3 v_texcoord;
 void main(void) {
     // need to combine colors from C0, C1, C2, C3, C4
 
-    vec4 c0 = texture2D( C0, v_texcoord.xy );
-    vec4 c1 = texture2D( C1, v_texcoord.xy );
-    vec4 c2 = texture2D( C2, v_texcoord.xy );
-    vec4 c3 = texture2D( C3, v_texcoord.xy );
-    vec4 c4 = texture2D( C4, v_texcoord.xy );
-    vec4 c5o = texture2D( C5, v_texcoord.xy );
+    vec4 c0 = texture( C0, v_texcoord.xy );
+    vec4 c1 = texture( C1, v_texcoord.xy );
+    vec4 c2 = texture( C2, v_texcoord.xy );
+    vec4 c3 = texture( C3, v_texcoord.xy );
+    vec4 c4 = texture( C4, v_texcoord.xy );
+    vec4 c5o = texture( C5, v_texcoord.xy );
 
-float d = decode( texture2D( D1, v_texcoord.xy ) );
+float d = decode( texture( D1, v_texcoord.xy ) );
 vec4 c5;
 if ( d > 0 )
 {

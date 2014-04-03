@@ -8,6 +8,7 @@
 #ifndef MESHALGOS_H_
 #define MESHALGOS_H_
 
+#include <vector>
 #include <QList>
 
 class Dataset;

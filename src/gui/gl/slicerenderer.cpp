@@ -84,10 +84,11 @@ void SliceRenderer::initGeometry()
     {
         VertexData verticesAxial[] =
         {
+            // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
             { QVector3D( lx, ly, z ), QVector3D( 0.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
             { QVector3D( xb, ly, z ), QVector3D( 1.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( xb, yb, z ), QVector3D( 1.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( lx, yb, z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
+            { QVector3D( lx, yb, z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) },
+            { QVector3D( xb, yb, z ), QVector3D( 1.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
         };
         // Transfer vertex data to VBO 1
         glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
@@ -99,10 +100,11 @@ void SliceRenderer::initGeometry()
     {
         VertexData verticesCoronal[] =
         {
+            // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
             { QVector3D( lx, y, lz ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
             { QVector3D( xb, y, lz ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
-            { QVector3D( xb, y, zb ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
-            { QVector3D( lx, y, zb ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
+            { QVector3D( lx, y, zb ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
+            { QVector3D( xb, y, zb ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
         };
 
         // Transfer vertex data to VBO 2
@@ -115,10 +117,11 @@ void SliceRenderer::initGeometry()
     {
         VertexData verticesSagittal[] =
         {
+            // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
             { QVector3D( x, ly, lz ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 0.0 ) },
             { QVector3D( x, yb, lz ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 0.0 ) },
-            { QVector3D( x, yb, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 1.0 ) },
-            { QVector3D( x, ly, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 1.0 ) }
+            { QVector3D( x, ly, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 0.0, 1.0 ) },
+            { QVector3D( x, yb, zb ), QVector3D( ( m_x ) / ( m_nx - 1 ), 1.0, 1.0 ) }
         };
         // Transfer vertex data to VBO 3
         glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
@@ -176,7 +179,7 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
         return;
     }
     //qDebug() << "main gl draw, renderMode:" << renderMode;
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
+    // XXX not in Core/deprecated //glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
 
@@ -225,7 +228,8 @@ void SliceRenderer::drawAxial( QString target )
     setShaderVars( target );
 
     // Draw cube geometry using indices from VBO 0
-    glDrawArrays( GL_QUADS, 0, 4 );
+    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
@@ -236,7 +240,8 @@ void SliceRenderer::drawCoronal( QString target )
     glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
     setShaderVars( target );
     // Draw cube geometry using indices from VBO 1
-    glDrawArrays( GL_QUADS, 0, 4 );
+    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
@@ -247,7 +252,8 @@ void SliceRenderer::drawSagittal( QString target )
     glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
     setShaderVars( target );
     // Draw cube geometry using indices from VBO 2
-    glDrawArrays( GL_QUADS, 0, 4 );
+    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

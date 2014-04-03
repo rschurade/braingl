@@ -51,6 +51,10 @@
 
 #include <QtGui>
 #include <QWebView>
+#include <QGLFormat>
+#include "core_3_3_context.h"
+
+#include <iostream>
 
 int MainWindow::countMainGL = 2;
 
@@ -66,11 +70,18 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
-	loadColormaps( resetSettings );
+    QGLFormat fmt;
+    fmt.setVersion( 3, 3 );
+    fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
+    fmt.setSampleBuffers( true );
+    QGLFormat::setDefaultFormat( fmt );
+
+    loadColormaps( resetSettings );
 
     createActions();
     createMenus();
     createToolBars();
+    //this->show();   // XXX work around "invalid drawable"?
     createDockWindows();
 
 
@@ -81,13 +92,14 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 
     setWindowTitle( tr( "brainGL" ) );
 
-    QIcon logo( ":/logo_blue_orange_64.png" );
+    QIcon logo( ":/icons/logo_blue_orange_64.png" );
     setWindowIcon( logo );
 
     setUnifiedTitleAndToolBarOnMac( true );
 
     if ( !resetSettings )
     {
+        mainGLWidget->makeCurrent();    // need GL context for this XXXX
         loadSettings();
     }
 }
@@ -353,6 +365,7 @@ bool MainWindow::loadRoi( QString fileName )
 
 bool MainWindow::load( QString fileName )
 {
+    mainGLWidget->makeCurrent();    // XXX load* needs GL context
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -392,6 +405,7 @@ bool MainWindow::load( QString fileName )
 
 bool MainWindow::load( QString fileName, QList<QVariant> state )
 {
+    mainGLWidget->makeCurrent();    // XXX load* needs GL context
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -1153,6 +1167,7 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
 
+    //this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );

@@ -112,8 +112,8 @@ void DiffPointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, in
         setShaderVars( props );
 
         glEnable( GL_BLEND );
-        glShadeModel( GL_SMOOTH );
-        glEnable( GL_POINT_SMOOTH );
+        //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
+        //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
 
         if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {

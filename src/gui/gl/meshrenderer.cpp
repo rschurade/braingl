@@ -193,7 +193,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glDisable(GL_CULL_FACE);
 
-    glShadeModel( GL_SMOOTH );
+    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
@@ -298,7 +298,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glDisable(GL_CULL_FACE);
 
-    glShadeModel( GL_SMOOTH );
+    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
