@@ -27,6 +27,7 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
 
     examineDataset();
 
@@ -99,6 +100,9 @@ void Dataset3D::createTexture()
     {
         div = 255.;
     }
+    //div = 255.;
+    div *= m_properties["maingl"]->get( Fn::Property::D_SCALING ).toFloat();
+
 
     int blockSize = nx * ny * nz;
     float* data = new float[blockSize * 3];
@@ -204,4 +208,10 @@ void Dataset3D::switchRenderSticks()
 {
     m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
     Models::d()->submit();
+}
+
+void Dataset3D::scalingChanged()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    createTexture();
 }

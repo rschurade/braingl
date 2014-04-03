@@ -83,7 +83,8 @@ namespace Fn
         CREATE_ROI,
         DELETE_LITTLE_BRAINS,
         COLOR_LITTLE_BRAINS,
-        APPLY_ROI_BRAINS
+        APPLY_ROI_BRAINS,
+        BRAINGL_MATH
     };
 
     enum class Orient : int

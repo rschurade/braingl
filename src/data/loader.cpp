@@ -922,13 +922,18 @@ bool Loader::loadMRtrix()
             test.append( qba.at( i + 5 ) );
             test.append( qba.at( i + 6 ) );
 
-
             if ( test == "file: ." )
             {
-                offset.append( qba.at( i + 7 ) );
-                offset.append( qba.at( i + 8 ) );
-                offset.append( qba.at( i + 9 ) );
-                offset.append( qba.at( i + 10 ) );
+                int add = 7;
+                while ( qba.at( i + add ) == ' ' )
+                {
+                    ++add;
+                }
+                while ( qba.at( i + add ) != '\n' && qba.at( i + add ) != ' ' )
+                {
+                    offset.append( qba.at( i + add ) );
+                    ++add;
+                }
 
                 qDebug() << "found file: . at " << i << "offset:" << offset.toInt();
                 pc = offset.toInt() + 4;
