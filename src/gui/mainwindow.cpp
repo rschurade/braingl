@@ -968,15 +968,15 @@ void MainWindow::createActions()
     connect( showSagittalAct, SIGNAL( toggled( bool ) ), this, SLOT( slotToggleSagittalSlice() ) );
 
     standardViewAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Axial View" ), this );
-    standardViewAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
+    standardViewAxialAct->setStatusTip( tr( "Set view to axial." ) );
     connect( standardViewAxialAct, SIGNAL( triggered() ), this, SLOT( slotStandardAxialView() ) );
 
     standardViewCoronalAct = new QAction( QIcon( ":/icons/coronal.png" ), tr( "Coronal View" ), this );
-    standardViewCoronalAct->setStatusTip( tr( "Toggle rendering of the coronal slice." ) );
+    standardViewCoronalAct->setStatusTip( tr( "Set view to coronal." ) );
     connect( standardViewCoronalAct, SIGNAL( triggered() ), this, SLOT( slotStandardCoronalView() ) );
 
     standardViewSagittalAct = new QAction( QIcon( ":/icons/sagittal.png" ), tr( "Sagittal view" ), this );
-    standardViewSagittalAct->setStatusTip( tr( "Toggle rendering of the sagittal slice." ) );
+    standardViewSagittalAct->setStatusTip( tr( "Set view to sagittal." ) );
     connect( standardViewSagittalAct, SIGNAL( triggered() ), this, SLOT( slotStandardSagittalView() ) );
 
     toggleShaderEditAct = new QAction( QIcon( ":/icons/cat.png" ), tr( "Toggle shader edit" ), this );
