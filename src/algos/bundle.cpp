@@ -99,33 +99,31 @@ void Bundle::applyLoopResult()
         {
             Fib fib = m_fibs[k];
             float size = fib.length() - 1;
-
+            float v = 1.0;
             for ( unsigned int l = 1; l < fib.length() - 1; ++l )
             {
                 QVector3D force = forces[pc++] / ( m_iterations * 0.50 );
 
                 if ( l < ( ( size / 100 ) * m_smoothRange ) )
                 {
-                    float v = static_cast<float>( l ) / ( ( size / 100 ) * m_smoothRange );
-                    fib[l].setX( fib[l].x() + force.x() * v );
-                    fib[l].setY( fib[l].y() + force.y() * v );
-                    fib[l].setZ( fib[l].z() + force.z() * v );
-
+                    v = static_cast<float>( l ) / ( ( size / 100 ) * m_smoothRange );
                 }
                 else if ( l > ( ( size / 100 ) * ( 100. - m_smoothRange ) ) )
                 {
-                    float v = static_cast<float>( size - l ) / ( ( size / 100 ) * m_smoothRange );
-                    fib[l].setX( fib[l].x() + force.x() * v );
-                    fib[l].setY( fib[l].y() + force.y() * v );
-                    fib[l].setZ( fib[l].z() + force.z() * v );
+                    v = static_cast<float>( size - l ) / ( ( size / 100 ) * m_smoothRange );
                 }
                 else
                 {
-                    fib[l].setX( fib[l].x() + force.x() );
-                    fib[l].setY( fib[l].y() + force.y() );
-                    fib[l].setZ( fib[l].z() + force.z() );
+                    v = 1.0;
                 }
+                QVector3D vert = fib[l];
+                vert.setX( fib[l].x() + force.x() * v );
+                vert.setY( fib[l].y() + force.y() * v );
+                vert.setZ( fib[l].z() + force.z() * v );
+                fib.setVert( l, vert );
+
             }
+
             m_fibs[k] = fib;
         }
     }
