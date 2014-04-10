@@ -48,6 +48,7 @@
 #include "../data/roibox.h"
 
 #include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasetplane.h"
 
 #include <QtGui>
 #include <QWebView>
@@ -1000,6 +1001,12 @@ void MainWindow::createActions()
     continousRenderingAct->setChecked( false );
     connect( continousRenderingAct, SIGNAL( toggled( bool ) ), this, SLOT( continousRendering() ) );
 
+    newPlaneAct = new QAction( QIcon( ":/icons/plane.png" ), tr( "new Plane" ), this );
+    newPlaneAct->setStatusTip( tr( "create a new plane" ) );
+    newPlaneAct->setCheckable( false );
+    newPlaneAct->setChecked( false );
+    connect( newPlaneAct, SIGNAL(triggered()), this, SLOT(newPlane()) );
+
 }
 
 void MainWindow::createMenus()
@@ -1049,6 +1056,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( openAct );
     fileToolBar->addAction( saveAct );
     fileToolBar->addAction( screenshotAct );
+    fileToolBar->addAction( newPlaneAct );
     //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
@@ -1451,4 +1459,10 @@ void MainWindow::slotDatasetSelectionChanged()
 {
     m_dockDSP->show();
     m_dockDSP->raise();
+}
+
+void MainWindow::newPlane()
+{
+    DatasetPlane* plane = new DatasetPlane();
+    Models::addDataset( plane );
 }

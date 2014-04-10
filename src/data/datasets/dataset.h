@@ -39,6 +39,7 @@ public:
     virtual QString getColormapShader( int num );
 
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+    virtual bool rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifiers modifiers, QString target );
     void copySettings( QString target );
 
     virtual QString getSaveFilter();
