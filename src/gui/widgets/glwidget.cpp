@@ -427,6 +427,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
             updateRequired |= ds->mousePick( m_picked, pickPos, event->modifiers(), target );
+            updateRequired |= ds->rightMouseDrag( m_picked, dir, event->modifiers(), target );
         }
     }
 

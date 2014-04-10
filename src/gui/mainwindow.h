@@ -115,6 +115,8 @@ private:
     QAction* lockDockTitlesAct;
     QAction* renderCrosshairsAct;
 
+    QAction* newPlaneAct;
+
     QAction* showAxialAct;
     QAction* showCoronalAct;
     QAction* showSagittalAct;
@@ -172,6 +174,8 @@ private slots:
     void slotDatasetSelectionChanged();
 
     void saveFilterChanged(QString filterString);
+
+    void newPlane();
 };
 
 #endif

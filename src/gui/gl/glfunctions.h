@@ -49,7 +49,7 @@ public:
     static QString getShaderCode( QString name );
     static void setShaderCode( QString name,  QString source );
 
-    static int getPickIndex();
+    static unsigned int getPickIndex();
 
     static void updateColormapShader();
 

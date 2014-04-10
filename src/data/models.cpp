@@ -142,3 +142,8 @@ void Models::addROIArea( ROIArea* roi )
 {
     m_roiWidget->addROIArea( roi );
 }
+
+void Models::addDataset( Dataset* ds )
+{
+    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( ds ), Qt::DisplayRole );
+}

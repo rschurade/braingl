@@ -33,7 +33,8 @@ namespace Fn
         SURFACESET = 0x8000,
         CONS = 0x10000,
         TREE = 0x20000,
-        CONGLYPHS = 0x40000
+        CONGLYPHS = 0x40000,
+        PLANE = 0x80000
     };
 
     enum class ColormapEnum : int

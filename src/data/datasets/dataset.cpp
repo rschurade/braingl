@@ -67,6 +67,13 @@ bool Dataset::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifi
     return false;
 }
 
+bool Dataset::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifiers modifiers, QString target )
+{
+    // do nothing here
+    return false;
+}
+
+
 QString Dataset::getColormapShader( int num )
 {
     QString code( "" );
