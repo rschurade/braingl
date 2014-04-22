@@ -26,10 +26,9 @@ public:
 private:
     GLuint vbo0;
 
-    unsigned int m_handle0;
-    unsigned int m_handle1;
-    unsigned int m_handle2;
-    unsigned int m_handle3;
+    int m_handle0;
+    int m_handle1;
+    int m_handle2;
 
     QVector3D m_h0;
     QVector3D m_h1;

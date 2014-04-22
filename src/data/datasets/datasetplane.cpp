@@ -19,7 +19,6 @@ DatasetPlane::DatasetPlane() :
     m_handle0( GLFunctions::getPickIndex() ),
     m_handle1( GLFunctions::getPickIndex() ),
     m_handle2( GLFunctions::getPickIndex() ),
-    m_handle3( GLFunctions::getPickIndex() ),
     m_h0( 80, 100, 80 ),
     m_h1( 0, 100, 80 ),
     m_h2( 80, 0, 80 ),
@@ -40,6 +39,10 @@ DatasetPlane::~DatasetPlane()
 
 void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
+    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    {
+        return;
+    }
     if ( m_properties["maingl"]->get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
     {
         QColor color = m_properties["maingl"]->get( Fn::Property::D_HANDLE_COLOR ).value<QColor>();
@@ -130,12 +133,6 @@ void DatasetPlane::initGeometry()
         glDeleteBuffers( 1, &vbo0 );
     }
     glGenBuffers( 1, &vbo0 );
-
-//    wmath::WPosition v0( m_h1.x()                  , m_h2.y()                 , m_h0.z() - ( m_h0.z() - m_h1.z() ) - ( m_h0.z() - m_h2.z() ) );
-//    wmath::WPosition v1( m_h1.x()                  , m_h0.y() + m_h0.y() - m_h2.y() , m_h0.z() - ( m_h0.z() - m_h1.z() ) + ( m_h0.z() - m_h2.z() ) );
-//    wmath::WPosition v2( m_h0.x() + m_h0.x() - m_h1.x()  , m_h0.y() + m_h0.y() - m_h2.y() , m_h0.z() + ( m_h0.z() - m_h1.z() ) + ( m_h0.z() - m_h2.z() ) );
-//    wmath::WPosition v3( m_h0.x() + m_h0.x() - m_h1.x()  , m_h2.y()                 , m_h0.z() + ( m_h0.z() - m_h1.z() ) - ( m_h0.z() - m_h2.z() ) );
-
 
     float x0 = m_h1.x();
     float y0 = m_h2.y();
