@@ -18,8 +18,6 @@ public:
     DatasetPlane();
     virtual ~DatasetPlane();
 
-    void initProperties();
-
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
     //bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
@@ -33,11 +31,9 @@ private:
     unsigned int m_handle2;
     unsigned int m_handle3;
 
-    QVector3D m_handle0Pos;
-    QVector3D m_handle1Pos;
-    QVector3D m_handle2Pos;
-    QVector3D m_handle3Pos;
-
+    QVector3D m_h0;
+    QVector3D m_h1;
+    QVector3D m_h2;
 
     bool dirty;
 

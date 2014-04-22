@@ -260,6 +260,8 @@ namespace Fn
         D_LITTLE_BRAINS_COLORMODE,
         D_THRESHOLD_PERC,
         D_FIBER_MORPH,
+        D_SHOW_PLANE_HANDLES,
+        D_HANDLE_COLOR,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -519,6 +521,8 @@ namespace Fn
                 case Property::D_LITTLE_BRAINS_COLORMODE: return QString( "little brains color mode" ); break;
                 case Property::D_THRESHOLD_PERC: return QString( "threshold as percentage" ); break;
                 case Property::D_FIBER_MORPH: return QString( "interpolation btw. straight line and data" ); break;
+                case Property::D_SHOW_PLANE_HANDLES: return QString( "show/hide handles" ); break;
+                case Property::D_HANDLE_COLOR: return QString( "handle color" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
