@@ -19,11 +19,19 @@ DatasetPlane::DatasetPlane() :
     m_handle0( GLFunctions::getPickIndex() ),
     m_handle1( GLFunctions::getPickIndex() ),
     m_handle2( GLFunctions::getPickIndex() ),
-    m_h0( 80, 100, 80 ),
-    m_h1( 0, 100, 80 ),
-    m_h2( 80, 0, 80 ),
     dirty( true )
 {
+    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+    float nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toFloat();
+    float ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toFloat();
+    float nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toFloat();
+
+    m_h0 = QVector3D( nx * dx / 2, ny * dy / 2, nz * dz / 2 );
+    m_h1 = QVector3D( 0.0, m_h0.y(), m_h0.z() );
+    m_h2 = QVector3D( m_h0.x(), 0.0, m_h0.z() );
+
     m_properties["maingl"]->createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
     m_properties["maingl"]->createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
 
