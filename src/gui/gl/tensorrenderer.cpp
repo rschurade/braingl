@@ -95,8 +95,8 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars();
 
-    GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-     // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+    //GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
+    // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
     // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, m_quads );
     glDrawElements( GL_TRIANGLES, m_quads, GL_UNSIGNED_INT, 0 );  // XXX triangle pairs

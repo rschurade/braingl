@@ -143,13 +143,19 @@ bool LoaderVTK::open()
     {
         qDebug() << "vtk file is a polydata";
         vtkPolyData* output = reader->GetPolyDataOutput();
-        qDebug() << "vtk file has " << output->GetNumberOfPoints() << " points.";
-        qDebug() << "vtk file has " << output->GetNumberOfLines() << " lines.";
-        qDebug() << "vtk file has " << output->GetNumberOfPolys() << " polys.";
 
         m_numPoints = output->GetNumberOfPoints();
         m_numLines = output->GetNumberOfLines();
         m_numPolys = output->GetNumberOfPolys();
+
+        qDebug() << "vtk file has " << m_numPoints << " points.";
+        qDebug() << "vtk file has " << m_numLines << " lines.";
+        qDebug() << "vtk file has " << m_numPolys << " polys.";
+
+        if( m_numPoints <= 0 )
+        {
+            return false;
+        }
 
         if ( m_numPolys > 0 )
         {

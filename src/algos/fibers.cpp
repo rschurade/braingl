@@ -108,31 +108,40 @@ Fib Fibers::mergeFibs( Fib& lhs, Fib& rhs )
 
 DatasetScalar* Fibers::tractDensity()
 {
-    m_dx = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
-    m_dy = m_dx;
-    m_dz = m_dx;
-    m_nx = 160 / m_dx;
-    m_ny = 200 / m_dy;
-    m_nz = 160 / m_dz;
+    float res = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
+    m_dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    m_dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    m_dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+    m_nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toFloat();
+    m_ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toFloat();
+    m_nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toFloat();
+
+    m_nx = ( ( m_nx * m_dx ) / res ) + 1;
+    m_ny = ( ( m_ny * m_dy ) / res ) + 1;
+    m_nz = ( ( m_nz * m_dz ) / res ) + 1;
+    m_dx = res;
+    m_dy = res;
+    m_dz = res;
+
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<float> data( m_blockSize, 0 );
     std::vector<Fib> fibs = m_dataset->getSelectedFibs();
-    int x, y, z;
+    float x, y, z;
     QVector3D p3;
+    qDebug() << "calculating tract density for " << fibs.size() << " fibers...";
     for ( unsigned int i = 0; i < fibs.size(); ++i )
     {
+        if ( i % 1000 == 0 ) qDebug() << i << " done...";
         std::vector<float> fibdata( m_blockSize, 0 );
 
         for( unsigned int k = 0; k < fibs[i].length() - 1; ++k )
         {
             QVector3D p1( fibs[i][k] );
             QVector3D p2( fibs[i][k+1] );
-            p2 = p2 - p1;
-            p2.normalize();
 
             for ( int l = 0; l < 10; ++l )
             {
-                p3 = p1 + ( ( (float)l / 10 ) * p2 ) ;
+                p3 = ( 1.0 - ( (float)l / 10. ) ) * p1 + ( (float)l / 10. ) * p2;
                 x = p3.x();
                 y = p3.y();
                 z = p3.z();
@@ -148,8 +157,11 @@ DatasetScalar* Fibers::tractDensity()
         }
     }
 
-    int dims[8] = { 3, 160, 200, 160, 1, 1, 1 };
+    int dims[8] = { 3, m_nx, m_ny, m_nz, 1, 1, 1 };
     nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
+    header->dx = m_dx;
+    header->dy = m_dy;
+    header->dz = m_dz;
     DatasetScalar* out = new DatasetScalar( QDir( "tract density" ), data, header );
     return out;
 }
