@@ -47,6 +47,8 @@ public:
     static void setRoiWidget( ROIWidget* rw );
     static void addROIArea( ROIArea* roi );
 
+    static void addDataset( Dataset* ds );
+
 private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;

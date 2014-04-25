@@ -50,7 +50,7 @@ std::vector< QString > GLFunctions::m_shaderNames;
 
 ROI* GLFunctions::roi = 0;
 
-int GLFunctions::getPickIndex()
+unsigned int GLFunctions::getPickIndex()
 {
     return GLFunctions::pickIndex++;
 }
