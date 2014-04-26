@@ -119,7 +119,6 @@ void DatasetIsosurface::renameVerticesAndTriangles()
 //    float xOff = 0.5f;
 //    float yOff = 0.5f;
 //    float zOff = 0.5f;
-
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
@@ -128,7 +127,6 @@ void DatasetIsosurface::renameVerticesAndTriangles()
         m_mesh[0]->addVertex( ( *mapIterator ).x, ( *mapIterator ).y, ( *mapIterator ).z );
         ++mapIterator;
     }
-
     // Now rename triangles.
     while ( vecIterator != m_trivecTriangles.end() )
     {
@@ -140,7 +138,6 @@ void DatasetIsosurface::renameVerticesAndTriangles()
         ++vecIterator;
     }
     m_mesh[0]->finalize();
-
     m_i2pt3idVertices.clear();
     m_trivecTriangles.clear();
 }
