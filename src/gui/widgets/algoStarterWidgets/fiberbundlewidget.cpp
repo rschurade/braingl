@@ -14,7 +14,7 @@
 #include "../../../data/datasets/dataset.h"
 #include "../../../data/datasets/datasetfibers.h"
 
-#include "../../gui/gl/glfunctions.h"
+#include "../../gl/glfunctions.h"
 
 #include <QPushButton>
 #include <QProgressBar>

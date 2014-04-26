@@ -58,6 +58,10 @@ void MeshRenderer::init()
 
 void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
 {
+    if ( m_mesh->numTris() == 0 )
+    {
+        return;
+    }
 
     float alpha = props->get( Fn::Property::D_ALPHA ).toFloat();
     m_renderMode = renderMode;

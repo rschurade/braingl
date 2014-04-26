@@ -44,6 +44,7 @@ private:
     bool loadRGB();
     bool load1D();
     bool loadMRtrix();
+    bool loadPNG();
 
     nifti_image* m_header;
     QDir m_fileName;

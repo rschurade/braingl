@@ -15,15 +15,21 @@
 #include "datasets/datasettree.h"
 #include "datasets/datasetmesh.h"
 #include "datasets/datasetfibers.h"
+#include "datasets/dataset3d.h"
+#include "datasets/datasetscalar.h"
 
 #include "mesh/trianglemesh2.h"
 
 #include "../algos/fib.h"
 
+#include "../gui/widgets/algoStarterWidgets/loadimagewidget.h"
+#include "../gui/widgets/controls/sliderwitheditint.h"
+
 #include <QDebug>
 #include <QDataStream>
 #include <QVector3D>
 #include <QtGui>
+#include <QImage>
 
 #include <cmath>
 
@@ -124,6 +130,11 @@ bool Loader::load()
     if ( m_fileName.path().endsWith( ".1D" ) )
     {
         return load1D();
+    }
+
+    if ( m_fileName.path().endsWith( ".png" ) || m_fileName.path().endsWith( ".jpg" ) )
+    {
+        return loadPNG();
     }
 
     return false;
@@ -994,6 +1005,137 @@ bool Loader::loadMRtrix()
     dataNames.push_back( "no data" );
     DatasetFibers* dataset = new DatasetFibers( fn, fibs, dataNames );
     m_dataset.push_back( dataset );
+
+    return true;
+}
+
+bool Loader::loadPNG()
+{
+    QImage img( m_fileName.path() );
+
+    LoadImageWidget widget; // = new LoadImageWidget();
+    widget.exec();
+    int orient = widget.getOrient();
+
+    int dimX = 0;
+    int dimY = 0;
+    int dimZ = 0;
+
+    int thickness = widget.m_thickness->getValue();
+    int offset = widget.m_offset->getValue();
+
+    std::vector<QVector3D>vectorData;
+    std::vector<float>scalarData;
+
+    switch ( orient )
+    {
+        case 0:
+        {
+            dimX = img.width();
+            dimY = img.height();
+            dimZ = widget.m_thickness2->getValue();
+            size_t blockSize = dimX * dimY * dimZ;
+
+            int z = offset;
+
+            vectorData.resize( blockSize );
+            scalarData.resize( blockSize );
+
+            for ( int i = 0; i < thickness; ++i )
+            {
+                for ( int y = 0; y < dimY; ++y )
+                {
+                    for ( int x = 0; x < dimX; ++x )
+                    {
+                        QRgb c = img.pixel( x, dimY - y - 1 );
+                        QColor col =  QColor( c ).toRgb();
+                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setX( col.redF() );
+                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setY( col.greenF() );
+                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setZ( col.blueF() );
+                        scalarData[x + y * dimX + ( z + i ) * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                    }
+                }
+            }
+            break;
+        }
+        case 1:
+        {
+            dimX = img.width();
+            dimY = widget.m_thickness2->getValue();
+            dimZ = img.height();
+            size_t blockSize = dimX * dimY * dimZ;
+
+            int y = offset;
+
+            vectorData.resize( blockSize );
+            scalarData.resize( blockSize );
+
+            for ( int i = 0; i < thickness; ++i )
+            {
+                for ( int z = 0; z < dimZ; ++z )
+                {
+                    for ( int x = 0; x < dimX; ++x )
+                    {
+                        QRgb c = img.pixel( x, dimZ - z - 1 );
+                        QColor col =  QColor( c ).toRgb();
+                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setX( col.redF() );
+                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setY( col.greenF() );
+                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                        scalarData[x + ( y + i ) * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                    }
+                }
+            }
+
+            break;
+        }
+        case 2:
+        {
+            dimX = widget.m_thickness2->getValue();
+            dimY = img.width();
+            dimZ = img.height();
+            size_t blockSize = dimX * dimY * dimZ;
+
+            int x = offset;
+
+            vectorData.resize( blockSize );
+            scalarData.resize( blockSize );
+
+            for ( int i = 0; i < thickness; ++i )
+            {
+                for ( int z = 0; z < dimZ; ++z )
+                {
+                    for ( int y = 0; y < dimY; ++y )
+                    {
+                        QRgb c = img.pixel( dimY - y - 1, dimZ - z - 1 );
+                        QColor col =  QColor( c ).toRgb();
+                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setX( col.redF() );
+                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setY( col.greenF() );
+                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                        scalarData[( x + i ) + y * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    int dims[8] = { 3, dimX, dimY, dimZ, 3, 1, 1 };
+    nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
+    header->dx = 1.0;
+    header->dy = 1.0;
+    header->dz = 1.0;
+
+    Dataset3D* dataset = new Dataset3D( m_fileName.path(), vectorData, header );
+    m_dataset.push_back( dataset );
+
+    int dims2[8] = { 3, dimX, dimY, dimZ, 1, 1, 1 };
+    nifti_image* header2 = nifti_make_new_nim( dims2, NIFTI_TYPE_FLOAT32, 1 );
+    header->dx = 1.0;
+    header->dy = 1.0;
+    header->dz = 1.0;
+
+    DatasetScalar* dataset2 = new DatasetScalar( m_fileName.path(), scalarData, header2 );
+    m_dataset.push_back( dataset2 );
 
     return true;
 }
