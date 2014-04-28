@@ -42,6 +42,7 @@ public:
 
     static QModelIndex createRoiIndex( int branch, int pos, int column );
 
+    static Dataset* getDataset( int id );
     static QList<Dataset*>getDatasets( Fn::DatasetType filter );
 
     static void setRoiWidget( ROIWidget* rw );

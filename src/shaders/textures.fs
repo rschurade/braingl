@@ -44,7 +44,13 @@ uniform float u_selectedMin4;
 uniform float u_selectedMax4;
 uniform int u_colormap4;
 
-vec4 texColor( vec3 texCoord )
+in vec3 v_texCoord0;
+in vec3 v_texCoord1;
+in vec3 v_texCoord2;
+in vec3 v_texCoord3;
+in vec3 v_texCoord4;
+
+vec4 texColor()
 {
     vec4 color0 = vec4( 0.0, 0.0, 0.0, 0.0 );
     vec4 color1 = vec4( 0.0, 0.0, 0.0, 0.0 );
@@ -54,7 +60,7 @@ vec4 texColor( vec3 texCoord )
 
     if ( u_texActive0 )
     {
-        color0 = texture( texture0, texCoord );
+        color0 = texture( texture0, v_texCoord0 );
         if ( u_colormap0 != -1 )
         {
             color0 = colormap( unpackFloat( color0 ), u_colormap0, u_lowerThreshold0, u_upperThreshold0, u_selectedMin0, u_selectedMax0 );
@@ -63,7 +69,7 @@ vec4 texColor( vec3 texCoord )
 
     if ( u_texActive1 )
     {
-        color1 = texture( texture1, texCoord );
+        color1 = texture( texture1, v_texCoord1 );
         if ( u_colormap1 != -1 )
         {
             color1 = colormap( unpackFloat( color1 ), u_colormap1, u_lowerThreshold1, u_upperThreshold1, u_selectedMin1, u_selectedMax1 );
@@ -72,7 +78,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive2 )
     {
-        color2 = texture( texture2, texCoord );
+        color2 = texture( texture2, v_texCoord2 );
         if ( u_colormap2 != -1 )
         {
             color2 = colormap( unpackFloat( color2 ), u_colormap2, u_lowerThreshold2, u_upperThreshold2, u_selectedMin2, u_selectedMax2 );
@@ -81,7 +87,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive3 )
     {
-        color3 = texture( texture3, texCoord );
+        color3 = texture( texture3, v_texCoord3 );
         if ( u_colormap3 != -1 )
         {
             color3 = colormap( unpackFloat( color3 ), u_colormap3, u_lowerThreshold3, u_upperThreshold3, u_selectedMin3, u_selectedMax3 );
@@ -90,7 +96,7 @@ vec4 texColor( vec3 texCoord )
     
     if ( u_texActive4 )
     {
-        color4 = texture( texture4, texCoord );
+        color4 = texture( texture4, v_texCoord4 );
         if ( u_colormap4 != -1 )
         {
             color4 = colormap( unpackFloat( color4 ), u_colormap4, u_lowerThreshold4, u_upperThreshold4, u_selectedMin4, u_selectedMax4 );

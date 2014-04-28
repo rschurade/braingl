@@ -22,7 +22,7 @@ void main()
     vec4 color = vec4( 0.0, 0.0, 0.0, 1.0 ); 
     if ( u_colorMode == 3 )
     {
-        color = texColor( v_texcoord );
+        color = texColor();
 	    
 	    if ( !( color.r + color.g + color.b > 0.0 ) ) discard;
     }
