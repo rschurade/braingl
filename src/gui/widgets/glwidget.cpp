@@ -464,6 +464,10 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z );
                 QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_ny / 2, m_z + 1.0 );
                 QVector2D v3 = v1 - v2;
+                if ( v3.length() <= 1 )
+                {
+                    v3 = QVector2D( -1 * slowDown, -1 * slowDown );
+                }
                 float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
                 float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
                 int newSlice = m_sliceZPosAtPick + distX * m_nz / slowDown - distY * m_nz / slowDown;
@@ -480,6 +484,10 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y, m_nz / 2 );
                 QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_nx / 2, m_y + 1.0, m_nz / 2 );
                 QVector2D v3 = v1 - v2;
+                if ( v3.length() <= 1 )
+                {
+                    v3 = QVector2D( -1 * slowDown, -1 * slowDown );
+                }
                 float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
                 float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
                 int newSlice = m_sliceYPosAtPick + distX * m_ny / slowDown - distY * m_ny / slowDown;
@@ -496,6 +504,10 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 QVector2D v1 = m_sceneRenderer->mapWorld2Mouse( m_x, m_ny / 2, m_nz / 2 );
                 QVector2D v2 = m_sceneRenderer->mapWorld2Mouse( m_x + 1.0, m_ny / 2, m_nz / 2 );
                 QVector2D v3 = v1 - v2;
+                if ( v3.length() <= 1 )
+                {
+                    v3 = QVector2D( -1 * slowDown, -1 * slowDown );
+                }
                 float distX = ( m_rightMouseDown.x() - x ) * v3.x() / m_width;
                 float distY = ( m_rightMouseDown.y() - y ) * v3.y() / m_height;
                 int newSlice = m_sliceXPosAtPick + distX * m_nx / slowDown - distY * m_nx / slowDown;
