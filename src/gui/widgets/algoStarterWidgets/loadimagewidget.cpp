@@ -10,6 +10,7 @@
 #include "../controls/sliderwithedit.h"
 #include "../controls/sliderwitheditint.h"
 #include "../controls/selectwithlabel.h"
+#include "../controls/checkbox.h"
 
 LoadImageWidget::LoadImageWidget( QWidget* parent ) :
     QDialog( parent )
@@ -53,6 +54,10 @@ LoadImageWidget::LoadImageWidget( QWidget* parent ) :
 //    m_paddingLeftRight->setMax( 200 );
 //    m_paddingTopBottom->setValue( 0 );
 //    m_layout->addWidget( m_paddingTopBottom );
+
+    m_whiteTransparent = new CheckBox( "white is transparent" );
+    m_whiteTransparent->setChecked( false );
+    m_layout->addWidget( m_whiteTransparent );
 
     m_layout->addStretch();
 

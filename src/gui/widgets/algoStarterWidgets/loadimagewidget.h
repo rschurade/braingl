@@ -10,6 +10,7 @@
 
 #include <QtGui>
 
+class CheckBox;
 class SelectWithLabel;
 class SliderWithEditInt;
 
@@ -28,6 +29,7 @@ public:
     SliderWithEditInt* m_offset;
     SliderWithEditInt* m_paddingLeftRight;
     SliderWithEditInt* m_paddingTopBottom;
+    CheckBox*  m_whiteTransparent;
 
 private:
     QVBoxLayout* m_layout;
