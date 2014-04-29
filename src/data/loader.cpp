@@ -24,6 +24,7 @@
 
 #include "../gui/widgets/algoStarterWidgets/loadimagewidget.h"
 #include "../gui/widgets/controls/sliderwitheditint.h"
+#include "../gui/widgets/controls/checkbox.h"
 
 #include <QDebug>
 #include <QDataStream>
@@ -1027,6 +1028,8 @@ bool Loader::loadPNG()
     std::vector<QVector3D>vectorData;
     std::vector<float>scalarData;
 
+    bool whiteTransp = widget.m_whiteTransparent->checked();
+
     switch ( orient )
     {
         case 0:
@@ -1049,10 +1052,23 @@ bool Loader::loadPNG()
                     {
                         QRgb c = img.pixel( x, dimY - y - 1 );
                         QColor col =  QColor( c ).toRgb();
-                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setX( col.redF() );
-                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setY( col.greenF() );
-                        vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setZ( col.blueF() );
-                        scalarData[x + y * dimX + ( z + i ) * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        if ( whiteTransp )
+                        {
+                            if ( col.red() < 254 && col.green() < 254 && col.blue() < 254 )
+                            {
+                                vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setX( col.redF() );
+                                vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setY( col.greenF() );
+                                vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setZ( col.blueF() );
+                                scalarData[x + y * dimX + ( z + i ) * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                            }
+                        }
+                        else
+                        {
+                            vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setX( col.redF() );
+                            vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setY( col.greenF() );
+                            vectorData[x + y * dimX + ( z + i ) * dimX * dimY ].setZ( col.blueF() );
+                            scalarData[x + y * dimX + ( z + i ) * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        }
                     }
                 }
             }
@@ -1078,10 +1094,23 @@ bool Loader::loadPNG()
                     {
                         QRgb c = img.pixel( x, dimZ - z - 1 );
                         QColor col =  QColor( c ).toRgb();
-                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setX( col.redF() );
-                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setY( col.greenF() );
-                        vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setZ( col.blueF() );
-                        scalarData[x + ( y + i ) * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        if ( whiteTransp )
+                        {
+                            if ( col.red() < 254 && col.green() < 254 && col.blue() < 254 )
+                            {
+                                vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setX( col.redF() );
+                                vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setY( col.greenF() );
+                                vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                                scalarData[x + ( y + i ) * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                            }
+                        }
+                        else
+                        {
+                            vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setX( col.redF() );
+                            vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setY( col.greenF() );
+                            vectorData[x + ( y + i ) * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                            scalarData[x + ( y + i ) * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        }
                     }
                 }
             }
@@ -1108,10 +1137,23 @@ bool Loader::loadPNG()
                     {
                         QRgb c = img.pixel( dimY - y - 1, dimZ - z - 1 );
                         QColor col =  QColor( c ).toRgb();
-                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setX( col.redF() );
-                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setY( col.greenF() );
-                        vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setZ( col.blueF() );
-                        scalarData[( x + i ) + y * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        if ( whiteTransp )
+                        {
+                            if ( col.red() < 254 && col.green() < 254 && col.blue() < 254 )
+                            {
+                                vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setX( col.redF() );
+                                vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setY( col.greenF() );
+                                vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                                scalarData[( x + i ) + y * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                            }
+                        }
+                        else
+                        {
+                            vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setX( col.redF() );
+                            vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setY( col.greenF() );
+                            vectorData[( x + i ) + y * dimX + z * dimX * dimY ].setZ( col.blueF() );
+                            scalarData[( x + i ) + y * dimX + z * dimX * dimY ] = qMax( qMax( col.redF(), col.greenF() ), col.blueF() );
+                        }
                     }
                 }
             }
