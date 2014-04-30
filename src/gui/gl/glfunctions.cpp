@@ -89,6 +89,9 @@ bool GLFunctions::setupTextures( QString target )
             glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         }
             /* no break */
         case 4:
@@ -100,6 +103,9 @@ bool GLFunctions::setupTextures( QString target )
             glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         }
             /* no break */
         case 3:
@@ -111,6 +117,9 @@ bool GLFunctions::setupTextures( QString target )
             glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         }
             /* no break */
         case 2:
@@ -122,6 +131,9 @@ bool GLFunctions::setupTextures( QString target )
             glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         }
             /* no break */
         case 1:
@@ -133,6 +145,9 @@ bool GLFunctions::setupTextures( QString target )
             glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
             break;
         }
         default:

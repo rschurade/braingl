@@ -316,6 +316,7 @@ bool LoaderVTK::open()
                         {
                             data.push_back( dataArray->GetVariantValue( k ).ToFloat() );
                         }
+                        lc += lineSize + 1;
                     }
 
                     m_hasPointData = true;
