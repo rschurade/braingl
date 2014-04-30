@@ -72,6 +72,7 @@ public:
     static bool getAndPrintGLError( QString prefix = "" );
 
     static int idealThreadCount;
+    static int maxDim;
     static QHash<QString, float> sliceAlpha;
 
     static ROI* roi;

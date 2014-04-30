@@ -113,6 +113,11 @@ QModelIndex Models::createRoiIndex( int branch, int pos, int column )
     return m_roiModel->index( row, column, parent );
 }
 
+Dataset* Models::getDataset( int id )
+{
+    return VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( id, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+}
+
 QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
 {
     QList<Dataset*>rl;

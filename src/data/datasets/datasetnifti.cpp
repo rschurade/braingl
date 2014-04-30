@@ -37,9 +37,6 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->create( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
 //    m_properties["maingl"]->create( Fn::Property::NBYPER, m_header->nbyper );
     m_properties["maingl"]->createInt( Fn::Property::D_DATATYPE, m_header->datatype );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DX, m_header->dx );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DY, m_header->dy );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, m_header->dz );
 //    m_properties["maingl"]->create( Fn::Property::DT, m_header->dt );
 //    m_properties["maingl"]->create( Fn::Property::DU, m_header->du );
 //    m_properties["maingl"]->create( Fn::Property::DV, m_header->dv );
@@ -119,6 +116,13 @@ void DatasetNifti::parseNiftiHeader()
     m_properties["maingl"]->createMatrix( Fn::Property::D_Q_FORM, m_qform, "transform" );
     m_properties["maingl"]->getWidget( Fn::Property::D_S_FORM )->setEnabled( false );
     m_properties["maingl"]->getWidget( Fn::Property::D_Q_FORM )->setEnabled( false );
+
+    m_properties["maingl"]->createFloat( Fn::Property::D_DX, m_header->dx, 0.01, 10.0, "transform" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DY, m_header->dy, 0.01, 10.0, "transform" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, m_header->dz, 0.01, 10.0, "transform" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, 0, -250, 250, "transform" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
 }
 
 nifti_image* DatasetNifti::getHeader()

@@ -23,7 +23,7 @@ void main()
     }
     if ( u_colorMode == 3 )
     {
-        vec4 tcolor = texColor( v_texcoord );
+        vec4 tcolor = texColor();
 	    
 	    if ( !( tcolor.r + tcolor.g + tcolor.b > 0.0 ) ) discard;
 	    

@@ -120,7 +120,10 @@ void NavRenderer::setupTextures()
 void NavRenderer::setShaderVars()
 {
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
-    GLFunctions::setShaderVarsSlice( program, "maingl" );
+    int vertexLocation = program->attributeLocation( "a_position" );
+    program->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0 );
+    GLFunctions::setTextureUniforms( program, "maingl" );
 }
 
 void NavRenderer::mouseWheel( int step )

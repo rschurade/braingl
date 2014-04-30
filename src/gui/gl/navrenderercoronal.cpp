@@ -31,31 +31,41 @@ void NavRendererCoronal::adjustRatios()
     m_ratio = static_cast< float >( m_width ) / static_cast< float >( m_height );
 
     // Reset projection
-    QMatrix4x4 pMatrix;
-    pMatrix.setToIdentity();
+    m_pMatrix.setToIdentity();
 
     int boundingbox = qMax ( m_nx * m_dx, qMax( m_ny * m_dy, m_nz * m_dz ) );
 
-    pMatrix.ortho( 0, boundingbox, 0, boundingbox, -3000, 3000 );
+    m_pMatrix.ortho( 0, boundingbox, 0, boundingbox, -3000, 3000 );
 
-    pMatrix.translate( static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / boundingbox ),
+    m_pMatrix.translate( static_cast<float>( m_moveX ) / ( static_cast<float>( m_width ) / boundingbox ),
                        static_cast<float>( m_moveY ) / ( static_cast<float>( m_height ) / boundingbox ), 0 );
 
-    pMatrix.translate( boundingbox / 2, boundingbox / 2, 0 );
+    m_pMatrix.translate( boundingbox / 2, boundingbox / 2, 0 );
 
-    pMatrix.scale( m_zoom );
+    m_pMatrix.scale( m_zoom );
 
     if ( m_ratio >= 1.0 )
     {
-        pMatrix.scale( 1.0 / m_ratio, 1.0, 1.0 );
+        m_pMatrix.scale( 1.0 / m_ratio, 1.0, 1.0 );
     }
     else
     {
-        pMatrix.scale( 1.0, m_ratio, 1.0 );
+        m_pMatrix.scale( 1.0, m_ratio, 1.0 );
     }
 
-    pMatrix.translate( m_nx * m_dx / -2, m_nz * m_dz / -2, 0 );
-    m_mvpMatrix = pMatrix;
+    m_pMatrix.translate( m_nx * m_dx / -2, m_nz * m_dz / -2, 0 );
+
+    QMatrix4x4 vMatrix;
+    vMatrix.setToIdentity();
+
+    QQuaternion rotx( sqrt(0.5), 0, 0, sqrt(0.5) );
+    QQuaternion rotz( 0, 0, sqrt(0.5), sqrt(0.5) );
+
+    vMatrix.rotate( rotz );
+    vMatrix.rotate( rotx );
+    vMatrix.rotate( rotx );
+
+    m_mvpMatrix = m_pMatrix * vMatrix;
 }
 
 void NavRendererCoronal::leftMouseDown( int x, int y )
@@ -69,7 +79,7 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
     test.setZ( 1 );
     test.setW( 1 );
 
-    QVector4D out = m_mvpMatrix.inverted() * test;
+    QVector4D out = m_pMatrix.inverted() * test;
 
     int xout = out.x() / m_dx;
     int yout = out.y() / m_dz;
@@ -110,20 +120,20 @@ void NavRendererCoronal::initGeometry()
         //float yb = m_ny * m_dy;
         float zb = m_nz * m_dz;
 
-        VertexData vertices[] =
+        float vertices[] =
         {
-            { QVector3D( 0.0, 0.0, y ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
-            { QVector3D( xb,  0.0, y ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 0.0 ) },
-            { QVector3D( xb,  zb,  y ), QVector3D( 1.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) },
-            { QVector3D( 0.0, zb,  y ), QVector3D( 0.0, ( m_y ) / ( m_ny - 1 ), 1.0 ) }
+            0.0, y, 0.0,
+            xb,  y, 0.0,
+            xb,  y, zb,
+            0.0, y, zb
         };
 
-        VertexData verticesCrosshair[] =
+        float verticesCrosshair[] =
         {
-            { QVector3D( 0.0, z,   y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( xb,  z,   y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( x,   0.0, y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( x,   zb,  y + 1. ), QVector3D( 0.0, 0.0, 0.0 ) }
+            0.0, y - 1.f, z,
+            xb,  y - 1.f, z,
+            x,   y - 1.f, 0.0,
+            x,   y - 1.f, zb
         };
 
         // Transfer vertex data to VBO 2
@@ -181,7 +191,7 @@ void NavRendererCoronal::draw()
         // Tell OpenGL programmable pipeline how to locate vertex position data
         int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
         GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
-        glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), 0 );
+        glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), 0 );
         // Draw cube geometry using indices from VBO 0
         glDrawElements( GL_LINES, 4, GL_UNSIGNED_SHORT, 0 );
     }
