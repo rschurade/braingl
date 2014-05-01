@@ -445,7 +445,7 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
     float texMin = 0;
     float texMax = 1;
 
-    float nx, ny, nz, dx, dy, dz, ax, ay, az;
+    float nx, ny, nz, dx, dy, dz, ndx, ndy, ndz, ax, ay, az;
 
     switch ( tl.size() )
     {
@@ -465,10 +465,13 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             nx = props->get( Fn::Property::D_NX ).toFloat();
             ny = props->get( Fn::Property::D_NY ).toFloat();
             nz = props->get( Fn::Property::D_NZ ).toFloat();
-            ax = props->get( Fn::Property::D_ADJUST_X ).toFloat() / maxDim;
-            ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat() / maxDim;
-            az = props->get( Fn::Property::D_ADJUST_Z ).toFloat() / maxDim;
-            program->setUniformValue( "u_dims4", QVector3D( nx * dx, ny * dy, nz * dz ) );
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims4", QVector3D( ndx, ndy, ndz ) );
             program->setUniformValue( "u_adjust4", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
@@ -497,10 +500,13 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             nx = props->get( Fn::Property::D_NX ).toFloat();
             ny = props->get( Fn::Property::D_NY ).toFloat();
             nz = props->get( Fn::Property::D_NZ ).toFloat();
-            ax = props->get( Fn::Property::D_ADJUST_X ).toFloat() / maxDim;
-            ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat() / maxDim;
-            az = props->get( Fn::Property::D_ADJUST_Z ).toFloat() / maxDim;
-            program->setUniformValue( "u_dims3", QVector3D( nx * dx, ny * dy, nz * dz ) );
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims3", QVector3D( ndx, ndy, ndz ) );
             program->setUniformValue( "u_adjust3", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
@@ -529,10 +535,13 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             nx = props->get( Fn::Property::D_NX ).toFloat();
             ny = props->get( Fn::Property::D_NY ).toFloat();
             nz = props->get( Fn::Property::D_NZ ).toFloat();
-            ax = props->get( Fn::Property::D_ADJUST_X ).toFloat() / maxDim;
-            ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat() / maxDim;
-            az = props->get( Fn::Property::D_ADJUST_Z ).toFloat() / maxDim;
-            program->setUniformValue( "u_dims2", QVector3D( nx * dx, ny * dy, nz * dz ) );
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims2", QVector3D( ndx, ndy, ndz ) );
             program->setUniformValue( "u_adjust2", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
@@ -561,10 +570,13 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             nx = props->get( Fn::Property::D_NX ).toFloat();
             ny = props->get( Fn::Property::D_NY ).toFloat();
             nz = props->get( Fn::Property::D_NZ ).toFloat();
-            ax = props->get( Fn::Property::D_ADJUST_X ).toFloat() / maxDim;
-            ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat() / maxDim;
-            az = props->get( Fn::Property::D_ADJUST_Z ).toFloat() / maxDim;
-            program->setUniformValue( "u_dims1", QVector3D( nx * dx, ny * dy, nz * dz ) );
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims1", QVector3D( ndx, ndy, ndz ) );
             program->setUniformValue( "u_adjust1", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
@@ -594,10 +606,13 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             nx = props->get( Fn::Property::D_NX ).toFloat();
             ny = props->get( Fn::Property::D_NY ).toFloat();
             nz = props->get( Fn::Property::D_NZ ).toFloat();
-            ax = props->get( Fn::Property::D_ADJUST_X ).toFloat() / maxDim;
-            ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat() / maxDim;
-            az = props->get( Fn::Property::D_ADJUST_Z ).toFloat() / maxDim;
-            program->setUniformValue( "u_dims0", QVector3D( nx * dx, ny * dy, nz * dz ) );
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims0", QVector3D( ndx, ndy, ndz ) );
             program->setUniformValue( "u_adjust0", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
