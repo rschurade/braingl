@@ -1,6 +1,7 @@
 #version 330
 
 #include uniforms_vs
+#include textures_vs
 #include peel_vs
 
 in float a_direction;
@@ -59,5 +60,5 @@ void main()
         v_discard = 1.0;
     } 
     
-    v_texcoord = vec3( a_position.x / 160.0, a_position.y / 200.0, a_position.z / 160.0 );
+    calcTexCoords();
 }
