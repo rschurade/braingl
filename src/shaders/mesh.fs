@@ -78,7 +78,7 @@ void main()
     }
     else if ( u_colorMode == 1 )
     {
-        vec4 tcol = texColor( v_texcoord );
+        vec4 tcol = texColor();
         
         color = light( tcol ).rgb;
         

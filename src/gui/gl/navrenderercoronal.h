@@ -28,6 +28,8 @@ public:
 
 private:
     void initGeometry();
+
+    QMatrix4x4 m_pMatrix;
 };
 
 #endif /* SCENERENDERER_H_ */

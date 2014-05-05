@@ -7,9 +7,12 @@
 
 void main()
 {
-    vec4 color = texColor( v_texcoord );
+    vec4 color = texColor();
     
-    if ( !( length( color.rgb ) > 0.0 ) ) discard;
+    if ( !( length( color.rgb ) > 0.0 ) ) 
+    {
+        discard;
+    }
 	
 	writePeel( color );   
 }

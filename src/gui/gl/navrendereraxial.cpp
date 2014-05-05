@@ -110,29 +110,29 @@ void NavRendererAxial::initGeometry()
         float yb = m_ny * m_dy;
         //float zb = m_nz * m_dz;
 
-        VertexData vertices[] =
+        float vertices[] =
         {
-            { QVector3D( 0.0, 0.0, z ), QVector3D( 0.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( xb,  0.0, z ), QVector3D( 1.0, 0.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( xb,  yb,  z ), QVector3D( 1.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) },
-            { QVector3D( 0.0, yb,  z ), QVector3D( 0.0, 1.0, ( m_z ) / ( m_nz - 1 ) ) }
+            0.0, 0.0, z,
+            xb,  0.0, z,
+            xb,  yb,  z,
+            0.0, yb,  z
         };
 
-        VertexData verticesCrosshair[] =
+        float verticesCrosshair[] =
         {
-            { QVector3D( x,   0.0, z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( x,   yb,  z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( 0.0, y,   z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) },
-            { QVector3D( xb,  y,   z + 1.0 ), QVector3D( 0.0, 0.0, 0.0 ) }
+            x,   0.0, z + 1.0f,
+            x,   yb,  z + 1.0f,
+            0.0, y,   z + 1.0f,
+            xb,  y,   z + 1.0f
         };
 
         // Transfer vertex data to VBO 1
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-        glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
+        glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(float), vertices, GL_STATIC_DRAW );
 
         // Transfer vertex data to VBO 2
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-        glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), verticesCrosshair, GL_STATIC_DRAW );
+        glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(float), verticesCrosshair, GL_STATIC_DRAW );
 
         m_xOld = m_x;
         m_yOld = m_y;
@@ -181,7 +181,7 @@ void NavRendererAxial::draw()
         // Tell OpenGL programmable pipeline how to locate vertex position data
         int vertexLocation = GLFunctions::getShader( "crosshair" )->attributeLocation( "a_position" );
         GLFunctions::getShader( "crosshair" )->enableAttributeArray( vertexLocation );
-        glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof( VertexData ), 0 );
+        glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( float ), 0 );
         // Draw cube geometry using indices from VBO 0
         glDrawElements( GL_LINES, 4, GL_UNSIGNED_SHORT, 0 );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

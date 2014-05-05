@@ -35,6 +35,7 @@
 #define NUM_TEXTURES 5
 
 int GLFunctions::idealThreadCount = qMax( 1, QThread::idealThreadCount() - 1 );
+int GLFunctions::maxDim = 250;
 
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
@@ -423,6 +424,7 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QString target 
 
     setTextureUniforms( program, target );
 }
+
 void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target )
 {
     program->setUniformValue( "texture0", /*0*/ 15 );   // XXX Samplers of different types use the same texture image unit. - or - A sampler's texture unit is out of range (greater than max allowed or negative).
@@ -443,6 +445,8 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
     float texMin = 0;
     float texMax = 1;
 
+    float nx, ny, nz, dx, dy, dz, ndx, ndy, ndz, ax, ay, az;
+
     switch ( tl.size() )
     {
         case 5:
@@ -454,6 +458,21 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             {
                 props = ds->properties( "maingl" );
             }
+
+            dx = props->get( Fn::Property::D_DX ).toFloat();
+            dy = props->get( Fn::Property::D_DY ).toFloat();
+            dz = props->get( Fn::Property::D_DZ ).toFloat();
+            nx = props->get( Fn::Property::D_NX ).toFloat();
+            ny = props->get( Fn::Property::D_NY ).toFloat();
+            nz = props->get( Fn::Property::D_NZ ).toFloat();
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims4", QVector3D( ndx, ndy, ndz ) );
+            program->setUniformValue( "u_adjust4", QVector3D( ax, ay, az ) );
 
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
@@ -475,6 +494,21 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             {
                 props = ds->properties( "maingl" );
             }
+            dx = props->get( Fn::Property::D_DX ).toFloat();
+            dy = props->get( Fn::Property::D_DY ).toFloat();
+            dz = props->get( Fn::Property::D_DZ ).toFloat();
+            nx = props->get( Fn::Property::D_NX ).toFloat();
+            ny = props->get( Fn::Property::D_NY ).toFloat();
+            nz = props->get( Fn::Property::D_NZ ).toFloat();
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims3", QVector3D( ndx, ndy, ndz ) );
+            program->setUniformValue( "u_adjust3", QVector3D( ax, ay, az ) );
+
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold3", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -495,6 +529,21 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             {
                 props = ds->properties( "maingl" );
             }
+            dx = props->get( Fn::Property::D_DX ).toFloat();
+            dy = props->get( Fn::Property::D_DY ).toFloat();
+            dz = props->get( Fn::Property::D_DZ ).toFloat();
+            nx = props->get( Fn::Property::D_NX ).toFloat();
+            ny = props->get( Fn::Property::D_NY ).toFloat();
+            nz = props->get( Fn::Property::D_NZ ).toFloat();
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims2", QVector3D( ndx, ndy, ndz ) );
+            program->setUniformValue( "u_adjust2", QVector3D( ax, ay, az ) );
+
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold2", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -515,6 +564,21 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             {
                 props = ds->properties( "maingl" );
             }
+            dx = props->get( Fn::Property::D_DX ).toFloat();
+            dy = props->get( Fn::Property::D_DY ).toFloat();
+            dz = props->get( Fn::Property::D_DZ ).toFloat();
+            nx = props->get( Fn::Property::D_NX ).toFloat();
+            ny = props->get( Fn::Property::D_NY ).toFloat();
+            nz = props->get( Fn::Property::D_NZ ).toFloat();
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims1", QVector3D( ndx, ndy, ndz ) );
+            program->setUniformValue( "u_adjust1", QVector3D( ax, ay, az ) );
+
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold1", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
@@ -536,6 +600,21 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
             {
                 props = ds->properties( "maingl" );
             }
+            dx = props->get( Fn::Property::D_DX ).toFloat();
+            dy = props->get( Fn::Property::D_DY ).toFloat();
+            dz = props->get( Fn::Property::D_DZ ).toFloat();
+            nx = props->get( Fn::Property::D_NX ).toFloat();
+            ny = props->get( Fn::Property::D_NY ).toFloat();
+            nz = props->get( Fn::Property::D_NZ ).toFloat();
+            ndx = nx * dx;
+            ndy = ny * dy;
+            ndz = nz * dz;
+            ax = ( props->get( Fn::Property::D_ADJUST_X ).toFloat() - dx / 2 ) / ndx;
+            ay = ( props->get( Fn::Property::D_ADJUST_Y ).toFloat() - dy / 2 ) / ndy;
+            az = ( props->get( Fn::Property::D_ADJUST_Z ).toFloat() - dz / 2 ) / ndz;
+            program->setUniformValue( "u_dims0", QVector3D( ndx, ndy, ndz ) );
+            program->setUniformValue( "u_adjust0", QVector3D( ax, ay, az ) );
+
             texMin = props->get( Fn::Property::D_MIN ).toFloat();
             texMax = props->get( Fn::Property::D_MAX ).toFloat();
             program->setUniformValue( "u_lowerThreshold0", ( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
