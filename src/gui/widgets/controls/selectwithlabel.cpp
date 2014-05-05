@@ -88,3 +88,8 @@ QVariant SelectWithLabel::getSelectedItemData()
 {
     return m_comboBox->itemData( m_comboBox->currentIndex() );
 }
+
+void SelectWithLabel::clear()
+{
+    m_comboBox->clear();
+}

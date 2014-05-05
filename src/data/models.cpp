@@ -138,6 +138,27 @@ QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
     return rl;
 }
 
+QList<Dataset*> Models::getDatasets( int filter )
+{
+    QList<Dataset*>rl;
+    int countDatasets = m_dataModel->rowCount();
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        QModelIndex index = m_dataModel->index( i, (int)Fn::Property::D_ACTIVE );
+        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        {
+            index = m_dataModel->index( i, (int)Fn::Property::D_TYPE );
+            if ( m_dataModel->data( index, Qt::DisplayRole ).toInt() & filter )
+            {
+                Dataset* ds = VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+                rl.push_back( ds );
+            }
+        }
+    }
+    return rl;
+}
+
+
 void Models::setRoiWidget( ROIWidget* rw )
 {
     m_roiWidget = rw;

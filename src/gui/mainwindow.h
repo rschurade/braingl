@@ -28,6 +28,7 @@ class ShaderEditWidget;
 class ScriptWidget;
 class FNDockWidget;
 class ColormapEditWidget;
+class FiberStipplingWidget;
 
 class GLWidget;
 class ToolBar;
@@ -82,6 +83,7 @@ private:
     ScriptWidget* m_scriptWidget;
     FNDockWidget* m_dockDSP;
     ColormapEditWidget* m_colormapEditWidget;
+    FiberStipplingWidget* m_fiberStipplingWidget;
 
     QMenu* fileMenu;
     QMenu* optionMenu;

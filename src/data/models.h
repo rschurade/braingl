@@ -44,6 +44,7 @@ public:
 
     static Dataset* getDataset( int id );
     static QList<Dataset*>getDatasets( Fn::DatasetType filter );
+    static QList<Dataset*>getDatasets( int filter );
 
     static void setRoiWidget( ROIWidget* rw );
     static void addROIArea( ROIArea* roi );
