@@ -1223,8 +1223,8 @@ void MainWindow::createDockWindows()
 
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
-    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
-    viewMenu->addAction( dockNav4->toggleViewAction() );
+//    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
+//    viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
