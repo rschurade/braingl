@@ -177,6 +177,9 @@ void ROIArea::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heig
 
     }
 
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties );
+    if ( m_properties.get( Fn::Property::R_RENDER).toBool() )
+    {
+        m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties );
+    }
 }
 
