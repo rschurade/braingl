@@ -1,6 +1,7 @@
 #version 330
 
 #include uniforms_vs
+#include textures_vs
 #include lighting_vs
 #include peel_vs
 
@@ -52,8 +53,7 @@ void main()
         v_discard = 1.0;
     } 
     
-    // TODO submit the actual dims in a uniform
-    v_texcoord = vec3( ( a_position.x + u_dx / 2.0 ) / u_dims.x , ( a_position.y + u_dy / 2.0 ) / u_dims.y, ( a_position.z + u_dz / 2.0 ) / u_dims.z );
+    calcTexCoords();
 	
 	v_position = mvp_matrix * vec4( a_position, 1.0 );
     gl_Position = v_position;
