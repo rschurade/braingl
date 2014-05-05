@@ -29,6 +29,7 @@
 #include "widgets/colormapeditwidget.h"
 #include "widgets/scriptwidget.h"
 #include "widgets/hierarchicaltreeglwidget.h"
+#include "widgets/fiberstipplingwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
 #include "gl/camerabase.h"
@@ -1235,6 +1236,13 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
     connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
 
+    m_fiberStipplingWidget = new FiberStipplingWidget( QString( "fiber stippling" ), this, mainGLWidget );
+    FNDockWidget* dockFS = new FNDockWidget( QString("fiber stippling"), m_fiberStipplingWidget, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockFS );
+    viewMenu->addAction( dockFS->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockFS, SLOT( toggleTitleWidget() ) );
+    connect( dockFS, SIGNAL( visibilityChanged( bool ) ), m_fiberStipplingWidget, SLOT( setWidgetVisible( bool ) ) );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), m_fiberStipplingWidget, SLOT( updateSelects() ) );
 
     dockNav1->hide();
     dockNav2->hide();
@@ -1242,6 +1250,7 @@ void MainWindow::createDockWindows()
     dockNav4->hide();
     dockMainGL2->hide();
     dockHTW->hide();
+    dockFS->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
@@ -1257,10 +1266,11 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockMainGL2->toggleViewAction() );
     viewMenu->addAction( dockDSP2->toggleViewAction() );
 
-    m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
+    //m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockSW, dockMainGL );
+    m_centralWidget->tabifyDockWidget( dockFS, dockMainGL );
 
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );

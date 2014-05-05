@@ -28,6 +28,7 @@ public:
     void addItem (const QString &text, const QVariant &userData=QVariant() );
     QString getSelectedItemString();
     QVariant getSelectedItemData();
+    void clear();
 
 private:
     QLabel* m_label;
