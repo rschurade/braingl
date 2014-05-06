@@ -28,6 +28,8 @@ SliderWithEdit::SliderWithEdit( QString name,  Fn::Position editPos, int id, QWi
     m_edit->setMaxLength( 10 );
     m_edit->setMaximumWidth( 100 );
     m_edit->setAlignment( Qt::AlignCenter );
+    m_edit->setText( "0.00" );
+
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_slider, SIGNAL( valueChanged( int ) ), this, SLOT( sliderChanged( int ) ) );
@@ -82,7 +84,14 @@ SliderWithEdit::~SliderWithEdit()
 
 void SliderWithEdit::sliderChanged( int value )
 {
-    m_edit->setText( QString::number( static_cast<double>( value ) / SLIDERMULT, 'f', m_digits ) );
+    if ( value == 0 )
+    {
+        m_edit->setText( "0.00" );
+    }
+    else
+    {
+        m_edit->setText( QString::number( static_cast<double>( value ) / SLIDERMULT, 'f', m_digits ) );
+    }
     m_slider->repaint();
 }
 
