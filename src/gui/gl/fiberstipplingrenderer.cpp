@@ -68,6 +68,8 @@ void FiberStipplingRenderer::initGL()
     glEnable( GL_DEPTH_TEST );
 
     glEnable( GL_MULTISAMPLE );
+
+    glGenBuffers( 2, vboIds );
 }
 
 void FiberStipplingRenderer::draw()
@@ -83,6 +85,7 @@ void FiberStipplingRenderer::draw()
    // Reset projection
    QMatrix4x4 pMatrix;
    pMatrix.setToIdentity();
+   pMatrix.ortho(  0, 1000, 0, 1000, -3000, 3000 );
 
    if ( m_iso1Verts.size() != 0 )
    {
@@ -131,7 +134,6 @@ void FiberStipplingRenderer::middleMouseDrag( int x, int y )
 
 void FiberStipplingRenderer::setIso1( std::vector<float> verts )
 {
-    qDebug() << "renderer: set iso 1";
     qDebug() << verts.size();
     m_iso1Verts = verts;
 
@@ -140,7 +142,11 @@ void FiberStipplingRenderer::setIso1( std::vector<float> verts )
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    m_colors.resize( ( verts.size() / 3 ) * 4, 0.5f );
+    m_colors.resize( ( verts.size() / 3 ) * 4, 0.0 );
+    for ( unsigned int i = 0; i < verts.size() / 3; ++i )
+    {
+        m_colors[i * 4 + 3] = 1.0;
+    }
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, m_colors.size() * sizeof( float ), m_colors.data(), GL_STATIC_DRAW );
@@ -149,8 +155,6 @@ void FiberStipplingRenderer::setIso1( std::vector<float> verts )
 
 void FiberStipplingRenderer::drawIso1( QMatrix4x4 mvpMatrix )
 {
-    qDebug() << "renderer: draw iso 1";
-
     GLFunctions::getShader( "line" )->bind();
     GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", mvpMatrix );
 
