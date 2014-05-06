@@ -35,7 +35,6 @@ TreeWidgetRenderer::TreeWidgetRenderer( QString name ) :
     m_moveYOld( 0 ),
     m_middleDownX( 0 ),
     m_middleDownY( 0 )
-
 {
 }
 

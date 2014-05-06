@@ -13,11 +13,15 @@
 #include <QList>
 #include <QWidget>
 #include <QtOpenGL/QGLWidget>
-#include <QTextEdit>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 class Dataset;
+class ButtonWithLabel;
 class SelectWithLabel;
 class SliderWithEdit;
+class SliderWithEditInt;
+class FiberStipplingGLWidget;
 
 class FiberStipplingWidget: public QWidget
 {
@@ -32,10 +36,12 @@ public slots:
     void updateSelects();
     void updateIsoBounds();
     void setWidgetVisible( bool visible );
+    void startAlgo();
 
 
 private:
-    QTextEdit* m_edit;
+    FiberStipplingGLWidget* m_view;
+
 
     SelectWithLabel* m_anatomySelect;
     SelectWithLabel* m_vectorSelect;
@@ -45,6 +51,8 @@ private:
     QList<Dataset*> m_vectorDSL;
 
     SelectWithLabel* m_orientSelect;
+
+    SliderWithEditInt* m_resolutionMultiply;
 
     SliderWithEdit* m_iso1;
     SliderWithEdit* m_iso2;
