@@ -20,10 +20,9 @@
 
 FiberStipplingGLWidget::FiberStipplingGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
     QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
+    m_renderer( 0 ),
     m_visible( true )
 {
-    m_renderer = new FiberStipplingRenderer( "fiber stippling renderer" );
-
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }
@@ -50,7 +49,11 @@ void FiberStipplingGLWidget::initializeGL()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    m_renderer->initGL();
+    if ( !m_renderer )
+    {
+        m_renderer = new FiberStipplingRenderer( "fiber stippling renderer" );
+        m_renderer->init();
+    }
 }
 
 void FiberStipplingGLWidget::paintGL()

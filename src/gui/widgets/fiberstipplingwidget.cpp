@@ -80,7 +80,7 @@ FiberStipplingWidget::FiberStipplingWidget( QString name, QWidget *parent, const
 
     buttonlayout->addStretch();
 
-    m_view = new FiberStipplingGLWidget( "stipple widget" );
+    m_view = new FiberStipplingGLWidget( "stipple widget", parent, shareWidget );
     m_view->setMinimumHeight( 500 );
     m_view->setMinimumWidth( 500 );
 
@@ -113,6 +113,11 @@ void FiberStipplingWidget::updateSelects()
 
     if( dsl1.size() != m_scalarDSL.size() )
     {
+        m_anatomySelect->blockSignals( true );
+        m_probTracSelect->blockSignals( true );
+        int curScalar = m_anatomySelect->getCurrentIndex();
+        int curProb = m_probTracSelect->getCurrentIndex();
+
         m_anatomySelect->clear();
         m_probTracSelect->clear();
         for ( int i = 0; i < dsl1.size(); ++i )
@@ -123,27 +128,42 @@ void FiberStipplingWidget::updateSelects()
         {
             m_probTracSelect->addItem( dsl1[i]->properties()->get( Fn::Property::D_NAME ).toString(), i+1 );
         }
+        if ( dsl1.size() > m_scalarDSL.size() )
+        {
+            m_anatomySelect->setCurrentIndex( qMax( 0, curScalar ) );
+            m_probTracSelect->setCurrentIndex( qMax( 0, curProb ) );
+        }
+        else
+        {
+            m_anatomySelect->setCurrentIndex( 0 );
+            m_probTracSelect->setCurrentIndex( 0 );
+        }
         m_scalarDSL = dsl1;
         updateIsoBounds();
+        m_anatomySelect->blockSignals( false );
+        m_probTracSelect->blockSignals( false );
     }
-    int filter = (int)Fn::DatasetType::NIFTI_VECTOR | (int)Fn::DatasetType::NIFTI_TENSOR | (int)Fn::DatasetType::NIFTI_DWI;
+    //int filter = (int)Fn::DatasetType::NIFTI_VECTOR | (int)Fn::DatasetType::NIFTI_TENSOR | (int)Fn::DatasetType::NIFTI_DWI;
+    int filter = (int)Fn::DatasetType::NIFTI_VECTOR;
     QList<Dataset*>dsl2 = Models::getDatasets( filter );
 
     if ( dsl2.size() != m_vectorDSL.size() )
     {
+        m_vectorSelect->blockSignals( true );
         m_vectorSelect->clear();
         for ( int i = 0; i < dsl2.size(); ++i )
         {
             m_vectorSelect->addItem( dsl2[i]->properties()->get( Fn::Property::D_NAME ).toString(), i+1 );
         }
         m_vectorDSL = dsl2;
+        m_vectorSelect->blockSignals( false );
     }
 }
 
 void FiberStipplingWidget::updateIsoBounds()
 {
     int index = m_anatomySelect->getCurrentIndex();
-    if( m_scalarDSL.size() > 0 )
+    if( index >= 0 && m_scalarDSL.size() > 0 )
     {
         float min = m_scalarDSL[ index ]->properties()->get( Fn::Property::D_MIN ).toFloat();
         float max = m_scalarDSL[ index ]->properties()->get( Fn::Property::D_MAX ).toFloat();
@@ -196,7 +216,7 @@ std::vector<float> FiberStipplingWidget::extractSagittal()
     {
         int index = m_anatomySelect->getCurrentIndex();
         DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
-        int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+        int slicePos =Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
         int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
         int nz = ds->properties()->get( Fn::Property::D_NZ ).toInt();
         std::vector<float>* data = ds->getData();
@@ -263,6 +283,7 @@ void FiberStipplingWidget::iso1SliderChanged()
             {
                 sliceData = extractSagittal();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), ny, nz, dy, dz );
+                m_view->renderer()->setBoundingBox( ny * dy, nz * dz );
                 m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }
@@ -270,6 +291,7 @@ void FiberStipplingWidget::iso1SliderChanged()
             {
                 sliceData = extractCoronal();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, nz, dx, dz );
+                m_view->renderer()->setBoundingBox( nx * dx, nz * dz );
                 m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }
@@ -277,6 +299,7 @@ void FiberStipplingWidget::iso1SliderChanged()
             {
                 sliceData = extractAxial();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, ny, dx, dy );
+                m_view->renderer()->setBoundingBox( nx * dx, ny * dy );
                 m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }

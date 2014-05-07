@@ -1271,7 +1271,7 @@ void MainWindow::createDockWindows()
     m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockSW, dockMainGL );
-    m_centralWidget->tabifyDockWidget( dockFS, dockMainGL );
+    //m_centralWidget->tabifyDockWidget( dockFS, dockMainGL );
 
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
     connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
