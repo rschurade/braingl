@@ -1243,6 +1243,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockFS, SLOT( toggleTitleWidget() ) );
     connect( dockFS, SIGNAL( visibilityChanged( bool ) ), m_fiberStipplingWidget, SLOT( setWidgetVisible( bool ) ) );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), m_fiberStipplingWidget, SLOT( updateSelects() ) );
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), m_fiberStipplingWidget, SLOT( startAlgo() ) );
 
     dockNav1->hide();
     dockNav2->hide();

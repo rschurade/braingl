@@ -7,14 +7,15 @@
 
 #include "marchingsquares.h"
 
-MarchingSquares::MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, int mult ) :
+MarchingSquares::MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, float dx, float dy ) :
     m_data( data ),
     m_isoValue( isoValue ),
     m_nx( nx ),
     m_ny( ny ),
-    m_yMult( ny * mult ),
-    m_mult( mult ),
-    m_mult4( mult / 2 )
+    m_dx( dx ),
+    m_dy( dy ),
+    m_dx2( dx / 2 ),
+    m_dy2( dy / 2 )
 {
 }
 
@@ -143,60 +144,60 @@ std::vector<float> MarchingSquares::run()
 
 void MarchingSquares::paintNW( int x, int y )
 {
-    m_verts.push_back( x * m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintNE( int x, int y )
 {
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx + m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintSE( int x, int y )
 {
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult + m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy + m_dy );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx + m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintSW( int x, int y )
 {
-    m_verts.push_back( x * m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult + m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy + m_dy );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintSN( int x, int y )
 {
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult4 );
-    m_verts.push_back( y * m_mult + m_mult );
+    m_verts.push_back( x * m_dx + m_dx2 );
+    m_verts.push_back( y * m_dy + m_dy );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintEW( int x, int y )
 {
-    m_verts.push_back( x * m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
-    m_verts.push_back( x * m_mult + m_mult );
-    m_verts.push_back( y * m_mult + m_mult4 );
+    m_verts.push_back( x * m_dx + m_dx );
+    m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
 }

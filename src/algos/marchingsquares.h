@@ -13,11 +13,10 @@
 class MarchingSquares
 {
 public:
-    MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, int mult = 4 );
+    MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, float dx, float dy );
     virtual ~MarchingSquares();
 
     std::vector<float> run();
-
 
 private:
     std::vector<float>* m_data;
@@ -26,9 +25,10 @@ private:
     float m_isoValue;
     int m_nx;
     int m_ny;
-    int m_yMult;
-    int m_mult;
-    int m_mult4;
+    float m_dx;
+    float m_dy;
+    float m_dx2;
+    float m_dy2;
 
     std::vector<float>m_verts;
 

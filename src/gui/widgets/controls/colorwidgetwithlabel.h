@@ -23,6 +23,7 @@ public:
     virtual ~ColorWidgetWithLabel();
 
     void setValue( QColor value);
+    QColor getValue();
 
 private:
     int m_id;
