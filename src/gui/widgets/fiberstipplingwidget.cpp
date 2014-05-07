@@ -23,6 +23,7 @@
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
 #include "../../data/datasets/datasetscalar.h"
+#include "../../data/datasets/dataset3d.h"
 
 #include <QtGui>
 #include <QDebug>
@@ -179,10 +180,13 @@ void FiberStipplingWidget::startAlgo()
 {
     iso1SliderChanged();
     iso2SliderChanged();
+
+    m_view->renderer()->setVectorVerts( extractVectorsAxial() );
+
     Models::d()->submit();
 }
 
-std::vector<float> FiberStipplingWidget::extractAxial()
+std::vector<float> FiberStipplingWidget::extractAnatomyAxial()
 {
     std::vector<float>sliceData;
     if( m_scalarDSL.size() > 0 )
@@ -209,7 +213,43 @@ std::vector<float> FiberStipplingWidget::extractAxial()
     return sliceData;
 }
 
-std::vector<float> FiberStipplingWidget::extractSagittal()
+std::vector<float>FiberStipplingWidget::extractVectorsAxial()
+{
+    std::vector<float>vectorData;
+    if( m_vectorDSL.size() > 0 )
+    {
+        int index = m_vectorSelect->getCurrentIndex();
+        Dataset3D* ds = static_cast<Dataset3D*>( m_vectorDSL[ index ] );
+        int slicePos =Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+        int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
+        int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
+        float dx = ds->properties()->get( Fn::Property::D_DX ).toFloat();
+        float dy = ds->properties()->get( Fn::Property::D_DY ).toFloat();
+        float dz = ds->properties()->get( Fn::Property::D_DZ ).toFloat();
+        std::vector<QVector3D>* data = ds->getData();
+
+
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int x = 0; x < nx; ++x )
+            {
+                int id = ds->getId( x, y, slicePos );
+                QVector3D value = data->at( id );
+                value.normalize();
+                vectorData.push_back( x * dx );
+                vectorData.push_back( y * dy );
+                vectorData.push_back( slicePos * dz );
+                vectorData.push_back( x * dx + value.x() );
+                vectorData.push_back( y * dy + value.y() );
+                vectorData.push_back( slicePos * dz + value.z() );
+            }
+        }
+    }
+    return vectorData;
+
+}
+
+std::vector<float> FiberStipplingWidget::extractAnatomySagittal()
 {
     std::vector<float>sliceData;
     if( m_scalarDSL.size() > 0 )
@@ -236,7 +276,7 @@ std::vector<float> FiberStipplingWidget::extractSagittal()
     return sliceData;
 }
 
-std::vector<float> FiberStipplingWidget::extractCoronal()
+std::vector<float> FiberStipplingWidget::extractAnatomyCoronal()
 {
     std::vector<float>sliceData;
     if( m_scalarDSL.size() > 0 )
@@ -281,7 +321,7 @@ void FiberStipplingWidget::iso1SliderChanged()
         {
             case 0: // sagittal
             {
-                sliceData = extractSagittal();
+                sliceData = extractAnatomySagittal();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), ny, nz, dy, dz );
                 m_view->renderer()->setBoundingBox( ny * dy, nz * dz );
                 m_view->renderer()->setIso1Verts( ms1.run() );
@@ -289,7 +329,7 @@ void FiberStipplingWidget::iso1SliderChanged()
             }
             case 1: // coronal
             {
-                sliceData = extractCoronal();
+                sliceData = extractAnatomyCoronal();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, nz, dx, dz );
                 m_view->renderer()->setBoundingBox( nx * dx, nz * dz );
                 m_view->renderer()->setIso1Verts( ms1.run() );
@@ -297,7 +337,7 @@ void FiberStipplingWidget::iso1SliderChanged()
             }
             case 2: // axial
             {
-                sliceData = extractAxial();
+                sliceData = extractAnatomyAxial();
                 MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, ny, dx, dy );
                 m_view->renderer()->setBoundingBox( nx * dx, ny * dy );
                 m_view->renderer()->setIso1Verts( ms1.run() );
@@ -312,6 +352,7 @@ void FiberStipplingWidget::iso1SliderChanged()
 void FiberStipplingWidget::iso2SliderChanged()
 {
     std::vector<float>sliceData;
+    std::vector<QVector3D>vectorData;
     if( m_scalarDSL.size() > 0 )
     {
         int index = m_anatomySelect->getCurrentIndex();
@@ -327,21 +368,21 @@ void FiberStipplingWidget::iso2SliderChanged()
         {
             case 0: // sagittal
             {
-                sliceData = extractSagittal();
+                sliceData = extractAnatomySagittal();
                 MarchingSquares ms2( &sliceData, m_iso2->getValue(), ny, nz, dy, dz );
                 m_view->renderer()->setIso2Verts( ms2.run() );
                 break;
             }
             case 1: // coronal
             {
-                sliceData = extractCoronal();
+                sliceData = extractAnatomyCoronal();
                 MarchingSquares ms2( &sliceData, m_iso2->getValue(), nx, nz, dx, dz );
                 m_view->renderer()->setIso2Verts( ms2.run() );
                 break;
             }
             case 2: // axial
             {
-                sliceData = extractAxial();
+                sliceData = extractAnatomyAxial();
                 MarchingSquares ms2( &sliceData, m_iso2->getValue(), nx, ny, dx, dy );
                 m_view->renderer()->setIso2Verts( ms2.run() );
                 break;
