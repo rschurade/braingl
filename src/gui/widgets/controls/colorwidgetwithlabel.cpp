@@ -60,6 +60,11 @@ void ColorWidgetWithLabel::setValue( QColor value )
 
 }
 
+QColor ColorWidgetWithLabel::getValue()
+{
+    return m_value;
+}
+
 void ColorWidgetWithLabel::slotButton()
 {
     QColorDialog* cd = new QColorDialog( m_value );

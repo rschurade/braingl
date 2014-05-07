@@ -10,6 +10,7 @@
 #include "../gl/fiberstipplingrenderer.h"
 
 #include "controls/buttonwithlabel.h"
+#include "controls/colorwidgetwithlabel.h"
 #include "controls/selectwithlabel.h"
 #include "controls/sliderwithedit.h"
 #include "controls/sliderwitheditint.h"
@@ -50,28 +51,32 @@ FiberStipplingWidget::FiberStipplingWidget( QString name, QWidget *parent, const
     m_orientSelect->insertItem( 2, QString("axial") );
     buttonlayout->addWidget( m_orientSelect );
     m_orientSelect->setCurrentIndex( 2 );
+    connect( m_orientSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( iso1SliderChanged() ) );
+    connect( m_orientSelect, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( iso2SliderChanged() ) );
 
     m_iso1 = new SliderWithEdit( "outer iso line");
     buttonlayout->addWidget( m_iso1 );
     m_iso1->setValue( 0 );
+    connect( m_iso1, SIGNAL( valueChanged( float, int) ), this, SLOT( iso1SliderChanged() ) );
+
+    m_iso1Color = new ColorWidgetWithLabel( "outer line color" );
+    m_iso1Color->setValue( QColor( 0, 0, 0 ) );
+    buttonlayout->addWidget( m_iso1Color );
+    connect( m_iso1Color, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( iso1ColorChanged() ) );
 
     m_iso2 = new SliderWithEdit( "inner iso line");
     buttonlayout->addWidget( m_iso2 );
     m_iso2->setValue( 0 );
+    connect( m_iso2, SIGNAL( valueChanged( float, int) ), this, SLOT( iso2SliderChanged() ) );
 
-    m_resolutionMultiply = new SliderWithEditInt( "resolution multiplier");
-    buttonlayout->addWidget( m_resolutionMultiply );
-    m_resolutionMultiply->setMin( 1 );
-    m_resolutionMultiply->setMax( 10 );
-    m_resolutionMultiply->setValue( 4 );
+    m_iso2Color = new ColorWidgetWithLabel( "outer line color" );
+    m_iso2Color->setValue( QColor( 80, 80, 80 ) );
+    buttonlayout->addWidget( m_iso2Color );
+    connect( m_iso2Color, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( iso2ColorChanged() ) );
 
-
-    ButtonWithLabel* startButton = new ButtonWithLabel( "start" );
-    buttonlayout->addWidget( startButton );
-
-    connect( startButton, SIGNAL( buttonPressed( int ) ), this, SLOT( startAlgo() ) );
-
-
+//    ButtonWithLabel* startButton = new ButtonWithLabel( "start" );
+//    buttonlayout->addWidget( startButton );
+//    connect( startButton, SIGNAL( buttonPressed( int ) ), this, SLOT( startAlgo() ) );
 
     buttonlayout->addStretch();
 
@@ -152,60 +157,186 @@ void FiberStipplingWidget::updateIsoBounds()
 
 void FiberStipplingWidget::startAlgo()
 {
-    qDebug() << "start fiberstippling";
-    int index = m_anatomySelect->getCurrentIndex();
+    iso1SliderChanged();
+    iso2SliderChanged();
+    Models::d()->submit();
+}
+
+std::vector<float> FiberStipplingWidget::extractAxial()
+{
+    std::vector<float>sliceData;
     if( m_scalarDSL.size() > 0 )
     {
+        int index = m_anatomySelect->getCurrentIndex();
         DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
-        float max = ds->properties()->get( Fn::Property::D_MAX ).toFloat();
+        int slicePos =Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+        int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
+        int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
+        std::vector<float>* data = ds->getData();
+
+        sliceData.resize( nx * ny, 0 );
+
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int x = 0; x < nx; ++x )
+            {
+                int id = ds->getId( x, y, slicePos );
+                float value = data->at( id );
+                sliceData[ x + nx * y ] = value;
+            }
+        }
+    }
+    return sliceData;
+}
+
+std::vector<float> FiberStipplingWidget::extractSagittal()
+{
+    std::vector<float>sliceData;
+    if( m_scalarDSL.size() > 0 )
+    {
+        int index = m_anatomySelect->getCurrentIndex();
+        DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
+        int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+        int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
+        int nz = ds->properties()->get( Fn::Property::D_NZ ).toInt();
+        std::vector<float>* data = ds->getData();
+
+        sliceData.resize( ny * nz, 0 );
+
+        for ( int z = 0; z < nz; ++z )
+        {
+            for ( int y = 0; y < ny; ++y )
+            {
+                int id = ds->getId( slicePos, y, z );
+                float value = data->at( id );
+                sliceData[ y + ny * z ] = value;
+            }
+        }
+    }
+    return sliceData;
+}
+
+std::vector<float> FiberStipplingWidget::extractCoronal()
+{
+    std::vector<float>sliceData;
+    if( m_scalarDSL.size() > 0 )
+    {
+        int index = m_anatomySelect->getCurrentIndex();
+        DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
+        int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+        int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
+        int nz = ds->properties()->get( Fn::Property::D_NZ ).toInt();
+        std::vector<float>* data = ds->getData();
+
+        sliceData.resize( nx * nz, 0 );
+
+        for ( int z = 0; z < nz; ++z )
+        {
+            for ( int x = 0; x < nx; ++x )
+            {
+                int id = ds->getId( x, slicePos, z );
+                float value = data->at( id );
+                sliceData[ x + nx * z ] = value;
+            }
+        }
+    }
+    return sliceData;
+}
+
+void FiberStipplingWidget::iso1SliderChanged()
+{
+    std::vector<float>sliceData;
+    if( m_scalarDSL.size() > 0 )
+    {
+        int index = m_anatomySelect->getCurrentIndex();
+        DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
+        int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
+        int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
+        int nz = ds->properties()->get( Fn::Property::D_NZ ).toInt();
+        float dx = ds->properties()->get( Fn::Property::D_DX ).toFloat();
+        float dy = ds->properties()->get( Fn::Property::D_DY ).toFloat();
+        float dz = ds->properties()->get( Fn::Property::D_DZ ).toFloat();
 
         switch ( m_orientSelect->getCurrentIndex() )
         {
             case 0: // sagittal
             {
-                //int slicePos = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+                sliceData = extractSagittal();
+                MarchingSquares ms1( &sliceData, m_iso1->getValue(), ny, nz, dy, dz );
+                m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }
             case 1: // coronal
             {
-                //int slicePos = Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+                sliceData = extractCoronal();
+                MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, nz, dx, dz );
+                m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }
             case 2: // axial
             {
-                int slicePos =Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
-                int mult = m_resolutionMultiply->getValue();
-                int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
-                int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
-                std::vector<float>* data = ds->getData();
-
-                std::vector<float>sliceData( nx * ny, 0 );
-                QImage image( nx * mult, ny * mult, QImage::Format_RGB32 );
-
-                for ( int y = 0; y < ny; ++y )
-                {
-                    for ( int x = 0; x < nx; ++x )
-                    {
-                        int id = ds->getId( x, y, slicePos );
-                        float value = data->at( id );
-                        sliceData[ x + nx * y ] = value;
-                        for ( int i = 0; i < mult; ++i )
-                        {
-                            for ( int k = 0; k < mult; ++k )
-                            {
-                                float grey = value / max * 255;
-                                image.setPixel( x * mult + k, y * mult + i, QColor( grey, grey, grey ).rgb() );
-                            }
-                        }
-                    }
-                }
-                //m_graphicsScene->addPixmap( QPixmap::fromImage( image ) );
-
-                MarchingSquares ms( &sliceData, m_iso1->getValue(), nx, ny, 8 );
-
-                m_view->renderer()->setIso1( ms.run() );
+                sliceData = extractAxial();
+                MarchingSquares ms1( &sliceData, m_iso1->getValue(), nx, ny, dx, dy );
+                m_view->renderer()->setIso1Verts( ms1.run() );
                 break;
             }
         }
+
+        Models::d()->submit();
     }
+}
+
+void FiberStipplingWidget::iso2SliderChanged()
+{
+    std::vector<float>sliceData;
+    if( m_scalarDSL.size() > 0 )
+    {
+        int index = m_anatomySelect->getCurrentIndex();
+        DatasetScalar* ds = static_cast<DatasetScalar*>( m_scalarDSL[ index ] );
+        int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
+        int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
+        int nz = ds->properties()->get( Fn::Property::D_NZ ).toInt();
+        float dx = ds->properties()->get( Fn::Property::D_DX ).toFloat();
+        float dy = ds->properties()->get( Fn::Property::D_DY ).toFloat();
+        float dz = ds->properties()->get( Fn::Property::D_DY ).toFloat();
+
+        switch ( m_orientSelect->getCurrentIndex() )
+        {
+            case 0: // sagittal
+            {
+                sliceData = extractSagittal();
+                MarchingSquares ms2( &sliceData, m_iso2->getValue(), ny, nz, dy, dz );
+                m_view->renderer()->setIso2Verts( ms2.run() );
+                break;
+            }
+            case 1: // coronal
+            {
+                sliceData = extractCoronal();
+                MarchingSquares ms2( &sliceData, m_iso2->getValue(), nx, nz, dx, dz );
+                m_view->renderer()->setIso2Verts( ms2.run() );
+                break;
+            }
+            case 2: // axial
+            {
+                sliceData = extractAxial();
+                MarchingSquares ms2( &sliceData, m_iso2->getValue(), nx, ny, dx, dy );
+                m_view->renderer()->setIso2Verts( ms2.run() );
+                break;
+            }
+        }
+
+        Models::d()->submit();
+    }
+}
+
+void FiberStipplingWidget::iso1ColorChanged()
+{
+    m_view->renderer()->setIso1Color( m_iso1Color->getValue() );
+    Models::d()->submit();
+}
+
+void FiberStipplingWidget::iso2ColorChanged()
+{
+    m_view->renderer()->setIso2Color( m_iso2Color->getValue() );
+    Models::d()->submit();
 }

@@ -35,16 +35,27 @@ public:
     float getMoveX() { return m_moveX; };
     int getZoom() { return m_zoom; };
 
-    void setIso1( std::vector<float> verts );
+    void setIso1Verts( std::vector<float> verts );
+    void setIso2Verts( std::vector<float> verts );
+
+     void setIso1Color( QColor color );
+     void setIso2Color( QColor color );
 
 private:
     void setShaderVars();
 
     void drawIso1( QMatrix4x4 mvpMatrix );
+    void drawIso2( QMatrix4x4 mvpMatrix );
 
     QString m_name;
 
     GLuint *vboIds;
+
+    std::vector<float>m_iso1Verts;
+    std::vector<float>m_iso2Verts;
+    QColor m_iso1Color;
+    QColor m_iso2Color;
+
 
     QMatrix4x4 m_mvpMatrix;
 
@@ -58,8 +69,10 @@ private:
     int m_middleDownX;
     int m_middleDownY;
 
-    std::vector<float> m_iso1Verts;
-    std::vector<float>m_colors;
+    bool m_iso1VertsDirty;
+    bool m_iso2VertsDirty;
+    bool m_iso1ColorDirty;
+    bool m_iso2ColorDirty;
 };
 
 #endif /* FIBERSTIPPLINGRENDERER_H_ */

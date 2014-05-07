@@ -18,6 +18,7 @@
 
 class Dataset;
 class ButtonWithLabel;
+class ColorWidgetWithLabel;
 class SelectWithLabel;
 class SliderWithEdit;
 class SliderWithEditInt;
@@ -38,6 +39,10 @@ public slots:
     void setWidgetVisible( bool visible );
     void startAlgo();
 
+    void iso1SliderChanged();
+    void iso2SliderChanged();
+    void iso1ColorChanged();
+    void iso2ColorChanged();
 
 private:
     FiberStipplingGLWidget* m_view;
@@ -52,12 +57,16 @@ private:
 
     SelectWithLabel* m_orientSelect;
 
-    SliderWithEditInt* m_resolutionMultiply;
-
     SliderWithEdit* m_iso1;
     SliderWithEdit* m_iso2;
+    ColorWidgetWithLabel* m_iso1Color;
+    ColorWidgetWithLabel* m_iso2Color;
 
     bool m_visible;
+
+    std::vector<float>extractAxial();
+    std::vector<float>extractSagittal();
+    std::vector<float>extractCoronal();
 };
 
 #endif /* FIBERSTIPPLINGWIDGET_H_ */
