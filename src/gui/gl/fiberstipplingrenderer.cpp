@@ -42,6 +42,7 @@ FiberStipplingRenderer::FiberStipplingRenderer( QString name ) :
     m_iso2VertsDirty( true ),
     m_iso1ColorDirty( true ),
     m_iso2ColorDirty( true ),
+    m_vectorsDirty( true ),
     m_boundingBoxX( 0 ),
     m_boundingBoxY( 0 )
 {
@@ -53,6 +54,8 @@ FiberStipplingRenderer::~FiberStipplingRenderer()
     glDeleteBuffers( 1, &vbo1 );
     glDeleteBuffers( 1, &vbo2 );
     glDeleteBuffers( 1, &vbo3 );
+    glDeleteBuffers( 1, &vbo4 );
+    glDeleteBuffers( 1, &vbo5 );
 }
 
 void FiberStipplingRenderer::init()
@@ -61,6 +64,8 @@ void FiberStipplingRenderer::init()
     glGenBuffers( 1, &vbo1 );
     glGenBuffers( 1, &vbo2 );
     glGenBuffers( 1, &vbo3 );
+    glGenBuffers( 1, &vbo4 );
+    glGenBuffers( 1, &vbo5 );
 }
 
 void FiberStipplingRenderer::initGL()
@@ -122,6 +127,11 @@ void FiberStipplingRenderer::draw()
     if ( m_iso2Verts.size() != 0 )
     {
         drawIso2( pMatrix );
+    }
+
+    if ( m_vectorVerts.size() != 0 )
+    {
+        drawVectors( pMatrix );
     }
 }
 
@@ -193,6 +203,13 @@ void FiberStipplingRenderer::setIso2Color( QColor color )
     m_iso2Color = color;
     m_iso2ColorDirty = true;
 }
+
+void FiberStipplingRenderer::setVectorVerts( std::vector<float> verts )
+{
+    m_vectorVerts = verts;
+    m_vectorsDirty = true;
+}
+
 
 void FiberStipplingRenderer::drawIso1( QMatrix4x4 mvpMatrix )
 {
@@ -309,5 +326,58 @@ void FiberStipplingRenderer::drawIso2( QMatrix4x4 mvpMatrix )
 
     // Draw cube geometry using indices from VBO 0
     glDrawArrays( GL_LINES, 0 , m_iso2Verts.size() / 2 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+}
+
+void FiberStipplingRenderer::drawVectors( QMatrix4x4 mvpMatrix )
+{
+    if ( m_vectorsDirty )
+    {
+//        glDeleteBuffers( 1, &vbo2 );
+//        glGenBuffers( 1, &vbo2 );
+        // Transfer vertex data to VBO 3
+        glBindBuffer( GL_ARRAY_BUFFER, vbo4 );
+        glBufferData( GL_ARRAY_BUFFER, m_vectorVerts.size() * sizeof( float ), m_vectorVerts.data(), GL_DYNAMIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+//        glDeleteBuffers( 1, &vbo3 );
+//        glGenBuffers( 1, &vbo3 );
+
+        std::vector<float>colors( ( m_vectorVerts.size() / 3 ) * 4, 0.0 );
+        for ( unsigned int i = 0; i < colors.size() / 4; ++i )
+        {
+            colors[i * 4    ] = 1.0;
+            colors[i * 4 + 1] = 0.0;
+            colors[i * 4 + 2] = 0.0;
+            colors[i * 4 + 3] = 1.0;
+        }
+
+        glBindBuffer( GL_ARRAY_BUFFER, vbo5 );
+        glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        m_vectorsDirty = false;
+    }
+
+    GLFunctions::getShader( "line" )->bind();
+    GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", mvpMatrix );
+
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vbo4 );
+    // Draw cube geometry using indices from VBO 0
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_position" );
+    GLFunctions::getShader( "line" )->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vbo5 );
+    // Draw cube geometry using indices from VBO 1
+    int colorLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_color" );
+    GLFunctions::getShader( "line" )->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+
+    // Draw cube geometry using indices from VBO 0
+    glDrawArrays( GL_LINES, 0 , m_vectorVerts.size() / 2 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }

@@ -38,6 +38,8 @@ public:
     void setIso1Verts( std::vector<float> verts );
     void setIso2Verts( std::vector<float> verts );
 
+    void setVectorVerts( std::vector<float> verts );
+
      void setIso1Color( QColor color );
      void setIso2Color( QColor color );
 
@@ -48,6 +50,7 @@ private:
 
     void drawIso1( QMatrix4x4 mvpMatrix );
     void drawIso2( QMatrix4x4 mvpMatrix );
+    void drawVectors( QMatrix4x4 mvpMatrix );
 
     QString m_name;
 
@@ -55,9 +58,12 @@ private:
     GLuint vbo1;
     GLuint vbo2;
     GLuint vbo3;
+    GLuint vbo4;
+    GLuint vbo5;
 
     std::vector<float>m_iso1Verts;
     std::vector<float>m_iso2Verts;
+    std::vector<float>m_vectorVerts;
     QColor m_iso1Color;
     QColor m_iso2Color;
 
@@ -78,6 +84,7 @@ private:
     bool m_iso2VertsDirty;
     bool m_iso1ColorDirty;
     bool m_iso2ColorDirty;
+    bool m_vectorsDirty;
 
     int m_boundingBoxX;
     int m_boundingBoxY;

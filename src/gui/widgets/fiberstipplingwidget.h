@@ -15,6 +15,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QVector3D>
 
 class Dataset;
 class ButtonWithLabel;
@@ -64,9 +65,11 @@ private:
 
     bool m_visible;
 
-    std::vector<float>extractAxial();
-    std::vector<float>extractSagittal();
-    std::vector<float>extractCoronal();
+    std::vector<float>extractAnatomyAxial();
+    std::vector<float>extractAnatomySagittal();
+    std::vector<float>extractAnatomyCoronal();
+
+    std::vector<float>extractVectorsAxial();
 };
 
 #endif /* FIBERSTIPPLINGWIDGET_H_ */
