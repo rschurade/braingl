@@ -62,6 +62,10 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_dY = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
     m_dZ = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
 
+    m_plusX = ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_X ).toFloat();
+    m_plusY = ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Y ).toFloat();
+    m_plusZ = ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Z ).toFloat();
+
     m_nPointsInXDirection = ( m_nX + 1 );
     m_nPointsInSlice = m_nPointsInXDirection * ( m_nY + 1 );
 
@@ -124,7 +128,7 @@ void DatasetIsosurface::renameVerticesAndTriangles()
     {
         ( *mapIterator ).newID = nextID++;
         //m_mesh[0]->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
-        m_mesh[0]->addVertex( ( *mapIterator ).x, ( *mapIterator ).y, ( *mapIterator ).z );
+        m_mesh[0]->addVertex( ( *mapIterator ).x + m_plusX, ( *mapIterator ).y + m_plusY, ( *mapIterator ).z + m_plusZ );
         ++mapIterator;
     }
     // Now rename triangles.
