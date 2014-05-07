@@ -41,6 +41,8 @@ public:
      void setIso1Color( QColor color );
      void setIso2Color( QColor color );
 
+     void setBoundingBox( int x, int y );
+
 private:
     void setShaderVars();
 
@@ -49,7 +51,10 @@ private:
 
     QString m_name;
 
-    GLuint *vboIds;
+    GLuint vbo0;
+    GLuint vbo1;
+    GLuint vbo2;
+    GLuint vbo3;
 
     std::vector<float>m_iso1Verts;
     std::vector<float>m_iso2Verts;
@@ -73,6 +78,9 @@ private:
     bool m_iso2VertsDirty;
     bool m_iso1ColorDirty;
     bool m_iso2ColorDirty;
+
+    int m_boundingBoxX;
+    int m_boundingBoxY;
 };
 
 #endif /* FIBERSTIPPLINGRENDERER_H_ */
