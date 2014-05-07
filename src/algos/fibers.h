@@ -42,7 +42,7 @@ private:
 
     int getID( float x, float y, float z )
     {
-        int id = (int) ( x / m_dx ) + (int) ( y / m_dy ) * m_nx + (int) ( z / m_dz ) * m_ny * m_nx;
+        int id = (int) ( ( x + m_dx / 2 ) / m_dx ) + (int) ( ( y + m_dy / 2 ) / m_dy ) * m_nx + (int) ( ( z + m_dz / 2 ) / m_dz ) * m_ny * m_nx;
 
         id = std::max( (int) 0, std::min( m_blockSize - 1, id ) );
         return id;

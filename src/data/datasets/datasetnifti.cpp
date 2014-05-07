@@ -193,9 +193,10 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
     int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
     int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
 
-    int px = x / dx;
-    int py = y / dy;
-    int pz = z / dz;
+    int px = ( x + dx / 2 ) / dx;
+    int py = ( y + dy / 2 ) / dy;
+    int pz = ( z + dz / 2 ) / dz;
+
 
     px = qMax( 0, qMin( px, nx - 1 ) );
     py = qMax( 0, qMin( py, ny - 1 ) );
