@@ -52,6 +52,10 @@ private:
     float m_dY;
     float m_dZ;
 
+    float m_plusX;
+    float m_plusY;
+    float m_plusZ;
+
     int m_nPointsInXDirection;
     int m_nPointsInSlice;
 
