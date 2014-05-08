@@ -75,9 +75,22 @@ FiberStipplingWidget::FiberStipplingWidget( QString name, QWidget *parent, const
     buttonlayout->addWidget( m_iso2Color );
     connect( m_iso2Color, SIGNAL( colorChanged( QColor, int ) ), this, SLOT( iso2ColorChanged() ) );
 
-//    ButtonWithLabel* startButton = new ButtonWithLabel( "start" );
-//    buttonlayout->addWidget( startButton );
-//    connect( startButton, SIGNAL( buttonPressed( int ) ), this, SLOT( startAlgo() ) );
+    m_lineWidth = new SliderWithEditInt( "stipple line width");
+    buttonlayout->addWidget( m_lineWidth );
+    m_lineWidth->setValue( 1 );
+    m_lineWidth->setMin( 1 );
+    m_lineWidth->setMax( 5 );
+    connect( m_lineWidth, SIGNAL( valueChanged( int, int ) ), this, SLOT( lineWidthChanged() ) );
+
+    m_transparencyAdjust = new SliderWithEdit( "transparency adjust");
+    buttonlayout->addWidget( m_transparencyAdjust );
+    m_transparencyAdjust->setValue( 0.0 );
+    m_transparencyAdjust->setMin( -1.0f );
+    m_transparencyAdjust->setMax( 1.0f );
+
+    ButtonWithLabel* startButton = new ButtonWithLabel( "start" );
+    buttonlayout->addWidget( startButton );
+    connect( startButton, SIGNAL( buttonPressed( int ) ), this, SLOT( startAlgo() ) );
 
     buttonlayout->addStretch();
 
@@ -178,10 +191,17 @@ void FiberStipplingWidget::updateIsoBounds()
 
 void FiberStipplingWidget::startAlgo()
 {
+    if( !m_visible )
+    {
+        return;
+    }
     iso1SliderChanged();
     iso2SliderChanged();
 
-    m_view->renderer()->setVectorVerts( extractVectorsAxial() );
+    std::vector<float> verts;
+    std::vector<float> colors;
+    extractVectorsAxial( verts, colors );
+    m_view->renderer()->setVectorVerts( verts, colors );
 
     Models::d()->submit();
 }
@@ -213,14 +233,14 @@ std::vector<float> FiberStipplingWidget::extractAnatomyAxial()
     return sliceData;
 }
 
-std::vector<float>FiberStipplingWidget::extractVectorsAxial()
+void FiberStipplingWidget::extractVectorsAxial( std::vector<float>& verts, std::vector<float>& colors )
 {
-    std::vector<float>vectorData;
-    if( m_vectorDSL.size() > 0 )
+    if( m_vectorDSL.size() > 0 && m_scalarDSL.size() > 0 )
     {
         int index = m_vectorSelect->getCurrentIndex();
         Dataset3D* ds = static_cast<Dataset3D*>( m_vectorDSL[ index ] );
         int slicePos =Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+        int sliceDZ =Models::getGlobal( Fn::Property::G_SLICE_DZ ).toInt();
         int nx = ds->properties()->get( Fn::Property::D_NX ).toInt();
         int ny = ds->properties()->get( Fn::Property::D_NY ).toInt();
         float dx = ds->properties()->get( Fn::Property::D_DX ).toFloat();
@@ -228,25 +248,51 @@ std::vector<float>FiberStipplingWidget::extractVectorsAxial()
         float dz = ds->properties()->get( Fn::Property::D_DZ ).toFloat();
         std::vector<QVector3D>* data = ds->getData();
 
+        int index2 = m_probTracSelect->getCurrentIndex();
+        DatasetScalar* ds2 = static_cast<DatasetScalar*>( m_scalarDSL[ index2 ] );
+        std::vector<float>* probData = ds2->getData();
+        //float min = ds2->properties()->get( Fn::Property::D_MIN ).toFloat();
+        float max = ds2->properties()->get( Fn::Property::D_MAX ).toFloat();
+
+        float transparencyAdjust = m_transparencyAdjust->getValue();
 
         for ( int y = 0; y < ny; ++y )
         {
             for ( int x = 0; x < nx; ++x )
             {
-                int id = ds->getId( x, y, slicePos );
+                int id = ds->getIdFromPos( x * dx, y * dy, slicePos * sliceDZ );
                 QVector3D value = data->at( id );
                 value.normalize();
-                vectorData.push_back( x * dx );
-                vectorData.push_back( y * dy );
-                vectorData.push_back( slicePos * dz );
-                vectorData.push_back( x * dx + value.x() );
-                vectorData.push_back( y * dy + value.y() );
-                vectorData.push_back( slicePos * dz + value.z() );
+
+                int id2 = ds2->getIdFromPos( x * dx, y * dy, slicePos * sliceDZ );
+                float prob = probData->at( id2 );
+                int countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+
+                for( int i = 0; i < countStips; ++i )
+                {
+                    float randx = ( (float) rand() / ( RAND_MAX ) ) * dx - dx/2;
+                    float randy = ( (float) rand() / ( RAND_MAX ) ) * dy - dy/2;
+                    float randz = ( (float) rand() / ( RAND_MAX ) ) * dz - dz/2;
+
+                    verts.push_back( x * dx + randx );
+                    verts.push_back( y * dy + randy );
+                    verts.push_back( slicePos * dz + randz);
+                    verts.push_back( x * dx + value.x() + randx );
+                    verts.push_back( y * dy + value.y() + randy );
+                    verts.push_back( slicePos * dz + value.z() + randz );
+
+                    colors.push_back( 1.0 );
+                    colors.push_back( 0.0 );
+                    colors.push_back( 0.0 );
+                    colors.push_back( prob / max + transparencyAdjust );
+                    colors.push_back( 1.0 );
+                    colors.push_back( 0.0 );
+                    colors.push_back( 0.0 );
+                    colors.push_back( prob / max + transparencyAdjust );
+                }
             }
         }
     }
-    return vectorData;
-
 }
 
 std::vector<float> FiberStipplingWidget::extractAnatomySagittal()
@@ -388,7 +434,6 @@ void FiberStipplingWidget::iso2SliderChanged()
                 break;
             }
         }
-
         Models::d()->submit();
     }
 }
@@ -402,5 +447,11 @@ void FiberStipplingWidget::iso1ColorChanged()
 void FiberStipplingWidget::iso2ColorChanged()
 {
     m_view->renderer()->setIso2Color( m_iso2Color->getValue() );
+    Models::d()->submit();
+}
+
+void FiberStipplingWidget::lineWidthChanged()
+{
+    m_view->renderer()->setStippleWidth( m_lineWidth->getValue() );
     Models::d()->submit();
 }

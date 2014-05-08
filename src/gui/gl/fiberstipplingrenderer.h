@@ -38,13 +38,13 @@ public:
     void setIso1Verts( std::vector<float> verts );
     void setIso2Verts( std::vector<float> verts );
 
-    void setVectorVerts( std::vector<float> verts );
+    void setVectorVerts( std::vector<float> verts, std::vector<float> colors );
 
      void setIso1Color( QColor color );
      void setIso2Color( QColor color );
 
      void setBoundingBox( int x, int y );
-
+     void setStippleWidth( int width );
 private:
     void setShaderVars();
 
@@ -64,6 +64,7 @@ private:
     std::vector<float>m_iso1Verts;
     std::vector<float>m_iso2Verts;
     std::vector<float>m_vectorVerts;
+    std::vector<float>m_vectorColors;
     QColor m_iso1Color;
     QColor m_iso2Color;
 
@@ -88,6 +89,8 @@ private:
 
     int m_boundingBoxX;
     int m_boundingBoxY;
+
+    int m_stippleWidth;
 };
 
 #endif /* FIBERSTIPPLINGRENDERER_H_ */
