@@ -8,6 +8,7 @@
 
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetisosurface.h"
+#include "../data/datasets/datasetisoline.h"
 
 #include "../data/models.h"
 #include "../data/roiarea.h"
@@ -29,6 +30,15 @@ QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds )
     l.push_back( iso );
     return l;
 }
+
+QList<Dataset*> ScalarAlgos::isoLine( Dataset* ds )
+{
+    DatasetIsoline* iso = new DatasetIsoline( dynamic_cast<DatasetScalar*>( ds ) );
+    QList<Dataset*> l;
+    l.push_back( iso );
+    return l;
+}
+
 
 QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 {

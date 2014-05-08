@@ -93,48 +93,48 @@ std::vector<float> MarchingSquares::run()
                 case 15:
                     break;
                 case 1:
-                    paintSW( x, y );
+                    paintSW( x-1, y-1 );
                     break;
                 case 2:
-                    paintSE( x, y );
+                    paintSE( x - 1, y - 1 );
                     break;
                 case 3:
-                    paintEW( x, y );
+                    paintEW( x - 1, y - 1 );
                     break;
                 case 4:
-                    paintNE( x, y );
+                    paintNE( x - 1, y - 1 );
                     break;
                 case 5:
-                    paintSE( x, y );
-                    paintNW( x, y );
+                    paintSE( x - 1, y - 1 );
+                    paintNW( x - 1, y - 1 );
                     break;
                 case 6:
-                    paintSN( x, y );
+                    paintSN( x - 1, y - 1 );
                     break;
                 case 7:
-                    paintNW( x, y );
+                    paintNW( x - 1, y - 1 );
                     break;
                 case 8:
-                    paintNW( x, y );
+                    paintNW( x - 1, y - 1 );
                     break;
                 case 9:
-                    paintSN( x, y );
+                    paintSN( x - 1, y - 1 );
                     break;
                 case 10:
-                    paintSW( x, y );
-                    paintNE( x, y );
+                    paintSW( x - 1, y - 1 );
+                    paintNE( x - 1, y - 1 );
                     break;
                 case 11:
-                    paintNE( x, y );
+                    paintNE( x - 1, y - 1 );
                     break;
                 case 12:
-                    paintEW( x, y );
+                    paintEW( x - 1, y - 1 );
                     break;
                 case 13:
-                    paintSE( x, y );
+                    paintSE( x - 1, y - 1 );
                     break;
                 case 14:
-                    paintSW( x, y );
+                    paintSW( x - 1, y - 1 );
                     break;
             }
         }
