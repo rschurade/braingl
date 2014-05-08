@@ -1,0 +1,303 @@
+/*
+ * datasetisoline.cpp
+ *
+ *  Created on: 08.05.2014
+ *      Author: Ralph
+ */
+
+#include "datasetisoline.h"
+
+#include "datasetscalar.h"
+
+#include "../enums.h"
+#include "../models.h"
+
+#include "../../algos/marchingsquares.h"
+
+#include "../../gui/gl/glfunctions.h"
+
+#include <QtOpenGL/QGLShaderProgram>
+
+DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
+    Dataset( QDir( "new iso line" ), Fn::DatasetType::ISO_LINE ),
+    m_dirty( true ),
+    vbo0( 0 ),
+    vbo1( 0 ),
+    m_countLines( 0 )
+{
+    m_scalarField = *(ds->getData() );
+
+    m_properties["maingl"]->createInt( Fn::Property::D_NX, ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt() );
+    m_properties["maingl"]->createInt( Fn::Property::D_NY, ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt() );
+    m_properties["maingl"]->createInt( Fn::Property::D_NZ, ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DX, ds->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DY, ds->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, ds->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat() );
+
+    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 0 );
+    m_properties["maingl"]->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
+    m_properties["maingl"]->createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
+
+    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (isoline)";
+
+    m_properties["maingl"]->createString( Fn::Property::D_NAME, name );
+
+    m_properties["maingl"]->createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat(), "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"]->createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 0, "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_SLICE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0, -1.0, 1.0, "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_OFFSET ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"]->createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
+    //connect( m_properties["maingl"]->getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 0, 0, 0), "general" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
+    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    m_properties.insert( "maingl2", props2 );
+}
+
+DatasetIsoline::~DatasetIsoline()
+{
+}
+
+void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
+{
+    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    {
+        return;
+    }
+
+    if ( m_dirty )
+    {
+        initGeometry();
+    }
+
+    float alpha = GLFunctions::sliceAlpha[target];
+
+    switch ( renderMode )
+    {
+        case 0:
+            break;
+        case 1:
+        {
+            if ( alpha < 1.0 ) // obviously not opaque
+            {
+                return;
+            }
+            break;
+        }
+        default:
+        {
+            if ( alpha == 1.0  ) // not transparent
+            {
+                return;
+            }
+            break;
+        }
+    }
+
+    GLFunctions::getShader( "line" )->bind();
+    GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+
+    glLineWidth(  m_properties["maingl"]->get( Fn::Property::D_LINE_WIDTH ).toInt() );
+
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    // Draw cube geometry using indices from VBO 0
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_position" );
+    GLFunctions::getShader( "line" )->enableAttributeArray( vertexLocation );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+    // Tell OpenGL which VBOs to use
+    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    // Draw cube geometry using indices from VBO 1
+    int colorLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_color" );
+    GLFunctions::getShader( "line" )->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+
+
+    // Draw cube geometry using indices from VBO 0
+    glDrawArrays( GL_LINES, 0 , m_countLines );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glLineWidth(  1 );
+}
+
+void DatasetIsoline::initGeometry()
+{
+    if( vbo0 )
+    {
+        glDeleteBuffers( 1, &vbo0 );
+    }
+    glGenBuffers( 1, &vbo0 );
+    if( vbo1 )
+    {
+        glDeleteBuffers( 1, &vbo1 );
+    }
+    glGenBuffers( 1, &vbo1 );
+
+    std::vector<float>sliceData;
+    std::vector<float>isoVerts;
+    std::vector<float>tmpVerts;
+
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
+
+    float isoValue = m_properties["maingl"]->get( Fn::Property::D_ISO_VALUE ).toFloat();
+
+    switch ( m_properties["maingl"]->get( Fn::Property::D_RENDER_SLICE ).toInt() )
+    {
+        case 0: // sagittal
+        {
+            sliceData = extractAnatomySagittal();
+            MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz );
+            tmpVerts = ms1.run();
+            isoVerts.resize( tmpVerts.size() );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
+            {
+                isoVerts[3*i] = x;
+                isoVerts[3*i+1] = tmpVerts[3*i];
+                isoVerts[3*i+2] = tmpVerts[3*i+1];
+            }
+            break;
+        }
+        case 1: // coronal
+        {
+            sliceData = extractAnatomyCoronal();
+            MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz );
+            tmpVerts = ms1.run();
+            isoVerts.resize( tmpVerts.size() );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
+            {
+                isoVerts[3*i] = tmpVerts[3*i];
+                isoVerts[3*i+1] = y;
+                isoVerts[3*i+2] = tmpVerts[3*i+1];
+            }
+            break;
+        }
+        case 2: // axial
+        {
+            sliceData = extractAnatomyAxial();
+            MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy );
+            tmpVerts = ms1.run();
+            isoVerts.resize( tmpVerts.size() );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
+            {
+                isoVerts[3*i] = tmpVerts[3*i];
+                isoVerts[3*i+1] = tmpVerts[3*i+1];
+                isoVerts[3*i+2] = z;
+            }
+            break;
+        }
+    }
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    glBufferData( GL_ARRAY_BUFFER, isoVerts.size() * sizeof( float ), isoVerts.data(), GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    std::vector<float>colors( ( isoVerts.size() / 3 ) * 4, 0.0 );
+    QColor col = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
+    for ( unsigned int i = 0; i < colors.size() / 4; ++i )
+    {
+        colors[i * 4    ] = col.redF();
+        colors[i * 4 + 1] = col.greenF();
+        colors[i * 4 + 2] = col.blueF();
+        colors[i * 4 + 3] = 1.0;
+    }
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    m_countLines = isoVerts.size() / 2;
+    m_dirty = false;
+}
+
+std::vector<float> DatasetIsoline::extractAnatomyAxial()
+{
+    std::vector<float>sliceData;
+    int slicePos = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+    int nx =  m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny =  m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+
+    sliceData.resize( nx * ny, 0 );
+
+    for ( int y = 0; y < ny; ++y )
+    {
+        for ( int x = 0; x < nx; ++x )
+        {
+            int id = getId( x, y, slicePos );
+            float value = m_scalarField[ id ];
+            sliceData[ x + nx * y ] = value;
+        }
+    }
+    return sliceData;
+}
+
+std::vector<float> DatasetIsoline::extractAnatomySagittal()
+{
+    std::vector<float>sliceData;
+    int slicePos =Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+
+    sliceData.resize( ny * nz, 0 );
+
+    for ( int z = 0; z < nz; ++z )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            int id = getId( slicePos, y, z );
+            float value = m_scalarField[ id ];
+            sliceData[ y + ny * z ] = value;
+        }
+    }
+    return sliceData;
+}
+
+std::vector<float> DatasetIsoline::extractAnatomyCoronal()
+{
+    std::vector<float>sliceData;
+    int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+
+    sliceData.resize( nx * nz, 0 );
+
+    for ( int z = 0; z < nz; ++z )
+    {
+        for ( int x = 0; x < nx; ++x )
+        {
+            int id = getId( x, slicePos, z );
+            float value = m_scalarField[ id ];
+            sliceData[ x + nx * z ] = value;
+        }
+    }
+    return sliceData;
+}
+
+int DatasetIsoline::getId( int x, int y, int z )
+{
+    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+
+    int px = qMax( 0, qMin( x, nx - 1) );
+    int py = qMax( 0, qMin( y, ny - 1) );
+    int pz = qMax( 0, qMin( z, nz - 1) );
+
+    return px + py * nx + pz * nx * ny;
+}
+
+void DatasetIsoline::isoValueChanged()
+{
+    m_dirty = true;
+}

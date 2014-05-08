@@ -37,6 +37,7 @@ private:
     ToolBarView* m_toolBarView;
 
     FNAction* m_isosurfaceAct;
+    FNAction* m_isoLineAct;
     FNAction* m_distanceMapAct;
     FNAction* m_gaussAct;
     FNAction* m_medianAct;

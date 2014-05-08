@@ -57,6 +57,10 @@ void ToolBar::createActions()
     m_isosurfaceAct->setStatusTip( tr( "iso surface" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
+    m_isoLineAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "iso line" ), this, Fn::Algo::ISOLINE );
+    m_isoLineAct->setStatusTip( tr( "iso line" ) );
+    connect( m_isoLineAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
     m_distanceMapAct = new FNAction( QIcon( ":/icons/distance.png" ), tr( "distance map" ), this, Fn::Algo::DISTANCE_MAP );
     m_distanceMapAct->setStatusTip( tr( "distance map" ) );
     connect( m_distanceMapAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
@@ -290,6 +294,9 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::ISOSURFACE:
             l = ScalarAlgos::isoSurface( ds );
             break;
+        case Fn::Algo::ISOLINE:
+            l = ScalarAlgos::isoLine( ds );
+            break;
         case Fn::Algo::DISTANCE_MAP:
             l = ScalarAlgos::distanceMap( ds );
             break;
@@ -449,6 +456,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::NIFTI_SCALAR:
         {
             this->addAction( m_isosurfaceAct );
+            this->addAction( m_isoLineAct );
             this->addAction( m_distanceMapAct );
             this->addAction( m_gaussAct );
             this->addAction( m_medianAct );

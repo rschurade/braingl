@@ -1236,22 +1236,12 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
     connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
 
-    m_fiberStipplingWidget = new FiberStipplingWidget( QString( "fiber stippling" ), this, mainGLWidget );
-    FNDockWidget* dockFS = new FNDockWidget( QString("fiber stippling"), m_fiberStipplingWidget, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockFS );
-    viewMenu->addAction( dockFS->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockFS, SLOT( toggleTitleWidget() ) );
-    connect( dockFS, SIGNAL( visibilityChanged( bool ) ), m_fiberStipplingWidget, SLOT( setWidgetVisible( bool ) ) );
-    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), m_fiberStipplingWidget, SLOT( updateSelects() ) );
-    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), m_fiberStipplingWidget, SLOT( startAlgo() ) );
-
     dockNav1->hide();
     dockNav2->hide();
     dockNav3->hide();
     dockNav4->hide();
     dockMainGL2->hide();
     dockHTW->hide();
-    dockFS->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
