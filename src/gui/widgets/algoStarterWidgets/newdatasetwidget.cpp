@@ -122,6 +122,18 @@ void NewDatasetWidget::createDataset()
             float dy = m_dY->getValue();
             float dz = m_dZ->getValue();
             std::vector<float> data( nx * ny * nz );
+            for( int z = 0; z < nz; ++z )
+            {
+                for( int y = 0; y < ny; ++y )
+                {
+                    for( int x = 0; x < nx; ++x )
+                    {
+                        float val = 255 * ( ( ( x + ( y % 2 ) ) + ( z % 2 ) )  % 2 ) ;
+                        data[ x + y*nx + z*nx*ny ] = val;
+                    }
+                }
+            }
+
             data[0] = 255;
             int dims[8] = { 3, nx, ny, nz, 1, 1, 1 };
             nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );

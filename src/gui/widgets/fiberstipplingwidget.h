@@ -44,6 +44,7 @@ public slots:
     void iso2SliderChanged();
     void iso1ColorChanged();
     void iso2ColorChanged();
+    void lineWidthChanged();
 
 private:
     FiberStipplingGLWidget* m_view;
@@ -63,13 +64,16 @@ private:
     ColorWidgetWithLabel* m_iso1Color;
     ColorWidgetWithLabel* m_iso2Color;
 
+    SliderWithEditInt* m_lineWidth;
+    SliderWithEdit* m_transparencyAdjust;
+
     bool m_visible;
 
     std::vector<float>extractAnatomyAxial();
     std::vector<float>extractAnatomySagittal();
     std::vector<float>extractAnatomyCoronal();
 
-    std::vector<float>extractVectorsAxial();
+    void extractVectorsAxial( std::vector<float>& verts, std::vector<float>& colors );
 };
 
 #endif /* FIBERSTIPPLINGWIDGET_H_ */
