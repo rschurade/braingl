@@ -57,7 +57,7 @@ void ToolBar::createActions()
     m_isosurfaceAct->setStatusTip( tr( "iso surface" ) );
     connect( m_isosurfaceAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
-    m_isoLineAct = new FNAction( QIcon( ":/icons/tmp1.png" ), tr( "iso line" ), this, Fn::Algo::ISOLINE );
+    m_isoLineAct = new FNAction( QIcon( ":/icons/isoline.png" ), tr( "iso line" ), this, Fn::Algo::ISOLINE );
     m_isoLineAct->setStatusTip( tr( "iso line" ) );
     connect( m_isoLineAct, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 
