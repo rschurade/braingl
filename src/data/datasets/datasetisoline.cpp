@@ -33,6 +33,9 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"]->createFloat( Fn::Property::D_DX, ds->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat() );
     m_properties["maingl"]->createFloat( Fn::Property::D_DY, ds->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat() );
     m_properties["maingl"]->createFloat( Fn::Property::D_DZ, ds->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_X ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Y ).toFloat() );
+    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Z ).toFloat() );
 
     m_properties["maingl"]->createInt( Fn::Property::D_DIM, 0 );
     m_properties["maingl"]->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
@@ -147,6 +150,9 @@ void DatasetIsoline::initGeometry()
     float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
     float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
     float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+    float px = m_properties["maingl"]->get( Fn::Property::D_ADJUST_X ).toFloat();
+    float py = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float pz = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Z ).toFloat();
     float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
     float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
     float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
@@ -163,9 +169,9 @@ void DatasetIsoline::initGeometry()
             isoVerts.resize( tmpVerts.size() );
             for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
             {
-                isoVerts[3*i] = x;
-                isoVerts[3*i+1] = tmpVerts[3*i];
-                isoVerts[3*i+2] = tmpVerts[3*i+1];
+                isoVerts[3*i] = x + px;
+                isoVerts[3*i+1] = tmpVerts[3*i] + py;
+                isoVerts[3*i+2] = tmpVerts[3*i+1] + pz;
             }
             break;
         }
@@ -177,9 +183,9 @@ void DatasetIsoline::initGeometry()
             isoVerts.resize( tmpVerts.size() );
             for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
             {
-                isoVerts[3*i] = tmpVerts[3*i];
-                isoVerts[3*i+1] = y;
-                isoVerts[3*i+2] = tmpVerts[3*i+1];
+                isoVerts[3*i] = tmpVerts[3*i] + px;
+                isoVerts[3*i+1] = y + py;
+                isoVerts[3*i+2] = tmpVerts[3*i+1] + pz;
             }
             break;
         }
@@ -191,9 +197,9 @@ void DatasetIsoline::initGeometry()
             isoVerts.resize( tmpVerts.size() );
             for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
             {
-                isoVerts[3*i] = tmpVerts[3*i];
-                isoVerts[3*i+1] = tmpVerts[3*i+1];
-                isoVerts[3*i+2] = z;
+                isoVerts[3*i] = tmpVerts[3*i] + px;
+                isoVerts[3*i+1] = tmpVerts[3*i+1] + py;
+                isoVerts[3*i+2] = z + pz;
             }
             break;
         }
