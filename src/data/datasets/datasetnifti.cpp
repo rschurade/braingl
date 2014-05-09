@@ -80,6 +80,9 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->create( Fn::Property::"swapsize", m_header->swapsize );
 //    m_properties["maingl"]->create( Fn::Property::"byteorder", m_header->byteorder );
 
+    qDebug() << "qform code: " << m_header->qform_code;
+    qDebug() << "sform code: " << m_header->sform_code;
+
     for ( int i = 0; i < 4; ++i )
     {
         for ( int j = 0; j < 4; ++j )
@@ -120,9 +123,24 @@ void DatasetNifti::parseNiftiHeader()
     m_properties["maingl"]->createFloat( Fn::Property::D_DX, m_header->dx, 0.01, 10.0, "transform" );
     m_properties["maingl"]->createFloat( Fn::Property::D_DY, m_header->dy, 0.01, 10.0, "transform" );
     m_properties["maingl"]->createFloat( Fn::Property::D_DZ, m_header->dz, 0.01, 10.0, "transform" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, 0, -250, 250, "transform" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
+    if ( m_header->sform_code > 0 )
+    {
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, m_sform( 0, 3 ), -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, m_sform( 1, 3 ), -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, m_sform( 2, 3 ), -250, 250, "transform" );
+    }
+    else if ( m_header->sform_code > 0 )
+    {
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, m_qform( 0, 3), -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, m_qform( 1, 3), -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, m_qform( 2, 3), -250, 250, "transform" );
+    }
+    else
+    {
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, 0, -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
+        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
+    }
 }
 
 nifti_image* DatasetNifti::getHeader()
