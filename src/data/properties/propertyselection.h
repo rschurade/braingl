@@ -25,6 +25,11 @@ public:
     virtual ~PropertySelection();
 
     std::vector<QString> getOptions();
+
+    void clear();
+    void setOptions( std::initializer_list<QString> options );
+    void addOption( QString option );
+
 private:
     std::vector<QString>m_options;
 

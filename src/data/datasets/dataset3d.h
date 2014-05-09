@@ -10,9 +10,11 @@
 
 #include "datasetnifti.h"
 
+#include <QList>
 #include <QVector>
 #include <QVector3D>
 
+class DatasetScalar;
 class EVRenderer;
 
 class Dataset3D: public DatasetNifti
@@ -38,9 +40,15 @@ private:
 
     EVRenderer* m_renderer;
 
+    QList<DatasetScalar*>m_scalarDSL;
+
+public slots:
+    void updateMaskSelect();
+
 private slots:
     void switchRenderSticks();
     void scalingChanged();
+    void probMaskChanged();
 };
 
 #endif /* DATASET3D_H_ */

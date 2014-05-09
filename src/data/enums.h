@@ -167,6 +167,7 @@ namespace Fn
         D_RENDER_SECOND,
         D_RENDER_THIRD,
         D_RENDER_VECTORS_STICKS,
+        D_RENDER_VECTORS_STIPPLES,
         D_ISO_VALUE,
         D_NUM_POINTS,
         D_NUM_LINES,
@@ -265,6 +266,7 @@ namespace Fn
         D_SHOW_PLANE_HANDLES,
         D_HANDLE_COLOR,
         D_LINE_WIDTH,
+        D_STIPPLE_PROB_MASK,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -429,6 +431,7 @@ namespace Fn
                 case Property::D_RENDER_SECOND: return QString( "render second peak" ); break;
                 case Property::D_RENDER_THIRD: return QString( "render third peak" ); break;
                 case Property::D_RENDER_VECTORS_STICKS: return QString( "render vector sticks" ); break;
+                case Property::D_RENDER_VECTORS_STIPPLES: return QString( "render vector stipples" ); break;
                 case Property::D_ISO_VALUE: return QString( "iso value" ); break;
                 case Property::D_NUM_POINTS: return QString( "num points" ); break;
                 case Property::D_NUM_LINES: return QString( "num lines" ); break;
@@ -527,6 +530,7 @@ namespace Fn
                 case Property::D_SHOW_PLANE_HANDLES: return QString( "show/hide handles" ); break;
                 case Property::D_HANDLE_COLOR: return QString( "handle color" ); break;
                 case Property::D_LINE_WIDTH: return QString( "line width" ); break;
+                case Property::D_STIPPLE_PROB_MASK: return QString( "probability mask" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

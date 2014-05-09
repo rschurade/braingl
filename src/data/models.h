@@ -43,8 +43,8 @@ public:
     static QModelIndex createRoiIndex( int branch, int pos, int column );
 
     static Dataset* getDataset( int id );
-    static QList<Dataset*>getDatasets( Fn::DatasetType filter );
-    static QList<Dataset*>getDatasets( int filter );
+    static QList<Dataset*>getDatasets( Fn::DatasetType filter, bool ignoreInactive = true );
+    static QList<Dataset*>getDatasets( int filter, bool ignoreInactive = true );
 
     static void setRoiWidget( ROIWidget* rw );
     static void addROIArea( ROIArea* roi );

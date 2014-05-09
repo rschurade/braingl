@@ -84,3 +84,31 @@ std::vector<QString> PropertySelection::getOptions()
 {
     return m_options;
 }
+
+void PropertySelection::clear()
+{
+    m_options.clear();
+    static_cast<SelectWithLabel*>( m_widget )->clear();
+}
+
+void PropertySelection::setOptions( std::initializer_list<QString> options )
+{
+    SelectWithLabel* widget = static_cast<SelectWithLabel*>( m_widget );
+    int index = 0;
+    widget->blockSignals( true );
+    for ( auto i = options.begin(); i != options.end(); ++i )
+    {
+        widget->insertItem( index++, (*i) );
+        m_options.push_back( (*i) );
+    }
+    widget->blockSignals( false );
+}
+
+void PropertySelection::addOption( QString option )
+{
+    SelectWithLabel* widget = static_cast<SelectWithLabel*>( m_widget );
+    widget->blockSignals( true );
+    widget->addItem( option );
+    m_options.push_back( ( option ) );
+    widget->blockSignals( false );
+}

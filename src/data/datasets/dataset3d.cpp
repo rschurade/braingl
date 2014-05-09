@@ -5,9 +5,12 @@
  * @author Ralph Schurade
  */
 #include "dataset3d.h"
+#include "datasetscalar.h"
 #include "../models.h"
 
 #include "../../gui/gl/evrenderer.h"
+
+#include "../properties/propertyselection.h"
 
 Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ),
@@ -29,11 +32,22 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
 
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STIPPLES, false, "stipples" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STIPPLES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
+    m_properties["maingl"]->createList( Fn::Property::D_STIPPLE_PROB_MASK, { "none" }, 0, "stipples" );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_STIPPLE_PROB_MASK ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( probMaskChanged() ) );
+
+
     examineDataset();
 
     PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
     m_properties.insert( "maingl2", props2 );
     m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateMaskSelect() ) );
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateMaskSelect() ) );
+
+    probMaskChanged();
 }
 
 Dataset3D::~Dataset3D()
@@ -206,6 +220,7 @@ bool Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers mod
 
 void Dataset3D::switchRenderSticks()
 {
+    m_properties["maingl"]->set( Fn::Property::D_RENDER_VECTORS_STICKS, m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() );
     m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
     Models::d()->submit();
 }
@@ -214,4 +229,49 @@ void Dataset3D::scalingChanged()
 {
     glDeleteTextures( 1, &m_textureGLuint );
     createTexture();
+}
+
+void Dataset3D::updateMaskSelect()
+{
+    QList<Dataset*>dsl1 = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, false );
+
+    if( dsl1.size() != m_scalarDSL.size() )
+    {
+        QWidget* widget = m_properties["maingl"]->getWidget( Fn::Property::D_STIPPLE_PROB_MASK );
+        widget->blockSignals( true );
+
+        int curScalar = m_properties["maingl"]->get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt();
+
+        PropertySelection* prop = static_cast<PropertySelection*> ( m_properties["maingl"]->getProperty( Fn::Property::D_STIPPLE_PROB_MASK ) );
+        prop->clear();
+
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            prop->addOption( dsl1[i]->properties()->get( Fn::Property::D_NAME ).toString() );
+        }
+
+        if ( dsl1.size() > m_scalarDSL.size() )
+        {
+            m_properties["maingl"]->set( Fn::Property::D_STIPPLE_PROB_MASK, qMax( 0, curScalar ) );
+        }
+        else
+        {
+            m_properties["maingl"]->set( Fn::Property::D_STIPPLE_PROB_MASK, 0 );
+        }
+        m_scalarDSL.clear();
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            m_scalarDSL.push_back( static_cast<DatasetScalar*>( dsl1[i] ) );
+        }
+        widget->blockSignals( false );
+
+    }
+}
+
+void Dataset3D::probMaskChanged()
+{
+    if ( m_renderer )
+    {
+        m_renderer->setMask( m_scalarDSL[ m_properties["maingl"]->get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() ] );
+    }
 }
