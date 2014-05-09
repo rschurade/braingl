@@ -12,6 +12,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+class DatasetScalar;
 class PropertyGroup;
 
 class EVRenderer : public ObjectRenderer
@@ -23,6 +24,8 @@ public:
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
+
+    void setMask( DatasetScalar* mask );
 
 protected:
     void setupTextures();
@@ -37,6 +40,7 @@ private:
     GLuint vbo;
 
     std::vector<QVector3D>* m_data;
+    DatasetScalar* m_mask;
 
     int m_nx;
     int m_ny;
@@ -48,6 +52,7 @@ private:
     float m_scaling;
     int m_orient;
     float m_offset;
+    bool m_renderStipples;
 };
 
 #endif /* TENSORRENDEREREV_H_ */

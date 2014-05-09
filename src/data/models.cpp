@@ -118,14 +118,14 @@ Dataset* Models::getDataset( int id )
     return VPtr<Dataset>::asPtr( m_dataModel->data( m_dataModel->index( id, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
 }
 
-QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
+QList<Dataset*> Models::getDatasets( Fn::DatasetType filter, bool ignoreInactive )
 {
     QList<Dataset*>rl;
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = m_dataModel->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() || !ignoreInactive )
         {
             index = m_dataModel->index( i, (int)Fn::Property::D_TYPE );
             if ( m_dataModel->data( index, Qt::DisplayRole ).toInt() & (int)filter )
@@ -138,14 +138,14 @@ QList<Dataset*> Models::getDatasets( Fn::DatasetType filter )
     return rl;
 }
 
-QList<Dataset*> Models::getDatasets( int filter )
+QList<Dataset*> Models::getDatasets( int filter, bool ignoreInactive )
 {
     QList<Dataset*>rl;
     int countDatasets = m_dataModel->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
         QModelIndex index = m_dataModel->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() )
+        if ( m_dataModel->data( index, Qt::DisplayRole ).toBool() || !ignoreInactive )
         {
             index = m_dataModel->index( i, (int)Fn::Property::D_TYPE );
             if ( m_dataModel->data( index, Qt::DisplayRole ).toInt() & filter )

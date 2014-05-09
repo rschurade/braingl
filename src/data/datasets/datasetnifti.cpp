@@ -80,9 +80,6 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->create( Fn::Property::"swapsize", m_header->swapsize );
 //    m_properties["maingl"]->create( Fn::Property::"byteorder", m_header->byteorder );
 
-    qDebug() << "qform code: " << m_header->qform_code;
-    qDebug() << "sform code: " << m_header->sform_code;
-
     for ( int i = 0; i < 4; ++i )
     {
         for ( int j = 0; j < 4; ++j )

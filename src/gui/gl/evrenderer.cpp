@@ -9,7 +9,9 @@
 
 #include "../../algos/fmath.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/properties/propertygroup.h"
+#include "../../data/datasets/datasetscalar.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
@@ -25,6 +27,7 @@ EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, fl
     m_vertCount( 0 ),
     vbo( 0 ),
     m_data( data ),
+    m_mask( 0 ),
     m_nx( nx ),
     m_ny( ny ),
     m_nz( nz ),
@@ -41,6 +44,11 @@ EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, fl
 EVRenderer::~EVRenderer()
 {
     glDeleteBuffers( 1, &vbo );
+}
+
+void EVRenderer::setMask( DatasetScalar* mask )
+{
+    m_mask = mask;
 }
 
 void EVRenderer::init()
@@ -65,6 +73,7 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_renderStipples = props->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
 
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
@@ -123,19 +132,20 @@ void EVRenderer::setShaderVars()
 
 void EVRenderer::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * ( dx / m_dx );
+    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * ( dy / m_dy );
+    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * ( dz / m_dz );
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
     zi = qMax( 0, qMin( zi, m_nz - 1) );
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset } );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -151,6 +161,16 @@ void EVRenderer::initGeometry()
 
     m_vertCount = 0;
 
+    std::vector<float>* probData;
+    float max;
+    if ( m_mask )
+    {
+        probData = m_mask->getData();
+        //float min = ds2->properties()->get( Fn::Property::D_MIN ).toFloat();
+        max = m_mask->properties()->get( Fn::Property::D_MAX ).toFloat();
+    }
+    float randx, randy, randz;
+
     if ( ( m_orient & 1 ) == 1 )
     {
         for( int yy = 0; yy < m_ny; ++yy )
@@ -162,8 +182,31 @@ void EVRenderer::initGeometry()
                 float locX = xx * m_dx + m_dx / 2;
                 float locY = yy * m_dy + m_dy / 2;
 
-                addGlyph( verts, locX, locY, z - m_offset * m_dz , vec );
-                m_vertCount += 2;
+                if( m_renderStipples )
+                {
+                    int countStips = 10;
+                    if ( m_mask )
+                    {
+                        int id = m_mask->getIdFromPos( locX, locY, z - m_offset * m_dz );
+                        float prob = probData->at( id );
+                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                    }
+
+                    for( int i = 0; i < countStips; ++i )
+                    {
+                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
+                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
+                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+
+                        addGlyph( verts, locX + randx, locY + randy, z - m_offset * m_dz + randz, vec );
+                        m_vertCount += 2;
+                    }
+                }
+                else
+                {
+                    addGlyph( verts, locX, locY, z - m_offset * m_dz , vec );
+                    m_vertCount += 2;
+                }
             }
         }
     }
@@ -178,8 +221,31 @@ void EVRenderer::initGeometry()
                 float locX = xx * m_dx + m_dx / 2;
                 float locZ = zz * m_dz + m_dz / 2;
 
-                addGlyph( verts, locX, y + m_offset * m_dy, locZ, vec );
-                m_vertCount += 2;
+                if( m_renderStipples )
+                {
+                    int countStips = 10;
+                    if ( m_mask )
+                    {
+                        int id = m_mask->getIdFromPos( locX, y + m_offset * m_dy, locZ );
+                        float prob = probData->at( id );
+                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                    }
+
+                    for( int i = 0; i < countStips; ++i )
+                    {
+                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
+                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
+                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+
+                        addGlyph( verts, locX + randx, y + m_offset * m_dy + randy, locZ + randz, vec );
+                        m_vertCount += 2;
+                    }
+                }
+                else
+                {
+                    addGlyph( verts, locX, y + m_offset * m_dy, locZ, vec );
+                    m_vertCount += 2;
+                }
             }
         }
     }
@@ -193,8 +259,31 @@ void EVRenderer::initGeometry()
                 float locY = yy * m_dy + m_dy / 2;
                 float locZ = zz * m_dz + m_dz / 2;
 
-                addGlyph( verts, x + m_offset * m_dx, locY, locZ, vec );
-                m_vertCount += 2;
+                if( m_renderStipples )
+                {
+                    int countStips = 10;
+                    if ( m_mask )
+                    {
+                        int id = m_mask->getIdFromPos( x + m_offset * m_dx, locY, locZ );
+                        float prob = probData->at( id );
+                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                    }
+
+                    for( int i = 0; i < countStips; ++i )
+                    {
+                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
+                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
+                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+
+                        addGlyph( verts, x + m_offset * m_dx + randx, locY + randy, locZ + randz, vec );
+                        m_vertCount += 2;
+                    }
+                }
+                else
+                {
+                    addGlyph( verts, x + m_offset * m_dx, locY, locZ, vec );
+                    m_vertCount += 2;
+                }
             }
         }
     }
