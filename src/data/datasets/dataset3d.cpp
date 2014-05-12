@@ -23,17 +23,17 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"]->createInt( Fn::Property::D_DIM, 3 );
     m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
     m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STICKS, true, "general" );
     m_properties["maingl"]->createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"]->createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, false );
 
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
 
     m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STIPPLES, false, "stipples" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STIPPLES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
+    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STIPPLES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderStipples() ) );
     m_properties["maingl"]->createList( Fn::Property::D_STIPPLE_PROB_MASK, { "none" }, 0, "stipples" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_STIPPLE_PROB_MASK ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( probMaskChanged() ) );
 
@@ -47,6 +47,7 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateMaskSelect() ) );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateMaskSelect() ) );
 
+    updateMaskSelect();
     probMaskChanged();
 }
 
@@ -156,6 +157,7 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
 
     if ( properties( target )->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() )
     {
+        probMaskChanged();
         m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
 }
@@ -220,10 +222,16 @@ bool Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers mod
 
 void Dataset3D::switchRenderSticks()
 {
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_VECTORS_STICKS, m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() );
     m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
     Models::d()->submit();
 }
+
+void Dataset3D::switchRenderStipples()
+{
+    m_properties["maingl"]->set( Fn::Property::D_RENDER_VECTORS_STICKS, m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() );
+    Models::d()->submit();
+}
+
 
 void Dataset3D::scalingChanged()
 {

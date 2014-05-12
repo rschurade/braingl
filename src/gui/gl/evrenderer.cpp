@@ -25,7 +25,7 @@
 EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
     ObjectRenderer(),
     m_vertCount( 0 ),
-    vbo( 0 ),
+    vbo0( 0 ),
     m_data( data ),
     m_mask( 0 ),
     m_nx( nx ),
@@ -43,7 +43,8 @@ EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, fl
 
 EVRenderer::~EVRenderer()
 {
-    glDeleteBuffers( 1, &vbo );
+    glDeleteBuffers( 1, &vbo0 );
+    glDeleteBuffers( 1, &vbo1 );
 }
 
 void EVRenderer::setMask( DatasetScalar* mask )
@@ -53,7 +54,8 @@ void EVRenderer::setMask( DatasetScalar* mask )
 
 void EVRenderer::init()
 {
-    glGenBuffers( 1, &vbo );
+    glGenBuffers( 1, &vbo0 );
+    glGenBuffers( 1, &vbo1 );
 }
 
 void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
@@ -62,18 +64,24 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
             (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
             (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    m_renderStipples = props->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
+    m_orient = slice;
 
-     m_orient = slice;
-
-    if ( ( renderMode != 1 ) || ( renderMode == 0 ) ||  ( m_orient == 0 ) ) // we are drawing opaque objects
+    if ( ( renderMode == 1 ) && m_renderStipples )
     {
-        // obviously not opaque
         return;
     }
 
+    if ( ( renderMode != 1 ) || ( renderMode == 0 ) ||  ( m_orient == 0 ) ) // we are drawing opaque objects
+    {
+        if ( !m_renderStipples )
+        {
+            // obviously not opaque
+            return;
+        }
+    }
     m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
-    m_renderStipples = props->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
 
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
@@ -92,13 +100,10 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     initGeometry();
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars();
-
+    glLineWidth( 2 );
     glDrawArrays( GL_LINES, 0, m_vertCount );
-
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
+    glLineWidth( 1 );
     GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
 }
 
@@ -114,6 +119,7 @@ void EVRenderer::setShaderVars()
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
+    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
@@ -128,6 +134,13 @@ void EVRenderer::setShaderVars()
     int offsetLocation = program->attributeLocation( "a_vec" );
     program->enableAttributeArray( offsetLocation );
     glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    int colorLocation = program->attributeLocation( "a_color" );
+    program->enableAttributeArray( colorLocation );
+    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void EVRenderer::initGeometry()
@@ -154,6 +167,7 @@ void EVRenderer::initGeometry()
     m_previousSettings = s;
 
     std::vector<float>verts;
+    std::vector<float>colors;
 
     float x = (float)xi * m_dx + m_dx / 2.;
     float y = (float)yi * m_dy + m_dy / 2.;
@@ -163,6 +177,8 @@ void EVRenderer::initGeometry()
 
     std::vector<float>* probData;
     float max;
+    float prob;
+    float alpha = 1.0;
     if ( m_mask )
     {
         probData = m_mask->getData();
@@ -188,8 +204,9 @@ void EVRenderer::initGeometry()
                     if ( m_mask )
                     {
                         int id = m_mask->getIdFromPos( locX, locY, z - m_offset * m_dz );
-                        float prob = probData->at( id );
-                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                        prob = probData->at( id );
+                        alpha = prob / max;
+                        countStips = qMax( 0, (int)( alpha * 10 ) );
                     }
 
                     for( int i = 0; i < countStips; ++i )
@@ -198,13 +215,13 @@ void EVRenderer::initGeometry()
                         randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
                         randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
-                        addGlyph( verts, locX + randx, locY + randy, z - m_offset * m_dz + randz, vec );
+                        addGlyph( verts, colors,locX + randx, locY + randy, z - m_offset * m_dz + randz, vec, alpha );
                         m_vertCount += 2;
                     }
                 }
                 else
                 {
-                    addGlyph( verts, locX, locY, z - m_offset * m_dz , vec );
+                    addGlyph( verts, colors, locX, locY, z - m_offset * m_dz , vec, 1.f );
                     m_vertCount += 2;
                 }
             }
@@ -227,8 +244,9 @@ void EVRenderer::initGeometry()
                     if ( m_mask )
                     {
                         int id = m_mask->getIdFromPos( locX, y + m_offset * m_dy, locZ );
-                        float prob = probData->at( id );
-                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                        prob = probData->at( id );
+                        alpha = prob / max;
+                        countStips = qMax( 0, (int)( alpha * 10 ) );
                     }
 
                     for( int i = 0; i < countStips; ++i )
@@ -237,13 +255,13 @@ void EVRenderer::initGeometry()
                         randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
                         randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
-                        addGlyph( verts, locX + randx, y + m_offset * m_dy + randy, locZ + randz, vec );
+                        addGlyph( verts, colors, locX + randx, y + m_offset * m_dy + randy, locZ + randz, vec, alpha );
                         m_vertCount += 2;
                     }
                 }
                 else
                 {
-                    addGlyph( verts, locX, y + m_offset * m_dy, locZ, vec );
+                    addGlyph( verts, colors, locX, y + m_offset * m_dy, locZ, vec, 1.0 );
                     m_vertCount += 2;
                 }
             }
@@ -265,8 +283,9 @@ void EVRenderer::initGeometry()
                     if ( m_mask )
                     {
                         int id = m_mask->getIdFromPos( x + m_offset * m_dx, locY, locZ );
-                        float prob = probData->at( id );
-                        countStips = qMax( 0, (int)( ( prob / max ) * 10 ) );
+                        prob = probData->at( id );
+                        alpha = prob / max;
+                        countStips = qMax( 0, (int)( alpha * 10 ) );
                     }
 
                     for( int i = 0; i < countStips; ++i )
@@ -275,28 +294,34 @@ void EVRenderer::initGeometry()
                         randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
                         randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
-                        addGlyph( verts, x + m_offset * m_dx + randx, locY + randy, locZ + randz, vec );
+                        addGlyph( verts, colors, x + m_offset * m_dx + randx, locY + randy, locZ + randz, vec, alpha );
                         m_vertCount += 2;
                     }
                 }
                 else
                 {
-                    addGlyph( verts, x + m_offset * m_dx, locY, locZ, vec );
+                    addGlyph( verts, colors, x + m_offset * m_dx, locY, locZ, vec, 1.0f );
                     m_vertCount += 2;
                 }
             }
         }
     }
 
-    glDeleteBuffers( 1, &vbo );
-    glGenBuffers( 1, &vbo );
+    glDeleteBuffers( 1, &vbo0 );
+    glGenBuffers( 1, &vbo0 );
+    glDeleteBuffers( 1, &vbo1 );
+    glGenBuffers( 1, &vbo1 );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), verts.data(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof(GLfloat), colors.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void EVRenderer::addGlyph( std::vector<float> &verts, float xPos, float yPos, float zPos, QVector3D vector )
+void EVRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &colors, float xPos, float yPos, float zPos, QVector3D vector, float alpha )
 {
     float v0 = vector.x();
     float v1 = vector.y();
@@ -317,5 +342,15 @@ void EVRenderer::addGlyph( std::vector<float> &verts, float xPos, float yPos, fl
     verts.push_back( v0 );
     verts.push_back( v1 );
     verts.push_back( v2 );
+
+    colors.push_back( 1.0f );
+    colors.push_back( 0.0f );
+    colors.push_back( 0.0f );
+    colors.push_back( alpha );
+
+    colors.push_back( 1.0f );
+    colors.push_back( 0.0f );
+    colors.push_back( 0.0f );
+    colors.push_back( alpha );
 }
 

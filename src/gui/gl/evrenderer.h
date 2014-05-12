@@ -32,12 +32,13 @@ protected:
     void setShaderVars();
 
     void initGeometry();
-    void addGlyph( std::vector<float> &verts, float xPos, float yPos, float zPos, QVector3D data );
+    void addGlyph( std::vector<float> &verts, std::vector<float> &colors, float xPos, float yPos, float zPos, QVector3D data, float alpha );
 
 private:
     int m_vertCount;
 
-    GLuint vbo;
+    GLuint vbo0;
+    GLuint vbo1;
 
     std::vector<QVector3D>* m_data;
     DatasetScalar* m_mask;

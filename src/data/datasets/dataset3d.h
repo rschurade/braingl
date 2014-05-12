@@ -47,6 +47,7 @@ public slots:
 
 private slots:
     void switchRenderSticks();
+    void switchRenderStipples();
     void scalingChanged();
     void probMaskChanged();
 };
