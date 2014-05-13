@@ -83,6 +83,9 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
 
+    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
+    m_lineWidth = props->get( Fn::Property::D_LINE_WIDTH ).toInt();
+
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
     program->bind();
@@ -101,7 +104,7 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     initGeometry();
 
     setShaderVars();
-    glLineWidth( 2 );
+    glLineWidth( m_lineWidth );
     glDrawArrays( GL_LINES, 0, m_vertCount );
     glLineWidth( 1 );
     GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
@@ -158,7 +161,9 @@ void EVRenderer::initGeometry()
     yi = qMax( 0, qMin( yi, m_ny - 1) );
     zi = qMax( 0, qMin( zi, m_nz - 1) );
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples } );
+
+
+    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples, m_color } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -343,14 +348,14 @@ void EVRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &colors
     verts.push_back( v1 );
     verts.push_back( v2 );
 
-    colors.push_back( 1.0f );
-    colors.push_back( 0.0f );
-    colors.push_back( 0.0f );
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
     colors.push_back( alpha );
 
-    colors.push_back( 1.0f );
-    colors.push_back( 0.0f );
-    colors.push_back( 0.0f );
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
     colors.push_back( alpha );
 }
 

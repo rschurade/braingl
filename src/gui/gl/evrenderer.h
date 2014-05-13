@@ -54,6 +54,8 @@ private:
     int m_orient;
     float m_offset;
     bool m_renderStipples;
+    QColor m_color;
+    int m_lineWidth;
 };
 
 #endif /* TENSORRENDEREREV_H_ */
