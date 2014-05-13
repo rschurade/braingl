@@ -36,7 +36,8 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STIPPLES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderStipples() ) );
     m_properties["maingl"]->createList( Fn::Property::D_STIPPLE_PROB_MASK, { "none" }, 0, "stipples" );
     connect( m_properties["maingl"]->getProperty( Fn::Property::D_STIPPLE_PROB_MASK ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( probMaskChanged() ) );
-
+    m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "stipples" );
+    m_properties["maingl"]->createInt( Fn::Property::D_LINE_WIDTH, 2, 1, 5, "stipples" );
 
     examineDataset();
 
@@ -228,7 +229,7 @@ void Dataset3D::switchRenderSticks()
 
 void Dataset3D::switchRenderStipples()
 {
-    m_properties["maingl"]->set( Fn::Property::D_RENDER_VECTORS_STICKS, m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() );
+    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
     Models::d()->submit();
 }
 
