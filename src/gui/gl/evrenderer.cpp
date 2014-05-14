@@ -58,13 +58,13 @@ void EVRenderer::init()
     glGenBuffers( 1, &vbo1 );
 }
 
-void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     int slice = 0;
-    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
-    m_renderStipples = props->get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
+    slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    m_renderStipples = props.get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
     m_orient = slice;
 
     if ( ( renderMode == 1 ) && m_renderStipples )
@@ -80,11 +80,11 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
             return;
         }
     }
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
-    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
 
-    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
-    m_lineWidth = props->get( Fn::Property::D_LINE_WIDTH ).toInt();
+    m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
+    m_lineWidth = props.get( Fn::Property::D_LINE_WIDTH ).toInt();
 
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
@@ -188,7 +188,7 @@ void EVRenderer::initGeometry()
     {
         probData = m_mask->getData();
         //float min = ds2->properties()->get( Fn::Property::D_MIN ).toFloat();
-        max = m_mask->properties()->get( Fn::Property::D_MAX ).toFloat();
+        max = m_mask->properties().get( Fn::Property::D_MAX ).toFloat();
     }
     float randx, randy, randz;
 

@@ -14,21 +14,21 @@ DatasetFMRI::DatasetFMRI( QDir filename, std::vector<float> data, nifti_image* h
     DatasetNifti( filename, Fn::DatasetType::NIFTI_FMRI, header ),
     m_data( data )
 {
-    m_properties["maingl"]->createBool( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
 
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "general" );
     examineDataset();
 
-    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties["maingl2"].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
-    m_properties["maingl"]->createBool( Fn::Property::D_AUTOPLAY, false, "autoplay" );
-    m_properties["maingl"]->createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
+    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false, "autoplay" );
+    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000, "autoplay" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
 }
 
 DatasetFMRI::~DatasetFMRI()
@@ -42,10 +42,10 @@ std::vector<float>* DatasetFMRI::getData()
 
 void DatasetFMRI::examineDataset()
 {
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
-    int dim = m_properties["maingl"]->get( Fn::Property::D_DIM ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
 
     float min = std::numeric_limits<float>::max();
     float max = -std::numeric_limits<float>::max();
@@ -57,32 +57,32 @@ void DatasetFMRI::examineDataset()
         max = qMax( max, m_data[i] );
     }
 
-    m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/100., min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
+    m_properties["maingl"].createFloat( Fn::Property::D_MIN, min );
+    m_properties["maingl"].createFloat( Fn::Property::D_MAX, max );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/100., min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
-    m_properties["maingl"]->createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
-    m_properties["maingl"]->createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
+    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"].createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
+    m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
+    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
 
-    m_properties["maingl"]->createInt( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectTexture() ) );
-    connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
+    m_properties["maingl"].createInt( Fn::Property::D_SELECTED_TEXTURE, 0, 0, dim - 1, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectTexture() ) );
+    connect ( &m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
 }
 
 void DatasetFMRI::createTexture()
@@ -99,16 +99,16 @@ void DatasetFMRI::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
 
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
-    float min = m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat();
-    float max = m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat();
+    float min = m_properties["maingl"].get( Fn::Property::D_MIN ).toFloat();
+    float max = m_properties["maingl"].get( Fn::Property::D_MAX ).toFloat();
     max = max + ( (max-min)/100. );
 
-    int dim = m_properties["maingl"]->get( Fn::Property::D_DIM ).toInt();
-    int frame = m_properties["maingl"]->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+    int frame = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
     if ( frame < 0 )
     {
         frame = 0;
@@ -156,20 +156,20 @@ void DatasetFMRI::selectTexture()
 
 void DatasetFMRI::autoplay()
 {
-    if ( m_properties["maingl"]->get( Fn::Property::D_AUTOPLAY ).toBool() )
+    if ( m_properties["maingl"].get( Fn::Property::D_AUTOPLAY ).toBool() )
     {
-        int dim = m_properties["maingl"]->get( Fn::Property::D_DIM ).toInt();
-        int currentframe = m_properties["maingl"]->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+        int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+        int currentframe = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
         ++currentframe;
         if ( currentframe >= dim )
         {
             currentframe = 0;
         }
-        m_properties["maingl"]->set( Fn::Property::D_SELECTED_TEXTURE, currentframe );
+        m_properties["maingl"].set( Fn::Property::D_SELECTED_TEXTURE, currentframe );
         selectTexture();
         Models::d()->submit();
 
-        int interval = m_properties["maingl"]->get( Fn::Property::D_AUTOPLAY_INTERVAL ).toInt();
+        int interval = m_properties["maingl"].get( Fn::Property::D_AUTOPLAY_INTERVAL ).toInt();
         QTimer::singleShot( interval, this, SLOT( autoplay() ) );
     }
 }

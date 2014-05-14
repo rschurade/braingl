@@ -32,13 +32,13 @@ DatasetPlane::DatasetPlane() :
     m_h1 = QVector3D( 0.0, m_h0.y(), m_h0.z() );
     m_h2 = QVector3D( m_h0.x(), 0.0, m_h0.z() );
 
-    m_properties["maingl"]->createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
-    m_properties["maingl"]->createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
+    m_properties["maingl"].createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
-    m_properties["maingl2"]->createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties["maingl2"].createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
+    m_properties["maingl2"].createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
 }
 
 DatasetPlane::~DatasetPlane()
@@ -47,13 +47,13 @@ DatasetPlane::~DatasetPlane()
 
 void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
-    if ( m_properties["maingl"]->get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
+    if ( m_properties["maingl"].get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
     {
-        QColor color = m_properties["maingl"]->get( Fn::Property::D_HANDLE_COLOR ).value<QColor>();
+        QColor color = m_properties["maingl"].get( Fn::Property::D_HANDLE_COLOR ).value<QColor>();
         color.setAlpha( 254 );
         GLFunctions::drawSphere( pMatrix, mvMatrix, m_h0.x(), m_h0.y(), m_h0.z(), 5, 5, 5,
                                   color, m_handle0, width, height, renderMode );

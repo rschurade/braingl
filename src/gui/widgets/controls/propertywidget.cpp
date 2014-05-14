@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QDebug>
 
 
 PropertyWidget::PropertyWidget( QString label, int id, QWidget* parent ) :
@@ -25,6 +26,8 @@ PropertyWidget::PropertyWidget( QString label, int id, QWidget* parent ) :
 
 PropertyWidget::~PropertyWidget()
 {
+    delete m_controlWidget;
+    delete m_label;
 }
 
 void PropertyWidget::showLabel( bool show )

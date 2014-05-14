@@ -37,9 +37,9 @@ void TubeRenderer::init()
     glGenBuffers( 4, vboIds );
 }
 
-void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
-    float alpha = props->get( Fn::Property::D_ALPHA ).toFloat();
+    float alpha = props.get( Fn::Property::D_ALPHA ).toFloat();
 
     if ( renderMode == 0 ) // picking
     {
@@ -123,7 +123,7 @@ void TubeRenderer::setupTextures()
 {
 }
 
-void TubeRenderer::setShaderVars( PropertyGroup* props )
+void TubeRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "tube" );
 
@@ -147,15 +147,15 @@ void TubeRenderer::setShaderVars( PropertyGroup* props )
     program->enableAttributeArray( dirLocation );
     glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
 
-    program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
-    program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
-    program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
+    program->setUniformValue( "u_fibGrowth", props.get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
+    program->setUniformValue( "u_colorMode", props.get( Fn::Property::D_COLORMODE ).toInt() );
+    program->setUniformValue( "u_colormap", props.get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    program->setUniformValue( "u_selectedMin", props->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-    program->setUniformValue( "u_selectedMax", props->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-    program->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_upperThreshold", props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_thickness", props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() / 100.f );
+    program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+    program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+    program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_thickness", props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() / 100.f );
 }
 
 void TubeRenderer::initGeometry()

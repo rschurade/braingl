@@ -236,8 +236,8 @@ bool Loader::loadVTK()
         DatasetMesh* dataset = new DatasetMesh( mesh, fn );
         if ( min != max )
         {
-            dataset->properties()->set( Fn::Property::D_MIN, min );
-            dataset->properties()->set( Fn::Property::D_MAX, max );
+            dataset->properties().set( Fn::Property::D_MIN, min );
+            dataset->properties().set( Fn::Property::D_MAX, max );
         }
         m_dataset.push_back( dataset );
         delete lv;

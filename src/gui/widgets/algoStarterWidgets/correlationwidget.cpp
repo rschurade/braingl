@@ -36,7 +36,7 @@ CorrelationWidget::CorrelationWidget( Dataset* ds, QWidget* parent ) :
     m_startButton = new QPushButton( tr("Start") );
     connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
 
-    int numVertexes = ds->properties()->get( Fn::Property::D_MESH_NUM_VERTEX ).toInt();
+    int numVertexes = ds->properties().get( Fn::Property::D_MESH_NUM_VERTEX ).toInt();
 
     m_progressBar = new QProgressBar( this );
     m_progressBar->setValue( 0 );

@@ -6,6 +6,9 @@
  */
 #include "property.h"
 
+#include <QDebug>
+#include <QWidget>
+
 Property::Property( QString name, QVariant value, QVariant min, QVariant max ) :
     m_widget( 0 ),
     m_name( name ),
@@ -19,6 +22,7 @@ Property::Property( QString name, QVariant value, QVariant min, QVariant max ) :
 
 Property::~Property()
 {
+    delete m_widget;
 }
 
 QString Property::getName()

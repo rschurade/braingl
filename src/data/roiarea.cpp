@@ -16,10 +16,9 @@
 
 #include <QAbstractItemModel>
 
-ROIArea::ROIArea( std::vector<float> data, nifti_image* header ) :
+ROIArea::ROIArea( std::vector<float> data, PropertyGroup& props ) :
     ROI( QString("new roi") + QString::number( ROI::m_count++ ) ),
     m_data( data ),
-    m_header( header ),
     m_renderer( 0 ),
     m_mesh( 0 )
 {
@@ -29,13 +28,13 @@ ROIArea::ROIArea( std::vector<float> data, nifti_image* header ) :
         m_max = qMax( m_max, data[i] );
     }
 
-    m_properties.createBool( Fn::Property::R_RENDER, true, "general" );
-    m_properties.createBool( Fn::Property::R_NEG, false, "general" );
-    m_properties.createColor( Fn::Property::R_COLOR, QColor( 255, 0, 0 ), "general" );
-    m_properties.createFloat( Fn::Property::R_ALPHA, 0.4f, 0.f, 1.f, "general" );
-    m_properties.createInt( Fn::Property::R_PICK_ID, 0 );
-    m_properties.createInt( Fn::Property::R_SHAPE, 10 );
-    m_properties.createFloat( Fn::Property::R_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
+    m_properties.createBool( Fn::Property::D_RENDER, true, "general" );
+    m_properties.createBool( Fn::Property::D_NEG, false, "general" );
+    m_properties.createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties.createFloat( Fn::Property::D_ALPHA, 0.4f, 0.f, 1.f, "general" );
+    m_properties.createInt( Fn::Property::D_PICK_ID, 0 );
+    m_properties.createInt( Fn::Property::D_SHAPE, 10 );
+    m_properties.createFloat( Fn::Property::D_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
 
@@ -48,30 +47,35 @@ ROIArea::ROIArea( std::vector<float> data, nifti_image* header ) :
     m_properties.createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
     m_properties.createFloat( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
 
-    m_properties.createFloat( Fn::Property::R_NX, m_header->nx );
-    m_properties.createFloat( Fn::Property::R_NY, m_header->ny );
-    m_properties.createFloat( Fn::Property::R_NZ, m_header->nz );
-    m_properties.createFloat( Fn::Property::R_DX, m_header->dx );
-    m_properties.createFloat( Fn::Property::R_DY, m_header->dy );
-    m_properties.createFloat( Fn::Property::R_DZ, m_header->dz );
+    m_properties.createFloat( Fn::Property::D_NX, props.get( Fn::Property::D_NX ).toInt() );
+    m_properties.createFloat( Fn::Property::D_NY, props.get( Fn::Property::D_NY ).toInt() );
+    m_properties.createFloat( Fn::Property::D_NZ, props.get( Fn::Property::D_NZ ).toInt() );
+    m_properties.createFloat( Fn::Property::D_DX, props.get( Fn::Property::D_DX ).toFloat() );
+    m_properties.createFloat( Fn::Property::D_DY, props.get( Fn::Property::D_DY ).toFloat() );
+    m_properties.createFloat( Fn::Property::D_DZ, props.get( Fn::Property::D_DZ ).toFloat() );
+    m_properties.createFloat( Fn::Property::D_ADJUST_X, props.get( Fn::Property::D_ADJUST_X ).toFloat() );
+    m_properties.createFloat( Fn::Property::D_ADJUST_Y, props.get( Fn::Property::D_ADJUST_Y ).toFloat() );
+    m_properties.createFloat( Fn::Property::D_ADJUST_Z, props.get( Fn::Property::D_ADJUST_Z ).toFloat() );
+
+
 
     m_properties.createInt( Fn::Property::D_START_INDEX, 0 );
     m_properties.createInt( Fn::Property::D_END_INDEX, 0 );
 
-    m_properties.createInt( Fn::Property::R_PICK_ID, (int)GLFunctions::getPickIndex() );
+    m_properties.createInt( Fn::Property::D_PICK_ID, (int)GLFunctions::getPickIndex() );
 
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 
-    m_nX = m_header->nx - 1;
-    m_nY = m_header->ny - 1;
-    m_nZ = m_header->nz - 1;
+    int nx = props.get( Fn::Property::D_NX ).toInt() - 1;
+    int ny = props.get( Fn::Property::D_NY ).toInt() - 1;
+    int nz = props.get( Fn::Property::D_NZ ).toInt() - 1;
 
-    m_dX = m_header->dx;
-    m_dY = m_header->dy;
-    m_dZ = m_header->dz;
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
 
-    m_nPointsInXDirection = ( m_nX + 1 );
-    m_nPointsInSlice = m_nPointsInXDirection * ( m_nY + 1 );
+    m_nPointsInXDirection = ( nx + 1 );
+    m_nPointsInSlice = m_nPointsInXDirection * ( ny + 1 );
 
     QMutex* mutex = new QMutex();
 
@@ -80,7 +84,7 @@ ROIArea::ROIArea( std::vector<float> data, nifti_image* header ) :
     // create threads
     for ( int i = 0; i < m_numThreads; ++i )
     {
-        m_threads.push_back( new IsoSurfaceThread( &m_data, mutex, &m_i2pt3idVertices, &m_trivecTriangles, m_nX, m_nY, m_nZ, m_dX, m_dY, m_dZ, i ) );
+        m_threads.push_back( new IsoSurfaceThread( &m_data, mutex, &m_i2pt3idVertices, &m_trivecTriangles, nx, ny, nz, dx, dy, dz, i ) );
     }
 
     generateSurface();
@@ -127,16 +131,17 @@ void ROIArea::renameVerticesAndTriangles()
 
     m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
 
-//    float xOff = 0.5f;
-//    float yOff = 0.5f;
-//    float zOff = 0.5f;
+
+    float plusX = m_properties.get( Fn::Property::D_ADJUST_X ).toFloat();
+    float plusY = m_properties.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float plusZ = m_properties.get( Fn::Property::D_ADJUST_Z ).toFloat();
 
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )
     {
         ( *mapIterator ).newID = nextID++;
         //m_mesh->addVertex( ( *mapIterator ).x + xOff, ( *mapIterator ).y + yOff, ( *mapIterator ).z + zOff );
-        m_mesh->addVertex( ( *mapIterator ).x, ( *mapIterator ).y, ( *mapIterator ).z );
+        m_mesh->addVertex( ( *mapIterator ).x + plusX, ( *mapIterator ).y + plusY, ( *mapIterator ).z + plusZ );
         ++mapIterator;
     }
 
@@ -167,7 +172,7 @@ void ROIArea::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heig
         m_renderer->init();
     }
 
-    m_isoLevel = m_properties.get( Fn::Property::R_THRESHOLD ).toFloat();
+    m_isoLevel = m_properties.get( Fn::Property::D_THRESHOLD ).toFloat();
     if ( m_oldIsoValue != m_isoLevel )
     {
         delete m_mesh;
@@ -177,7 +182,7 @@ void ROIArea::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heig
 
     }
 
-    if ( m_properties.get( Fn::Property::R_RENDER).toBool() )
+    if ( m_properties.get( Fn::Property::D_RENDER).toBool() )
     {
         m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, m_properties );
     }

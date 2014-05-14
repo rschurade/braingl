@@ -21,18 +21,18 @@ DatasetCorrelation::DatasetCorrelation( QDir fileName, float minThreshold, float
     m_correlations( NULL ),
     m_prevPickedID( -1 )
 {
-    m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( -1 );
-    m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setValue( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setMin( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setValue( -1 );
 
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMin( -1 );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setValue( -1 );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMin( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMin( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMin( -1 );
 
-    m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
-    m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
-    m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( -1 );
 
-    m_properties["maingl"]->set( Fn::Property::D_COLORMODE, 3 );
+    m_properties["maingl"].set( Fn::Property::D_COLORMODE, 3 );
 
     finalizeProperties();
 }
@@ -60,11 +60,11 @@ bool DatasetCorrelation::mousePick( int pickId, QVector3D pos, Qt::KeyboardModif
 {
 
 //TODO: Extra property for radius...
-    m_picked = getMesh( target )->pick( pos, m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toFloat() );
+    m_picked = getMesh( target )->pick( pos, m_properties["maingl"].get( Fn::Property::D_PAINTSIZE ).toFloat() );
 
     int pickedID = getMesh( target )->closestVertexIndex( pos );
 
-    properties( "maingl" )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
+    properties( "maingl" ).set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
 
     DatasetMesh::mousePick( pickId, pos, modifiers, target );
     setPickedID( pickedID );
@@ -89,7 +89,7 @@ void DatasetCorrelation::setPickedID( int pickedID )
 
 void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -102,7 +102,7 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
     m_renderer->setMesh( getMesh( target ) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 
-    int pickedID = properties( "maingl" )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
+    int pickedID = properties( "maingl" ).get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
     if ( m_prevPickedID != pickedID )
     {
         setPickedID( pickedID );

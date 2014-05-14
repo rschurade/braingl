@@ -109,14 +109,14 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
         }
         case Qt::BackgroundColorRole:
         {
-            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::R_COLOR );
+            return VPtr<ROI>::asPtr( roi )->properties()->get( Fn::Property::D_COLOR );
             break;
         }
         case Qt::DisplayRole:
         {
             switch ( (Fn::Property)index.column() )
             {
-                case Fn::Property::R_POINTER:
+                case Fn::Property::D_POINTER:
                 {
                     return roi;
                     break;
@@ -169,7 +169,7 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         }
         case Qt::DisplayRole:
         {
-            if ( index.column() == (int)Fn::Property::R_POINTER )
+            if ( index.column() == (int)Fn::Property::D_POINTER )
             {
                 if ( index.internalId() == -1 )
                 {
@@ -185,7 +185,7 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
                 return true;
             }
 
-            if ( index.column() == (int)Fn::Property::R_UPDATED )
+            if ( index.column() == (int)Fn::Property::D_UPDATED )
             {
                 emit( dataChanged( QModelIndex(), QModelIndex() ) );
                 return true;
@@ -256,7 +256,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         {
             // child box selected
             beginInsertRows( parent.parent(), m_rois[parent.parent().row()].size(), m_rois[parent.parent().row()].size() );
-            newROI->properties()->set( Fn::Property::R_COLOR, VPtr<ROI>::asPtr( m_rois[parent.parent().row()][0] )->properties()->get( Fn::Property::R_COLOR ) );
+            newROI->properties()->set( Fn::Property::D_COLOR, VPtr<ROI>::asPtr( m_rois[parent.parent().row()][0] )->properties()->get( Fn::Property::D_COLOR ) );
             m_rois[parent.parent().row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
@@ -264,7 +264,7 @@ bool ROIModel::insertRows( int row, int count, const QModelIndex &parent )
         {
             // top box selected
             beginInsertRows( parent, m_rois[parent.row()].size(), m_rois[parent.row()].size() );
-            newROI->properties()->set( Fn::Property::R_COLOR, VPtr<ROI>::asPtr( m_rois[parent.row()][0] )->properties()->get( Fn::Property::R_COLOR ) );
+            newROI->properties()->set( Fn::Property::D_COLOR, VPtr<ROI>::asPtr( m_rois[parent.row()][0] )->properties()->get( Fn::Property::D_COLOR ) );
             m_rois[parent.row()].push_back( VPtr<ROI>::asQVariant( newROI ) );
             endInsertRows();
         }
@@ -311,7 +311,7 @@ void ROIModel::propChanged( int value )
     {
         for ( int k = 0; k < m_rois[i].size(); ++k )
         {
-            if ( value == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::R_ID ).toInt() )
+            if ( value == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::D_ID ).toInt() )
             {
                 found = true;
                 kk = k;
@@ -348,7 +348,7 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
         {
             for ( int k = 0; k < m_rois[i].size(); ++k )
             {
-                if ( value.toInt() == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::R_PICK_ID ).toInt() )
+                if ( value.toInt() == VPtr<ROI>::asPtr( m_rois[i][k] )->properties()->get( Fn::Property::D_PICK_ID ).toInt() )
                 {
                     if ( k == 0 )
                     {

@@ -119,7 +119,7 @@ void ROITreeView::dropEvent ( QDropEvent * event )
 {
     QModelIndex dropIndex = indexAt( event->pos() );
 
-    QModelIndex index = model()->index( m_draggedIndex.row(), (int)Fn::Property::R_POINTER, model()->parent( m_draggedIndex ) );
+    QModelIndex index = model()->index( m_draggedIndex.row(), (int)Fn::Property::D_POINTER, model()->parent( m_draggedIndex ) );
     ROI* roi = VPtr<ROI>::asPtr( model()->data( index, Qt::DisplayRole ) );
     GLFunctions::roi = roi;
 

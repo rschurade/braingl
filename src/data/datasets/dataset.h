@@ -29,7 +29,7 @@ public:
     Dataset( QDir fileName, Fn::DatasetType type );
     virtual ~Dataset();
 
-    PropertyGroup* properties( QString target = "maingl" );
+    PropertyGroup& properties( QString target = "maingl" );
 
     GLuint getTextureGLuint();
 
@@ -41,6 +41,8 @@ public:
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     virtual bool rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifiers modifiers, QString target );
     void copySettings( QString target );
+    void copyPropertyObject( PropertyGroup& props, QString target );
+
 
     virtual QString getSaveFilter();
     virtual QString getDefaultSuffix();
@@ -48,7 +50,7 @@ public:
 protected:
     virtual void createTexture();
 
-    QHash< QString, PropertyGroup* >m_properties;
+    QHash< QString, PropertyGroup >m_properties;
 
     GLuint m_textureGLuint;
 };

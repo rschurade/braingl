@@ -48,6 +48,7 @@ QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 std::vector< QString > GLFunctions::m_shaderNames;
+std::vector< GLuint > GLFunctions::m_texturesToDelete;
 
 ROI* GLFunctions::roi = 0;
 
@@ -58,6 +59,12 @@ unsigned int GLFunctions::getPickIndex()
 
 bool GLFunctions::setupTextures( QString target )
 {
+    for ( unsigned int i = 0; i < GLFunctions::m_texturesToDelete.size(); ++i )
+    {
+        glDeleteTextures( 1, &GLFunctions::m_texturesToDelete[i] );
+    }
+    GLFunctions::m_texturesToDelete.clear();
+
     glActiveTexture( GL_TEXTURE4 );
     glBindTexture( GL_TEXTURE_3D, 0 );
     glActiveTexture( GL_TEXTURE3 );
@@ -66,7 +73,7 @@ bool GLFunctions::setupTextures( QString target )
     glBindTexture( GL_TEXTURE_3D, 0 );
     glActiveTexture( GL_TEXTURE1 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE0 );
+    glActiveTexture( GL_TEXTURE15 );
     glBindTexture( GL_TEXTURE_3D, 0 );
 
     QAbstractItemModel* model = Models::d();
@@ -230,6 +237,12 @@ void GLFunctions::setShaderCode( QString name, QString source )
 
 void GLFunctions::reloadShaders()
 {
+    QHash< QString, QGLShaderProgram* >::iterator iter;
+    for ( iter = m_shaders.begin(); iter != m_shaders.end(); ++iter )
+    {
+        delete iter.value();
+    }
+    m_shaders.clear();
     updateColormapShader();
     for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
@@ -380,7 +393,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
         qDebug() << code;
-        /**/exit( false );
+        //exit( false );
     }
 
     // Linking shader pipeline
@@ -396,7 +409,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     {
         qCritical() << "Error while binding shader: " << name << "!";
         qDebug() << code;
-        /**/exit( false );
+        //exit( false );
     }
 
     // Restore system locale
@@ -453,10 +466,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 4;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
 
             dx = props->get( Fn::Property::D_DX ).toFloat();
@@ -489,10 +502,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 3;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -524,10 +537,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 2;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -559,10 +572,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 1;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -595,10 +608,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 0;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -642,7 +655,7 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        PropertyGroup* props = ds->properties( target );
+        PropertyGroup* props = &ds->properties( target );
         bool active = props->get( Fn::Property::D_ACTIVE ).toBool();
         bool isTex = props->get( Fn::Property::D_HAS_TEXTURE ).toBool();
 
@@ -710,4 +723,9 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
         isError = true;
     }
     return isError;
+}
+
+void GLFunctions::deleteTexture( GLuint tex )
+{
+    m_texturesToDelete.push_back( tex );
 }
