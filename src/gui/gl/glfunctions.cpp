@@ -66,7 +66,7 @@ bool GLFunctions::setupTextures( QString target )
     glBindTexture( GL_TEXTURE_3D, 0 );
     glActiveTexture( GL_TEXTURE1 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE0 );
+    glActiveTexture( GL_TEXTURE15 );
     glBindTexture( GL_TEXTURE_3D, 0 );
 
     QAbstractItemModel* model = Models::d();
@@ -230,6 +230,12 @@ void GLFunctions::setShaderCode( QString name, QString source )
 
 void GLFunctions::reloadShaders()
 {
+    QHash< QString, QGLShaderProgram* >::iterator iter;
+    for ( iter = m_shaders.begin(); iter != m_shaders.end(); ++iter )
+    {
+        delete iter.value();
+    }
+    m_shaders.clear();
     updateColormapShader();
     for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
     {
