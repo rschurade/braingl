@@ -25,7 +25,7 @@ PropertyGroup::PropertyGroup()
 {
 }
 
-PropertyGroup::PropertyGroup( PropertyGroup& pg )
+PropertyGroup::PropertyGroup( const PropertyGroup& pg )
 {
     for ( int i = 0; i < pg.size(); ++i )
     {
@@ -70,6 +70,50 @@ PropertyGroup::PropertyGroup( PropertyGroup& pg )
 
 PropertyGroup::~PropertyGroup()
 {
+}
+
+PropertyGroup& PropertyGroup::operator=( const PropertyGroup& pg )
+{
+    for ( int i = 0; i < pg.size(); ++i )
+    {
+        QPair<Fn::Property, Property*> pair = pg.getNthPropertyPair( i );
+        Property* prop = pair.second;
+
+        if ( dynamic_cast<PropertyBool*>( prop ) )
+        {
+            this->createBool( pair.first, prop->getValue().toBool(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyColor*>( prop ) )
+        {
+            this->createColor( pair.first, prop->getValue().value<QColor>(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyFloat*>( prop ) )
+        {
+            this->createFloat( pair.first, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyInt*>( prop ) )
+        {
+            this->createInt( pair.first, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyPath*>( prop ) )
+        {
+            this->createDir( pair.first, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertySelection*>( prop ) )
+        {
+            PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
+            this->createList( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyString*>( prop ) )
+        {
+            this->createString( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyText*>( prop ) )
+        {
+            this->createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+    }
+    return *this;
 }
 
 bool PropertyGroup::createBool( Fn::Property name, bool value, QString tab )
@@ -404,7 +448,7 @@ Property* PropertyGroup::getNthProperty( int n )
     return m_properties[n].second;
 }
 
-QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n )
+QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n ) const
 {
     if ( n < 0 || n >= (int)m_properties.size() )
     {
