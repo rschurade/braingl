@@ -380,7 +380,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
         qDebug() << code;
-        /**/exit( false );
+        //exit( false );
     }
 
     // Linking shader pipeline
@@ -396,7 +396,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     {
         qCritical() << "Error while binding shader: " << name << "!";
         qDebug() << code;
-        /**/exit( false );
+        //exit( false );
     }
 
     // Restore system locale
