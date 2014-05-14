@@ -38,12 +38,12 @@ Track::Track( DatasetTensor* ds ) :
     m_numPoints( 0 ),
     m_numLines( 0 )
 {
-    m_nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-    m_ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-    m_nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
-    m_dx = ds->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat();
-    m_dy = ds->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat();
-    m_dz = ds->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat();
+    m_nx = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+    m_ny = ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+    m_nz = ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
+    m_dx = ds->properties( "maingl" ).get( Fn::Property::D_DX ).toFloat();
+    m_dy = ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat();
+    m_dz = ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat();
 
     m_diag = sqrt( m_dx * m_dx + m_dy * m_dy + m_dz * m_dz );
     maxStepsInVoxel = ( (int) ( m_diag / m_stepSize ) + 1 ) * 2;

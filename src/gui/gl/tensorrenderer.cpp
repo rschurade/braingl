@@ -50,7 +50,7 @@ void TensorRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     if ( renderMode != 1 ) // we are drawing opaque objects
     {
@@ -576,17 +576,17 @@ void TensorRenderer::addGlyph( std::vector<float>& verts, float xPos, float yPos
     verts.push_back( o2 );
 }
 
-void TensorRenderer::setRenderParams( PropertyGroup* props )
+void TensorRenderer::setRenderParams( PropertyGroup& props )
 {
     int slice = 0;
-    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
-    m_faThreshold = props->get( Fn::Property::D_FA_THRESHOLD ).toFloat();
-    m_evThreshold = props->get( Fn::Property::D_EV_THRESHOLD ).toFloat();
-    m_gamma = props->get( Fn::Property::D_GAMMA ).toFloat();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_faThreshold = props.get( Fn::Property::D_FA_THRESHOLD ).toFloat();
+    m_evThreshold = props.get( Fn::Property::D_EV_THRESHOLD ).toFloat();
+    m_gamma = props.get( Fn::Property::D_GAMMA ).toFloat();
     m_orient = slice;
-    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
 }

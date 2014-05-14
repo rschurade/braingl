@@ -62,7 +62,7 @@ void BinghamRenderer::init()
     glGenBuffers( 2, vboIds );
 }
 
-void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     if ( renderMode != 1 ) // we are drawing opaque objects
     {
@@ -239,19 +239,19 @@ void BinghamRenderer::initGeometry()
     indexes.clear();
 }
 
-void BinghamRenderer::setRenderParams( PropertyGroup* props )
+void BinghamRenderer::setRenderParams( PropertyGroup& props )
 {
-    int slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-                    (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-                    (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    int slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+                    (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+                    (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
     m_orient = slice;
-    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
-    m_lodAdjust = props->get( Fn::Property::D_LOD ).toInt();
-    m_minMaxScaling = props->get( Fn::Property::D_MINMAX_SCALING ).toBool();
-    m_order = props->get( Fn::Property::D_ORDER ).toInt();
-    m_render1 = props->get( Fn::Property::D_RENDER_FIRST ).toBool();
-    m_render2 = props->get( Fn::Property::D_RENDER_SECOND ).toBool();
-    m_render3 = props->get( Fn::Property::D_RENDER_THIRD ).toBool();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
+    m_lodAdjust = props.get( Fn::Property::D_LOD ).toInt();
+    m_minMaxScaling = props.get( Fn::Property::D_MINMAX_SCALING ).toBool();
+    m_order = props.get( Fn::Property::D_ORDER ).toInt();
+    m_render1 = props.get( Fn::Property::D_RENDER_FIRST ).toBool();
+    m_render2 = props.get( Fn::Property::D_RENDER_SECOND ).toBool();
+    m_render3 = props.get( Fn::Property::D_RENDER_THIRD ).toBool();
 }

@@ -67,7 +67,7 @@ TensorTrackWidget::TensorTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWidget
     connect( smoothness, SIGNAL( valueChanged( float, int) ), m_tracker, SLOT( setSmoothness( float, int) ) );
 
 
-    int numVoxels = ds->properties()->get( Fn::Property::D_NX ).toInt() * ds->properties()->get( Fn::Property::D_NY ).toInt() * ds->properties()->get( Fn::Property::D_NZ ).toInt();
+    int numVoxels = ds->properties().get( Fn::Property::D_NX ).toInt() * ds->properties().get( Fn::Property::D_NY ).toInt() * ds->properties().get( Fn::Property::D_NZ ).toInt();
 
 
     m_progressBar = new QProgressBar( this );

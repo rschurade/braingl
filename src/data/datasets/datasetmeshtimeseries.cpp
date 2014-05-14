@@ -95,7 +95,7 @@ void DatasetMeshTimeSeries::setProperties()
 
 void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -116,8 +116,8 @@ bool DatasetMeshTimeSeries::mousePick( int pickId, QVector3D pos, Qt::KeyboardMo
 
 void DatasetMeshTimeSeries::selectFrame()
 {
-    int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
-    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int frame = properties( "maingl" ).get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
     std::vector<float>data = m_data[frame];
     for ( unsigned int i = 0; i < data.size(); ++i )
@@ -136,19 +136,19 @@ void DatasetMeshTimeSeries::slotPropSet( int id )
 
 void DatasetMeshTimeSeries::slotCopyColors()
 {
-    int frame = properties( "maingl" )->get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
-    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int frame = properties( "maingl" ).get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
     std::vector<float>data = m_data[frame];
 
     QColor color;
 
-    float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float selectedMin = properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float selectedMax = properties( "maingl" ).get( Fn::Property::D_SELECTED_MAX ).toFloat();
 
     for ( unsigned int i = 0; i < data.size(); ++i )
     {
-        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" ).get( Fn::Property::D_COLORMAP ).toInt() );
 
         float value = ( data[i] - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );

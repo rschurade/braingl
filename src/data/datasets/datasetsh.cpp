@@ -92,18 +92,18 @@ std::vector<ColumnVector>* DatasetSH::getData()
 
 void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( &m_data, properties( target )->get( Fn::Property::D_NX ).toInt(),
-                                              properties( target )->get( Fn::Property::D_NY ).toInt(),
-                                              properties( target )->get( Fn::Property::D_NZ ).toInt(),
-                                              properties( target )->get( Fn::Property::D_DX ).toFloat(),
-                                              properties( target )->get( Fn::Property::D_DY ).toFloat(),
-                                              properties( target )->get( Fn::Property::D_DZ ).toFloat() );
+        m_renderer = new SHRenderer( &m_data, properties( target ).get( Fn::Property::D_NX ).toInt(),
+                                              properties( target ).get( Fn::Property::D_NY ).toInt(),
+                                              properties( target ).get( Fn::Property::D_NZ ).toInt(),
+                                              properties( target ).get( Fn::Property::D_DX ).toFloat(),
+                                              properties( target ).get( Fn::Property::D_DY ).toFloat(),
+                                              properties( target ).get( Fn::Property::D_DZ ).toFloat() );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
@@ -120,12 +120,12 @@ TriangleMesh2* DatasetSH::getMeshFromCurrent()
 {
     if ( m_renderer == 0 )
     {
-        m_renderer = new SHRenderer( &m_data, properties( "maingl" )->get( Fn::Property::D_NX ).toInt(),
-                                              properties( "maingl" )->get( Fn::Property::D_NY ).toInt(),
-                                              properties( "maingl" )->get( Fn::Property::D_NZ ).toInt(),
-                                              properties( "maingl" )->get( Fn::Property::D_DX ).toFloat(),
-                                              properties( "maingl" )->get( Fn::Property::D_DY ).toFloat(),
-                                              properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat() );
+        m_renderer = new SHRenderer( &m_data, properties( "maingl" ).get( Fn::Property::D_NX ).toInt(),
+                                              properties( "maingl" ).get( Fn::Property::D_NY ).toInt(),
+                                              properties( "maingl" ).get( Fn::Property::D_NZ ).toInt(),
+                                              properties( "maingl" ).get( Fn::Property::D_DX ).toFloat(),
+                                              properties( "maingl" ).get( Fn::Property::D_DY ).toFloat(),
+                                              properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
         m_renderer->setModel( Models::g() );
         m_renderer->init();
     }

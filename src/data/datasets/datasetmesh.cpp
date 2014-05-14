@@ -214,14 +214,14 @@ TriangleMesh2* DatasetMesh::getMesh( int id )
 
 TriangleMesh2* DatasetMesh::getMesh( QString target )
 {
-    int n = properties( target )->get( Fn::Property::D_SURFACE ).toInt();
+    int n = properties( target ).get( Fn::Property::D_SURFACE ).toInt();
     return m_mesh[n];
 }
 
 
 void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -379,8 +379,8 @@ void DatasetMesh::transformChanged( QVariant value )
 
     if ( dsl.size() > 0 )
     {
-        qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
-        sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+        qForm = dsl.first()->properties().get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        sForm = dsl.first()->properties().get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
     }
     m_properties["maingl"].getWidget( Fn::Property::D_TRANSFORM )->setEnabled( false );
 
@@ -418,7 +418,7 @@ void DatasetMesh::applyTransform()
     float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
     float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
-    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
     int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
@@ -475,7 +475,7 @@ void DatasetMesh::applyTransform()
 
 void DatasetMesh::slotCopyColors()
 {
-    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
     if( m_properties["maingl"].get( Fn::Property::D_COLORMODE ).toInt() == 3 )
@@ -483,13 +483,13 @@ void DatasetMesh::slotCopyColors()
 
         QColor color;
 
-        float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-        float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+        float selectedMin = properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
+        float selectedMax = properties( "maingl" ).get( Fn::Property::D_SELECTED_MAX ).toFloat();
 
         m_renderer->beginUpdateColor();
         for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
         {
-            ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+            ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" ).get( Fn::Property::D_COLORMAP ).toInt() );
 
             float value = ( mesh->getVertexData( i ) - selectedMin ) / ( selectedMax - selectedMin );
             color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );
@@ -506,7 +506,7 @@ void DatasetMesh::slotCopyColors()
         for ( int k = 0; k < dsl.size(); ++k )
         {
             Dataset* ds = VPtr<Dataset>::asPtr( dsl[k] );
-            if ( ds->properties()->get( Fn::Property::D_ACTIVE ).toBool() && ds->properties()->get( Fn::Property::D_HAS_TEXTURE ).toBool() )
+            if ( ds->properties().get( Fn::Property::D_ACTIVE ).toBool() && ds->properties().get( Fn::Property::D_HAS_TEXTURE ).toBool() )
             {
                 texList.push_back( VPtr<DatasetScalar>::asPtr( dsl[k] ) );
                 if ( texList.size() == 5 )

@@ -391,10 +391,10 @@ bool LoaderNifti::loadNiftiSH()
     m_data.clear();
 
     DatasetSH* out = new DatasetSH( m_fileName.path(), dataVector, m_header );
-    out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::QBALL );
-    out->properties()->set( Fn::Property::D_LOD, 2 );
-    out->properties()->set( Fn::Property::D_ORDER, order );
-    out->properties()->set( Fn::Property::D_RENDER_SLICE, 1 );
+    out->properties().set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::QBALL );
+    out->properties().set( Fn::Property::D_LOD, 2 );
+    out->properties().set( Fn::Property::D_ORDER, order );
+    out->properties().set( Fn::Property::D_RENDER_SLICE, 1 );
 
     m_dataset.push_back( out );
     return true;
@@ -433,8 +433,8 @@ bool LoaderNifti::loadNiftiBingham()
     m_data.clear();
 
     DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
-    out->properties()->set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::BINGHAM );
-    out->properties()->set( Fn::Property::D_LOD, 2 );
+    out->properties().set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::BINGHAM );
+    out->properties().set( Fn::Property::D_LOD, 2 );
 
     m_dataset.push_back( out );
 

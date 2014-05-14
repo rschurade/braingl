@@ -184,20 +184,20 @@ void DatasetTensor::createLogTensors()
 
 void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
-    if ( properties( target )->get( Fn::Property::D_TENSOR_RENDERMODE ).toInt() == 0 )
+    if ( properties( target ).get( Fn::Property::D_TENSOR_RENDERMODE ).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
-            m_renderer = new TensorRenderer( &m_data, properties( target )->get( Fn::Property::D_NX ).toInt(),
-                                                      properties( target )->get( Fn::Property::D_NY ).toInt(),
-                                                      properties( target )->get( Fn::Property::D_NZ ).toInt(),
-                                                      properties( target )->get( Fn::Property::D_DX ).toFloat(),
-                                                      properties( target )->get( Fn::Property::D_DY ).toFloat(),
-                                                      properties( target )->get( Fn::Property::D_DZ ).toFloat() );
+            m_renderer = new TensorRenderer( &m_data, properties( target ).get( Fn::Property::D_NX ).toInt(),
+                                                      properties( target ).get( Fn::Property::D_NY ).toInt(),
+                                                      properties( target ).get( Fn::Property::D_NZ ).toInt(),
+                                                      properties( target ).get( Fn::Property::D_DX ).toFloat(),
+                                                      properties( target ).get( Fn::Property::D_DY ).toFloat(),
+                                                      properties( target ).get( Fn::Property::D_DZ ).toFloat() );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
         }
@@ -208,8 +208,8 @@ void DatasetTensor::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     {
         if ( m_rendererEV == 0 )
         {
-            m_rendererEV = new TensorRendererEV( &m_data, properties( target )->get( Fn::Property::D_NX ).toInt(), properties( target )->get( Fn::Property::D_NY ).toInt(), properties( target )->get( Fn::Property::D_NZ ).toInt(),
-                    properties( target )->get( Fn::Property::D_DX ).toFloat(), properties( target )->get( Fn::Property::D_DY ).toFloat(), properties( target )->get( Fn::Property::D_DZ ).toFloat() );
+            m_rendererEV = new TensorRendererEV( &m_data, properties( target ).get( Fn::Property::D_NX ).toInt(), properties( target ).get( Fn::Property::D_NY ).toInt(), properties( target ).get( Fn::Property::D_NZ ).toInt(),
+                    properties( target ).get( Fn::Property::D_DX ).toFloat(), properties( target ).get( Fn::Property::D_DY ).toFloat(), properties( target ).get( Fn::Property::D_DZ ).toFloat() );
             m_rendererEV->setModel( Models::g() );
             m_rendererEV->init();
         }

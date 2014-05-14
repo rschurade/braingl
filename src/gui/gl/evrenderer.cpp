@@ -48,12 +48,12 @@ void EVRenderer::init()
     glGenBuffers( 1, &vbo );
 }
 
-void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     int slice = 0;
-    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
      m_orient = slice;
 
@@ -63,8 +63,8 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
         return;
     }
 
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
-    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
 
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 

@@ -27,7 +27,7 @@ public:
 	virtual void init() = 0;
 	virtual void initGeometry() {};
 	virtual void setShaderVars() {};
-	//virtual void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
+	//virtual void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
 	// methods that must be implemented for QAbstractItemView
 	QRect visualRect( const QModelIndex &index ) const;

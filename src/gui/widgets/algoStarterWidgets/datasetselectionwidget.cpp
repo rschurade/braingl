@@ -27,9 +27,9 @@ DatasetSelectionWidget::DatasetSelectionWidget( std::vector< QPair<QString, QLis
         {
             for( int l = 0; l < types.size(); ++l )
             {
-                if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)types[l] )
+                if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)types[l] )
                 {
-                    sel->insertItem( k, VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString() );
+                    sel->insertItem( k, VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString() );
                     m_selections.push_back( dsl[k] );
                 }
             }

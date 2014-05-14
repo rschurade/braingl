@@ -26,6 +26,8 @@ public:
 	void init();
 	void initGL();
 	void draw();
+	//no implementation, only here because pure virtual in super class
+	void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props ) {};
 
 	virtual void leftMouseDown( int x, int y );
 	virtual void leftMouseDrag( int x, int y );
