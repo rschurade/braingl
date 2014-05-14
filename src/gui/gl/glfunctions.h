@@ -71,6 +71,8 @@ public:
 
     static bool getAndPrintGLError( QString prefix = "" );
 
+    static void deleteTexture( GLuint tex );
+
     static int idealThreadCount;
     static int maxDim;
     static QHash<QString, float> sliceAlpha;
@@ -93,6 +95,8 @@ private:
 
     static bool shadersLoaded;
     static unsigned int pickIndex;
+
+    static std::vector< GLuint >m_texturesToDelete;
 };
 
 #endif /* GLFUNCTIONS_H_ */

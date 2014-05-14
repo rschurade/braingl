@@ -9,6 +9,7 @@
 
 #include "../../gui/gl/colormapfunctions.h"
 #include "../../gui/gl/colormaprenderer.h"
+#include "../../gui/gl/glfunctions.h"
 
 #include <QDebug>
 
@@ -54,7 +55,8 @@ DatasetScalar::~DatasetScalar()
     m_properties["maingl"].set( Fn::Property::D_ACTIVE, false );
     delete m_colormapRenderer;
     m_data.clear();
-    glDeleteTextures( 1, &m_textureGLuint );
+    GLFunctions::deleteTexture( m_textureGLuint );
+    //glDeleteTextures( 1, &m_textureGLuint );
 }
 
 std::vector<float>* DatasetScalar::getData()

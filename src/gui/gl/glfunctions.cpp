@@ -48,6 +48,7 @@ QHash< QString, QGLShaderProgram* > GLFunctions::m_shaders;
 QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 std::vector< QString > GLFunctions::m_shaderNames;
+std::vector< GLuint > GLFunctions::m_texturesToDelete;
 
 ROI* GLFunctions::roi = 0;
 
@@ -58,6 +59,12 @@ unsigned int GLFunctions::getPickIndex()
 
 bool GLFunctions::setupTextures( QString target )
 {
+    for ( unsigned int i = 0; i < GLFunctions::m_texturesToDelete.size(); ++i )
+    {
+        glDeleteTextures( 1, &GLFunctions::m_texturesToDelete[i] );
+    }
+    GLFunctions::m_texturesToDelete.clear();
+
     glActiveTexture( GL_TEXTURE4 );
     glBindTexture( GL_TEXTURE_3D, 0 );
     glActiveTexture( GL_TEXTURE3 );
@@ -716,4 +723,9 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
         isError = true;
     }
     return isError;
+}
+
+void GLFunctions::deleteTexture( GLuint tex )
+{
+    m_texturesToDelete.push_back( tex );
 }
