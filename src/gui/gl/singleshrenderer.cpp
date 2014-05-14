@@ -129,13 +129,14 @@ void SingleSHRenderer::calcMVPMatrix()
 
 void SingleSHRenderer::initGeometry()
 {
-    m_dx = m_dataset->properties()->get( Fn::Property::D_DX ).toFloat();
-    m_dy = m_dataset->properties()->get( Fn::Property::D_DY ).toFloat();
-    m_dz = m_dataset->properties()->get( Fn::Property::D_DZ ).toFloat();
+    PropertyGroup props = m_dataset->properties();
+    m_dx = props.get( Fn::Property::D_DX ).toFloat();
+    m_dy = props.get( Fn::Property::D_DY ).toFloat();
+    m_dz = props.get( Fn::Property::D_DZ ).toFloat();
 
-    m_nx = m_dataset->properties()->get( Fn::Property::D_NX ).toInt();
-    m_ny = m_dataset->properties()->get( Fn::Property::D_NY ).toInt();
-    m_nz = m_dataset->properties()->get( Fn::Property::D_NZ ).toInt();
+    m_nx = props.get( Fn::Property::D_NX ).toInt();
+    m_ny = props.get( Fn::Property::D_NY ).toInt();
+    m_nz = props.get( Fn::Property::D_NZ ).toInt();
 
     float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
     float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
@@ -158,7 +159,7 @@ void SingleSHRenderer::initGeometry()
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 
-    int order = m_dataset->properties()->get( Fn::Property::D_ORDER ).toInt();
+    int order = props.get( Fn::Property::D_ORDER ).toInt();
 
     Matrix base = ( FMath::sh_base( (*vertices), order ) );
 
@@ -293,7 +294,7 @@ void SingleSHRenderer::draw()
         GLFunctions::getShader( "qball" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
         GLFunctions::getShader( "qball" )->setUniformValue( "mv_matrixInvert", m_arcBall->getMVMat().inverted() );
 
-        bool hnl = m_dataset->properties()->get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
+        bool hnl = m_dataset->properties().get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
         GLFunctions::getShader( "qball" )->setUniformValue( "u_hideNegativeLobes", hnl );
         GLFunctions::getShader( "qball" )->setUniformValue( "u_renderMode", 0 );
 

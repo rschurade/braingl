@@ -63,7 +63,7 @@ void ROIPropertyWidget::updateWidgetVisibility()
     }
     repaint();
     // get properties
-    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::R_POINTER );
+    QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::D_POINTER );
     ROI* roi = VPtr<ROI>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
 
     PropertyGroup* props = roi->properties();

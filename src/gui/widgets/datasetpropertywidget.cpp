@@ -60,7 +60,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
     // get properties
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::D_DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    PropertyGroup* props = ds->properties( m_target );
+    PropertyGroup* props = &ds->properties( m_target );
     m_tabs.clear();
 
     for ( int i = 0; i < props->size(); ++i )
@@ -98,28 +98,30 @@ void DatasetPropertyWidget::updateWidgetVisibility()
                 cmapSel->insertItem( k, ColormapFunctions::get( k ).getName() );
 
             }
-            int selectedCmap = ds->properties( m_target )->get( Fn::Property::D_COLORMAP ).toInt();
+            PropertyGroup* props = &ds->properties( m_target );
+
+            int selectedCmap = props->get( Fn::Property::D_COLORMAP ).toInt();
             cmapSel->setCurrentIndex( selectedCmap );
             m_tabs[tab]->addWidget( cmapSel );
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int ) ), this, SLOT( colormapSelectionChanged( int) ) );
 
-            float min = ds->properties( m_target )->get( Fn::Property::D_MIN ).toFloat();
-            float max = ds->properties( m_target )->get( Fn::Property::D_MAX ).toFloat();
+            float min = props->get( Fn::Property::D_MIN ).toFloat();
+            float max = props->get( Fn::Property::D_MAX ).toFloat();
             ColormapWidget* cmapWidget = new ColormapWidget( size().width() - 14, min, max );
             m_tabs[tab]->addWidget( cmapWidget );
 
-            cmapWidget->setMin( ds->properties( m_target )->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-            cmapWidget->setMax( ds->properties( m_target )->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-            cmapWidget->setLowerThreshold( ds->properties( m_target )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-            cmapWidget->setUpperThreshold( ds->properties( m_target )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+            cmapWidget->setMin( props->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+            cmapWidget->setMax( props->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+            cmapWidget->setLowerThreshold( props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+            cmapWidget->setUpperThreshold( props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
             cmapWidget->setColormap( selectedCmap );
 
-            if ( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MIN ) )
+            if ( props->getWidget( Fn::Property::D_SELECTED_MIN ) )
             {
-                connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
-                connect( ds->properties( m_target )->getWidget( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
-                connect( ds->properties( m_target )->getWidget( Fn::Property::D_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
-                connect( ds->properties( m_target )->getWidget( Fn::Property::D_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
+                connect( props->getWidget( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMin( float ) ) );
+                connect( props->getWidget( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setMax( float ) ) );
+                connect( props->getWidget( Fn::Property::D_LOWER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setLowerThreshold( float ) ) );
+                connect( props->getWidget( Fn::Property::D_UPPER_THRESHOLD ), SIGNAL( valueChanged( float, int) ), cmapWidget, SLOT( setUpperThreshold( float ) ) );
             }
             connect( cmapSel, SIGNAL( currentIndexChanged( int, int) ), cmapWidget, SLOT( setColormap( int ) ) );
         }
@@ -151,8 +153,8 @@ void DatasetPropertyWidget::colormapSelectionChanged( int id )
 {
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::D_DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
-    ds->properties( m_target )->set( Fn::Property::D_COLORMAP, id );
-    ds->properties( m_target )->slotPropChanged();
+    ds->properties( m_target ).set( Fn::Property::D_COLORMAP, id );
+    ds->properties( m_target ).slotPropChanged();
 
     GLFunctions::reloadShaders();
     Models::g()->submit();

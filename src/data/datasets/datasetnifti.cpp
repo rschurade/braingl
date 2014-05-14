@@ -24,67 +24,70 @@ DatasetNifti::~DatasetNifti()
 
 void DatasetNifti::parseNiftiHeader()
 {
-    m_properties["maingl"]->createInt( Fn::Property::D_DIM, m_header->dim[4] );
-    m_properties["maingl"]->createInt( Fn::Property::D_NX, m_header->nx );
-    m_properties["maingl"]->createInt( Fn::Property::D_NY, m_header->ny );
-    m_properties["maingl"]->createInt( Fn::Property::D_NZ, m_header->nz );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, m_header->dim[4] );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, m_header->nx );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, m_header->ny );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, m_header->nz );
 
-//    m_properties["maingl"]->create( Fn::Property::NT, m_header->nt );
-//    m_properties["maingl"]->create( Fn::Property::NU, m_header->nu );
-//    m_properties["maingl"]->create( Fn::Property::NV, m_header->nv );
-//    m_properties["maingl"]->create( Fn::Property::NW, m_header->nw );
-//    m_properties["maingl"]->create("dim", m_header->dim );
-//    m_properties["maingl"]->create( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
-//    m_properties["maingl"]->create( Fn::Property::NBYPER, m_header->nbyper );
-    m_properties["maingl"]->createInt( Fn::Property::D_DATATYPE, m_header->datatype );
-//    m_properties["maingl"]->create( Fn::Property::DT, m_header->dt );
-//    m_properties["maingl"]->create( Fn::Property::DU, m_header->du );
-//    m_properties["maingl"]->create( Fn::Property::DV, m_header->dv );
-//    m_properties["maingl"]->create( Fn::Property::DW, m_header->dw );
-//    m_properties["maingl"]->create( Fn::Property::"pixdim", m_header->pixdim );
-//    m_properties["maingl"]->create( Fn::Property::"scl_slope", m_header->scl_slope );
-//    m_properties["maingl"]->create( Fn::Property::"scl_inter", m_header->scl_inter );
-//    m_properties["maingl"]->create( Fn::Property::"cal_min", m_header->cal_min );
-//    m_properties["maingl"]->create( Fn::Property::"cal_max", m_header->cal_max );
-//    m_properties["maingl"]->create( Fn::Property::"qform_code", m_header->qform_code );
-//    m_properties["maingl"]->create( Fn::Property::"sform_code", m_header->sform_code );
-//    m_properties["maingl"]->create( Fn::Property::"freq_dim", m_header->freq_dim );
-//    m_properties["maingl"]->create( Fn::Property::"phase_dim", m_header->phase_dim );
-//    m_properties["maingl"]->create( Fn::Property::"slice_dim", m_header->slice_dim );
-//    m_properties["maingl"]->create( Fn::Property::"slice_code", m_header->slice_code );
-//    m_properties["maingl"]->create( Fn::Property::"slice_start", m_header->slice_start );
-//    m_properties["maingl"]->create( Fn::Property::"slice_end", m_header->slice_end );
-//    m_properties["maingl"]->create( Fn::Property::"slice_duration", m_header->slice_duration );
-//    m_properties["maingl"]->create( Fn::Property::"quatern_b", m_header->quatern_b );
-//    m_properties["maingl"]->create( Fn::Property::"quatern_c", m_header->quatern_c );
-//    m_properties["maingl"]->create( Fn::Property::"quatern_d", m_header->quatern_d );
-//    m_properties["maingl"]->create( Fn::Property::"qoffset_x", m_header->qoffset_x );
-//    m_properties["maingl"]->create( Fn::Property::"qoffset_y", m_header->qoffset_y );
-//    m_properties["maingl"]->create( Fn::Property::"qoffset_z", m_header->qoffset_z );
-//    m_properties["maingl"]->create( Fn::Property::"qfac", m_header->qfac );
-//    m_properties["maingl"]->create( Fn::Property::qto_xyz", m_header->qto_xyz );
-//    m_properties["maingl"]->create( Fn::Property::qto_ijk", m_header->qto_ijk );
-//    m_properties["maingl"]->create( Fn::Property:: sto_xyz", m_header->sto_xyz );
-//    m_properties["maingl"]->create( Fn::Property::"sto_ijk", m_header->sto_ijk );
-//    m_properties["maingl"]->create( Fn::Property::"toffset", m_header->toffset );
-//    m_properties["maingl"]->create( Fn::Property::"xyz_units", m_header->xyz_units );
-//    m_properties["maingl"]->create( Fn::Property::"time_units", m_header->time_units );
-//    m_properties["maingl"]->create( Fn::Property::"nifti_type", m_header->nifti_type );
-//    m_properties["maingl"]->create( Fn::Property::"intent_code", m_header->intent_code );
-//    m_properties["maingl"]->create( Fn::Property::"intent_p1", m_header->intent_p1 );
-//    m_properties["maingl"]->create( Fn::Property::"intent_p2", m_header->intent_p2 );
-//    m_properties["maingl"]->create( Fn::Property::"intent_p3", m_header->intent_p3 );
-//    m_properties["maingl"]->create( Fn::Property::"intent_name", m_header->intent_name );
-//    m_properties["maingl"]->create( Fn::Property::"descrip", m_header->descrip );
-//    m_properties["maingl"]->create( Fn::Property::"aux_file", m_header->aux_file );
-//    m_properties["maingl"]->create( Fn::Property::"swapsize", m_header->swapsize );
-//    m_properties["maingl"]->create( Fn::Property::"byteorder", m_header->byteorder );
+//    m_properties["maingl"].create( Fn::Property::NT, m_header->nt );
+//    m_properties["maingl"].create( Fn::Property::NU, m_header->nu );
+//    m_properties["maingl"].create( Fn::Property::NV, m_header->nv );
+//    m_properties["maingl"].create( Fn::Property::NW, m_header->nw );
+//    m_properties["maingl"].create("dim", m_header->dim );
+//    m_properties["maingl"].create( Fn::Property::NVOX, static_cast<int>( m_header->nvox ) );
+//    m_properties["maingl"].create( Fn::Property::NBYPER, m_header->nbyper );
+    m_properties["maingl"].createInt( Fn::Property::D_DATATYPE, m_header->datatype );
+//    m_properties["maingl"].create( Fn::Property::DT, m_header->dt );
+//    m_properties["maingl"].create( Fn::Property::DU, m_header->du );
+//    m_properties["maingl"].create( Fn::Property::DV, m_header->dv );
+//    m_properties["maingl"].create( Fn::Property::DW, m_header->dw );
+//    m_properties["maingl"].create( Fn::Property::"pixdim", m_header->pixdim );
+//    m_properties["maingl"].create( Fn::Property::"scl_slope", m_header->scl_slope );
+//    m_properties["maingl"].create( Fn::Property::"scl_inter", m_header->scl_inter );
+//    m_properties["maingl"].create( Fn::Property::"cal_min", m_header->cal_min );
+//    m_properties["maingl"].create( Fn::Property::"cal_max", m_header->cal_max );
+//    m_properties["maingl"].create( Fn::Property::"qform_code", m_header->qform_code );
+//    m_properties["maingl"].create( Fn::Property::"sform_code", m_header->sform_code );
+//    m_properties["maingl"].create( Fn::Property::"freq_dim", m_header->freq_dim );
+//    m_properties["maingl"].create( Fn::Property::"phase_dim", m_header->phase_dim );
+//    m_properties["maingl"].create( Fn::Property::"slice_dim", m_header->slice_dim );
+//    m_properties["maingl"].create( Fn::Property::"slice_code", m_header->slice_code );
+//    m_properties["maingl"].create( Fn::Property::"slice_start", m_header->slice_start );
+//    m_properties["maingl"].create( Fn::Property::"slice_end", m_header->slice_end );
+//    m_properties["maingl"].create( Fn::Property::"slice_duration", m_header->slice_duration );
+//    m_properties["maingl"].create( Fn::Property::"quatern_b", m_header->quatern_b );
+//    m_properties["maingl"].create( Fn::Property::"quatern_c", m_header->quatern_c );
+//    m_properties["maingl"].create( Fn::Property::"quatern_d", m_header->quatern_d );
+//    m_properties["maingl"].create( Fn::Property::"qoffset_x", m_header->qoffset_x );
+//    m_properties["maingl"].create( Fn::Property::"qoffset_y", m_header->qoffset_y );
+//    m_properties["maingl"].create( Fn::Property::"qoffset_z", m_header->qoffset_z );
+//    m_properties["maingl"].create( Fn::Property::"qfac", m_header->qfac );
+//    m_properties["maingl"].create( Fn::Property::qto_xyz", m_header->qto_xyz );
+//    m_properties["maingl"].create( Fn::Property::qto_ijk", m_header->qto_ijk );
+//    m_properties["maingl"].create( Fn::Property:: sto_xyz", m_header->sto_xyz );
+//    m_properties["maingl"].create( Fn::Property::"sto_ijk", m_header->sto_ijk );
+//    m_properties["maingl"].create( Fn::Property::"toffset", m_header->toffset );
+//    m_properties["maingl"].create( Fn::Property::"xyz_units", m_header->xyz_units );
+//    m_properties["maingl"].create( Fn::Property::"time_units", m_header->time_units );
+//    m_properties["maingl"].create( Fn::Property::"nifti_type", m_header->nifti_type );
+//    m_properties["maingl"].create( Fn::Property::"intent_code", m_header->intent_code );
+//    m_properties["maingl"].create( Fn::Property::"intent_p1", m_header->intent_p1 );
+//    m_properties["maingl"].create( Fn::Property::"intent_p2", m_header->intent_p2 );
+//    m_properties["maingl"].create( Fn::Property::"intent_p3", m_header->intent_p3 );
+//    m_properties["maingl"].create( Fn::Property::"intent_name", m_header->intent_name );
+//    m_properties["maingl"].create( Fn::Property::"descrip", m_header->descrip );
+//    m_properties["maingl"].create( Fn::Property::"aux_file", m_header->aux_file );
+//    m_properties["maingl"].create( Fn::Property::"swapsize", m_header->swapsize );
+//    m_properties["maingl"].create( Fn::Property::"byteorder", m_header->byteorder );
+
+    QMatrix4x4 sform;
+    QMatrix4x4 qform;
 
     for ( int i = 0; i < 4; ++i )
     {
         for ( int j = 0; j < 4; ++j )
         {
-            m_qform( i, j ) = m_header->qto_xyz.m[i][j];
+            qform( i, j ) = m_header->qto_xyz.m[i][j];
         }
     }
 
@@ -92,7 +95,7 @@ void DatasetNifti::parseNiftiHeader()
     {
         for ( int j = 0; j < 4; ++j )
         {
-            m_sform( i, j ) = m_header->sto_xyz.m[i][j];
+            sform( i, j ) = m_header->sto_xyz.m[i][j];
         }
     }
 
@@ -108,51 +111,38 @@ void DatasetNifti::parseNiftiHeader()
     m_header->descrip[4] = '2';
     m_header->descrip[5] = 0;
 
-    QMatrix4x4 sform;
-    QMatrix4x4 qform;
+    //m_properties["maingl"].create( Fn::Property::D_USE_TRANSFORM, { "none", "sform", "qform" }, 0, "transform" );
+    m_properties["maingl"].createMatrix( Fn::Property::D_S_FORM, sform, "transform" );
+    m_properties["maingl"].createMatrix( Fn::Property::D_Q_FORM, qform, "transform" );
+    m_properties["maingl"].getWidget( Fn::Property::D_S_FORM )->setEnabled( false );
+    m_properties["maingl"].getWidget( Fn::Property::D_Q_FORM )->setEnabled( false );
 
-    //m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "sform", "qform" }, 0, "transform" );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_S_FORM, m_sform, "transform" );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_Q_FORM, m_qform, "transform" );
-    m_properties["maingl"]->getWidget( Fn::Property::D_S_FORM )->setEnabled( false );
-    m_properties["maingl"]->getWidget( Fn::Property::D_Q_FORM )->setEnabled( false );
-
-    m_properties["maingl"]->createFloat( Fn::Property::D_DX, m_header->dx, 0.01, 10.0, "transform" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DY, m_header->dy, 0.01, 10.0, "transform" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, m_header->dz, 0.01, 10.0, "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DX, m_header->dx, 0.01, 10.0, "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DY, m_header->dy, 0.01, 10.0, "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DZ, m_header->dz, 0.01, 10.0, "transform" );
     if ( m_header->sform_code > 0 )
     {
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, m_sform( 0, 3 ), -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, m_sform( 1, 3 ), -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, m_sform( 2, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, sform( 0, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, sform( 1, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, sform( 2, 3 ), -250, 250, "transform" );
     }
     else if ( m_header->sform_code > 0 )
     {
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, m_qform( 0, 3), -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, m_qform( 1, 3), -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, m_qform( 2, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, qform( 0, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, qform( 1, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, qform( 2, 3), -250, 250, "transform" );
     }
     else
     {
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, 0, -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, 0, -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
     }
 }
 
 nifti_image* DatasetNifti::getHeader()
 {
     return m_header;
-}
-
-QMatrix4x4 DatasetNifti::getQForm()
-{
-    return m_qform;
-}
-
-QMatrix4x4 DatasetNifti::getSForm()
-{
-    return m_sform;
 }
 
 QString DatasetNifti::getNiftiDataType( const int type )
@@ -200,13 +190,13 @@ int DatasetNifti::getIdFromPos( QVector3D pos )
 
 int DatasetNifti::getIdFromPos( float x, float y, float z )
 {
-    float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
-    float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
-    float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+    float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
 
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     int px = ( x + dx / 2 ) / dx;
     int py = ( y + dy / 2 ) / dy;
@@ -222,9 +212,9 @@ int DatasetNifti::getIdFromPos( float x, float y, float z )
 
 int DatasetNifti::getId( int x, int y, int z )
 {
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     int px = qMax( 0, qMin( x, nx - 1) );
     int py = qMax( 0, qMin( y, ny - 1) );
@@ -235,8 +225,8 @@ int DatasetNifti::getId( int x, int y, int z )
 
 void DatasetNifti::getXYZ( int id, int &x, int &y, int &z )
 {
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
 
     x = id % nx;
     int tempY = id % ( nx * ny );

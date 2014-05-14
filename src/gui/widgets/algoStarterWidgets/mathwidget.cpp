@@ -36,9 +36,9 @@ MathWidget::MathWidget( DatasetScalar* ds, QWidget* parent ) :
     QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
         {
-            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), dsl[k] );
+            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString(), dsl[k] );
         }
     }
     m_layout->addWidget( m_sourceSelect );
@@ -97,8 +97,8 @@ void MathWidget::execute()
     int mode = m_modeSelect->getCurrentIndex();
     float arg = m_arg->getValue();
 
-    float lowerThreshold = m_dataset->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    float upperThreshold = m_dataset->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    float lowerThreshold = m_dataset->properties( "maingl" ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float upperThreshold = m_dataset->properties( "maingl" ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
 
     switch ( mode )
     {

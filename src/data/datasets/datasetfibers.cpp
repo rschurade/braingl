@@ -74,58 +74,58 @@ void DatasetFibers::createProps()
     bool hasData =(  m_dataNames[0] != "no data" );
     qDebug() << "num points:" << m_numPoints << "num lines:" << m_fibs.size();
 
-    m_properties["maingl"]->createInt( Fn::Property::D_NUM_POINTS, m_numPoints );
-    m_properties["maingl"]->createInt( Fn::Property::D_NUM_LINES, m_fibs.size() );
-    m_properties["maingl"]->createList( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_NUM_POINTS, m_numPoints );
+    m_properties["maingl"].createInt( Fn::Property::D_NUM_LINES, m_fibs.size() );
+    m_properties["maingl"].createList( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
     if ( hasData )
     {
-        m_properties["maingl"]->createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
-        m_properties["maingl"]->createList( Fn::Property::D_DATAMODE, m_dataNames, 0, "general" );
+        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
+        m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0, "general" );
     }
     else
     {
-        m_properties["maingl"]->createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
-        m_properties["maingl"]->createList( Fn::Property::D_DATAMODE, m_dataNames, 0 );
+        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
+        m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0 );
     }
-    m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "color" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "color" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MIN, 0.0f );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MAX, 1.0f );
+    m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MIN, 0.0f );
+    m_properties["maingl"].createFloat( Fn::Property::D_MAX, 1.0f );
 
     if ( hasData )
     {
-        m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 1, "general" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
+        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
+        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
+        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
+        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
+        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
     }
     else
     {
-        m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 1 );
-        m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f );
-        m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
+        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1 );
+        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f );
+        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f );
+        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
+        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
     }
-    m_properties["maingl"]->createFloat( Fn::Property::D_DX, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DY, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"]->createInt( Fn::Property::D_NX, 800, 0, 2000, "special" );
-    m_properties["maingl"]->createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
-    m_properties["maingl"]->createInt( Fn::Property::D_NZ, 800, 0, 2000, "special" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DX, 2000.0f, 0.0f, 2000.0f, "special" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DY, 2000.0f, 0.0f, 2000.0f, "special" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DZ, 2000.0f, 0.0f, 2000.0f, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, 0, 2000, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, 0, 2000, "special" );
 
-    m_properties["maingl"]->createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
+    m_properties["maingl"].createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
 
-    m_properties["maingl"]->createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.2f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_DIFFUSE,   0.45f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_AMBIENT,   2.0f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
+    m_properties["maingl"].createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.2f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_DIFFUSE,   0.45f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_AMBIENT,   2.0f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
 
     unsigned int maxLength = 0;
     for ( unsigned int i = 0; i < m_fibs.size(); ++i )
@@ -133,51 +133,51 @@ void DatasetFibers::createProps()
         maxLength = qMax( maxLength, m_fibs[i].length() );
     }
 
-    m_properties["maingl"]->createFloat( Fn::Property::D_FIBER_GROW_LENGTH, (float)maxLength, 0.0f, (float)maxLength, "special" );
+    m_properties["maingl"].createFloat( Fn::Property::D_FIBER_GROW_LENGTH, (float)maxLength, 0.0f, (float)maxLength, "special" );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( colorChanged() ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( colorChanged() ) );
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
 
     if ( hasData )
     {
-//        connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-//                      m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
-//        connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-//                  m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
+//        connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+//                      m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
+//        connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+//                  m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-        connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-                  m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-        connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-                  m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
+        connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+                  m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+        connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+                  m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
-        connect( m_properties["maingl"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
+        connect( m_properties["maingl"].getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
 
 //        connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
 //                      m_properties["maingl2"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
 //        connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
 //                  m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-        connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-                  m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-        connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-                  m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
+        connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+                  m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+        connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+                  m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
     }
 
-    m_properties["maingl"]->createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
-    m_properties["maingl"]->createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
+    m_properties["maingl"].createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
+    m_properties["maingl"].createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
 
-//    m_properties["maingl"]->createBool( Fn::Property::D_AUTOPLAY, false );
-//    m_properties["maingl"]->createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
-//    connect( m_properties["maingl"]->getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
+//    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false );
+//    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
+//    connect( m_properties["maingl"].getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
 
     transformChanged( 3 );
 }
@@ -210,12 +210,12 @@ std::vector<Fib> DatasetFibers::getSelectedFibs()
         QVector3D start;
         if ( Models::r()->rowCount()  > 0 )
         {
-            int shape = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt();
+            int shape = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_SHAPE ), Qt::DisplayRole ).toInt();
             if ( shape >= 0 && shape <= 3 )
             {
-                float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
-                float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
-                float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
+                float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_X ), Qt::DisplayRole ).toFloat();
+                float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_Y ), Qt::DisplayRole ).toFloat();
+                float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_Z ), Qt::DisplayRole ).toFloat();
                 start = QVector3D( x, y, z );
             }
             else
@@ -259,7 +259,7 @@ QList<QString> DatasetFibers::getDataNames()
 
 void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -271,26 +271,26 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         connect( m_selector, SIGNAL( changed() ), Models::d(), SLOT( submit() ) );
     }
 
-    if ( properties( target )->get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 0 )
+    if ( properties( target ).get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
             m_renderer = new FiberRenderer( m_selector, &m_fibs, m_numPoints );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
-            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
+            connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
         }
 
         m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-    else if ( properties( target )->get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 1 )
+    else if ( properties( target ).get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 1 )
     {
         if ( m_tubeRenderer == 0 )
         {
             m_tubeRenderer = new TubeRenderer( m_selector, &m_fibs );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
-            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
+            connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
         }
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
@@ -306,17 +306,17 @@ void DatasetFibers::transformChanged( QVariant value )
 
     if ( dsl.size() > 0 )
     {
-        qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
-        sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+        qForm = dsl.first()->properties().get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        sForm = dsl.first()->properties().get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
     }
 
-    m_properties["maingl"]->getWidget( Fn::Property::D_TRANSFORM )->setEnabled( false );
+    m_properties["maingl"].getWidget( Fn::Property::D_TRANSFORM )->setEnabled( false );
 
     switch ( value.toInt() )
     {
         case 0:
             m_transform.setToIdentity();
-            m_properties["maingl"]->getWidget( Fn::Property::D_TRANSFORM )->setEnabled( true );
+            m_properties["maingl"].getWidget( Fn::Property::D_TRANSFORM )->setEnabled( true );
             break;
         case 1:
             m_transform = qForm;
@@ -335,7 +335,7 @@ void DatasetFibers::transformChanged( QVariant value )
             break;
     }
 
-    m_properties["maingl"]->set( Fn::Property::D_TRANSFORM, m_transform );
+    m_properties["maingl"].set( Fn::Property::D_TRANSFORM, m_transform );
 }
 
 void DatasetFibers::applyTransform()
@@ -344,9 +344,9 @@ void DatasetFibers::applyTransform()
     float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
     float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
-    int selectedMatrix = m_properties["maingl"]->get( Fn::Property::D_USE_TRANSFORM ).toInt();
+    int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
 
-    m_transform = m_properties["maingl"]->get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
+    m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
 
     switch( selectedMatrix )
     {
@@ -534,7 +534,7 @@ void DatasetFibers::colorChanged()
     {
         if ( selected->at( i ) )
         {
-            m_fibs[ i ].setCustomColor( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+            m_fibs[ i ].setCustomColor( m_properties["maingl"].getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
         }
     }
     if ( m_renderer != 0 )
@@ -551,25 +551,25 @@ void DatasetFibers::dataModeChanged()
 {
     if ( m_renderer != 0 )
     {
-        m_renderer->updateExtraData( properties( "maingl" )->get( Fn::Property::D_DATAMODE).toInt() );
+        m_renderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     if ( m_tubeRenderer != 0 )
     {
-        m_tubeRenderer->updateExtraData( properties( "maingl" )->get( Fn::Property::D_DATAMODE).toInt() );
+        m_tubeRenderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
-    float min = m_dataMins[ m_properties["maingl"]->get( Fn::Property::D_DATAMODE).toInt()];
-    float max = m_dataMaxes[ m_properties["maingl"]->get( Fn::Property::D_DATAMODE).toInt()];
+    float min = m_dataMins[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
+    float max = m_dataMaxes[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
 
-    m_properties["maingl"]->set( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->set( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMin( min );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMax( max );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMin( min );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
-    m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
-    m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
-    m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
+    m_properties["maingl"].set( Fn::Property::D_MIN, min );
+    m_properties["maingl"].set( Fn::Property::D_MAX, max );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMax( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
     Models::d()->submit();
 }
 

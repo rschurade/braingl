@@ -19,9 +19,9 @@ SDThread::SDThread( DatasetDWI* ds, int id  ) :
     m_bvals = ds->getBvals();
     m_bvecs = ds->getBvecs();
 
-    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    int nx = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
     m_blockSize = nx * ny *nz;
 }
 

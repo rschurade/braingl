@@ -29,7 +29,6 @@
 #include "widgets/colormapeditwidget.h"
 #include "widgets/scriptwidget.h"
 #include "widgets/hierarchicaltreeglwidget.h"
-#include "widgets/fiberstipplingwidget.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
 #include "gl/camerabase.h"
@@ -348,7 +347,7 @@ bool MainWindow::loadRoi( QString fileName )
                         out[i] = data->at( i );
                     }
 
-                    ROIArea* roiOut = new ROIArea( out, dss->getHeader() );
+                    ROIArea* roiOut = new ROIArea( out, dss->properties() );
                     Models::addROIArea( roiOut );
                 }
                 QFileInfo fi( fileName );
@@ -428,7 +427,7 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
             {
                 for ( int k = 0; k < loader.getNumDatasets(); ++k )
                 {
-                    loader.getDataset( k )->properties()->setState( state );
+                    loader.getDataset( k )->properties().setState( state );
                     Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
                 }
                 QFileInfo fi( fileName );
@@ -522,7 +521,7 @@ bool MainWindow::save( Dataset* ds )
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
 
-    QString name =  fn + "/" + ds->properties()->get( Fn::Property::D_NAME ).toString().replace( " ", "" );
+    QString name =  fn + "/" + ds->properties().get( Fn::Property::D_NAME ).toString().replace( " ", "" );
     name.replace( "." + ds->getDefaultSuffix(), "" );
     name += ".";
     name += ds->getDefaultSuffix();
@@ -542,8 +541,8 @@ bool MainWindow::save( Dataset* ds )
         if ( !fileName.isEmpty() )
         {
             QDir dir;
-            ds->properties()->set( Fn::Property::D_FILENAME, fileName );
-            ds->properties()->set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
+            ds->properties().set( Fn::Property::D_FILENAME, fileName );
+            ds->properties().set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
             saveDataset( ds, fd->selectedFilter() );
 
             QFileInfo fi( fileName );
@@ -575,7 +574,7 @@ void MainWindow::saveFilterChanged( QString filterString )
 
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
-    QString fileName = ds->properties()->get( Fn::Property::D_FILENAME ).toString();
+    QString fileName = ds->properties().get( Fn::Property::D_FILENAME ).toString();
     Writer writer( ds, QFileInfo( fileName ), filter );
     writer.save();
 }
@@ -690,7 +689,7 @@ void MainWindow::saveScene( QString fileName )
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        QVariant fn = ds->properties()->get( Fn::Property::D_FILENAME );
+        QVariant fn = ds->properties().get( Fn::Property::D_FILENAME );
 
         if ( !fn.toString().isEmpty() )
         {
@@ -700,16 +699,16 @@ void MainWindow::saveScene( QString fileName )
                 qDebug() << "saving scene with file not on file system";
                 if ( save( ds ) )
                 {
-                    fn = ds->properties()->get( Fn::Property::D_FILENAME );
+                    fn = ds->properties().get( Fn::Property::D_FILENAME );
                     fileNames.push_back( fn );
-                    QList<QVariant>state = ds->properties()->getState();
+                    QList<QVariant>state = ds->properties().getState();
                     settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
                 }
             }
             else
             {
                 fileNames.push_back( fn );
-                QList<QVariant>state = ds->properties()->getState();
+                QList<QVariant>state = ds->properties().getState();
                 settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
 
             }
@@ -735,10 +734,10 @@ void MainWindow::saveScene( QString fileName )
         QList<QVariant>branch;
         for ( int k = 0; k < leafCount+1; ++k )
         {
-            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
+            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
 
             QList<QVariant>state = roi->properties()->getState();
-            if ( roi->properties()->get( Fn::Property::R_SHAPE).toInt() != 10 )
+            if ( roi->properties()->get( Fn::Property::D_SHAPE).toInt() != 10 )
             {
                 branch.push_back( state );
             }
@@ -819,7 +818,7 @@ void MainWindow::loadScene( QString fileName )
 
                 for ( int l = 0; l < roiState.size() / 2; ++l )
                 {
-                    if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::R_COLOR )
+                    if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::D_COLOR )
                     {
                         GLFunctions::roi->properties()->set( (Fn::Property)( roiState[l*2].toInt() ), roiState[l*2+1] );
                     }

@@ -9,18 +9,18 @@
 Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     m_textureGLuint( 0 )
 {
-    PropertyGroup* props = new PropertyGroup();
+    PropertyGroup props;
     // add standard properties
-    props->createBool( Fn::Property::D_ACTIVE, true );
-    props->createBool( Fn::Property::D_LOCK_PROPS, false );
-    props->createDir( Fn::Property::D_FILENAME, fileName.path() );
-    props->createInt( Fn::Property::D_TYPE, (int)type );
-    props->createString( Fn::Property::D_NAME, fileName.path().split( "/" ).last(), "general" );
-    props->createInt( Fn::Property::D_SIZE, -1 );
-    props->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::NONE );
+    props.createBool( Fn::Property::D_ACTIVE, true );
+    props.createBool( Fn::Property::D_LOCK_PROPS, false );
+    props.createDir( Fn::Property::D_FILENAME, fileName.path() );
+    props.createInt( Fn::Property::D_TYPE, (int)type );
+    props.createString( Fn::Property::D_NAME, fileName.path().split( "/" ).last(), "general" );
+    props.createInt( Fn::Property::D_SIZE, -1 );
+    props.createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::NONE );
 
-    props->createBool( Fn::Property::D_HAS_TEXTURE, false );
-    props->createString( Fn::Property::D_RENDER_TARGET, "maingl" );
+    props.createBool( Fn::Property::D_HAS_TEXTURE, false );
+    props.createString( Fn::Property::D_RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
 }
@@ -38,7 +38,7 @@ GLuint Dataset::getTextureGLuint()
     return m_textureGLuint;
 }
 
-PropertyGroup* Dataset::properties( QString target )
+PropertyGroup& Dataset::properties( QString target )
 {
     if ( m_properties.contains( target ) )
     {
@@ -88,10 +88,19 @@ QString Dataset::getColormapShader( int num )
 
 void Dataset::copySettings( QString target )
 {
-    PropertyGroup* props = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props( ( m_properties["maingl"] ) );
     m_properties.insert( target, props );
-    m_properties[target]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
-    m_properties[target]->getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
+    m_properties[target].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties[target].getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
+}
+
+void Dataset::copyPropertyObject( PropertyGroup& props, QString target )
+{
+    if ( m_properties.contains( target ) )
+    {
+        m_properties.remove( target );
+    }
+    m_properties.insert( target, props );
 }
 
 QString Dataset::getSaveFilter()

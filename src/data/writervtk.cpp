@@ -45,7 +45,7 @@ bool WriterVTK::save()
     if ( m_fileName.endsWith( ".vtk" ) || m_fileName.endsWith( ".fib" ) )
     {
         //qDebug() << "filter:" << m_filter;
-        switch ( (Fn::DatasetType)( m_dataset->properties()->get( Fn::Property::D_TYPE ).toInt() ) )
+        switch ( (Fn::DatasetType)( m_dataset->properties().get( Fn::Property::D_TYPE ).toInt() ) )
         {
             case Fn::DatasetType::FIBERS:
             case Fn::DatasetType::CONS:
@@ -192,7 +192,7 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
         newPoints->InsertNextPoint( points[i*bufferSize], points[i*bufferSize+1], points[i*bufferSize+2] );
     }
 
-    if ( m_dataset->properties()->get( Fn::Property::D_INVERT_VERTEX_ORDER ).toBool() )
+    if ( m_dataset->properties().get( Fn::Property::D_INVERT_VERTEX_ORDER ).toBool() )
     {
         for( unsigned int i = 0; i < numTris; ++i )
         {

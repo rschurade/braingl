@@ -693,12 +693,12 @@ void ScriptWidget::addPropertySelect( QHBoxLayout* layout, int id, int selected,
     if ( Models::d()->rowCount() > dataset && dataset >= 0 )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( dataset, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        PropertyGroup* props = ds->properties();
+        PropertyGroup props = ds->properties();
         int toSelect = 0;
 
-        for ( int i = 0; i < props->size(); ++i )
+        for ( int i = 0; i < props.size(); ++i )
         {
-            QPair<Fn::Property, Property*> prop = props->getNthPropertyPair( i );
+            QPair<Fn::Property, Property*> prop = props.getNthPropertyPair( i );
             if ( prop.second->getPropertyTab() != "none" || prop.first == Fn::Property::D_ACTIVE )
             {
                 select->insertItem( i, Fn::Prop2String::s( prop.first ), (int)prop.first );

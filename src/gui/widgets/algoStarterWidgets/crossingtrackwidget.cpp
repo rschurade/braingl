@@ -35,9 +35,9 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_maskSelect->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
         {
-            m_maskSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), k+1 );
+            m_maskSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString(), k+1 );
         }
     }
     m_layout->addWidget( m_maskSelect );
@@ -47,9 +47,9 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_tensor2Select->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
         {
-            m_tensor2Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), k+1 );
+            m_tensor2Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString(), k+1 );
         }
     }
     m_layout->addWidget( m_tensor2Select );
@@ -58,9 +58,9 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_tensor3Select->insertItem( 0, QString("none") );
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_TENSOR )
         {
-            m_tensor3Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), k+1 );
+            m_tensor3Select->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString(), k+1 );
         }
     }
     m_layout->addWidget( m_tensor3Select );
@@ -90,7 +90,7 @@ CrossingTrackWidget::CrossingTrackWidget( Dataset* ds, QList<QVariant> &dsl, QWi
     m_layout->addWidget( smoothness );
     connect( smoothness, SIGNAL( valueChanged( float, int) ), m_tracker, SLOT( setSmoothness( float, int) ) );
 
-    int numVoxels = ds->properties()->get( Fn::Property::D_NX ).toInt() * ds->properties()->get( Fn::Property::D_NY ).toInt() * ds->properties()->get( Fn::Property::D_NZ ).toInt();
+    int numVoxels = ds->properties().get( Fn::Property::D_NX ).toInt() * ds->properties().get( Fn::Property::D_NY ).toInt() * ds->properties().get( Fn::Property::D_NZ ).toInt();
 
     m_progressBar = new QProgressBar( this );
     m_progressBar->setValue( 0 );
@@ -127,9 +127,9 @@ void CrossingTrackWidget::start()
     qDebug() << "tensor track widget start";
 
     qDebug() << m_maskSelect->getCurrentIndex() << m_tensor2Select->getCurrentIndex() << m_tensor3Select->getCurrentIndex();
-    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_maskSelect->getCurrentIndex()-1] )->properties()->get( Fn::Property::D_NAME ).toString();
-    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_tensor2Select->getCurrentIndex()-1] )->properties()->get( Fn::Property::D_NAME ).toString();
-    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_tensor3Select->getCurrentIndex()-1] )->properties()->get( Fn::Property::D_NAME ).toString();
+    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_maskSelect->getCurrentIndex()-1] )->properties().get( Fn::Property::D_NAME ).toString();
+    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_tensor2Select->getCurrentIndex()-1] )->properties().get( Fn::Property::D_NAME ).toString();
+    qDebug() << VPtr<Dataset>::asPtr( m_dsl[m_tensor3Select->getCurrentIndex()-1] )->properties().get( Fn::Property::D_NAME ).toString();
     m_tracker->setDatasets( dynamic_cast<DatasetScalar*>( VPtr<Dataset>::asPtr( m_dsl[m_maskSelect->getCurrentIndex()-1] ) ),
                             dynamic_cast<DatasetTensor*>( m_ds ),
                             dynamic_cast<DatasetTensor*>(VPtr<Dataset>::asPtr( m_dsl[m_tensor2Select->getCurrentIndex()-1] ) ),

@@ -446,7 +446,7 @@ void SceneRenderer::renderRois()
 
     for ( int i = 0; i < countTopBoxes; ++i )
     {
-        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int) Fn::Property::R_POINTER ), Qt::DisplayRole ) );
+        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( i, (int) Fn::Property::D_POINTER ), Qt::DisplayRole ) );
         if ( roi->properties()->get( Fn::Property::D_ACTIVE ).toBool() )
         {
             roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );
@@ -456,7 +456,7 @@ void SceneRenderer::renderRois()
 
             for ( int k = 0; k < countBoxes; ++k )
             {
-                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int) Fn::Property::R_POINTER, mi ), Qt::DisplayRole ) );
+                roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( k, (int) Fn::Property::D_POINTER, mi ), Qt::DisplayRole ) );
                 if ( roi->properties()->get( Fn::Property::D_ACTIVE ).toBool() )
                 {
                     roi->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode );

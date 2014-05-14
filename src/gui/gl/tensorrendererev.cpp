@@ -49,7 +49,7 @@ void TensorRendererEV::init()
     glGenBuffers( 1, vboIds );
 }
 
-void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     setRenderParams( props );
 
@@ -248,17 +248,17 @@ void TensorRendererEV::addGlyph( std::vector<float>* verts, float xPos, float yP
     verts->push_back( o2 );
 }
 
-void TensorRendererEV::setRenderParams( PropertyGroup* props )
+void TensorRendererEV::setRenderParams( PropertyGroup& props )
 {
     int slice = 0;
-    slice = (int)props->get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-            (int)props->get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-            (int)props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
+    slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
+            (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
+            (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
 
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
-    m_faThreshold = props->get( Fn::Property::D_FA_THRESHOLD ).toFloat();
-    m_evThreshold = props->get( Fn::Property::D_EV_THRESHOLD ).toFloat();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_faThreshold = props.get( Fn::Property::D_FA_THRESHOLD ).toFloat();
+    m_evThreshold = props.get( Fn::Property::D_EV_THRESHOLD ).toFloat();
     m_orient = slice;
-    m_offset = props->get( Fn::Property::D_OFFSET ).toFloat();
-    m_evSelect = props->get( Fn::Property::D_TENSOR_RENDERMODE ).toInt();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
+    m_evSelect = props.get( Fn::Property::D_TENSOR_RENDERMODE ).toInt();
 }

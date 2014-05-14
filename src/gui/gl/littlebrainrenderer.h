@@ -18,7 +18,7 @@ public:
     int m_LB_colormode;
 
 private:
-    void setRenderParams( PropertyGroup* props );
+    void setRenderParams( PropertyGroup& props );
 };
 
 #endif /* LITTLEBRAINRENDERER_H_ */

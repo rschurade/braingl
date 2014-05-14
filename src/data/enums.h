@@ -351,28 +351,18 @@ namespace Fn
         G_TRACT_TEXT_SOURCE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
-        R_X = 1000,
-        R_Y,
-        R_Z,
-        R_NX,
-        R_NY,
-        R_NZ,
-        R_DX,
-        R_DY,
-        R_DZ,
-        R_NEG,
-        R_TYPE,
-        R_COLOR,
-        R_ALPHA,
-        R_RENDER,
-        R_SHAPE,
-        R_STICK_TO_CROSSHAIR,
-        R_ID,
-        R_PICK_ID,
-        R_UPDATED,
-        R_THRESHOLD,
-        R_POINTER,
-        R_DESCRIPTION
+        D_X = 1000,
+        D_Y,
+        D_Z,
+        D_NEG,
+        D_RENDER,
+        D_SHAPE,
+        D_STICK_TO_CROSSHAIR,
+        D_ID,
+        D_PICK_ID,
+        D_UPDATED,
+        D_POINTER,
+        D_DESCRIPTION
     };
 
     struct Prop2String
@@ -614,28 +604,18 @@ namespace Fn
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
-                case Property::R_X: return QString( "x" ); break;
-                case Property::R_Y: return QString( "y" ); break;
-                case Property::R_Z: return QString( "z" ); break;
-                case Property::R_NX: return QString( "nx" ); break;
-                case Property::R_NY: return QString( "ny" ); break;
-                case Property::R_NZ: return QString( "nz" ); break;
-                case Property::R_DX: return QString( "dx" ); break;
-                case Property::R_DY: return QString( "dy" ); break;
-                case Property::R_DZ: return QString( "dz" ); break;
-                case Property::R_NEG: return QString( "negate" ); break;
-                case Property::R_TYPE: return QString( "type" ); break;
-                case Property::R_COLOR: return QString( "color" ); break;
-                case Property::R_ALPHA: return QString( "alpha" ); break;
-                case Property::R_RENDER: return QString( "render" ); break;
-                case Property::R_SHAPE: return QString( "shape" ); break;
-                case Property::R_STICK_TO_CROSSHAIR: return QString( "stick to crosshair" ); break;
-                case Property::R_ID: return QString( "id" ); break;
-                case Property::R_PICK_ID: return QString( "pick id" ); break;
-                case Property::R_UPDATED: return QString( "updated" ); break;
-                case Property::R_THRESHOLD: return QString( "threshold" ); break;
-                case Property::R_POINTER: return QString( "pointer" ); break;
-                case Property::R_DESCRIPTION: return QString( "description" ); break;
+                case Property::D_X: return QString( "x" ); break;
+                case Property::D_Y: return QString( "y" ); break;
+                case Property::D_Z: return QString( "z" ); break;
+                case Property::D_NEG: return QString( "negate" ); break;
+                case Property::D_RENDER: return QString( "render" ); break;
+                case Property::D_SHAPE: return QString( "shape" ); break;
+                case Property::D_STICK_TO_CROSSHAIR: return QString( "stick to crosshair" ); break;
+                case Property::D_ID: return QString( "id" ); break;
+                case Property::D_PICK_ID: return QString( "pick id" ); break;
+                case Property::D_UPDATED: return QString( "updated" ); break;
+                case Property::D_POINTER: return QString( "pointer" ); break;
+                case Property::D_DESCRIPTION: return QString( "description" ); break;
             }
             return QString( "property not defined" );
         }

@@ -27,36 +27,36 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
 {
     m_scalarField = *(ds->getData() );
 
-    m_properties["maingl"]->createInt( Fn::Property::D_NX, ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt() );
-    m_properties["maingl"]->createInt( Fn::Property::D_NY, ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt() );
-    m_properties["maingl"]->createInt( Fn::Property::D_NZ, ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DX, ds->properties( "maingl" )->get( Fn::Property::D_DX ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DY, ds->properties( "maingl" )->get( Fn::Property::D_DY ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_DZ, ds->properties( "maingl" )->get( Fn::Property::D_DZ ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_X, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_X ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Y ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" )->get( Fn::Property::D_ADJUST_Z ).toFloat() );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt() );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt() );
+    m_properties["maingl"].createFloat( Fn::Property::D_DX, ds->properties( "maingl" ).get( Fn::Property::D_DX ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_DY, ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_DZ, ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_X ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Y ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Z ).toFloat() );
 
-    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 0 );
-    m_properties["maingl"]->createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
-    m_properties["maingl"]->createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 0 );
+    m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
+    m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
 
-    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (isoline)";
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (isoline)";
 
-    m_properties["maingl"]->createString( Fn::Property::D_NAME, name );
+    m_properties["maingl"].createString( Fn::Property::D_NAME, name );
 
-    m_properties["maingl"]->createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat(), "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"]->createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 0, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_SLICE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0, -1.0, 1.0, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_OFFSET ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"]->createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
-    //connect( m_properties["maingl"]->getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"]->createColor( Fn::Property::D_COLOR, QColor( 0, 0, 0), "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 0, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_SLICE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0, -1.0, 1.0, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_OFFSET ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
+    //connect( m_properties["maingl"].getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 0, 0, 0), "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
 }
 
@@ -66,7 +66,7 @@ DatasetIsoline::~DatasetIsoline()
 
 void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -103,7 +103,7 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
     GLFunctions::getShader( "line" )->bind();
     GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
 
-    glLineWidth(  m_properties["maingl"]->get( Fn::Property::D_LINE_WIDTH ).toInt() );
+    glLineWidth(  m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toInt() );
 
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
@@ -144,22 +144,22 @@ void DatasetIsoline::initGeometry()
     std::vector<float>isoVerts;
     std::vector<float>tmpVerts;
 
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
-    float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
-    float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
-    float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
-    float px = m_properties["maingl"]->get( Fn::Property::D_ADJUST_X ).toFloat();
-    float py = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Y ).toFloat();
-    float pz = m_properties["maingl"]->get( Fn::Property::D_ADJUST_Z ).toFloat();
-    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
-    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
-    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"]->get( Fn::Property::D_OFFSET ).toFloat();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
+    float px = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
+    float py = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float pz = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
 
-    float isoValue = m_properties["maingl"]->get( Fn::Property::D_ISO_VALUE ).toFloat();
+    float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
 
-    switch ( m_properties["maingl"]->get( Fn::Property::D_RENDER_SLICE ).toInt() )
+    switch ( m_properties["maingl"].get( Fn::Property::D_RENDER_SLICE ).toInt() )
     {
         case 0: // sagittal
         {
@@ -210,7 +210,7 @@ void DatasetIsoline::initGeometry()
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     std::vector<float>colors( ( isoVerts.size() / 3 ) * 4, 0.0 );
-    QColor col = m_properties["maingl"]->get( Fn::Property::D_COLOR ).value<QColor>();
+    QColor col = m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
     for ( unsigned int i = 0; i < colors.size() / 4; ++i )
     {
         colors[i * 4    ] = col.redF();
@@ -231,8 +231,8 @@ std::vector<float> DatasetIsoline::extractAnatomyAxial()
 {
     std::vector<float>sliceData;
     int slicePos = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
-    int nx =  m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny =  m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
+    int nx =  m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny =  m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
 
     sliceData.resize( nx * ny, 0 );
 
@@ -252,8 +252,8 @@ std::vector<float> DatasetIsoline::extractAnatomySagittal()
 {
     std::vector<float>sliceData;
     int slicePos =Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     sliceData.resize( ny * nz, 0 );
 
@@ -273,8 +273,8 @@ std::vector<float> DatasetIsoline::extractAnatomyCoronal()
 {
     std::vector<float>sliceData;
     int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     sliceData.resize( nx * nz, 0 );
 
@@ -292,9 +292,9 @@ std::vector<float> DatasetIsoline::extractAnatomyCoronal()
 
 int DatasetIsoline::getId( int x, int y, int z )
 {
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     int px = qMax( 0, qMin( x, nx - 1) );
     int py = qMax( 0, qMin( y, ny - 1) );

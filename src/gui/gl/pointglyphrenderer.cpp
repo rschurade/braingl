@@ -32,11 +32,11 @@ void PointGlyphRenderer::init()
     glGenBuffers( 1, vboIds );
 }
 
-void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
     setRenderParams(props);
 
-    float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
+    float alpha = props.get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
 
     if ( renderMode == 1 ) // we are drawing opaque objects
     {
@@ -66,11 +66,11 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     float rotx = 0;
     float roty = 0;
     float rotz = 0;
-    if ( props->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+    if ( props.get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
     {
-        rotx = props->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
-        roty = props->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
-        rotz = props->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+        rotx = props.get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+        roty = props.get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+        rotz = props.get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
     }
     QMatrix4x4 rotMatrix;
     rotMatrix.rotate( rotx, 1, 0, 0 );
@@ -114,7 +114,7 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
         //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
         //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
 
-        if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+        if ( props.get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {
             glDrawArrays( GL_POINTS, 0, np );
         }
@@ -123,15 +123,15 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
     }
 }
 
-void PointGlyphRenderer::setRenderParams( PropertyGroup* props )
+void PointGlyphRenderer::setRenderParams( PropertyGroup& props )
 {
-    m_colorMode = props->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
-    m_colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
-    m_selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    m_selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-    m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
-    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
+    m_colorMode = props.get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+    m_colormap = props.get( Fn::Property::D_COLORMAP ).toInt();
+    m_selectedMin = props.get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    m_selectedMax = props.get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
 void PointGlyphRenderer::setupTextures()
@@ -139,15 +139,15 @@ void PointGlyphRenderer::setupTextures()
 
 }
 
-void PointGlyphRenderer::setShaderVars( PropertyGroup* props )
+void PointGlyphRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "points" );
 
     program->bind();
 
-    program->setUniformValue( "threshold", props->get( Fn::Property::D_THRESHOLD ).toFloat() );
-    program->setUniformValue( "radius", props->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
-    program->setUniformValue( "minlength", props->get( Fn::Property::D_MINLENGTH ).toFloat() );
+    program->setUniformValue( "threshold", props.get( Fn::Property::D_THRESHOLD ).toFloat() );
+    program->setUniformValue( "radius", props.get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "minlength", props.get( Fn::Property::D_MINLENGTH ).toFloat() );
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
