@@ -80,11 +80,14 @@ void DatasetNifti::parseNiftiHeader()
 //    m_properties["maingl"]->create( Fn::Property::"swapsize", m_header->swapsize );
 //    m_properties["maingl"]->create( Fn::Property::"byteorder", m_header->byteorder );
 
+    QMatrix4x4 sform;
+    QMatrix4x4 qform;
+
     for ( int i = 0; i < 4; ++i )
     {
         for ( int j = 0; j < 4; ++j )
         {
-            m_qform( i, j ) = m_header->qto_xyz.m[i][j];
+            qform( i, j ) = m_header->qto_xyz.m[i][j];
         }
     }
 
@@ -92,7 +95,7 @@ void DatasetNifti::parseNiftiHeader()
     {
         for ( int j = 0; j < 4; ++j )
         {
-            m_sform( i, j ) = m_header->sto_xyz.m[i][j];
+            sform( i, j ) = m_header->sto_xyz.m[i][j];
         }
     }
 
@@ -108,12 +111,9 @@ void DatasetNifti::parseNiftiHeader()
     m_header->descrip[4] = '2';
     m_header->descrip[5] = 0;
 
-    QMatrix4x4 sform;
-    QMatrix4x4 qform;
-
     //m_properties["maingl"]->create( Fn::Property::D_USE_TRANSFORM, { "none", "sform", "qform" }, 0, "transform" );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_S_FORM, m_sform, "transform" );
-    m_properties["maingl"]->createMatrix( Fn::Property::D_Q_FORM, m_qform, "transform" );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_S_FORM, sform, "transform" );
+    m_properties["maingl"]->createMatrix( Fn::Property::D_Q_FORM, qform, "transform" );
     m_properties["maingl"]->getWidget( Fn::Property::D_S_FORM )->setEnabled( false );
     m_properties["maingl"]->getWidget( Fn::Property::D_Q_FORM )->setEnabled( false );
 
@@ -128,16 +128,6 @@ void DatasetNifti::parseNiftiHeader()
 nifti_image* DatasetNifti::getHeader()
 {
     return m_header;
-}
-
-QMatrix4x4 DatasetNifti::getQForm()
-{
-    return m_qform;
-}
-
-QMatrix4x4 DatasetNifti::getSForm()
-{
-    return m_sform;
 }
 
 QString DatasetNifti::getNiftiDataType( const int type )
