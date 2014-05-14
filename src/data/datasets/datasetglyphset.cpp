@@ -253,7 +253,7 @@ void DatasetGlyphset::makeLittleBrains()
         if ( ( littleBrains[i] == NULL )
                 && ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>() ) )
         {
-            TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
+            TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" ).get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
             LittleBrainRenderer* m_renderer = new LittleBrainRenderer( mesh );
 
             m_renderer->setModel( Models::g() );
@@ -267,9 +267,9 @@ void DatasetGlyphset::makeLittleBrains()
             {
                 mesh->setVertexData( p, m_correlations->getValue( i, p ) );
             }
-            QVector3D f1 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
+            QVector3D f1 = m_mesh.at( properties( "maingl" ).get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() )->getVertex( i );
             shifts1[i] = f1;
-            QVector3D f2 = m_mesh.at( properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
+            QVector3D f2 = m_mesh.at( properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt() )->getVertex( i );
             shifts2[i] = f2;
         }
         if ( ( littleBrains[i] != NULL )
@@ -349,27 +349,27 @@ void DatasetGlyphset::deleteLittleBrains()
 
 void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
 
-    if ( properties( target )->get( Fn::Property::D_DRAW_SURFACE ).toBool() )
+    if ( properties( target ).get( Fn::Property::D_DRAW_SURFACE ).toBool() )
     {
-        int lr = properties( target )->get( Fn::Property::D_LEFT_RIGHT ).toInt();
+        int lr = properties( target ).get( Fn::Property::D_LEFT_RIGHT ).toInt();
         switch ( lr )
         {
             case 0:
-                properties( target )->set( Fn::Property::D_START_INDEX, 0 );
-                properties( target )->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
+                properties( target ).set( Fn::Property::D_START_INDEX, 0 );
+                properties( target ).set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
                 break;
             case 1:
-                properties( target )->set( Fn::Property::D_START_INDEX, 0 );
-                properties( target )->set( Fn::Property::D_END_INDEX, m_tris_middle - 1 );
+                properties( target ).set( Fn::Property::D_START_INDEX, 0 );
+                properties( target ).set( Fn::Property::D_END_INDEX, m_tris_middle - 1 );
                 break;
             case 2:
-                properties( target )->set( Fn::Property::D_START_INDEX, m_tris_middle );
-                properties( target )->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
+                properties( target ).set( Fn::Property::D_START_INDEX, m_tris_middle );
+                properties( target ).set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
                 break;
             default:
                 break;
@@ -381,7 +381,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
 
     //qDebug() << "little brains size: " << littleBrains.size();
 
-    if ( ( target == "maingl" ) && properties( target )->get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
+    if ( ( target == "maingl" ) && properties( target ).get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
         for ( int i = 0; i < m_n; ++i )
         {
@@ -391,16 +391,16 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                 QVector3D shift2 = shifts2[i];
                 QMatrix4x4 toOrigin;
                 toOrigin.translate( shift2 );
-                toOrigin.scale( properties( "maingl" )->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+                toOrigin.scale( properties( "maingl" ).get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
                 //Rotation of the individual glyphs:
                 float rotx = 0;
                 float roty = 0;
                 float rotz = 0;
-                if ( properties( "maingl" )->get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
+                if ( properties( "maingl" ).get( Fn::Property::D_GLYPH_ROTATION ).toBool() )
                 {
-                    rotx = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
-                    roty = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
-                    rotz = properties( "maingl" )->get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
+                    rotx = properties( "maingl" ).get( Fn::Property::D_GLYPH_ROT_X ).toFloat();
+                    roty = properties( "maingl" ).get( Fn::Property::D_GLYPH_ROT_Y ).toFloat();
+                    rotz = properties( "maingl" ).get( Fn::Property::D_GLYPH_ROT_Z ).toFloat();
                 }
                 QMatrix4x4 rotMatrix;
                 rotMatrix.rotate( rotx, 1, 0, 0 );
@@ -418,7 +418,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
                 float f = 1.2;
                 if ( fabs( test.x() ) < f && fabs( test.y() ) < f )
                 {
-                    littleBrains[i]->m_LB_colormode = properties( "maingl" )->get( Fn::Property::D_LITTLE_BRAINS_COLORMODE ).toInt();
+                    littleBrains[i]->m_LB_colormode = properties( "maingl" ).get( Fn::Property::D_LITTLE_BRAINS_COLORMODE ).toInt();
                     littleBrains[i]->draw( pMatrix, zshift * mvMatrix * toOrigin, width, height, renderMode, properties( target ) );
                 }
                 else
@@ -429,22 +429,22 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         }
     }
 
-    int geoSurf = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
-    int geoGlyph = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
-    int geoCol = properties( "maingl" )->get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
-    int glyphstyle = properties( "maingl" )->get( Fn::Property::D_GLYPHSTYLE ).toInt();
-    int colorMode = properties( "maingl" )->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+    int geoSurf = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
+    int geoGlyph = properties( "maingl" ).get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt();
+    int geoCol = properties( "maingl" ).get( Fn::Property::D_SURFACE_GLYPH_COLOR ).toInt();
+    int glyphstyle = properties( "maingl" ).get( Fn::Property::D_GLYPHSTYLE ).toInt();
+    int colorMode = properties( "maingl" ).get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
 
-    float threshold = properties( "maingl" )->get( Fn::Property::D_THRESHOLD ).toFloat();
-    float minlength = properties( "maingl" )->get( Fn::Property::D_MINLENGTH ).toFloat();
-    int lr = properties( "maingl" )->get( Fn::Property::D_LEFT_RIGHT ).toInt();
-    int sign = properties( "maingl" )->get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
+    float threshold = properties( "maingl" ).get( Fn::Property::D_THRESHOLD ).toFloat();
+    float minlength = properties( "maingl" ).get( Fn::Property::D_MINLENGTH ).toFloat();
+    int lr = properties( "maingl" ).get( Fn::Property::D_LEFT_RIGHT ).toInt();
+    int sign = properties( "maingl" ).get( Fn::Property::D_GLYPH_THRESHOLD_SIGN ).toInt();
 
     glEnable( GL_BLEND );
     //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
-    glPointSize( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
-    glLineWidth( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glPointSize( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glLineWidth( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
 
     if ( ( glyphstyle == 0 )
             && ( ( m_prenderer == 0 ) || ( prevGeo != geoSurf ) || ( prevGlyph != geoGlyph ) || ( prevCol != geoCol )
@@ -530,27 +530,27 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_dprenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
 
-    if ( properties( target )->get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
+    if ( properties( target ).get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
     {
         if ( !m_colormapRenderer )
         {
             m_colormapRenderer = new ColormapRenderer();
             m_colormapRenderer->init();
         }
-        m_colormapRenderer->setColormap( properties( target )->get( Fn::Property::D_COLORMAP ).toInt() );
-        m_colormapRenderer->setX( properties( target )->get( Fn::Property::D_COLORMAP_X ).toFloat() );
-        m_colormapRenderer->setY( properties( target )->get( Fn::Property::D_COLORMAP_Y ).toFloat() );
-        m_colormapRenderer->setDX( properties( target )->get( Fn::Property::D_COLORMAP_DX ).toFloat() );
-        m_colormapRenderer->setDY( properties( target )->get( Fn::Property::D_COLORMAP_DY ).toFloat() );
-        m_colormapRenderer->setTextSize( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
-        m_colormapRenderer->setTextColor( properties( target )->get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
+        m_colormapRenderer->setColormap( properties( target ).get( Fn::Property::D_COLORMAP ).toInt() );
+        m_colormapRenderer->setX( properties( target ).get( Fn::Property::D_COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( properties( target ).get( Fn::Property::D_COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( properties( target ).get( Fn::Property::D_COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( properties( target ).get( Fn::Property::D_COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
 
-        m_colormapRenderer->setMin( properties( target )->get( Fn::Property::D_MIN ).toFloat() );
-        m_colormapRenderer->setMax( properties( target )->get( Fn::Property::D_MAX ).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target )->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target )->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->setMin( properties( target ).get( Fn::Property::D_MIN ).toFloat() );
+        m_colormapRenderer->setMax( properties( target ).get( Fn::Property::D_MAX ).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target ).get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target ).get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
 
         m_colormapRenderer->draw( width, height, renderMode );
     }
@@ -1312,17 +1312,17 @@ void DatasetGlyphset::avgConRtoZ()
 
 void DatasetGlyphset::slotCopyColors()
 {
-    int n = properties( "maingl" )->get( Fn::Property::D_SURFACE ).toInt();
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
     QColor color;
 
-    float selectedMin = properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    float selectedMax = properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float selectedMin = properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float selectedMax = properties( "maingl" ).get( Fn::Property::D_SELECTED_MAX ).toFloat();
 
     for ( int i = 0; i < m_n; ++i )
     {
-        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" )->get( Fn::Property::D_COLORMAP ).toInt() );
+        ColormapBase cmap = ColormapFunctions::getColormap( properties( "maingl" ).get( Fn::Property::D_COLORMAP ).toInt() );
 
         float value = ( m_correlations->getValue( m_prevPickedID, i ) - selectedMin ) / ( selectedMax - selectedMin );
         color = cmap.getColor( qMax( 0.0f, qMin( 1.0f, value ) ) );

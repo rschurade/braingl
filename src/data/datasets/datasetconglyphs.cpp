@@ -163,23 +163,23 @@ void DatasetConGlyphs::rotationChanged( QVariant qv )
 
 void DatasetConGlyphs::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
 
-    int glyphstyle = properties( "maingl" )->get( Fn::Property::D_GLYPHSTYLE ).toInt();
-    int colorMode = properties( "maingl" )->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+    int glyphstyle = properties( "maingl" ).get( Fn::Property::D_GLYPHSTYLE ).toInt();
+    int colorMode = properties( "maingl" ).get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
 
-    float threshold = properties( "maingl" )->get( Fn::Property::D_THRESHOLD ).toFloat();
-    float minlength = properties( "maingl" )->get( Fn::Property::D_MINLENGTH ).toFloat();
+    float threshold = properties( "maingl" ).get( Fn::Property::D_THRESHOLD ).toFloat();
+    float minlength = properties( "maingl" ).get( Fn::Property::D_MINLENGTH ).toFloat();
 
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
     //glShadeModel( GL_SMOOTH );    // XXX not in CoreProfile; use shader
     // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
-    glPointSize( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
-    glLineWidth( properties( "maingl" )->get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glPointSize( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
+    glLineWidth( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
 
     //TODO: Make transparency right, using other rendermodes, adapt shaders?
 

@@ -453,10 +453,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 4;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
 
             dx = props->get( Fn::Property::D_DX ).toFloat();
@@ -489,10 +489,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 3;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -524,10 +524,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 2;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -559,10 +559,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 1;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -595,10 +595,10 @@ void GLFunctions::setTextureUniforms( QGLShaderProgram* program, QString target 
         {
             texIndex = 0;
             Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( tl.at( texIndex ), (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-            PropertyGroup* props = ds->properties( target );
+            PropertyGroup* props = &ds->properties( target );
             if ( props->get( Fn::Property::D_LOCK_PROPS ).toBool() )
             {
-                props = ds->properties( "maingl" );
+                props = &ds->properties( "maingl" );
             }
             dx = props->get( Fn::Property::D_DX ).toFloat();
             dy = props->get( Fn::Property::D_DY ).toFloat();
@@ -642,7 +642,7 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        PropertyGroup* props = ds->properties( target );
+        PropertyGroup* props = &ds->properties( target );
         bool active = props->get( Fn::Property::D_ACTIVE ).toBool();
         bool isTex = props->get( Fn::Property::D_HAS_TEXTURE ).toBool();
 

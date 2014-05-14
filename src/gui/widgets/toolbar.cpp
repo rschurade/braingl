@@ -248,21 +248,21 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         }
         case Fn::Algo::FA:
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
+            if ( ds->properties().get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcFAFromDWI( ds );
             }
-            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
+            else if ( ds->properties().get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcFAFromTensor( ds );
             }
             break;
         case Fn::Algo::EV:
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
+            if ( ds->properties().get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_DWI )
             {
                 l = DWIAlgos::calcEVFromDWI( ds );
             }
-            else if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
+            else if ( ds->properties().get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::NIFTI_TENSOR )
             {
                 l = DWIAlgos::calcEVFromTensor( ds );
             }
@@ -336,7 +336,7 @@ void ToolBar::slot( Fn::Algo algo )
         case Fn::Algo::QBALL:
             break;
         case Fn::Algo::CUT_SELECTED_FIBERS:
-            if ( ds->properties()->get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::FIBERS )
+            if ( ds->properties().get( Fn::Property::D_TYPE ) == (int)Fn::DatasetType::FIBERS )
             {
                 l = FiberAlgos::cutSelecteded( ds );
             }
@@ -597,7 +597,7 @@ void ToolBar::correlationFinished()
 
 void ToolBar::slotMeshSelected( QList<QVariant> meshes )
 {
-    qDebug() << VPtr<DatasetMesh>::asPtr( meshes[0] )->properties()->get( Fn::Property::D_NAME ).toString();
+    qDebug() << VPtr<DatasetMesh>::asPtr( meshes[0] )->properties().get( Fn::Property::D_NAME ).toString();
 
     QModelIndex index = m_toolBarView->model()->index( m_toolBarView->getSelected(), (int)Fn::Property::D_DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_toolBarView->model()->data( index, Qt::DisplayRole ) );

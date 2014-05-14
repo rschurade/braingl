@@ -43,9 +43,9 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     bool *srcpix;
     double g, *array;
 
-    nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-    ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-    nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    nx = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+    ny = ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+    nz = ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
 
     npixels = qMax( nz, ny );
     array = new double[npixels];
@@ -307,12 +307,13 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
 
     out = tmp;
 
-    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (distance map)";
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (distance map)";
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
-    iso->properties()->set( Fn::Property::D_ISO_VALUE, 0.10 );
-    iso->properties()->set( Fn::Property::D_COLORMODE, 1 );
+    iso->properties().set( Fn::Property::D_ISO_VALUE, 0.10 );
+    iso->properties().set( Fn::Property::D_COLORMODE, 1 );
 
     QList<Dataset*> l;
     //l.push_back( dsOut );
@@ -332,9 +333,9 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
 
     int b, r, c, bb, rr, r0, b0, c0;
 
-    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    int nx = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
     int npixels = nz * ny * nx;
 
     // create the filter kernel
@@ -442,8 +443,9 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
 
     out = tmp;
 
-    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (gauss)";
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (gauss)";
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
@@ -463,7 +465,7 @@ QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
     std::vector<float>* data = static_cast<DatasetScalar*>( ds )->getData();
     std::vector<float> out( data->size() );
 
-    float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
+    float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat();
     out[0] = max;
 
 
@@ -480,9 +482,9 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
     std::vector<float>* data = dss->getData();
     std::vector<float> out( data->size() );
 
-    int nx = ds->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-    int ny = ds->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-    int nz = ds->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
+    int nx = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+    int ny = ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+    int nz = ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
 
     // create the filter kernel
     int dist = Models::getGlobal( Fn::Property::G_FILTER_SIZE ).toInt();
@@ -505,8 +507,9 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
         }
     }
 
-    QString name = ds->properties( "maingl" )->get( Fn::Property::D_NAME ).toString() + " (median)";
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (median)";
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
@@ -521,12 +524,14 @@ QList<Dataset*> ScalarAlgos::createROI( Dataset* ds )
     std::vector<float> out( data->size(), 0.0 );
     std::vector<bool> mask( data->size(), true );
 
-    float min = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    float max = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-    float totalMin = ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat();
-    float totalMax = ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
-    float lowerThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    float upperThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    PropertyGroup props = ds->properties( "maingl" );
+
+    float min = props.get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float max = props.get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float totalMin = props.get( Fn::Property::D_MIN ).toFloat();
+    float totalMax = props.get( Fn::Property::D_MAX ).toFloat();
+    float lowerThreshold = props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float upperThreshold = props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
 
     for ( unsigned int i = 0; i < data->size(); ++i )
     {
@@ -545,7 +550,7 @@ QList<Dataset*> ScalarAlgos::createROI( Dataset* ds )
         out[i] = value;
     }
 
-    ROIArea* roiOut = new ROIArea( out, dss->getHeader() );
+    ROIArea* roiOut = new ROIArea( out, dss->properties() );
     Models::addROIArea( roiOut );
 
 

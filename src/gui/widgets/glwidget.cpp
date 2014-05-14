@@ -392,7 +392,7 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
 
     if ( Models::r()->rowCount() > 0 )
     {
-        QModelIndex mi = Models::r()->index( 0, (int)Fn::Property::R_PICK_ID );
+        QModelIndex mi = Models::r()->index( 0, (int)Fn::Property::D_PICK_ID );
         QModelIndexList l = ( Models::r()->match( mi, Qt::DisplayRole, m_picked ) );
         m_roiSelectionModel->clear();
         if ( l.size() > 0 )
@@ -524,14 +524,14 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
                 if ( m_roiSelectionModel->hasSelection() )
                 {
                     QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::R_POINTER, mi.parent() ), Qt::DisplayRole ) );
-                    float newx = roi->properties()->get( Fn::Property::R_X ).toFloat() + dir.x();
-                    float newy = roi->properties()->get( Fn::Property::R_Y ).toFloat() + dir.y();
-                    float newz = roi->properties()->get( Fn::Property::R_Z ).toFloat() + dir.z();
+                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::D_POINTER, mi.parent() ), Qt::DisplayRole ) );
+                    float newx = roi->properties()->get( Fn::Property::D_X ).toFloat() + dir.x();
+                    float newy = roi->properties()->get( Fn::Property::D_Y ).toFloat() + dir.y();
+                    float newz = roi->properties()->get( Fn::Property::D_Z ).toFloat() + dir.z();
 
-                    roi->properties()->set( Fn::Property::R_X, newx );
-                    roi->properties()->set( Fn::Property::R_Y, newy );
-                    roi->properties()->set( Fn::Property::R_Z, newz );
+                    roi->properties()->set( Fn::Property::D_X, newx );
+                    roi->properties()->set( Fn::Property::D_Y, newy );
+                    roi->properties()->set( Fn::Property::D_Z, newz );
                     roi->slotPropChanged();
                 }
                 break;

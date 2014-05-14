@@ -102,7 +102,7 @@ void ROIWidget::itemSelectionChanged( const QItemSelection &selected )
 void ROIWidget::deleteItem()
 {
     QModelIndex id = m_treeView->selectionModel()->selectedIndexes().first();
-    QModelIndex index = Models::r()->index( id.row(), (int)Fn::Property::R_POINTER, Models::r()->parent( id ) );
+    QModelIndex index = Models::r()->index( id.row(), (int)Fn::Property::D_POINTER, Models::r()->parent( id ) );
     ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( index, Qt::DisplayRole ) );
     delete roi;
     m_treeView->model()->removeRows( id.row(), 0, id.parent() );
@@ -116,10 +116,10 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
     }
     QModelIndex id = m_treeView->selectionModel()->selectedIndexes().first();
 
-    QModelIndex index = Models::r()->index( id.row(), (int)Fn::Property::R_POINTER, Models::r()->parent( id ) );
+    QModelIndex index = Models::r()->index( id.row(), (int)Fn::Property::D_POINTER, Models::r()->parent( id ) );
 
     ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( index, Qt::DisplayRole ) );
-    int type = roi->properties()->get( Fn::Property::R_SHAPE ).toInt();
+    int type = roi->properties()->get( Fn::Property::D_SHAPE ).toInt();
     if ( type < 10 )
     {
         float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
@@ -141,12 +141,12 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             add = 5.0f;
         }
 
-        float rx = roi->properties()->get( Fn::Property::R_X ).toFloat();
-        float ry = roi->properties()->get( Fn::Property::R_Y ).toFloat();
-        float rz = roi->properties()->get( Fn::Property::R_Z ).toFloat();
-        float rdx = roi->properties()->get( Fn::Property::R_DX ).toFloat();
-        float rdy = roi->properties()->get( Fn::Property::R_DY ).toFloat();
-        float rdz = roi->properties()->get( Fn::Property::R_DZ ).toFloat();
+        float rx = roi->properties()->get( Fn::Property::D_X ).toFloat();
+        float ry = roi->properties()->get( Fn::Property::D_Y ).toFloat();
+        float rz = roi->properties()->get( Fn::Property::D_Z ).toFloat();
+        float rdx = roi->properties()->get( Fn::Property::D_DX ).toFloat();
+        float rdy = roi->properties()->get( Fn::Property::D_DY ).toFloat();
+        float rdz = roi->properties()->get( Fn::Property::D_DZ ).toFloat();
 
         switch( event->key() )
         {
@@ -223,12 +223,12 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 break;
             }
         }
-        roi->properties()->set( Fn::Property::R_X, rx );
-        roi->properties()->set( Fn::Property::R_Y, ry );
-        roi->properties()->set( Fn::Property::R_Z, rz );
-        roi->properties()->set( Fn::Property::R_DX, rdx );
-        roi->properties()->set( Fn::Property::R_DY, rdy );
-        roi->properties()->set( Fn::Property::R_DZ, rdz );
+        roi->properties()->set( Fn::Property::D_X, rx );
+        roi->properties()->set( Fn::Property::D_Y, ry );
+        roi->properties()->set( Fn::Property::D_Z, rz );
+        roi->properties()->set( Fn::Property::D_DX, rdx );
+        roi->properties()->set( Fn::Property::D_DY, rdy );
+        roi->properties()->set( Fn::Property::D_DZ, rdz );
     }
-    Models::r()->setData( Models::r()->index( id.row(), (int)Fn::Property::R_UPDATED, Models::r()->parent( id ) ), true );
+    Models::r()->setData( Models::r()->index( id.row(), (int)Fn::Property::D_UPDATED, Models::r()->parent( id ) ), true );
 }

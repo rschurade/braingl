@@ -38,15 +38,15 @@ GLuint Dataset::getTextureGLuint()
     return m_textureGLuint;
 }
 
-PropertyGroup* Dataset::properties( QString target )
+PropertyGroup& Dataset::properties( QString target )
 {
     if ( m_properties.contains( target ) )
     {
-        return &m_properties[target];
+        return m_properties[target];
     }
     else
     {
-        return &m_properties["maingl"];
+        return m_properties["maingl"];
     }
 }
 
@@ -92,6 +92,15 @@ void Dataset::copySettings( QString target )
     m_properties.insert( target, props );
     m_properties[target].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
     m_properties[target].getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
+}
+
+void Dataset::copyPropertyObject( PropertyGroup& props, QString target )
+{
+    if ( m_properties.contains( target ) )
+    {
+        m_properties.remove( target );
+    }
+    m_properties.insert( target, props );
 }
 
 QString Dataset::getSaveFilter()

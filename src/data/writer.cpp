@@ -38,7 +38,7 @@ Writer::~Writer()
 
 bool Writer::save()
 {
-    switch ( (Fn::DatasetType)( m_dataset->properties()->get( Fn::Property::D_TYPE ).toInt() ) )
+    switch ( (Fn::DatasetType)( m_dataset->properties().get( Fn::Property::D_TYPE ).toInt() ) )
     {
         case Fn::DatasetType::NIFTI_SCALAR:
         {

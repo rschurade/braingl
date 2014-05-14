@@ -48,9 +48,9 @@ void FiberRenderer::init()
     glGenBuffers( 1, &indexVbo );
 }
 
-void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
-    float alpha = props->get( Fn::Property::D_ALPHA ).toFloat();
+    float alpha = props.get( Fn::Property::D_ALPHA ).toFloat();
     if ( renderMode == 0 ) // picking
     {
         return;
@@ -106,15 +106,15 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
     program->setUniformValue( "C5", 13 );
-    program->setUniformValue( "u_fibGrowth", props->get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
+    program->setUniformValue( "u_fibGrowth", props.get( Fn::Property::D_FIBER_GROW_LENGTH).toFloat() );
 
-    program->setUniformValue( "u_lighting", props->get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
-    program->setUniformValue( "u_lightAmbient", props->get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
-    program->setUniformValue( "u_lightDiffuse", props->get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
-    program->setUniformValue( "u_materialAmbient", props->get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
-    program->setUniformValue( "u_materialDiffuse", props->get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
-    program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
-    program->setUniformValue( "u_materialShininess", props->get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
+    program->setUniformValue( "u_lighting", props.get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", props.get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", props.get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialAmbient", props.get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_materialDiffuse", props.get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialSpecular", props.get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
+    program->setUniformValue( "u_materialShininess", props.get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
 
     float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
     float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
@@ -135,7 +135,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
 
-    glLineWidth( props->get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
+    glLineWidth( props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
     std::vector<bool>*selected = m_selector->getSelection();
 
@@ -168,7 +168,7 @@ void FiberRenderer::setupTextures()
 {
 }
 
-void FiberRenderer::setShaderVars( PropertyGroup* props )
+void FiberRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "fiber" );
 
@@ -188,19 +188,19 @@ void FiberRenderer::setShaderVars( PropertyGroup* props )
     glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numFloats, (const void *) offset );
     offset += sizeof(float) * 3;
 
-    program->setUniformValue( "u_colorMode", props->get( Fn::Property::D_COLORMODE ).toInt() );
-    program->setUniformValue( "u_colormap", props->get( Fn::Property::D_COLORMAP ).toInt() );
+    program->setUniformValue( "u_colorMode", props.get( Fn::Property::D_COLORMODE ).toInt() );
+    program->setUniformValue( "u_colormap", props.get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    program->setUniformValue( "u_selectedMin", props->get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-    program->setUniformValue( "u_selectedMax", props->get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-    program->setUniformValue( "u_lowerThreshold", props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_upperThreshold", props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_cutdx", props->get( Fn::Property::D_DX ).toFloat() );
-    program->setUniformValue( "u_cutdy", props->get( Fn::Property::D_DY ).toFloat() );
-    program->setUniformValue( "u_cutdz", props->get( Fn::Property::D_DZ ).toFloat() );
-    program->setUniformValue( "u_cutx", props->get( Fn::Property::D_NX ).toFloat() / 10.f );
-    program->setUniformValue( "u_cuty", props->get( Fn::Property::D_NY ).toFloat() / 10.f );
-    program->setUniformValue( "u_cutz", props->get( Fn::Property::D_NZ ).toFloat() / 10.f );
+    program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+    program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+    program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    program->setUniformValue( "u_cutdx", props.get( Fn::Property::D_DX ).toFloat() );
+    program->setUniformValue( "u_cutdy", props.get( Fn::Property::D_DY ).toFloat() );
+    program->setUniformValue( "u_cutdz", props.get( Fn::Property::D_DZ ).toFloat() );
+    program->setUniformValue( "u_cutx", props.get( Fn::Property::D_NX ).toFloat() / 10.f );
+    program->setUniformValue( "u_cuty", props.get( Fn::Property::D_NY ).toFloat() / 10.f );
+    program->setUniformValue( "u_cutz", props.get( Fn::Property::D_NZ ).toFloat() / 10.f );
 }
 
 void FiberRenderer::initGeometry()

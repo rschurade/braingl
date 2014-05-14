@@ -167,7 +167,7 @@ void DatasetDWI::createTexture()
 
 void DatasetDWI::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }

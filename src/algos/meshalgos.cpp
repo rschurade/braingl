@@ -38,10 +38,10 @@ QList<Dataset*> MeshAlgos::meshTimeSeries( Dataset* ds, TriangleMesh2* mesh )
     {
         DatasetFMRI* fmri = dynamic_cast<DatasetFMRI*>( ds );
 
-        int nx = fmri->properties( "maingl" )->get( Fn::Property::D_NX ).toInt();
-        int ny = fmri->properties( "maingl" )->get( Fn::Property::D_NY ).toInt();
-        int nz = fmri->properties( "maingl" )->get( Fn::Property::D_NZ ).toInt();
-        int dim = fmri->properties( "maingl" )->get( Fn::Property::D_DIM ).toInt();
+        int nx = fmri->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+        int ny = fmri->properties( "maingl" ).get( Fn::Property::D_NY ).toInt();
+        int nz = fmri->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt();
+        int dim = fmri->properties( "maingl" ).get( Fn::Property::D_DIM ).toInt();
         std::vector<float>* data = fmri->getData();
 
         int numVerts = mesh->numVerts();

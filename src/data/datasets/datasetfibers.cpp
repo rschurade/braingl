@@ -210,12 +210,12 @@ std::vector<Fib> DatasetFibers::getSelectedFibs()
         QVector3D start;
         if ( Models::r()->rowCount()  > 0 )
         {
-            int shape = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt();
+            int shape = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_SHAPE ), Qt::DisplayRole ).toInt();
             if ( shape >= 0 && shape <= 3 )
             {
-                float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
-                float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
-                float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
+                float x = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_X ), Qt::DisplayRole ).toFloat();
+                float y = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_Y ), Qt::DisplayRole ).toFloat();
+                float z = Models::r()->data( m_selector->createIndex( 0, 0, (int)Fn::Property::D_Z ), Qt::DisplayRole ).toFloat();
                 start = QVector3D( x, y, z );
             }
             else
@@ -259,7 +259,7 @@ QList<QString> DatasetFibers::getDataNames()
 
 void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -271,26 +271,26 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         connect( m_selector, SIGNAL( changed() ), Models::d(), SLOT( submit() ) );
     }
 
-    if ( properties( target )->get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 0 )
+    if ( properties( target ).get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 0 )
     {
         if ( m_renderer == 0 )
         {
             m_renderer = new FiberRenderer( m_selector, &m_fibs, m_numPoints );
             m_renderer->setModel( Models::g() );
             m_renderer->init();
-            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
+            connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
         }
 
         m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-    else if ( properties( target )->get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 1 )
+    else if ( properties( target ).get( Fn::Property::D_FIBER_RENDERMODE).toInt() == 1 )
     {
         if ( m_tubeRenderer == 0 )
         {
             m_tubeRenderer = new TubeRenderer( m_selector, &m_fibs );
             m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
-            connect( properties( target )->getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
+            connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
         }
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
@@ -306,8 +306,8 @@ void DatasetFibers::transformChanged( QVariant value )
 
     if ( dsl.size() > 0 )
     {
-        qForm = dsl.first()->properties()->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
-        sForm = dsl.first()->properties()->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+        qForm = dsl.first()->properties().get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        sForm = dsl.first()->properties().get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
     }
 
     m_properties["maingl"].getWidget( Fn::Property::D_TRANSFORM )->setEnabled( false );
@@ -551,11 +551,11 @@ void DatasetFibers::dataModeChanged()
 {
     if ( m_renderer != 0 )
     {
-        m_renderer->updateExtraData( properties( "maingl" )->get( Fn::Property::D_DATAMODE).toInt() );
+        m_renderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     if ( m_tubeRenderer != 0 )
     {
-        m_tubeRenderer->updateExtraData( properties( "maingl" )->get( Fn::Property::D_DATAMODE).toInt() );
+        m_tubeRenderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     float min = m_dataMins[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
     float max = m_dataMaxes[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];

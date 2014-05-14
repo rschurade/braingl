@@ -40,9 +40,9 @@ NewDatasetWidget::NewDatasetWidget( ROIWidget* roiWidget, QWidget* parent ) :
     QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
     for ( int k = 0; k < dsl.size(); ++k )
     {
-        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
+        if ( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::NIFTI_SCALAR )
         {
-            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties()->get( Fn::Property::D_NAME ).toString(), dsl[k] );
+            m_sourceSelect->addItem( VPtr<Dataset>::asPtr( dsl[k] )->properties().get( Fn::Property::D_NAME ).toString(), dsl[k] );
         }
     }
     m_layout->addWidget( m_sourceSelect );
@@ -141,12 +141,12 @@ void NewDatasetWidget::createDataset()
             std::vector<float>* data = ds->getData();
             std::vector<float> out( data->size() );
 
-            float min = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-            float max = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-            float totalMin = ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat();
-            float totalMax = ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
-            float lowerThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-            float upperThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+            float min = ds->properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
+            float max = ds->properties( "maingl" ).get( Fn::Property::D_SELECTED_MAX ).toFloat();
+            float totalMin = ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat();
+            float totalMax = ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat();
+            float lowerThreshold = ds->properties( "maingl" ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+            float upperThreshold = ds->properties( "maingl" ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
 
             for ( unsigned int i = 0; i < data->size(); ++i )
             {
@@ -203,12 +203,12 @@ void NewDatasetWidget::createROI()
     {
         case 1:
             {
-                float min = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-                float max = ds->properties( "maingl" )->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-                float totalMin = ds->properties( "maingl" )->get( Fn::Property::D_MIN ).toFloat();
-                float totalMax = ds->properties( "maingl" )->get( Fn::Property::D_MAX ).toFloat();
-                float lowerThreshold = ds->properties( "maingl" )->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-                float upperThreshold = ds->properties( "maingl" )->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+                float min = ds->properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
+                float max = ds->properties( "maingl" ).get( Fn::Property::D_SELECTED_MAX ).toFloat();
+                float totalMin = ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat();
+                float totalMax = ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat();
+                float lowerThreshold = ds->properties( "maingl" ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+                float upperThreshold = ds->properties( "maingl" ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
 
                 for ( unsigned int i = 0; i < data->size(); ++i )
                 {
@@ -233,7 +233,7 @@ void NewDatasetWidget::createROI()
             break;
     }
 
-    ROIArea* roiOut = new ROIArea( out, ds->getHeader() );
+    ROIArea* roiOut = new ROIArea( out, ds->properties() );
 
     m_roiWidget->addROIArea( roiOut );
 
@@ -303,29 +303,29 @@ void NewDatasetWidget::copyWithRois( DatasetScalar* source, std::vector<float> &
 
 void NewDatasetWidget::copy( int branch, int pos, DatasetScalar* source, std::vector<float> &target )
 {
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt() > 4 )
+    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_SHAPE ), Qt::DisplayRole ).toInt() > 4 )
     {
         return;
     }
 
     std::vector<float>* s = source->getData();
 
-    int ds_nx = source->properties()->get( Fn::Property::D_NX ).toInt();
-    int ds_ny = source->properties()->get( Fn::Property::D_NY ).toInt();
-    int ds_nz = source->properties()->get( Fn::Property::D_NZ ).toInt();
-    float ds_dx = source->properties()->get( Fn::Property::D_DX ).toFloat();
-    float ds_dy = source->properties()->get( Fn::Property::D_DY ).toFloat();
-    float ds_dz = source->properties()->get( Fn::Property::D_DZ ).toFloat();
+    int ds_nx = source->properties().get( Fn::Property::D_NX ).toInt();
+    int ds_ny = source->properties().get( Fn::Property::D_NY ).toInt();
+    int ds_nz = source->properties().get( Fn::Property::D_NZ ).toInt();
+    float ds_dx = source->properties().get( Fn::Property::D_DX ).toFloat();
+    float ds_dy = source->properties().get( Fn::Property::D_DY ).toFloat();
+    float ds_dz = source->properties().get( Fn::Property::D_DZ ).toFloat();
 
     if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
 
-        float x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
-        float y = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
-        float z = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
-        float dx = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DX ), Qt::DisplayRole ).toFloat() / 2;
-        float dy = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DY ), Qt::DisplayRole ).toFloat() / 2;
-        float dz = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DZ ), Qt::DisplayRole ).toFloat() / 2;
+        float x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_X ), Qt::DisplayRole ).toFloat();
+        float y = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_Y ), Qt::DisplayRole ).toFloat();
+        float z = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_Z ), Qt::DisplayRole ).toFloat();
+        float dx = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DX ), Qt::DisplayRole ).toFloat() / 2;
+        float dy = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DY ), Qt::DisplayRole ).toFloat() / 2;
+        float dz = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DZ ), Qt::DisplayRole ).toFloat() / 2;
         float xMin = x - dx;
         float xMax = x + dx;
         float yMin = y - dy;

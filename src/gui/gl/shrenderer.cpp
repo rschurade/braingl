@@ -17,7 +17,6 @@
 #include "../../algos/qball.h"
 
 #include "../../data/mesh/tesselation.h"
-#include "../../data/properties/propertygroup.h"
 #include "../../data/mesh/trianglemesh2.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
@@ -67,9 +66,9 @@ void SHRenderer::init()
     glGenBuffers( 3, vboIds );
 }
 
-void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
-    float alpha = 1.0; //props->get( Fn::Property::D_ALPHA ).toFloat();
+    float alpha = 1.0; //props.get( Fn::Property::D_ALPHA ).toFloat();
     m_renderMode = renderMode;
 
     m_pMatrix = p_matrix;
@@ -149,13 +148,13 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    program->setUniformValue( "u_lighting", props->get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
-    program->setUniformValue( "u_lightAmbient", props->get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
-    program->setUniformValue( "u_lightDiffuse", props->get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
-    program->setUniformValue( "u_materialAmbient", props->get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
-    program->setUniformValue( "u_materialDiffuse", props->get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
-    program->setUniformValue( "u_materialSpecular", props->get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
-    program->setUniformValue( "u_materialShininess", props->get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
+    program->setUniformValue( "u_lighting", props.get( Fn::Property::D_LIGHT_SWITCH ).toBool() );
+    program->setUniformValue( "u_lightAmbient", props.get( Fn::Property::D_LIGHT_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_lightDiffuse", props.get( Fn::Property::D_LIGHT_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialAmbient", props.get( Fn::Property::D_MATERIAL_AMBIENT ).toFloat() );
+    program->setUniformValue( "u_materialDiffuse", props.get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
+    program->setUniformValue( "u_materialSpecular", props.get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
+    program->setUniformValue( "u_materialShininess", props.get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
 
 
     float pAlpha =  1.0;
@@ -261,36 +260,36 @@ void SHRenderer::initGeometry()
     createMesh();
 }
 
-void SHRenderer::setRenderParams( PropertyGroup* props )
+void SHRenderer::setRenderParams( PropertyGroup& props )
 {
-    m_scaling = props->get( Fn::Property::D_SCALING ).toFloat();
-    m_offset = props->get( Fn::Property::D_OFFSET ).toInt();
-    m_lod = props->get( Fn::Property::D_LOD ).toInt();
-    m_minMaxScaling = props->get( Fn::Property::D_MINMAX_SCALING ).toBool();
-    m_hideNegativeLobes = props->get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
-    m_order = props->get( Fn::Property::D_ORDER ).toInt();
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_offset = props.get( Fn::Property::D_OFFSET ).toInt();
+    m_lod = props.get( Fn::Property::D_LOD ).toInt();
+    m_minMaxScaling = props.get( Fn::Property::D_MINMAX_SCALING ).toBool();
+    m_hideNegativeLobes = props.get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
+    m_order = props.get( Fn::Property::D_ORDER ).toInt();
 
     m_orient = 0;
-    if ( props->get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+    if ( props.get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
         m_orient = 1;
     }
-    if ( props->get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+    if ( props.get( Fn::Property::D_RENDER_CORONAL ).toBool() )
     {
         m_orient += 2;
     }
-    if ( props->get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+    if ( props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
     {
         m_orient += 4;
     }
 
-    m_colorMode = props->get( Fn::Property::D_COLORMODE ).toInt();
-    m_colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
-    m_selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    m_selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-    m_lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    m_upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
-    m_color = props->get( Fn::Property::D_COLOR ).value<QColor>();
+    m_colorMode = props.get( Fn::Property::D_COLORMODE ).toInt();
+    m_colormap = props.get( Fn::Property::D_COLORMAP ).toInt();
+    m_selectedMin = props.get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    m_selectedMax = props.get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    m_lowerThreshold = props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    m_upperThreshold = props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
 void SHRenderer::createMesh()

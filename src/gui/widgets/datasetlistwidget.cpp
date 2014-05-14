@@ -189,8 +189,8 @@ void DatasetListWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
 //            }
             case 80:
             {
-                int paintMode = ds->properties()->get( Fn::Property::D_PAINTMODE ).toInt();
-                ds->properties()->set( Fn::Property::D_PAINTMODE, 1 - paintMode );
+                int paintMode = ds->properties().get( Fn::Property::D_PAINTMODE ).toInt();
+                ds->properties().set( Fn::Property::D_PAINTMODE, 1 - paintMode );
                 break;
             }
         }

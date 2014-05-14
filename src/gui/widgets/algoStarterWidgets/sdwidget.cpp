@@ -24,7 +24,7 @@ SDWidget::SDWidget( Dataset* ds, QList<QVariant> &dsl, QWidget* parent )
     m_startButton = new QPushButton( tr("Start") );
     connect( m_startButton, SIGNAL( clicked() ), this, SLOT( start() ) );
 
-    int numVoxels = ds->properties()->get( Fn::Property::D_NX ).toInt() * ds->properties()->get( Fn::Property::D_NY ).toInt() * ds->properties()->get( Fn::Property::D_NZ ).toInt();
+    int numVoxels = ds->properties().get( Fn::Property::D_NX ).toInt() * ds->properties().get( Fn::Property::D_NY ).toInt() * ds->properties().get( Fn::Property::D_NZ ).toInt();
 
 
     m_progressBar = new QProgressBar( this );

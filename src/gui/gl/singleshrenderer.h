@@ -29,6 +29,7 @@ public:
 
     void initGL();
     void draw();
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props ) {};
 
     void leftMouseDown( int x, int y );
     void leftMouseDrag( int x, int y );

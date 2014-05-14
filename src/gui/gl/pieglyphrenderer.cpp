@@ -25,16 +25,16 @@ PieGlyphRenderer::~PieGlyphRenderer()
     pies = NULL;
 }
 
-void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props )
+void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
-    float alpha = props->get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
-    int colorMode = props->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
-    int colormap = props->get( Fn::Property::D_COLORMAP ).toInt();
-    float selectedMin = props->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    float selectedMax = props->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-    float lowerThreshold = props->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    float upperThreshold = props->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
-    QColor color = props->get( Fn::Property::D_COLOR ).value<QColor>();
+    float alpha = props.get( Fn::Property::D_GLYPH_ALPHA ).toFloat();
+    int colorMode = props.get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+    int colormap = props.get( Fn::Property::D_COLORMAP ).toInt();
+    float selectedMin = props.get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float selectedMax = props.get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float lowerThreshold = props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float upperThreshold = props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    QColor color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 
     if ( renderMode == 1 ) // we are drawing opaque objects
     {
@@ -95,7 +95,7 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
         glShadeModel( GL_FLAT );
 
         int start = 0;
-        if ( props->get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
+        if ( props.get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {
             for ( int i = 0; i < n; i++ )
             {
@@ -123,16 +123,16 @@ void PieGlyphRenderer::setupTextures()
 
 }
 
-void PieGlyphRenderer::setShaderVars( PropertyGroup* props )
+void PieGlyphRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "pies" );
 
     program->bind();
 
-    program->setUniformValue( "threshold", props->get( Fn::Property::D_THRESHOLD ).toFloat() );
-    program->setUniformValue( "minlength", props->get( Fn::Property::D_MINLENGTH ).toFloat() );
-    program->setUniformValue( "radius", props->get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
-    program->setUniformValue( "normalization", props->get( Fn::Property::D_NORMALIZATION ).toFloat() );
+    program->setUniformValue( "threshold", props.get( Fn::Property::D_THRESHOLD ).toFloat() );
+    program->setUniformValue( "minlength", props.get( Fn::Property::D_MINLENGTH ).toFloat() );
+    program->setUniformValue( "radius", props.get( Fn::Property::D_GLYPHRADIUS ).toFloat() );
+    program->setUniformValue( "normalization", props.get( Fn::Property::D_NORMALIZATION ).toFloat() );
     program->setUniformValue( "u_maxNodeCount", (float)m_maxNodeCount );
 
     int elementSize = 9;

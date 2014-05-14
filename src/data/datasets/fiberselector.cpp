@@ -233,20 +233,20 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
 
 void FiberSelector::updateROI( int branch, int pos )
 {
-	int shape = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_SHAPE ), Qt::DisplayRole ).toInt();
+	int shape = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_SHAPE ), Qt::DisplayRole ).toInt();
     if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
         if ( shape == 10 )
         {
-            ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_POINTER ), Qt::DisplayRole ) );
-            float threshold = roi->properties()->get( Fn::Property::R_THRESHOLD ).toFloat();
+            ROIArea* roi = VPtr<ROIArea>::asPtr( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
+            float threshold = roi->properties()->get( Fn::Property::D_THRESHOLD ).toFloat();
             std::vector<float>* data = roi->data();
-            int nx = roi->properties()->get( Fn::Property::R_NX ).toInt();
-            int ny = roi->properties()->get( Fn::Property::R_NY ).toInt();
-            int nz = roi->properties()->get( Fn::Property::R_NZ ).toInt();
-            float dx = roi->properties()->get( Fn::Property::R_DX ).toFloat();
-            float dy = roi->properties()->get( Fn::Property::R_DY ).toFloat();
-            float dz = roi->properties()->get( Fn::Property::R_DZ ).toFloat();
+            int nx = roi->properties()->get( Fn::Property::D_NX ).toInt();
+            int ny = roi->properties()->get( Fn::Property::D_NY ).toInt();
+            int nz = roi->properties()->get( Fn::Property::D_NZ ).toInt();
+            float dx = roi->properties()->get( Fn::Property::D_DX ).toFloat();
+            float dy = roi->properties()->get( Fn::Property::D_DY ).toFloat();
+            float dz = roi->properties()->get( Fn::Property::D_DZ ).toFloat();
             for ( int i = 0; i < m_numLines; ++i )
             {
                 m_bitfields[branch][pos][i] = false;
@@ -275,12 +275,12 @@ void FiberSelector::updateROI( int branch, int pos )
         }
         else
         {
-            m_x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_X ), Qt::DisplayRole ).toFloat();
-            m_y = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Y ), Qt::DisplayRole ).toFloat();
-            m_z = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_Z ), Qt::DisplayRole ).toFloat();
-            m_dx = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DX ), Qt::DisplayRole ).toFloat() / 2;
-            m_dy = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DY ), Qt::DisplayRole ).toFloat() / 2;
-            m_dz = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::R_DZ ), Qt::DisplayRole ).toFloat() / 2;
+            m_x = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_X ), Qt::DisplayRole ).toFloat();
+            m_y = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_Y ), Qt::DisplayRole ).toFloat();
+            m_z = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_Z ), Qt::DisplayRole ).toFloat();
+            m_dx = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DX ), Qt::DisplayRole ).toFloat() / 2;
+            m_dy = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DY ), Qt::DisplayRole ).toFloat() / 2;
+            m_dz = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_DZ ), Qt::DisplayRole ).toFloat() / 2;
             m_boxMin[0] = m_x - m_dx;
             m_boxMax[0] = m_x + m_dx;
             m_boxMin[1] = m_y - m_dy;
@@ -309,7 +309,7 @@ void FiberSelector::updateROI( int branch, int pos )
     updateBranch( branch );
     if ( m_isInitialized )
     {
-        Models::r()->setData( createIndex( branch, pos, (int)Fn::Property::R_UPDATED ), true, Qt::DisplayRole );
+        Models::r()->setData( createIndex( branch, pos, (int)Fn::Property::D_UPDATED ), true, Qt::DisplayRole );
     }
 }
 
@@ -377,7 +377,7 @@ void FiberSelector::updateBranch( int branch )
     //qDebug() << "update branch" << branch;
     int current = 0;
 
-    bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::R_NEG ), Qt::DisplayRole ).toBool();
+    bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::D_NEG ), Qt::DisplayRole ).toBool();
     if ( neg )
     {
         for ( int k = 0; k < m_numLines; ++k )
@@ -398,7 +398,7 @@ void FiberSelector::updateBranch( int branch )
     {
         if ( Models::r()->data( createIndex( branch, current, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
         {
-            bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::R_NEG ), Qt::DisplayRole ).toBool();
+            bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::D_NEG ), Qt::DisplayRole ).toBool();
             if ( neg )
             {
                 for ( int k = 0; k < m_numLines; ++k )

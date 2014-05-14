@@ -19,7 +19,7 @@ LittleBrainRenderer::~LittleBrainRenderer()
 
 }
 
-void LittleBrainRenderer::setRenderParams( PropertyGroup* props )
+void LittleBrainRenderer::setRenderParams( PropertyGroup& props )
 {
     MeshRenderer::setRenderParams( props );
     m_colorMode = m_LB_colormode;

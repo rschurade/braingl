@@ -12,8 +12,6 @@
 
 #include "mesh/isosurfaceincludes.h"
 
-#include "../thirdparty/nifti/nifti1_io.h"
-
 #include <QVector>
 
 class MeshRenderer;
@@ -25,7 +23,7 @@ class ROIArea : public ROI
     Q_OBJECT
 
 public:
-    ROIArea( std::vector<float> data, nifti_image* header );
+    ROIArea( std::vector<float> data, PropertyGroup& props );
     virtual ~ROIArea();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode );
@@ -37,7 +35,6 @@ private:
     void renameVerticesAndTriangles();
 
     std::vector<float> m_data;
-    nifti_image* m_header;
 
     MeshRenderer* m_renderer;
     TriangleMesh2* m_mesh;
@@ -49,14 +46,6 @@ private:
 
     // List of TRIANGLES which form the triangulation of the isosurface.
     TRIANGLEVECTOR m_trivecTriangles;
-
-    int m_nX;
-    int m_nY;
-    int m_nZ;
-
-    float m_dX;
-    float m_dY;
-    float m_dZ;
 
     float m_max;
 

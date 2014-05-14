@@ -64,7 +64,7 @@ bool DatasetCorrelation::mousePick( int pickId, QVector3D pos, Qt::KeyboardModif
 
     int pickedID = getMesh( target )->closestVertexIndex( pos );
 
-    properties( "maingl" )->set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
+    properties( "maingl" ).set( Fn::Property::D_GLYPHSET_PICKED_ID, pickedID );
 
     DatasetMesh::mousePick( pickId, pos, modifiers, target );
     setPickedID( pickedID );
@@ -89,7 +89,7 @@ void DatasetCorrelation::setPickedID( int pickedID )
 
 void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
 {
-    if ( !properties( target )->get( Fn::Property::D_ACTIVE ).toBool() )
+    if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
     }
@@ -102,7 +102,7 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
     m_renderer->setMesh( getMesh( target ) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
 
-    int pickedID = properties( "maingl" )->get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
+    int pickedID = properties( "maingl" ).get( Fn::Property::D_GLYPHSET_PICKED_ID ).toInt();
     if ( m_prevPickedID != pickedID )
     {
         setPickedID( pickedID );

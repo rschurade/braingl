@@ -30,11 +30,11 @@ public:
     void init();
     void updateExtraData( unsigned int dataFieldId );
 
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup* props );
+    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
 protected:
     void setupTextures();
-    void setShaderVars( PropertyGroup* props );
+    void setShaderVars( PropertyGroup& props );
 
     void initGeometry();
 
