@@ -70,6 +70,10 @@ PropertyGroup::PropertyGroup( const PropertyGroup& pg )
 
 PropertyGroup::~PropertyGroup()
 {
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
+    {
+        delete m_properties[i].second;
+    }
 }
 
 PropertyGroup& PropertyGroup::operator=( const PropertyGroup& pg )
