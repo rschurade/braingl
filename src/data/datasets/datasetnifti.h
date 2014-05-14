@@ -25,9 +25,6 @@ public:
 
     nifti_image* getHeader();
 
-    QMatrix4x4 getQForm();
-    QMatrix4x4 getSForm();
-
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
 
@@ -52,9 +49,6 @@ protected:
     void parseNiftiHeader();
 
     nifti_image* m_header;
-
-    QMatrix4x4 m_qform;
-    QMatrix4x4 m_sform;
 };
 
 #endif /* DATASETNIFTI_H_ */
