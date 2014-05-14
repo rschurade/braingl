@@ -14,31 +14,31 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_data( data ),
     m_renderer( 0 )
 {
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, -1 );
-    m_properties["maingl"]->createBool( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
-    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 3 );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_AXIAL, false, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, -1 );
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
+    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
 
     examineDataset();
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties["maingl2"].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 }
 
 Dataset3D::~Dataset3D()
 {
-    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
+    m_properties["maingl"].set( Fn::Property::D_ACTIVE, false );
     glDeleteTextures( 1, &m_textureGLuint );
     m_data.clear();
 
@@ -47,32 +47,32 @@ Dataset3D::~Dataset3D()
 
 void Dataset3D::examineDataset()
 {
-    int type = m_properties["maingl"]->get( Fn::Property::D_DATATYPE ).toInt();
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int type = m_properties["maingl"].get( Fn::Property::D_DATATYPE ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
     int size = nx * ny * nz * 3;
 
     if ( type == DT_UNSIGNED_CHAR )
     {
-        m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
+        m_properties["maingl"].createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(unsigned char) ) );
 
-        m_properties["maingl"]->createInt( Fn::Property::D_MIN, 0 );
-        m_properties["maingl"]->createInt( Fn::Property::D_MAX, 255 );
+        m_properties["maingl"].createInt( Fn::Property::D_MIN, 0 );
+        m_properties["maingl"].createInt( Fn::Property::D_MAX, 255 );
     }
 
     if ( type == DT_FLOAT )
     {
-        m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
-        m_properties["maingl"]->createFloat( Fn::Property::D_MIN, -1.0f );
-        m_properties["maingl"]->createFloat( Fn::Property::D_MAX, 1.0f );
+        m_properties["maingl"].createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
+        m_properties["maingl"].createFloat( Fn::Property::D_MIN, -1.0f );
+        m_properties["maingl"].createFloat( Fn::Property::D_MAX, 1.0f );
     }
-    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat() );
-    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, m_properties["maingl"].get( Fn::Property::D_MIN ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, m_properties["maingl"].get( Fn::Property::D_MAX ).toFloat() );
 
-    m_properties["maingl"]->createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
-    m_properties["maingl"]->createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
+    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"].createFloat( Fn::Property::D_PAINTSIZE, 2.f, 1.f, 100.f, "paint" );
+    m_properties["maingl"].createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
 
 }
 
@@ -90,10 +90,10 @@ void Dataset3D::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
 
-    int type = m_properties["maingl"]->get( Fn::Property::D_DATATYPE ).toInt();
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int type = m_properties["maingl"].get( Fn::Property::D_DATATYPE ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     float div = 1.0;
     if ( type == DT_UNSIGNED_CHAR )
@@ -101,7 +101,7 @@ void Dataset3D::createTexture()
         div = 255.;
     }
     //div = 255.;
-    div *= m_properties["maingl"]->get( Fn::Property::D_SCALING ).toFloat();
+    div *= m_properties["maingl"].get( Fn::Property::D_SCALING ).toFloat();
 
 
     int blockSize = nx * ny * nz;
@@ -155,15 +155,15 @@ QString Dataset3D::getValueAsString( int x, int y, int z )
 
 bool Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers modifiers, QString target )
 {
-    int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
+    int paintMode = m_properties["maingl"].get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return false;
     }
 
-   QColor paintColorC = m_properties["maingl"]->get( Fn::Property::D_PAINTCOLOR ).value<QColor>();
+   QColor paintColorC = m_properties["maingl"].get( Fn::Property::D_PAINTCOLOR ).value<QColor>();
    QVector3D paintValue;
-   int type = m_properties["maingl"]->get( Fn::Property::D_DATATYPE ).toInt();
+   int type = m_properties["maingl"].get( Fn::Property::D_DATATYPE ).toInt();
    if ( type == DT_UNSIGNED_CHAR )
    {
        paintValue = QVector3D( paintColorC.red(), paintColorC.green(), paintColorC.blue() );
@@ -173,13 +173,13 @@ bool Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers mod
        paintValue = QVector3D( paintColorC.redF(), paintColorC.greenF(), paintColorC.blueF() );
    }
 
-   float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
-   float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
-   float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+   float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+   float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+   float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
 
    m_data[ getIdFromPos( pos.x(), pos.y(), pos.z() ) ] = paintValue;
 
-   int brushSize = m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toInt();
+   int brushSize = m_properties["maingl"].get( Fn::Property::D_PAINTSIZE ).toInt();
 
    for ( int i = 0; i < brushSize; ++i )
    {
@@ -206,7 +206,7 @@ bool Dataset3D::mousePick( int pickId, QVector3D pos,  Qt::KeyboardModifiers mod
 
 void Dataset3D::switchRenderSticks()
 {
-    m_properties["maingl"]->set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"]->get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
+    m_properties["maingl"].set( Fn::Property::D_HAS_TEXTURE, !( m_properties["maingl"].get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() ) );
     Models::d()->submit();
 }
 

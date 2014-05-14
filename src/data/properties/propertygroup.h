@@ -28,8 +28,10 @@ class PropertyGroup : public QObject
 
 public:
     PropertyGroup();
-    PropertyGroup( PropertyGroup& pg );
+    PropertyGroup( const PropertyGroup& pg );
     virtual ~PropertyGroup();
+
+    PropertyGroup& operator=( const PropertyGroup& pg );
 
     bool contains( Fn::Property name ) const;
     QVariant get( Fn::Property name ) const;
@@ -60,7 +62,7 @@ public:
 
     Property* getProperty( Fn::Property name );
     Property* getNthProperty( int n );
-    QPair<Fn::Property, Property*>getNthPropertyPair( int n );
+    QPair<Fn::Property, Property*>getNthPropertyPair( int n ) const;
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );

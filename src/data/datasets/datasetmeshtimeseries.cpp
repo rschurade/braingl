@@ -36,10 +36,10 @@ void DatasetMeshTimeSeries::addMesh( TriangleMesh2* tm, QString displayString )
     m_mesh.push_back( tm );
     m_displayList.push_back( displayString );
 
-    m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
-    m_properties["maingl"]->set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
-    m_properties["maingl"]->set( Fn::Property::D_START_INDEX, 0 );
-    m_properties["maingl"]->set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
+    m_properties["maingl"].set( Fn::Property::D_MESH_NUM_VERTEX, m_mesh[0]->numVerts() );
+    m_properties["maingl"].set( Fn::Property::D_MESH_NUM_TRIANGLES, m_mesh[0]->numTris() );
+    m_properties["maingl"].set( Fn::Property::D_START_INDEX, 0 );
+    m_properties["maingl"].set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
 }
 
 void DatasetMeshTimeSeries::addData( std::vector<float> data )
@@ -55,42 +55,42 @@ void DatasetMeshTimeSeries::addData( std::vector<float> data )
         }
         qDebug() << "min/max" << m_dataMin << m_dataMax;
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_MIN )->setValue( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setValue( m_dataMin );
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_MAX )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_MAX )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_MAX )->setValue( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_MAX )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_MAX )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_MAX )->setValue( m_dataMax );
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN )->setValue( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( m_dataMin );
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX )->setValue( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( m_dataMax );
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( m_dataMin );
 
-        m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( m_dataMin );
-        m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( m_dataMax );
-        m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( m_dataMin );
+        m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( m_dataMax );
+        m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( m_dataMax );
     }
 }
 
 void DatasetMeshTimeSeries::setProperties()
 {
-    m_properties["maingl"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
-    m_properties["maingl"]->createInt( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectFrame() ) );
-    connect ( m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
-    m_properties["maingl2"]->createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl"].createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_SELECTED_TEXTURE, 0, 0, m_data.size() - 1, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectFrame() ) );
+    connect ( &m_properties["maingl"], SIGNAL( signalSetProp( int ) ), this, SLOT( slotPropSet( int ) ) );
+    m_properties["maingl2"].createList( Fn::Property::D_SURFACE, m_displayList, 0, "general" );
 
-//    m_properties["maingl"]->createButton( Fn::Property::D_COPY_COLORS, "general" );
-//    connect( m_properties["maingl"]->getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+//    m_properties["maingl"].createButton( Fn::Property::D_COPY_COLORS, "general" );
+//    connect( m_properties["maingl"].getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
 }
 
 void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )

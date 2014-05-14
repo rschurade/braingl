@@ -46,36 +46,36 @@ DatasetConGlyphs::DatasetConGlyphs( QDir filename ) :
 {
     float min = -1;
     float max = 1;
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 1, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, min + ( max - min ) / 1000., min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
     addProperties();
 
     qDebug() << "properties added";
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties["maingl2"].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
 
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-            m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+            m_properties["maingl2"].getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
+    connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+            m_properties["maingl2"].getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-    m_properties["maingl"]->createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
-    m_properties["maingl2"]->createBool( Fn::Property::D_DRAW_GLYPHS, false );
+    m_properties["maingl"].createBool( Fn::Property::D_DRAW_GLYPHS, true, "general" );
+    m_properties["maingl2"].createBool( Fn::Property::D_DRAW_GLYPHS, false );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHSTYLE ), SIGNAL( valueChanged(QVariant)), this,
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_GLYPHSTYLE ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( glyphStyleChanged(QVariant) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_GLYPH_ROTATION ), SIGNAL( valueChanged(QVariant)), this,
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_GLYPH_ROTATION ), SIGNAL( valueChanged(QVariant)), this,
             SLOT( rotationChanged(QVariant) ) );
 
-    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
-    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
-    m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
+    m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
+    m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
+    m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
 
     qDebug() << "more properties added";
 }
@@ -107,22 +107,22 @@ void DatasetConGlyphs::setCons( Connections* cons )
 void DatasetConGlyphs::addProperties()
 {
     //TODO: stuff for symmetric thresholding / inversion?
-    m_properties["maingl"]->createFloat( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPHSTYLE,
+    m_properties["maingl"].createFloat( Fn::Property::D_THRESHOLD, 0.0f, 0.0f, 1.0f, "general" );
+    m_properties["maingl"].createList( Fn::Property::D_GLYPHSTYLE,
     { "points", "vectors", "pies" }, 0, "glyphs" ); //0 = points, 1 = vectors, 2 = pies
-    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
-    m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
-    m_properties["maingl"]->createFloat( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_GLYPHRADIUS, 0.01f, 0.0f, 0.5f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_NORMALIZATION, 0.5f, 0.0f, 1.0f, "glyphs" );
+    m_properties["maingl"].getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
+    m_properties["maingl"].createFloat( Fn::Property::D_PRIMSIZE, 0.5f, 0.0f, 10.0f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MINLENGTH, 0.0f, 0.0f, 100.0f, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_GLYPH_ROTATION, false, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_GLYPH_ROT_X, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_GLYPH_ROT_Y, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_GLYPH_ROT_Z, 0.0f, 0.0f, 360.0f, "glyphs" );
+    m_properties["maingl"].createFloat( Fn::Property::D_GLYPH_ALPHA, 1.0f, 0.0f, 1.0f, "glyphs" );
 
-    ( (PropertyFloat*) m_properties["maingl"]->getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
-    m_properties["maingl"]->createList( Fn::Property::D_GLYPH_COLORMODE,
+    ( (PropertyFloat*) m_properties["maingl"].getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
+    m_properties["maingl"].createList( Fn::Property::D_GLYPH_COLORMODE,
     { "orientation", "value" }, 0, "glyphs" );
 }
 
@@ -131,17 +131,17 @@ void DatasetConGlyphs::glyphStyleChanged( QVariant qv )
     if ( qv != 2 )
     {
         //Geometry-based glyphs
-        m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
-        m_properties["maingl"]->getWidget( Fn::Property::D_PRIMSIZE )->setHidden( false );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_NORMALIZATION )->setHidden( true );
+        m_properties["maingl"].getWidget( Fn::Property::D_PRIMSIZE )->setHidden( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
     }
     else
     {
         //Piechart glyphs
-        m_properties["maingl"]->getWidget( Fn::Property::D_NORMALIZATION )->setHidden( false );
-        m_properties["maingl"]->getWidget( Fn::Property::D_PRIMSIZE )->setHidden( true );
-        m_properties["maingl2"]->set( Fn::Property::D_GLYPH_COLORMODE, 0 );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_NORMALIZATION )->setHidden( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_PRIMSIZE )->setHidden( true );
+        m_properties["maingl2"].set( Fn::Property::D_GLYPH_COLORMODE, 0 );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_COLORMODE )->setDisabled( false );
     }
 }
 
@@ -149,15 +149,15 @@ void DatasetConGlyphs::rotationChanged( QVariant qv )
 {
     if ( !qv.toBool() )
     {
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( true );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( true );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( true );
     }
     else
     {
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( false );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( false );
-        m_properties["maingl"]->getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_X )->setHidden( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Y )->setHidden( false );
+        m_properties["maingl"].getWidget( Fn::Property::D_GLYPH_ROT_Z )->setHidden( false );
     }
 }
 
@@ -403,7 +403,7 @@ void DatasetConGlyphs::makePies()
         {
             maxNodeCount = count;
         }
-        int colorMode = m_properties["maingl"]->get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
+        int colorMode = m_properties["maingl"].get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
         if ( colorMode == 0 )
         {
             qSort( sortlist.begin(), sortlist.end(), edgeCompareHue2 );

@@ -16,42 +16,42 @@ DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_imag
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
         m_colormapRenderer( 0 )
 {
-    m_properties["maingl"]->createBool( Fn::Property::D_INTERPOLATION, false, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
-    m_properties["maingl"]->createInt( Fn::Property::D_DIM, 1 );
-    m_properties["maingl"]->createBool( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 1 );
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
 
     examineDataset();
 
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP, 0, "general" );
-    m_properties["maingl"]->createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"]->createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
-    m_properties["maingl"]->createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
-    //m_properties["maingl"]->create( Fn::Property::D_IS_ATLAS, false, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 0, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    m_properties["maingl"].createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    //m_properties["maingl"].create( Fn::Property::D_IS_ATLAS, false, "colormap" );
 
-    PropertyGroup* props2 = new PropertyGroup( *( m_properties["maingl"] ) );
+    PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
-    m_properties["maingl2"]->getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
+    m_properties["maingl2"].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+    m_properties["maingl2"].getProperty( Fn::Property::D_LOCK_PROPS )->setPropertyTab( "general" );
 
 //    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
 //              m_properties["maingl2"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
 //    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
 //              m_properties["maingl2"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-    connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
+    connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 }
 
 DatasetScalar::~DatasetScalar()
 {
-    m_properties["maingl"]->set( Fn::Property::D_ACTIVE, false );
+    m_properties["maingl"].set( Fn::Property::D_ACTIVE, false );
     delete m_colormapRenderer;
     m_data.clear();
     glDeleteTextures( 1, &m_textureGLuint );
@@ -65,9 +65,9 @@ std::vector<float>* DatasetScalar::getData()
 
 void DatasetScalar::examineDataset()
 {
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     float min = std::numeric_limits<float>::max();
     float max = 0;
@@ -79,28 +79,28 @@ void DatasetScalar::examineDataset()
         max = qMax( max, m_data[i] );
     }
 
-    m_properties["maingl"]->createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MIN, min );
-    m_properties["maingl"]->createFloat( Fn::Property::D_MAX, max );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/100., min, max, "general" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_SIZE, static_cast<int>( size * sizeof(float) ) );
+    m_properties["maingl"].createFloat( Fn::Property::D_MIN, min );
+    m_properties["maingl"].createFloat( Fn::Property::D_MAX, max );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, min + (max-min)/100., min, max, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, max, min, max, "general" );
 
-//    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-//              m_properties["maingl"]->getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
-//    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-//              m_properties["maingl"]->getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
+//    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+//              m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD ), SLOT( setMax( QVariant ) ) );
+//    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+//              m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD ), SLOT( setMin( QVariant ) ) );
 
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
-    connect( m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
-              m_properties["maingl"]->getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SLOT( setMin( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
+              m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
-    m_properties["maingl"]->createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
-    m_properties["maingl"]->createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
-    m_properties["maingl"]->createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
-    m_properties["maingl"]->createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
+    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"].createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
+    m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
+    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
 }
 
 void DatasetScalar::createTexture()
@@ -117,12 +117,12 @@ void DatasetScalar::createTexture()
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
 
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
-    float min = m_properties["maingl"]->get( Fn::Property::D_MIN ).toFloat();
-    float max = m_properties["maingl"]->get( Fn::Property::D_MAX ).toFloat();
+    float min = m_properties["maingl"].get( Fn::Property::D_MIN ).toFloat();
+    float max = m_properties["maingl"].get( Fn::Property::D_MAX ).toFloat();
     max = max + ( (max-min)/100. );
 
     unsigned char* tmpData = new unsigned char[nx * ny * nz * 4];
@@ -184,19 +184,19 @@ QString DatasetScalar::getValueAsString( int x, int y, int z )
 
 bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
-    int paintMode = m_properties["maingl"]->get( Fn::Property::D_PAINTMODE ).toInt();
+    int paintMode = m_properties["maingl"].get( Fn::Property::D_PAINTMODE ).toInt();
     if ( pickId == 0 ||  paintMode == 0 || !( modifiers & Qt::ControlModifier ) )
     {
         return false;
     }
 
-    float dx = m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
-    float dy = m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
-    float dz = m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+    float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
 
-    float paintValue = m_properties["maingl"]->get( Fn::Property::D_PAINTVALUE ).toFloat();
+    float paintValue = m_properties["maingl"].get( Fn::Property::D_PAINTVALUE ).toFloat();
 
-    int brushSize = m_properties["maingl"]->get( Fn::Property::D_PAINTSIZE ).toInt() - 1;
+    int brushSize = m_properties["maingl"].get( Fn::Property::D_PAINTSIZE ).toInt() - 1;
 
     int x = pos.x() / dx + 0.5 * dx;
     int y = pos.y() / dy + 0.5 * dy;
@@ -221,7 +221,7 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
     glDeleteTextures( 1, &m_textureGLuint );
     m_textureGLuint = 0;
 
-    if ( m_properties["maingl"]->get( Fn::Property::D_PAINT_LINK_CURSOR ).toBool() )
+    if ( m_properties["maingl"].get( Fn::Property::D_PAINT_LINK_CURSOR ).toBool() )
     {
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), pos.x() / dx );
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), pos.y() / dy );
@@ -233,9 +233,9 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
 
 float DatasetScalar::getInterpolatedValueAtPos( QVector3D pos )
 {
-    float x = pos.x() / m_properties["maingl"]->get( Fn::Property::D_DX ).toFloat();
-    float y = pos.y() / m_properties["maingl"]->get( Fn::Property::D_DY ).toFloat();
-    float z = pos.z() / m_properties["maingl"]->get( Fn::Property::D_DZ ).toFloat();
+    float x = pos.x() / m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+    float y = pos.y() / m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+    float z = pos.z() / m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
 
     int x0 = (int) x;
     int y0 = (int) y;
@@ -245,9 +245,9 @@ float DatasetScalar::getInterpolatedValueAtPos( QVector3D pos )
     float yd = y - y0;
     float zd = z - z0;
 
-    int nx = m_properties["maingl"]->get( Fn::Property::D_NX ).toInt();
-    int ny = m_properties["maingl"]->get( Fn::Property::D_NY ).toInt();
-    int nz = m_properties["maingl"]->get( Fn::Property::D_NZ ).toInt();
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
     int blockSize = nx * ny * nz;
 
@@ -286,12 +286,12 @@ QColor DatasetScalar::getColorAtPos( QVector3D pos )
 {
     float value = getInterpolatedValueAtPos( pos );
 
-    float colormapID = m_properties["maingl"]->get( Fn::Property::D_COLORMAP ).toInt();
-    float min = m_properties["maingl"]->get( Fn::Property::D_SELECTED_MIN ).toFloat();
-    float max = m_properties["maingl"]->get( Fn::Property::D_SELECTED_MAX ).toFloat();
-    float lower_t = m_properties["maingl"]->get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
-    float upper_t = m_properties["maingl"]->get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
-    float alpha =  m_properties["maingl"]->get( Fn::Property::D_ALPHA ).toFloat();
+    float colormapID = m_properties["maingl"].get( Fn::Property::D_COLORMAP ).toInt();
+    float min = m_properties["maingl"].get( Fn::Property::D_SELECTED_MIN ).toFloat();
+    float max = m_properties["maingl"].get( Fn::Property::D_SELECTED_MAX ).toFloat();
+    float lower_t = m_properties["maingl"].get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
+    float upper_t = m_properties["maingl"].get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
+    float alpha =  m_properties["maingl"].get( Fn::Property::D_ALPHA ).toFloat();
     QColor c = ColormapFunctions::getColor( colormapID, value, min, max, lower_t, upper_t, alpha );
     return c;
 }
