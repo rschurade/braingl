@@ -31,10 +31,10 @@ int MarchingSquares::id( int x, int y )
 int MarchingSquares::step( int x, int y )
 {
     // Scan our 4 pixel area
-    bool upLeft = m_mask[ id( x-1, y-1 ) ];
-    bool upRight = m_mask[ id( x, y-1 ) ];
-    bool downLeft = m_mask[ id( x-1, y ) ];
-    bool downRight = m_mask[ id( x, y ) ];
+    bool upLeft = m_mask[ id( x, y + 1 ) ];
+    bool upRight = m_mask[ id( x + 1, y + 1 ) ];
+    bool downLeft = m_mask[ id( x, y ) ];
+    bool downRight = m_mask[ id( x + 1, y ) ];
 
     // Determine which state we are in
     int state = 0;
@@ -73,17 +73,17 @@ std::vector<float> MarchingSquares::run()
 
     m_states.resize( m_nx * m_ny, 0 );
 
-    for ( int y = 1; y < m_ny; ++y )
+    for ( int y = 0; y < m_ny - 1; ++y )
     {
-        for ( int x = 1; x < m_nx; ++x )
+        for ( int x = 0; x < m_nx - 1; ++x )
         {
             m_states[ id( x, y ) ] = step( x, y );
         }
     }
 
-    for ( int y = 1; y < m_ny; ++y )
+    for ( int y = 0; y < m_ny - 1; ++y )
     {
-        for ( int x = 1; x < m_nx; ++x )
+        for ( int x = 0; x < m_nx - 1; ++x )
         {
             int state = m_states[ id( x, y ) ];
 
@@ -93,48 +93,48 @@ std::vector<float> MarchingSquares::run()
                 case 15:
                     break;
                 case 1:
-                    paintSW( x-1, y-1 );
+                    paintSW( x, y );
                     break;
                 case 2:
-                    paintSE( x - 1, y - 1 );
+                    paintSE( x, y );
                     break;
                 case 3:
-                    paintEW( x - 1, y - 1 );
+                    paintEW( x, y );
                     break;
                 case 4:
-                    paintNE( x - 1, y - 1 );
+                    paintNE( x, y );
                     break;
                 case 5:
-                    paintSE( x - 1, y - 1 );
-                    paintNW( x - 1, y - 1 );
+                    paintSE( x, y );
+                    paintNW( x, y );
                     break;
                 case 6:
-                    paintSN( x - 1, y - 1 );
+                    paintSN( x, y );
                     break;
                 case 7:
-                    paintNW( x - 1, y - 1 );
+                    paintNW( x, y );
                     break;
                 case 8:
-                    paintNW( x - 1, y - 1 );
+                    paintNW( x, y );
                     break;
                 case 9:
-                    paintSN( x - 1, y - 1 );
+                    paintSN( x, y );
                     break;
                 case 10:
-                    paintSW( x - 1, y - 1 );
-                    paintNE( x - 1, y - 1 );
+                    paintSW( x, y );
+                    paintNE( x, y );
                     break;
                 case 11:
-                    paintNE( x - 1, y - 1 );
+                    paintNE( x, y );
                     break;
                 case 12:
-                    paintEW( x - 1, y - 1 );
+                    paintEW( x, y );
                     break;
                 case 13:
-                    paintSE( x - 1, y - 1 );
+                    paintSE( x, y );
                     break;
                 case 14:
-                    paintSW( x - 1, y - 1 );
+                    paintSW( x, y );
                     break;
             }
         }
@@ -148,14 +148,14 @@ void MarchingSquares::paintNW( int x, int y )
     m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
     m_verts.push_back( x * m_dx + m_dx2 );
-    m_verts.push_back( y * m_dy );
+    m_verts.push_back( y * m_dy + m_dy );
     m_verts.push_back( 0.0 );
 }
 
 void MarchingSquares::paintNE( int x, int y )
 {
     m_verts.push_back( x * m_dx + m_dx2 );
-    m_verts.push_back( y * m_dy );
+    m_verts.push_back( y * m_dy + m_dy );
     m_verts.push_back( 0.0 );
     m_verts.push_back( x * m_dx + m_dx );
     m_verts.push_back( y * m_dy + m_dy2 );
@@ -165,7 +165,7 @@ void MarchingSquares::paintNE( int x, int y )
 void MarchingSquares::paintSE( int x, int y )
 {
     m_verts.push_back( x * m_dx + m_dx2 );
-    m_verts.push_back( y * m_dy + m_dy );
+    m_verts.push_back( y * m_dy );
     m_verts.push_back( 0.0 );
     m_verts.push_back( x * m_dx + m_dx );
     m_verts.push_back( y * m_dy + m_dy2 );
@@ -178,7 +178,7 @@ void MarchingSquares::paintSW( int x, int y )
     m_verts.push_back( y * m_dy + m_dy2 );
     m_verts.push_back( 0.0 );
     m_verts.push_back( x * m_dx + m_dx2 );
-    m_verts.push_back( y * m_dy + m_dy );
+    m_verts.push_back( y * m_dy );
     m_verts.push_back( 0.0 );
 }
 
