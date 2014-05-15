@@ -14,6 +14,7 @@
 
 #include "../../../data/models.h"
 #include "../../../data/vptr.h"
+#include "../../../data/writer.h"
 #include "../../../data/roiarea.h"
 
 #include "../../../data/datasets/dataset.h"
@@ -177,7 +178,8 @@ void NewDatasetWidget::createDataset()
                 out[i] = value;
             }
 
-            DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, ds->getHeader() );
+            Writer writer( ds, QFileInfo() );
+            DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, writer.createHeader( 1 ) );
 
             QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
             Models::d()->setData( index, VPtr<Dataset>::asQVariant( dsOut ), Qt::DisplayRole );
@@ -193,7 +195,8 @@ void NewDatasetWidget::createDataset()
 
             copyWithRois( ds, out );
 
-            DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, ds->getHeader() );
+            Writer writer( ds, QFileInfo() );
+            DatasetScalar* dsOut = new DatasetScalar( QDir( "new dataset" ), out, writer.createHeader( 1 ) );
 
             QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
             Models::d()->setData( index, VPtr<Dataset>::asQVariant( dsOut ), Qt::DisplayRole );

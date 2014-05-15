@@ -10,6 +10,8 @@
 #include "gradients.h"
 #include "sorts.h"
 
+#include "../data/writer.h"
+
 #include "../data/datasets/dataset.h"
 #include "../data/datasets/datasetdwi.h"
 #include "../data/datasets/datasetsh.h"
@@ -87,7 +89,8 @@ QList<Dataset*> Bingham::calc_bingham( DatasetSH* sh, const int lod, const int n
         delete threads[i];
     }
 
-    DatasetBingham* out1 = new DatasetBingham( QDir( "Bingham" ), out, sh->getHeader() );
+    Writer writer( sh, QFileInfo() );
+    DatasetBingham* out1 = new DatasetBingham( QDir( "Bingham" ), out, writer.createHeader( 27 ) );
     dsout.push_back( out1 );
 
     return dsout;
@@ -230,7 +233,8 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
-        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, ds->getHeader() );
+        Writer writer( ds, QFileInfo() );
+        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, writer.createHeader( gradientsSize + 1 ) );
 
         dsout.push_back( out );
     }

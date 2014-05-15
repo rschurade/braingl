@@ -6,6 +6,7 @@
  */
 #include "dwialgos.h"
 #include "../data/enums.h"
+#include "../data/writer.h"
 
 #include "../data/mesh/trianglemesh2.h"
 #include "../data/mesh/tesselation.h"
@@ -65,7 +66,8 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
         qBallVector.push_back( qBallBase * data->at( i ) );
     }
 
-    DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, writer.createHeader( data->at( 0 ).Nrows() ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "QBall" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::QBALL );
     out->properties( "maingl" ).set( Fn::Property::D_LOD, 2 );
@@ -90,7 +92,8 @@ QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
 
     QString name = QString( "Qball_" + QString::number( order ) + "_" + ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() );
 
-    DatasetSH* out = new DatasetSH( QDir( name ), qBallVector, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetSH* out = new DatasetSH( QDir( name ), qBallVector, writer.createHeader( qBallVector.at( 0 ).Nrows() ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, name );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::QBALL );
     out->properties( "maingl" ).set( Fn::Property::D_LOD, 2 );
@@ -117,7 +120,8 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
     std::vector<Matrix> tensors;
     FMath::fitTensors( *data, *b0Images, bvecs, bvals, tensors );
 
-    DatasetTensor* out = new DatasetTensor( QDir( ds->properties( "maingl" ).get( Fn::Property::D_FILENAME ).toString() ), tensors, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetTensor* out = new DatasetTensor( QDir( ds->properties( "maingl" ).get( Fn::Property::D_FILENAME ).toString() ), tensors, writer.createHeader( 6 ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "Tensor" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::TENSORFIT );
     out->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
@@ -140,7 +144,8 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
     std::vector<float> fa;
     FMath::fa( tensors, fa );
 
-    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, writer.createHeader( 1 ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "FA" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::FA );
     out->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
@@ -183,13 +188,14 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 
     QList<Dataset*> l;
 
-    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, writer.createHeader( 3 ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "evec 1" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
     l.push_back( out );
 
-    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, dynamic_cast<DatasetDWI*>( ds )->getHeader() );
+    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, writer.createHeader( 3 ) );
     out2->properties( "maingl" ).set( Fn::Property::D_NAME, "fa rgb" );
     out2->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out2->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
@@ -205,7 +211,8 @@ QList<Dataset*> DWIAlgos::calcFAFromTensor( Dataset* ds )
     std::vector<float> fa;
     FMath::fa( *tensors, fa );
 
-    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* out = new DatasetScalar( QDir( "fa.nii.gz" ), fa, writer.createHeader( 1 ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "FA" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::FA );
     out->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
@@ -242,13 +249,14 @@ QList<Dataset*> DWIAlgos::calcEVFromTensor( Dataset* ds )
 
     QList<Dataset*> l;
 
-    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    Dataset3D* out = new Dataset3D( QDir( "evec1.nii.gz" ), evec1, writer.createHeader( 3 ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "evec 1" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
     l.push_back( out );
 
-    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, dynamic_cast<DatasetTensor*>( ds )->getHeader() );
+    Dataset3D* out2 = new Dataset3D( QDir( "fa_rgb.nii.gz" ), evec2, writer.createHeader( 3 ) );
     out2->properties( "maingl" ).set( Fn::Property::D_NAME, "fa rgb" );
     out2->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::EV );
     out2->properties( "maingl" ).set( Fn::Property::D_DATATYPE, DT_FLOAT );
