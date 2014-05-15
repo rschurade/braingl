@@ -38,6 +38,10 @@ Writer::~Writer()
 
 bool Writer::save()
 {
+    int nx = m_dataset->properties().get( Fn::Property::D_NX ).toInt();
+    int ny = m_dataset->properties().get( Fn::Property::D_NY ).toInt();
+    int nz = m_dataset->properties().get( Fn::Property::D_NZ ).toInt();
+
     switch ( (Fn::DatasetType)( m_dataset->properties().get( Fn::Property::D_TYPE ).toInt() ) )
     {
         case Fn::DatasetType::NIFTI_SCALAR:
@@ -62,26 +66,24 @@ bool Writer::save()
         {
             std::vector<QVector3D>* data = dynamic_cast<Dataset3D*>( m_dataset )->getData();
 
-            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-
             int dim = 3;
             nifti_image* out = createHeader( dim );
-            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( nx * ny * nz * dim );
 
-            int blockSize = img->nx * img->ny * img->nz;
+            int blockSize = nx * ny * nz;
             setDescrip( out, "fnav2_vec3" );
 
-            for ( int z = 0; z < img->nz; ++z )
+            for ( int z = 0; z < nz; ++z )
             {
-                for ( int y = 0; y < img->ny; ++y )
+                for ( int y = 0; y < ny; ++y )
                 {
-                    for ( int x = 0; x < img->nx; ++x )
+                    for ( int x = 0; x < nx; ++x )
                     {
-                        QVector3D vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        QVector3D vData = data->at( x + y * nx + z * nx * ny );
 
-                        outData[( x + y * img->nx + z * img->nx * img->ny )] = vData.x();
-                        outData[( x + y * img->nx + z * img->nx * img->ny + blockSize )] = vData.y();
-                        outData[( x + y * img->nx + z * img->nx * img->ny + 2 * blockSize )] = vData.z();
+                        outData[( x + y * nx + z * nx * ny )] = vData.x();
+                        outData[( x + y * nx + z * nx * ny + blockSize )] = vData.y();
+                        outData[( x + y * nx + z * nx * ny + 2 * blockSize )] = vData.z();
                     }
                 }
             }
@@ -104,25 +106,24 @@ bool Writer::save()
 
             std::vector<Matrix>* data = dynamic_cast<DatasetTensor*>( m_dataset )->getData();
 
-            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-            std::vector<float> outData( img->nx * img->ny * img->nz * 6 );
+            std::vector<float> outData( nx * ny * nz * 6 );
 
-            int blockSize = img->nx * img->ny * img->nz;
+            int blockSize = nx * ny * nz;
             setDescrip( out, "fnav2_tensor" );
 
-            for ( int z = 0; z < img->nz; ++z )
+            for ( int z = 0; z < nz; ++z )
             {
-                for ( int y = 0; y < img->ny; ++y )
+                for ( int y = 0; y < ny; ++y )
                 {
-                    for ( int x = 0; x < img->nx; ++x )
+                    for ( int x = 0; x < nx; ++x )
                     {
-                        Matrix tensor = data->at( x + y * img->nx + z * img->nx * img->ny );
-                        outData[( x + y * img->nx + z * img->nx * img->ny )] = tensor( 1, 1 );
-                        outData[( x + y * img->nx + z * img->nx * img->ny ) + blockSize] = tensor( 1, 2 );
-                        outData[( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 2] = tensor( 1, 3 );
-                        outData[( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 3] = tensor( 2, 2 );
-                        outData[( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 4] = tensor( 2, 3 );
-                        outData[( x + y * img->nx + z * img->nx * img->ny ) + blockSize * 5] = tensor( 3, 3 );
+                        Matrix tensor = data->at( x + y * nx + z * nx * ny );
+                        outData[( x + y * nx + z * nx * ny )] = tensor( 1, 1 );
+                        outData[( x + y * nx + z * nx * ny ) + blockSize] = tensor( 1, 2 );
+                        outData[( x + y * nx + z * nx * ny ) + blockSize * 2] = tensor( 1, 3 );
+                        outData[( x + y * nx + z * nx * ny ) + blockSize * 3] = tensor( 2, 2 );
+                        outData[( x + y * nx + z * nx * ny ) + blockSize * 4] = tensor( 2, 3 );
+                        outData[( x + y * nx + z * nx * ny ) + blockSize * 5] = tensor( 3, 3 );
                     }
                 }
             }
@@ -143,26 +144,24 @@ bool Writer::save()
         {
             std::vector<ColumnVector>* data = dynamic_cast<DatasetSH*>( m_dataset )->getData();
 
-            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-
             int dim = data->at( 0 ).Nrows();
             nifti_image* out = createHeader( dim );
-            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( nx * ny * nz * dim );
 
-            int blockSize = img->nx * img->ny * img->nz;
+            int blockSize = nx * ny * nz;
             setDescrip( out, "fnav2_qball" );
 
-            for ( int z = 0; z < img->nz; ++z )
+            for ( int z = 0; z < nz; ++z )
             {
-                for ( int y = 0; y < img->ny; ++y )
+                for ( int y = 0; y < ny; ++y )
                 {
-                    for ( int x = 0; x < img->nx; ++x )
+                    for ( int x = 0; x < nx; ++x )
                     {
-                        ColumnVector vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        ColumnVector vData = data->at( x + y * nx + z * nx * ny );
 
                         for ( int i = 0; i < dim; ++i )
                         {
-                            outData[( x + y * img->nx + z * img->nx * img->ny + i * blockSize )] = vData( i + 1 );
+                            outData[( x + y * nx + z * nx * ny + i * blockSize )] = vData( i + 1 );
                         }
                     }
                 }
@@ -184,26 +183,24 @@ bool Writer::save()
         {
             std::vector<std::vector<float> >* data = dynamic_cast<DatasetBingham*>( m_dataset )->getData();
 
-            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-
             int dim = data->at( 0 ).size();
             nifti_image* out = createHeader( dim );
-            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( nx * ny * nz * dim );
 
-            int blockSize = img->nx * img->ny * img->nz;
+            int blockSize = nx * ny * nz;
             setDescrip( out, "fnav2_bingham" );
 
-            for ( int z = 0; z < img->nz; ++z )
+            for ( int z = 0; z < nz; ++z )
             {
-                for ( int y = 0; y < img->ny; ++y )
+                for ( int y = 0; y < ny; ++y )
                 {
-                    for ( int x = 0; x < img->nx; ++x )
+                    for ( int x = 0; x < nx; ++x )
                     {
-                        std::vector<float> vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        std::vector<float> vData = data->at( x + y * nx + z * nx * ny );
 
                         for ( int i = 0; i < dim; ++i )
                         {
-                            outData[( x + y * img->nx + z * img->nx * img->ny + i * blockSize )] = vData[i];
+                            outData[( x + y * nx + z * nx * ny + i * blockSize )] = vData[i];
                         }
                     }
                 }
@@ -226,11 +223,9 @@ bool Writer::save()
             std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
             std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
-            nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
-
             int dim = data->at( 0 ).Nrows() + 1;
             nifti_image* out = createHeader( dim );
-            std::vector<float> outData( img->nx * img->ny * img->nz * dim );
+            std::vector<float> outData( nx * ny * nz * dim );
 
             std::vector<float> bvals = dynamic_cast<DatasetDWI*>( m_dataset )->getBvals();
             std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( m_dataset )->getBvecs();
@@ -248,24 +243,24 @@ bool Writer::save()
             char* extData = reinterpret_cast<char*>( &bvalOut[0] );
             nifti_add_extension( out, extData, bvalOut.size() * 4, 0 );
 
-            int blockSize = img->nx * img->ny * img->nz;
-            setDescrip( out, "fnav2_dwi" );
+            int blockSize = nx * ny * nz;
+            setDescrip( out, "braingl_dwi" );
 
             for ( int i = 0; i < blockSize; ++i )
             {
                 outData[i] = b0data->at( i );
             }
 
-            for ( int z = 0; z < img->nz; ++z )
+            for ( int z = 0; z < nz; ++z )
             {
-                for ( int y = 0; y < img->ny; ++y )
+                for ( int y = 0; y < ny; ++y )
                 {
-                    for ( int x = 0; x < img->nx; ++x )
+                    for ( int x = 0; x < nx; ++x )
                     {
-                        ColumnVector vData = data->at( x + y * img->nx + z * img->nx * img->ny );
+                        ColumnVector vData = data->at( x + y * nx + z * nx * ny );
                         for ( int i = 1; i < dim; ++i )
                         {
-                            outData[( x + y * img->nx + z * img->nx * img->ny + i * blockSize )] = vData( i );
+                            outData[( x + y * nx + z * nx * ny + i * blockSize )] = vData( i );
                         }
                     }
                 }
@@ -362,19 +357,19 @@ bool Writer::save()
 
 nifti_image* Writer::createHeader( int dim )
 {
-    nifti_image* img = dynamic_cast<DatasetNifti*>( m_dataset )->getHeader();
+    PropertyGroup* props = &m_dataset->properties();
 
     nifti_image* out = nifti_simple_init_nim();
 
-    out->nx = img->nx;
-    out->ny = img->ny;
-    out->nz = img->nz;
+    out->nx = props->get( Fn::Property::D_NX ).toInt();
+    out->ny = props->get( Fn::Property::D_NY ).toInt();
+    out->nz = props->get( Fn::Property::D_NZ ).toInt();
 
-    out->nvox = img->nx * img->ny * img->nz * dim;
+    out->nvox = out->nx * out->ny * out->nz * dim;
 
-    out->dx = img->dx;
-    out->dy = img->dy;
-    out->dz = img->dz;
+    out->dx = props->get( Fn::Property::D_DX ).toFloat();
+    out->dy = props->get( Fn::Property::D_DY ).toFloat();
+    out->dz = props->get( Fn::Property::D_DZ ).toFloat();
 
     out->nifti_type = 1; // 1==NIFTI-1 (1 file)
 
@@ -389,12 +384,15 @@ nifti_image* Writer::createHeader( int dim )
     out->nv = 4;
     out->ndim = 4;
 
+    QMatrix4x4 qform = props->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+    QMatrix4x4 sform = props->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+
     for ( size_t i = 0; i < 4; ++i )
     {
         for ( size_t j = 0; j < 4; ++j )
         {
-            out->qto_xyz.m[i][j] = img->qto_xyz.m[i][j];
-            out->sto_xyz.m[i][j] = img->sto_xyz.m[i][j];
+            out->qto_xyz.m[i][j] = qform( i, j );
+            out->sto_xyz.m[i][j] = sform( i, j );
         }
     }
 

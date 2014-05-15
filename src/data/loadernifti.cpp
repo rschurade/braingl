@@ -58,7 +58,7 @@ bool LoaderNifti::load()
         return false;
     }
 
-    if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) )
+    if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) || QString( m_header->descrip ) == QString( "braingl_dwi" ) )
     {
         qDebug() << "braingl dwi dataset found";
         m_datasetType = Fn::DatasetType::NIFTI_DWI;

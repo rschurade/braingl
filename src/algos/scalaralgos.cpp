@@ -11,6 +11,7 @@
 
 #include "../data/models.h"
 #include "../data/roiarea.h"
+#include "../data/writer.h"
 
 #include <QQueue>
 
@@ -308,7 +309,8 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     out = tmp;
 
     QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (distance map)";
-    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
@@ -444,7 +446,8 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
     out = tmp;
 
     QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (gauss)";
-    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     QList<Dataset*> l;
@@ -468,8 +471,8 @@ QList<Dataset*> ScalarAlgos::createNew( Dataset* ds )
     float max = static_cast<DatasetScalar*>( ds )->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat();
     out[0] = max;
 
-
-    DatasetScalar* dsOut = new DatasetScalar( QDir( "new scalar dataset" ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* dsOut = new DatasetScalar( QDir( "new scalar dataset" ), out, writer.createHeader( 1 ) );
     QList<Dataset*> l;
     l.push_back( dsOut );
     return l;
@@ -508,7 +511,8 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
     }
 
     QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (median)";
-    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, static_cast<DatasetScalar*>( ds )->getHeader() );
+    Writer writer( ds, QFileInfo() );
+    DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
 
     QList<Dataset*> l;

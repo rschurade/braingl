@@ -23,7 +23,7 @@ public:
     DatasetNifti( QDir filename, Fn::DatasetType type, nifti_image* header );
     virtual ~DatasetNifti();
 
-    nifti_image* getHeader();
+    //nifti_image* getHeader();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
     virtual QString getValueAsString( int x, int y, int z ) = 0;
