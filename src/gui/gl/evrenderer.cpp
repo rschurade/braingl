@@ -162,9 +162,7 @@ void EVRenderer::initGeometry()
     yi = qMax( 0, qMin( yi, m_ny - 1) );
     zi = qMax( 0, qMin( zi, m_nz - 1) );
 
-
-
-    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples, m_color } );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples, m_color, m_mask->properties().get( Fn::Property::D_NAME ) } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {

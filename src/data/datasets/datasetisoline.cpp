@@ -47,7 +47,7 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
 
     m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"].createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 0, "general" );
+    m_properties["maingl"].createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 2, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_SLICE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0, -1.0, 1.0, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_OFFSET ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
