@@ -11,6 +11,7 @@
 
 #include "../../../data/models.h"
 #include "../../../data/vptr.h"
+#include "../../../data/writer.h"
 
 #include "../controls/sliderwithedit.h"
 #include "../controls/sliderwitheditint.h"
@@ -146,8 +147,8 @@ void MathWidget::execute()
         }
     }
 
-
-    DatasetScalar* out = new DatasetScalar( QDir( "new dataset" ), data, m_dataset->getHeader() );
+    Writer writer( m_dataset, QFileInfo() );
+    DatasetScalar* out = new DatasetScalar( QDir( "new dataset" ), data, writer.createHeader( 1 ) );
     QModelIndex index = Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
     Models::d()->setData( index, VPtr<Dataset>::asQVariant( out ), Qt::DisplayRole );
 

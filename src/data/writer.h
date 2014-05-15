@@ -24,12 +24,12 @@ public:
 
     bool save();
 
+    nifti_image* createHeader( int dim );
+
 private:
     Dataset* m_dataset;
     QFileInfo m_fileName;
     QString m_filter;
-
-    nifti_image* createHeader( int dim );
 
     void setDescrip( nifti_image* hdr, QString descrip );
 
