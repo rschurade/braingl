@@ -94,6 +94,7 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "u_scaling", m_scaling );
 
     program->setUniformValue( "u_alpha", 1.0f );
+    program->setUniformValue( "u_renderStipples", m_renderStipples );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );

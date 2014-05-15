@@ -3,6 +3,8 @@
 #include uniforms_vs
 #include peel_vs
 
+uniform bool u_renderStipples;
+
 out float v_discard;
 
 vec4 getColor( vec3 vec )
@@ -21,10 +23,16 @@ void main()
     float dir = a_dir;
     vec4 vec = vec4( a_vec, 0. ) * dir * u_scaling;
     
-    //frontColor = getColor( a_vec.xyz );
-    //frontColor = normalize( abs( frontColor * u_scaling ) );
+    if ( u_renderStipples )
+    {
+        frontColor = a_color;
+    }
+    else
+    {
+        frontColor = getColor( a_vec.xyz );
+        frontColor = normalize( abs( frontColor * u_scaling ) );
+    }
     
-    frontColor = a_color;
  
     v_discard = 0.;
     if ( length( a_vec.xyz ) < 0.0001 )
