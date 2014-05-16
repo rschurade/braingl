@@ -20,7 +20,7 @@ public:
 
 private:
     std::vector<float>* m_data;
-    std::vector<bool> m_mask;
+    std::vector<float> m_mask;
     std::vector<int>m_states;
     float m_isoValue;
     int m_nx;
