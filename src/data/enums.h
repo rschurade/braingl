@@ -349,6 +349,7 @@ namespace Fn
         G_UNSELECTED_FIBERS_GREY,
         G_TRACT_TEX_RESOLUTION,
         G_TRACT_TEXT_SOURCE,
+        G_ISOLINE_STANDARD_COLOR,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         D_X = 1000,
@@ -602,6 +603,7 @@ namespace Fn
                 case Property::G_UNSELECTED_FIBERS_GREY: return QString( "render hidden fibers grey" ); break;
                 case Property::G_TRACT_TEX_RESOLUTION: return QString( "resolution of tract textures" ); break;
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
+                case Property::G_ISOLINE_STANDARD_COLOR: return QString( "isoline standard color" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::D_X: return QString( "x" ); break;
