@@ -13,7 +13,7 @@
 class MarchingSquares
 {
 public:
-    MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, float dx, float dy );
+    MarchingSquares( std::vector<float>* data, float isoValue, int nx, int ny, float dx, float dy, bool interpolation = true );
     virtual ~MarchingSquares();
 
     std::vector<float> run();
@@ -29,6 +29,8 @@ private:
     float m_dy;
     float m_dx2;
     float m_dy2;
+
+    bool m_interpolation;
 
     std::vector<float>m_verts;
 

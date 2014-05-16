@@ -107,6 +107,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createFloat( Fn::Property::G_DECIMATE_EPSILON, 2.0f, 0.0f, 20.f, "algos" );
     m_properties->createFloat( Fn::Property::G_TRACT_TEX_RESOLUTION, 1.0f, 0.2f, 5.f, "algos" );
     m_properties->createList( Fn::Property::G_TRACT_TEXT_SOURCE, {"local", "global", "user defined"}, 0, "algos" );
+    m_properties->createColor( Fn::Property::G_ISOLINE_STANDARD_COLOR, QColor( 0, 0, 0 ), "algos" );
 
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );

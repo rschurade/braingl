@@ -145,6 +145,7 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DIGITS ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DIGITS ) );
     settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
+    settings.setValue( Fn::Prop2String::s( Fn::Property::G_ISOLINE_STANDARD_COLOR ), Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ) );
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -206,6 +207,7 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX2 );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_DIGITS );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_CURRENT_NUMBER );
+    loadSetting( settings, Fn::Property::G_ISOLINE_STANDARD_COLOR );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )

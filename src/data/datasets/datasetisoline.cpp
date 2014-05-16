@@ -53,8 +53,11 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_AXIAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
     //connect( m_properties["maingl"].getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 0, 0, 0), "general" );
+    m_properties["maingl"].createColor( Fn::Property::D_COLOR, Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ).value<QColor>(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, true, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_INTERPOLATION ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
     m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
@@ -163,11 +166,12 @@ void DatasetIsoline::initGeometry()
     m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
+    bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
 
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
     {
         sliceData = extractAnatomySagittal( m_x / dx );
-        MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz );
+        MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
         tmpVerts = ms1.run();
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
@@ -180,7 +184,7 @@ void DatasetIsoline::initGeometry()
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
     {
         sliceData = extractAnatomyCoronal( m_y / dy );
-        MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz );
+        MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
         tmpVerts = ms1.run();
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
@@ -193,7 +197,7 @@ void DatasetIsoline::initGeometry()
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
         sliceData = extractAnatomyAxial( m_z / dz );
-        MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy );
+        MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy, interpolation );
         tmpVerts = ms1.run();
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
@@ -302,6 +306,7 @@ int DatasetIsoline::getId( int x, int y, int z )
 void DatasetIsoline::isoValueChanged()
 {
     m_dirty = true;
+    Models::d()->submit();
 }
 
 void DatasetIsoline::globalChanged()
@@ -312,4 +317,5 @@ void DatasetIsoline::globalChanged()
     {
         m_dirty = true;
     }
+    Models::d()->submit();
 }
