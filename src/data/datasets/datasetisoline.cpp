@@ -45,19 +45,24 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
 
     m_properties["maingl"].createString( Fn::Property::D_NAME, name );
 
-    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
-    connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"].createList( Fn::Property::D_RENDER_SLICE, { "sagittal", "coronal", "axial" }, 2, "general" );
-    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_SLICE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0, -1.0, 1.0, "general" );
-    connect( m_properties["maingl"].getProperty( Fn::Property::D_OFFSET ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_SAGITTAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_CORONAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_AXIAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
     //connect( m_properties["maingl"].getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 0, 0, 0), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
+    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
+
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 }
 
 DatasetIsoline::~DatasetIsoline()
@@ -153,55 +158,49 @@ void DatasetIsoline::initGeometry()
     float px = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
     float py = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
     float pz = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
-    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
-    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
-    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() +  m_properties["maingl"].get( Fn::Property::D_OFFSET ).toFloat();
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
 
-    switch ( m_properties["maingl"].get( Fn::Property::D_RENDER_SLICE ).toInt() )
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
     {
-        case 0: // sagittal
+        sliceData = extractAnatomySagittal( m_x / dx );
+        MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz );
+        tmpVerts = ms1.run();
+
+        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            sliceData = extractAnatomySagittal();
-            MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz );
-            tmpVerts = ms1.run();
-            isoVerts.resize( tmpVerts.size() );
-            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
-            {
-                isoVerts[3*i] = x + px;
-                isoVerts[3*i+1] = tmpVerts[3*i] + py;
-                isoVerts[3*i+2] = tmpVerts[3*i+1] + pz;
-            }
-            break;
+            isoVerts.push_back( m_x + px );
+            isoVerts.push_back( tmpVerts[3*i] + py );
+            isoVerts.push_back( tmpVerts[3*i+1] + pz );
         }
-        case 1: // coronal
+    }
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+    {
+        sliceData = extractAnatomyCoronal( m_y / dy );
+        MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz );
+        tmpVerts = ms1.run();
+
+        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            sliceData = extractAnatomyCoronal();
-            MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz );
-            tmpVerts = ms1.run();
-            isoVerts.resize( tmpVerts.size() );
-            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
-            {
-                isoVerts[3*i] = tmpVerts[3*i] + px;
-                isoVerts[3*i+1] = y + py;
-                isoVerts[3*i+2] = tmpVerts[3*i+1] + pz;
-            }
-            break;
+            isoVerts.push_back( tmpVerts[3*i] + px );
+            isoVerts.push_back( m_y + py );
+            isoVerts.push_back( tmpVerts[3*i+1] + pz );
         }
-        case 2: // axial
+    }
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+    {
+        sliceData = extractAnatomyAxial( m_z / dz );
+        MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy );
+        tmpVerts = ms1.run();
+
+        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            sliceData = extractAnatomyAxial();
-            MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy );
-            tmpVerts = ms1.run();
-            isoVerts.resize( tmpVerts.size() );
-            for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
-            {
-                isoVerts[3*i] = tmpVerts[3*i] + px;
-                isoVerts[3*i+1] = tmpVerts[3*i+1] + py;
-                isoVerts[3*i+2] = z + pz;
-            }
-            break;
+            isoVerts.push_back( tmpVerts[3*i] + px );
+            isoVerts.push_back( tmpVerts[3*i+1] + py );
+            isoVerts.push_back( m_z + pz );
         }
     }
 
@@ -227,10 +226,9 @@ void DatasetIsoline::initGeometry()
     m_dirty = false;
 }
 
-std::vector<float> DatasetIsoline::extractAnatomyAxial()
+std::vector<float> DatasetIsoline::extractAnatomyAxial( float z )
 {
     std::vector<float>sliceData;
-    int slicePos = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
     int nx =  m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
     int ny =  m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
 
@@ -240,7 +238,7 @@ std::vector<float> DatasetIsoline::extractAnatomyAxial()
     {
         for ( int x = 0; x < nx; ++x )
         {
-            int id = getId( x, y, slicePos );
+            int id = getId( x, y, z );
             float value = m_scalarField[ id ];
             sliceData[ x + nx * y ] = value;
         }
@@ -248,10 +246,9 @@ std::vector<float> DatasetIsoline::extractAnatomyAxial()
     return sliceData;
 }
 
-std::vector<float> DatasetIsoline::extractAnatomySagittal()
+std::vector<float> DatasetIsoline::extractAnatomySagittal( float x )
 {
     std::vector<float>sliceData;
-    int slicePos =Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
     int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
     int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
@@ -261,7 +258,7 @@ std::vector<float> DatasetIsoline::extractAnatomySagittal()
     {
         for ( int y = 0; y < ny; ++y )
         {
-            int id = getId( slicePos, y, z );
+            int id = getId( x, y, z );
             float value = m_scalarField[ id ];
             sliceData[ y + ny * z ] = value;
         }
@@ -269,10 +266,9 @@ std::vector<float> DatasetIsoline::extractAnatomySagittal()
     return sliceData;
 }
 
-std::vector<float> DatasetIsoline::extractAnatomyCoronal()
+std::vector<float> DatasetIsoline::extractAnatomyCoronal( float y )
 {
     std::vector<float>sliceData;
-    int slicePos =Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
     int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
 
@@ -282,7 +278,7 @@ std::vector<float> DatasetIsoline::extractAnatomyCoronal()
     {
         for ( int x = 0; x < nx; ++x )
         {
-            int id = getId( x, slicePos, z );
+            int id = getId( x, y, z );
             float value = m_scalarField[ id ];
             sliceData[ x + nx * z ] = value;
         }
@@ -306,4 +302,14 @@ int DatasetIsoline::getId( int x, int y, int z )
 void DatasetIsoline::isoValueChanged()
 {
     m_dirty = true;
+}
+
+void DatasetIsoline::globalChanged()
+{
+    if( m_x != Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() ||
+        m_y != Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat() ||
+        m_z != Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat() )
+    {
+        m_dirty = true;
+    }
 }
