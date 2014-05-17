@@ -84,6 +84,11 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         initGeometry();
     }
 
+    if ( m_countLines == 0 )
+    {
+        return;
+    }
+
     float alpha = GLFunctions::sliceAlpha[target];
 
     switch ( renderMode )
@@ -237,7 +242,6 @@ std::vector<float> DatasetIsoline::extractAnatomyAxial( float z )
     int ny =  m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
 
     sliceData.resize( nx * ny, 0 );
-
     for ( int y = 0; y < ny; ++y )
     {
         for ( int x = 0; x < nx; ++x )
