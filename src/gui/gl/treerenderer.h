@@ -8,14 +8,12 @@
 #ifndef TREERENDERER_H_
 #define TREERENDERER_H_
 
-#include "objectrenderer.h"
-
 #include <QMatrix4x4>
 
 class Tree;
 class QGLShaderProgram;
 
-class TreeRenderer : public ObjectRenderer
+class TreeRenderer
 {
 public:
 	TreeRenderer( QString name, Tree* tree );

@@ -21,7 +21,6 @@
 #include <limits>
 
 MeshRenderer::MeshRenderer( TriangleMesh2* mesh ) :
-    ObjectRenderer(),
     m_colorMode( 0 ),
     m_tris( 0 ),
     vboIds( new GLuint[ 3 ] ),
@@ -200,10 +199,6 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-}
-
-void MeshRenderer::setupTextures()
-{
 }
 
 void MeshRenderer::setShaderVars()

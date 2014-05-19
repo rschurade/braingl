@@ -8,11 +8,9 @@
 #ifndef DIFFPOINTGLYPHRENDERER_H_
 #define DIFFPOINTGLYPHRENDERER_H_
 
-#include "objectrenderer.h"
-
 #include "../../data/properties/propertygroup.h"
 
-class DiffPointGlyphRenderer: public ObjectRenderer
+class DiffPointGlyphRenderer
 {
 public:
     DiffPointGlyphRenderer();

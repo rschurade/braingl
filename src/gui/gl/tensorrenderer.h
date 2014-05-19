@@ -17,7 +17,7 @@ class PropertyGroup;
 class TensorRenderer : public ObjectRenderer
 {
 public:
-    TensorRenderer( std::vector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    TensorRenderer( std::vector<Matrix>* data );
     virtual ~TensorRenderer();
 
     void init();
@@ -25,11 +25,10 @@ public:
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
 protected:
-    void setupTextures();
-    void setShaderVars();
     void setRenderParams( PropertyGroup& props );
+    void initGeometry( PropertyGroup& props );
+    void setShaderVars( PropertyGroup& props );
 
-    void initGeometry();
     void addGlyph( std::vector<float>& verts, float xPos, float yPos, float zPos, Matrix tensor );
 
 private:

@@ -14,7 +14,11 @@
 #include "qmatrix4x4.h"
 
 DiffPointGlyphRenderer::DiffPointGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 14 ), m_pickId( GLFunctions::getPickIndex() )
+    vboIds( new GLuint[1] ),
+    ps( new float[1] ),
+    np( 1 ),
+    ao( 14 ),
+    m_pickId( GLFunctions::getPickIndex() )
 {
 
 }

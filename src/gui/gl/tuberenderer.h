@@ -15,11 +15,12 @@
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
+#include <QObject>
 
 class FiberSelector;
 class PropertyGroup;
 
-class TubeRenderer : public ObjectRenderer
+class TubeRenderer : public QObject
 {
     Q_OBJECT
 

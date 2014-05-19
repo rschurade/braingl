@@ -188,11 +188,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void SHRenderer::setupTextures()
-{
-}
-
-void SHRenderer::setShaderVars()
+void SHRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
@@ -226,7 +222,7 @@ void SHRenderer::setShaderVars()
     glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0 );
 }
 
-void SHRenderer::initGeometry()
+void SHRenderer::initGeometry( PropertyGroup& props )
 {
     float x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
     float y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();

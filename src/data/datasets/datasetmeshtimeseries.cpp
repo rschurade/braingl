@@ -102,7 +102,6 @@ void DatasetMeshTimeSeries::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int w
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( getMesh( target ) );
-        m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
     m_renderer->setMesh( getMesh( target ) );

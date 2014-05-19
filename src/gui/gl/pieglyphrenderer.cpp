@@ -12,7 +12,10 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 PieGlyphRenderer::PieGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), pies( new float[1] ), np( 1 ), m_pickId( GLFunctions::getPickIndex() )
+    vboIds( new GLuint[1] ),
+    pies( new float[1] ),
+    np( 1 ),
+    m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -116,11 +119,6 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
 void PieGlyphRenderer::init()
 {
     glGenBuffers( 1, vboIds );
-}
-
-void PieGlyphRenderer::setupTextures()
-{
-
 }
 
 void PieGlyphRenderer::setShaderVars( PropertyGroup& props )

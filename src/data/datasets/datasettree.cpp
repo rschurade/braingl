@@ -15,6 +15,7 @@
 
 #include <QDebug>
 #include <QQueue>
+#include <QWidget>
 
 DatasetTree::DatasetTree( QDir fn ) :
     Dataset( fn , Fn::DatasetType::TREE ),

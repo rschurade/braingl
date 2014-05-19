@@ -17,7 +17,6 @@
 
 class TreeRenderer;
 
-
 struct PtrGreater // public std::binary_function<bool, const T*, const T*>
 {
   bool operator()( Tree* a, Tree* b )

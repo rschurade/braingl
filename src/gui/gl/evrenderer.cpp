@@ -22,7 +22,7 @@
 
 #include <limits>
 
-EVRenderer::EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
+EVRenderer::EVRenderer( std::vector<QVector3D>* data ) :
     ObjectRenderer(),
     m_vertCount( 0 ),
     vbo0( 0 ),
@@ -111,11 +111,7 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
 }
 
-void EVRenderer::setupTextures()
-{
-}
-
-void EVRenderer::setShaderVars()
+void EVRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
@@ -147,7 +143,7 @@ void EVRenderer::setShaderVars()
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void EVRenderer::initGeometry()
+void EVRenderer::initGeometry( PropertyGroup& props )
 {
     Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
     float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
