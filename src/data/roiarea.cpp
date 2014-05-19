@@ -168,7 +168,6 @@ void ROIArea::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heig
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( m_mesh );
-        m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
 

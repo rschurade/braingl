@@ -76,13 +76,7 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
     if ( m_renderer == 0 )
     {
         qDebug() << "ds bingham init renderer";
-        m_renderer = new BinghamRenderer( &m_data, properties( target ).get( Fn::Property::D_NX ).toInt(),
-                                                  properties( target ).get( Fn::Property::D_NY ).toInt(),
-                                                  properties( target ).get( Fn::Property::D_NZ ).toInt(),
-                                                  properties( target ).get( Fn::Property::D_DX ).toFloat(),
-                                                  properties( target ).get( Fn::Property::D_DY ).toFloat(),
-                                                  properties( target ).get( Fn::Property::D_DZ ).toFloat() );
-        m_renderer->setModel( Models::g() );
+        m_renderer = new BinghamRenderer( &m_data );
         m_renderer->init();
         qDebug() << "ds bingham init renderer done";
     }

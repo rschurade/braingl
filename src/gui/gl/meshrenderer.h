@@ -8,13 +8,13 @@
 #ifndef MESHRENDERER_H_
 #define MESHRENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 class TriangleMesh2;
 class PropertyGroup;
 class ROIPropertyGroup;
 
-class MeshRenderer  : public ObjectRenderer
+class MeshRenderer
 {
 public:
     MeshRenderer( TriangleMesh2* mesh );
@@ -31,7 +31,6 @@ public:
     void updateColor( int id, float r, float g, float b, float a );
 
 protected:
-    void setupTextures();
     void setShaderVars();
     virtual void setRenderParams( PropertyGroup& props );
     void initGeometry();

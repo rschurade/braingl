@@ -204,9 +204,6 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
 
 bool GlobalPropertyModel::submit()
 {
-    m_properties->setMax( Fn::Property::G_AXIAL, m_properties->get( Fn::Property::G_MAX_AXIAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Property::G_CORONAL, m_properties->get( Fn::Property::G_MAX_CORONAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Property::G_SAGITTAL, m_properties->get( Fn::Property::G_MAX_SAGITTAL ).toInt() - 1 );
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }

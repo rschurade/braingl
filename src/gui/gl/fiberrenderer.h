@@ -20,7 +20,7 @@
 class FiberSelector;
 class PropertyGroup;
 
-class FiberRenderer : QObject
+class FiberRenderer : public QObject
 {
     Q_OBJECT
 

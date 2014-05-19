@@ -14,7 +14,11 @@
 #include "qmatrix4x4.h"
 
 PointGlyphRenderer::PointGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 13 ), m_pickId( GLFunctions::getPickIndex() )
+    vboIds( new GLuint[1] ),
+    ps( new float[1] ),
+    np( 1 ),
+    ao( 13 ),
+    m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -132,11 +136,6 @@ void PointGlyphRenderer::setRenderParams( PropertyGroup& props )
     m_lowerThreshold = props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat();
     m_upperThreshold = props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat();
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
-}
-
-void PointGlyphRenderer::setupTextures()
-{
-
 }
 
 void PointGlyphRenderer::setShaderVars( PropertyGroup& props )

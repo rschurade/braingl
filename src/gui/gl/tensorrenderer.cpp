@@ -20,7 +20,7 @@
 
 #include <limits>
 
-TensorRenderer::TensorRenderer( std::vector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
+TensorRenderer::TensorRenderer( std::vector<Matrix>* data ) :
     ObjectRenderer(),
     m_quads( 0 ),
     vboIds( new GLuint[ 1 ] ),
@@ -111,11 +111,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
-void TensorRenderer::setupTextures()
-{
-}
-
-void TensorRenderer::setShaderVars()
+void TensorRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "superquadric" );
 
@@ -144,7 +140,7 @@ void TensorRenderer::setShaderVars()
     glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (const void *) offset );
 }
 
-void TensorRenderer::initGeometry()
+void TensorRenderer::initGeometry( PropertyGroup& props )
 {
     float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
     float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();

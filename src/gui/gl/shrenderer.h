@@ -36,11 +36,10 @@ public:
     TriangleMesh2* getMesh();
 
 protected:
-    void setupTextures();
-    void setShaderVars();
-    void setRenderParams( PropertyGroup& props );
+    void initGeometry( PropertyGroup& props );
+    void setShaderVars( PropertyGroup& props );
 
-    void initGeometry();
+    void setRenderParams( PropertyGroup& props );
     void updateMesh();
 
 private:

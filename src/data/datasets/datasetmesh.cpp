@@ -228,7 +228,6 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( getMesh(target) );
-        m_renderer->setModel( Models::g() );
         m_renderer->init();
     }
     m_renderer->setMesh( getMesh(target) );
@@ -414,10 +413,6 @@ void DatasetMesh::applyTransform()
 {
     m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
 
-    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
-
     int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
@@ -443,9 +438,6 @@ void DatasetMesh::applyTransform()
             for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
             {
                 QVector3D vert = mesh->getVertex( i );
-                vert.setX( vert.x() / dx );
-                vert.setY( vert.y() / dy );
-                vert.setZ( vert.z() / dz );
                 vert = m_transform * vert;
                 mesh->setVertex( i, vert );
             }
@@ -458,9 +450,6 @@ void DatasetMesh::applyTransform()
             {
                 QVector3D vert = mesh->getVertex( i );
                 vert = m_transform * vert;
-                vert.setX( vert.x() * dx );
-                vert.setY( vert.y() * dy );
-                vert.setZ( vert.z() * dz );
                 mesh->setVertex( i, vert );
             }
             break;

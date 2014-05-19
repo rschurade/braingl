@@ -18,7 +18,7 @@ class PropertyGroup;
 class EVRenderer : public ObjectRenderer
 {
 public:
-    EVRenderer( std::vector<QVector3D>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    EVRenderer( std::vector<QVector3D>* data );
     virtual ~EVRenderer();
 
     void init();
@@ -28,10 +28,9 @@ public:
     void setMask( DatasetScalar* mask );
 
 protected:
-    void setupTextures();
-    void setShaderVars();
+    void initGeometry( PropertyGroup& props );
+    void setShaderVars( PropertyGroup& props );
 
-    void initGeometry();
     void addGlyph( std::vector<float> &verts, std::vector<float> &colors, float xPos, float yPos, float zPos, QVector3D data, float alpha );
 
 private:

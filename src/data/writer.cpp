@@ -24,6 +24,7 @@
 #include "../algos/fmath.h"
 
 #include <QDebug>
+#include <QImage>
 
 Writer::Writer( Dataset* dataset, QFileInfo fileName, QString filter ) :
     m_dataset( dataset ),

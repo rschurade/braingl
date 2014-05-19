@@ -255,8 +255,6 @@ void DatasetGlyphset::makeLittleBrains()
         {
             TriangleMesh2* mesh = new TriangleMesh2( m_mesh.at( properties( "maingl" ).get( Fn::Property::D_SURFACE_GLYPH_GEOMETRY ).toInt() ) );
             LittleBrainRenderer* m_renderer = new LittleBrainRenderer( mesh );
-
-            m_renderer->setModel( Models::g() );
             m_renderer->init();
 
             littleBrains[i] = m_renderer;

@@ -19,7 +19,7 @@ class PropertyGroup;
 class BinghamRenderer : public ObjectRenderer
 {
 public:
-    BinghamRenderer( std::vector<std::vector<float> >* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    BinghamRenderer( std::vector<std::vector<float> >* data );
     virtual ~BinghamRenderer();
 
     void init();
@@ -29,11 +29,9 @@ public:
 
 
 protected:
-    void setupTextures();
-    void setShaderVars();
+    void initGeometry( PropertyGroup& props );
+    void setShaderVars( PropertyGroup& props );
     void setRenderParams( PropertyGroup& props );
-
-    void initGeometry();
 
 private:
     int m_tris1;

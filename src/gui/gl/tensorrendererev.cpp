@@ -19,7 +19,7 @@
 
 #include <limits>
 
-TensorRendererEV::TensorRendererEV( std::vector<Matrix>* data, int nx, int ny, int nz, float dx, float dy, float dz ) :
+TensorRendererEV::TensorRendererEV( std::vector<Matrix>* data ) :
     ObjectRenderer(),
     m_quads( 0 ),
     vboIds( new GLuint[ 1 ] ),
@@ -101,11 +101,7 @@ void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void TensorRendererEV::setupTextures()
-{
-}
-
-void TensorRendererEV::setShaderVars()
+void TensorRendererEV::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "tensorev" );
 
@@ -134,7 +130,7 @@ void TensorRendererEV::setShaderVars()
     glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 10, (const void *) offset );
 }
 
-void TensorRendererEV::initGeometry()
+void TensorRendererEV::initGeometry( PropertyGroup& props )
 {
     float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
     float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();

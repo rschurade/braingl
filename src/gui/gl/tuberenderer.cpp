@@ -17,7 +17,6 @@
 #include <QDebug>
 
 TubeRenderer::TubeRenderer( FiberSelector* selector, std::vector<Fib>* fibs )  :
-    ObjectRenderer(),
     m_selector( selector ),
     vboIds( new GLuint[ 4 ] ),
     m_fibs( fibs ),

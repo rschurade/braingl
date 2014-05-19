@@ -11,6 +11,7 @@
 
 #include "../../data/datasets/datasetsh.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/vptr.h"
 #include "../../algos/fmath.h"
 #include "../../algos/qball.h"
@@ -28,7 +29,7 @@
 #include <limits>
 #include <stdint.h>
 
-BinghamRenderer::BinghamRenderer( std::vector<std::vector<float> >* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
+BinghamRenderer::BinghamRenderer( std::vector<std::vector<float> >* data ) :
     ObjectRenderer(),
     m_tris1( 0 ),
     vboIds( new GLuint[ 2 ] ),
@@ -81,7 +82,7 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     m_mvMatrix = mv_matrix;
 
 
-    initGeometry();
+    initGeometry( props );
 
     QGLShaderProgram* program = GLFunctions::getShader( "qball" );
     program->bind();
@@ -102,18 +103,14 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( props );
     glDrawElements( GL_TRIANGLES, m_tris1, GL_UNSIGNED_INT, 0 );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void BinghamRenderer::setupTextures()
-{
-}
-
-void BinghamRenderer::setShaderVars()
+void BinghamRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "qball" );
 
@@ -136,23 +133,23 @@ void BinghamRenderer::setShaderVars()
     glVertexAttribPointer( radiusLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
 }
 
-void BinghamRenderer::initGeometry()
+void BinghamRenderer::initGeometry( PropertyGroup& props )
 {
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL).toFloat();
+    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
     zi = qMax( 0, qMin( zi, m_nz - 1) );
 
-    float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-    float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
-    float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
+    float zoom = Models::getGlobal( Fn::Property::G_ZOOM ).toFloat();
+    float moveX = Models::getGlobal( Fn::Property::G_MOVEX ).toFloat();
+    float moveY = Models::getGlobal( Fn::Property::G_MOVEY ).toFloat();
 
 
     int renderPeaks = (int)m_render1 * 1 + (int)m_render2 * 2 + (int)m_render3 * 4;
