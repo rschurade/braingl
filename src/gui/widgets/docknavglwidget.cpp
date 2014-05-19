@@ -86,9 +86,7 @@ void DockNavGLWidget::sliderChanged( int value )
 
 void DockNavGLWidget::settingChanged()
 {
-    QModelIndex mi;
-    mi = Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 );
-    if ( Models::g()->data( mi ).toBool() )
+    if ( Models::getGlobal( Fn::Property::G_SHOW_NAV_SLIDERS ).toBool() )
     {
         m_slider->show();
     }
@@ -97,6 +95,9 @@ void DockNavGLWidget::settingChanged()
         m_slider->hide();
     }
 
+    m_slider->setMin( -250 );
+    m_slider->setMax( 250 );
+/*
     if  ( m_name == "sagittal")
     {
         mi = Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 );
@@ -136,6 +137,7 @@ void DockNavGLWidget::settingChanged()
             m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
         }
     }
+    */
 }
 
 void DockNavGLWidget::update()

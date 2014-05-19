@@ -8,13 +8,12 @@
 #ifndef NAVRENDERER_H_
 #define NAVRENDERER_H_
 
-#include "objectrenderer.h"
-
 #include <QMatrix4x4>
 
+class PropertyGroup;
 class QGLShaderProgram;
 
-class NavRenderer : public ObjectRenderer
+class NavRenderer
 {
 public:
 	NavRenderer( QString name );

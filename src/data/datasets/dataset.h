@@ -47,12 +47,16 @@ public:
     virtual QString getSaveFilter();
     virtual QString getDefaultSuffix();
 
+    virtual QPair<QVector3D, QVector3D>getBoundingBox();
+
 protected:
     virtual void createTexture();
+    virtual void calcBoundingBox();
 
     QHash< QString, PropertyGroup >m_properties;
 
     GLuint m_textureGLuint;
+    QPair<QVector3D, QVector3D>m_boundingBox;
 };
 
 #endif /* DATASET_H_ */

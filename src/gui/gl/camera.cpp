@@ -8,6 +8,7 @@
 #include "camera.h"
 
 #include "../../data/models.h"
+#include "../../data/datasets/dataset.h"
 
 Camera::Camera( int width, int height ) :
     CameraBase( width, height ),
@@ -250,17 +251,15 @@ QMatrix4x4 Camera::getMVMat()
 
 void Camera::setView( Fn::Orient view )
 {
-    float nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    float ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    float nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-    nx = nx * dx / 2;
-    ny = ny * dy / 2;
-    nz = nz * dz / 2;
+    if( !Models::d()->rowCount() == 0)
+    {
+        return;
+    }
+    Dataset* ds = Models::getDataset( 0 );
+    QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
+    QVector3D center = ( bb.first + bb.second ) / 2;
 
-    m_lookAt = QVector3D( nx, ny, nz );
+    m_lookAt = QVector3D( center.x(), center.y(), center.z() );
     m_up = QVector3D( 0, 0 , 1 );
     m_zoom = 1.0;
     switch( view )
@@ -268,22 +267,22 @@ void Camera::setView( Fn::Orient view )
         case Fn::Orient::NONE:
             break;
         case Fn::Orient::AXIAL:
-            m_position = QVector3D( nx, ny, nz + 200 );
+            m_position = QVector3D( center.x(), center.y(), center.z() + 200 );
             break;
         case Fn::Orient::CORONAL:
-            m_position = QVector3D( nx, ny - 200, nz );
+            m_position = QVector3D( center.x(), center.y() - 200, center.z() );
             break;
         case Fn::Orient::SAGITTAL:
-            m_position = QVector3D( nx - 200, ny, nz );
+            m_position = QVector3D( center.x() - 200, center.y(), center.z() );
             break;
         case Fn::Orient::AXIAL2:
-            m_position = QVector3D( nx, ny, nz - 200 );
+            m_position = QVector3D( center.x(), center.y(), center.z() - 200 );
             break;
         case Fn::Orient::CORONAL2:
-            m_position = QVector3D( nx, ny + 200, nz );
+            m_position = QVector3D( center.x(), center.y() + 200, center.z() );
             break;
         case Fn::Orient::SAGITTAL2:
-            m_position = QVector3D( nx + 200, ny, nz );
+            m_position = QVector3D( center.x() + 200, center.y(), center.z() );
             break;
     }
     setGlobals();

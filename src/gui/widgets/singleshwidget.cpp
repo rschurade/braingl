@@ -20,7 +20,6 @@ SingleSHWidget::SingleSHWidget( QString name, QWidget *parent, const QGLWidget *
     m_visible( false )
 {
     m_renderer = new SingleSHRenderer();
-    m_renderer->setModel( Models::d() );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }

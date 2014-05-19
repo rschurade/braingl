@@ -59,10 +59,6 @@ private:
 
     bool m_visible;
 
-    float m_nx;
-    float m_ny;
-    float m_nz;
-
     int m_picked;
     QVector2D m_rightMouseDown;
     QVector2D m_pickOld;

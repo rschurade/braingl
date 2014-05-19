@@ -15,7 +15,7 @@
 class DataStore;
 class QGLShaderProgram;
 
-class CombinedNavRenderer : public ObjectRenderer
+class CombinedNavRenderer
 {
 public:
 	CombinedNavRenderer( QString name );

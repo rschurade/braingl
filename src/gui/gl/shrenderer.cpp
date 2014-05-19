@@ -28,18 +28,12 @@
 
 #include <limits>
 
-SHRenderer::SHRenderer( std::vector<ColumnVector>* data, int m_nx, int m_ny, int m_nz, float m_dx, float m_dy, float m_dz ) :
+SHRenderer::SHRenderer( std::vector<ColumnVector>* data ) :
     ObjectRenderer(),
     m_tris( 0 ),
     vboIds( new GLuint[ 3 ] ),
     m_mesh( 0 ),
     m_data( data ),
-    m_nx( m_nx ),
-    m_ny( m_ny ),
-    m_nz( m_nz ),
-    m_dx( m_dx ),
-    m_dy( m_dy ),
-    m_dz( m_dz ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
     m_offset( 0 ),
@@ -234,23 +228,15 @@ void SHRenderer::setShaderVars()
 
 void SHRenderer::initGeometry()
 {
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
-
-    xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
-    yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
-    zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
+    float x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    float y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    float z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
 
     float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
     float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
     float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, zoom, m_minMaxScaling, m_scaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
+    QString s = createSettingsString( { x, y, z, m_orient, zoom, m_minMaxScaling, m_scaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
     if ( !m_updateWaiting && ( s == m_previousSettings || m_orient == 0 ) )
     {
         return;
@@ -302,19 +288,23 @@ void SHRenderer::createMesh()
 
     m_updateWaiting = false;
 
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    int nx = model()->data( model()->index( (int)Fn::Property::D_NX, 0 ) ).toInt();
+    int ny = model()->data( model()->index( (int)Fn::Property::D_NY, 0 ) ).toInt();
+    int nz = model()->data( model()->index( (int)Fn::Property::D_NZ, 0 ) ).toInt();
 
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    float dx = model()->data( model()->index( (int)Fn::Property::D_DX, 0 ) ).toFloat();
+    float dy = model()->data( model()->index( (int)Fn::Property::D_DY, 0 ) ).toFloat();
+    float dz = model()->data( model()->index( (int)Fn::Property::D_DZ, 0 ) ).toFloat();
+
+    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
 
     xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
     yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
     zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
 
-    m_masterThread = new SHRendererThread2( 0, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi, yi, zi, m_lod,
+    m_masterThread = new SHRendererThread2( 0, m_data, nx, ny, nz, dx, dy, dz, xi, yi, zi, m_lod,
                                                        m_order, m_orient, m_minMaxScaling, m_scaling, m_hideNegativeLobes, m_pMatrix, m_mvMatrix );
     connect( m_masterThread, SIGNAL( finished( TriangleMesh2* ) ), this, SLOT( slotNewMeshCreated( TriangleMesh2* ) ) );
 

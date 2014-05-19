@@ -87,31 +87,26 @@ void NavRendererCoronal::leftMouseDown( int x, int y )
     xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
     yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
 
-    QModelIndex mi;
     QPoint p( xout, yout );
-    mi = model()->index( (int)Fn::Property::G_SAGITTAL_AXIAL, 0 );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, p );
-        model()->submit();
-    }
+    Models::setGlobal( Fn::Property::G_SAGITTAL_AXIAL, p );
+    Models::g()->submit();
 }
 
 void NavRendererCoronal::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-    m_y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-    m_z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
 
     if ( m_xOld != m_x || m_yOld != m_y || m_zOld != m_z )
     {
-        m_nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
-        m_ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
-        m_nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
+        m_nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
+        m_ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
+        m_nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
 
-        m_dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-        m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-        m_dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+        m_dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+        m_dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+        m_dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
         float x = m_x * m_dx + m_dx / 2.0;
         float y = m_y * m_dy + m_dy / 2.0;
@@ -152,7 +147,7 @@ void NavRendererCoronal::initGeometry()
 
 void NavRendererCoronal::draw()
 {
-    QColor color = model()->data( model()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ).value<QColor>();
+    QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     //qDebug() << "nav draw";
@@ -176,13 +171,13 @@ void NavRendererCoronal::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshirs = model()->data( model()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool();
+    bool renderCrosshirs = Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ).toBool();
 
     if ( renderCrosshirs )
     {
         GLFunctions::getShader( "crosshair" )->bind();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-        QColor ccolor = model()->data( model()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
+        QColor ccolor = Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ).value<QColor>();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "u_color", ccolor.redF(), ccolor.greenF(), ccolor.blueF(), 1.0f );
         // Tell OpenGL which VBOs to use
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );

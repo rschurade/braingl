@@ -275,12 +275,6 @@ namespace Fn
         G_SAGITTAL,
         G_CORONAL,
         G_AXIAL,
-        G_MAX_SAGITTAL,
-        G_MAX_CORONAL,
-        G_MAX_AXIAL,
-        G_SLICE_DX,
-        G_SLICE_DY,
-        G_SLICE_DZ,
         G_CORONAL_AXIAL,
         G_SAGITTAL_AXIAL,
         G_SAGITTAL_CORONAL,
@@ -529,12 +523,6 @@ namespace Fn
                 case Property::G_SAGITTAL: return QString( "global sagittal" ); break;
                 case Property::G_CORONAL: return QString( "global coronal" ); break;
                 case Property::G_AXIAL: return QString( "global axial" ); break;
-                case Property::G_MAX_SAGITTAL: return QString( "" ); break;
-                case Property::G_MAX_CORONAL: return QString( "" ); break;
-                case Property::G_MAX_AXIAL: return QString( "" ); break;
-                case Property::G_SLICE_DX: return QString( "" ); break;
-                case Property::G_SLICE_DY: return QString( "" ); break;
-                case Property::G_SLICE_DZ: return QString( "" ); break;
                 case Property::G_CORONAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_CORONAL: return QString( "" ); break;
