@@ -25,7 +25,7 @@ class SHRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    SHRenderer( std::vector<ColumnVector>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    SHRenderer( std::vector<ColumnVector>* data );
     virtual ~SHRenderer();
 
     void init();
@@ -51,13 +51,6 @@ private:
     TriangleMesh2* m_newMesh;
 
     std::vector<ColumnVector>* m_data;
-
-    int m_nx;
-    int m_ny;
-    int m_nz;
-    float m_dx;
-    float m_dy;
-    float m_dz;
 
     float m_scaling;
     int m_orient;

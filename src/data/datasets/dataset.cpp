@@ -23,6 +23,8 @@ Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
     props.createString( Fn::Property::D_RENDER_TARGET, "maingl" );
 
     m_properties.insert( "maingl", props );
+
+    calcBoundingBox();
 }
 
 Dataset::~Dataset()
@@ -111,4 +113,15 @@ QString Dataset::getSaveFilter()
 QString Dataset::getDefaultSuffix()
 {
     return QString( "" );
+}
+
+QPair<QVector3D, QVector3D> Dataset::getBoundingBox()
+{
+    return m_boundingBox;
+}
+
+void Dataset::calcBoundingBox()
+{
+    m_boundingBox.first = QVector3D( -250, -250, -250 );
+    m_boundingBox.second = QVector3D( 250, 250, 250 );
 }

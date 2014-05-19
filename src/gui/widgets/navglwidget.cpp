@@ -40,7 +40,6 @@ NavGLWidget::NavGLWidget( QString name, int orient, QWidget *parent, const QGLWi
         }
     }
 
-    m_navRenderer->setModel( Models::g() );
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }

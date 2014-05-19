@@ -8,11 +8,14 @@
 #ifndef COLORMAPRENDERER_H_
 #define COLORMAPRENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
-class QGLShaderProgram;
+#include <QColor>
+#include <QVector3D>
+#include <QMatrix4x4>
+#include <QObject>
 
-class ColormapRenderer : public ObjectRenderer
+class ColormapRenderer : public QObject
 {
     Q_OBJECT
 

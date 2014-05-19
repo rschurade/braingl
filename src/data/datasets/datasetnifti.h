@@ -33,6 +33,9 @@ public:
     int getIdFromPos( float x, float y, float z );
     int getIdFromPos( QVector3D pos );
     int getId( int x, int y, int z );
+    int getIdX( float x );
+    int getIdY( float y );
+    int getIdZ( float z );
     void getXYZ( int id, int &x, int &y, int &z );
     QList<int>getNeighbourhood3x3( int x, int y, int z );
     QList<int>getNeighbourhoodXxX( int x, int y, int z, int dist );

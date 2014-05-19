@@ -122,18 +122,6 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
     int type = roi->properties()->get( Fn::Property::D_SHAPE ).toInt();
     if ( type < 10 )
     {
-        float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-        float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-        float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-        float nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-        float ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-        float nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-
-        float px = dx * nx;
-        float py = dy * ny;
-        float pz = dz * nz;
-
         float add = 1.0f;
 
         if ( event->modifiers() & Qt::ShiftModifier )
@@ -147,6 +135,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
         float rdx = roi->properties()->get( Fn::Property::D_DX ).toFloat();
         float rdy = roi->properties()->get( Fn::Property::D_DY ).toFloat();
         float rdz = roi->properties()->get( Fn::Property::D_DZ ).toFloat();
+        float dim = 250;
 
         switch( event->key() )
         {
@@ -154,11 +143,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdx = qMax( 0.5f, qMin( rdx - add, px ) );
+                    rdx = qMax( 0.5f, qMin( rdx - add, dim ) );
                 }
                 else
                 {
-                    rx = qMax( 0.0f, qMin( rx - add, px ) );
+                    rx = qMax( 0.0f, qMin( rx - add, dim ) );
                 }
                 break;
             }
@@ -166,11 +155,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdx = qMax( 0.5f, qMin( rdx + add, px ) );
+                    rdx = qMax( 0.5f, qMin( rdx + add, dim ) );
                 }
                 else
                 {
-                    rx = qMax( 0.0f, qMin( rx + add, px ) );
+                    rx = qMax( 0.0f, qMin( rx + add, dim ) );
                 }
                 break;
             }
@@ -178,11 +167,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdy = qMax( 0.5f, qMin( rdy + add, py ) );
+                    rdy = qMax( 0.5f, qMin( rdy + add, dim ) );
                 }
                 else
                 {
-                    ry = qMax( 0.0f, qMin( ry + add, py ) );
+                    ry = qMax( 0.0f, qMin( ry + add, dim ) );
                 }
                 break;
             }
@@ -190,11 +179,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdy = qMax( 0.5f, qMin( rdy - add, py ) );
+                    rdy = qMax( 0.5f, qMin( rdy - add, dim ) );
                 }
                 else
                 {
-                    ry = qMax( 0.0f, qMin( ry - add, py ) );
+                    ry = qMax( 0.0f, qMin( ry - add, dim ) );
                 }
                 break;
             }
@@ -202,11 +191,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdz = qMax( 0.5f, qMin( rdz + add, pz ) );
+                    rdz = qMax( 0.5f, qMin( rdz + add, dim ) );
                 }
                 else
                 {
-                    rz = qMax( 0.0f, qMin( rz + add, pz ) );
+                    rz = qMax( 0.0f, qMin( rz + add, dim ) );
                 }
                 break;
             }
@@ -214,11 +203,11 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
             {
                 if ( event->modifiers() & Qt::ControlModifier )
                 {
-                    rdz = qMax( 0.5f, qMin( rdz - add, pz ) );
+                    rdz = qMax( 0.5f, qMin( rdz - add, dim ) );
                 }
                 else
                 {
-                    rz = qMax( 0.0f, qMin( rz - add, pz ) );
+                    rz = qMax( 0.0f, qMin( rz - add, dim ) );
                 }
                 break;
             }

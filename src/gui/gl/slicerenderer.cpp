@@ -17,10 +17,10 @@
 #include <QMatrix4x4>
 
 SliceRenderer::SliceRenderer() :
-    ObjectRenderer(),
     vbo0( 0 ),
     vbo1( 0 ),
-    vbo2( 0 ){
+    vbo2( 0 )
+{
 }
 
 SliceRenderer::~SliceRenderer()
@@ -45,17 +45,9 @@ void SliceRenderer::initGeometry()
 
     QList< int > tl = GLFunctions::getTextureIndexes( "maingl" );
 
-
-    float xs = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    float ys = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    float zs = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    float x = xs * dx;
-    float y = ys * dy;
-    float z = zs * dz;
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     float lx = -maxDim;
     float ly = -maxDim;
@@ -64,7 +56,6 @@ void SliceRenderer::initGeometry()
     float xb = maxDim;
     float yb = maxDim;
     float zb = maxDim;
-
 
     float verticesAxial[] =
     {
@@ -77,8 +68,6 @@ void SliceRenderer::initGeometry()
     glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
     glBufferData( GL_ARRAY_BUFFER, 12 * sizeof(float), verticesAxial, GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-
 
     float verticesCoronal[] =
     {
@@ -170,19 +159,19 @@ void SliceRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     float red =   0.0f;
 
     initGeometry();
-    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ) ).toBool() )
+    if ( Models::getGlobal( Fn::Property::G_SHOW_AXIAL ).toBool() )
     {
         float blue =  (float)(( 1 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawAxial( target );
     }
-    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ) ).toBool() )
+    if ( Models::getGlobal( Fn::Property::G_SHOW_CORONAL ).toBool() )
     {
         float blue =  (float)(( 2 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
         drawCoronal( target );
     }
-    if ( model()->data( model()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ) ).toBool() )
+    if ( Models::getGlobal( Fn::Property::G_SHOW_SAGITTAL ).toBool() )
     {
         float blue =  (float)(( 3 ) & 0xFF) / 255.f;
         GLFunctions::getShader( "slice" )->setUniformValue( "u_pickColor", red, green , blue, pAlpha );

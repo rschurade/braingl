@@ -26,9 +26,6 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
-    m_nx( 160 ),
-    m_ny( 200 ),
-    m_nz( 160 ),
     m_picked( 0 ),
     m_sliceXPosAtPick( 0 ),
     m_sliceYPosAtPick( 0 ),
@@ -57,9 +54,6 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
-    m_nx( 160 ),
-    m_ny( 200 ),
-    m_nz( 160 ),
     m_picked( 0 ),
     m_sliceXPosAtPick( 0 ),
     m_sliceYPosAtPick( 0 ),
@@ -207,19 +201,16 @@ void GLWidget::calcMVPMatrix()
         m_cameraInUse = m_camera;
     }
 
-    m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-    m_nx *= dx;
-    m_ny *= dy;
-    m_nz *= dz;
+    int boundingbox = 0;
+    if( Models::d()->rowCount() > 0)
+    {
+        Dataset* ds = Models::getDataset( 0 );
+        QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
+        QVector3D center = ( bb.first + bb.second ) / 2;
 
-    m_arcBall->setRotCenter( m_nx / 2., m_ny / 2., m_nz / 2. );
-
-    int boundingbox = qMax ( m_nx, qMax( m_ny, m_nz ) );
+        m_arcBall->setRotCenter( center.x(), center.y(), center.z() );
+        boundingbox = qMax ( bb.second.x(), qMax( bb.second.y(), bb.second.z() ) );
+    }
 
     // Reset projection
     m_pMatrix.setToIdentity();
@@ -453,6 +444,13 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         Models::g()->submit();
     }
 
+    Dataset* ds = Models::getDataset( 0 );
+    QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
+
+    float m_nx = bb.second.x() - bb.first.x();
+    float m_ny = bb.second.y() - bb.first.y();
+    float m_nz = bb.second.z() - bb.first.z();
+
     if ( !(event->modifiers() & Qt::ControlModifier) )
     {
         switch ( m_picked )
@@ -551,39 +549,37 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         int m_y = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
         int m_z = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
 
-        int m_nx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
-        int m_ny = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
-        int m_nz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
+        int dim = 250;
         switch( event->key() )
         {
             case Qt::Key_Left :
             {
-                m_x = qMax( 0, m_x -1 );
+                m_x = qMax( -dim, m_x -1 );
                 break;
             }
             case Qt::Key_Right:
             {
-                m_x = qMin( m_nx, m_x +1 );
+                m_x = qMin( dim, m_x +1 );
                 break;
             }
             case Qt::Key_Down :
             {
-                m_y = qMax( 0, m_y -1 );
+                m_y = qMax( -dim, m_y -1 );
                 break;
             }
             case Qt::Key_Up:
             {
-                m_y = qMin( m_ny, m_y +1 );
+                m_y = qMin( dim, m_y +1 );
                 break;
             }
             case Qt::Key_PageDown:
             {
-                m_z = qMax( 0, m_z -1 );
+                m_z = qMax( -dim, m_z -1 );
                 break;
             }
             case Qt::Key_PageUp:
             {
-                m_z = qMin( m_nz, m_z +1 );
+                m_z = qMin( dim, m_z +1 );
                 break;
             }
         }

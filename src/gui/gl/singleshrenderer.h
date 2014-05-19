@@ -8,16 +8,16 @@
 #ifndef SINGLESHRENDERER_H_
 #define SINGLESHRENDERER_H_
 
-#include "objectrenderer.h"
-
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QMatrix4x4>
 
+#include <initializer_list>
+
 class ArcBall;
 class DatasetDWI;
 
-class SingleSHRenderer : public ObjectRenderer
+class SingleSHRenderer
 {
 public:
     SingleSHRenderer();
@@ -29,7 +29,6 @@ public:
 
     void initGL();
     void draw();
-    void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props ) {};
 
     void leftMouseDown( int x, int y );
     void leftMouseDrag( int x, int y );
@@ -41,6 +40,8 @@ private:
     void initGeometry();
 
     void calcMVPMatrix();
+
+    QString createSettingsString( std::initializer_list<QVariant> settings );
 
     GLuint *vboIds;
 
@@ -64,6 +65,8 @@ private:
     ArcBall* m_arcBall;
 
     DatasetDWI* m_dataset;
+
+    QString m_previousSettings;
 };
 
 #endif /* SINGLESHRENDERER_H_ */

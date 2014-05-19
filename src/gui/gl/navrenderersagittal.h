@@ -27,7 +27,7 @@ public:
 	void adjustRatios();
 
 private:
-    void initGeometry();
+	void initGeometry();
 
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_pMatrixWorkaround;

@@ -28,14 +28,14 @@
 #include <limits>
 
 SingleSHRenderer::SingleSHRenderer() :
-    ObjectRenderer(),
     vboIds( new GLuint[ 2 ] ),
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
     m_dx( 1.0 ),
     m_dy( 1.0 ),
-    m_dz( 1.0 )
+    m_dz( 1.0 ),
+    m_previousSettings( "" )
 {
     m_arcBall = new ArcBall( 50, 50 );
 }
@@ -262,14 +262,14 @@ void SingleSHRenderer::draw()
 {
     QList<int>rl;
 
-    int countDatasets = model()->rowCount();
+    int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = model()->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( model()->data( index, Qt::DisplayRole ).toBool() )
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            index = model()->index( i, (int)Fn::Property::D_TYPE );
-            if ( model()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
+            index = Models::d()->index( i, (int)Fn::Property::D_TYPE );
+            if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
             {
                 rl.push_back( i );
                 //qDebug() << "found QBall to render";
@@ -279,7 +279,7 @@ void SingleSHRenderer::draw()
 
     if ( rl.size() > 0 )
     {
-        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        m_dataset = VPtr<DatasetDWI>::asPtr( Models::d()->data( Models::d()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         initGeometry();
     }
     else
@@ -310,4 +310,15 @@ void SingleSHRenderer::draw()
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
+}
+
+QString SingleSHRenderer::createSettingsString( std::initializer_list<QVariant>settings )
+{
+    QString result("");
+
+    for ( auto i = settings.begin(); i != settings.end(); ++i )
+    {
+        result += (*i).toString();
+    }
+    return result;
 }
