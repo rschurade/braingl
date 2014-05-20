@@ -110,15 +110,15 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
     program->setUniformValue( "u_upperThreshold", m_upperThreshold );
 
-    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    float nx = props.get( Fn::Property::D_NX ).toFloat();
+    float ny = props.get( Fn::Property::D_NY ).toFloat();
+    float nz = props.get( Fn::Property::D_NZ ).toFloat();
+    float sx = props.get( Fn::Property::G_SAGITTAL ).toFloat();
+    float sy = props.get( Fn::Property::G_CORONAL ).toFloat();
+    float sz = props.get( Fn::Property::G_AXIAL ).toFloat();
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
 
     program->setUniformValue( "u_x", sx * dx + dx / 2.0f );
     program->setUniformValue( "u_y", sy * dy + dy / 2.0f );
@@ -159,7 +159,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
-    initGeometry();
+    initGeometry( props );
 
     if ( m_meshUpdated )
     {
@@ -173,7 +173,7 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( props );
 
     glEnable(GL_CULL_FACE);
     glCullFace( GL_BACK );
@@ -224,13 +224,13 @@ void SHRenderer::setShaderVars( PropertyGroup& props )
 
 void SHRenderer::initGeometry( PropertyGroup& props )
 {
-    float x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    float y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    float z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
-    float zoom = model()->data( model()->index( (int)Fn::Property::G_ZOOM, 0 ) ).toFloat();
-    float moveX = model()->data( model()->index( (int)Fn::Property::G_MOVEX, 0 ) ).toFloat();
-    float moveY = model()->data( model()->index( (int)Fn::Property::G_MOVEY, 0 ) ).toFloat();
+    float zoom = Models::getGlobal( Fn::Property::G_ZOOM ).toFloat();
+    float moveX = Models::getGlobal( Fn::Property::G_MOVEX ).toFloat();
+    float moveY = Models::getGlobal( Fn::Property::G_MOVEY ).toFloat();
 
     QString s = createSettingsString( { x, y, z, m_orient, zoom, m_minMaxScaling, m_scaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
     if ( !m_updateWaiting && ( s == m_previousSettings || m_orient == 0 ) )
@@ -239,7 +239,7 @@ void SHRenderer::initGeometry( PropertyGroup& props )
     }
     m_previousSettings = s;
 
-    createMesh();
+    createMesh( props );
 }
 
 void SHRenderer::setRenderParams( PropertyGroup& props )
@@ -274,7 +274,7 @@ void SHRenderer::setRenderParams( PropertyGroup& props )
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
-void SHRenderer::createMesh()
+void SHRenderer::createMesh( PropertyGroup& props )
 {
     if ( m_masterThread && m_masterThread->isRunning() )
     {
@@ -284,21 +284,21 @@ void SHRenderer::createMesh()
 
     m_updateWaiting = false;
 
-    int nx = model()->data( model()->index( (int)Fn::Property::D_NX, 0 ) ).toInt();
-    int ny = model()->data( model()->index( (int)Fn::Property::D_NY, 0 ) ).toInt();
-    int nz = model()->data( model()->index( (int)Fn::Property::D_NZ, 0 ) ).toInt();
+    int nx = props.get( Fn::Property::D_NX ).toInt();
+    int ny = props.get( Fn::Property::D_NY ).toInt();
+    int nz = props.get( Fn::Property::D_NZ ).toInt();
 
-    float dx = model()->data( model()->index( (int)Fn::Property::D_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::D_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::D_DZ, 0 ) ).toFloat();
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
 
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
+    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
-    xi = qMax( 0, qMin( xi + m_offset, m_nx - 1) );
-    yi = qMax( 0, qMin( yi + m_offset, m_ny - 1) );
-    zi = qMax( 0, qMin( zi + m_offset, m_nz - 1) );
+    xi = qMax( 0, qMin( xi + m_offset, nx - 1) );
+    yi = qMax( 0, qMin( yi + m_offset, ny - 1) );
+    zi = qMax( 0, qMin( zi + m_offset, nz - 1) );
 
     m_masterThread = new SHRendererThread2( 0, m_data, nx, ny, nz, dx, dy, dz, xi, yi, zi, m_lod,
                                                        m_order, m_orient, m_minMaxScaling, m_scaling, m_hideNegativeLobes, m_pMatrix, m_mvMatrix );

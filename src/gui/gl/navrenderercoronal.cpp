@@ -7,6 +7,7 @@
 #include "navrenderercoronal.h"
 #include "glfunctions.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 
 #include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
@@ -100,13 +101,13 @@ void NavRendererCoronal::initGeometry()
 
     if ( m_xOld != m_x || m_yOld != m_y || m_zOld != m_z )
     {
-        m_nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
-        m_ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
-        m_nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
+        m_nx = 160; //Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
+        m_ny = 200; //Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
+        m_nz = 160; //Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
 
-        m_dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-        m_dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-        m_dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+        m_dx = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+        m_dy = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+        m_dz = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
         float x = m_x * m_dx + m_dx / 2.0;
         float y = m_y * m_dy + m_dy / 2.0;

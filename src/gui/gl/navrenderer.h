@@ -8,6 +8,8 @@
 #ifndef NAVRENDERER_H_
 #define NAVRENDERER_H_
 
+#include "GL/glew.h"
+
 #include <QMatrix4x4>
 
 class PropertyGroup;

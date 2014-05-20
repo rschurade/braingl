@@ -8,6 +8,8 @@
 #ifndef SINGLESHRENDERER_H_
 #define SINGLESHRENDERER_H_
 
+#include "GL/glew.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QMatrix4x4>

@@ -8,6 +8,8 @@
 #ifndef PIEGLYPHRENDERER_H_
 #define PIEGLYPHRENDERER_H_
 
+#include "GL/glew.h"
+
 #include "../../data/properties/propertygroup.h"
 
 class PieGlyphRenderer

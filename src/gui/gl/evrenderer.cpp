@@ -28,12 +28,12 @@ EVRenderer::EVRenderer( std::vector<QVector3D>* data ) :
     vbo0( 0 ),
     m_data( data ),
     m_mask( 0 ),
-    m_nx( nx ),
-    m_ny( ny ),
-    m_nz( nz ),
-    m_dx( dx ),
-    m_dy( dy ),
-    m_dz( dz ),
+    m_nx( 0 ),
+    m_ny( 0 ),
+    m_nz( 0 ),
+    m_dx( 0 ),
+    m_dy( 0 ),
+    m_dz( 0 ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
     m_offset( 0.0 )
@@ -102,9 +102,9 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    initGeometry();
+    initGeometry( props );
 
-    setShaderVars();
+    setShaderVars( props );
     glLineWidth( m_lineWidth );
     glDrawArrays( GL_LINES, 0, m_vertCount );
     glLineWidth( 1 );
@@ -145,14 +145,13 @@ void EVRenderer::setShaderVars( PropertyGroup& props )
 
 void EVRenderer::initGeometry( PropertyGroup& props )
 {
-    Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
 
-    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * ( dx / m_dx );
-    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * ( dy / m_dy );
-    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * ( dz / m_dz );
+    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
