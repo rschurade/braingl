@@ -13,6 +13,8 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
+#include <cmath>
+
 NavRendererCoronal::NavRendererCoronal( QString name ) :
     NavRenderer( name )
 {

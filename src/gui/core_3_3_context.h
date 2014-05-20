@@ -6,9 +6,9 @@
 #if defined(Q_OS_MAC)
 #if QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
 void* select_3_2_mac_visual(GDHandle handle, int depthBufferSize);
-
 #else
-#error __FILE__ __LINE__ This Qt version is not supported.
+/* XXX include the offending version in message */
+#error This Qt version is not supported.
 #endif
 #endif
 
