@@ -107,22 +107,13 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "u_lowerThreshold", m_lowerThreshold );
     program->setUniformValue( "u_upperThreshold", m_upperThreshold );
 
-    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    float sx = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float sy = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float sz = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
-    program->setUniformValue( "u_dx", dx );
-    program->setUniformValue( "u_dy", dy );
-    program->setUniformValue( "u_dz", dz );
-    program->setUniformValue( "u_x", sx * dx ); // + dx / 2.0f );
-    program->setUniformValue( "u_y", sy * dy ); // + dy / 2.0f );
-    program->setUniformValue( "u_z", sz * dz ); // + dz / 2.0f );
+    program->setUniformValue( "u_x", sx ); // + dx / 2.0f );
+    program->setUniformValue( "u_y", sy ); // + dy / 2.0f );
+    program->setUniformValue( "u_z", sz ); // + dz / 2.0f );
     program->setUniformValue( "u_cutLowerX", props.get( Fn::Property::D_MESH_CUT_LOWER_X ).toBool() );
     program->setUniformValue( "u_cutLowerY", props.get( Fn::Property::D_MESH_CUT_LOWER_Y ).toBool() );
     program->setUniformValue( "u_cutLowerZ", props.get( Fn::Property::D_MESH_CUT_LOWER_Z ).toBool() );
@@ -156,8 +147,6 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     float green = (float) ( ( m_pickId >> 8 ) & 0xFF ) / 255.f;
     float red = (float) ( ( m_pickId >> 16 ) & 0xFF ) / 255.f;
     program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
-
-    program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
     if ( m_dirty )
     {

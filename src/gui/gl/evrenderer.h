@@ -12,6 +12,8 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
+#include <QColor>
+
 class DatasetScalar;
 class PropertyGroup;
 

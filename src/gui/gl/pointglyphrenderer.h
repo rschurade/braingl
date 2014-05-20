@@ -8,6 +8,8 @@
 #ifndef POINTGLYPHRENDERER_H_
 #define POINTGLYPHRENDERER_H_
 
+#include "GL/glew.h"
+
 #include "../../data/properties/propertygroup.h"
 
 class PointGlyphRenderer

@@ -8,6 +8,8 @@
 #ifndef VECTORGLYPHRENDERER_H_
 #define VECTORGLYPHRENDERER_H_
 
+#include "GL/glew.h"
+
 #include "../../data/properties/propertygroup.h"
 
 class VectorGlyphRenderer

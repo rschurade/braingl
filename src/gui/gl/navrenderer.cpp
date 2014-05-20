@@ -18,7 +18,6 @@
 #endif
 
 NavRenderer::NavRenderer( QString name ) :
-    ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),

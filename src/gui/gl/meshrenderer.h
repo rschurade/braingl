@@ -10,6 +10,9 @@
 
 #include "GL/glew.h"
 
+#include <QColor>
+#include <QMatrix4x4>
+
 class TriangleMesh2;
 class PropertyGroup;
 class ROIPropertyGroup;

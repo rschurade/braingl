@@ -9,6 +9,7 @@
 
 #include "../../algos/fmath.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
 #include "../../data/properties/propertygroup.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
@@ -25,12 +26,12 @@ TensorRenderer::TensorRenderer( std::vector<Matrix>* data ) :
     m_quads( 0 ),
     vboIds( new GLuint[ 1 ] ),
     m_data( data ),
-    m_nx( nx ),
-    m_ny( ny ),
-    m_nz( nz ),
-    m_dx( dx ),
-    m_dy( dy ),
-    m_dz( dz ),
+    m_nx( 0 ),
+    m_ny( 0 ),
+    m_nz( 0 ),
+    m_dx( 0 ),
+    m_dy( 0 ),
+    m_dz( 0 ),
     m_scaling( 1.0 ),
     m_faThreshold( 0.0 ),
     m_evThreshold( 0.0 ),
@@ -65,7 +66,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
         return;
     }
 
-    initGeometry();
+    initGeometry( props );
 
     QGLShaderProgram* program = GLFunctions::getShader( "superquadric" );
 
@@ -93,7 +94,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( props );
 
     //GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
     // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
@@ -142,13 +143,9 @@ void TensorRenderer::setShaderVars( PropertyGroup& props )
 
 void TensorRenderer::initGeometry( PropertyGroup& props )
 {
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    int xi = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );

@@ -8,7 +8,7 @@
 #ifndef TUBERENDERER_H_
 #define TUBERENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 #include "../../algos/fib.h"
 
@@ -42,8 +42,6 @@ protected:
     void initIndexBuffer( int lod );
 
 private:
-    QModelIndex createIndex( int branch, int pos, int column );
-
     FiberSelector* m_selector;
     GLuint *vboIds;
 

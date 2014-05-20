@@ -8,6 +8,8 @@
 #ifndef TREERENDERER_H_
 #define TREERENDERER_H_
 
+#include "GL/glew.h"
+
 #include <QMatrix4x4>
 
 class Tree;
