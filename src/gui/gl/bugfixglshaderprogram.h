@@ -18,7 +18,7 @@
 // important: include Qt headers before redefining QGLShaderProgram
 #include <QGLShaderProgram>
 
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
 #  define QGLShaderProgram BugfixGLShaderProgram
 
 class QGLShaderProgram : public QObject

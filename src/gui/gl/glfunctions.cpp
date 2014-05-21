@@ -28,7 +28,7 @@
 
 #include <locale.h>
 
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
 #include "bugfixglshaderprogram.h"
 #endif
 
@@ -355,7 +355,7 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
     QGLShaderProgram* program = new BugfixGLShaderProgram;
 #else
     QGLShaderProgram* program = new QGLShaderProgram;
