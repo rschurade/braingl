@@ -4,7 +4,7 @@
 #include <QGLContext>
 
 #if defined(Q_OS_MAC)
-#if QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
 void* select_3_2_mac_visual(GDHandle handle, int depthBufferSize);
 #else
 /* XXX include the offending version in message */
@@ -15,7 +15,7 @@ void* select_3_2_mac_visual(GDHandle handle, int depthBufferSize);
 struct core_3_3_context : public QGLContext
 {
 //#if defined(Q_OS_MAC)
-#if QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
     QGLFormat core_3_3_format()
     {
         QGLFormat format = QGLFormat();
