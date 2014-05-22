@@ -30,7 +30,7 @@ SharpQBallThread::~SharpQBallThread()
     m_qBallVector.clear();
 }
 
-std::vector<ColumnVector> SharpQBallThread::getQBallVector()
+std::vector<ColumnVector>& SharpQBallThread::getQBallVector()
 {
     return m_qBallVector;
 }
