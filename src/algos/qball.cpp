@@ -102,31 +102,32 @@ void QBall::sharpQBall( DatasetDWI* ds, int order, std::vector<ColumnVector>& ou
     int numThreads = GLFunctions::idealThreadCount;
 
     std::vector<SharpQBallThread*> threads;
-    // create threads
+    //qDebug() << "create threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         threads.push_back( new SharpQBallThread( ds, order, i ) );
     }
 
-    // run threads
+    //qDebug() << "run threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         threads[i]->start();
     }
 
-    // wait for all threads to finish
+    //qDebug() << "wait for all threads to finish";
     for ( int i = 0; i < numThreads; ++i )
     {
         threads[i]->wait();
     }
 
     out.clear();
-    // combine fibs from all threads
+    //qDebug() << "combine result from all threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         out.insert( out.end(), threads[i]->getQBallVector().begin(), threads[i]->getQBallVector().end() );
     }
 
+    //qDebug() << "delete threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         delete threads[i];

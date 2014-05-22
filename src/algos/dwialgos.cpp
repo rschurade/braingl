@@ -86,6 +86,7 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
 
 QList<Dataset*> DWIAlgos::qBallSharp( Dataset* ds, int order )
 {
+    qDebug() << "start calculating qBall sharp";
     std::vector<ColumnVector> qBallVector;
     QBall::sharpQBall( dynamic_cast<DatasetDWI*>( ds ), order, qBallVector );
     qDebug() << "create dataset";
