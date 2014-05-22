@@ -26,12 +26,6 @@ TensorRenderer::TensorRenderer( std::vector<Matrix>* data ) :
     m_quads( 0 ),
     vboIds( new GLuint[ 1 ] ),
     m_data( data ),
-    m_nx( 0 ),
-    m_ny( 0 ),
-    m_nz( 0 ),
-    m_dx( 0 ),
-    m_dy( 0 ),
-    m_dz( 0 ),
     m_scaling( 1.0 ),
     m_faThreshold( 0.0 ),
     m_evThreshold( 0.0 ),
@@ -143,13 +137,25 @@ void TensorRenderer::setShaderVars( PropertyGroup& props )
 
 void TensorRenderer::initGeometry( PropertyGroup& props )
 {
-    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
-    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
-    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+    float nx = props.get( Fn::Property::D_NX ).toFloat();
+    float ny = props.get( Fn::Property::D_NY ).toFloat();
+    float nz = props.get( Fn::Property::D_NZ ).toFloat();
 
-    xi = qMax( 0, qMin( xi, m_nx - 1) );
-    yi = qMax( 0, qMin( yi, m_ny - 1) );
-    zi = qMax( 0, qMin( zi, m_nz - 1) );
+    float dx = props.get( Fn::Property::D_DX ).toFloat();
+    float dy = props.get( Fn::Property::D_DY ).toFloat();
+    float dz = props.get( Fn::Property::D_DZ ).toFloat();
+
+    float ax = props.get( Fn::Property::D_ADJUST_X ).toFloat();
+    float ay = props.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float az = props.get( Fn::Property::D_ADJUST_Z ).toFloat();
+
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+    int xi = qMax( 0.0f, qMin( ( x + dx / 2 - ax ) / dx, nx - 1 ) );
+    int yi = qMax( 0.0f, qMin( ( y + dy / 2 - ay ) / dy, ny - 1 ) );
+    int zi = qMax( 0.0f, qMin( ( z + dz / 2 - az ) / dz, nz - 1 ) );
 
     QString s = createSettingsString( { xi, yi, zi, m_orient, m_offset } );
 
@@ -166,55 +172,51 @@ void TensorRenderer::initGeometry( PropertyGroup& props )
 
     ColumnVector newVert( 3 );
 
-    float x = (float)xi * m_dx + m_dx / 2;
-    float y = (float)yi * m_dy + m_dy / 2;
-    float z = (float)zi * m_dz + m_dz / 2;
-
     m_quads = 0;
 
     if ( ( m_orient & 1 ) == 1 )
     {
-        for( int yy = 0; yy < m_ny; ++yy )
+        for( int yy = 0; yy < ny; ++yy )
         {
-            for ( int xx = 0; xx < m_nx; ++xx )
+            for ( int xx = 0; xx < nx; ++xx )
             {
-                Matrix tensor = m_data->at( xx + yy * m_nx + zi * m_nx * m_ny ) * 1000;
+                Matrix tensor = m_data->at( xx + yy * nx + zi * nx * ny ) * 1000;
 
-                float locX = xx * m_dx; // + m_dx / 2;
-                float locY = yy * m_dy; // + m_dy / 2;
+                float locX = xx * dx + ax;
+                float locY = yy * dy + ay;
 
-                addGlyph( verts, locX, locY, z - m_offset * m_dz , tensor );
+                addGlyph( verts, locX, locY, z - m_offset * dz , tensor );
                 m_quads += 36;
             }
         }
     }
     if ( ( m_orient & 2 ) == 2 )
     {
-        for( int xx = 0; xx < m_nx; ++xx )
+        for( int xx = 0; xx < nx; ++xx )
         {
-            for ( int zz = 0; zz < m_nz; ++zz )
+            for ( int zz = 0; zz < nz; ++zz )
             {
-                Matrix tensor = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny ) * 1000;
+                Matrix tensor = m_data->at( xx + yi * nx + zz * nx * ny ) * 1000;
 
-                float locX = xx * m_dx; // + m_dx / 2;
-                float locZ = zz * m_dz; // + m_dz / 2;
+                float locX = xx * dx + ax;
+                float locZ = zz * dz + az;
 
-                addGlyph( verts, locX, y + m_offset * m_dy, locZ, tensor );
+                addGlyph( verts, locX, y + m_offset * dy, locZ, tensor );
                 m_quads += 36;
             }
         }
     }
     if ( ( m_orient & 4 ) == 4 )
     {
-        for( int yy = 0; yy < m_ny; ++yy )
+        for( int yy = 0; yy < ny; ++yy )
         {
-            for ( int zz = 0; zz < m_nz; ++zz )
+            for ( int zz = 0; zz < nz; ++zz )
             {
-                Matrix tensor = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny ) * 1000;
-                float locY = yy * m_dy; // + m_dy / 2;
-                float locZ = zz * m_dz; // + m_dz / 2;
+                Matrix tensor = m_data->at( xi + yy * nx + zz * nx * ny ) * 1000;
+                float locY = yy * dy + ay;
+                float locZ = zz * dz + az;
 
-                addGlyph( verts, x + m_offset * m_dx, locY, locZ, tensor );
+                addGlyph( verts, x + m_offset * dx, locY, locZ, tensor );
                 m_quads += 36;
             }
         }

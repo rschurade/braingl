@@ -27,6 +27,7 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     m_edit->setMaxLength( 10 );
     m_edit->setMaximumWidth( 60 );
     m_edit->setAlignment( Qt::AlignCenter );
+    m_edit->setText( "0" );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
@@ -78,7 +79,14 @@ SliderWithEditInt::~SliderWithEditInt()
 void SliderWithEditInt::sliderMoved( int value )
 {
     m_slider->setValue( value );
-    m_edit->setText( QString::number( value ) );
+    if ( value == 0 )
+    {
+        m_edit->setText( "0" );
+    }
+    else
+    {
+        m_edit->setText( QString::number( value ) );
+    }
     emit( valueChanged( value, m_id ) );
     m_slider->repaint();
 }
@@ -94,7 +102,14 @@ void SliderWithEditInt::editEdited()
 void SliderWithEditInt::setValue( int value )
 {
     m_slider->setValue( value );
-    m_edit->setText( QString::number( value ) );
+    if ( value == 0 )
+    {
+        m_edit->setText( "0" );
+    }
+    else
+    {
+        m_edit->setText( QString::number( value ) );
+    }
     m_slider->repaint();
 }
 

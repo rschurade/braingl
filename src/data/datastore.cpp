@@ -37,7 +37,9 @@ void DataStore::updateGlobals( int row )
             {
                 Dataset* ds2 = VPtr<Dataset>::asPtr( m_datasetList[1] );
 
-                dimsChanged = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() != ds2->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+                dimsChanged = ( ds->properties().get( Fn::Property::D_NX ).toInt() != ds2->properties().get( Fn::Property::D_NX ).toInt() ) ||
+                              ( ds->properties().get( Fn::Property::D_NY ).toInt() != ds2->properties().get( Fn::Property::D_NY ).toInt() ) ||
+                              ( ds->properties().get( Fn::Property::D_NZ ).toInt() != ds2->properties().get( Fn::Property::D_NZ ).toInt() );
             }
 
             if ( m_datasetList.size() == 1 || dimsChanged )
