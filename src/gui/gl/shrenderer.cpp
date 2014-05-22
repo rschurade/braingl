@@ -284,24 +284,7 @@ void SHRenderer::createMesh( PropertyGroup& props )
 
     m_updateWaiting = false;
 
-    int nx = props.get( Fn::Property::D_NX ).toInt();
-    int ny = props.get( Fn::Property::D_NY ).toInt();
-    int nz = props.get( Fn::Property::D_NZ ).toInt();
-
-    float dx = props.get( Fn::Property::D_DX ).toFloat();
-    float dy = props.get( Fn::Property::D_DY ).toFloat();
-    float dz = props.get( Fn::Property::D_DZ ).toFloat();
-
-    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
-    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
-    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
-
-    xi = qMax( 0, qMin( xi + m_offset, nx - 1) );
-    yi = qMax( 0, qMin( yi + m_offset, ny - 1) );
-    zi = qMax( 0, qMin( zi + m_offset, nz - 1) );
-
-    m_masterThread = new SHRendererThread2( 0, m_data, nx, ny, nz, dx, dy, dz, xi, yi, zi, m_lod,
-                                                       m_order, m_orient, m_minMaxScaling, m_scaling, m_hideNegativeLobes, m_pMatrix, m_mvMatrix );
+    m_masterThread = new SHRendererThread2( 0, m_data, m_pMatrix, m_mvMatrix, props );
     connect( m_masterThread, SIGNAL( finished( TriangleMesh2* ) ), this, SLOT( slotNewMeshCreated( TriangleMesh2* ) ) );
 
     m_masterThread->start();
