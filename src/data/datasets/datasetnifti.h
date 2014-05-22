@@ -51,6 +51,8 @@ protected:
 
     void parseNiftiHeader();
 
+    void calcBoundingBox();
+
     nifti_image* m_header;
 };
 

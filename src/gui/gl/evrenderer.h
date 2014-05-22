@@ -44,13 +44,6 @@ private:
     std::vector<QVector3D>* m_data;
     DatasetScalar* m_mask;
 
-    int m_nx;
-    int m_ny;
-    int m_nz;
-    float m_dx;
-    float m_dy;
-    float m_dz;
-
     float m_scaling;
     int m_orient;
     float m_offset;

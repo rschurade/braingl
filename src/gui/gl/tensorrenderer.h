@@ -38,13 +38,6 @@ private:
 
     std::vector<Matrix>* m_data;
 
-    int m_nx;
-    int m_ny;
-    int m_nz;
-    float m_dx;
-    float m_dy;
-    float m_dz;
-
     float m_scaling;
     float m_faThreshold;
     float m_evThreshold;

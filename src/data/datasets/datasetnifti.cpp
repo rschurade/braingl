@@ -132,6 +132,8 @@ void DatasetNifti::parseNiftiHeader()
         m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, 0, -250, 250, "transform" );
         m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, 0, -250, 250, "transform" );
     }
+
+    calcBoundingBox();
 }
 
 //nifti_image* DatasetNifti::getHeader()
@@ -326,4 +328,23 @@ QString DatasetNifti::getDefaultSuffix()
 QColor DatasetNifti::getColorAtPos( float x, float y, float z )
 {
     return QColor( 0, 0, 0 ,0 );
+}
+
+void DatasetNifti::calcBoundingBox()
+{
+    float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+    float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
+    float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    float ax = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
+    float ay = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float az = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
+
+
+    m_boundingBox.first = QVector3D( ax, ay, az );
+    m_boundingBox.second = QVector3D( nx * dx + ax, ny * dy + ay, nz * dz + az );
 }

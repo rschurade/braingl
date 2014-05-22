@@ -97,47 +97,19 @@ void DockNavGLWidget::settingChanged()
 
     m_slider->setMin( -250 );
     m_slider->setMax( 250 );
-/*
+
     if  ( m_name == "sagittal")
     {
-        mi = Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setValue( Models::g()->data( mi ).toInt() );
-        }
-        mi = Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
-        }
+        m_slider->setValue( Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt() );
     }
     else if ( m_name == "coronal" )
     {
-        mi = Models::g()->index( (int)Fn::Property::G_CORONAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setValue( Models::g()->data( mi ).toInt() );
-        }
-        mi = Models::g()->index( (int)Fn::Property::G_MAX_CORONAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
-        }
+        m_slider->setValue( Models::getGlobal( Fn::Property::G_CORONAL ).toInt() );
     }
     else if ( m_name == "axial" )
     {
-        mi = Models::g()->index( (int)Fn::Property::G_AXIAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setValue( Models::g()->data( mi ).toInt() );
-        }
-        mi = Models::g()->index( (int)Fn::Property::G_MAX_AXIAL, 0 );
-        if ( mi.isValid() )
-        {
-            m_slider->setMax( Models::g()->data( mi ).toInt() - 1 );
-        }
+        m_slider->setValue( Models::getGlobal( Fn::Property::G_AXIAL ).toInt() );
     }
-    */
 }
 
 void DockNavGLWidget::update()
