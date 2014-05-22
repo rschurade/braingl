@@ -14,7 +14,7 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
-
+#include <cmath>
 
 
 NavRendererSagittal::NavRendererSagittal( QString name ) :

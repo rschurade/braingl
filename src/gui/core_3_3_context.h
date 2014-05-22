@@ -4,18 +4,18 @@
 #include <QGLContext>
 
 #if defined(Q_OS_MAC)
-#if QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
 void* select_3_2_mac_visual(GDHandle handle, int depthBufferSize);
-
 #else
-#error __FILE__ __LINE__ This Qt version is not supported.
+/* XXX include the offending version in message */
+#error This Qt version is not supported.
 #endif
 #endif
 
 struct core_3_3_context : public QGLContext
 {
 //#if defined(Q_OS_MAC)
-#if QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
     QGLFormat core_3_3_format()
     {
         QGLFormat format = QGLFormat();

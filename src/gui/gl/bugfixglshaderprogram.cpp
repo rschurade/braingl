@@ -14,7 +14,7 @@
 
 #include "bugfixglshaderprogram.h"
 
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040805 && QT_VERSION >= 0x040800    // if less or equal to 4.8.5
+#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
 
 #include <QtCore>
 
@@ -235,6 +235,17 @@ QString BugfixGLShaderProgram::log() const
 GLuint BugfixGLShaderProgram::programId() const
 {
     return m_programId;
+}
+
+void BugfixGLShaderProgram::setUniformValue(int location, const QVector3D& value)
+{
+    if (location != -1)
+        glUniform3fv(location, 1, reinterpret_cast<const GLfloat *>(&value));
+}
+
+void BugfixGLShaderProgram::setUniformValue(const char *name, const QVector3D& value)
+{
+    setUniformValue(uniformLocation(name), value);
 }
 
 void BugfixGLShaderProgram::setUniformValue(int location, QMatrix4x4 const& value)
