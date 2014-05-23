@@ -92,6 +92,11 @@ bool Loader::load()
         return loadVTK();
     }
 
+    if ( m_fileName.path().endsWith( ".json" ) )
+    {
+        return loadJSON();
+    }
+
     if ( m_fileName.path().endsWith( ".asc" ) )
     {
         //TODO: Deal with offsets: Check if orig is always the same size?
@@ -1180,4 +1185,98 @@ bool Loader::loadPNG()
     m_dataset.push_back( dataset2 );
 
     return true;
+}
+
+bool Loader::loadJSON()
+{
+    QString fn = m_fileName.path();
+
+    QFile n( fn );
+    if ( !n.open( QIODevice::ReadOnly ) )
+    {
+        qDebug() << "nodes unreadable" << fn;
+        return false;
+    }
+    QTextStream ns( &n );
+
+    //skip first line
+    ns.readLine();
+    QString nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+
+    QStringList vertList = nl.split( "," );
+
+    if ( vertList.first() != "\"vertices\"" )
+    {
+        qDebug() << "verts not found";
+        return false;
+    }
+
+    // skip normals
+    ns.readLine();
+
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+
+    QStringList colorList = nl.split( "," );
+
+    if ( colorList.first() != "\"colors\"" )
+    {
+        qDebug() << "colors not found";
+        return false;
+    }
+
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+
+    QStringList indexList = nl.split( "," );
+
+    if ( indexList.first() != "\"indices\"" )
+    {
+        qDebug() << "indices not found";
+        return false;
+    }
+
+    std::vector<Fib> fibs;
+    Fib fib;
+
+    int pc = 1;
+
+    for ( int i = 1; i < indexList.size(); ++i )
+    {
+        int length = indexList[i].toInt();
+        for ( int k = 0; k < length; ++k )
+        {
+            float x = vertList[pc++].toFloat();
+            float y = vertList[pc++].toFloat();
+            float z = vertList[pc++].toFloat();
+            fib.addVert( x,y ,z );
+        }
+        fibs.push_back( fib );
+        fib.clear();
+        fib.addDataField();
+    }
+
+    QList<QString>dataNames;
+    dataNames.push_back( "no data" );
+    DatasetFibers* dataset = new DatasetFibers( fn, fibs, dataNames );
+    m_dataset.push_back( dataset );
+
+    return true;
+
 }
