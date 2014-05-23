@@ -34,12 +34,6 @@ BinghamRenderer::BinghamRenderer( std::vector<std::vector<float> >* data ) :
     m_tris1( 0 ),
     vboIds( new GLuint[ 2 ] ),
     m_data( data ),
-    m_nx( m_nx ),
-    m_ny( m_ny ),
-    m_nz( m_nz ),
-    m_dx( m_dx ),
-    m_dy( m_dy ),
-    m_dz( m_dz ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
     m_offset( 0 ),
@@ -135,17 +129,9 @@ void BinghamRenderer::setShaderVars( PropertyGroup& props )
 
 void BinghamRenderer::initGeometry( PropertyGroup& props )
 {
-    float dx = props.get( Fn::Property::D_DX ).toFloat();
-    float dy = props.get( Fn::Property::D_DY ).toFloat();
-    float dz = props.get( Fn::Property::D_DZ ).toFloat();
-
-    int xi = Models::getGlobal( Fn::Property::G_SAGITTAL).toFloat();
-    int yi = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
-    int zi = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
-
-    xi = qMax( 0, qMin( xi, m_nx - 1) );
-    yi = qMax( 0, qMin( yi, m_ny - 1) );
-    zi = qMax( 0, qMin( zi, m_nz - 1) );
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     float zoom = Models::getGlobal( Fn::Property::G_ZOOM ).toFloat();
     float moveX = Models::getGlobal( Fn::Property::G_MOVEX ).toFloat();
@@ -156,7 +142,7 @@ void BinghamRenderer::initGeometry( PropertyGroup& props )
 
     int lod = m_lodAdjust;
 
-    QString s = createSettingsString( {xi, yi, zi, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
+    QString s = createSettingsString( {x, y, z, m_orient, m_minMaxScaling, renderPeaks, lod, zoom, moveX, moveY, m_offset } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -175,9 +161,7 @@ void BinghamRenderer::initGeometry( PropertyGroup& props )
     // create threads
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new BinghamRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, xi + m_offset, yi + m_offset, zi + m_offset, lod,
-                                                      m_order, m_orient, m_minMaxScaling, renderPeaks,
-                                                      m_pMatrix, m_mvMatrix ) );
+        threads.push_back( new BinghamRendererThread( i, m_data, m_pMatrix, m_mvMatrix, props ) );
     }
 
     // run threads
