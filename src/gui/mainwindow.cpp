@@ -276,7 +276,7 @@ void MainWindow::open()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
 
-    QString filter( "all files (*.*);;niftii (*.nii *.nii.gz);;fib files (*.fib *.vtk *.asc);;surfaces (*.vtk *.asc)" );
+    QString filter( "all files (*.*);;niftii (*.nii *.nii.gz);;fib files (*.fib *.vtk *.asc *.json);;surfaces (*.vtk *.asc)" );
 
     fd = new QFileDialog( this, "Open File", fn, filter );
     fd->setFileMode( QFileDialog::ExistingFiles );
