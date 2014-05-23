@@ -10,41 +10,64 @@
 
 #include "../../algos/fmath.h"
 
+#include "../../data/models.h"
 #include "../../data/mesh/tesselation.h"
 
 #include "math.h"
 
-BinghamRendererThread::BinghamRendererThread( int id, std::vector<std::vector<float> >* data, int nx, int ny, int nz,
-                                                                float dx, float dy, float dz,
-                                                                int xi, int yi, int zi,
-                                                                int lod,
-                                                                int order,
-                                                                int orient,
-                                                                bool scaling,
-                                                                int renderPeaks,
-                                                                QMatrix4x4 pMatrix,
-                                                                QMatrix4x4 mvMatrix
+BinghamRendererThread::BinghamRendererThread( int id,
+                                                   std::vector<std::vector<float> >* data,
+                                                   QMatrix4x4 pMatrix,
+                                                   QMatrix4x4 mvMatrix,
+                                                   PropertyGroup& props
                                                                  ) :
     m_id( id ),
     m_data( data ),
-    m_nx( nx ),
-    m_ny( ny ),
-    m_nz( nz ),
-    m_dx( dx ),
-    m_dy( dy ),
-    m_dz( dz ),
-    m_xi( xi ),
-    m_yi( yi ),
-    m_zi( zi ),
-    m_lod( lod ),
-    m_order( order ),
-    m_orient( orient ),
-    m_scaling( scaling ),
-    m_renderPeaks( renderPeaks ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {
     m_verts = new std::vector<float>();
+
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+    m_nx = props.get( Fn::Property::D_NX ).toFloat();
+    m_ny = props.get( Fn::Property::D_NY ).toFloat();
+    m_nz = props.get( Fn::Property::D_NZ ).toFloat();
+
+    m_dx = props.get( Fn::Property::D_DX ).toFloat();
+    m_dy = props.get( Fn::Property::D_DY ).toFloat();
+    m_dz = props.get( Fn::Property::D_DZ ).toFloat();
+
+    m_ax = props.get( Fn::Property::D_ADJUST_X ).toFloat();
+    m_ay = props.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    m_az = props.get( Fn::Property::D_ADJUST_Z ).toFloat();
+
+    m_xi = qMax( 0.0f, qMin( ( m_x + m_dx / 2 - m_ax ) / m_dx, m_nx - 1 ) );
+    m_yi = qMax( 0.0f, qMin( ( m_y + m_dy / 2 - m_ay ) / m_dy, m_ny - 1 ) );
+    m_zi = qMax( 0.0f, qMin( ( m_z + m_dz / 2 - m_az ) / m_dz, m_nz - 1 ) );
+
+    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_lod = props.get( Fn::Property::D_LOD ).toInt();
+    m_order = props.get( Fn::Property::D_ORDER ).toInt();
+    m_render1 = props.get( Fn::Property::D_RENDER_FIRST ).toBool();
+    m_render2 = props.get( Fn::Property::D_RENDER_SECOND ).toBool();
+    m_render3 = props.get( Fn::Property::D_RENDER_THIRD ).toBool();
+
+    m_orient = 0;
+    if ( props.get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+    {
+        m_orient = 1;
+    }
+    if ( props.get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+    {
+        m_orient += 2;
+    }
+    if ( props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+    {
+        m_orient += 4;
+    }
 }
 
 BinghamRendererThread::~BinghamRendererThread()
@@ -64,10 +87,6 @@ void BinghamRendererThread::run()
 
     Matrix base = ( FMath::sh_base( (*vertices), m_order ) );
 
-    float x = (float)m_xi * m_dx + m_dx / 2.;
-    float y = (float)m_yi * m_dy + m_dy / 2.;
-    float z = (float)m_zi * m_dz + m_dz / 2.;
-
     int numThreads = GLFunctions::idealThreadCount;
 
     double radius( 0.0 );
@@ -76,7 +95,7 @@ void BinghamRendererThread::run()
     {
         int glyphs = m_nx * m_ny;
         m_verts->reserve( numVerts * glyphs * 7 );
-        QVector4D pos( 0, 0, z, 1.0 );
+        QVector4D pos( 0, 0, m_z, 1.0 );
         for( int yy = m_id; yy < m_ny; yy += numThreads )
         {
             for ( int xx = 0; xx < m_nx; ++xx )
@@ -84,8 +103,8 @@ void BinghamRendererThread::run()
                 int dataPos = xx + yy * m_nx + m_zi * m_nx * m_ny;
                 if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locY = yy * m_dy + m_dy / 2;
+                    float locX = xx * m_dx + m_ax;
+                    float locY = yy * m_dy + m_ay;
 
                     pos.setX( locX );
                     pos.setY( locY );
@@ -95,7 +114,7 @@ void BinghamRendererThread::run()
                     {
                         for ( int k = 0; k < 3; ++k )
                         {
-                            if ( k == 0 && ( m_renderPeaks & 1 ) == 1 )
+                            if ( k == 0 && m_render1 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -129,11 +148,11 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
                                     m_verts->push_back( locY );
-                                    m_verts->push_back( z );
+                                    m_verts->push_back( m_z );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 1 && ( ( m_renderPeaks & 2 ) == 2 ) )
+                            if ( k == 1 && m_render2 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -167,11 +186,11 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
                                     m_verts->push_back( locY );
-                                    m_verts->push_back( z );
+                                    m_verts->push_back( m_z );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 2 && ( m_renderPeaks & 4 ) == 4 )
+                            if ( k == 2 && m_render3 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -205,7 +224,7 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
                                     m_verts->push_back( locY );
-                                    m_verts->push_back( z );
+                                    m_verts->push_back( m_z );
                                     m_verts->push_back( radius );
                                 }
                             }
@@ -219,7 +238,7 @@ void BinghamRendererThread::run()
     {
         int glyphs = m_nx * m_nz;
         m_verts->reserve( numVerts * glyphs * 7 );
-        QVector4D pos( 0, y, 0, 1.0 );
+        QVector4D pos( 0, m_y, 0, 1.0 );
         for( int zz = m_id; zz < m_nz; zz += numThreads )
         {
             for ( int xx = 0; xx < m_nx; ++xx )
@@ -227,8 +246,8 @@ void BinghamRendererThread::run()
                 int dataPos = xx + m_yi * m_nx + zz * m_nx * m_ny;
                 if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    float locX = xx * m_dx + m_dx / 2;
-                    float locZ = zz * m_dz + m_dz / 2;
+                    float locX = xx * m_dx + m_ax;
+                    float locZ = zz * m_dz + m_az;
 
                     pos.setX( locX );
                     pos.setZ( locZ );
@@ -238,7 +257,7 @@ void BinghamRendererThread::run()
                     {
                         for ( int k = 0; k < 3; ++k )
                         {
-                            if ( k == 0 && ( m_renderPeaks & 1 ) == 1 )
+                            if ( k == 0 && m_render1 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -271,12 +290,12 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
-                                    m_verts->push_back( y );
+                                    m_verts->push_back( m_y );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 1 && ( ( m_renderPeaks & 2 ) == 2 ) )
+                            if ( k == 1 && m_render2 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -309,12 +328,12 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
-                                    m_verts->push_back( y );
+                                    m_verts->push_back( m_y );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 2 && ( m_renderPeaks & 4 ) == 4 )
+                            if ( k == 2 && m_render3 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -347,7 +366,7 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
                                     m_verts->push_back( locX );
-                                    m_verts->push_back( y );
+                                    m_verts->push_back( m_y );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
                                 }
@@ -362,7 +381,7 @@ void BinghamRendererThread::run()
     {
         int glyphs = m_ny * m_nz;
         m_verts->reserve( numVerts * glyphs * 10 );
-        QVector4D pos( x, 0, 0, 1.0 );
+        QVector4D pos( m_x, 0, 0, 1.0 );
         for( int yy = m_id; yy < m_ny; yy += numThreads )
         {
             for ( int zz = 0; zz < m_nz; ++zz )
@@ -370,8 +389,8 @@ void BinghamRendererThread::run()
                 int dataPos = m_xi + yy * m_nx + zz * m_nx * m_ny;
                 if ( ( fabs( m_data->at( dataPos )[8] ) > 0.0001 ) )
                 {
-                    float locZ = zz * m_dz + m_dz / 2;
-                    float locY = yy * m_dy + m_dy / 2;
+                    float locZ = zz * m_dz + m_az;
+                    float locY = yy * m_dy + m_ay;
 
                     pos.setY( locY );
                     pos.setZ( locZ );
@@ -381,7 +400,7 @@ void BinghamRendererThread::run()
                     {
                         for ( int k = 0; k < 3; ++k )
                         {
-                            if ( k == 0 && ( m_renderPeaks & 1 ) == 1 )
+                            if ( k == 0 && m_render1 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -413,13 +432,13 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 1 ) );
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                    m_verts->push_back( x );
+                                    m_verts->push_back( m_x );
                                     m_verts->push_back( locY );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 1 && ( ( m_renderPeaks & 2 ) == 2 ) )
+                            if ( k == 1 && m_render2 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -451,13 +470,13 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 1 ) );
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                    m_verts->push_back( x );
+                                    m_verts->push_back( m_x );
                                     m_verts->push_back( locY );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
                                 }
                             }
-                            if ( k == 2 && ( m_renderPeaks & 4 ) == 4 )
+                            if ( k == 2 && m_render3 )
                             {
                                 for( int i = 0; i < numVerts; ++i )
                                 {
@@ -489,7 +508,7 @@ void BinghamRendererThread::run()
                                     m_verts->push_back( (*vertices)( i+1, 1 ) );
                                     m_verts->push_back( (*vertices)( i+1, 2 ) );
                                     m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                    m_verts->push_back( x );
+                                    m_verts->push_back( m_x );
                                     m_verts->push_back( locY );
                                     m_verts->push_back( locZ );
                                     m_verts->push_back( radius );
