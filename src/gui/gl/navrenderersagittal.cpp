@@ -8,6 +8,7 @@
 #include "glfunctions.h"
 #include "../../data/enums.h"
 #include "../../data/models.h"
+#include "../../data/datasets/dataset.h"
 
 #include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
@@ -26,6 +27,24 @@ NavRendererSagittal::~NavRendererSagittal()
 {
     glDeleteBuffers( 4, vboIds );
     delete[] vboIds;
+}
+
+void NavRendererSagittal::leftMouseDown( int x, int y )
+{
+    float xf = static_cast<float>( x );
+    float yf = static_cast<float>( m_height - y );
+
+    QVector4D test;
+    test.setX( ( 2 * xf ) / m_width - 1 );
+    test.setY( ( 2 * yf ) / m_height - 1 );
+    test.setZ( 1 );
+    test.setW( 1 );
+
+    QVector4D out = m_mvpMatrix.inverted() * test;
+
+    QPoint p( out.y(), out.z() );
+    Models::setGlobal( Fn::Property::G_CORONAL_AXIAL, p );
+    Models::g()->submit();
 }
 
 void NavRendererSagittal::adjustRatios()
@@ -73,31 +92,6 @@ void NavRendererSagittal::adjustRatios()
     m_mvpMatrix = m_pMatrix * vMatrix;
 }
 
-void NavRendererSagittal::leftMouseDown( int x, int y )
-{
-    float xf = static_cast<float>( x );
-    float yf = static_cast<float>( m_height - y );
-
-    QVector4D test;
-    test.setX( ( 2 * xf ) / m_width - 1 );
-    test.setY( ( 2 * yf ) / m_height - 1 );
-    test.setZ( 1 );
-    test.setW( 1 );
-
-    QVector4D out = m_pMatrixWorkaround.inverted() * test;
-
-    int xout = out.x() / m_dy;
-    int yout = out.y() / m_dz;
-
-    xout = ( m_ny - 1 ) - xout;
-    xout = qMax( 0, qMin( xout, static_cast<int>( m_ny - 1.0 ) ) );
-    yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-
-    QPoint p( xout, yout );
-    Models::setGlobal( Fn::Property::G_CORONAL_AXIAL, p );
-    Models::g()->submit();
-}
-
 void NavRendererSagittal::initGeometry()
 {
     m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
@@ -106,35 +100,38 @@ void NavRendererSagittal::initGeometry()
 
     if ( m_xOld != m_x || m_yOld != m_y || m_zOld != m_z )
     {
-        m_nx = 160; //Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
-        m_ny = 200; //Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
-        m_nz = 160; //Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
+        QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
 
-        m_dx = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-        m_dy = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-        m_dz = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+        if ( dsl.size() > 0 )
+        {
+            Dataset* ds = dsl.first();
+            m_nx = ds->properties().get( Fn::Property::D_NX ).toFloat();
+            m_ny = ds->properties().get( Fn::Property::D_NY ).toFloat();
+            m_nz = ds->properties().get( Fn::Property::D_NZ ).toFloat();
 
-        float x = m_x * m_dx + m_dx / 2.0;
-        float y = m_y * m_dy + m_dy / 2.0;
-        float z = m_z * m_dz + m_dz / 2.0;
+            m_dx = ds->properties().get( Fn::Property::D_DX ).toFloat();
+            m_dy = ds->properties().get( Fn::Property::D_DY ).toFloat();
+            m_dz = ds->properties().get( Fn::Property::D_DZ ).toFloat();
 
-        float yb = m_ny * m_dy;
-        float zb = m_nz * m_dz;
+            m_ax = ds->properties().get( Fn::Property::D_ADJUST_X ).toFloat();
+            m_ay = ds->properties().get( Fn::Property::D_ADJUST_Y ).toFloat();
+            m_az = ds->properties().get( Fn::Property::D_ADJUST_Z ).toFloat();
+        }
 
         float vertices[] =
         {
-            x, 0.0, 0.0,
-            x, yb,  0.0,
-            x, yb,  zb,
-            x, 0.0, zb
+            m_x, -250.0, -250.0,
+            m_x, 250.0,  -250.0,
+            m_x, 250.0,  250.0,
+            m_x, -250.0, 250.0
         };
 
         float verticesCrosshair[] =
         {
-            x - 1.f, 0.0,    z,
-            x - 1.f, yb,     z,
-            x - 1.f, y, 0.0,
-            x - 1.f, y, zb
+            m_x - 1.f, -250.0,    m_z,
+            m_x - 1.f, 250.0,     m_z,
+            m_x - 1.f, m_y, -250.0,
+            m_x - 1.f, m_y, 250.0
         };
 
         // Transfer vertex data to VBO 3
