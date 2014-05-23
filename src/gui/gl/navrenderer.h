@@ -59,6 +59,9 @@ protected:
     float m_dx;
     float m_dy;
     float m_dz;
+    float m_ax;
+    float m_ay;
+    float m_az;
     int m_xOld;
     int m_yOld;
     int m_zOld;

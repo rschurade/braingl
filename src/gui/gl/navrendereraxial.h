@@ -23,7 +23,6 @@ public:
 	void draw();
 
 	void leftMouseDown( int x, int y );
-
 	void adjustRatios();
 
 private:
