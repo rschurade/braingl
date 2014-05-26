@@ -16,6 +16,7 @@
 
 class DatasetScalar;
 class EVRenderer;
+class StippleRenderer;
 
 class Dataset3D: public DatasetNifti
 {
@@ -39,6 +40,7 @@ private:
     std::vector<QVector3D> m_data;
 
     EVRenderer* m_renderer;
+    StippleRenderer* m_stippleRenderer;
 
     QList<DatasetScalar*>m_scalarDSL;
 

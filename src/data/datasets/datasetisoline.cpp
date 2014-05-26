@@ -115,6 +115,7 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
     GLFunctions::getShader( "line" )->bind();
     GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+    GLFunctions::getShader( "line" )->setUniformValue( "u_renderStipples", false );
 
     glLineWidth(  m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toInt() );
 
