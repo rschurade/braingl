@@ -27,7 +27,6 @@ EVRenderer::EVRenderer( std::vector<QVector3D>* data ) :
     m_vertCount( 0 ),
     vbo0( 0 ),
     m_data( data ),
-    m_mask( 0 ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
     m_offset( 0.0 )
@@ -39,11 +38,6 @@ EVRenderer::~EVRenderer()
 {
     glDeleteBuffers( 1, &vbo0 );
     glDeleteBuffers( 1, &vbo1 );
-}
-
-void EVRenderer::setMask( DatasetScalar* mask )
-{
-    m_mask = mask;
 }
 
 void EVRenderer::init()
@@ -58,21 +52,12 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
             (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
             (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
-    m_renderStipples = props.get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool();
     m_orient = slice;
-
-    if ( ( renderMode == 1 ) && m_renderStipples )
-    {
-        return;
-    }
 
     if ( ( renderMode != 1 ) || ( renderMode == 0 ) ||  ( m_orient == 0 ) ) // we are drawing opaque objects
     {
-        if ( !m_renderStipples )
-        {
-            // obviously not opaque
-            return;
-        }
+        // obviously not opaque
+        return;
     }
     m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
@@ -88,7 +73,6 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "u_scaling", m_scaling );
 
     program->setUniformValue( "u_alpha", 1.0f );
-    program->setUniformValue( "u_renderStipples", m_renderStipples );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );
@@ -160,7 +144,7 @@ void EVRenderer::initGeometry( PropertyGroup& props )
     int zi = qMax( 0.0f, qMin( ( z + dz / 2 - az ) / dz, nz - 1 ) );
 
 
-    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_renderStipples, m_color, m_mask->properties().get( Fn::Property::D_NAME ) } );
+    QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_color } );
 
     if ( s == m_previousSettings || m_orient == 0 )
     {
@@ -173,163 +157,50 @@ void EVRenderer::initGeometry( PropertyGroup& props )
 
     m_vertCount = 0;
 
-    if ( m_renderStipples )
+    if ( ( m_orient & 1 ) == 1 )
     {
-        std::vector<float>* probData;
-        float max = 0;
-        float prob;
-        float alpha = 1.0;
-        if ( m_mask )
+        for( int yy = 0; yy < ny; ++yy )
         {
-            probData = m_mask->getData();
-            //float min = ds2->properties()->get( Fn::Property::D_MIN ).toFloat();
-            max = m_mask->properties().get( Fn::Property::D_MAX ).toFloat();
-        }
-        float randx, randy, randz;
-
-        if ( ( m_orient & 1 ) == 1 )
-        {
-            for( int yy = 0; yy < ny; ++yy )
+            for ( int xx = 0; xx < nx; ++xx )
             {
-                for ( int xx = 0; xx < nx; ++xx )
-                {
-                    QVector3D vec = m_data->at( xx + yy * nx + zi * nx * ny );
+                QVector3D vec = m_data->at( xx + yy * nx + zi * nx * ny );
 
-                    float locX = xx * dx + ax;
-                    float locY = yy * dy + ay;
+                float locX = xx * dx + ax;
+                float locY = yy * dy + ay;
 
-                    int countStips = 10;
-                    if ( m_mask )
-                    {
-                        int id = m_mask->getIdFromPos( locX, locY, z - m_offset * dz );
-                        prob = probData->at( id );
-                        alpha = prob / max;
-                        countStips = qMax( 0, (int)( alpha * 10 ) );
-                    }
-
-                    for( int i = 0; i < countStips; ++i )
-                    {
-                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
-
-                        addGlyph( verts, colors,locX + randx, locY + randy, z - m_offset * dz + randz, vec, alpha );
-                        m_vertCount += 2;
-                    }
-                }
-            }
-        }
-        if ( ( m_orient & 2 ) == 2 )
-        {
-            for( int xx = 0; xx < nx; ++xx )
-            {
-                for ( int zz = 0; zz < nz; ++zz )
-                {
-                    QVector3D vec = m_data->at( xx + yi * nx + zz * nx * ny );
-
-                    float locX = xx * dx + ax;
-                    float locZ = zz * dz + az;
-
-                    int countStips = 10;
-                    if ( m_mask )
-                    {
-                        int id = m_mask->getIdFromPos( locX, y + m_offset * dy, locZ );
-                        prob = probData->at( id );
-                        alpha = prob / max;
-                        countStips = qMax( 0, (int)( alpha * 10 ) );
-                    }
-
-                    for( int i = 0; i < countStips; ++i )
-                    {
-                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
-
-                        addGlyph( verts, colors, locX + randx, y + m_offset * dy + randy, locZ + randz, vec, alpha );
-                        m_vertCount += 2;
-                    }
-                }
-            }
-        }
-        if ( ( m_orient & 4 ) == 4 )
-        {
-            for( int yy = 0; yy < ny; ++yy )
-            {
-                for ( int zz = 0; zz < nz; ++zz )
-                {
-                    QVector3D vec = m_data->at( xi + yy * nx + zz * nx * ny );
-                    float locY = yy * dy + ay;
-                    float locZ = zz * dz + az;
-
-                    int countStips = 10;
-                    if ( m_mask )
-                    {
-                        int id = m_mask->getIdFromPos( x + m_offset * dx, locY, locZ );
-                        prob = probData->at( id );
-                        alpha = prob / max;
-                        countStips = qMax( 0, (int)( alpha * 10 ) );
-                    }
-
-                    for( int i = 0; i < countStips; ++i )
-                    {
-                        randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                        randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                        randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
-
-                        addGlyph( verts, colors, x + m_offset * dx + randx, locY + randy, locZ + randz, vec, alpha );
-                        m_vertCount += 2;
-                    }
-                }
+                addGlyph( verts, colors, locX, locY, z - m_offset * dz , vec, 1.f );
+                m_vertCount += 2;
             }
         }
     }
-    else
+    if ( ( m_orient & 2 ) == 2 )
     {
-        if ( ( m_orient & 1 ) == 1 )
+        for( int xx = 0; xx < nx; ++xx )
         {
-            for( int yy = 0; yy < ny; ++yy )
+            for ( int zz = 0; zz < nz; ++zz )
             {
-                for ( int xx = 0; xx < nx; ++xx )
-                {
-                    QVector3D vec = m_data->at( xx + yy * nx + zi * nx * ny );
+                QVector3D vec = m_data->at( xx + yi * nx + zz * nx * ny );
 
-                    float locX = xx * dx + ax;
-                    float locY = yy * dy + ay;
+                float locX = xx * dx + ax;
+                float locZ = zz * dz + az;
 
-                    addGlyph( verts, colors, locX, locY, z - m_offset * dz , vec, 1.f );
-                    m_vertCount += 2;
-                }
+                addGlyph( verts, colors, locX, y + m_offset * dy, locZ, vec, 1.0 );
+                m_vertCount += 2;
             }
         }
-        if ( ( m_orient & 2 ) == 2 )
+    }
+    if ( ( m_orient & 4 ) == 4 )
+    {
+        for( int yy = 0; yy < ny; ++yy )
         {
-            for( int xx = 0; xx < nx; ++xx )
+            for ( int zz = 0; zz < nz; ++zz )
             {
-                for ( int zz = 0; zz < nz; ++zz )
-                {
-                    QVector3D vec = m_data->at( xx + yi * nx + zz * nx * ny );
+                QVector3D vec = m_data->at( xi + yy * nx + zz * nx * ny );
+                float locY = yy * dy + ay;
+                float locZ = zz * dz + az;
 
-                    float locX = xx * dx + ax;
-                    float locZ = zz * dz + az;
-
-                    addGlyph( verts, colors, locX, y + m_offset * dy, locZ, vec, 1.0 );
-                    m_vertCount += 2;
-                }
-            }
-        }
-        if ( ( m_orient & 4 ) == 4 )
-        {
-            for( int yy = 0; yy < ny; ++yy )
-            {
-                for ( int zz = 0; zz < nz; ++zz )
-                {
-                    QVector3D vec = m_data->at( xi + yy * nx + zz * nx * ny );
-                    float locY = yy * dy + ay;
-                    float locZ = zz * dz + az;
-
-                    addGlyph( verts, colors, x + m_offset * dx, locY, locZ, vec, 1.0f );
-                    m_vertCount += 2;
-                }
+                addGlyph( verts, colors, x + m_offset * dx, locY, locZ, vec, 1.0f );
+                m_vertCount += 2;
             }
         }
     }
