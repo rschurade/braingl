@@ -61,7 +61,7 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
             (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
     m_orient = slice;
 
-    if ( ( renderMode == 1 ) )
+    if ( ( renderMode != 1 ) )
     {
         return;
     }
@@ -87,13 +87,17 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
+    program->setUniformValue( "u_aVec", 1., 0., 0. );
+    program->setUniformValue( "u_bVec", 0., 1., 0. );
+    program->setUniformValue( "u_glyphThickness", m_lineWidth );
+
     initGeometry( props );
 
     setShaderVars( props );
     glLineWidth( m_lineWidth );
-    glDrawArrays( GL_LINES, 0, m_vertCount );
+    glDrawArrays( GL_TRIANGLES, 0, m_vertCount );
     glLineWidth( 1 );
-    GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
+    GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
 }
 
 void StippleRenderer::setShaderVars( PropertyGroup& props )
@@ -108,17 +112,17 @@ void StippleRenderer::setShaderVars( PropertyGroup& props )
 
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
 
     offset += sizeof(float) * 3;
-    int dirLocation = program->attributeLocation( "a_dir" );
-    program->enableAttributeArray( dirLocation );
-    glVertexAttribPointer( dirLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
-
-    offset += sizeof(float) * 1;
     int offsetLocation = program->attributeLocation( "a_vec" );
     program->enableAttributeArray( offsetLocation );
-    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void *) offset );
+    glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+    offset += sizeof(float) * 3;
+    int dirLocation = program->attributeLocation( "a_dir2" );
+    program->enableAttributeArray( dirLocation );
+    glVertexAttribPointer( dirLocation, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
@@ -203,7 +207,6 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
                     randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
                     addGlyph( verts, colors,locX + randx, locY + randy, z - m_offset * dz + randz, vec, alpha );
-                    m_vertCount += 2;
                 }
             }
         }
@@ -235,7 +238,6 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
                     randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
                     addGlyph( verts, colors, locX + randx, y + m_offset * dy + randy, locZ + randz, vec, alpha );
-                    m_vertCount += 2;
                 }
             }
         }
@@ -266,7 +268,6 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
                     randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
 
                     addGlyph( verts, colors, x + m_offset * dx + randx, locY + randy, locZ + randz, vec, alpha );
-                    m_vertCount += 2;
                 }
             }
         }
@@ -295,18 +296,57 @@ void StippleRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &c
     verts.push_back( xPos );
     verts.push_back( yPos );
     verts.push_back( zPos );
-    verts.push_back( 1.0 );
     verts.push_back( v0 );
     verts.push_back( v1 );
     verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
 
     verts.push_back( xPos );
     verts.push_back( yPos );
     verts.push_back( zPos );
-    verts.push_back( -1.0 );
     verts.push_back( v0 );
     verts.push_back( v1 );
     verts.push_back( v2 );
+    verts.push_back(  1.0 );
+    verts.push_back( -1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back(  1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+
 
     colors.push_back( m_color.redF() );
     colors.push_back( m_color.greenF() );
@@ -317,5 +357,27 @@ void StippleRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &c
     colors.push_back( m_color.greenF() );
     colors.push_back( m_color.blueF() );
     colors.push_back( alpha );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( alpha );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( alpha );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( alpha );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( alpha );
+
+    m_vertCount += 6;
 }
 
