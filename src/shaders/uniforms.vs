@@ -7,6 +7,7 @@ in float a_extra;
 in float a_indexes;
 in float a_value;
 in float a_dir;
+in vec2 a_dir2;
 in vec3 a_vec;
 in vec3 a_offset;
 in float a_radius;
@@ -15,8 +16,8 @@ in vec3 a_offdiag;
 
 out vec3 v_texcoord;
 out vec3 v_normal;
-out float v_extra;
 out vec4 frontColor;
+out float v_extra;
 out float v_value;
 out float v_index;
 

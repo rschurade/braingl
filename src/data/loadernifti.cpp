@@ -72,7 +72,7 @@ bool LoaderNifti::load()
 
     int dim = m_header->dim[4];
 
-    if ( dim > 1 && askTimeSeries( dim ) )
+    if ( dim > 3 && askTimeSeries( dim ) )
     {
         m_datasetType = Fn::DatasetType::NIFTI_FMRI;
         return loadNiftiFMRI();
