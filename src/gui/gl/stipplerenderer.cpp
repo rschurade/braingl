@@ -55,21 +55,17 @@ void StippleRenderer::init()
 
 void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
 {
-    int slice = 0;
-    slice = (int)props.get( Fn::Property::D_RENDER_AXIAL ).toBool() +
-            (int)props.get( Fn::Property::D_RENDER_CORONAL ).toBool() * 2 +
-            (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
-    m_orient = slice;
-
     if ( ( renderMode == 1 ) )
     {
         return;
     }
 
+    m_orient = props.get( Fn::Property::D_STIPPLE_SLICE_ORIENT ).toInt();
     m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
-    m_lineWidth = props.get( Fn::Property::D_LINE_WIDTH ).toFloat();
+    float thickness = props.get( Fn::Property::D_STIPPLE_THICKNESS ).toFloat();
+    float glpyhSize = props.get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat();
 
     QGLShaderProgram* program = GLFunctions::getShader( "stipple" );
 
@@ -79,7 +75,6 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     program->setUniformValue( "u_scaling", m_scaling );
 
     program->setUniformValue( "u_alpha", 1.0f );
-    program->setUniformValue( "u_renderStipples", true );
     program->setUniformValue( "u_renderMode", renderMode );
     program->setUniformValue( "u_canvasSize", width, height );
     program->setUniformValue( "D0", 9 );
@@ -87,9 +82,28 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     program->setUniformValue( "D2", 11 );
     program->setUniformValue( "P0", 12 );
 
-    program->setUniformValue( "u_aVec", 1., 0., 0. );
-    program->setUniformValue( "u_bVec", 0., 1., 0. );
-    program->setUniformValue( "u_glyphThickness", m_lineWidth );
+    switch ( m_orient )
+    {
+        case 0:
+            program->setUniformValue( "u_aVec", 1., 0., 0. );
+            program->setUniformValue( "u_bVec", 0., 1., 0. );
+            break;
+        case 1:
+            program->setUniformValue( "u_aVec", 1., 0., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            break;
+        case 2:
+            program->setUniformValue( "u_aVec", 0., 1., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            break;
+        default:
+            qDebug() << "error, wrong orientation in stipples renderer";
+            return;
+    }
+
+    program->setUniformValue( "u_orient", m_orient );
+    program->setUniformValue( "u_glyphThickness", thickness );
+    program->setUniformValue( "u_glyphSize", glpyhSize );
 
     initGeometry( props );
 
@@ -157,7 +171,7 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
     QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_color, m_mask->properties().get( Fn::Property::D_NAME ) } );
 
-    if ( s == m_previousSettings || m_orient == 0 )
+    if ( s == m_previousSettings )
     {
         return;
     }
@@ -180,7 +194,7 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
     }
     float randx, randy, randz;
 
-    if ( ( m_orient & 1 ) == 1 )
+    if ( m_orient == 0 )
     {
         for( int yy = 0; yy < ny; ++yy )
         {
@@ -211,7 +225,7 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
             }
         }
     }
-    if ( ( m_orient & 2 ) == 2 )
+    if ( m_orient == 1 )
     {
         for( int xx = 0; xx < nx; ++xx )
         {
@@ -242,7 +256,7 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
             }
         }
     }
-    if ( ( m_orient & 4 ) == 4 )
+    if ( m_orient == 2 )
     {
         for( int yy = 0; yy < ny; ++yy )
         {
@@ -380,4 +394,3 @@ void StippleRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &c
 
     m_vertCount += 6;
 }
-
