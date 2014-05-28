@@ -267,6 +267,9 @@ namespace Fn
         D_HANDLE_COLOR,
         D_LINE_WIDTH,
         D_STIPPLE_PROB_MASK,
+        D_STIPPLE_THICKNESS,
+        D_STIPPLE_GLYPH_SIZE,
+        D_STIPPLE_SLICE_ORIENT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -516,6 +519,9 @@ namespace Fn
                 case Property::D_HANDLE_COLOR: return QString( "handle color" ); break;
                 case Property::D_LINE_WIDTH: return QString( "line width" ); break;
                 case Property::D_STIPPLE_PROB_MASK: return QString( "probability mask" ); break;
+                case Property::D_STIPPLE_THICKNESS: return QString( "thickness" ); break;
+                case Property::D_STIPPLE_GLYPH_SIZE: return QString( "glyph size" ); break;
+                case Property::D_STIPPLE_SLICE_ORIENT: return QString( "slice orientation" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
