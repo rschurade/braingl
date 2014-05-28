@@ -48,7 +48,7 @@ private:
     int m_orient;
     float m_offset;
     QColor m_color;
-    int m_lineWidth;
+    float m_lineWidth;
 };
 
 

@@ -39,7 +39,7 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"].createList( Fn::Property::D_STIPPLE_PROB_MASK, { "none" }, 0, "stipples" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_STIPPLE_PROB_MASK ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( probMaskChanged() ) );
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "stipples" );
-    m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 2, 1, 5, "stipples" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LINE_WIDTH, 2.0f, 1.0f, 5.0f, "stipples" );
 
     examineDataset();
 
