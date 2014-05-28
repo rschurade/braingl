@@ -48,20 +48,12 @@ void main()
     vec *= u_glyphSize;
     
     vec3 texCoord = vec3( 0.0, 0.0, 0.0 );
-    if ( vx < 0 )
-    {
-        texCoord.x = 0.0;
-    }
-    else
+    if ( vx > 0 )
     {
         texCoord.x = 1.0;
     }
     
-    if ( vy < 0 )
-    {
-        texCoord.y = 0.0;
-    }
-    else
+    if ( vy > 0 )
     {
         texCoord.y = 1.0;
     }
