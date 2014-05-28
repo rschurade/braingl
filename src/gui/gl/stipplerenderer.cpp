@@ -31,7 +31,17 @@ StippleRenderer::StippleRenderer( std::vector<QVector3D>* data ) :
     m_mask( 0 ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
-    m_offset( 0.0 )
+    m_offset( 0.0 ),
+    m_blockSize( 0 ),
+    m_nx( 0 ),
+    m_ny( 0 ),
+    m_nz( 0 ),
+    m_dx( 0.0f ),
+    m_dy( 0.0f ),
+    m_dz( 0.0f ),
+    m_ax( 0.0f ),
+    m_ay( 0.0f ),
+    m_az( 0.0f )
 {
     init();
 }
@@ -148,25 +158,27 @@ void StippleRenderer::setShaderVars( PropertyGroup& props )
 
 void StippleRenderer::initGeometry( PropertyGroup& props )
 {
-    float nx = props.get( Fn::Property::D_NX ).toFloat();
-    float ny = props.get( Fn::Property::D_NY ).toFloat();
-    float nz = props.get( Fn::Property::D_NZ ).toFloat();
+    m_nx = props.get( Fn::Property::D_NX ).toFloat();
+    m_ny = props.get( Fn::Property::D_NY ).toFloat();
+    m_nz = props.get( Fn::Property::D_NZ ).toFloat();
 
-    float dx = props.get( Fn::Property::D_DX ).toFloat();
-    float dy = props.get( Fn::Property::D_DY ).toFloat();
-    float dz = props.get( Fn::Property::D_DZ ).toFloat();
+    m_blockSize = m_nx * m_ny * m_nz;
 
-    float ax = props.get( Fn::Property::D_ADJUST_X ).toFloat();
-    float ay = props.get( Fn::Property::D_ADJUST_Y ).toFloat();
-    float az = props.get( Fn::Property::D_ADJUST_Z ).toFloat();
+    m_dx = props.get( Fn::Property::D_DX ).toFloat();
+    m_dy = props.get( Fn::Property::D_DY ).toFloat();
+    m_dz = props.get( Fn::Property::D_DZ ).toFloat();
+
+    m_ax = props.get( Fn::Property::D_ADJUST_X ).toFloat();
+    m_ay = props.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    m_az = props.get( Fn::Property::D_ADJUST_Z ).toFloat();
 
     float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
     float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
     float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
-    int xi = qMax( 0.0f, qMin( ( x + dx / 2 - ax ) / dx, nx - 1 ) );
-    int yi = qMax( 0.0f, qMin( ( y + dy / 2 - ay ) / dy, ny - 1 ) );
-    int zi = qMax( 0.0f, qMin( ( z + dz / 2 - az ) / dz, nz - 1 ) );
+    int xi = qMax( 0.0f, qMin( ( x + m_dx / 2 - m_ax ) / m_dx, (float)m_nx - 1 ) );
+    int yi = qMax( 0.0f, qMin( ( y + m_dy / 2 - m_ay ) / m_dy, (float)m_ny - 1 ) );
+    int zi = qMax( 0.0f, qMin( ( z + m_dz / 2 - m_az ) / m_dz, (float)m_nz - 1 ) );
 
 
     QString s = createSettingsString( { xi, yi, zi, m_orient, false, m_offset, m_color, m_mask->properties().get( Fn::Property::D_NAME ) } );
@@ -196,19 +208,19 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
     if ( m_orient == 0 )
     {
-        for( int yy = 0; yy < ny; ++yy )
+        for( int yy = 0; yy < m_ny; ++yy )
         {
-            for ( int xx = 0; xx < nx; ++xx )
+            for ( int xx = 0; xx < m_nx; ++xx )
             {
-                QVector3D vec = m_data->at( xx + yy * nx + zi * nx * ny );
+                QVector3D vec = m_data->at( xx + yy * m_nx + zi * m_nx * m_ny );
 
-                float locX = xx * dx + ax;
-                float locY = yy * dy + ay;
+                float locX = xx * m_dx + m_ax;
+                float locY = yy * m_dy + m_ay;
 
                 int countStips = 10;
                 if ( m_mask )
                 {
-                    int id = m_mask->getIdFromPos( locX, locY, z - m_offset * dz );
+                    int id = m_mask->getIdFromPos( locX, locY, z - m_offset * m_dz );
                     prob = probData->at( id );
                     alpha = prob / max;
                     countStips = qMax( 0, (int)( alpha * 10 ) );
@@ -216,30 +228,30 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
                 for( int i = 0; i < countStips; ++i )
                 {
-                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dx - m_dx;
+                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dy - m_dy;
+                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dz - m_dz;
 
-                    addGlyph( verts, colors,locX + randx, locY + randy, z - m_offset * dz + randz, vec, alpha );
+                    addGlyph( verts, colors,locX + randx, locY + randy, z - m_offset * m_dz + randz, vec, alpha );
                 }
             }
         }
     }
     if ( m_orient == 1 )
     {
-        for( int xx = 0; xx < nx; ++xx )
+        for( int xx = 0; xx < m_nx; ++xx )
         {
-            for ( int zz = 0; zz < nz; ++zz )
+            for ( int zz = 0; zz < m_nz; ++zz )
             {
-                QVector3D vec = m_data->at( xx + yi * nx + zz * nx * ny );
+                QVector3D vec = m_data->at( xx + yi * m_nx + zz * m_nx * m_ny );
 
-                float locX = xx * dx + ax;
-                float locZ = zz * dz + az;
+                float locX = xx * m_dx + m_ax;
+                float locZ = zz * m_dz + m_az;
 
                 int countStips = 10;
                 if ( m_mask )
                 {
-                    int id = m_mask->getIdFromPos( locX, y + m_offset * dy, locZ );
+                    int id = m_mask->getIdFromPos( locX, y + m_offset * m_dy, locZ );
                     prob = probData->at( id );
                     alpha = prob / max;
                     countStips = qMax( 0, (int)( alpha * 10 ) );
@@ -247,29 +259,29 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
                 for( int i = 0; i < countStips; ++i )
                 {
-                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dx - m_dx;
+                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dy - m_dy;
+                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dz - m_dz;
 
-                    addGlyph( verts, colors, locX + randx, y + m_offset * dy + randy, locZ + randz, vec, alpha );
+                    addGlyph( verts, colors, locX + randx, y + m_offset * m_dy + randy, locZ + randz, vec, alpha );
                 }
             }
         }
     }
     if ( m_orient == 2 )
     {
-        for( int yy = 0; yy < ny; ++yy )
+        for( int yy = 0; yy < m_ny; ++yy )
         {
-            for ( int zz = 0; zz < nz; ++zz )
+            for ( int zz = 0; zz < m_nz; ++zz )
             {
-                QVector3D vec = m_data->at( xi + yy * nx + zz * nx * ny );
-                float locY = yy * dy + ay;
-                float locZ = zz * dz + az;
+                QVector3D vec = m_data->at( xi + yy * m_nx + zz * m_nx * m_ny );
+                float locY = yy * m_dy + m_ay;
+                float locZ = zz * m_dz + m_az;
 
                 int countStips = 10;
                 if ( m_mask )
                 {
-                    int id = m_mask->getIdFromPos( x + m_offset * dx, locY, locZ );
+                    int id = m_mask->getIdFromPos( x + m_offset * m_dx, locY, locZ );
                     prob = probData->at( id );
                     alpha = prob / max;
                     countStips = qMax( 0, (int)( alpha * 10 ) );
@@ -277,11 +289,11 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
                 for( int i = 0; i < countStips; ++i )
                 {
-                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * dx - dx;
-                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * dy - dy;
-                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * dz - dz;
+                    randx = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dx - m_dx;
+                    randy = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dy - m_dy;
+                    randz = ( (float) rand() / ( RAND_MAX ) ) * 2 * m_dz - m_dz;
 
-                    addGlyph( verts, colors, x + m_offset * dx + randx, locY + randy, locZ + randz, vec, alpha );
+                    addGlyph( verts, colors, x + m_offset * m_dx + randx, locY + randy, locZ + randz, vec, alpha );
                 }
             }
         }
@@ -303,9 +315,10 @@ void StippleRenderer::initGeometry( PropertyGroup& props )
 
 void StippleRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &colors, float xPos, float yPos, float zPos, QVector3D vector, float alpha )
 {
-    float v0 = vector.x();
-    float v1 = vector.y();
-    float v2 = vector.z();
+    QVector3D vec = getInterpolatedVector( xPos, yPos, zPos );
+    float v0 = vec.x();
+    float v1 = vec.y();
+    float v2 = vec.z();
 
     verts.push_back( xPos );
     verts.push_back( yPos );
@@ -393,4 +406,50 @@ void StippleRenderer::addGlyph( std::vector<float> &verts, std::vector<float> &c
     colors.push_back( alpha );
 
     m_vertCount += 6;
+}
+
+QVector3D StippleRenderer::getInterpolatedVector( float inx, float iny, float inz )
+{
+    float x = qMax( 0.0f, qMin( ( inx + m_dx / 2 - m_ax ) / m_dx, (float)m_nx - 1 ) );
+    float y = qMax( 0.0f, qMin( ( iny + m_dy / 2 - m_ay ) / m_dy, (float)m_ny - 1 ) );
+    float z = qMax( 0.0f, qMin( ( inz + m_dz / 2 - m_az ) / m_dz, (float)m_nz - 1 ) );
+
+    int x0 = (int) x;
+    int y0 = (int) y;
+    int z0 = (int) z;
+
+    float xd = x - x0;
+    float yd = y - y0;
+    float zd = z - z0;
+
+    int id = x0 + y0 * m_nx + z0 * m_nx * m_ny;
+
+    int id_x0y0z0 = id;
+    int id_x1y0z0 = qMin( m_blockSize - 1, id + 1 );
+    int id_x0y1z0 = qMin( m_blockSize - 1, id + m_nx );
+    int id_x1y1z0 = qMin( m_blockSize - 1, id + m_nx + 1 );
+    int id_x0y0z1 = qMin( m_blockSize - 1, id + m_nx * m_ny );
+    int id_x1y0z1 = qMin( m_blockSize - 1, id + m_nx * m_ny + 1 );
+    int id_x0y1z1 = qMin( m_blockSize - 1, id + m_nx * m_ny + m_nx );
+    int id_x1y1z1 = qMin( m_blockSize - 1, id + m_nx * m_ny + m_nx + 1 );
+
+    QVector3D i1;
+    QVector3D i2;
+    QVector3D j1;
+    QVector3D j2;
+    QVector3D w1;
+    QVector3D w2;
+    QVector3D iv;
+
+    i1 = m_data->at( id_x0y0z0 ) * ( 1.0 - zd ) + m_data->at( id_x0y0z1 ) * zd;
+    i2 = m_data->at( id_x0y1z0 ) * ( 1.0 - zd ) + m_data->at( id_x0y1z1 ) * zd;
+    j1 = m_data->at( id_x1y0z0 ) * ( 1.0 - zd ) + m_data->at( id_x1y0z1 ) * zd;
+    j2 = m_data->at( id_x1y1z0 ) * ( 1.0 - zd ) + m_data->at( id_x1y1z1 ) * zd;
+
+    w1 = i1 * ( 1.0 - yd ) + i2 * yd;
+    w2 = j1 * ( 1.0 - yd ) + j2 * yd;
+
+    iv = w1 * ( 1.0 - xd ) + w2 * xd;
+
+    return iv;
 }
