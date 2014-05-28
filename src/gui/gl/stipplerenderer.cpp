@@ -61,7 +61,7 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
             (int)props.get( Fn::Property::D_RENDER_SAGITTAL ).toBool() * 4;
     m_orient = slice;
 
-    if ( ( renderMode != 1 ) )
+    if ( ( renderMode == 1 ) )
     {
         return;
     }
@@ -69,7 +69,7 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
     m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
-    m_lineWidth = props.get( Fn::Property::D_LINE_WIDTH ).toInt();
+    m_lineWidth = props.get( Fn::Property::D_LINE_WIDTH ).toFloat();
 
     QGLShaderProgram* program = GLFunctions::getShader( "stipple" );
 

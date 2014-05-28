@@ -15,7 +15,7 @@ uniform float u_glyphThickness;
 /**
  * Computes the distance from a line segment and a point.
  *
- * \param start Definig the start of the line segment.
+ * \param start Defining the start of the line segment.
  * \param end Defining the end of the line segment.
  * \param point For which the distance should be computed.
  *
@@ -71,7 +71,8 @@ void main( void )
     float q = area / 3.14159265;
     float r1 = p2 + sqrt( p2 * p2 + q );
     float r2 = p2 - sqrt( p2 * p2 + q );
-    float radius = max( r1, r2 );// - 0.05;
+    float radius = 0.05 * u_glyphThickness; //max( r1, r2 );// - 0.05;
+    //float radius = max( r1, r2 );// - 0.05;
     
     
     float dist = distancePointLineSegment( v_texCoord, scaledFocalPoint1, scaledFocalPoint2 );
@@ -82,6 +83,7 @@ void main( void )
     }
     else
     {
-        writePeel( vec4( 0.0, 0.0, 1.0, 1.0 ) );
+        discard;
+        //writePeel( vec4( 0.0, 0.0, 1.0, 1.0 ) );
     }
 }
