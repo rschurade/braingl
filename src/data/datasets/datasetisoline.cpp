@@ -180,7 +180,7 @@ void DatasetIsoline::initGeometry()
 
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
     {
-        sliceData = extractAnatomySagittal( m_x / dx );
+        sliceData = extractAnatomySagittal( xi );
         MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
         tmpVerts = ms1.run();
 
@@ -193,7 +193,7 @@ void DatasetIsoline::initGeometry()
     }
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
     {
-        sliceData = extractAnatomyCoronal( m_y / dy );
+        sliceData = extractAnatomyCoronal( yi );
         MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
         tmpVerts = ms1.run();
 
