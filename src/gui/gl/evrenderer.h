@@ -27,8 +27,6 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
-    void setMask( DatasetScalar* mask );
-
 protected:
     void initGeometry( PropertyGroup& props );
     void setShaderVars( PropertyGroup& props );
@@ -42,12 +40,10 @@ private:
     GLuint vbo1;
 
     std::vector<QVector3D>* m_data;
-    DatasetScalar* m_mask;
 
     float m_scaling;
     int m_orient;
     float m_offset;
-    bool m_renderStipples;
     QColor m_color;
     int m_lineWidth;
 };

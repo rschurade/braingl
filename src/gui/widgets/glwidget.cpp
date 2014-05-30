@@ -607,28 +607,28 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case Qt::Key_Down:
                     m_camera->viewDown();
                     break;
-                case 69:
+                case 69: // e
                     m_camera->strafeLeft();
                     break;
-                case 81:
+                case 81: // q
                     m_camera->strafeRight();
                     break;
-                case 87:
+                case 87: // w
                     m_camera->up();
                     break;
-                case 83:
+                case 83: // s
                     m_camera->down();
                     break;
-                case 68:
+                case 68: // d
                     m_camera->left();
                     break;
-                case 65:
+                case 65: // a
                     m_camera->right();
                     break;
-                case 82:
+                case 82: // r
                     m_camera->forward();
                     break;
-                case 70:
+                case 70: // f
                     m_camera->backward();
                     break;
                 case 71: //G

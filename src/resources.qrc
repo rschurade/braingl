@@ -74,6 +74,8 @@
         <file>shaders/shape.fs</file>
         <file>shaders/slice.vs</file>
         <file>shaders/slice.fs</file>
+        <file>shaders/stipple.vs</file>
+        <file>shaders/stipple.fs</file>
         <file>shaders/superquadric.vs</file>
         <file>shaders/superquadric.fs</file>
         <file>shaders/tensorev.vs</file>

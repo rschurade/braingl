@@ -115,7 +115,7 @@ include(${VTK_USE_FILE})
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11 -stdlib=libc++" )
 ELSE()
-    set( CMAKE_CXX_FLAGS "-Wall -pedantic -ansi -std=c++0x" )
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++0x" )
 ENDIF()
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -172,7 +172,6 @@ ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
     ADD_DEFINITIONS( -D__LINUX__ )
-    ADD_DEFINITIONS( -D__cplusplus )
     
 	# Some linux distributions need to explicitily link against X11. We add this lib here.
 	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )

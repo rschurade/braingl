@@ -9,13 +9,15 @@
 #include "../models.h"
 
 #include "../../gui/gl/evrenderer.h"
+#include "../../gui/gl/stipplerenderer.h"
 
 #include "../properties/propertyselection.h"
 
 Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_VECTOR, header ),
     m_data( data ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_stippleRenderer( 0 )
 {
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, -1 );
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
@@ -37,7 +39,9 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"].createList( Fn::Property::D_STIPPLE_PROB_MASK, { "none" }, 0, "stipples" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_STIPPLE_PROB_MASK ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( probMaskChanged() ) );
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "stipples" );
-    m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 2, 1, 5, "stipples" );
+    m_properties["maingl"].createFloat( Fn::Property::D_STIPPLE_THICKNESS, 1.0f, 1.0f, 5.0f, "stipples" );
+    m_properties["maingl"].createFloat( Fn::Property::D_STIPPLE_GLYPH_SIZE, 1.0f, 1.0f, 5.0f, "stipples" );
+    m_properties["maingl"].createList( Fn::Property::D_STIPPLE_SLICE_ORIENT, { "axial", "coronal", "sagittal" }, 0, "stipples" );
 
     examineDataset();
 
@@ -145,15 +149,27 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
         return;
     }
 
-    if ( m_renderer == 0 )
+    if (  properties( target ).get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() )
     {
-        m_renderer = new EVRenderer( &m_data );
-    }
+        if ( m_stippleRenderer == 0 )
+        {
+            m_stippleRenderer = new StippleRenderer( &m_data );
+        }
 
-    if ( properties( target ).get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() )
-    {
         probMaskChanged();
-        m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+        m_stippleRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
+    else
+    {
+        if ( properties( target ).get( Fn::Property::D_RENDER_VECTORS_STICKS ).toBool() )
+        {
+            if ( m_renderer == 0 )
+            {
+                m_renderer = new EVRenderer( &m_data );
+            }
+
+            m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+        }
     }
 }
 
@@ -273,8 +289,8 @@ void Dataset3D::updateMaskSelect()
 
 void Dataset3D::probMaskChanged()
 {
-    if ( m_renderer )
+    if ( m_stippleRenderer )
     {
-        m_renderer->setMask( m_scalarDSL[ m_properties["maingl"].get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() ] );
+        m_stippleRenderer->setMask( m_scalarDSL[ m_properties["maingl"].get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() ] );
     }
 }
