@@ -8,11 +8,13 @@
 #ifndef SLICERENDERER_H_
 #define SLICERENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
-class QGLShaderProgram;
+#include <QString>
+#include <QVector3D>
+#include <QMatrix4x4>
 
-class SliceRenderer : public ObjectRenderer
+class SliceRenderer
 {
 public:
 	SliceRenderer();

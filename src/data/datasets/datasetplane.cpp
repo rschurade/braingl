@@ -21,12 +21,23 @@ DatasetPlane::DatasetPlane() :
     m_handle2( GLFunctions::getPickIndex() ),
     dirty( true )
 {
-    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
-    float nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toFloat();
-    float ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toFloat();
-    float nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toFloat();
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
+
+    int nx = 160;
+    int ny = 200;
+    int nz = 160;
+    float dx = 1.0f;
+    float dy = 1.0f;
+    float dz = 1.0f;
+    if ( dsl.size() > 0 )
+    {
+        nx = dsl[0]->properties().get( Fn::Property::D_NX ).toInt();
+        ny = dsl[0]->properties().get( Fn::Property::D_NY ).toInt();
+        nz = dsl[0]->properties().get( Fn::Property::D_NZ ).toInt();
+        dx = dsl[0]->properties().get( Fn::Property::D_DX ).toFloat();
+        dy = dsl[0]->properties().get( Fn::Property::D_DY ).toFloat();
+        dz = dsl[0]->properties().get( Fn::Property::D_DZ ).toFloat();
+    }
 
     m_h0 = QVector3D( nx * dx / 2, ny * dy / 2, nz * dz / 2 );
     m_h1 = QVector3D( 0.0, m_h0.y(), m_h0.z() );
@@ -158,13 +169,23 @@ void DatasetPlane::initGeometry()
     float y3 = m_h2.y();
     float z3 = m_h0.z() + ( m_h0.z() - m_h1.z() ) - ( m_h0.z() - m_h2.z() );
 
-    float nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
-    float ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
-    float nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
+    int nx = 160;
+    int ny = 200;
+    int nz = 160;
+    float dx = 1.0f;
+    float dy = 1.0f;
+    float dz = 1.0f;
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
+    if ( dsl.size() > 0 )
+    {
+        nx = dsl[0]->properties().get( Fn::Property::D_NX ).toInt();
+        ny = dsl[0]->properties().get( Fn::Property::D_NY ).toInt();
+        nz = dsl[0]->properties().get( Fn::Property::D_NZ ).toInt();
+        dx = dsl[0]->properties().get( Fn::Property::D_DX ).toFloat();
+        dy = dsl[0]->properties().get( Fn::Property::D_DY ).toFloat();
+        dz = dsl[0]->properties().get( Fn::Property::D_DZ ).toFloat();
+    }
 
-    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
     float vertices[] =
     {

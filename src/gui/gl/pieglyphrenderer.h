@@ -8,11 +8,11 @@
 #ifndef PIEGLYPHRENDERER_H_
 #define PIEGLYPHRENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 #include "../../data/properties/propertygroup.h"
 
-class PieGlyphRenderer: public ObjectRenderer
+class PieGlyphRenderer
 {
 public:
     PieGlyphRenderer();
@@ -25,7 +25,6 @@ public:
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
 protected:
-    void setupTextures();
     void setShaderVars( PropertyGroup& props );
 
 private:

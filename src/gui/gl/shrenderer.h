@@ -25,22 +25,21 @@ class SHRenderer : public ObjectRenderer
     Q_OBJECT
 
 public:
-    SHRenderer( std::vector<ColumnVector>* data, int nx, int ny, int nz, float dx, float dy, float dz );
+    SHRenderer( std::vector<ColumnVector>* data );
     virtual ~SHRenderer();
 
     void init();
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
-    void createMesh();
+    void createMesh( PropertyGroup& props );
     TriangleMesh2* getMesh();
 
 protected:
-    void setupTextures();
-    void setShaderVars();
-    void setRenderParams( PropertyGroup& props );
+    void initGeometry( PropertyGroup& props );
+    void setShaderVars( PropertyGroup& props );
 
-    void initGeometry();
+    void setRenderParams( PropertyGroup& props );
     void updateMesh();
 
 private:
@@ -51,13 +50,6 @@ private:
     TriangleMesh2* m_newMesh;
 
     std::vector<ColumnVector>* m_data;
-
-    int m_nx;
-    int m_ny;
-    int m_nz;
-    float m_dx;
-    float m_dy;
-    float m_dz;
 
     float m_scaling;
     int m_orient;

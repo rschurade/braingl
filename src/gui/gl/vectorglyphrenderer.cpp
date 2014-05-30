@@ -12,7 +12,10 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 VectorGlyphRenderer::VectorGlyphRenderer() :
-        ObjectRenderer(), vboIds( new GLuint[1] ), ps( new float[1] ), np( 1 ), ao( 14 ), m_pickId( GLFunctions::getPickIndex() )
+    vboIds( new GLuint[1] ),
+    ps( new float[1] ),
+    np( 1 ), ao( 14 ),
+    m_pickId( GLFunctions::getPickIndex() )
 {
 
 }
@@ -118,11 +121,6 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
 
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
-}
-
-void VectorGlyphRenderer::setupTextures()
-{
-
 }
 
 void VectorGlyphRenderer::setShaderVars( PropertyGroup& props )

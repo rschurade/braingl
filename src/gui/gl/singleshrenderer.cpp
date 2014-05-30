@@ -28,14 +28,14 @@
 #include <limits>
 
 SingleSHRenderer::SingleSHRenderer() :
-    ObjectRenderer(),
     vboIds( new GLuint[ 2 ] ),
     m_width( 1 ),
     m_height( 1 ),
     m_ratio( 1.0 ),
     m_dx( 1.0 ),
     m_dy( 1.0 ),
-    m_dz( 1.0 )
+    m_dz( 1.0 ),
+    m_previousSettings( "" )
 {
     m_arcBall = new ArcBall( 50, 50 );
 }
@@ -138,13 +138,9 @@ void SingleSHRenderer::initGeometry()
     m_ny = props.get( Fn::Property::D_NY ).toInt();
     m_nz = props.get( Fn::Property::D_NZ ).toInt();
 
-    float dx = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    int xi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat() * ( dx / m_dx );
-    int yi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat() * ( dy / m_dy );
-    int zi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat() * ( dz / m_dz );
+    int xi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
+    int yi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
+    int zi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
 
     xi = qMax( 0, qMin( xi, m_nx - 1) );
     yi = qMax( 0, qMin( yi, m_ny - 1) );
@@ -262,14 +258,14 @@ void SingleSHRenderer::draw()
 {
     QList<int>rl;
 
-    int countDatasets = model()->rowCount();
+    int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
     {
-        QModelIndex index = model()->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( model()->data( index, Qt::DisplayRole ).toBool() )
+        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
+        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
         {
-            index = model()->index( i, (int)Fn::Property::D_TYPE );
-            if ( model()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
+            index = Models::d()->index( i, (int)Fn::Property::D_TYPE );
+            if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
             {
                 rl.push_back( i );
                 //qDebug() << "found QBall to render";
@@ -279,7 +275,7 @@ void SingleSHRenderer::draw()
 
     if ( rl.size() > 0 )
     {
-        m_dataset = VPtr<DatasetDWI>::asPtr( model()->data( model()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        m_dataset = VPtr<DatasetDWI>::asPtr( Models::d()->data( Models::d()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         initGeometry();
     }
     else
@@ -310,4 +306,15 @@ void SingleSHRenderer::draw()
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
+}
+
+QString SingleSHRenderer::createSettingsString( std::initializer_list<QVariant>settings )
+{
+    QString result("");
+
+    for ( auto i = settings.begin(); i != settings.end(); ++i )
+    {
+        result += (*i).toString();
+    }
+    return result;
 }

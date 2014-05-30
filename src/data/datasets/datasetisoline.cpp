@@ -115,6 +115,7 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
     GLFunctions::getShader( "line" )->bind();
     GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+    GLFunctions::getShader( "line" )->setUniformValue( "u_renderStipples", false );
 
     glLineWidth(  m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toInt() );
 
@@ -166,9 +167,9 @@ void DatasetIsoline::initGeometry()
     float px = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
     float py = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
     float pz = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
-    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
     bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
@@ -315,9 +316,9 @@ void DatasetIsoline::isoValueChanged()
 
 void DatasetIsoline::globalChanged()
 {
-    if( m_x != Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat() ||
-        m_y != Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat() ||
-        m_z != Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat() )
+    if( m_x != Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() ||
+        m_y != Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() ||
+        m_z != Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() )
     {
         m_dirty = true;
     }

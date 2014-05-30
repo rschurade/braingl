@@ -21,15 +21,10 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createList( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "general" );
     m_properties->createList( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "general" );
 
-    m_properties->createFloat( Fn::Property::G_SAGITTAL, 0.0f, 0.0f, 0.0f, "general" );
-    m_properties->createFloat( Fn::Property::G_CORONAL, 0.0f, 0.0f, 0.0f, "general" );
-    m_properties->createFloat( Fn::Property::G_AXIAL, 0.0f, 0.0f, 0.0f, "general" );
-    m_properties->createInt( Fn::Property::G_MAX_AXIAL, 1 );
-    m_properties->createInt( Fn::Property::G_MAX_CORONAL, 1 );
-    m_properties->createInt( Fn::Property::G_MAX_SAGITTAL, 1 );
-    m_properties->createFloat( Fn::Property::G_SLICE_DX, 1.0f );
-    m_properties->createFloat( Fn::Property::G_SLICE_DY, 1.0f );
-    m_properties->createFloat( Fn::Property::G_SLICE_DZ, 1.0f );
+    float dim = 250.0f;
+    m_properties->createFloat( Fn::Property::G_SAGITTAL, 0.0f, -dim, dim, "general" );
+    m_properties->createFloat( Fn::Property::G_CORONAL, 0.0f, -dim, dim, "general" );
+    m_properties->createFloat( Fn::Property::G_AXIAL, 0.0f, -dim, dim, "general" );
     m_properties->createString( Fn::Property::G_LAST_PATH, QString("") );
     m_properties->createBool( Fn::Property::G_SHOW_AXIAL, true );
     m_properties->createBool( Fn::Property::G_SHOW_CORONAL, true );
@@ -209,9 +204,6 @@ bool GlobalPropertyModel::setData( const QModelIndex &index, const QVariant &val
 
 bool GlobalPropertyModel::submit()
 {
-    m_properties->setMax( Fn::Property::G_AXIAL, m_properties->get( Fn::Property::G_MAX_AXIAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Property::G_CORONAL, m_properties->get( Fn::Property::G_MAX_CORONAL ).toInt() - 1 );
-    m_properties->setMax( Fn::Property::G_SAGITTAL, m_properties->get( Fn::Property::G_MAX_SAGITTAL ).toInt() - 1 );
     emit ( dataChanged( index( 0, 0 ), index( 0, 0 ) ) );
     return true;
 }

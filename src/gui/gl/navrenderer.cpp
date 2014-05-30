@@ -8,6 +8,8 @@
 
 #include "../gl/glfunctions.h"
 
+#include "../../data/models.h"
+
 #include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
 #include <QVector3D>
@@ -18,19 +20,21 @@
 #endif
 
 NavRenderer::NavRenderer( QString name ) :
-    ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),
     m_x( 0. ),
     m_y( 0. ),
     m_z( 0. ),
-    m_nx( 0 ),
-    m_ny( 0 ),
-    m_nz( 0 ),
-    m_dx( 0 ),
-    m_dy( 0 ),
-    m_dz( 0 ),
+    m_nx( 160 ),
+    m_ny( 200 ),
+    m_nz( 160 ),
+    m_dx( 1.0f ),
+    m_dy( 1.0f ),
+    m_dz( 1.0f ),
+    m_ax( 1.0f ),
+    m_ay( 1.0f ),
+    m_az( 1.0f ),
     m_xOld( -1 ),
     m_yOld( -1 ),
     m_zOld( -1 ),

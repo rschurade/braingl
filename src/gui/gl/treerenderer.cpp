@@ -22,7 +22,6 @@
 #include <QMatrix4x4>
 
 TreeRenderer::TreeRenderer( QString name, Tree* tree ) :
-    ObjectRenderer(),
     m_name( name ),
     m_tree( tree ),
     vboIds( new GLuint[ 2 ] ),

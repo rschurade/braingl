@@ -267,6 +267,9 @@ namespace Fn
         D_HANDLE_COLOR,
         D_LINE_WIDTH,
         D_STIPPLE_PROB_MASK,
+        D_STIPPLE_THICKNESS,
+        D_STIPPLE_GLYPH_SIZE,
+        D_STIPPLE_SLICE_ORIENT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -275,12 +278,6 @@ namespace Fn
         G_SAGITTAL,
         G_CORONAL,
         G_AXIAL,
-        G_MAX_SAGITTAL,
-        G_MAX_CORONAL,
-        G_MAX_AXIAL,
-        G_SLICE_DX,
-        G_SLICE_DY,
-        G_SLICE_DZ,
         G_CORONAL_AXIAL,
         G_SAGITTAL_AXIAL,
         G_SAGITTAL_CORONAL,
@@ -522,6 +519,9 @@ namespace Fn
                 case Property::D_HANDLE_COLOR: return QString( "handle color" ); break;
                 case Property::D_LINE_WIDTH: return QString( "line width" ); break;
                 case Property::D_STIPPLE_PROB_MASK: return QString( "probability mask" ); break;
+                case Property::D_STIPPLE_THICKNESS: return QString( "thickness" ); break;
+                case Property::D_STIPPLE_GLYPH_SIZE: return QString( "glyph size" ); break;
+                case Property::D_STIPPLE_SLICE_ORIENT: return QString( "slice orientation" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
@@ -529,12 +529,6 @@ namespace Fn
                 case Property::G_SAGITTAL: return QString( "global sagittal" ); break;
                 case Property::G_CORONAL: return QString( "global coronal" ); break;
                 case Property::G_AXIAL: return QString( "global axial" ); break;
-                case Property::G_MAX_SAGITTAL: return QString( "" ); break;
-                case Property::G_MAX_CORONAL: return QString( "" ); break;
-                case Property::G_MAX_AXIAL: return QString( "" ); break;
-                case Property::G_SLICE_DX: return QString( "" ); break;
-                case Property::G_SLICE_DY: return QString( "" ); break;
-                case Property::G_SLICE_DZ: return QString( "" ); break;
                 case Property::G_CORONAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_AXIAL: return QString( "" ); break;
                 case Property::G_SAGITTAL_CORONAL: return QString( "" ); break;

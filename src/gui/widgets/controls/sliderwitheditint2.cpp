@@ -21,9 +21,10 @@ SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     m_slider->setOrientation( Qt::Horizontal );
 
     m_edit = new QLineEdit( this );
-    m_edit->setMaxLength( 3 );
-    m_edit->setMaximumWidth( 35 );
+    m_edit->setMaxLength( 4 );
+    m_edit->setMaximumWidth( 45 );
     m_edit->setAlignment( Qt::AlignCenter );
+    m_edit->setText( "0" );
 
     connect( m_slider, SIGNAL( sliderMoved( int ) ), this, SLOT( sliderMoved( int ) ) );
     connect( m_edit, SIGNAL( editingFinished() ), this, SLOT( editEdited() ) );
@@ -61,7 +62,14 @@ SliderWithEditInt2::~SliderWithEditInt2()
 
 void SliderWithEditInt2::sliderMoved( int value )
 {
-    m_edit->setText( QString::number( value ) );
+    if ( value == 0 )
+    {
+        m_edit->setText( "0" );
+    }
+    else
+    {
+        m_edit->setText( QString::number( value ) );
+    }
     m_slider->repaint();
     emit( valueChanged( value ) );
 }
@@ -77,7 +85,14 @@ void SliderWithEditInt2::editEdited()
 void SliderWithEditInt2::setValue( int value )
 {
     m_slider->setValue( value );
-    m_edit->setText( QString::number( value ) );
+    if ( value == 0 )
+    {
+        m_edit->setText( "0" );
+    }
+    else
+    {
+        m_edit->setText( QString::number( value ) );
+    }
     m_slider->repaint();
 }
 
@@ -98,8 +113,8 @@ void SliderWithEditInt2::setMax( int max )
     m_slider->setMaximum( max );
     m_slider->repaint();
 
-    m_edit->setMaxLength( QString::number( max ).size() );
-    m_edit->setMaximumWidth( QString::number( max ).size() * 12 );
+    m_edit->setMaxLength( QString::number( max ).size() + 1 );
+    m_edit->setMaximumWidth( ( QString::number( max ).size() + 1 ) * 12 );
 }
 
 void SliderWithEditInt2::minusPressed()

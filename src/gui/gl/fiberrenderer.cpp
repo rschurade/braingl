@@ -22,7 +22,6 @@
 FiberRenderer::FiberRenderer( FiberSelector* selector,
                                   std::vector<Fib>* fibs,
                                   int numPoints )  :
-    ObjectRenderer(),
     m_selector( selector ),
     vbo( 0 ),
     dataVbo( 0 ),
@@ -115,25 +114,6 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "u_materialDiffuse", props.get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
     program->setUniformValue( "u_materialSpecular", props.get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
     program->setUniformValue( "u_materialShininess", props.get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
-
-    float nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toFloat();
-    float ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toFloat();
-    float nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toFloat();
-    float sx = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
-    float sy = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
-    float sz = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
-    float dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    float dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    float dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
-
-    program->setUniformValue( "u_dx", dx );
-    program->setUniformValue( "u_dy", dy );
-    program->setUniformValue( "u_dz", dz );
-    program->setUniformValue( "u_x", sx * dx ); // + dx / 2.0f );
-    program->setUniformValue( "u_y", sy * dy ); // + dy / 2.0f );
-    program->setUniformValue( "u_z", sz * dz ); // + dz / 2.0f );
-    program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
-
 
     glLineWidth( props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 

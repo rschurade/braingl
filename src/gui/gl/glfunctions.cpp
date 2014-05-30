@@ -277,6 +277,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "superquadric" );
         GLFunctions::m_shaderNames.push_back( "tensorev" );
         GLFunctions::m_shaderNames.push_back( "ev" );
+        GLFunctions::m_shaderNames.push_back( "stipple" );
         GLFunctions::m_shaderNames.push_back( "shape" );
         GLFunctions::m_shaderNames.push_back( "text" );
         GLFunctions::m_shaderNames.push_back( "merge" );

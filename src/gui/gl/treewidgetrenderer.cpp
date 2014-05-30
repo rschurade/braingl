@@ -26,7 +26,6 @@
 #endif
 
 TreeWidgetRenderer::TreeWidgetRenderer( QString name ) :
-    ObjectRenderer(),
     m_name( name ),
     m_zoom( 1 ),
     m_moveX( 0 ),

@@ -7,6 +7,8 @@
 #include "navrenderercoronal.h"
 #include "glfunctions.h"
 #include "../../data/enums.h"
+#include "../../data/models.h"
+#include "../../data/datasets/dataset.h"
 
 #include <QDebug>
 #include <QtOpenGL/QGLShaderProgram>
@@ -24,6 +26,24 @@ NavRendererCoronal::~NavRendererCoronal()
 {
     glDeleteBuffers( 4, vboIds );
     delete[] vboIds;
+}
+
+void NavRendererCoronal::leftMouseDown( int x, int y )
+{
+    float xf = static_cast<float>( x );
+    float yf = static_cast<float>( m_height - y );
+
+    QVector4D test;
+    test.setX( ( 2 * xf ) / m_width - 1 );
+    test.setY( ( 2 * yf ) / m_height - 1 );
+    test.setZ( 1 );
+    test.setW( 1 );
+
+    QVector4D out = m_mvpMatrix.inverted() * test;
+
+    QPoint p( out.x(), out.z() );
+    Models::setGlobal( Fn::Property::G_SAGITTAL_AXIAL, p );
+    Models::g()->submit();
 }
 
 void NavRendererCoronal::adjustRatios()
@@ -70,72 +90,47 @@ void NavRendererCoronal::adjustRatios()
     m_mvpMatrix = m_pMatrix * vMatrix;
 }
 
-void NavRendererCoronal::leftMouseDown( int x, int y )
-{
-    float xf = static_cast<float>( x );
-    float yf = static_cast<float>( m_height - y );
-
-    QVector4D test;
-    test.setX( ( 2 * xf ) / m_width - 1 );
-    test.setY( ( 2 * yf ) / m_height - 1 );
-    test.setZ( 1 );
-    test.setW( 1 );
-
-    QVector4D out = m_pMatrix.inverted() * test;
-
-    int xout = out.x() / m_dx;
-    int yout = out.y() / m_dz;
-
-    xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
-    yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-
-    QModelIndex mi;
-    QPoint p( xout, yout );
-    mi = model()->index( (int)Fn::Property::G_SAGITTAL_AXIAL, 0 );
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, p );
-        model()->submit();
-    }
-}
-
 void NavRendererCoronal::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-    m_y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-    m_z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
 
     if ( m_xOld != m_x || m_yOld != m_y || m_zOld != m_z )
     {
-        m_nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
-        m_ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
-        m_nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
+        QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
 
-        m_dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-        m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-        m_dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+        if ( dsl.size() > 0 )
+        {
+            Dataset* ds = dsl.first();
+            m_nx = ds->properties().get( Fn::Property::D_NX ).toFloat();
+            m_ny = ds->properties().get( Fn::Property::D_NY ).toFloat();
+            m_nz = ds->properties().get( Fn::Property::D_NZ ).toFloat();
 
-        float x = m_x * m_dx + m_dx / 2.0;
-        float y = m_y * m_dy + m_dy / 2.0;
-        float z = m_z * m_dz + m_dz / 2.0;
-        float xb = m_nx * m_dx;
-        //float yb = m_ny * m_dy;
-        float zb = m_nz * m_dz;
+            m_dx = ds->properties().get( Fn::Property::D_DX ).toFloat();
+            m_dy = ds->properties().get( Fn::Property::D_DY ).toFloat();
+            m_dz = ds->properties().get( Fn::Property::D_DZ ).toFloat();
+
+            m_ax = ds->properties().get( Fn::Property::D_ADJUST_X ).toFloat();
+            m_ay = ds->properties().get( Fn::Property::D_ADJUST_Y ).toFloat();
+            m_az = ds->properties().get( Fn::Property::D_ADJUST_Z ).toFloat();
+        }
+
 
         float vertices[] =
         {
-            0.0, y, 0.0,
-            xb,  y, 0.0,
-            xb,  y, zb,
-            0.0, y, zb
+            -250.0, m_y, -250.0,
+             250.0, m_y, -250.0,
+             250.0, m_y,  250.0,
+            -250.0, m_y,  250.0
         };
 
         float verticesCrosshair[] =
         {
-            0.0, y - 1.f, z,
-            xb,  y - 1.f, z,
-            x,   y - 1.f, 0.0,
-            x,   y - 1.f, zb
+           -250.0, m_y - 1.f, m_z,
+            250.0, m_y - 1.f, m_z,
+            m_x,   m_y - 1.f, -250.0,
+            m_x,   m_y - 1.f,  250.0
         };
 
         // Transfer vertex data to VBO 2
@@ -154,7 +149,7 @@ void NavRendererCoronal::initGeometry()
 
 void NavRendererCoronal::draw()
 {
-    QColor color = model()->data( model()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ).value<QColor>();
+    QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     //qDebug() << "nav draw";
@@ -178,13 +173,13 @@ void NavRendererCoronal::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshirs = model()->data( model()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool();
+    bool renderCrosshirs = Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ).toBool();
 
     if ( renderCrosshirs )
     {
         GLFunctions::getShader( "crosshair" )->bind();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-        QColor ccolor = model()->data( model()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
+        QColor ccolor = Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ).value<QColor>();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "u_color", ccolor.redF(), ccolor.greenF(), ccolor.blueF(), 1.0f );
         // Tell OpenGL which VBOs to use
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 3 ] );

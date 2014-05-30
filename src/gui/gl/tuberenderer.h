@@ -8,18 +8,19 @@
 #ifndef TUBERENDERER_H_
 #define TUBERENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 #include "../../algos/fib.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
+#include <QObject>
 
 class FiberSelector;
 class PropertyGroup;
 
-class TubeRenderer : public ObjectRenderer
+class TubeRenderer : public QObject
 {
     Q_OBJECT
 
@@ -41,8 +42,6 @@ protected:
     void initIndexBuffer( int lod );
 
 private:
-    QModelIndex createIndex( int branch, int pos, int column );
-
     FiberSelector* m_selector;
     GLuint *vboIds;
 

@@ -43,7 +43,6 @@ SceneRenderer::SceneRenderer( QString renderTarget ) :
     FBO( 0 )
 {
     m_sliceRenderer = new SliceRenderer();
-    m_sliceRenderer->setModel( Models::g() );
 
     m_mvMatrix.setToIdentity();
     m_pMatrix.setToIdentity();

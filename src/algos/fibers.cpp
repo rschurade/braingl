@@ -109,19 +109,17 @@ Fib Fibers::mergeFibs( Fib& lhs, Fib& rhs )
 DatasetScalar* Fibers::tractDensity()
 {
     float res = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
-    m_dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    m_dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    m_dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
-    m_nx = Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toFloat();
-    m_ny = Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toFloat();
-    m_nz = Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toFloat();
+    m_dx = res;
+    m_dy = res;
+    m_dz = res;
+    m_nx = 160;
+    m_ny = 200;
+    m_nz = 160;
 
     m_nx = ( ( m_nx * m_dx ) / res ) + 1;
     m_ny = ( ( m_ny * m_dy ) / res ) + 1;
     m_nz = ( ( m_nz * m_dz ) / res ) + 1;
-    m_dx = res;
-    m_dy = res;
-    m_dz = res;
+
 
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<float> data( m_blockSize, 0 );

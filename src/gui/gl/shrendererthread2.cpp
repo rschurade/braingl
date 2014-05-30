@@ -18,39 +18,18 @@
 #include <math.h>
 #include <limits>
 
-SHRendererThread2::SHRendererThread2( int id, std::vector<ColumnVector>* data,
-                                                                int nx, int ny, int nz,
-                                                                float dx, float dy, float dz,
-                                                                int xi, int yi, int zi,
-                                                                int lod,
-                                                                int order,
-                                                                int orient,
-                                                                bool scaling,
-                                                                float scaleFactor,
-                                                                bool hideNegative,
-                                                                QMatrix4x4 pMatrix,
-                                                                QMatrix4x4 mvMatrix
+SHRendererThread2::SHRendererThread2( int id,
+                                           std::vector<ColumnVector>* data,
+                                           QMatrix4x4 pMatrix,
+                                           QMatrix4x4 mvMatrix,
+                                           PropertyGroup& props
                                                                  ) :
     m_id( id ),
     m_data( data ),
-    m_nx( nx ),
-    m_ny( ny ),
-    m_nz( nz ),
-    m_dx( dx ),
-    m_dy( dy ),
-    m_dz( dz ),
-    m_xi( xi ),
-    m_yi( yi ),
-    m_zi( zi ),
-    m_lod( lod ),
-    m_order( order ),
-    m_orient( orient ),
-    m_scaling( scaling ),
-    m_scaleFactor( scaleFactor ),
-    m_hideNegative( hideNegative ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix ),
-    m_mesh( 0 )
+    m_mesh( 0 ),
+    m_props( props )
 {
 }
 
@@ -66,9 +45,9 @@ TriangleMesh2* SHRendererThread2::getMesh()
 void SHRendererThread2::run()
 {
     //qDebug() << "SH Renderer: using lod " << lod;
-
-    int numVerts = tess::n_vertices( m_lod );
-    int numTris = tess::n_faces( m_lod );
+    int lod = m_props.get( Fn::Property::D_LOD ).toInt();
+    int numVerts = tess::n_vertices( lod );
+    int numTris = tess::n_faces( lod );
 
     int numThreads = GLFunctions::idealThreadCount;
 
@@ -77,8 +56,7 @@ void SHRendererThread2::run()
 
     for ( int i = 0; i < numThreads; ++i )
     {
-        threads.push_back( new SHRendererThread( i, m_data, m_nx, m_ny, m_nz, m_dx, m_dy, m_dz, m_xi, m_yi, m_zi, m_lod,
-                                                   m_order, m_orient, m_scaling, m_hideNegative, m_pMatrix, m_mvMatrix ) );
+        threads.push_back( new SHRendererThread( i, m_data, m_pMatrix, m_mvMatrix, m_props ) );
     }
 
     // run threads
@@ -107,7 +85,7 @@ void SHRendererThread2::run()
 
         m_mesh = new TriangleMesh2( numVerts * numBalls, numTris * numBalls );
 
-        const int* faces = tess::faces( m_lod );
+        const int* faces = tess::faces( lod );
 
         float posX, posY, posZ;
         float newPosX, newPosY, newPosZ;
@@ -122,7 +100,7 @@ void SHRendererThread2::run()
             offsetX = verts[i*7+3];
             offsetY = verts[i*7+4];
             offsetZ = verts[i*7+5];
-            if ( m_hideNegative )
+            if ( m_props.get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool() )
             {
                 radius = qMax( 0.0f, verts[i*7+6] );
             }
@@ -131,9 +109,10 @@ void SHRendererThread2::run()
                 radius = verts[i*7+6];
             }
 
-            newPosX = posX * radius * m_scaleFactor + offsetX;
-            newPosY = posY * radius * m_scaleFactor + offsetY;
-            newPosZ = posZ * radius * m_scaleFactor + offsetZ;
+            float scaling = m_props.get( Fn::Property::D_SCALING ).toFloat();
+            newPosX = posX * radius * scaling + offsetX;
+            newPosY = posY * radius * scaling + offsetY;
+            newPosZ = posZ * radius * scaling + offsetZ;
 
             m_mesh->addVertex( newPosX, newPosY, newPosZ );
             m_mesh->setVertexColor( i, fabs( posX), fabs( posY), fabs( posZ), 1.0f );

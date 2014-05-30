@@ -8,13 +8,14 @@
 #ifndef NAVRENDERER_H_
 #define NAVRENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 #include <QMatrix4x4>
 
+class PropertyGroup;
 class QGLShaderProgram;
 
-class NavRenderer : public ObjectRenderer
+class NavRenderer
 {
 public:
 	NavRenderer( QString name );
@@ -58,6 +59,9 @@ protected:
     float m_dx;
     float m_dy;
     float m_dz;
+    float m_ax;
+    float m_ay;
+    float m_az;
     int m_xOld;
     int m_yOld;
     int m_zOld;

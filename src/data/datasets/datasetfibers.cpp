@@ -276,7 +276,6 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         if ( m_renderer == 0 )
         {
             m_renderer = new FiberRenderer( m_selector, &m_fibs, m_numPoints );
-            m_renderer->setModel( Models::g() );
             m_renderer->init();
             connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_renderer, SLOT( colorChanged() ) );
         }
@@ -288,7 +287,6 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         if ( m_tubeRenderer == 0 )
         {
             m_tubeRenderer = new TubeRenderer( m_selector, &m_fibs );
-            m_tubeRenderer->setModel( Models::g() );
             m_tubeRenderer->init();
             connect( properties( target ).getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), m_tubeRenderer, SLOT( colorChanged() ) );
         }
@@ -340,10 +338,6 @@ void DatasetFibers::transformChanged( QVariant value )
 
 void DatasetFibers::applyTransform()
 {
-    float dx = Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
-    float dy = Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
-    float dz = Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
-
     int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
 
     m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
@@ -374,9 +368,6 @@ void DatasetFibers::applyTransform()
                 for ( unsigned int k = 0; k < fib.length(); ++k )
                 {
                     QVector3D vert = fib.getVert( k );
-                    vert.setX( vert.x() / dx );
-                    vert.setY( vert.y() / dy );
-                    vert.setZ( vert.z() / dz );
                     vert = m_transform * vert;
                     fib.setVert( k, vert );
                 }
@@ -394,9 +385,6 @@ void DatasetFibers::applyTransform()
                 {
                     QVector3D vert = fib.getVert( k );
                     vert = m_transform * vert;
-                    vert.setX( vert.x() * dx );
-                    vert.setY( vert.y() * dy );
-                    vert.setZ( vert.z() * dz );
                     fib.setVert( k, vert );
                 }
                 m_fibs[i] = fib;

@@ -8,14 +8,15 @@
 #ifndef COMBINEDNAVRENDERER_H_
 #define COMBINEDNAVRENDERER_H_
 
-#include "objectrenderer.h"
+#include "GL/glew.h"
 
 #include <QMatrix4x4>
 
 class DataStore;
 class QGLShaderProgram;
+class PropertyGroup;
 
-class CombinedNavRenderer : public ObjectRenderer
+class CombinedNavRenderer
 {
 public:
 	CombinedNavRenderer( QString name );

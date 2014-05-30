@@ -15,7 +15,7 @@
 class Tree;
 class QGLShaderProgram;
 
-class TreeWidgetRenderer : public ObjectRenderer
+class TreeWidgetRenderer
 {
 public:
 	TreeWidgetRenderer( QString name );

@@ -8,6 +8,7 @@
 #include "../gl/glfunctions.h"
 
 #include "../../data/enums.h"
+#include "../../data/models.h"
 
 #include <QDebug>
 #include <QVector3D>
@@ -19,7 +20,6 @@
 #endif
 
 CombinedNavRenderer::CombinedNavRenderer( QString name ) :
-    ObjectRenderer(),
     m_name( name ),
     m_ratio( 1.0 ),
     vboIds( new GLuint[ 4 ] ),
@@ -155,7 +155,7 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
     int yout;
 
     QVector4D out = m_mvpMatrix.inverted() * test;
-    QModelIndex mi;
+
     if ( m_ratio > 1.5 )
     {
         xout = out.x() / m_dx;
@@ -164,7 +164,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = out.y() / m_dy;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_SAGITTAL_CORONAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_SAGITTAL_CORONAL, p );
         }
         else if ( ( (float)out.x() / m_dx ) < m_nx * 2  )
         {
@@ -172,7 +173,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = out.y() / m_dz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_SAGITTAL_AXIAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_SAGITTAL_AXIAL, p );
         }
         else
         {
@@ -180,7 +182,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = out.y() / m_dz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_CORONAL_AXIAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_CORONAL_AXIAL, p );
         }
     }
     else if ( m_ratio < 0.66 )
@@ -191,7 +194,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = out.x() / m_dy;
             xout = qMax( 0, qMin( m_ny - xout - 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_CORONAL_AXIAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_CORONAL_AXIAL, p );
         }
         else if ( ( (float)out.y() / m_dz ) < m_nz * 2  )
         {
@@ -199,7 +203,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = yout - m_nz;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_SAGITTAL_AXIAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_SAGITTAL_AXIAL, p );
         }
         else
         {
@@ -207,7 +212,8 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
             yout = yout - ( 2 * m_nz );
             yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_SAGITTAL_CORONAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_SAGITTAL_CORONAL, p );
         }
     }
     else
@@ -220,14 +226,16 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             {
                 xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
                 yout = qMax( 0, qMin( yout, static_cast<int>( m_ny - 1.0 ) ) );
-                mi = model()->index( (int)Fn::Property::G_SAGITTAL_CORONAL, 0 );
+                QPoint p( xout, yout );
+                Models::setGlobal( Fn::Property::G_SAGITTAL_CORONAL, p );
             }
             else
             {
                 xout = qMax( 0, qMin( xout, static_cast<int>( m_nx - 1.0 ) ) );
                 yout = yout - m_ny;
                 yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-                mi = model()->index( (int)Fn::Property::G_SAGITTAL_AXIAL, 0 );
+                QPoint p( xout, yout );
+                Models::setGlobal( Fn::Property::G_SAGITTAL_AXIAL, p );
             }
         }
         else
@@ -236,14 +244,9 @@ void CombinedNavRenderer::leftMouseDown( int x, int y )
             xout = qMax( 0, qMin( m_ny - xout- 1, static_cast<int>( m_ny - 1.0 ) ) );
             yout = yout - m_ny;
             yout = qMax( 0, qMin( yout, static_cast<int>( m_nz - 1.0 ) ) );
-            mi = model()->index( (int)Fn::Property::G_CORONAL_AXIAL, 0 );
+            QPoint p( xout, yout );
+            Models::setGlobal( Fn::Property::G_CORONAL_AXIAL, p );
         }
-    }
-    QPoint p( xout, yout );
-
-    if ( mi.isValid() )
-    {
-        model()->setData( mi, p );
     }
 }
 
@@ -254,16 +257,16 @@ void CombinedNavRenderer::leftMouseDrag( int x, int y )
 
 void CombinedNavRenderer::initGeometry()
 {
-    m_x = model()->data( model()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toInt();
-    m_y = model()->data( model()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toInt();
-    m_z = model()->data( model()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toInt();
-    m_nx = model()->data( model()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ) ).toInt();
-    m_ny = model()->data( model()->index( (int)Fn::Property::G_MAX_CORONAL, 0 ) ).toInt();
-    m_nz = model()->data( model()->index( (int)Fn::Property::G_MAX_AXIAL, 0 ) ).toInt();
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toInt();
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toInt();
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toInt();
+    m_nx = 160; // Models::getGlobal( Fn::Property::G_MAX_SAGITTAL ).toInt();
+    m_ny = 200; // Models::getGlobal( Fn::Property::G_MAX_CORONAL ).toInt();
+    m_nz = 160;  // Models::getGlobal( Fn::Property::G_MAX_AXIAL ).toInt();
 
-    m_dx = model()->data( model()->index( (int)Fn::Property::G_SLICE_DX, 0 ) ).toFloat();
-    m_dy = model()->data( model()->index( (int)Fn::Property::G_SLICE_DY, 0 ) ).toFloat();
-    m_dz = model()->data( model()->index( (int)Fn::Property::G_SLICE_DZ, 0 ) ).toFloat();
+    m_dx = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DX ).toFloat();
+    m_dy = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DY ).toFloat();
+    m_dz = 1.0; //Models::getGlobal( Fn::Property::G_SLICE_DZ ).toFloat();
 
     float x = m_x * m_dx + m_dx / 2.0;
     float y = m_y * m_dy + m_dy / 2.0;
@@ -432,7 +435,7 @@ void CombinedNavRenderer::setShaderVars()
 
 void CombinedNavRenderer::draw()
 {
-    QColor color = model()->data( model()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ).value<QColor>();
+    QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
     //qDebug() << "combined draw";
@@ -457,13 +460,13 @@ void CombinedNavRenderer::draw()
     // Draw cube geometry using indices from VBO 0
     glDrawElements( GL_TRIANGLES, 18, GL_UNSIGNED_SHORT, 0 );
 
-    bool renderCrosshairs = model()->data( model()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ) ).toBool();
+    bool renderCrosshairs = Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ).toBool();
 
     if ( renderCrosshairs )
     {
         GLFunctions::getShader( "crosshair" )->bind();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "mvp_matrix", m_mvpMatrix );
-        QColor ccolor = model()->data( model()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ).value<QColor>();
+        QColor ccolor = Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ).value<QColor>();
         GLFunctions::getShader( "crosshair" )->setUniformValue( "u_color", ccolor.redF(), ccolor.greenF(), ccolor.blueF(), 1.0 );
         // Tell OpenGL which VBOs to use
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 2 ] );

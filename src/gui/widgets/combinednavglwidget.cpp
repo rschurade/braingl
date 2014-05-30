@@ -18,7 +18,6 @@ CombinedNavGLWidget::CombinedNavGLWidget( QString name, QWidget *parent, const Q
 	m_visible( true )
 {
     m_renderer = new CombinedNavRenderer( name );
-    m_renderer->setModel( Models::g() );
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
     connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
 }

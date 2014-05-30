@@ -11,6 +11,7 @@
 #include "objectrenderer.h"
 
 #include <QMatrix4x4>
+#include <QColor>
 
 class QGLShaderProgram;
 

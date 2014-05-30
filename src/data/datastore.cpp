@@ -32,27 +32,23 @@ void DataStore::updateGlobals( int row )
 
         if ( ds->properties( "maingl" ).get( Fn::Property::D_TYPE ).toInt() < (int)Fn::DatasetType::NIFTI_ANY )
         {
-
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MAX_AXIAL,    0 ), ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MAX_CORONAL,  0 ), ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MAX_SAGITTAL, 0 ), ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SLICE_DX,     0 ), ds->properties( "maingl" ).get( Fn::Property::D_DX ).toFloat() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SLICE_DY,     0 ), ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat() );
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SLICE_DZ,     0 ), ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
-
             bool dimsChanged = false;
             if ( m_datasetList.size() >= 2 )
             {
                 Dataset* ds2 = VPtr<Dataset>::asPtr( m_datasetList[1] );
 
-                dimsChanged = ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() != ds2->properties( "maingl" ).get( Fn::Property::D_NX ).toInt();
+                dimsChanged = ( ds->properties().get( Fn::Property::D_NX ).toInt() != ds2->properties().get( Fn::Property::D_NX ).toInt() ) ||
+                              ( ds->properties().get( Fn::Property::D_NY ).toInt() != ds2->properties().get( Fn::Property::D_NY ).toInt() ) ||
+                              ( ds->properties().get( Fn::Property::D_NZ ).toInt() != ds2->properties().get( Fn::Property::D_NZ ).toInt() );
             }
 
             if ( m_datasetList.size() == 1 || dimsChanged )
             {
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt() / 2 );
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt() / 2 );
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() / 2 );
+                QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
+                QVector3D center = ( bb.first + bb.second ) / 2;
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), center.z() );
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ), center.y() );
+                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ), center.x() );
             }
 
             Models::g()->submit();

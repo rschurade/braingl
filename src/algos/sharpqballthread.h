@@ -22,7 +22,7 @@ public:
     SharpQBallThread( DatasetDWI* ds, int order, int id );
     virtual ~SharpQBallThread();
 
-    std::vector<ColumnVector> getQBallVector();
+    std::vector<ColumnVector>& getQBallVector();
 
 private:
     void run();

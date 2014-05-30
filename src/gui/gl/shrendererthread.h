@@ -8,6 +8,8 @@
 #ifndef SHRENDERERTHREAD_H_
 #define SHRENDERERTHREAD_H_
 
+#include "../../data/properties/propertygroup.h"
+
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QDebug>
@@ -18,12 +20,7 @@
 class SHRendererThread : public QThread
 {
 public:
-    SHRendererThread( int id, std::vector<ColumnVector>* data, int   m_nx,   int m_ny,   int m_nz,
-                                                     float m_dx, float m_dy, float m_dz,
-                                                     int   xi,     int yi,       int zi,
-                                                     int lod, int order, int orient, bool scaling,
-                                                     bool hideNegative,
-                                                     QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix );
+    SHRendererThread( int id, std::vector<ColumnVector>* data, QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, PropertyGroup& props );
     virtual ~SHRendererThread();
 
     std::vector<float>* getVerts();
@@ -35,12 +32,18 @@ private:
 
     std::vector<ColumnVector>* m_data;
 
-    int m_nx;
-    int m_ny;
-    int m_nz;
+    float m_x;
+    float m_y;
+    float m_z;
+    float m_nx;
+    float m_ny;
+    float m_nz;
     float m_dx;
     float m_dy;
     float m_dz;
+    float m_ax;
+    float m_ay;
+    float m_az;
 
     int m_xi;
     int m_yi;
