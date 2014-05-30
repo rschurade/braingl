@@ -164,12 +164,16 @@ void DatasetIsoline::initGeometry()
     float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
     float dy = m_properties["maingl"].get( Fn::Property::D_DY ).toFloat();
     float dz = m_properties["maingl"].get( Fn::Property::D_DZ ).toFloat();
-    float px = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
-    float py = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
-    float pz = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
+    float ax = m_properties["maingl"].get( Fn::Property::D_ADJUST_X ).toFloat();
+    float ay = m_properties["maingl"].get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float az = m_properties["maingl"].get( Fn::Property::D_ADJUST_Z ).toFloat();
     m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
     m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
     m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+    int xi = qMax( 0.0f, qMin( ( m_x / dx ) - ax, (float)nx - 1 ) );
+    int yi = qMax( 0.0f, qMin( ( m_y / dy ) - ay, (float)ny - 1 ) );
+    int zi = qMax( 0.0f, qMin( ( m_z / dz ) - az, (float)nz - 1 ) );
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
     bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
@@ -182,9 +186,9 @@ void DatasetIsoline::initGeometry()
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            isoVerts.push_back( m_x + px );
-            isoVerts.push_back( tmpVerts[3*i] + py );
-            isoVerts.push_back( tmpVerts[3*i+1] + pz );
+            isoVerts.push_back( m_x );
+            isoVerts.push_back( tmpVerts[3*i] + ay );
+            isoVerts.push_back( tmpVerts[3*i+1] + az );
         }
     }
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
@@ -195,22 +199,22 @@ void DatasetIsoline::initGeometry()
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            isoVerts.push_back( tmpVerts[3*i] + px );
-            isoVerts.push_back( m_y + py );
-            isoVerts.push_back( tmpVerts[3*i+1] + pz );
+            isoVerts.push_back( tmpVerts[3*i] + ax );
+            isoVerts.push_back( m_y );
+            isoVerts.push_back( tmpVerts[3*i+1] + az );
         }
     }
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
-        sliceData = extractAnatomyAxial( m_z / dz );
+        sliceData = extractAnatomyAxial( zi );
         MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy, interpolation );
         tmpVerts = ms1.run();
 
         for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
         {
-            isoVerts.push_back( tmpVerts[3*i] + px );
-            isoVerts.push_back( tmpVerts[3*i+1] + py );
-            isoVerts.push_back( m_z + pz );
+            isoVerts.push_back( tmpVerts[3*i] + ax );
+            isoVerts.push_back( tmpVerts[3*i+1] + ay );
+            isoVerts.push_back( m_z );
         }
     }
 

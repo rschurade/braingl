@@ -209,7 +209,7 @@ void GLWidget::calcMVPMatrix()
         QVector3D center = ( bb.first + bb.second ) / 2;
 
         m_arcBall->setRotCenter( center.x(), center.y(), center.z() );
-        boundingbox = qMax ( bb.second.x(), qMax( bb.second.y(), bb.second.z() ) );
+        boundingbox = qMax ( bb.second.x() - bb.first.x(), qMax( bb.second.y() - bb.first.y(), bb.second.z() - bb.first.z() ) );
     }
 
     // Reset projection
