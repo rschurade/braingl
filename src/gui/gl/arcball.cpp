@@ -108,9 +108,17 @@ void ArcBall::mouseWheel( float step )
     {
         step /= 2.0;
     }
+    if ( m_zoom < 1.5f )
+    {
+        step /= 3.0;
+    }
+    if ( m_zoom < 1.0f )
+    {
+        step /= 4.0;
+    }
     m_zoom += step;
 
-    m_zoom = qMax( 1.0f, m_zoom );
+    m_zoom = qMax( 0.2f, m_zoom );
 }
 
 void ArcBall::midDrag( int x, int y )
