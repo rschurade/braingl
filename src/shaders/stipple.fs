@@ -71,8 +71,8 @@ void main( void )
     float q = area / 3.14159265;
     float r1 = p2 + sqrt( p2 * p2 + q );
     float r2 = p2 - sqrt( p2 * p2 + q );
-    float radius = 0.05 * u_glyphThickness; //max( r1, r2 );// - 0.05;
-    //float radius = max( r1, r2 );// - 0.05;
+    //float radius = 0.05 * u_glyphThickness; //max( r1, r2 );// - 0.05;
+    float radius = max( r1, r2 );// - 0.05;
     
     
     float dist = distancePointLineSegment( v_texCoord, scaledFocalPoint1, scaledFocalPoint2 );
