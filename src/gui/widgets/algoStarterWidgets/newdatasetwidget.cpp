@@ -122,18 +122,18 @@ void NewDatasetWidget::createDataset()
             float dx = m_dX->getValue();
             float dy = m_dY->getValue();
             float dz = m_dZ->getValue();
-            std::vector<float> data( nx * ny * nz );
-            for( int z = 0; z < nz; ++z )
-            {
-                for( int y = 0; y < ny; ++y )
-                {
-                    for( int x = 0; x < nx; ++x )
-                    {
-                        float val = 255 * ( ( ( x + ( y % 2 ) ) + ( z % 2 ) )  % 2 ) ;
-                        data[ x + y*nx + z*nx*ny ] = val;
-                    }
-                }
-            }
+            std::vector<float> data( nx * ny * nz, 0 );
+//            for( int z = 0; z < nz; ++z )
+//            {
+//                for( int y = 0; y < ny; ++y )
+//                {
+//                    for( int x = 0; x < nx; ++x )
+//                    {
+//                        float val = 255 * ( ( ( x + ( y % 2 ) ) + ( z % 2 ) )  % 2 ) ;
+//                        data[ x + y*nx + z*nx*ny ] = val;
+//                    }
+//                }
+//            }
 
             data[0] = 255;
             int dims[8] = { 3, nx, ny, nz, 1, 1, 1 };
