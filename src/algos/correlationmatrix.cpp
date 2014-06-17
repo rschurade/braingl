@@ -11,6 +11,7 @@
 #include <QtCore>
 #include <QFile>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QThread>
 #include <QApplication>
 #include <QDomDocument>
@@ -252,7 +253,7 @@ void CorrelationMatrix::loadMetaData()
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
-    QNetworkReply* reply = networkManager->post( request, postData.encodedQuery() );
+    QNetworkReply* reply = networkManager->post( request, postData.query() );
 
     while ( !reply->isFinished() )
     {
