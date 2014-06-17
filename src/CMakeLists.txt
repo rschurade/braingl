@@ -30,6 +30,8 @@ ENDIF()
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Some common setup
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
+cmake_policy(SET CMP0020 NEW)
+
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET( BinName "${PROJECT_NAME}" )
 ELSE()
@@ -41,25 +43,18 @@ ENDIF()
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Package dependencies:
-FIND_PACKAGE( Qt4 REQUIRED )
+#FIND_PACKAGE( Qt5Widgets REQUIRED )
+FIND_PACKAGE(Qt5 REQUIRED COMPONENTS core gui widgets opengl webkit xml )
 MARK_AS_ADVANCED( FORCE QT_QMAKE_EXECUTABLE )
 
 # Includes:
 INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtGui )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtCore )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtOpenGL )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtWebKit )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtNetwork )
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR}/QtXml )
-
-# Libraries for linking:
-SET( QT_LIBS ${QT_QTCORE_LIBRARY}
-                 ${QT_QTGUI_LIBRARY}
-                 ${QT_QTOPENGL_LIBRARY} 
-                 ${QT_QTWEBKIT_LIBRARY}
-                 ${QT_QTNETWORK_LIBRARY}
-                 ${QT_QTXML_LIBRARY} )
+INCLUDE_DIRECTORIES( ${QT_QTGUI_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_QTCORE_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_QTOPENGL_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_QTWEBKIT_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_QTNETWORK_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${QT_QTXML_INCLUDE_DIR} )
 
 # Resources
 SET(QtIcon_RCCS resources.qrc)
@@ -130,17 +125,8 @@ SET ( CMAKE_AUTOMOC TRUE )
 # Collect the compile-files for this target
 COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
 
-QT4_AUTOMOC( ${TARGET_CPP_FILES} )    
 # This is needed since the mocs will be generated there
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cifti )
-QT4_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
-
-IF( NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
-    # XXX just add the Mac-specific dependencies later?
-    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS})
-
-    ReadProjectRevisionStatus()
-ENDIF()
+QT5_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 
 IF (CMAKE_VERBOSE_MAKEFILE)
       MESSAGE(STATUS)
@@ -170,14 +156,6 @@ ENDIF()
 ENDIF()
 
 
-IF( CMAKE_HOST_SYSTEM MATCHES "Linux" )
-    ADD_DEFINITIONS( -D__LINUX__ )
-    
-	# Some linux distributions need to explicitily link against X11. We add this lib here.
-	SET( ADDITIONAL_TARGET_LINK_LIBRARIES "X11" )
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS}  ${GLEW_LIBRARY} ${VTK_LIBRARIES} GLU )
-ENDIF()
-
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
     ADD_DEFINITIONS( -D__WINDOWS__ )
     
@@ -185,48 +163,17 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
     IF ( SURPRESS_CMD_WINDOW MATCHES ON )
         SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
     ENDIF()
+   
+    # Tell CMake to run moc when necessary:
+    SET ( CMAKE_AUTOMOC ON )
+    # As moc files are generated in the binary dir, tell CMake
+    # to always look for includes there:
+    SET( CMAKE_INCLUDE_CURRENT_DIR ON )
     
-	TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
-ENDIF()
-
-IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
-
-    # XXX move to platform-independent settings?
-    SET( TARGET_CPP_FILES ${TARGET_CPP_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/gui/core_profile_3_2_attributes.mm" )
-
-    SET( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
-    SET_SOURCE_FILES_PROPERTIES( ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns
-                               PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-
-    # XXX merge with definition above
-    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS} ${MACOSX_RESOURCE_FILES} )
-
-    # XXX ditto
-    ReadProjectRevisionStatus()
-
-    SET( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${__HGTIP__}" )
-    # XXX value should be formed like 1.2.3
-    SET( MACOSX_BUNDLE_BUNDLE_VERSION ${__HGTIP__} )
-    SET( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
-    SET( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
-    SET( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
-
-    TARGET_LINK_LIBRARIES( ${BinName} ${QT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
-
-    SET( BUNDLED_DIR ${CMAKE_CURRENT_BINARY_DIR}/selfcontained )
-
-    # create self-contained application bundle with embedded Frameworks
-    # and dylibs
-    INSTALL( CODE "
-      INCLUDE( BundleUtilities )
-      FILE( REMOVE_RECURSE ${BUNDLED_DIR} )
-      COPY_AND_FIXUP_BUNDLE( ${BinName}.app ${BUNDLED_DIR}/${BinName}.app \"\" \"\" ) 
-    ")
-
-    # create distribution disk image (`package´ build target)
-    SET( CPACK_GENERATOR "DragNDrop" )
-    SET( CPACK_INSTALLED_DIRECTORIES ${BUNDLED_DIR} . )
-    INCLUDE( CPack )
-
+    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS})
+    
+    QT5_USE_MODULES( ${BinName} Widgets WebKitWidgets )
+    
+    TARGET_LINK_LIBRARIES( ${BinName}  ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
 ENDIF()
 

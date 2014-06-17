@@ -358,7 +358,7 @@ double Connections::vis_c( Edge* ep, Edge* eq )
     QVector3D im = ( i0 + i1 ) / 2;
     QVector3D pm = ( ep->fn + ep->tn ) / 2;
 
-    return qMax( 1 - 2 * ( pm - im ).length() / ( i0 - i1 ).length(), 0.0 );
+    return qMax( 1 - 2 * ( pm - im ).length() / ( i0 - i1 ).length(), 0.0f );
 }
 
 QVector3D Connections::proj( QVector3D a, QVector3D b, QVector3D p )
