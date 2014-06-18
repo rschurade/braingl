@@ -8,14 +8,14 @@
 #ifndef TEXTRENDERER_H_
 #define TEXTRENDERER_H_
 
-#include "GL/glew.h"
+#include "../gl/objectrenderer.h"
 
 #include <QChar>
 #include <QHash>
 #include <QString>
 #include <QColor>
 
-class TextRenderer
+class TextRenderer : public ObjectRenderer
 {
 public:
     TextRenderer();

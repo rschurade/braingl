@@ -8,17 +8,13 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
-#include "GL/glew.h"
-
 #include <QPoint>
 #include <QList>
 #include <QVector3D>
 #include <QImage>
 #include <QColor>
 
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-#include "bugfixglshaderprogram.h"
-#endif
+#include <QOpenGLFunctions_3_3_Core>
 
 class QGLShaderProgram;
 class ShapeRenderer;
@@ -78,6 +74,7 @@ public:
     static QHash<QString, float> sliceAlpha;
 
     static ROI* roi;
+    static QOpenGLFunctions_3_3_Core* f;
 
 private:
     GLFunctions() {};

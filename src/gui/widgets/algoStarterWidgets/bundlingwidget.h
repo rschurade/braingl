@@ -11,7 +11,7 @@
 #include "../../../data/enums.h"
 #include "../../../algos/connections.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 class QProgressBar;
 class QPushButton;

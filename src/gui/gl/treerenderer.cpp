@@ -17,9 +17,7 @@
 #include "../../data/datasets/datasettree.h"
 
 #include <QDebug>
-#include <QtOpenGL/QGLShaderProgram>
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <QGLShaderProgram>
 
 TreeRenderer::TreeRenderer( QString name, Tree* tree ) :
     m_name( name ),

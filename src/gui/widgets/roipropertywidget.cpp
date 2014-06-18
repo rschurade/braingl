@@ -18,7 +18,7 @@
 #include "../../data/roi.h"
 #include "../../data/properties/property.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 ROIPropertyWidget::ROIPropertyWidget( QWidget* parent ) :
     QTabWidget( parent ),

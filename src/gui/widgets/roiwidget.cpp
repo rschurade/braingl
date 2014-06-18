@@ -14,7 +14,7 @@
 
 
 #include <QDebug>
-#include <QtGui>
+#include <QtWidgets>
 
 ROIWidget::ROIWidget( QWidget* parent ) :
     QFrame( parent ),

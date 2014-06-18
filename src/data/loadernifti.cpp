@@ -17,6 +17,8 @@
 
 #include <QDebug>
 #include <QDataStream>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QVector3D>
 #include <QtGui>
 

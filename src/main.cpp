@@ -15,12 +15,12 @@ bool logToFile = false;
 bool verbose = false;
 bool makeScreenshot = false;
 
-void logOutput( QtMsgType type, const char *msg )
+void logOutput( QtMsgType type, const QMessageLogContext& context, const QString &message )
 {
     QString filedate = QDateTime::currentDateTime().toString( "yyyy.MM.dd hh:mm:ss:zzz" );
     QString debugdate = QDateTime::currentDateTime().toString( "hh:mm:ss:zzz" );
 
-    switch (type)
+    switch ( type )
     {
     case QtDebugMsg:
         debugdate += " [D]";
@@ -37,24 +37,21 @@ void logOutput( QtMsgType type, const char *msg )
     }
     if ( verbose )
     {
-        (*out) << debugdate << " " << msg << endl;
+        (*out) << debugdate << " " << message << endl;
     }
     if ( logToFile )
     {
         QFile outFile("log.txt");
         outFile.open(QIODevice::WriteOnly | QIODevice::Append);
         QTextStream ts(&outFile);
-        ts << filedate << " " << msg << endl;
+        ts << filedate << " " << message << endl;
     }
 
-    if (QtFatalMsg == type)
-    {
-        abort();
-    }
 }
 
-void noOutput(QtMsgType type, const char *msg) {}
-
+void noOutput( QtMsgType type, const QMessageLogContext& context, const QString &message )
+{
+}
 
 int main( int argc, char *argv[] )
 {
@@ -169,9 +166,10 @@ int main( int argc, char *argv[] )
 
         }
     }
-    qInstallMsgHandler( noOutput );
+
+    qInstallMessageHandler( noOutput );
     out = new QTextStream( stdout );
-    qInstallMsgHandler( logOutput );
+    qInstallMessageHandler( logOutput );
 
 #ifdef __DEBUG__
     debug = true;

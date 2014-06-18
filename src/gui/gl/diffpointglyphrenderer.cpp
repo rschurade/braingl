@@ -25,7 +25,6 @@ DiffPointGlyphRenderer::DiffPointGlyphRenderer() :
 
 DiffPointGlyphRenderer::~DiffPointGlyphRenderer()
 {
-    qDebug() << "diffpointglyphrenderer destruct";
     glDeleteBuffers( 1, &( vboIds[0] ) );
     delete[] ps;
     ps = NULL;
@@ -33,6 +32,7 @@ DiffPointGlyphRenderer::~DiffPointGlyphRenderer()
 
 void DiffPointGlyphRenderer::init()
 {
+
     glGenBuffers( 1, vboIds );
 }
 
@@ -111,6 +111,7 @@ void DiffPointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, in
 
     if ( np > 0 )
     {
+
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
         setShaderVars( props );
@@ -157,6 +158,7 @@ void DiffPointGlyphRenderer::setShaderVars( PropertyGroup& props )
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
+
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
     glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ao, (const void *) offset );
@@ -198,6 +200,7 @@ void DiffPointGlyphRenderer::initGeometry( float* points, int number )
 
     if ( np > 0 )
     {
+
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
         glBufferData( GL_ARRAY_BUFFER, np * ao * sizeof(GLfloat), ps, GL_STATIC_DRAW );
     }

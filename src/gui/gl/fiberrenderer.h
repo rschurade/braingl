@@ -8,19 +8,18 @@
 #ifndef FIBERRENDERER_H_
 #define FIBERRENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../algos/fib.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
-#include <QObject>
 
 class FiberSelector;
 class PropertyGroup;
 
-class FiberRenderer : public QObject
+class FiberRenderer : public ObjectRenderer
 {
     Q_OBJECT
 

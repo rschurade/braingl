@@ -6,7 +6,6 @@
  */
 
 #include "glwidget.h"
-#include "../core_3_3_context.h"
 #include "../gl/arcball.h"
 #include "../gl/camera.h"
 #include "../gl/camerabase.h"
@@ -19,10 +18,12 @@
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
 
-#include <QtGui>
+#include <QtWidgets>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions_3_3_Core>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent ),
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -50,7 +51,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 }
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -108,19 +109,23 @@ Camera* GLWidget::getCamera()
 
 void GLWidget::initializeGL()
 {
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
+    QOpenGLFunctions_3_3_Core* funcs = 0;
+
+    funcs = context()->contextHandle()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+
+    if (!funcs) {
+        qWarning() << "Could not obtain required OpenGL context version";
+        exit(1);
     }
+    funcs->initializeOpenGLFunctions();
+    GLFunctions::f = funcs;
 
     // needed per OpenGL context and so per QGLWidget
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // TODO: Qt5
+//    QOpenGLFunctions_3_3_Core f;
+//    GLuint vao;
+//    f.glGenVertexArrays(1, &vao);
+//    f.glBindVertexArray(vao);
 
     Q_ASSERT( m_sceneRenderer );
     m_sceneRenderer->initGL();
@@ -366,7 +371,7 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
 
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     //qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
 
@@ -423,7 +428,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     m_sceneRenderer->renderPick();
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     bool updateRequired = false;

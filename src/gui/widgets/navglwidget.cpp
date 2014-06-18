@@ -16,10 +16,8 @@
 #include <QtGui>
 #include <QDebug>
 
-#include "../core_3_3_context.h"
-
 NavGLWidget::NavGLWidget( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget )
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget )
 {
     switch( orient )
     {
@@ -62,9 +60,10 @@ QSize NavGLWidget::sizeHint() const
 void NavGLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // TODO: Qt5
+//    GLuint vao;
+//    glGenVertexArrays(1, &vao);
+//    glBindVertexArray(vao);
 
     m_navRenderer->initGL();
 }

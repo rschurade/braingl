@@ -9,6 +9,7 @@
 #define ENUMS_H_
 
 #include <QMetaType>
+#include <QString>
 
 namespace Fn
 {

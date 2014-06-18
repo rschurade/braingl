@@ -22,7 +22,6 @@ PieGlyphRenderer::PieGlyphRenderer() :
 
 PieGlyphRenderer::~PieGlyphRenderer()
 {
-    qDebug() << "pie renderer delete";
     glDeleteBuffers( 1, &( vboIds[0] ) );
     delete[] pies;
     pies = NULL;

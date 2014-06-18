@@ -205,6 +205,7 @@ void EVRenderer::initGeometry( PropertyGroup& props )
         }
     }
 
+
     glDeleteBuffers( 1, &vbo0 );
     glGenBuffers( 1, &vbo0 );
     glDeleteBuffers( 1, &vbo1 );

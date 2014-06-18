@@ -8,11 +8,8 @@
 #ifndef SHAPERENDERER_H_
 #define SHAPERENDERER_H_
 
-#include "GL/glew.h"
-
-#include <QMatrix4x4>
-
-class ShapeRenderer
+#include "objectrenderer.h"
+class ShapeRenderer : public ObjectRenderer
 {
 public:
     ShapeRenderer();

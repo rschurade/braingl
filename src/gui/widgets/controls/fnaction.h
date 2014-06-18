@@ -10,7 +10,7 @@
 
 #include "../../../data/enums.h"
 
-#include <QtGui>
+#include <QAction>
 
 class FNAction : public QAction
 {

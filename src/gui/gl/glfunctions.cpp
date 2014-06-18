@@ -4,9 +4,8 @@
  * Created on: 15.05.2012
  * @author Ralph Schurade
  */
-#include "GL/glew.h"
-
 #include "glfunctions.h"
+
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
 #include "../../data/models.h"
@@ -22,15 +21,11 @@
 #include <QHash>
 #include <QFile>
 #include <QThread>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 #include <QVector3D>
 #include <QMatrix4x4>
 
 #include <locale.h>
-
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-#include "bugfixglshaderprogram.h"
-#endif
 
 #define NUM_TEXTURES 5
 
@@ -51,6 +46,7 @@ std::vector< QString > GLFunctions::m_shaderNames;
 std::vector< GLuint > GLFunctions::m_texturesToDelete;
 
 ROI* GLFunctions::roi = 0;
+QOpenGLFunctions_3_3_Core* GLFunctions::f = 0;
 
 unsigned int GLFunctions::getPickIndex()
 {
@@ -64,16 +60,15 @@ bool GLFunctions::setupTextures( QString target )
         glDeleteTextures( 1, &GLFunctions::m_texturesToDelete[i] );
     }
     GLFunctions::m_texturesToDelete.clear();
-
-    glActiveTexture( GL_TEXTURE4 );
+    f->glActiveTexture( GL_TEXTURE4 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE3 );
+    f->glActiveTexture( GL_TEXTURE3 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE2 );
+    f->glActiveTexture( GL_TEXTURE2 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE1 );
+    f->glActiveTexture( GL_TEXTURE1 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE15 );
+    f->glActiveTexture( GL_TEXTURE15 );
     glBindTexture( GL_TEXTURE_3D, 0 );
 
     QAbstractItemModel* model = Models::d();
@@ -93,8 +88,8 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 4;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glf.glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE4 );
+            // XXX not in Core //glf->glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+            f->glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -108,7 +103,7 @@ bool GLFunctions::setupTextures( QString target )
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE3 );
+            f->glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -122,7 +117,7 @@ bool GLFunctions::setupTextures( QString target )
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE2 );
+            f->glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -136,7 +131,7 @@ bool GLFunctions::setupTextures( QString target )
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE1 );
+            f->glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -150,7 +145,7 @@ bool GLFunctions::setupTextures( QString target )
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
             // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
+            f->glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -196,16 +191,16 @@ bool GLFunctions::validateShader( QString name )
         qDebug()  << "log:" << log;
     }
 
-    glValidateProgram(program->programId());
+    f->glValidateProgram(program->programId());
     GLint status;
-    glGetProgramiv(program->programId(), GL_VALIDATE_STATUS, &status);
+    f->glGetProgramiv(program->programId(), GL_VALIDATE_STATUS, &status);
     if (status == GL_FALSE)
     {
         qCritical() << "Error validating shader program:" << name << "!";
         QByteArray buf(1024, 0);
         GLsizei length = 0;
 
-        glGetProgramInfoLog(program->programId(), buf.length(), &length, (char *)buf.data());
+        f->glGetProgramInfoLog(program->programId(), buf.length(), &length, (char *)buf.data());
         if (length > 0)
         {
             qDebug() << "program info log:" << buf;
@@ -427,14 +422,14 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QString target 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+    f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
     // Offset for texture coordinate
     offset += sizeof(QVector3D);
     // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
     int texcoordLocation = program->attributeLocation( "a_texcoord" );
     program->enableAttributeArray( texcoordLocation );
-    glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+    f->glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
     setTextureUniforms( program, target );
 }

@@ -4,9 +4,9 @@
  * Created on: 09.05.2012
  * @author Ralph Schurade
  */
-#include "glfunctions.h"
-
 #include "scenerenderer.h"
+
+#include "glfunctions.h"
 #include "arcball.h"
 #include "slicerenderer.h"
 #include "colormaprenderer.h"
@@ -20,8 +20,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtOpenGL/QGLShaderProgram>
-#include <GL/glu.h>     // XXX removed in OS X 10.9
+#include <QGLShaderProgram>
 #include <QDebug>
 
 #include <math.h>
@@ -32,6 +31,7 @@
 #endif
 
 SceneRenderer::SceneRenderer( QString renderTarget ) :
+    ObjectRenderer(),
     m_renderTarget( renderTarget ),
     vbo( 0 ),
     m_width( 1 ),
@@ -58,27 +58,16 @@ void SceneRenderer::initGL()
 
     if ( m_renderTarget == "maingl" )
     {
-        glewExperimental = true;
-        GLenum errorCode = glewInit();
-        if ( GLEW_OK != errorCode )
-        {
-            qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-            qDebug() << glewGetErrorString( errorCode );
-            exit( false );
-        }
-        else
-        {
-            qDebug() << "OpenGL initialized.";
-        }
+        qDebug() << "Get GL stats";
 
-        const GLubyte *renderer = glGetString( GL_RENDERER );
-        const GLubyte *vendor = glGetString( GL_VENDOR );
-        const GLubyte *version = glGetString( GL_VERSION );
-        const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
+        const GLubyte *renderer = GLFunctions::f->glGetString( GL_RENDERER );
+        const GLubyte *vendor = GLFunctions::f->glGetString( GL_VENDOR );
+        const GLubyte *version = GLFunctions::f->glGetString( GL_VERSION );
+        const GLubyte *glslVersion = GLFunctions::f->glGetString( GL_SHADING_LANGUAGE_VERSION );
 
         GLint major, minor;
-        glGetIntegerv( GL_MAJOR_VERSION, &major );
-        glGetIntegerv( GL_MINOR_VERSION, &minor );
+        GLFunctions::f->glGetIntegerv( GL_MAJOR_VERSION, &major );
+        GLFunctions::f->glGetIntegerv( GL_MINOR_VERSION, &minor );
 
         qDebug() << "GL Vendor :" << QString( (char*) vendor );
         qDebug() << "GL Renderer :" << QString( (char*) renderer );
@@ -493,14 +482,16 @@ QString SceneRenderer::getRenderTarget()
 QVector3D SceneRenderer::mapMouse2World( int x, int y, int z )
 {
     GLint viewport[4];
-    GLfloat winX, winY;
+    float winX, winY;
 
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     winX = (float) x;
     winY = (float) viewport[3] - (float) y;
-    GLdouble posX, posY, posZ;
-    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+    float posX, posY, posZ;
+
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    unproject( winX, winY, z, m_mvMatrix, m_pMatrix, vViewport, posX, posY, posZ );
 
     QVector3D v( posX, posY, posZ );
     return v;
@@ -510,15 +501,16 @@ QVector2D SceneRenderer::mapWorld2Mouse( float x, float y, float z )
 {
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
-    GLdouble winX, winY, winZ;
-    gluProject( x, y, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &winX, &winY, &winZ );
+    float winX, winY, winZ;
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    project( x, y, z, m_mvMatrix, m_pMatrix, vViewport, winX, winY, winZ );
     return QVector2D( winX, winY );
 }
 
 QVector3D SceneRenderer::mapMouse2World( float x, float y )
 {
     GLint viewport[4];
-    GLfloat winX, winY;
+    float winX, winY;
 
     glGetIntegerv( GL_VIEWPORT, viewport );
 
@@ -528,8 +520,9 @@ QVector3D SceneRenderer::mapMouse2World( float x, float y )
     GLfloat z;
     glReadPixels( winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, (void*) &z );
 
-    GLdouble posX, posY, posZ;
-    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+    float posX, posY, posZ;
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    unproject( winX, winY, z, m_mvMatrix, m_pMatrix, vViewport, posX, posY, posZ );
 
     QVector3D v( posX, posY, posZ );
     return v;

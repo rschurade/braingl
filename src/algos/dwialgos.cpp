@@ -30,7 +30,7 @@
 #include <QDebug>
 #include <QVector>
 #include <QVector3D>
-
+#include <QString>
 
 DWIAlgos::DWIAlgos()
 {

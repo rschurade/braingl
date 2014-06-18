@@ -10,12 +10,10 @@
 
 #include "objectrenderer.h"
 
-#include <QMatrix4x4>
-
 class Tree;
 class QGLShaderProgram;
 
-class TreeWidgetRenderer
+class TreeWidgetRenderer : public ObjectRenderer
 {
 public:
 	TreeWidgetRenderer( QString name );

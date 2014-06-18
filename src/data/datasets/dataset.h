@@ -8,8 +8,6 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include "GL/glew.h"
-
 #include "../enums.h"
 #include "../properties/propertygroup.h"
 
@@ -20,6 +18,8 @@
 #include <QString>
 #include <QVariant>
 #include <QMatrix4x4>
+
+#include <QOpenGLFunctions_3_3_Core>
 
 #include <limits>
 

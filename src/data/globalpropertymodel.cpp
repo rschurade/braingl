@@ -157,11 +157,11 @@ QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex &
 {
     if ( m_properties->contains( (Fn::Property)row ) )
     {
-        return createIndex( row, 0, 0 );
+        return createIndex( row, 0, (quintptr)0 );
     }
     else if ( row == (int)Fn::Property::G_OBJECT )
     {
-        return createIndex( row, 0, 0 );
+        return createIndex( row, 0, (quintptr)0 );
     }
     return QModelIndex();
 }

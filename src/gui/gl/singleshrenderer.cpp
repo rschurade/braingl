@@ -20,7 +20,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 #include <QDebug>
 #include <QVector3D>
 #include <QMatrix4x4>
@@ -50,20 +50,6 @@ void SingleSHRenderer::init()
 
 void SingleSHRenderer::initGL()
 {
-    qDebug() << "gl init single sh widget";
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
     glGenBuffers( 2, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );

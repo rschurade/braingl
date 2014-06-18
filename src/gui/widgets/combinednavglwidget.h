@@ -8,8 +8,7 @@
 #ifndef COMBINEDNAVGLWIDGET_H
 #define COMBINEDNAVGLWIDGET_H
 
-#include "GL/glew.h"
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class CombinedNavRenderer;
 
