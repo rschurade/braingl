@@ -21,7 +21,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
+#include "boost/math/special_functions/spherical_harmonic.hpp"
 
 #include <QDebug>
 

@@ -39,22 +39,12 @@ ELSE()
 ENDIF()
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-# Setup QT4
+# Setup QT5
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Package dependencies:
-#FIND_PACKAGE( Qt5Widgets REQUIRED )
-FIND_PACKAGE(Qt5 REQUIRED COMPONENTS core gui widgets opengl webkit xml )
+FIND_PACKAGE( Qt5 REQUIRED COMPONENTS core gui widgets opengl webkit xml )
 MARK_AS_ADVANCED( FORCE QT_QMAKE_EXECUTABLE )
-
-# Includes:
-INCLUDE_DIRECTORIES( ${QT_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTGUI_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTCORE_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTOPENGL_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTWEBKIT_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTNETWORK_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${QT_QTXML_INCLUDE_DIR} )
 
 # Resources
 SET(QtIcon_RCCS resources.qrc)
@@ -74,9 +64,6 @@ ENDIF()
 # REQUIRED third party libs
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-
-FIND_PACKAGE( GLEW REQUIRED )
-INCLUDE_DIRECTORIES( ${GLEW_INCLUDE_PATH} )
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 # OpenGL, at least 1.2
@@ -120,12 +107,16 @@ SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nifti/nifti1_io.cpp 
 SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cnifti/CiftiXMLReader.cxx PROPERTY COMPILE_FLAGS "-Wstrict-overflow")
 SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/data/writervtk.cpp PROPERTY COMPILE_FLAGS "-Wno-deprecated" )
 SET_PROPERTY( SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/data/loadervtk.cpp PROPERTY COMPILE_FLAGS "-Wno-deprecated" )
-SET ( CMAKE_AUTOMOC TRUE )
+
+SET ( CMAKE_AUTOMOC ON )
+# As moc files are generated in the binary dir, tell CMake
+# to always look for includes there:
+SET( CMAKE_INCLUDE_CURRENT_DIR ON )
+
 
 # Collect the compile-files for this target
 COLLECT_COMPILE_FILES( "${CMAKE_CURRENT_SOURCE_DIR}" TARGET_CPP_FILES TARGET_H_FILES TARGET_TEST_FILES )
 
-# This is needed since the mocs will be generated there
 QT5_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 
 IF (CMAKE_VERBOSE_MAKEFILE)
@@ -163,17 +154,13 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
     IF ( SURPRESS_CMD_WINDOW MATCHES ON )
         SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
     ENDIF()
-   
-    # Tell CMake to run moc when necessary:
-    SET ( CMAKE_AUTOMOC ON )
-    # As moc files are generated in the binary dir, tell CMake
-    # to always look for includes there:
-    SET( CMAKE_INCLUDE_CURRENT_DIR ON )
     
-    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS})
+    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS} )
+
+    ReadProjectRevisionStatus()
     
-    QT5_USE_MODULES( ${BinName} Widgets WebKitWidgets )
+    QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
     
-    TARGET_LINK_LIBRARIES( ${BinName}  ${GLEW_LIBRARY} ${VTK_LIBRARIES} z glu32 opengl32 )
+    TARGET_LINK_LIBRARIES( ${BinName} ${VTK_LIBRARIES} z glu32 opengl32  )
 ENDIF()
 

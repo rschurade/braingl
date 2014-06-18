@@ -11,8 +11,6 @@
 
 #include <QtOpenGL/QGLShaderProgram>
 
-#include "qmatrix4x4.h"
-
 PointGlyphRenderer::PointGlyphRenderer() :
     vboIds( new GLuint[1] ),
     ps( new float[1] ),
@@ -25,7 +23,6 @@ PointGlyphRenderer::PointGlyphRenderer() :
 
 PointGlyphRenderer::~PointGlyphRenderer()
 {
-    qDebug() << "pointglyphrenderer destruct";
     glDeleteBuffers( 1, &( vboIds[0] ) );
     delete[] ps;
     ps = NULL;

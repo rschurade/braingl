@@ -28,12 +28,14 @@ ColormapRenderer::ColormapRenderer() :
 
 ColormapRenderer::~ColormapRenderer()
 {
-    glDeleteBuffers( 3, &( vboIds[ 0 ] ) );
+    QOpenGLFunctions_3_3_Core f;
+    f.glDeleteBuffers( 3, &( vboIds[ 0 ] ) );
 }
 
 void ColormapRenderer::init()
 {
-    glGenBuffers( 3, vboIds );
+    QOpenGLFunctions_3_3_Core f;
+    f.glGenBuffers( 3, vboIds );
 
     initGeometry();
 }
@@ -163,7 +165,6 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     {
         return;
     }
-
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars();

@@ -8,16 +8,15 @@
 #ifndef MESHRENDERER_H_
 #define MESHRENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include <QColor>
-#include <QMatrix4x4>
 
 class TriangleMesh2;
 class PropertyGroup;
 class ROIPropertyGroup;
 
-class MeshRenderer
+class MeshRenderer : public ObjectRenderer
 {
 public:
     MeshRenderer( TriangleMesh2* mesh );

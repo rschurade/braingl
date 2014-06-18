@@ -13,7 +13,7 @@
 #include "../../data/vptr.h"
 #include "../../data/datasets/dataset.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QWidget( parent ),

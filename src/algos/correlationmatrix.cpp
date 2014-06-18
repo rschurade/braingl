@@ -253,7 +253,8 @@ void CorrelationMatrix::loadMetaData()
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
-    QNetworkReply* reply = networkManager->post( request, postData.query() );
+    //TODO: QT5
+    QNetworkReply* reply;//  = networkManager->post( request, postData.query() );
 
     while ( !reply->isFinished() )
     {
@@ -334,7 +335,8 @@ void CorrelationMatrix::loadRemote( int i )
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
-    QNetworkReply* reply = networkManager->post( request, postData.encodedQuery() );
+    //TODO: QT5
+    QNetworkReply* reply; // = networkManager->post( request, postData.query() );
     while ( !reply->isFinished() )
     {
         QApplication::processEvents();

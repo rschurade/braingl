@@ -119,40 +119,42 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
     glLineWidth(  m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toInt() );
 
+    QOpenGLFunctions_3_3_Core f;
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    f.glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
     // Draw cube geometry using indices from VBO 0
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_position" );
     GLFunctions::getShader( "line" )->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    f.glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 
     // Tell OpenGL which VBOs to use
-    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    f.glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
     // Draw cube geometry using indices from VBO 1
     int colorLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_color" );
     GLFunctions::getShader( "line" )->enableAttributeArray( colorLocation );
-    glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+    f.glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
 
 
     // Draw cube geometry using indices from VBO 0
     glDrawArrays( GL_LINES, 0 , m_countLines );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    f.glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glLineWidth(  1 );
 }
 
 void DatasetIsoline::initGeometry()
 {
+    QOpenGLFunctions_3_3_Core f;
     if( vbo0 )
     {
-        glDeleteBuffers( 1, &vbo0 );
+        f.glDeleteBuffers( 1, &vbo0 );
     }
-    glGenBuffers( 1, &vbo0 );
+    f.glGenBuffers( 1, &vbo0 );
     if( vbo1 )
     {
-        glDeleteBuffers( 1, &vbo1 );
+        f.glDeleteBuffers( 1, &vbo1 );
     }
-    glGenBuffers( 1, &vbo1 );
+    f.glGenBuffers( 1, &vbo1 );
 
     std::vector<float>sliceData;
     std::vector<float>isoVerts;
@@ -218,9 +220,9 @@ void DatasetIsoline::initGeometry()
         }
     }
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
-    glBufferData( GL_ARRAY_BUFFER, isoVerts.size() * sizeof( float ), isoVerts.data(), GL_DYNAMIC_DRAW );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    f.glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    f.glBufferData( GL_ARRAY_BUFFER, isoVerts.size() * sizeof( float ), isoVerts.data(), GL_DYNAMIC_DRAW );
+    f.glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     std::vector<float>colors( ( isoVerts.size() / 3 ) * 4, 0.0 );
     QColor col = m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
@@ -232,9 +234,9 @@ void DatasetIsoline::initGeometry()
         colors[i * 4 + 3] = 1.0;
     }
 
-    glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
-    glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    f.glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+    f.glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+    f.glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     m_countLines = isoVerts.size() / 2;
     m_dirty = false;

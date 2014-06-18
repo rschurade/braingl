@@ -50,10 +50,10 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetplane.h"
 
+#include <QAction>
 #include <QtGui>
 #include <QWebView>
 #include <QGLFormat>
-#include "core_3_3_context.h"
 
 #include <iostream>
 
@@ -83,6 +83,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     createMenus();
     createToolBars();
     //this->show();   // XXX work around "invalid drawable"?
+
     createDockWindows();
 
 
@@ -538,14 +539,15 @@ bool MainWindow::save( Dataset* ds )
     if ( fd->exec() )
     {
         QString fileName = fd->selectedFiles().first();
-        qDebug() << fileName << fd->selectedFilter();
+        // TODO: Qt5
+        qDebug() << fileName << fd->selectedNameFilter();
 
         if ( !fileName.isEmpty() )
         {
             QDir dir;
             ds->properties().set( Fn::Property::D_FILENAME, fileName );
             ds->properties().set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-            saveDataset( ds, fd->selectedFilter() );
+            saveDataset( ds, fd->selectedNameFilter() );
 
             QFileInfo fi( fileName );
             dir = fi.absoluteDir();
@@ -1104,6 +1106,7 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
+    qDebug() << "m1";
     m_datasetWidget = new DatasetListWidget();
 	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
 	addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
@@ -1113,14 +1116,14 @@ void MainWindow::createDockWindows()
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), Models::d(), SLOT( moveItemUp( int ) ) );
 	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), Models::d(), SLOT( moveItemDown( int ) ) );
 	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), Models::d(), SLOT( deleteItem( int ) ) );
-
+	qDebug() << "m2";
 	m_colormapEditWidget = new ColormapEditWidget( this );
     FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), m_colormapEditWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockCE );
     viewMenu->addAction( dockCE->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
     dockCE->hide();
-
+    qDebug() << "m3";
 	m_roiWidget = new ROIWidget( this );
 	Models::setRoiWidget( m_roiWidget );
 	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
@@ -1128,7 +1131,7 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
-
+    qDebug() << "m4";
 	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( "maingl", this );
 	m_dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, m_dockDSP );
@@ -1136,7 +1139,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockDSP, SLOT( toggleTitleWidget() ) );
     connect( m_colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
     connect( m_datasetWidget->selectionModel(), SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), this, SLOT( slotDatasetSelectionChanged() ) );
-
+    qDebug() << "m5";
     DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl2", this );
     FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties 2"), dsProperties2, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
@@ -1144,7 +1147,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
     connect( m_colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties2, SLOT( update() ) );
     dockDSP2->hide();
-
+    qDebug() << "m6";
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
     FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
     addDockWidget( Qt::RightDockWidgetArea, dockRP );
@@ -1153,14 +1156,14 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockRP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockRP, SLOT( toggleTitleWidget() ) );
 
-
+    qDebug() << "m7";
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
     FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockGP );
     globalProperties->setModel( Models::g() );
     viewMenu->addAction( dockGP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGP, SLOT( toggleTitleWidget() ) );
-
+    qDebug() << "m8";
 	DatasetInfoView *dsInfo = new DatasetInfoView( this );
 	FNDockWidget* dockDSI = new FNDockWidget( QString("dataset info"), dsInfo, this );
 	addDockWidget( Qt::BottomDockWidgetArea, dockDSI );
@@ -1176,7 +1179,7 @@ void MainWindow::createDockWindows()
     tabifyDockWidget( dockGP, dockDSP2 );
 
     // GL Widgets
-
+    qDebug() << "m9";
     //this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
@@ -1184,7 +1187,7 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
-
+    qDebug() << "m10";
     m_scriptWidget = new ScriptWidget( mainGLWidget, this );
     FNDockWidget* dockSW = new FNDockWidget( "script", m_scriptWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSW );
@@ -1195,41 +1198,41 @@ void MainWindow::createDockWindows()
     connect( mainGLWidget, SIGNAL( signalCopyCameraToScript( int ) ), m_scriptWidget, SLOT( slotCopyCamera( int ) ) );
     m_centralWidget->tabifiedDockWidgets( dockSW );
     //dockSW->hide();
-
+    qDebug() << "m11";
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
     FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
-
-    DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
-    FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
-    viewMenu->addAction( dockNav1->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
-    connect( dockNav1, SIGNAL( visibilityChanged( bool ) ), nav1, SLOT( setWidgetVisible( bool) ) );
-
-    DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
-    FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
-    viewMenu->addAction( dockNav2->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
-    connect( dockNav2, SIGNAL( visibilityChanged( bool ) ), nav2, SLOT( setWidgetVisible( bool) ) );
-
-    DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
-    FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
-    viewMenu->addAction( dockNav3->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
-    connect( dockNav3, SIGNAL( visibilityChanged( bool ) ), nav3, SLOT( setWidgetVisible( bool ) ) );
-
+//    qDebug() << "m12";
+//    DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
+//    FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
+//    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
+//    viewMenu->addAction( dockNav1->toggleViewAction() );
+//    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
+//    connect( dockNav1, SIGNAL( visibilityChanged( bool ) ), nav1, SLOT( setWidgetVisible( bool) ) );
+//    qDebug() << "m13";
+//    DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
+//    FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
+//    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
+//    viewMenu->addAction( dockNav2->toggleViewAction() );
+//    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
+//    connect( dockNav2, SIGNAL( visibilityChanged( bool ) ), nav2, SLOT( setWidgetVisible( bool) ) );
+//    qDebug() << "m14";
+//    DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
+//    FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
+//    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
+//    viewMenu->addAction( dockNav3->toggleViewAction() );
+//    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
+//    connect( dockNav3, SIGNAL( visibilityChanged( bool ) ), nav3, SLOT( setWidgetVisible( bool ) ) );
+    qDebug() << "m15";
     CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
     FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
 //    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
 //    viewMenu->addAction( dockNav4->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
     connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
-
+    qDebug() << "m16";
     HierarchicalTreeGLWidget* htw = new HierarchicalTreeGLWidget( QString( "tree" ), this, mainGLWidget );
     FNDockWidget* dockHTW = new FNDockWidget( QString("tree"), htw, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW );
@@ -1237,13 +1240,13 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
     connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
 
-    dockNav1->hide();
-    dockNav2->hide();
-    dockNav3->hide();
+//    dockNav1->hide();
+//    dockNav2->hide();
+//    dockNav3->hide();
     dockNav4->hide();
     dockMainGL2->hide();
     dockHTW->hide();
-
+    qDebug() << "m17";
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );

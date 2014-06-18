@@ -8,13 +8,11 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include "GL/glew.h"
-
 #include "../gl/scenerenderer.h"
 
 #include "../../data/enums.h"
 
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class ArcBall;
 class Camera;

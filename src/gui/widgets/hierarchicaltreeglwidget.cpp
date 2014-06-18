@@ -16,10 +16,8 @@
 #include <QtGui>
 #include <QDebug>
 
-#include "../core_3_3_context.h"
-
 HierarchicalTreeGLWidget::HierarchicalTreeGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget )
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget )
 {
     m_renderer = new TreeWidgetRenderer( "tree renderer" );
 
@@ -46,9 +44,10 @@ QSize HierarchicalTreeGLWidget::sizeHint() const
 void HierarchicalTreeGLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // TODO: Qt5
+//    GLuint vao;
+//    glGenVertexArrays(1, &vao);
+//    glBindVertexArray(vao);
 
     m_renderer->initGL();
 }

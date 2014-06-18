@@ -42,20 +42,6 @@ void CombinedNavRenderer::init()
 
 void CombinedNavRenderer::initGL()
 {
-    qDebug() << "gl init " << m_name << " widget";
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
     glGenBuffers( 4, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -404,6 +390,7 @@ void CombinedNavRenderer::initGeometry()
                            4, 5, 6, 4, 6, 7,
                            8, 9, 10, 8, 10, 11};
 
+
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 18 * sizeof(GLushort), indices, GL_STATIC_DRAW );
@@ -451,6 +438,7 @@ void CombinedNavRenderer::draw()
     GLFunctions::getShader( "slice" )->setUniformValue( "u_renderMode", 0 );
 
     initGeometry();
+
 
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );

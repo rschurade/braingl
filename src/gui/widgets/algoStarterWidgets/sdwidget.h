@@ -10,7 +10,7 @@
 
 #include "../../../data/enums.h"
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QList>
 
 class Dataset;

@@ -12,7 +12,7 @@
 #include "../../data/mesh/tesselation.h"
 
 #include <QDebug>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 
 ShapeRenderer::ShapeRenderer() :
     vboIds( new GLuint[ 5 ] )

@@ -11,9 +11,7 @@
 #include "../../data/datasets/dataset.h"
 
 #include <QDebug>
-#include <QtOpenGL/QGLShaderProgram>
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <QGLShaderProgram>
 
 #include <cmath>
 

@@ -8,19 +8,18 @@
 #ifndef TUBERENDERER_H_
 #define TUBERENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../algos/fib.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
-#include <QObject>
 
 class FiberSelector;
 class PropertyGroup;
 
-class TubeRenderer : public QObject
+class TubeRenderer : public ObjectRenderer
 {
     Q_OBJECT
 

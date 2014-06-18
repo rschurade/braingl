@@ -8,7 +8,7 @@
 #ifndef SCENERENDERER_H_
 #define SCENERENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../data/enums.h"
 
@@ -21,7 +21,7 @@ class DataStore;
 class SliceRenderer;
 class QItemSelectionModel;
 
-class SceneRenderer
+class SceneRenderer : public ObjectRenderer
 {
 public:
 	SceneRenderer( QString name );

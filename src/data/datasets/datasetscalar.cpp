@@ -137,7 +137,8 @@ void DatasetScalar::createTexture()
         tmpData[4 * i + 0 ] = tmp % 256 ;
     }
 
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
+    QOpenGLFunctions_3_3_Core f;
+    f.glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
 }
 

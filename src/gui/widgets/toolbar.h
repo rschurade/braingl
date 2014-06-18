@@ -12,7 +12,7 @@
 
 #include "../../data/enums.h"
 
-#include <QtGui>
+#include <QToolBar>
 
 class ToolBarView;
 class CorrelationWidget;
@@ -22,6 +22,7 @@ class SDWidget;
 class BundlingWidget;
 class FiberBundleWidget;
 class MathWidget;
+class QItemSelectionModel;
 
 class ToolBar : public QToolBar
 {

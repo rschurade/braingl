@@ -213,8 +213,8 @@ void DatasetTree::createTexture()
     }
 
     createTextureRec( m_tree );
-
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, m_textureData.data() );
+    QOpenGLFunctions_3_3_Core f;
+    f.glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, m_textureData.data() );
 }
 
 void DatasetTree::createTextureRec( Tree* tree )

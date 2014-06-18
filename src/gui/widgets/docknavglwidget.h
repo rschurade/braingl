@@ -8,10 +8,8 @@
 #ifndef NAVGLWIDGET_H_
 #define NAVGLWIDGET_H_
 
-#include "GL/glew.h"
-
 #include <QVariant>
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class NavGLWidget;
 class NavFrame;
