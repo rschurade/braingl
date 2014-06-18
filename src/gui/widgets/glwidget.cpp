@@ -118,14 +118,17 @@ void GLWidget::initializeGL()
         exit(1);
     }
     funcs->initializeOpenGLFunctions();
-    GLFunctions::f = funcs;
+
+    if ( m_name == "maingl" )
+    {
+        GLFunctions::f = funcs;
+    }
 
     // needed per OpenGL context and so per QGLWidget
     // TODO: Qt5
-//    QOpenGLFunctions_3_3_Core f;
-//    GLuint vao;
-//    f.glGenVertexArrays(1, &vao);
-//    f.glBindVertexArray(vao);
+    GLuint vao;
+    funcs->glGenVertexArrays(1, &vao);
+    funcs->glBindVertexArray(vao);
 
     Q_ASSERT( m_sceneRenderer );
     m_sceneRenderer->initGL();

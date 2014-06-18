@@ -27,6 +27,7 @@ ShapeRenderer::~ShapeRenderer()
 
 void ShapeRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 5, vboIds );
     initBox();
     initSphere();

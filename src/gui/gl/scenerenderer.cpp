@@ -55,19 +55,19 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::initGL()
 {
     qDebug() << "gl init " + m_renderTarget;
-
+    initializeOpenGLFunctions();
     if ( m_renderTarget == "maingl" )
     {
         qDebug() << "Get GL stats";
 
-        const GLubyte *renderer = GLFunctions::f->glGetString( GL_RENDERER );
-        const GLubyte *vendor = GLFunctions::f->glGetString( GL_VENDOR );
-        const GLubyte *version = GLFunctions::f->glGetString( GL_VERSION );
-        const GLubyte *glslVersion = GLFunctions::f->glGetString( GL_SHADING_LANGUAGE_VERSION );
+        const GLubyte *renderer = glGetString( GL_RENDERER );
+        const GLubyte *vendor = glGetString( GL_VENDOR );
+        const GLubyte *version = glGetString( GL_VERSION );
+        const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
 
         GLint major, minor;
-        GLFunctions::f->glGetIntegerv( GL_MAJOR_VERSION, &major );
-        GLFunctions::f->glGetIntegerv( GL_MINOR_VERSION, &minor );
+        glGetIntegerv( GL_MAJOR_VERSION, &major );
+        glGetIntegerv( GL_MINOR_VERSION, &minor );
 
         qDebug() << "GL Vendor :" << QString( (char*) vendor );
         qDebug() << "GL Renderer :" << QString( (char*) renderer );
@@ -126,6 +126,8 @@ void SceneRenderer::initGL()
     glBindBuffer( GL_ARRAY_BUFFER, vbo);
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    qDebug() << "done gl init " + m_renderTarget;
 }
 
 void SceneRenderer::resizeGL( int width, int height )

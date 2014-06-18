@@ -73,7 +73,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 
     QGLFormat fmt;
     fmt.setVersion( 3, 3 );
-    fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
+    fmt.setProfile( QGLFormat::CoreProfile );
     fmt.setSampleBuffers( true );
     QGLFormat::setDefaultFormat( fmt );
 
@@ -1180,7 +1180,6 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
     qDebug() << "m9";
-    //this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
     FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
