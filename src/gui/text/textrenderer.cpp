@@ -32,6 +32,7 @@ TextRenderer::~TextRenderer()
 
 void TextRenderer::init()
 {
+    initializeOpenGLFunctions();
     createFontTexture();
 
     glGenBuffers( 1, vboIds );

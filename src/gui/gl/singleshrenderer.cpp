@@ -50,6 +50,7 @@ void SingleSHRenderer::init()
 
 void SingleSHRenderer::initGL()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );

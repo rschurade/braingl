@@ -47,6 +47,7 @@ void TreeWidgetRenderer::init()
 
 void TreeWidgetRenderer::initGL()
 {
+    initializeOpenGLFunctions();
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
