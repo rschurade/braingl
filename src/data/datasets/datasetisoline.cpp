@@ -51,8 +51,11 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_SAGITTAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_CORONAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_AXIAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
-    m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
-    //connect( m_properties["maingl"].getProperty( Fn::Property::D_LINE_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
+    // TODO: Qt5
+    // glLineWidth is deprecated for values > 1.0, need to find another solution
+    //m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
+
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ).value<QColor>(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
@@ -117,8 +120,6 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
     GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
     GLFunctions::getShader( "line" )->setUniformValue( "u_renderStipples", false );
 
-    glLineWidth(  m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toInt() );
-
     // Tell OpenGL which VBOs to use
     GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
     // Draw cube geometry using indices from VBO 0
@@ -136,9 +137,8 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
 
 
     // Draw cube geometry using indices from VBO 0
-    glDrawArrays( GL_LINES, 0 , m_countLines );
+    GLFunctions::f->glDrawArrays( GL_LINES, 0 , m_countLines );
     GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glLineWidth(  1 );
 }
 
 void DatasetIsoline::initGeometry()

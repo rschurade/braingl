@@ -20,7 +20,6 @@ DockNavGLWidget::DockNavGLWidget( QString name, int orient, QWidget* parent, con
     m_name( name ),
     m_visible( true )
 {
-
     setObjectName( QString("nav gl ") + name );
 
     m_glWidget = new NavFrame( name, orient, this, shareWidget );
