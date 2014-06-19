@@ -7,6 +7,7 @@
 
 #include "navglwidget.h"
 
+#include "../gl/glfunctions.h"
 #include "../gl/navrendereraxial.h"
 #include "../gl/navrenderercoronal.h"
 #include "../gl/navrenderersagittal.h"
@@ -60,10 +61,9 @@ QSize NavGLWidget::sizeHint() const
 void NavGLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
-    // TODO: Qt5
-//    GLuint vao;
-//    glGenVertexArrays(1, &vao);
-//    glBindVertexArray(vao);
+    GLuint vao;
+    GLFunctions::f->glGenVertexArrays(1, &vao);
+    GLFunctions::f->glBindVertexArray(vao);
 
     m_navRenderer->initGL();
 }
