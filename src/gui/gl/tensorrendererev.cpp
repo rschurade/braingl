@@ -41,6 +41,7 @@ TensorRendererEV::~TensorRendererEV()
 
 void TensorRendererEV::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 

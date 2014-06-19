@@ -42,6 +42,7 @@ EVRenderer::~EVRenderer()
 
 void EVRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, &vbo0 );
     glGenBuffers( 1, &vbo1 );
 }

@@ -60,6 +60,7 @@ void NavRenderer::init()
 
 void NavRenderer::initGL()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 4, vboIds );
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );

@@ -29,6 +29,7 @@ VectorGlyphRenderer::~VectorGlyphRenderer()
 
 void VectorGlyphRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 

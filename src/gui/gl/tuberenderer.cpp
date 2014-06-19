@@ -33,6 +33,7 @@ TubeRenderer::~TubeRenderer()
 
 void TubeRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 4, vboIds );
 }
 

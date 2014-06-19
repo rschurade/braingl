@@ -59,6 +59,7 @@ void StippleRenderer::setMask( DatasetScalar* mask )
 
 void StippleRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, &vbo0 );
     glGenBuffers( 1, &vbo1 );
 }

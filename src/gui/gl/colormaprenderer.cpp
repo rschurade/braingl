@@ -33,8 +33,8 @@ ColormapRenderer::~ColormapRenderer()
 
 void ColormapRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 3, vboIds );
-
     initGeometry();
 }
 
