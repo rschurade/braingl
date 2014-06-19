@@ -12,7 +12,10 @@
 NavFrame::NavFrame( QString name, int orient, QWidget *parent, const QGLWidget *shareWidget ) :
     QFrame( parent )
 {
-    m_widget = new NavGLWidget( name, orient, parent, shareWidget );
+    //m_widget = new NavGLWidget( name, orient, parent, shareWidget );
+    // workaround for qt5, with above line it creates the following error on startup
+    // create: CreateWindowEx failed (Untergeordnetes Fenster kann nicht auf der obersten Ebene erstellt werden.)
+    m_widget = new NavGLWidget( name, orient, NULL, shareWidget );
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget( m_widget );
 
