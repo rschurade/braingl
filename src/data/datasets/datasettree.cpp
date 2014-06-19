@@ -11,6 +11,8 @@
 
 #include "../../gui/gl/colormapfunctions.h"
 #include "../../gui/gl/treerenderer.h"
+#include "../../gui/gl/glfunctions.h"
+
 #include "../../algos/colormapbase.h"
 
 #include <QDebug>
@@ -213,8 +215,7 @@ void DatasetTree::createTexture()
     }
 
     createTextureRec( m_tree );
-    QOpenGLFunctions_3_3_Core f;
-    f.glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, m_textureData.data() );
+    GLFunctions::f->glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, m_textureData.data() );
 }
 
 void DatasetTree::createTextureRec( Tree* tree )

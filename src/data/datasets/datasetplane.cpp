@@ -111,22 +111,21 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
 
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
 
-    QOpenGLFunctions_3_3_Core f;
     program->bind();
-    f.glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
 
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    f.glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
+    GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
 
     // Offset for texture coordinate
     offset += sizeof(float) * 3;
     // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
     int texcoordLocation = program->attributeLocation( "a_texcoord" );
     program->enableAttributeArray( texcoordLocation );
-    f.glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (const void *) offset );
+    GLFunctions::f->glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (const void *) offset );
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
@@ -144,16 +143,15 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     // Draw cube geometry using indices from VBO 0
     glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
-    f.glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 void DatasetPlane::initGeometry()
 {
-    QOpenGLFunctions_3_3_Core f;
     if( vbo0 )
     {
-        f.glDeleteBuffers( 1, &vbo0 );
+        GLFunctions::f->glDeleteBuffers( 1, &vbo0 );
     }
-    f.glGenBuffers( 1, &vbo0 );
+    GLFunctions::f->glGenBuffers( 1, &vbo0 );
 
     float x0 = m_h1.x();
     float y0 = m_h2.y();
@@ -198,9 +196,9 @@ void DatasetPlane::initGeometry()
     };
 
     // Transfer vertex data to VBO 1
-    f.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo0 );
-    f.glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW );
-    f.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    GLFunctions::f->glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo0 );
+    GLFunctions::f->glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW );
+    GLFunctions::f->glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     dirty = false;
 }

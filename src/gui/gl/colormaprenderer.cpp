@@ -28,14 +28,12 @@ ColormapRenderer::ColormapRenderer() :
 
 ColormapRenderer::~ColormapRenderer()
 {
-    QOpenGLFunctions_3_3_Core f;
-    f.glDeleteBuffers( 3, &( vboIds[ 0 ] ) );
+    glDeleteBuffers( 3, &( vboIds[ 0 ] ) );
 }
 
 void ColormapRenderer::init()
 {
-    QOpenGLFunctions_3_3_Core f;
-    f.glGenBuffers( 3, vboIds );
+    glGenBuffers( 3, vboIds );
 
     initGeometry();
 }

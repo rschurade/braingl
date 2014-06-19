@@ -10,6 +10,7 @@
 
 #include "../../gui/gl/evrenderer.h"
 #include "../../gui/gl/stipplerenderer.h"
+#include "../../gui/gl/glfunctions.h"
 
 #include "../properties/propertyselection.h"
 
@@ -25,7 +26,7 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
     m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_VECTORS_STICKS, true, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
@@ -106,9 +107,9 @@ void Dataset3D::createTexture()
 
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 
     int type = m_properties["maingl"].get( Fn::Property::D_DATATYPE ).toInt();
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
@@ -133,9 +134,7 @@ void Dataset3D::createTexture()
         data[i * 3 + 1] = qMin( 1.0f, fabs( m_data[i].y() ) / div );
         data[i * 3 + 2] = qMin( 1.0f, fabs( m_data[i].z() ) / div );
     }
-    QOpenGLFunctions_3_3_Core f;
-    f.glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
-
+    GLFunctions::f->glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
 }
 
 std::vector<QVector3D>* Dataset3D::getData()
