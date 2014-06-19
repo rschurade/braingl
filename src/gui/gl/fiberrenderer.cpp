@@ -43,7 +43,7 @@ FiberRenderer::~FiberRenderer()
 
 void FiberRenderer::init()
 {
-
+    initializeOpenGLFunctions();
     glGenBuffers( 1, &vbo );
     glGenBuffers( 1, &dataVbo );
     glGenBuffers( 1, &indexVbo );

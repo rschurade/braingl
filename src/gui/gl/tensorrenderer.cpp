@@ -42,6 +42,7 @@ TensorRenderer::~TensorRenderer()
 
 void TensorRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 }
 

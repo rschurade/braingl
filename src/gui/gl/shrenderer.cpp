@@ -55,6 +55,7 @@ SHRenderer::~SHRenderer()
 
 void SHRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 3, vboIds );
 }
 

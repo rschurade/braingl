@@ -32,7 +32,7 @@ DiffPointGlyphRenderer::~DiffPointGlyphRenderer()
 
 void DiffPointGlyphRenderer::init()
 {
-
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 

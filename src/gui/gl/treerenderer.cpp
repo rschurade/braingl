@@ -37,6 +37,7 @@ TreeRenderer::~TreeRenderer()
 
 void TreeRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 }
 

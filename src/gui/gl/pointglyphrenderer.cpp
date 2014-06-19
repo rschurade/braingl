@@ -30,6 +30,7 @@ PointGlyphRenderer::~PointGlyphRenderer()
 
 void PointGlyphRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 

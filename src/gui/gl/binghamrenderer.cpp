@@ -54,6 +54,7 @@ BinghamRenderer::~BinghamRenderer()
 
 void BinghamRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 }
 

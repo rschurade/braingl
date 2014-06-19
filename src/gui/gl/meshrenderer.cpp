@@ -52,6 +52,7 @@ void MeshRenderer::setMesh( TriangleMesh2* mesh )
 
 void MeshRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 3, vboIds );
 }
 

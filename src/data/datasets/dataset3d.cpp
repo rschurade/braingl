@@ -30,7 +30,7 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, false );
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
 
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
