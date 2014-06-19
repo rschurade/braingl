@@ -8,6 +8,7 @@
 #include "hierarchicaltreeglwidget.h"
 
 #include "../gl/treewidgetrenderer.h"
+#include "../gl/glfunctions.h"
 
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
@@ -44,10 +45,9 @@ QSize HierarchicalTreeGLWidget::sizeHint() const
 void HierarchicalTreeGLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
-    // TODO: Qt5
-//    GLuint vao;
-//    glGenVertexArrays(1, &vao);
-//    glBindVertexArray(vao);
+    GLuint vao;
+    GLFunctions::f->glGenVertexArrays(1, &vao);
+    GLFunctions::f->glBindVertexArray(vao);
 
     m_renderer->initGL();
 }

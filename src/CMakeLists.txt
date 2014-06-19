@@ -84,7 +84,7 @@ QT5_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11 -Wno-unused-local-typedefs" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11" )
 
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -98,6 +98,9 @@ IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
         SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
     ENDIF()
 ENDIF()
+
+# supress warnings from boost includes
+ SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs" )
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Add sources as target
