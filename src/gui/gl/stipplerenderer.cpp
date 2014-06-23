@@ -115,11 +115,12 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
     program->setUniformValue( "u_orient", m_orient );
     program->setUniformValue( "u_glyphThickness", thickness );
     program->setUniformValue( "u_glyphSize", glpyhSize );
+    program->setUniformValue( "u_constantThickness", false );
 
     initGeometry( props );
 
     setShaderVars( props );
-    glLineWidth( m_lineWidth );
+
     glDrawArrays( GL_TRIANGLES, 0, m_vertCount );
     glLineWidth( 1 );
     GLFunctions::getAndPrintGLError( "render stipples: opengl error" );

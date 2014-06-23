@@ -29,8 +29,16 @@ private:
 
     GLuint vbo0;
     GLuint vbo1;
+    GLuint vbo2;
+    GLuint vbo3;
+    GLuint vbo4;
+    GLuint vbo5;
 
-    int m_countLines;
+    int m_vertCountAxial;
+    int m_vertCountCoronal;
+    int m_vertCountSagittal;
+
+    QColor m_color;
 
     float m_x;
     float m_y;
@@ -47,6 +55,8 @@ private:
 private slots:
     void isoValueChanged();
     void globalChanged();
+
+    void addGlyph( std::vector<float> &verts, std::vector<float> &colors, float x1, float y1, float z1, float x2, float y2, float z2 );
 
 };
 

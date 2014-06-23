@@ -23,7 +23,13 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_dirty( true ),
     vbo0( 0 ),
     vbo1( 0 ),
-    m_countLines( 0 )
+    vbo2( 0 ),
+    vbo3( 0 ),
+    vbo4( 0 ),
+    vbo5( 0 ),
+    m_vertCountAxial( 0 ),
+    m_vertCountCoronal( 0 ),
+    m_vertCountSagittal( 0 )
 {
     m_scalarField = *(ds->getData() );
 
@@ -52,9 +58,8 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_CORONAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_AXIAL ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
-    // TODO: Qt5
-    // glLineWidth is deprecated for values > 1.0, need to find another solution
-    //m_properties["maingl"].createInt( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LINE_WIDTH, 1, 1, 10, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_STIPPLE_GLYPH_SIZE, 1.2f, 1, 10, "general" );
 
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ).value<QColor>(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COLOR ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
@@ -87,12 +92,7 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         initGeometry();
     }
 
-    if ( m_countLines == 0 )
-    {
-        return;
-    }
-
-    float alpha = GLFunctions::sliceAlpha[target];
+    float alpha = 1.0; //GLFunctions::sliceAlpha[target];
 
     switch ( renderMode )
     {
@@ -116,48 +116,178 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         }
     }
 
-    GLFunctions::getShader( "line" )->bind();
-    GLFunctions::getShader( "line" )->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
-    GLFunctions::getShader( "line" )->setUniformValue( "u_renderStipples", false );
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+    {
+        QGLShaderProgram* program = GLFunctions::getShader( "stipple" );
 
-    // Tell OpenGL which VBOs to use
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
-    // Draw cube geometry using indices from VBO 0
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_position" );
-    GLFunctions::getShader( "line" )->enableAttributeArray( vertexLocation );
-    GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+        program->bind();
 
-    // Tell OpenGL which VBOs to use
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
-    // Draw cube geometry using indices from VBO 1
-    int colorLocation = GLFunctions::getShader( "line" )->attributeLocation( "a_color" );
-    GLFunctions::getShader( "line" )->enableAttributeArray( colorLocation );
-    GLFunctions::f->glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+        intptr_t offset = 0;
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+
+        int vertexLocation = program->attributeLocation( "a_position" );
+        program->enableAttributeArray( vertexLocation );
+        GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int offsetLocation = program->attributeLocation( "a_vec" );
+        program->enableAttributeArray( offsetLocation );
+        GLFunctions::f->glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int dirLocation = program->attributeLocation( "a_dir2" );
+        program->enableAttributeArray( dirLocation );
+        GLFunctions::f->glVertexAttribPointer( dirLocation, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+        int colorLocation = program->attributeLocation( "a_color" );
+        program->enableAttributeArray( colorLocation );
+        GLFunctions::f->glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        // Set modelview-projection matrix
+        program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+        program->setUniformValue( "u_scaling", 1.0f );
+
+        program->setUniformValue( "u_alpha", 1.0f );
+        program->setUniformValue( "u_renderMode", renderMode );
+        program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "D0", 9 );
+        program->setUniformValue( "D1", 10 );
+        program->setUniformValue( "D2", 11 );
+        program->setUniformValue( "P0", 12 );
+
+        program->setUniformValue( "u_aVec", 1., 0., 0. );
+        program->setUniformValue( "u_bVec", 0., 1., 0. );
+
+        program->setUniformValue( "u_orient", 0 );
+        program->setUniformValue( "u_glyphThickness", m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toFloat() );
+        program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
+
+        program->setUniformValue( "u_constantThickness", true );
+
+        glDrawArrays( GL_TRIANGLES, 0, m_vertCountAxial );
+        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+    }
+
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+    {
+        QGLShaderProgram* program = GLFunctions::getShader( "stipple" );
+
+        program->bind();
+
+        intptr_t offset = 0;
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
+
+        int vertexLocation = program->attributeLocation( "a_position" );
+        program->enableAttributeArray( vertexLocation );
+        GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int offsetLocation = program->attributeLocation( "a_vec" );
+        program->enableAttributeArray( offsetLocation );
+        GLFunctions::f->glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int dirLocation = program->attributeLocation( "a_dir2" );
+        program->enableAttributeArray( dirLocation );
+        GLFunctions::f->glVertexAttribPointer( dirLocation, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo3 );
+        int colorLocation = program->attributeLocation( "a_color" );
+        program->enableAttributeArray( colorLocation );
+        GLFunctions::f->glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        // Set modelview-projection matrix
+        program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+        program->setUniformValue( "u_scaling", 1.0f );
+
+        program->setUniformValue( "u_alpha", 1.0f );
+        program->setUniformValue( "u_renderMode", renderMode );
+        program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "D0", 9 );
+        program->setUniformValue( "D1", 10 );
+        program->setUniformValue( "D2", 11 );
+        program->setUniformValue( "P0", 12 );
+
+        program->setUniformValue( "u_aVec", 1., 0., 0. );
+        program->setUniformValue( "u_bVec", 0., 0., 1. );
+
+        program->setUniformValue( "u_orient", 1 );
+        program->setUniformValue( "u_glyphThickness", m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toFloat() );
+        program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
+
+        program->setUniformValue( "u_constantThickness", true );
+
+        glDrawArrays( GL_TRIANGLES, 0, m_vertCountCoronal );
+        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+    }
+
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+    {
+        QGLShaderProgram* program = GLFunctions::getShader( "stipple" );
+
+        program->bind();
+
+        intptr_t offset = 0;
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo4 );
+
+        int vertexLocation = program->attributeLocation( "a_position" );
+        program->enableAttributeArray( vertexLocation );
+        GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int offsetLocation = program->attributeLocation( "a_vec" );
+        program->enableAttributeArray( offsetLocation );
+        GLFunctions::f->glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int dirLocation = program->attributeLocation( "a_dir2" );
+        program->enableAttributeArray( dirLocation );
+        GLFunctions::f->glVertexAttribPointer( dirLocation, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo5 );
+        int colorLocation = program->attributeLocation( "a_color" );
+        program->enableAttributeArray( colorLocation );
+        GLFunctions::f->glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        // Set modelview-projection matrix
+        program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+        program->setUniformValue( "u_scaling", 1.0f );
+
+        program->setUniformValue( "u_alpha", 1.0f );
+        program->setUniformValue( "u_renderMode", renderMode );
+        program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "D0", 9 );
+        program->setUniformValue( "D1", 10 );
+        program->setUniformValue( "D2", 11 );
+        program->setUniformValue( "P0", 12 );
+
+        program->setUniformValue( "u_aVec", 0., 1., 0. );
+        program->setUniformValue( "u_bVec", 0., 0., 1. );
+
+        program->setUniformValue( "u_orient", 2 );
+        program->setUniformValue( "u_glyphThickness", m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toFloat() );
+        program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
 
 
-    // Draw cube geometry using indices from VBO 0
-    GLFunctions::f->glDrawArrays( GL_LINES, 0 , m_countLines );
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        program->setUniformValue( "u_constantThickness", true );
+
+        glDrawArrays( GL_TRIANGLES, 0, m_vertCountSagittal );
+        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+    }
 }
 
 void DatasetIsoline::initGeometry()
 {
-    if( vbo0 )
-    {
-        GLFunctions::f->glDeleteBuffers( 1, &vbo0 );
-    }
-    GLFunctions::f->glGenBuffers( 1, &vbo0 );
-    if( vbo1 )
-    {
-        GLFunctions::f->glDeleteBuffers( 1, &vbo1 );
-    }
-    GLFunctions::f->glGenBuffers( 1, &vbo1 );
-
-    std::vector<float>sliceData;
-    std::vector<float>isoVerts;
-    std::vector<float>tmpVerts;
-
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
     int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
     int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
@@ -177,66 +307,121 @@ void DatasetIsoline::initGeometry()
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
     bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
+    m_color =  m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
 
-    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
-    {
-        sliceData = extractAnatomySagittal( xi );
-        MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
-        tmpVerts = ms1.run();
-
-        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
-        {
-            isoVerts.push_back( m_x );
-            isoVerts.push_back( tmpVerts[3*i] + ay );
-            isoVerts.push_back( tmpVerts[3*i+1] + az );
-        }
-    }
-    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
-    {
-        sliceData = extractAnatomyCoronal( yi );
-        MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
-        tmpVerts = ms1.run();
-
-        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
-        {
-            isoVerts.push_back( tmpVerts[3*i] + ax );
-            isoVerts.push_back( m_y );
-            isoVerts.push_back( tmpVerts[3*i+1] + az );
-        }
-    }
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
+        if( vbo0 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo0 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo0 );
+        if( vbo1 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo1 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo1 );
+
+        std::vector<float>sliceData;
+        std::vector<float>tmpVerts;
+        std::vector<float>verts;
+        std::vector<float>colors;
+
         sliceData = extractAnatomyAxial( zi );
         MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy, interpolation );
         tmpVerts = ms1.run();
 
-        for ( unsigned int i = 0; i < tmpVerts.size() / 3; ++i )
+        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
         {
-            isoVerts.push_back( tmpVerts[3*i] + ax );
-            isoVerts.push_back( tmpVerts[3*i+1] + ay );
-            isoVerts.push_back( m_z );
+            addGlyph( verts, colors, tmpVerts[4*i], tmpVerts[4*i+1], m_z, tmpVerts[4*i+2], tmpVerts[4*i+3], m_z );
         }
+        m_vertCountAxial = verts.size() / 8;
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
-    GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, isoVerts.size() * sizeof( float ), isoVerts.data(), GL_DYNAMIC_DRAW );
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-    std::vector<float>colors( ( isoVerts.size() / 3 ) * 4, 0.0 );
-    QColor col = m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
-    for ( unsigned int i = 0; i < colors.size() / 4; ++i )
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
     {
-        colors[i * 4    ] = col.redF();
-        colors[i * 4 + 1] = col.greenF();
-        colors[i * 4 + 2] = col.blueF();
-        colors[i * 4 + 3] = 1.0;
+        if( vbo2 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo2 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo2 );
+        if( vbo3 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo3 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo3 );
+
+        std::vector<float>sliceData;
+        std::vector<float>tmpVerts;
+        std::vector<float>verts;
+        std::vector<float>colors;
+
+        sliceData = extractAnatomyCoronal( yi );
+        MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
+        tmpVerts = ms1.run();
+
+        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+        {
+            addGlyph( verts, colors, tmpVerts[4*i], m_y, tmpVerts[4*i+1], tmpVerts[4*i+2], m_y, tmpVerts[4*i+3] );
+        }
+
+        m_vertCountCoronal = verts.size() / 8;
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo3 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
 
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
-    GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+    {
+        if( vbo4 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo4 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo4 );
+        if( vbo5 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo5 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo5 );
 
-    m_countLines = isoVerts.size() / 2;
+        std::vector<float>sliceData;
+        std::vector<float>tmpVerts;
+        std::vector<float>verts;
+        std::vector<float>colors;
+
+        sliceData = extractAnatomySagittal( xi );
+        MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
+        tmpVerts = ms1.run();
+
+        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+        {
+            addGlyph( verts, colors, m_x, tmpVerts[4*i], tmpVerts[4*i+1], m_x, tmpVerts[4*i+2], tmpVerts[4*i+3] );
+        }
+
+        m_vertCountSagittal = verts.size() / 8;
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo4 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo5 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
+
     m_dirty = false;
 }
 
@@ -327,4 +512,103 @@ void DatasetIsoline::globalChanged()
         m_dirty = true;
     }
     Models::d()->submit();
+}
+
+void DatasetIsoline::addGlyph( std::vector<float> &verts, std::vector<float> &colors, float x1, float y1, float z1, float x2, float y2, float z2 )
+{
+    QVector3D s1( x1, y1, z1 );
+    QVector3D s2( x2, y2, z2 );
+    s1 = ( s1 + s2 ) / 2;
+    s2 = s2 - s1;
+
+    float xPos = s1.x();
+    float yPos = s1.y();
+    float zPos = s1.z();
+    float v0 = s2.x();
+    float v1 = s2.y();
+    float v2 = s2.z();
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back(  1.0 );
+    verts.push_back( -1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( 1.0 );
+    verts.push_back( 1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back(  1.0 );
+
+    verts.push_back( xPos );
+    verts.push_back( yPos );
+    verts.push_back( zPos );
+    verts.push_back( v0 );
+    verts.push_back( v1 );
+    verts.push_back( v2 );
+    verts.push_back( -1.0 );
+    verts.push_back( -1.0 );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
+
+    colors.push_back( m_color.redF() );
+    colors.push_back( m_color.greenF() );
+    colors.push_back( m_color.blueF() );
+    colors.push_back( 1.0f );
 }
