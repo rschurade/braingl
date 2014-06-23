@@ -149,25 +149,19 @@ void MarchingSquares::paintNW( int x, int y )
 
         m_verts.push_back( x * m_dx );
         m_verts.push_back( ( 1 - yAlpha ) * ( y * m_dy ) + yAlpha * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( ( 1 - xAlpha ) * ( x * m_dx ) + xAlpha * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
     }
 }
 
@@ -180,25 +174,19 @@ void MarchingSquares::paintNE( int x, int y )
 
         m_verts.push_back( ( 1 - xAlpha ) * ( x * m_dx ) + xAlpha * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( ( 1 - yAlpha ) * ( y * m_dy ) + yAlpha * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
     }
 }
 
@@ -211,25 +199,19 @@ void MarchingSquares::paintSE( int x, int y )
 
         m_verts.push_back( ( 1 - xAlpha ) * ( x * m_dx ) + xAlpha * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( ( 1 - yAlpha ) * ( y * m_dy ) + yAlpha * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
     }
 }
 
@@ -241,25 +223,19 @@ void MarchingSquares::paintSW( int x, int y )
         float yAlpha = ( m_isoValue - m_data->at( id( x, y ) ) ) / ( m_data->at( id( x, y + 1) ) - m_data->at( id( x, y ) ) );
         m_verts.push_back( x * m_dx );
         m_verts.push_back( ( 1 - yAlpha ) * ( y * m_dy ) + yAlpha * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( ( 1 - xAlpha ) * ( x * m_dx ) + xAlpha * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2);
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
     }
 }
 
@@ -272,19 +248,15 @@ void MarchingSquares::paintSN( int x, int y )
 
         m_verts.push_back( ( 1 - xAlpha1 ) * ( x * m_dx ) + xAlpha1 * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( ( 1 - xAlpha2 ) * ( x * m_dx ) + xAlpha2 * ( ( x + 1 ) * m_dx ) );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx2 );
         m_verts.push_back( y * m_dy + m_dy );
-        m_verts.push_back( 0.0 );
     }
 }
 
@@ -296,18 +268,14 @@ void MarchingSquares::paintEW( int x, int y )
         float yAlpha2 = ( m_isoValue - m_data->at( id( x + 1, y ) ) ) / ( m_data->at( id( x + 1, y + 1) ) - m_data->at( id( x + 1, y ) ) );
         m_verts.push_back( x * m_dx );
         m_verts.push_back( ( 1 - yAlpha1 ) * ( y * m_dy ) + yAlpha1 * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( ( 1 - yAlpha2 ) * ( y * m_dy ) + yAlpha2 * ( ( y + 1 ) * m_dy ) );
-        m_verts.push_back( 0.0 );
     }
     else
     {
         m_verts.push_back( x * m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
         m_verts.push_back( x * m_dx + m_dx );
         m_verts.push_back( y * m_dy + m_dy2 );
-        m_verts.push_back( 0.0 );
     }
 }
