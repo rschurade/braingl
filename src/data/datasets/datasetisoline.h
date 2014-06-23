@@ -29,10 +29,6 @@ private:
 
     GLuint vbo0;
     GLuint vbo1;
-    GLuint vbo2;
-    GLuint vbo3;
-    GLuint vbo4;
-    GLuint vbo5;
 
     int m_vertCountAxial;
     int m_vertCountCoronal;
