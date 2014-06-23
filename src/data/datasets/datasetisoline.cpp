@@ -165,32 +165,32 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         program->setUniformValue( "u_glyphThickness", m_properties["maingl"].get( Fn::Property::D_LINE_WIDTH ).toFloat() );
         program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
         program->setUniformValue( "u_constantThickness", true );
-    }
 
-    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
-    {
-        glDrawArrays( GL_TRIANGLES, 0, m_vertCountAxial );
-        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
-    }
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+        {
+            glDrawArrays( GL_TRIANGLES, 0, m_vertCountAxial );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
 
-    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
-    {
-        program->setUniformValue( "u_aVec", 1., 0., 0. );
-        program->setUniformValue( "u_bVec", 0., 0., 1. );
-        program->setUniformValue( "u_orient", 1 );
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+        {
+            program->setUniformValue( "u_aVec", 1., 0., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            program->setUniformValue( "u_orient", 1 );
 
-        glDrawArrays( GL_TRIANGLES, m_vertCountAxial, m_vertCountCoronal );
-        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
-    }
+            glDrawArrays( GL_TRIANGLES, m_vertCountAxial, m_vertCountCoronal );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
 
-    if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
-    {
-        program->setUniformValue( "u_aVec", 0., 1., 0. );
-        program->setUniformValue( "u_bVec", 0., 0., 1. );
-        program->setUniformValue( "u_orient", 2 );
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+        {
+            program->setUniformValue( "u_aVec", 0., 1., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            program->setUniformValue( "u_orient", 2 );
 
-        glDrawArrays( GL_TRIANGLES, m_vertCountAxial + m_vertCountCoronal, m_vertCountSagittal );
-        GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+            glDrawArrays( GL_TRIANGLES, m_vertCountAxial + m_vertCountCoronal, m_vertCountSagittal );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
     }
 }
 
@@ -244,11 +244,14 @@ void DatasetIsoline::initGeometry()
         MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy, interpolation );
         tmpVerts = ms1.run();
 
-        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+        if ( tmpVerts.size() > 0 )
         {
-            addGlyph( verts, colors, tmpVerts[4*i], tmpVerts[4*i+1], m_z, tmpVerts[4*i+2], tmpVerts[4*i+3], m_z );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+            {
+                addGlyph( verts, colors, tmpVerts[4*i], tmpVerts[4*i+1], m_z, tmpVerts[4*i+2], tmpVerts[4*i+3], m_z );
+            }
+            m_vertCountAxial = verts.size() / 8;
         }
-        m_vertCountAxial = verts.size() / 8;
     }
 
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
@@ -260,12 +263,14 @@ void DatasetIsoline::initGeometry()
         MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
         tmpVerts = ms1.run();
 
-        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+        if ( tmpVerts.size() > 0 )
         {
-            addGlyph( verts, colors, tmpVerts[4*i], m_y, tmpVerts[4*i+1], tmpVerts[4*i+2], m_y, tmpVerts[4*i+3] );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+            {
+                addGlyph( verts, colors, tmpVerts[4*i], m_y, tmpVerts[4*i+1], tmpVerts[4*i+2], m_y, tmpVerts[4*i+3] );
+            }
+            m_vertCountCoronal = verts.size() / 8 - m_vertCountAxial;
         }
-
-        m_vertCountCoronal = verts.size() / 8 - m_vertCountAxial;
     }
 
     if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
@@ -277,22 +282,25 @@ void DatasetIsoline::initGeometry()
         MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
         tmpVerts = ms1.run();
 
-        for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+        if ( tmpVerts.size() > 0 )
         {
-            addGlyph( verts, colors, m_x, tmpVerts[4*i], tmpVerts[4*i+1], m_x, tmpVerts[4*i+2], tmpVerts[4*i+3] );
+            for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
+            {
+                addGlyph( verts, colors, m_x, tmpVerts[4*i], tmpVerts[4*i+1], m_x, tmpVerts[4*i+2], tmpVerts[4*i+3] );
+            }
+            m_vertCountSagittal = verts.size() / 8 - ( m_vertCountCoronal + m_vertCountAxial );
         }
-
-        m_vertCountSagittal = verts.size() / 8 - ( m_vertCountCoronal + m_vertCountAxial );
     }
+    if ( verts.size() > 0 )
+    {
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
-    GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
-    GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
-    GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    }
     m_dirty = false;
 }
 
