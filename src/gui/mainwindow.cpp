@@ -887,7 +887,13 @@ void MainWindow::about()
     hg.remove( "changeset:" );
     hg.replace( " ","" );
 
-    QString message ( "<b>brainGL development version " + hg + "<br><br> </b>"
+    QString message ( "<b>brainGL development version " + hg +
+#ifdef __DEBUG__
+            " (debug)"
+#elif __RELEASE__
+            " (release)"
+#endif
+            "<br><br> </b>"
             "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
             "For questions please consult the <a href=\"https://code.google.com/p/braingl/wiki/Main\"><b>documentation</b></a>.<br><br>"
             "Please report bugs and feature requests <a href=\"https://code.google.com/p/braingl/issues/list\"><b>here</b></a>.<br><br>"
