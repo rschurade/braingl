@@ -82,10 +82,8 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     createActions();
     createMenus();
     createToolBars();
-    //this->show();   // XXX work around "invalid drawable"?
 
     createDockWindows();
-
 
     // this needs to be done after the view is created
     m_toolsToolBar->setSelectionModel( m_datasetWidget->selectionModel() );
@@ -101,7 +99,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 
     if ( !resetSettings )
     {
-        mainGLWidget->makeCurrent();    // need GL context for this XXXX
+        mainGLWidget->makeCurrent();
         loadSettings();
     }
 }
@@ -369,7 +367,7 @@ bool MainWindow::loadRoi( QString fileName )
 
 bool MainWindow::load( QString fileName )
 {
-    mainGLWidget->makeCurrent();    // XXX load* needs GL context
+    mainGLWidget->makeCurrent();
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -409,7 +407,7 @@ bool MainWindow::load( QString fileName )
 
 bool MainWindow::load( QString fileName, QList<QVariant> state )
 {
-    mainGLWidget->makeCurrent();    // XXX load* needs GL context
+    mainGLWidget->makeCurrent();
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -897,8 +895,6 @@ void MainWindow::about()
             "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
             "For questions please consult the <a href=\"https://code.google.com/p/braingl/wiki/Main\"><b>documentation</b></a>.<br><br>"
             "Please report bugs and feature requests <a href=\"https://code.google.com/p/braingl/issues/list\"><b>here</b></a>.<br><br>"
-
-
     );
 
     QMessageBox::about( this, tr( "About brainGL" ), message );

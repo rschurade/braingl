@@ -88,7 +88,6 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 4;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glf->glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             f->glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -102,7 +101,6 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 3;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             f->glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -116,7 +114,6 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 2;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             f->glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -130,7 +127,6 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 1;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             f->glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -144,7 +140,6 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 0;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
             f->glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
@@ -286,9 +281,6 @@ void GLFunctions::loadShaders()
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_fs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
             GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
-            // Validate shader XXX too early, must be done after shader setup
-            //validateShader( GLFunctions::m_shaderNames[ i ] );
-
         }
 
         GLFunctions::shadersLoaded = true;
@@ -375,7 +367,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
         //exit( false );
     }
 
-    const QString code_vs(code);    // XXX
+    const QString code_vs(code);
     code = GLFunctions::m_shaderSources[ name + "_fs" ];
     QHashIterator<QString, QString> j( GLFunctions::m_shaderIncludes );
     while (j.hasNext() )
@@ -705,7 +697,7 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
     GLenum errCode;
     const char *errString;
     bool isError = false;
-    while ( 0 && /*XXXXX disabled*/ ( errCode = glGetError() ) != GL_NO_ERROR )
+    while ( ( errCode = glGetError() ) != GL_NO_ERROR )
     {
         switch(errCode)
         {

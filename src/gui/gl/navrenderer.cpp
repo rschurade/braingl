@@ -70,12 +70,7 @@ void NavRenderer::initGL()
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable( GL_BLEND );
 
-    //glShadeModel( GL_SMOOTH );    // XXX not in Core
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-    //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );   // XXX not in Core
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
     GLushort crosshairIndices[] = { 0, 1, 2, 3 };

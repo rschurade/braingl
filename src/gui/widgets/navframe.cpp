@@ -21,7 +21,7 @@ NavFrame::NavFrame( QString name, int orient, QWidget *parent, const QGLWidget *
 
     layout->setContentsMargins( 0, 0, 0, 0 );
 
-    parent->show(); // XXX work around "invalid drawable"
+    parent->show();
     setLayout( layout );
 
     setFrameStyle( QFrame::StyledPanel | QFrame::Plain );

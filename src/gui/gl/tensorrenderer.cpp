@@ -91,11 +91,7 @@ void TensorRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width,
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars( props );
 
-    //GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-    // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-
-    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, m_quads );
-    glDrawElements( GL_TRIANGLES, m_quads, GL_UNSIGNED_INT, 0 );  // XXX triangle pairs
+    glDrawElements( GL_TRIANGLES, m_quads, GL_UNSIGNED_INT, 0 );
 
     GLenum error;
     int i = 0;
@@ -223,10 +219,9 @@ void TensorRenderer::initGeometry( PropertyGroup& props )
         }
     }
 
-    // XXX should be an GL_ARRAY_BUFFER?
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW );
-    // XXX
+
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 1 ] );
     std::vector<unsigned int> triIndices;
     // fill index vector with two triangle's indices for every quad

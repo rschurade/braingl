@@ -112,9 +112,6 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
 
         setShaderVars( props );
 
-        //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
-        //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
-
         if ( props.get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {
             glDrawArrays( GL_LINES, 0, np * 2 );

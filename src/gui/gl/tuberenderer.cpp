@@ -108,8 +108,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
             program->setUniformValue( "u_color", c.redF(), c.greenF(), c.blueF(), 1.0 );
             c = m_fibs->at( i ).globalColor();
             program->setUniformValue( "u_globalColor", c.redF(), c.greenF(), c.blueF(), 1.0 );
-            //glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 ); // XXX not in Core
-            glDrawArrays( GL_TRIANGLE_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 ); // XXX quadstrip indices should also work for tristrip
+            glDrawArrays( GL_TRIANGLE_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
         }
     }
 

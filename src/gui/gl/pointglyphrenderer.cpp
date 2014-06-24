@@ -113,8 +113,6 @@ void PointGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int wi
         setShaderVars( props );
 
         glEnable( GL_BLEND );
-        //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
-        //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
 
         if ( props.get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {

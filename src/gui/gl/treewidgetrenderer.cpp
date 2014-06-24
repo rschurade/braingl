@@ -52,12 +52,7 @@ void TreeWidgetRenderer::initGL()
 
     glEnable( GL_DEPTH_TEST );
 
-    // XXX not in CoreProfile //glShadeModel( GL_SMOOTH );
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-     // XXX not in CoreProfile; use shader //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 }
 
 void TreeWidgetRenderer::draw()
