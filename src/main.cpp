@@ -173,6 +173,7 @@ int main( int argc, char *argv[] )
 
 #ifdef __DEBUG__
     debug = true;
+    verbose = true;
 #endif
 
     Models::init();
