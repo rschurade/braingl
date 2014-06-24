@@ -44,7 +44,6 @@ void ColormapRenderer::initGeometry()
     float z = -0.5f;
     VertexData vertices[] =
     {
-        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         { QVector3D( m_x,        m_y - m_dy, z ), QVector3D( 0.0, 0.0, 0.0 ) },
         { QVector3D( m_x + m_dx, m_y - m_dy, z ), QVector3D( 1.0, 0.0, 0.0 ) },
         { QVector3D( m_x,        m_y,        z ), QVector3D( 0.0, 1.0, 0.0 ) },
@@ -113,8 +112,7 @@ void ColormapRenderer::initGeometry()
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, 72 * sizeof(float), scaleVertices, GL_STATIC_DRAW );
 
-    // XXX
-    GLushort scaleTriangleIndices[] = // XXX quad-equivalent triangle-pair indices
+    GLushort scaleTriangleIndices[] =
     {
              0,  1,  3,     1,  2,  3,
              4,  5,  7,     5,  6,  7,
@@ -183,9 +181,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "u_scaleY", 1.0f );
 
     // Draw cube geometry using indices from VBO 0
-    //glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
-    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
-    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
@@ -214,8 +210,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
-    // XXXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
-    glDrawElements( GL_TRIANGLES, 6*2*3, GL_UNSIGNED_SHORT, 0 );    // XXX
+    glDrawElements( GL_TRIANGLES, 6*2*3, GL_UNSIGNED_SHORT, 0 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );

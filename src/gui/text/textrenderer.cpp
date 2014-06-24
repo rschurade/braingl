@@ -94,9 +94,7 @@ void TextRenderer::renderText( QString text, int x, int y, int width, int height
         QChar c = text.at( i );
         program->setUniformValue( "u_char", (float)m_characterPositions[ c ] );
         program->setUniformValue( "u_pos", (float)i );
-
-        // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 ); // third argument is count verts in buffer, not count quads
-        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
+        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
     }
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -107,7 +105,6 @@ void TextRenderer::initGeometry()
     float z = -0.3;
     float vertices[] =
     {
-        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         0.0f, 0.0f, z,
         1.0f, 0.0f, z,
         0.0f, 1.0f, z,
