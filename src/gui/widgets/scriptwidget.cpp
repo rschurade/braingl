@@ -864,6 +864,10 @@ void ScriptWidget::saveScript()
 {
     QString fn = Models::getGlobal( (int)Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save File", fn );
+    if ( !fileName.endsWith( ".bgscript" ) )
+    {
+        fileName += ".bgscript";
+    }
     saveScript( fileName );
 }
 

@@ -586,6 +586,11 @@ void MainWindow::exportColormaps()
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Export colormaps", fn );
 
+    if ( !fileName.endsWith( ".cm" ) )
+    {
+        fileName += ".cm";
+    }
+
     QSettings settings( fileName, QSettings::IniFormat );
     settings.clear();
 
@@ -652,6 +657,10 @@ void MainWindow::saveScene()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", fn );
+    if( !fileName.endsWith( ".scn" ) )
+    {
+        fileName += ".scn";
+    }
     saveScene( fileName );
 }
 
