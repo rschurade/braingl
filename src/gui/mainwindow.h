@@ -116,6 +116,7 @@ private:
     QAction* renderCrosshairsAct;
 
     QAction* newPlaneAct;
+    QAction* newGuideAct;
 
     QAction* showAxialAct;
     QAction* showCoronalAct;
@@ -176,6 +177,7 @@ private slots:
     void saveFilterChanged(QString filterString);
 
     void newPlane();
+    void newGuide();
 };
 
 #endif

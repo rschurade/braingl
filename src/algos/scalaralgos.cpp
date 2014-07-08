@@ -9,6 +9,7 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetisosurface.h"
 #include "../data/datasets/datasetisoline.h"
+#include "../data/datasets/datasetguides.h"
 
 #include "../data/models.h"
 #include "../data/roiarea.h"
