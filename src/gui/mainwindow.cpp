@@ -49,6 +49,7 @@
 
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetplane.h"
+#include "../data/datasets/datasetguides.h"
 
 #include <QAction>
 #include <QtGui>
@@ -1036,6 +1037,12 @@ void MainWindow::createActions()
     newPlaneAct->setChecked( false );
     connect( newPlaneAct, SIGNAL(triggered()), this, SLOT(newPlane()) );
 
+    newGuideAct = new QAction( QIcon( ":/icons/crosshair.png" ), tr( "new Guide" ), this );
+    newGuideAct->setStatusTip( tr( "create a new guides" ) );
+    newGuideAct->setCheckable( false );
+    newGuideAct->setChecked( false );
+    connect( newGuideAct, SIGNAL(triggered()), this, SLOT(newGuide()) );
+
 }
 
 void MainWindow::createMenus()
@@ -1085,6 +1092,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( saveAct );
     fileToolBar->addAction( screenshotAct );
     fileToolBar->addAction( newPlaneAct );
+    fileToolBar->addAction( newGuideAct );
     //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
@@ -1488,4 +1496,10 @@ void MainWindow::newPlane()
 {
     DatasetPlane* plane = new DatasetPlane();
     Models::addDataset( plane );
+}
+
+void MainWindow::newGuide()
+{
+    DatasetGuides* g = new DatasetGuides();
+    Models::addDataset( g );
 }

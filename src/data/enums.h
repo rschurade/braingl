@@ -36,7 +36,8 @@ namespace Fn
         TREE = 0x20000,
         CONGLYPHS = 0x40000,
         PLANE = 0x80000,
-        ISO_LINE = 0x100000
+        ISO_LINE = 0x100000,
+        GUIDE = 0x200000
     };
 
     enum class ColormapEnum : int
@@ -271,6 +272,9 @@ namespace Fn
         D_STIPPLE_THICKNESS,
         D_STIPPLE_GLYPH_SIZE,
         D_STIPPLE_SLICE_ORIENT,
+        D_GUIDE_X,
+        D_GUIDE_Y,
+        D_GUIDE_Z,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -523,6 +527,9 @@ namespace Fn
                 case Property::D_STIPPLE_THICKNESS: return QString( "thickness" ); break;
                 case Property::D_STIPPLE_GLYPH_SIZE: return QString( "glyph size" ); break;
                 case Property::D_STIPPLE_SLICE_ORIENT: return QString( "slice orientation" ); break;
+                case Property::D_GUIDE_X: return QString( "guide x position" ); break;
+                case Property::D_GUIDE_Y: return QString( "guide y position" ); break;
+                case Property::D_GUIDE_Z: return QString( "guide z position" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
