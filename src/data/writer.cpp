@@ -372,6 +372,10 @@ nifti_image* Writer::createHeader( int dim )
     out->dy = props->get( Fn::Property::D_DY ).toFloat();
     out->dz = props->get( Fn::Property::D_DZ ).toFloat();
 
+    float ax = props->get( Fn::Property::D_ADJUST_X ).toFloat();
+    float ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float az = props->get( Fn::Property::D_ADJUST_Z ).toFloat();
+
     out->nifti_type = 1; // 1==NIFTI-1 (1 file)
 
     out->freq_dim = 1;
@@ -396,6 +400,10 @@ nifti_image* Writer::createHeader( int dim )
             out->sto_xyz.m[i][j] = sform( i, j );
         }
     }
+
+    out->qto_xyz.m[0][3] = ax;
+    out->qto_xyz.m[1][3] = ay;
+    out->qto_xyz.m[2][3] = az;
 
     {
         float dx, dy, dz;

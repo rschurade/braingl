@@ -22,6 +22,7 @@ public:
 
 public slots:
     void setValue( QVariant value );
+    void setValue( int row, int column, float val );
     void widgetChanged( int id, QMatrix4x4 value );
 
 };
