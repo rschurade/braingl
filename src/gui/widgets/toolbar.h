@@ -80,6 +80,9 @@ private:
     FNAction* m_colorLittleBrainsAction;
     FNAction* m_applyROIAction;
     FNAction* m_brainglMathAction;
+    FNAction* m_flipXAction;
+    FNAction* m_flipYAction;
+    FNAction* m_flipZAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

@@ -45,6 +45,10 @@ public:
 
     virtual QColor getColorAtPos( float x, float y, float z );
 
+    virtual void flipX() = 0;
+    virtual void flipY() = 0;
+    virtual void flipZ() = 0;
+
 protected:
     virtual void createTexture() = 0;
     virtual void examineDataset() = 0;

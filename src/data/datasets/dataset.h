@@ -57,6 +57,8 @@ protected:
 
     GLuint m_textureGLuint;
     QPair<QVector3D, QVector3D>m_boundingBox;
+
+    bool m_resetRenderer;
 };
 
 #endif /* DATASET_H_ */

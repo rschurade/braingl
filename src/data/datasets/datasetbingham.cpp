@@ -73,6 +73,17 @@ void DatasetBingham::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
     {
         return;
     }
+
+    if ( m_resetRenderer )
+    {
+        if ( m_renderer != 0 )
+        {
+            delete m_renderer;
+            m_renderer = 0;
+        }
+        m_resetRenderer = false;
+    }
+
     if ( m_renderer == 0 )
     {
         qDebug() << "ds bingham init renderer";
@@ -90,4 +101,70 @@ QString DatasetBingham::getValueAsString( int x, int y, int z )
     return QString::number( data[0] ) + ", " + QString::number( data[1] ) + ", " + QString::number( data[2] ) + ", " + QString::number( data[3] ) +
      ", " + QString::number( data[4] ) + ", " + QString::number( data[5] ) + ", " + QString::number( data[6] ) + ", " + QString::number( data[7] ) +
      ", " + QString::number( data[8] );
+}
+
+void DatasetBingham::flipX()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                std::vector<float> tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void DatasetBingham::flipY()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                std::vector<float> tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void DatasetBingham::flipZ()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                std::vector<float> tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
 }

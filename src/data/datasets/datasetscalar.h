@@ -28,6 +28,11 @@ public:
     float getInterpolatedValueAtPos( QVector3D pos );
     QColor getColorAtPos( QVector3D pos );
 
+    void flipX();
+    void flipY();
+    void flipZ();
+
+
 private:
     std::vector<float> m_data;
 

@@ -89,7 +89,10 @@ namespace Fn
         DELETE_LITTLE_BRAINS,
         COLOR_LITTLE_BRAINS,
         APPLY_ROI_BRAINS,
-        BRAINGL_MATH
+        BRAINGL_MATH,
+        FLIP_X,
+        FLIP_Y,
+        FLIP_Z
     };
 
     enum class Orient : int

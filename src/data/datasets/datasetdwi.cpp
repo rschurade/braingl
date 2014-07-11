@@ -187,3 +187,18 @@ void DatasetDWI::selectTexture()
     glDeleteTextures( 1, &m_textureGLuint );
     m_textureGLuint = 0;
 }
+
+void DatasetDWI::flipX()
+{
+
+}
+
+void DatasetDWI::flipY()
+{
+
+}
+
+void DatasetDWI::flipZ()
+{
+
+}

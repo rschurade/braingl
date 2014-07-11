@@ -297,3 +297,75 @@ QColor DatasetScalar::getColorAtPos( QVector3D pos )
     QColor c = ColormapFunctions::getColor( colormapID, value, min, max, lower_t, upper_t, alpha );
     return c;
 }
+
+void DatasetScalar::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetScalar::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetScalar::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
+}

@@ -31,6 +31,10 @@ public:
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     QString getValueAsString( int x, int y, int z );
 
+    void flipX();
+    void flipY();
+    void flipZ();
+
 private:
     void createTexture();
     void examineDataset();
