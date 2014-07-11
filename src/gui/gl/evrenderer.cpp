@@ -64,7 +64,6 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
 
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
-    m_lineWidth = props.get( Fn::Property::D_LINE_WIDTH ).toInt();
 
     QGLShaderProgram* program = GLFunctions::getShader( "ev" );
 
@@ -84,9 +83,8 @@ void EVRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     initGeometry( props );
 
     setShaderVars( props );
-    glLineWidth( m_lineWidth );
     glDrawArrays( GL_LINES, 0, m_vertCount );
-    glLineWidth( 1 );
+
     GLFunctions::getAndPrintGLError( "render ev lines: opengl error" );
 }
 

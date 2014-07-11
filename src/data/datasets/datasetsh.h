@@ -31,6 +31,10 @@ public:
 
     TriangleMesh2* getMeshFromCurrent();
 
+    void flipX();
+    void flipY();
+    void flipZ();
+
 private:
     void createTexture();
     void examineDataset();

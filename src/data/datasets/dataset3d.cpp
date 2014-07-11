@@ -149,6 +149,21 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
         return;
     }
 
+    if ( m_resetRenderer )
+    {
+        if ( m_renderer != 0 )
+        {
+            delete m_renderer;
+            m_renderer = 0;
+        }
+        if ( m_stippleRenderer != 0 )
+        {
+            delete m_stippleRenderer;
+            m_stippleRenderer = 0;
+        }
+        m_resetRenderer = false;
+    }
+
     if (  properties( target ).get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() )
     {
         if ( m_stippleRenderer == 0 )
@@ -167,7 +182,6 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
             {
                 m_renderer = new EVRenderer( &m_data );
             }
-
             m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
     }
@@ -293,4 +307,79 @@ void Dataset3D::probMaskChanged()
     {
         m_stippleRenderer->setMask( m_scalarDSL[ m_properties["maingl"].get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() ] );
     }
+}
+
+void Dataset3D::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void Dataset3D::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void Dataset3D::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
 }

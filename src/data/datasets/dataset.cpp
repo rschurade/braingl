@@ -7,7 +7,8 @@
 #include "dataset.h"
 
 Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
-    m_textureGLuint( 0 )
+    m_textureGLuint( 0 ),
+    m_resetRenderer( false )
 {
     PropertyGroup props;
     // add standard properties

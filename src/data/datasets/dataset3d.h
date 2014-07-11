@@ -33,6 +33,10 @@ public:
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
+    void flipX();
+    void flipY();
+    void flipZ();
+
 private:
     void examineDataset();
     void createTexture();

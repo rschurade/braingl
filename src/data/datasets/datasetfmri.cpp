@@ -183,3 +183,90 @@ void DatasetFMRI::slotPropSet( int id )
         selectTexture();
     }
 }
+
+void DatasetFMRI::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx / 2; ++x )
+        {
+            for ( int y = 0; y < ny; ++y )
+            {
+                for ( int z = 0; z < nz; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset ];
+                    m_data[getId( x, y, z) + offset ] = m_data[getId( nx - x, y, z) + offset ];
+                    m_data[getId( nx - x, y, z) + offset ] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetFMRI::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx; ++x )
+        {
+            for ( int y = 0; y < ny / 2; ++y )
+            {
+                for ( int z = 0; z < nz; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset];
+                    m_data[getId( x, y, z) + offset] = m_data[getId( x, ny - y, z) + offset];
+                    m_data[getId( x, ny - y, z) + offset] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetFMRI::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx; ++x )
+        {
+            for ( int y = 0; y < ny; ++y )
+            {
+                for ( int z = 0; z < nz / 2; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset];
+                    m_data[getId( x, y, z) + offset] = m_data[getId( x, y, nz - z) + offset];
+                    m_data[getId( x, y, nz - z) + offset] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
+}
