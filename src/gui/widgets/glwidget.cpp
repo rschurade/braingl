@@ -661,8 +661,15 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         }
         else
         {
+            qDebug() << event->key();
             switch( event->key() )
             {
+                case 43: // +
+                    m_cameraInUse->setZoom( m_cameraInUse->getZoom() * 1.1 );
+                    break;
+                case 45: // -
+                    m_cameraInUse->setZoom( m_cameraInUse->getZoom() * 0.9 );
+                    break;
                 case Qt::Key_Left :
                 {
                     m_cameraInUse->click( x, y );
