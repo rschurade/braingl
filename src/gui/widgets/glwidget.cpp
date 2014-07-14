@@ -661,7 +661,6 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         }
         else
         {
-            qDebug() << event->key();
             switch( event->key() )
             {
                 case 43: // +
