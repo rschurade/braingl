@@ -44,6 +44,7 @@ public:
     bool loadRoi( QString fileName );
 
     void saveScene( QString fileName );
+    void packAndGo( QString fileName );
     void loadScene( QString fileName );
 
 private:
@@ -67,6 +68,10 @@ private:
     QString strippedName( const QString &fullFileName );
 
     bool load( QString fileName, QList<QVariant> state );
+
+    void loadScene_0_9_0( QString path, QSettings& settings );
+    QVariant getFromStateList( Fn::Property prop, QList<QVariant>& state );
+
 
     Dataset* selectedDataset();
 
@@ -106,6 +111,7 @@ private:
 
     QAction* loadRoiAct;
     QAction* saveSceneAct;
+    QAction* packAndGoAct;
 
     QAction* exportColormapsAct;
     QAction* importColormapsAct;
@@ -152,6 +158,7 @@ private slots:
     void save();
     void loadRoi();
     void saveScene();
+    void packAndGo();
     void exportColormaps();
     void importColormaps();
     void about();

@@ -46,8 +46,11 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
 
-    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (isoline)";
-
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString();
+    if( !name.contains( "isoline" ) )
+    {
+        name += " (isoline)";
+    }
     m_properties["maingl"].createString( Fn::Property::D_NAME, name );
 
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
@@ -77,6 +80,11 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
 
 DatasetIsoline::~DatasetIsoline()
 {
+}
+
+std::vector<float>* DatasetIsoline::getData()
+{
+    return &m_scalarField;
 }
 
 void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target )
@@ -494,3 +502,14 @@ void DatasetIsoline::addGlyph( std::vector<float> &verts, std::vector<float> &co
     colors.push_back( m_color.blueF() );
     colors.push_back( 1.0f );
 }
+
+QString DatasetIsoline::getSaveFilter()
+{
+    return QString( "niftii (*.nii.gz);; all files (*.*)" );
+}
+
+QString DatasetIsoline::getDefaultSuffix()
+{
+    return QString( "nii.gz" );
+}
+

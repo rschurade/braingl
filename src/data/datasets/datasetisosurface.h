@@ -24,6 +24,10 @@ public:
     virtual ~DatasetIsosurface();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
+    std::vector<float>* getData();
+
+    QString getSaveFilter();
+    QString getDefaultSuffix();
 
 protected:
     void createTexture() {};

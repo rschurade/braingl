@@ -16,6 +16,7 @@
 #include "propertyselection.h"
 #include "propertybutton.h"
 #include "propertymatrix.h"
+#include "propertyvector.h"
 
 #include "../models.h"
 
@@ -64,6 +65,14 @@ PropertyGroup::PropertyGroup( const PropertyGroup& pg )
         if ( dynamic_cast<PropertyText*>( prop ) )
         {
             createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyMatrix*>( prop ) )
+        {
+            createMatrix( pair.first, prop->getValue().value<QMatrix4x4>(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyVector*>( prop ) )
+        {
+            createVector( pair.first, prop->getValue().value<QVector3D>(), prop->getPropertyTab() );
         }
     }
 }
@@ -276,6 +285,23 @@ bool PropertyGroup::createMatrix( Fn::Property name, QMatrix4x4 value, QString t
     }
     return true;
 }
+
+bool PropertyGroup::createVector( Fn::Property name, QVector3D value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyVector* prop = new PropertyVector( Fn::Prop2String::s( (Fn::Property)name ), value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
 
 bool PropertyGroup::createDir( Fn::Property name, QDir value, QString tab )
 {

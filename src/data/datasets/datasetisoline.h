@@ -22,6 +22,10 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
+    std::vector<float>* getData();
+    QString getSaveFilter();
+    QString getDefaultSuffix();
+
 private:
     std::vector<float> m_scalarField;
 

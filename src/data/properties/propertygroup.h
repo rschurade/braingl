@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QColor>
 #include <QMatrix4x4>
+#include <QVector3D>
 #include <QObject>
 #include <QString>
 #include <QVariant>
@@ -51,6 +52,7 @@ public:
     bool createList( Fn::Property name, std::vector<QString> options, int value = 0, QString tab = "none" );
     bool createButton( Fn::Property name, QString tab = "none" );
     bool createMatrix( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
+    bool createVector( Fn::Property name, QVector3D value, QString tab = "none" );
     bool createText( Fn::Property name, QString value, QString tab = "none" );
 
     bool setMin( Fn::Property name,  QVariant value );

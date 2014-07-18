@@ -278,6 +278,9 @@ namespace Fn
         D_GUIDE_X,
         D_GUIDE_Y,
         D_GUIDE_Z,
+        D_HANDLE_0,
+        D_HANDLE_1,
+        D_HANDLE_2,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -533,6 +536,9 @@ namespace Fn
                 case Property::D_GUIDE_X: return QString( "guide x position" ); break;
                 case Property::D_GUIDE_Y: return QString( "guide y position" ); break;
                 case Property::D_GUIDE_Z: return QString( "guide z position" ); break;
+                case Property::D_HANDLE_0: return QString( "handle 0 position" ); break;
+                case Property::D_HANDLE_1: return QString( "handle 1 position" ); break;
+                case Property::D_HANDLE_2: return QString( "handle 2 position" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

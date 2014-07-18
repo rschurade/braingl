@@ -39,12 +39,16 @@ DatasetPlane::DatasetPlane() :
         dz = dsl[0]->properties().get( Fn::Property::D_DZ ).toFloat();
     }
 
-    m_h0 = QVector3D( nx * dx / 2, ny * dy / 2, nz * dz / 2 );
-    m_h1 = QVector3D( 0.0, m_h0.y(), m_h0.z() );
-    m_h2 = QVector3D( m_h0.x(), 0.0, m_h0.z() );
+    QVector3D h0( nx * dx / 2, ny * dy / 2, nz * dz / 2 );
+    QVector3D h1( 0.0, h0.y(), h0.z() );
+    QVector3D h2( h0.x(), 0.0, h0.z() );
 
     m_properties["maingl"].createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
     m_properties["maingl"].createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
+
+    m_properties["maingl"].createVector( Fn::Property::D_HANDLE_0, h0, "handles" );
+    m_properties["maingl"].createVector( Fn::Property::D_HANDLE_1, h1, "handles" );
+    m_properties["maingl"].createVector( Fn::Property::D_HANDLE_2, h2, "handles" );
 
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
@@ -62,15 +66,20 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     {
         return;
     }
+
+    QVector3D h0 = m_properties["maingl"].get( Fn::Property::D_HANDLE_0 ).value<QVector3D>();
+    QVector3D h1 = m_properties["maingl"].get( Fn::Property::D_HANDLE_1 ).value<QVector3D>();
+    QVector3D h2 = m_properties["maingl"].get( Fn::Property::D_HANDLE_2 ).value<QVector3D>();
+
     if ( m_properties["maingl"].get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
     {
         QColor color = m_properties["maingl"].get( Fn::Property::D_HANDLE_COLOR ).value<QColor>();
         color.setAlpha( 254 );
-        GLFunctions::drawSphere( pMatrix, mvMatrix, m_h0.x(), m_h0.y(), m_h0.z(), 5, 5, 5,
+        GLFunctions::drawSphere( pMatrix, mvMatrix, h0.x(), h0.y(), h0.z(), 5, 5, 5,
                                   color, m_handle0, width, height, renderMode );
-        GLFunctions::drawSphere( pMatrix, mvMatrix, m_h1.x(), m_h1.y(), m_h1.z(), 5, 5, 5,
+        GLFunctions::drawSphere( pMatrix, mvMatrix, h1.x(), h1.y(), h1.z(), 5, 5, 5,
                                   color, m_handle1, width, height, renderMode );
-        GLFunctions::drawSphere( pMatrix, mvMatrix, m_h2.x(), m_h2.y(), m_h2.z(), 5, 5, 5,
+        GLFunctions::drawSphere( pMatrix, mvMatrix, h2.x(), h2.y(), h2.z(), 5, 5, 5,
                                   color, m_handle2, width, height, renderMode );
     }
     if ( dirty )
@@ -136,7 +145,7 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
-    program->setUniformValue( "m_h0", 12 );
+    program->setUniformValue( "h0", 12 );
 
     GLFunctions::setTextureUniforms( program, target );
 
@@ -153,21 +162,25 @@ void DatasetPlane::initGeometry()
     }
     GLFunctions::f->glGenBuffers( 1, &vbo0 );
 
-    float x0 = m_h1.x();
-    float y0 = m_h2.y();
-    float z0 = m_h0.z() - ( m_h0.z() - m_h1.z() ) - ( m_h0.z() - m_h2.z() );
+    QVector3D h0 = m_properties["maingl"].get( Fn::Property::D_HANDLE_0 ).value<QVector3D>();
+    QVector3D h1 = m_properties["maingl"].get( Fn::Property::D_HANDLE_1 ).value<QVector3D>();
+    QVector3D h2 = m_properties["maingl"].get( Fn::Property::D_HANDLE_2 ).value<QVector3D>();
 
-    float x1 = m_h1.x();
-    float y1 = m_h0.y() + m_h0.y() - m_h2.y();
-    float z1 = m_h0.z() - ( m_h0.z() - m_h1.z() ) + ( m_h0.z() - m_h2.z() );
+    float x0 = h1.x();
+    float y0 = h2.y();
+    float z0 = h0.z() - ( h0.z() - h1.z() ) - ( h0.z() - h2.z() );
 
-    float x2 = m_h0.x() + m_h0.x() - m_h1.x();
-    float y2 = m_h0.y() + m_h0.y() - m_h2.y();
-    float z2 = m_h0.z() + ( m_h0.z() - m_h1.z() ) + ( m_h0.z() - m_h2.z() );
+    float x1 = h1.x();
+    float y1 = h0.y() + h0.y() - h2.y();
+    float z1 = h0.z() - ( h0.z() - h1.z() ) + ( h0.z() - h2.z() );
 
-    float x3 = m_h0.x() + m_h0.x() - m_h1.x();
-    float y3 = m_h2.y();
-    float z3 = m_h0.z() + ( m_h0.z() - m_h1.z() ) - ( m_h0.z() - m_h2.z() );
+    float x2 = h0.x() + h0.x() - h1.x();
+    float y2 = h0.y() + h0.y() - h2.y();
+    float z2 = h0.z() + ( h0.z() - h1.z() ) + ( h0.z() - h2.z() );
+
+    float x3 = h0.x() + h0.x() - h1.x();
+    float y3 = h2.y();
+    float z3 = h0.z() + ( h0.z() - h1.z() ) - ( h0.z() - h2.z() );
 
     int nx = 160;
     int ny = 200;
@@ -205,33 +218,44 @@ void DatasetPlane::initGeometry()
 
 bool DatasetPlane::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifiers modifiers, QString target )
 {
+    QVector3D h0 = m_properties["maingl"].get( Fn::Property::D_HANDLE_0 ).value<QVector3D>();
+    QVector3D h1 = m_properties["maingl"].get( Fn::Property::D_HANDLE_1 ).value<QVector3D>();
+    QVector3D h2 = m_properties["maingl"].get( Fn::Property::D_HANDLE_2 ).value<QVector3D>();
+
     if ( pickId == m_handle0 )
     {
-        m_h0.setX( m_h0.x() + dir.x() );
-        m_h0.setY( m_h0.y() + dir.y() );
-        m_h0.setZ( m_h0.z() + dir.z() );
-        m_h1.setX( m_h1.x() + dir.x() );
-        m_h1.setY( m_h1.y() + dir.y() );
-        m_h1.setZ( m_h1.z() + dir.z() );
-        m_h2.setX( m_h2.x() + dir.x() );
-        m_h2.setY( m_h2.y() + dir.y() );
-        m_h2.setZ( m_h2.z() + dir.z() );
+        h0.setX( h0.x() + dir.x() );
+        h0.setY( h0.y() + dir.y() );
+        h0.setZ( h0.z() + dir.z() );
+        h1.setX( h1.x() + dir.x() );
+        h1.setY( h1.y() + dir.y() );
+        h1.setZ( h1.z() + dir.z() );
+        h2.setX( h2.x() + dir.x() );
+        h2.setY( h2.y() + dir.y() );
+        h2.setZ( h2.z() + dir.z() );
+
+        m_properties["maingl"].set( Fn::Property::D_HANDLE_0, h0 );
+        m_properties["maingl"].set( Fn::Property::D_HANDLE_1, h1 );
+        m_properties["maingl"].set( Fn::Property::D_HANDLE_2, h2 );
+
         dirty = true;
         return true;
     }
     else if ( pickId == m_handle1 )
     {
-        m_h1.setX( m_h1.x() + dir.x() );
-        m_h1.setY( m_h0.y() );
-        m_h1.setZ( m_h1.z() + dir.z() );
+        h1.setX( h1.x() + dir.x() );
+        h1.setY( h0.y() );
+        h1.setZ( h1.z() + dir.z() );
+        m_properties["maingl"].set( Fn::Property::D_HANDLE_1, h1 );
         dirty = true;
         return true;
     }
     else if ( pickId == m_handle2 )
     {
-        m_h2.setX( m_h0.x() );
-        m_h2.setY( m_h2.y() + dir.y() );
-        m_h2.setZ( m_h2.z() + dir.z() );
+        h2.setX( h0.x() );
+        h2.setY( h2.y() + dir.y() );
+        h2.setZ( h2.z() + dir.z() );
+        m_properties["maingl"].set( Fn::Property::D_HANDLE_2, h2 );
         dirty = true;
         return true;
     }

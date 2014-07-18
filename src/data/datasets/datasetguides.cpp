@@ -32,8 +32,7 @@ DatasetGuides::DatasetGuides() :
     m_z( 0 )
 {
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 0 );
-    m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
-    m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
+    m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::NONE );
 
     QString name = "new guide";
     m_properties["maingl"].createString( Fn::Property::D_NAME, name );
