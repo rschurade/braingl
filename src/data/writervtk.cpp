@@ -72,7 +72,7 @@ bool WriterVTK::save()
                 {
                     saveMesh( m_fileName, mesh, false );
                 }
-                else if ( m_filter.startsWith( "Mesh binary") )
+                else
                 {
                     saveMesh( m_fileName, mesh, true );
                 }

@@ -42,6 +42,9 @@ private:
     std::vector<float> loadBvals( QString fileName );
     std::vector<QVector3D> loadBvecs( QString fileName, std::vector<float> bvals );
 
+    bool loadIsosurface();
+    bool loadIsoline();
+
     bool isRadialogical();
     void flipX();
 
@@ -50,6 +53,7 @@ private:
     std::vector<float>m_data;
     Fn::DatasetType m_datasetType;
     std::vector<Dataset*> m_dataset;
+    QList<QVariant>m_propStates;
 };
 
 #endif /* LOADERNIFTI_H_ */

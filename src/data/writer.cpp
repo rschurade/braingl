@@ -18,11 +18,14 @@
 #include "datasets/datasetmesh.h"
 #include "datasets/datasetcons.h"
 #include "datasets/datasetcorrelation.h"
+#include "datasets/datasetisosurface.h"
+#include "datasets/datasetisoline.h"
 #include "mesh/trianglemesh2.h"
 
 #include "../algos/fib.h"
 #include "../algos/fmath.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QImage>
 
@@ -292,8 +295,27 @@ bool Writer::save()
             }
         }
             break;
-        case Fn::DatasetType::MESH_BINARY:
+        case Fn::DatasetType::ISO_LINE:
+        {
+            nifti_image* out = createHeader( 1 );
+
+            std::vector<float>* data = dynamic_cast<DatasetIsoline*>( m_dataset )->getData();
+
+            out->data = data->data();
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
+            {
+                qDebug() << "NIfTI filename Problem" << endl;
+            }
+            setDescrip( out, "braingl_isoline" );
+
+            nifti_image_write( out );
+
+            out->data = NULL;
+            nifti_image_free( out );
+        }
+            break;
         case Fn::DatasetType::MESH_ISOSURFACE:
+        case Fn::DatasetType::MESH_BINARY:
         case Fn::DatasetType::MESH_TIME_SERIES :
         case Fn::DatasetType::GLYPHSET :
         case Fn::DatasetType::MESH_CORRELATION:
@@ -329,6 +351,23 @@ bool Writer::save()
             else if ( m_filter.endsWith( "(*.bin)" ) )
             {
                 saveBinaryConnectivity();
+            }
+            else if ( m_filter.endsWith( "(*.nii.gz)" ) )
+            {
+                nifti_image* out = createHeader( 1 );
+
+                std::vector<float>* data = dynamic_cast<DatasetIsosurface*>( m_dataset )->getData();
+
+                out->data = data->data();
+                if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
+                {
+                    qDebug() << "NIfTI filename Problem" << endl;
+                }
+                setDescrip( out, "braingl_isosurface" );
+                nifti_image_write( out );
+
+                out->data = NULL;
+                nifti_image_free( out );
             }
             else
             {
@@ -382,15 +421,23 @@ nifti_image* Writer::createHeader( int dim )
     out->phase_dim = 2;
     out->slice_dim = 3;
 
-    out->qform_code = 1;
-    out->sform_code = 1;
-
     out->nt = dim;
     out->nv = 4;
     out->ndim = 4;
 
-    QMatrix4x4 qform = props->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
-    QMatrix4x4 sform = props->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+    QMatrix4x4 qform;
+    QMatrix4x4 sform;
+
+    if ( props->contains( Fn::Property::D_Q_FORM ) )
+    {
+        qform = props->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        out->qform_code = 1;
+    }
+    if ( props->contains( Fn::Property::D_S_FORM ) )
+    {
+        sform = props->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+        out->sform_code = 1;
+    }
 
     for ( size_t i = 0; i < 4; ++i )
     {
@@ -416,6 +463,20 @@ nifti_image* Writer::createHeader( int dim )
 
     out->nbyper = 4;
     out->datatype = DT_FLOAT;
+
+    QList<QVariant> props1 = props->getState();
+
+    QByteArray ba;
+    QBuffer writeBuffer( &ba );
+    writeBuffer.open( QIODevice::WriteOnly );
+    QDataStream ds(&writeBuffer);
+    ds << props1;
+
+    writeBuffer.close();
+
+    char* extData = ba.data();
+    nifti_add_extension( out, extData, ba.size(), 0 );
+    qDebug() << ba.size();
 
     return out;
 }

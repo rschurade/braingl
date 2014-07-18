@@ -14,6 +14,8 @@
 #include "datasets/datasetfmri.h"
 #include "datasets/datasettensor.h"
 #include "datasets/datasetsh.h"
+#include "datasets/datasetisosurface.h"
+#include "datasets/datasetisoline.h"
 
 #include <QDebug>
 #include <QDataStream>
@@ -70,6 +72,32 @@ bool LoaderNifti::load()
     if ( !loadData( fn ) )
     {
         return false;
+    }
+
+    if( m_header->ext_list )
+    {
+        char* extData = reinterpret_cast<char*>( m_header->ext_list[0].edata );
+        QByteArray ba( extData, m_header->ext_list[0].esize );
+
+        QBuffer readBuffer( &ba );
+        readBuffer.open( QIODevice::ReadOnly );
+        QDataStream in( &readBuffer );
+
+        in >> m_propStates;
+    }
+
+    if ( QString( m_header->descrip ) == QString( "braingl_isosurface" ) )
+    {
+        qDebug() << "braingl isosurface dataset found";
+        m_datasetType = Fn::DatasetType::MESH_ISOSURFACE;
+        return loadIsosurface();
+    }
+
+    if ( QString( m_header->descrip ) == QString( "braingl_isoline" ) )
+    {
+        qDebug() << "braingl isoline dataset found";
+        m_datasetType = Fn::DatasetType::ISO_LINE;
+        return loadIsoline();
     }
 
     int dim = m_header->dim[4];
@@ -282,6 +310,34 @@ bool LoaderNifti::loadNiftiScalar()
     DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
     m_data.clear();
     m_dataset.push_back( dataset );
+    return true;
+}
+
+bool LoaderNifti::loadIsosurface()
+{
+    DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
+    m_data.clear();
+
+    DatasetIsosurface* iso = new DatasetIsosurface( dataset );
+    if ( m_propStates.size() > 0 )
+    {
+        iso->properties().setState( m_propStates );
+    }
+    m_dataset.push_back( iso );
+    return true;
+}
+
+bool LoaderNifti::loadIsoline()
+{
+    DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
+    m_data.clear();
+
+    DatasetIsoline* iso = new DatasetIsoline( dataset );
+    if ( m_propStates.size() > 0 )
+    {
+        iso->properties().setState( m_propStates );
+    }
+    m_dataset.push_back( iso );
     return true;
 }
 
@@ -632,7 +688,21 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
             std::vector<float> bvals2;
             std::vector<QVector3D> bvecs;
 
-            float* extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
+            float* extData;
+
+            if (  m_header->ext_list->esize == 1 )
+            {
+                extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
+            }
+            else if (  m_header->ext_list->esize == 2 )
+            {
+                extData = reinterpret_cast<float*>( m_header->ext_list[1].edata );
+            }
+            else
+            {
+                return false;
+            }
+
             for ( int i = 0; i < dim; ++i )
             {
                 bvals2.push_back( extData[i] );
