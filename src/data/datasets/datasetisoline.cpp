@@ -42,7 +42,7 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Y ).toFloat() );
     m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Z ).toFloat() );
 
-    m_properties["maingl"].createInt( Fn::Property::D_DIM, 0 );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 1 );
     m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::ISO_LINE );
 
