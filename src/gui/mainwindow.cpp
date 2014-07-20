@@ -974,12 +974,21 @@ void MainWindow::loadScene_0_9_0( QString path, QSettings& settings )
         QList<QVariant>roiState = branch[0].toList();
 
         int shape = getFromStateList( Fn::Property::D_SHAPE, roiState ).toInt();
-        qDebug() << "roi shape: " << shape;
+
         if ( shape == 10 )
         {
-            QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
-            GLFunctions::roi = loadRoi2( fn );
-            GLFunctions::roi->properties()->setState( roiState );
+            if ( packAndGo )
+            {
+                QFileInfo fi( getFromStateList( Fn::Property::D_FILENAME, roiState ).toString() );
+                QString fn = fi.fileName();
+                GLFunctions::roi = loadRoi2( path + QDir::separator() + fn );
+            }
+            else
+            {
+                QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
+                GLFunctions::roi = loadRoi2( fn );
+                GLFunctions::roi->properties()->setState( roiState );
+            }
         }
         else
         {
@@ -1007,9 +1016,18 @@ void MainWindow::loadScene_0_9_0( QString path, QSettings& settings )
                 qDebug() << "roi shape: " << shape;
                 if ( shape == 10 )
                 {
-                    QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
-                    GLFunctions::roi = loadRoi2( fn );
-                    GLFunctions::roi->properties()->setState( roiState );
+                    if ( packAndGo )
+                    {
+                        QFileInfo fi( getFromStateList( Fn::Property::D_FILENAME, roiState ).toString() );
+                        QString fn = fi.fileName();
+                        GLFunctions::roi = loadRoi2( path + QDir::separator() + fn );
+                    }
+                    else
+                    {
+                        QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
+                        GLFunctions::roi = loadRoi2( fn );
+                        GLFunctions::roi->properties()->setState( roiState );
+                    }
                     Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
                 }
                 else
