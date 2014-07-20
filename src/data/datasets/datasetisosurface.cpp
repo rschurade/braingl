@@ -32,7 +32,7 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"].createFloat( Fn::Property::D_DY, ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat() );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
 
-    m_properties["maingl"].createInt( Fn::Property::D_DIM, 0 );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 1 );
     m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
 

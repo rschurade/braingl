@@ -28,6 +28,7 @@ class ShaderEditWidget;
 class ScriptWidget;
 class FNDockWidget;
 class ColormapEditWidget;
+class ROIArea;
 
 class GLWidget;
 class ToolBar;
@@ -56,12 +57,14 @@ private:
 
     bool save( Dataset* ds );
     void saveDataset( Dataset* ds, QString filter = "" );
+    void saveRoi( ROIArea* roi );
 
     void saveSettings();
     QModelIndex createIndex( int branch, int pos, int column );
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
+    ROIArea* loadRoi2( QString fn );
 
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();
