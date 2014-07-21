@@ -732,12 +732,14 @@ void MainWindow::packAndGo()
 
 void MainWindow::saveScene( QString fileName )
 {
+    QFileInfo fi( fileName );
+    QString newScenePath = fi.path();
+
     QSettings settings( fileName, QSettings::IniFormat );
     settings.clear();
-    //qDebug() << settings.status();
 
     settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.8.1" );
+    settings.setValue( "version", "0.9.0" );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -758,43 +760,23 @@ void MainWindow::saveScene( QString fileName )
     ///////////////////////////////////////////////////////////////////////////////////////////////
     int countDatasets = Models::d()->rowCount();
 
-
-    QList<QVariant> fileNames;
-
-    int storeIndex = 0;
-
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        QVariant fn = ds->properties().get( Fn::Property::D_FILENAME );
+        QString fn = ds->properties().get( Fn::Property::D_FILENAME ).toString();
 
-        if ( !fn.toString().isEmpty() )
+        QDir dir;
+        if ( !dir.exists( fn ) )
         {
-            QDir dir;
-            if ( !dir.exists( fn.toString() ) )
-            {
-                qDebug() << "saving scene with file not on file system";
-                if ( save( ds ) )
-                {
-                    fn = ds->properties().get( Fn::Property::D_FILENAME );
-                    fileNames.push_back( fn );
-                    QList<QVariant>state = ds->properties().getState();
-                    settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
-                }
-            }
-            else
-            {
-                fileNames.push_back( fn );
-                QList<QVariant>state = ds->properties().getState();
-                settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
-
-            }
+            ds->properties().set( Fn::Property::D_FILENAME, newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + "." + ds->getDefaultSuffix() );
+            saveDataset( ds, "(*." +  ds->getDefaultSuffix() + ")" );
         }
-
+        QList<QVariant>state = ds->properties().getState();
+        settings.setValue( "file_" + QString::number( i ) + "_state", state );
 
     }
-    settings.setValue( "countDatasets", fileNames.size() );
-    settings.setValue( "fileNames", fileNames );
+    settings.setValue( "countDatasets", countDatasets );
+    settings.setValue( "packAndGo", true );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -808,25 +790,33 @@ void MainWindow::saveScene( QString fileName )
     {
         int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
 
-        QList<QVariant>branch;
-        for ( int k = 0; k < leafCount+1; ++k )
+        QList<QVariant> branch;
+        for ( int k = 0; k < leafCount + 1; ++k )
         {
-            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
+            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int) Fn::Property::D_POINTER ), Qt::DisplayRole ) );
 
-            QList<QVariant>state = roi->properties()->getState();
-            if ( roi->properties()->get( Fn::Property::D_SHAPE).toInt() != 10 )
+            if ( roi->properties()->get( Fn::Property::D_SHAPE ) == 10 )
             {
-                branch.push_back( state );
+                QString fn = roi->properties()->get( Fn::Property::D_FILENAME ).toString();
+                QDir dir;
+                if ( !dir.exists( fn ) )
+                {
+                    roi->properties()->set( Fn::Property::D_FILENAME,
+                            newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + ".nii.gz" );
+                    ROIArea* roi2save = dynamic_cast<ROIArea*>( roi );
+                    saveRoi( roi2save );
+                }
             }
 
-            //settings.setValue( "roi" + QString::number( i ) + "_" + QString::number( k ) + "state", state );
+            QList<QVariant> state = roi->properties()->getState();
+            branch.push_back( state );
         }
         if ( branch.size() > 0 )
         {
             roiStates.push_back( branch );
         }
     }
-    settings.setValue(  "roiStates", roiStates );
+    settings.setValue( "roiStates", roiStates );
 
     settings.sync();
 }
@@ -838,7 +828,6 @@ void MainWindow::packAndGo( QString fileName )
 
     QSettings settings( fileName, QSettings::IniFormat );
     settings.clear();
-    //qDebug() << settings.status();
 
     settings.setValue( "appName", "braingl" );
     settings.setValue( "version", "0.9.0" );
