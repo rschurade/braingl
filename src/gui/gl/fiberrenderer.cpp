@@ -35,7 +35,6 @@ FiberRenderer::FiberRenderer( FiberSelector* selector,
 
 FiberRenderer::~FiberRenderer()
 {
-
     glDeleteBuffers( 1, &vbo );
     glDeleteBuffers( 1, &dataVbo );
     glDeleteBuffers( 1, &indexVbo );
@@ -83,9 +82,9 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     program->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
+    program->setUniformValue( "userTransformMatrix", props.get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>() );
 
     initGeometry();
-
 
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     setShaderVars( props );

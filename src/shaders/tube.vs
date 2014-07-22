@@ -16,7 +16,7 @@ out float v_discard;
 
 void main()
 {
-    v_position = mvp_matrix * vec4( a_position, 1.0 );
+    v_position = mvp_matrix * userTransformMatrix * vec4( a_position, 1.0 );
     
     v_normal = normalize( a_normal );
     v_index = a_indexes;

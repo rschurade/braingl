@@ -67,6 +67,8 @@ protected:
     unsigned int m_numPoints;
     unsigned int m_numLines;
 
+    QMatrix4x4 m_userTransform;
+
 private:
 
 private slots:

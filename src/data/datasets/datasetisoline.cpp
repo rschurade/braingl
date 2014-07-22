@@ -72,6 +72,9 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
+    m_properties["maingl"].createList( Fn::Property::D_ISOLINE_STRIPES, { "none", "45 degrees right", "45 degrees left", "vertical", "horizontal" }, 0, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_ISOLINE_STRIPES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
 
@@ -227,6 +230,7 @@ void DatasetIsoline::initGeometry()
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
     bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
     m_color =  m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
+    int stripeType = m_properties["maingl"].get( Fn::Property::D_ISOLINE_STRIPES ).toInt();
 
     std::vector<float>verts;
     std::vector<float>colors;
@@ -250,16 +254,28 @@ void DatasetIsoline::initGeometry()
     {
         std::vector<float>sliceData;
         std::vector<float>tmpVerts;
+        std::vector<float>tmpVerts2;
 
         sliceData = extractAnatomyAxial( zi );
         MarchingSquares ms1( &sliceData, isoValue, nx, ny, dx, dy, interpolation );
         tmpVerts = ms1.run();
+        if ( stripeType > 0 )
+        {
+            tmpVerts2 = ms1.runStripes( stripeType, 2 );
+        }
 
         if ( tmpVerts.size() > 0 )
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
                 addGlyph( verts, colors, tmpVerts[4*i], tmpVerts[4*i+1], m_z, tmpVerts[4*i+2], tmpVerts[4*i+3], m_z );
+            }
+            if ( stripeType > 0 )
+            {
+                for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
+                {
+                    addGlyph( verts, colors, tmpVerts2[4*i], tmpVerts2[4*i+1], m_z, tmpVerts2[4*i+2], tmpVerts2[4*i+3], m_z );
+                }
             }
             m_vertCountAxial = verts.size() / 8;
         }
@@ -269,16 +285,28 @@ void DatasetIsoline::initGeometry()
     {
         std::vector<float>sliceData;
         std::vector<float>tmpVerts;
+        std::vector<float>tmpVerts2;
 
         sliceData = extractAnatomyCoronal( yi );
         MarchingSquares ms1( &sliceData, isoValue, nx, nz, dx, dz, interpolation );
         tmpVerts = ms1.run();
+        if ( stripeType > 0 )
+        {
+            tmpVerts2 = ms1.runStripes( stripeType, 2 );
+        }
 
         if ( tmpVerts.size() > 0 )
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
                 addGlyph( verts, colors, tmpVerts[4*i], m_y, tmpVerts[4*i+1], tmpVerts[4*i+2], m_y, tmpVerts[4*i+3] );
+            }
+            if ( stripeType > 0 )
+            {
+                for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
+                {
+                    addGlyph( verts, colors, tmpVerts2[4*i], m_y, tmpVerts2[4*i+1], tmpVerts2[4*i+2], m_y, tmpVerts2[4*i+3] );
+                }
             }
             m_vertCountCoronal = verts.size() / 8 - m_vertCountAxial;
         }
@@ -288,16 +316,28 @@ void DatasetIsoline::initGeometry()
     {
         std::vector<float>sliceData;
         std::vector<float>tmpVerts;
+        std::vector<float>tmpVerts2;
 
         sliceData = extractAnatomySagittal( xi );
         MarchingSquares ms1( &sliceData, isoValue, ny, nz, dy, dz, interpolation );
         tmpVerts = ms1.run();
+        if ( stripeType > 0 )
+        {
+            tmpVerts2 = ms1.runStripes( stripeType, 2 );
+        }
 
         if ( tmpVerts.size() > 0 )
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
                 addGlyph( verts, colors, m_x, tmpVerts[4*i], tmpVerts[4*i+1], m_x, tmpVerts[4*i+2], tmpVerts[4*i+3] );
+            }
+            if ( stripeType > 0 )
+            {
+                for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
+                {
+                    addGlyph( verts, colors, m_x, tmpVerts2[4*i], tmpVerts2[4*i+1], m_x, tmpVerts2[4*i+2], tmpVerts2[4*i+3] );
+                }
             }
             m_vertCountSagittal = verts.size() / 8 - ( m_vertCountCoronal + m_vertCountAxial );
         }

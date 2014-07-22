@@ -167,9 +167,10 @@ void DatasetFibers::createProps()
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
     }
 
-    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
+    m_transform.setToIdentity();
     m_properties["maingl"].createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
     m_properties["maingl"].createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
@@ -178,8 +179,6 @@ void DatasetFibers::createProps()
 //    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false );
 //    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
 //    connect( m_properties["maingl"].getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
-
-    transformChanged( 3 );
 }
 
 std::vector<Fib>* DatasetFibers::getFibs()
@@ -264,6 +263,33 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         return;
     }
 
+    if ( m_resetRenderer )
+    {
+        delete m_renderer;
+        m_renderer = 0;
+        delete m_tubeRenderer;
+        m_tubeRenderer = 0;
+        delete m_selector;
+        m_selector = 0;
+        if ( !m_kdVerts )
+        {
+            m_kdVerts = new std::vector<float>();
+        }
+        m_kdVerts->clear();
+        m_kdVerts->reserve( m_numPoints * 3 );
+        for ( unsigned int i = 0; i < m_fibs.size(); ++i )
+        {
+            for ( unsigned int k = 0; k < m_fibs[i].length(); ++k )
+            {
+                m_kdVerts->push_back( m_fibs[i][k].x() );
+                m_kdVerts->push_back( m_fibs[i][k].y() );
+                m_kdVerts->push_back( m_fibs[i][k].z() );
+            }
+
+        }
+        m_resetRenderer = false;
+    }
+
     if ( m_selector == 0 )
     {
         m_selector = new FiberSelector( m_kdVerts, m_numPoints );
@@ -334,88 +360,27 @@ void DatasetFibers::transformChanged( QVariant value )
     }
 
     m_properties["maingl"].set( Fn::Property::D_TRANSFORM, m_transform );
+    Models::d()->submit();
 }
 
 void DatasetFibers::applyTransform()
 {
-    int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
-
     m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
 
-    switch( selectedMatrix )
-    {
-        case 0:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-        case 1:
-        case 2:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-        case 3:
-        case 4:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-    }
-
-    delete m_renderer;
-    m_renderer = 0;
-    delete m_tubeRenderer;
-    m_tubeRenderer = 0;
-    delete m_selector;
-    m_selector = 0;
-    if ( !m_kdVerts )
-    {
-        m_kdVerts = new std::vector<float>();
-    }
-    m_kdVerts->clear();
-    m_kdVerts->reserve( m_numPoints * 3 );
     for ( unsigned int i = 0; i < m_fibs.size(); ++i )
     {
-        for ( unsigned int k = 0; k < m_fibs[i].length(); ++k )
+        Fib fib = m_fibs[i];
+        for ( unsigned int k = 0; k < fib.length(); ++k )
         {
-            m_kdVerts->push_back( m_fibs[i][k].x() );
-            m_kdVerts->push_back( m_fibs[i][k].y() );
-            m_kdVerts->push_back( m_fibs[i][k].z() );
+            QVector3D vert = fib.getVert( k );
+            vert = m_transform * vert;
+            fib.setVert( k, vert );
         }
-
+        m_fibs[i] = fib;
     }
 
+    m_resetRenderer = true;
+    transformChanged( 0 );
     Models::d()->submit();
 }
 

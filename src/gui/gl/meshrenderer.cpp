@@ -99,6 +99,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix * m_mMatrix );
     program->setUniformValue( "mv_matrixInvert", ( mv_matrix * m_mMatrix ).inverted() );
+    program->setUniformValue( "userTransformMatrix", props.get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>() );
 
     program->setUniformValue( "u_colorMode", m_colorMode );
     program->setUniformValue( "u_colormap", m_colormap );

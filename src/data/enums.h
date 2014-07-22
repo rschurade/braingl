@@ -281,6 +281,7 @@ namespace Fn
         D_HANDLE_0,
         D_HANDLE_1,
         D_HANDLE_2,
+        D_ISOLINE_STRIPES,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -539,6 +540,7 @@ namespace Fn
                 case Property::D_HANDLE_0: return QString( "handle 0 position" ); break;
                 case Property::D_HANDLE_1: return QString( "handle 1 position" ); break;
                 case Property::D_HANDLE_2: return QString( "handle 2 position" ); break;
+                case Property::D_ISOLINE_STRIPES: return QString( "stripes in inner area" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
