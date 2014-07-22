@@ -288,6 +288,10 @@ bool Writer::save()
             {
                 saveFibJson();
             }
+            else if ( m_filter.endsWith( "(*.trk)" ) )
+            {
+                saveFibTrk();
+            }
             else
             {
                 WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
@@ -997,5 +1001,72 @@ void Writer::saveFibJson()
         out << "}";
 
         outFile.close();
+    }
+}
+
+void Writer::saveFibTrk()
+{
+    // http://www.trackvis.org/docs/?subsect=fileformat
+    if ( dynamic_cast<DatasetFibers*>( m_dataset ) )
+    {
+        DatasetFibers* dsf = dynamic_cast<DatasetFibers*>( m_dataset );
+
+        QFile file( m_fileName.absoluteFilePath() );
+        file.open( QIODevice::WriteOnly );
+        QDataStream out( &file );
+        out.setFloatingPointPrecision( QDataStream::SinglePrecision );
+        char* s = "TRACK";
+        out.writeRawData( s, 6 ); // ID string for track file. The first 5 characters must be "TRACK".
+        out << (short) 128; // Dimension of the image volume.
+        out << (short) 128;
+        out << (short) 128;
+        out << (float) 1.0f; // Voxel size of the image volume.
+        out << (float) 1.0f;
+        out << (float) 1.0f;
+        out << (float) 0.0f; // Origin of the image volume. This field is not yet being used by TrackVis. That means the origin is always (0, 0, 0).
+        out << (float) 0.0f;
+        out << (float) 0.0f;
+        out << (short) 0; // Number of scalars saved at each track point (besides x, y and z coordinates).
+        for ( int i = 0; i < 200; ++i )
+        {
+            out << (qint8)0; // Name of each scalar. Can not be longer than 20 characters each. Can only store up to 10 names.
+        }
+        out << (short) 0; // Number of properties saved at each track.
+        for ( int i = 0; i < 200; ++i )
+        {
+            out << (qint8)0; // Name of each property. Can not be longer than 20 characters each. Can only store up to 10 names.
+        }
+        for ( int i = 0; i < 16; ++i )
+        {
+            out << (float)0; // 4x4 matrix for voxel to RAS (crs to xyz) transformation. If vox_to_ras[3][3] is 0, it means the matrix is not recorded. This field is added from version 2.
+        }
+        for ( int i = 0; i < 444; ++i )
+        {
+            out << (qint8)0; // Reserved space for future version.
+        }
+        for ( int i = 0; i < 40; ++i )
+        {
+            out << (qint8)0; // see documentation in link above
+        }
+        out << (qint32)dsf->numLines(); // Number of tracks stored in this track file. 0 means the number was NOT stored.
+        out << (qint32)2; // Version number. Current version is 2.
+        out << (qint32)1000; // Size of the header. Used to determine byte swap. Should be 1000.
+
+        std::vector<Fib>* fibs = dsf->getFibs();
+
+        for ( unsigned int i = 0; i < fibs->size(); ++i )
+        {
+            Fib fib = fibs->at(i);
+            out << (qint32)fib.length();
+            for ( unsigned int k = 0; k < fib.length(); ++k )
+            {
+                QVector3D vert = fib.getVert( k );
+                out << (float)vert.x();
+                out << (float)vert.y();
+                out << (float)vert.z();
+            }
+        }
+
+        file.close();
     }
 }

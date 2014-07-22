@@ -386,7 +386,7 @@ void DatasetFibers::applyTransform()
 
 QString DatasetFibers::getSaveFilter()
 {
-    return QString( "fib files binary(*.fib *.vtk);;fib files ascii (*.fib *.vtk);;fib files json (*.json);;all files (*.*)" );
+    return QString( "fib files binary(*.fib *.vtk);;fib files ascii (*.fib *.vtk);;fib files json (*.json);;trackvis (*.trk);;all files (*.*)" );
 }
 
 QString DatasetFibers::getDefaultSuffix()
