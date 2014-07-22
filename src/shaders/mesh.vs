@@ -18,7 +18,7 @@ void main()
 	
 	calcTexCoords();
 	
-	v_position = mvp_matrix * vec4( a_position.x + u_adjustX, a_position.y + u_adjustY, a_position.z + u_adjustZ,  1.0 );
+	v_position = mvp_matrix * userTransformMatrix * vec4( a_position.x + u_adjustX, a_position.y + u_adjustY, a_position.z + u_adjustZ,  1.0 );
 	
 	vertex = a_position.xyz;
     gl_Position = v_position;
