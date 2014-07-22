@@ -43,6 +43,7 @@ private:
     void saveMeshAsc();
     void saveBinaryConnectivity();
     void saveFibJson();
+    void saveFibTrk();
 };
 
 #endif /* WRITER_H_ */
