@@ -101,6 +101,9 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
 
+    QMatrix4x4 mat;
+    program->setUniformValue( "userTransformMatrix", mat );
+
     program->setUniformValue( "u_colorMode", 2 );
     program->setUniformValue( "u_colormap", m_colormap );
     program->setUniformValue( "u_color", m_color.redF(), m_color.greenF(), m_color.blueF(), 1.0 );
