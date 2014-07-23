@@ -25,6 +25,7 @@ public:
     bool save();
 
     nifti_image* createHeader( int dim );
+    void addPropsToHeader( nifti_image* header );
 
 private:
     Dataset* m_dataset;
