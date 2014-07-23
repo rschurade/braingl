@@ -62,16 +62,16 @@ bool LoaderNifti::load()
         return false;
     }
 
+    if ( !loadData( fn ) )
+    {
+        return false;
+    }
+
     if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) || QString( m_header->descrip ) == QString( "braingl_dwi" ) )
     {
         qDebug() << "braingl dwi dataset found";
         m_datasetType = Fn::DatasetType::NIFTI_DWI;
         return loadNiftiDWI_FNAV2( fn );
-    }
-
-    if ( !loadData( fn ) )
-    {
-        return false;
     }
 
     if( m_header->ext_list )
@@ -689,19 +689,9 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
             std::vector<QVector3D> bvecs;
 
             float* extData;
-
-            if (  m_header->ext_list->esize == 1 )
-            {
-                extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
-            }
-            else if (  m_header->ext_list->esize == 2 )
-            {
-                extData = reinterpret_cast<float*>( m_header->ext_list[1].edata );
-            }
-            else
-            {
-                return false;
-            }
+            extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
+            int extSize = m_header->ext_list[0].esize;
+            qDebug() << extSize;
 
             for ( int i = 0; i < dim; ++i )
             {
@@ -715,6 +705,10 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
             }
 
             DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
+            if ( m_propStates.size() > 0 )
+            {
+                dataset->properties().setState( m_propStates );
+            }
             m_dataset.push_back( dataset );
 
             qDebug() << "end loading data";

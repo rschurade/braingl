@@ -302,6 +302,7 @@ bool Writer::save()
         case Fn::DatasetType::ISO_LINE:
         {
             nifti_image* out = createHeader( 1 );
+            addPropsToHeader( out );
 
             std::vector<float>* data = dynamic_cast<DatasetIsoline*>( m_dataset )->getData();
 
@@ -359,6 +360,7 @@ bool Writer::save()
             else if ( m_filter.endsWith( "(*.nii.gz)" ) )
             {
                 nifti_image* out = createHeader( 1 );
+                addPropsToHeader( out );
 
                 std::vector<float>* data = dynamic_cast<DatasetIsosurface*>( m_dataset )->getData();
 
@@ -468,6 +470,13 @@ nifti_image* Writer::createHeader( int dim )
     out->nbyper = 4;
     out->datatype = DT_FLOAT;
 
+    return out;
+}
+
+void Writer::addPropsToHeader( nifti_image* header )
+{
+    PropertyGroup* props = &m_dataset->properties();
+
     QList<QVariant> props1 = props->getState();
 
     QByteArray ba;
@@ -479,10 +488,7 @@ nifti_image* Writer::createHeader( int dim )
     writeBuffer.close();
 
     char* extData = ba.data();
-    nifti_add_extension( out, extData, ba.size(), 0 );
-    qDebug() << ba.size();
-
-    return out;
+    nifti_add_extension( header, extData, ba.size(), 0 );
 }
 
 void Writer::setDescrip( nifti_image* hdr, QString descrip )
