@@ -82,6 +82,7 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
         GLFunctions::drawSphere( pMatrix, mvMatrix, h2.x(), h2.y(), h2.z(), 5, 5, 5,
                                   color, m_handle2, width, height, renderMode );
     }
+
     if ( dirty )
     {
         initGeometry();
@@ -115,9 +116,6 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     {
         return;
     }
-    //qDebug() << "main gl draw, renderMode:" << renderMode;
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
-
     QGLShaderProgram* program = GLFunctions::getShader( "slice" );
 
     program->bind();
@@ -127,14 +125,7 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (const void *) offset );
-
-    // Offset for texture coordinate
-    offset += sizeof(float) * 3;
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation( "a_texcoord" );
-    program->enableAttributeArray( texcoordLocation );
-    GLFunctions::f->glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (const void *) offset );
+    GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void *) offset );
 
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
@@ -145,14 +136,14 @@ void DatasetPlane::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     program->setUniformValue( "D0", 9 );
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
-    program->setUniformValue( "h0", 12 );
+    program->setUniformValue( "P0", 12 );
 
     GLFunctions::setTextureUniforms( program, target );
 
     // Draw cube geometry using indices from VBO 0
     glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-
     GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
 }
 void DatasetPlane::initGeometry()
 {
@@ -182,35 +173,17 @@ void DatasetPlane::initGeometry()
     float y3 = h2.y();
     float z3 = h0.z() + ( h0.z() - h1.z() ) - ( h0.z() - h2.z() );
 
-    int nx = 160;
-    int ny = 200;
-    int nz = 160;
-    float dx = 1.0f;
-    float dy = 1.0f;
-    float dz = 1.0f;
-    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_ANY );
-    if ( dsl.size() > 0 )
-    {
-        nx = dsl[0]->properties().get( Fn::Property::D_NX ).toInt();
-        ny = dsl[0]->properties().get( Fn::Property::D_NY ).toInt();
-        nz = dsl[0]->properties().get( Fn::Property::D_NZ ).toInt();
-        dx = dsl[0]->properties().get( Fn::Property::D_DX ).toFloat();
-        dy = dsl[0]->properties().get( Fn::Property::D_DY ).toFloat();
-        dz = dsl[0]->properties().get( Fn::Property::D_DZ ).toFloat();
-    }
-
-
     float vertices[] =
     {
-        x0, y0, z0, x0 / ( nx * dx ), y0 / ( ny * dy ), z0 / ( nz * dz ),
-        x1, y1, z1, x1 / ( nx * dx ), y1 / ( ny * dy ), z1 / ( nz * dz ),
-        x3, y3, z3, x3 / ( nx * dx ), y3 / ( ny * dy ), z3 / ( nz * dz ),
-        x2, y2, z2, x2 / ( nx * dx ), y2 / ( ny * dy ), z2 / ( nz * dz )
+        x0, y0, z0,
+        x1, y1, z1,
+        x3, y3, z3,
+        x2, y2, z2,
     };
 
     // Transfer vertex data to VBO 1
     GLFunctions::f->glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo0 );
-    GLFunctions::f->glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW );
+    GLFunctions::f->glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW );
     GLFunctions::f->glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     dirty = false;
