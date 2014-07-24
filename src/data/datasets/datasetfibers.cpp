@@ -521,6 +521,11 @@ void DatasetFibers::dataModeChanged()
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( max );
     m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
     m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
     Models::d()->submit();
