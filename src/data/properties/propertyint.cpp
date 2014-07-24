@@ -28,11 +28,15 @@ PropertyInt::~PropertyInt()
 void PropertyInt::setValue( QVariant value )
 {
     m_value = value.toInt();
+    if ( m_value.toInt() < m_min.toInt() )
+    {
+        setMin( value );
+    }
     if ( m_value.toInt() > m_max.toInt() )
     {
-        m_max = m_value;
-        ( ( SliderWithEditInt* )m_widget )->setMax( m_max.toInt() );
+        setMax( value );
     }
+
     ( ( SliderWithEditInt* )m_widget )->setValue( m_value.toInt() );
 }
 
@@ -60,6 +64,6 @@ void PropertyInt::setMax( QVariant max )
 
 void PropertyInt::widgetChanged( int value, int id )
 {
-    m_value = value;
+    setValue( value );
     emit( valueChanged( value ) );
 }
