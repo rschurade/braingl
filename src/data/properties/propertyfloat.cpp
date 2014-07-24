@@ -33,6 +33,14 @@ PropertyFloat::~PropertyFloat()
 void PropertyFloat::setValue( QVariant value )
 {
     m_value = value;
+    if ( m_value.toFloat() < m_min.toFloat() )
+    {
+        setMin( value );
+    }
+    if ( m_value.toFloat() > m_max.toFloat() )
+    {
+        setMax( value );
+    }
     ( ( SliderWithEdit* )m_widget )->setValue( m_value.toFloat() );
 }
 
@@ -43,7 +51,7 @@ void PropertyFloat::setMin( QVariant min )
     {
         m_value = m_min;
     }
-
+    ( ( SliderWithEdit* )m_widget )->setDigits( determineDigits() );
     ( ( SliderWithEdit* )m_widget )->setMin( m_min.toFloat() );
     ( ( SliderWithEdit* )m_widget )->setValue( m_value.toFloat() );
 }
@@ -62,7 +70,7 @@ void PropertyFloat::setMax( QVariant max )
 
 void PropertyFloat::widgetChanged( float value, int id )
 {
-    m_value = value;
+    setValue( value );
     emit( valueChanged( value ) );
 }
 
