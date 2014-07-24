@@ -22,7 +22,9 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, std::vector<Fib>* fibs )  :
     m_fibs( fibs ),
     m_numLines( fibs->size() ),
     m_numPoints( 0 ),
-    m_isInitialized( false )
+    m_isInitialized( false ),
+    m_updateExtraData( false ),
+    m_selectedExtraData( 0 )
 {
 }
 
@@ -61,6 +63,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
             return;
         }
     }
+
+    if ( m_updateExtraData )
+	{
+		updateExtraData( m_selectedExtraData );
+	}
 
     QGLShaderProgram* program = GLFunctions::getShader( "tube" );
     program->bind();
@@ -225,6 +232,12 @@ void TubeRenderer::colorChanged()
 {
 }
 
+void TubeRenderer::setExtraData( unsigned int dataFieldId )
+{
+	m_updateExtraData = true;
+	m_selectedExtraData = dataFieldId;
+}
+
 void TubeRenderer::updateExtraData( unsigned int dataFieldId )
 {
     std::vector<float>data;
@@ -253,4 +266,6 @@ void TubeRenderer::updateExtraData( unsigned int dataFieldId )
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[3] );
     glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    m_updateExtraData = false;
 }

@@ -504,11 +504,11 @@ void DatasetFibers::dataModeChanged()
 {
     if ( m_renderer != 0 )
     {
-        m_renderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
+        m_renderer->setExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     if ( m_tubeRenderer != 0 )
     {
-        m_tubeRenderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
+        m_tubeRenderer->setExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     float min = m_dataMins[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
     float max = m_dataMaxes[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
