@@ -6,11 +6,12 @@
 
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 cmake_policy(SET CMP0020 NEW)
+cmake_policy(SET CMP0043 NEW)
 
 SET( CMAKE_DISABLE_SOURCE_CHANGES ON )
 SET( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
 
-PROJECT( brainGL )
+PROJECT( braingl )
 SET( BinName "${PROJECT_NAME}" )
 
 # where to find our utils and cmake modules?
@@ -69,7 +70,7 @@ INCLUDE( ${VTK_USE_FILE} )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # Setup QT5
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-FIND_PACKAGE( Qt5 REQUIRED COMPONENTS core gui widgets opengl webkit xml )
+FIND_PACKAGE( Qt5 REQUIRED COMPONENTS Core Gui Widgets OpenGL Xml WebKit )
 
 # Resources
 SET(QtIcon_RCCS resources.qrc)
@@ -84,15 +85,17 @@ QT5_ADD_RESOURCES( QtIcon_RCC_SRCS ${QtIcon_RCCS} )
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 # CXX flags
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++11" )
+IF ( CMAKE_BUILD_TYPE MATCHES "Release" )
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -std=c++0x" )
+ELSE()
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++0x" )
+ENDIF()
 
 IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
 IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
-    ADD_DEFINITIONS( -D__WINDOWS__ )
-    
     OPTION( SURPRESS_CMD_WINDOW "No cmd window" OFF )
     IF ( SURPRESS_CMD_WINDOW MATCHES ON )
         SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
