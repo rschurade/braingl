@@ -149,21 +149,80 @@ std::vector<float> MarchingSquares::runStripes( int stripeType, int distance )
 
     m_stripeVerts.clear();
 
-    for ( int y = 0; y < m_ny - 1; ++y )
+    switch( stripeType )
     {
-        for ( int x = 0; x < m_nx - 1; ++x )
-        {
-            if ( ( ( x + y ) % m_stripeDistance ) == 0 )
+        case 1:
+            for ( int y = 0; y < m_ny - 1; ++y )
             {
-                if ( m_mask[id( x, y )] > 0 )
+                for ( int x = 0; x < m_nx - 1; ++x )
                 {
-                    m_stripeVerts.push_back( x * m_dx - m_dx2 );
-                    m_stripeVerts.push_back( y * m_dy - m_dx2 );
-                    m_stripeVerts.push_back( x * m_dx + m_dx2 );
-                    m_stripeVerts.push_back( y * m_dy + m_dy2 );
+                    if ( ( ( x + y ) % m_stripeDistance ) == 0 )
+                    {
+                        if ( m_mask[id( x, y )] > 0 )
+                        {
+                            m_stripeVerts.push_back( x * m_dx - m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy - m_dx2 );
+                            m_stripeVerts.push_back( x * m_dx + m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy + m_dy2 );
+                        }
+                    }
                 }
             }
-        }
+            break;
+        case 2:
+            for ( int y = 0; y < m_ny - 1; ++y )
+            {
+                for ( int x = 0; x < m_nx - 1; ++x )
+                {
+                    if ( ( ( x + y ) % m_stripeDistance ) == 0 )
+                    {
+                        if ( m_mask[id( x, y )] > 0 )
+                        {
+                            m_stripeVerts.push_back( x * m_dx + m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy - m_dy2 );
+                            m_stripeVerts.push_back( x * m_dx - m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy + m_dy2 );
+                        }
+                    }
+                }
+            }
+            break;
+        case 3:
+            for ( int y = 0; y < m_ny - 1; ++y )
+            {
+                for ( int x = 0; x < m_nx - 1; ++x )
+                {
+                    if ( ( x % m_stripeDistance ) == 0 )
+                    {
+                        if ( m_mask[id( x, y )] > 0 )
+                        {
+                            m_stripeVerts.push_back( x * m_dx );
+                            m_stripeVerts.push_back( y * m_dy - m_dy2 );
+                            m_stripeVerts.push_back( x * m_dx );
+                            m_stripeVerts.push_back( y * m_dy + m_dy2 );
+                        }
+                    }
+                }
+            }
+            break;
+        case 4:
+            for ( int y = 0; y < m_ny - 1; ++y )
+            {
+                for ( int x = 0; x < m_nx - 1; ++x )
+                {
+                    if ( ( y % m_stripeDistance ) == 0 )
+                    {
+                        if ( m_mask[id( x, y )] > 0 )
+                        {
+                            m_stripeVerts.push_back( x * m_dx + m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy );
+                            m_stripeVerts.push_back( x * m_dx - m_dx2 );
+                            m_stripeVerts.push_back( y * m_dy );
+                        }
+                    }
+                }
+            }
+            break;
     }
 
     return m_stripeVerts;
