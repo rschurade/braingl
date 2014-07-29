@@ -38,6 +38,8 @@ public:
     QVariant get( Fn::Property name ) const;
     bool set( Fn::Property name, QVariant value );
 
+    void copy( Fn::Property name, Property* prop );
+
     bool createBool( Fn::Property name, bool value, QString tab = "none" );
     bool createInt( Fn::Property name, int value, QString tab = "none" );
     bool createInt( Fn::Property name, int value, int min, int max, QString tab = "none" );

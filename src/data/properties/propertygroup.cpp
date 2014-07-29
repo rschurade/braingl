@@ -129,6 +129,43 @@ PropertyGroup& PropertyGroup::operator=( const PropertyGroup& pg )
     return *this;
 }
 
+void PropertyGroup::copy( Fn::Property name, Property* prop )
+{
+	if ( dynamic_cast<PropertyBool*>( prop ) )
+	{
+		this->createBool( name, prop->getValue().toBool(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyColor*>( prop ) )
+	{
+		this->createColor( name, prop->getValue().value<QColor>(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyFloat*>( prop ) )
+	{
+		this->createFloat( name, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyInt*>( prop ) )
+	{
+		this->createInt( name, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyPath*>( prop ) )
+	{
+		this->createDir( name, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertySelection*>( prop ) )
+	{
+		PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
+		this->createList( name, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyString*>( prop ) )
+	{
+		this->createString( name, prop->getValue().toString(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyText*>( prop ) )
+	{
+		this->createText( name, prop->getValue().toString(), prop->getPropertyTab() );
+	}
+}
+
 bool PropertyGroup::createBool( Fn::Property name, bool value, QString tab )
 {
     if ( contains( name ) )
