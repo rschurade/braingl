@@ -16,7 +16,7 @@
 
 #include "../../gui/gl/glfunctions.h"
 
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 
 DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     Dataset( QDir( "new iso line" ), Fn::DatasetType::ISO_LINE ),
@@ -35,12 +35,12 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createInt( Fn::Property::D_NX, ds->properties( "maingl" ).get( Fn::Property::D_NX ).toInt() );
     m_properties["maingl"].createInt( Fn::Property::D_NY, ds->properties( "maingl" ).get( Fn::Property::D_NY ).toInt() );
     m_properties["maingl"].createInt( Fn::Property::D_NZ, ds->properties( "maingl" ).get( Fn::Property::D_NZ ).toInt() );
-    m_properties["maingl"].createFloat( Fn::Property::D_DX, ds->properties( "maingl" ).get( Fn::Property::D_DX ).toFloat() );
-    m_properties["maingl"].createFloat( Fn::Property::D_DY, ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat() );
-    m_properties["maingl"].createFloat( Fn::Property::D_DZ, ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
-    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_X ).toFloat() );
-    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Y ).toFloat() );
-    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Z ).toFloat() );
+    m_properties["maingl"].createFloat( Fn::Property::D_DX, ds->properties( "maingl" ).get( Fn::Property::D_DX ).toFloat(), "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DY, ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat(), "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DZ, ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat(), "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_X ).toFloat(), "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Y ).toFloat(), "transform" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, ds->properties( "maingl" ).get( Fn::Property::D_ADJUST_Z ).toFloat(), "transform" );
 
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 1 );
     m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
@@ -180,13 +180,13 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
         program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
         program->setUniformValue( "u_constantThickness", true );
 
-        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() )
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() && m_vertCountAxial > 0 )
         {
             glDrawArrays( GL_TRIANGLES, 0, m_vertCountAxial );
             GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
         }
 
-        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() )
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() && m_vertCountCoronal > 0 )
         {
             program->setUniformValue( "u_aVec", 1., 0., 0. );
             program->setUniformValue( "u_bVec", 0., 0., 1. );
@@ -196,7 +196,7 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
             GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
         }
 
-        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() )
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() && m_vertCountSagittal > 0 )
         {
             program->setUniformValue( "u_aVec", 0., 1., 0. );
             program->setUniformValue( "u_bVec", 0., 0., 1. );
@@ -223,9 +223,9 @@ void DatasetIsoline::initGeometry()
     m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
     m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
 
-    int xi = qMax( 0.0f, qMin( ( m_x / dx ) - ax, (float)nx - 1 ) );
-    int yi = qMax( 0.0f, qMin( ( m_y / dy ) - ay, (float)ny - 1 ) );
-    int zi = qMax( 0.0f, qMin( ( m_z / dz ) - az, (float)nz - 1 ) );
+    int xi = qMax( 0.0f, qMin( ( m_x - ax ) / dx, (float)nx - 1 ) );
+    int yi = qMax( 0.0f, qMin( ( m_y - ay ) / dy, (float)ny - 1 ) );
+    int zi = qMax( 0.0f, qMin( ( m_z - az ) / dz, (float)nz - 1 ) );
 
     float isoValue = m_properties["maingl"].get( Fn::Property::D_ISO_VALUE ).toFloat();
     bool interpolation = m_properties["maingl"].get( Fn::Property::D_INTERPOLATION ).toBool();
@@ -234,17 +234,6 @@ void DatasetIsoline::initGeometry()
 
     std::vector<float>verts;
     std::vector<float>colors;
-
-    if( vbo0 )
-    {
-        GLFunctions::f->glDeleteBuffers( 1, &vbo0 );
-    }
-    GLFunctions::f->glGenBuffers( 1, &vbo0 );
-    if( vbo1 )
-    {
-        GLFunctions::f->glDeleteBuffers( 1, &vbo1 );
-    }
-    GLFunctions::f->glGenBuffers( 1, &vbo1 );
 
     m_vertCountAxial = 0;
     m_vertCountCoronal = 0;
@@ -268,13 +257,13 @@ void DatasetIsoline::initGeometry()
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
-                addGlyph( verts, colors, tmpVerts[4*i], tmpVerts[4*i+1], m_z, tmpVerts[4*i+2], tmpVerts[4*i+3], m_z );
+                addGlyph( verts, colors, tmpVerts[4*i] + ax, tmpVerts[4*i+1] + ay, m_z, tmpVerts[4*i+2] + ax, tmpVerts[4*i+3] + ay, m_z );
             }
             if ( stripeType > 0 )
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, tmpVerts2[4*i], tmpVerts2[4*i+1], m_z, tmpVerts2[4*i+2], tmpVerts2[4*i+3], m_z );
+                    addGlyph( verts, colors, tmpVerts2[4*i] + ax, tmpVerts2[4*i+1] + ay, m_z, tmpVerts2[4*i+2] + ax, tmpVerts2[4*i+3] + ay, m_z );
                 }
             }
             m_vertCountAxial = verts.size() / 8;
@@ -299,13 +288,13 @@ void DatasetIsoline::initGeometry()
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
-                addGlyph( verts, colors, tmpVerts[4*i], m_y, tmpVerts[4*i+1], tmpVerts[4*i+2], m_y, tmpVerts[4*i+3] );
+                addGlyph( verts, colors, tmpVerts[4*i] + ax, m_y, tmpVerts[4*i+1] + az, tmpVerts[4*i+2] + ax, m_y, tmpVerts[4*i+3] + az );
             }
             if ( stripeType > 0 )
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, tmpVerts2[4*i], m_y, tmpVerts2[4*i+1], tmpVerts2[4*i+2], m_y, tmpVerts2[4*i+3] );
+                    addGlyph( verts, colors, tmpVerts2[4*i] + ax, m_y, tmpVerts2[4*i+1] + az, tmpVerts2[4*i+2] + ax, m_y, tmpVerts2[4*i+3] + az );
                 }
             }
             m_vertCountCoronal = verts.size() / 8 - m_vertCountAxial;
@@ -330,20 +319,32 @@ void DatasetIsoline::initGeometry()
         {
             for ( unsigned int i = 0; i < tmpVerts.size() / 4; ++i )
             {
-                addGlyph( verts, colors, m_x, tmpVerts[4*i], tmpVerts[4*i+1], m_x, tmpVerts[4*i+2], tmpVerts[4*i+3] );
+                addGlyph( verts, colors, m_x, tmpVerts[4*i] + ay, tmpVerts[4*i+1] + az, m_x, tmpVerts[4*i+2] + ay, tmpVerts[4*i+3] + az );
             }
             if ( stripeType > 0 )
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, m_x, tmpVerts2[4*i], tmpVerts2[4*i+1], m_x, tmpVerts2[4*i+2], tmpVerts2[4*i+3] );
+                    addGlyph( verts, colors, m_x, tmpVerts2[4*i] + ay, tmpVerts2[4*i+1] + az, m_x, tmpVerts2[4*i+2] + ay, tmpVerts2[4*i+3] + az );
                 }
             }
             m_vertCountSagittal = verts.size() / 8 - ( m_vertCountCoronal + m_vertCountAxial );
         }
     }
+
     if ( verts.size() > 0 )
     {
+        if( vbo0 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo0 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo0 );
+        if( vbo1 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo1 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo1 );
+
         GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
         GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
         GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
