@@ -72,7 +72,7 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
-    m_properties["maingl"].createList( Fn::Property::D_ISOLINE_STRIPES, { "none", "45 degrees right", "45 degrees left", "vertical", "horizontal" }, 0, "general" );
+    m_properties["maingl"].createList( Fn::Property::D_ISOLINE_STRIPES, { "none", "45 degrees right", "45 degrees left", "vertical", "horizontal", "dots" }, 0, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISOLINE_STRIPES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
     PropertyGroup props2( m_properties["maingl"] );

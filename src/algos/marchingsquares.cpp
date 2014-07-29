@@ -223,6 +223,21 @@ std::vector<float> MarchingSquares::runStripes( int stripeType, int distance )
                 }
             }
             break;
+        case 5:
+        for ( int y = 0; y < m_ny - 1; ++y )
+        {
+            for ( int x = 0; x < m_nx - 1; ++x )
+            {
+                if ( m_mask[id( x, y )] > 0 )
+                {
+                    m_stripeVerts.push_back( x * m_dx );
+                    m_stripeVerts.push_back( y * m_dy );
+                    m_stripeVerts.push_back( x * m_dx );
+                    m_stripeVerts.push_back( y * m_dy );
+                }
+            }
+        }
+        break;
     }
 
     return m_stripeVerts;
