@@ -102,7 +102,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     if ( !resetSettings )
     {
         mainGLWidget->makeCurrent();
-        //loadSettings();
+        loadSettings();
     }
 }
 
