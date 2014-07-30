@@ -52,6 +52,9 @@ ADD_DEFINITIONS( -DHAVE_ZLIB )
 # REQUIRED third party libs
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
+IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+    FIND_PACKAGE( OpenGL REQUIRED )
+ENDIF()
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------
 # Boost
@@ -153,3 +156,7 @@ ReadProjectRevisionStatus()
 QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
 
 TARGET_LINK_LIBRARIES( ${BinName} ${VTK_LIBRARIES} z  )
+
+IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+    TARGET_LINK_LIBRARIES( ${BinName} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} z  )
+ENDIF()
