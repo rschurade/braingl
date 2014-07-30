@@ -152,6 +152,7 @@ void DatasetFibers::createProps()
         connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
                   m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
+        connect( m_properties["maingl"].getProperty( Fn::Property::D_COLORMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
         connect( m_properties["maingl"].getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
 
 //        connect( m_properties["maingl2"]->getProperty( Fn::Property::D_SELECTED_MIN ), SIGNAL( valueChanged( QVariant ) ),
@@ -451,7 +452,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
                 min = qMin( min, value );
                 max = qMax( max, value );
             }
-            qDebug() << m_dataNames[curField] << min << " " << max;
+            qDebug() << m_dataNames[curField] << "min: " << min << " max: " << max;
             m_dataMins.push_back( min );
             m_dataMaxes.push_back( max );
         }
