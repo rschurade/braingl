@@ -11,6 +11,9 @@
 #include "../data/datasets/dataset3d.h"
 #include "../data/models.h"
 
+#include "../algos/colormapbase.h"
+#include "../gui/gl/colormapfunctions.h"
+
 #include <QSet>
 #include <QVector3D>
 
@@ -291,6 +294,46 @@ Dataset3D* Fibers::tractColor()
 
             break;
         }
+        case 3:
+        {
+            int dm = m_dataset->properties( "maingl" ).get( Fn::Property::D_DATAMODE ).toInt();
+            int cm = m_dataset->properties( "maingl" ).get( Fn::Property::D_COLORMAP ).toInt();
+            ColormapBase cmb = ColormapFunctions::get( cm );
+
+            float dataMin = m_dataset->getDataMins()[dm];
+            float dataMax = m_dataset->getDataMaxes()[dm];
+            float div = dataMax - dataMin;
+
+            for ( unsigned int i = 0; i < fibs.size(); ++i )
+            {
+                Fib fib = fibs[i];
+                visited.clear();
+
+                for ( unsigned int k = 0; k < fib.length(); ++k )
+                {
+                    float value = ( fib.getData( dm, k ) - dataMin ) / div;
+
+                    QColor localColor = cmb.getColor( value );
+                    QVector3D colVec( localColor.redF(), localColor.greenF(), localColor.blue() );
+
+                    id = getID( fib[k].x(), fib[k].y(), fib[k].z() );
+                    if ( !visited.contains( id) )
+                    {
+                        ++count[ id ];
+                        data[ id ] += colVec;
+                        visited.insert( id );
+                    }
+                }
+            }
+
+            for ( int i = 0; i < m_blockSize; ++i )
+            {
+                data[i] /= count[i];
+            }
+
+            break;
+        }
+
         default:
             break;
     }
