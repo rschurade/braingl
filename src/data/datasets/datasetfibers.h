@@ -51,6 +51,7 @@ public:
 protected:
     void copyFromLoader( LoaderVTK* lv );
     void createProps();
+    void calcBoundingBox();
 
     std::vector<Fib>m_fibs;
     QList<QString>m_dataNames;
