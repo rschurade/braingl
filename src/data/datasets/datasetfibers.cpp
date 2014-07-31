@@ -44,6 +44,12 @@ DatasetFibers::DatasetFibers( QDir filename, std::vector<Fib> fibs, QList<QStrin
     m_numPoints( 0 ),
     m_numLines( 0 )
 {
+    if ( fibs.size() > 0 )
+    {
+        int count = fibs[0].getCountDataFields();
+        m_dataMins = std::vector<float>( count, 0.0f );
+        m_dataMaxes = std::vector<float>( count, 1.0f );
+    }
     createProps();
     calcBoundingBox();
 }
