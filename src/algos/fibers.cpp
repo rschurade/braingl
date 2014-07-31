@@ -25,6 +25,9 @@ Fibers::Fibers( DatasetFibers* ds ) :
     m_dx( 1.0 ),
     m_dy( 1.0 ),
     m_dz( 1.0 ),
+    m_ax( 0.0 ),
+    m_ay( 0.0 ),
+    m_az( 0.0 ),
     m_blockSize( 1 )
 {
 }
@@ -109,21 +112,23 @@ Fib Fibers::mergeFibs( Fib& lhs, Fib& rhs )
 DatasetScalar* Fibers::tractDensity()
 {
     float res = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
+
+    QVector3D lowerCorner = m_dataset->getBoundingBox().first;
+    QVector3D upperCorner = m_dataset->getBoundingBox().second;
     m_dx = res;
     m_dy = res;
     m_dz = res;
-    m_nx = 160;
-    m_ny = 200;
-    m_nz = 160;
-
-    m_nx = ( ( m_nx * m_dx ) / res ) + 1;
-    m_ny = ( ( m_ny * m_dy ) / res ) + 1;
-    m_nz = ( ( m_nz * m_dz ) / res ) + 1;
-
+    m_ax = lowerCorner.x();
+    m_ay = lowerCorner.y();
+    m_az = lowerCorner.z();
+    m_nx = ( upperCorner.x() - m_ax ) / res;
+    m_ny = ( upperCorner.y() - m_ay ) / res;
+    m_nz = ( upperCorner.z() - m_az ) / res;
 
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<float> data( m_blockSize, 0 );
     std::vector<Fib> fibs = m_dataset->getSelectedFibs();
+
     float x, y, z;
     QVector3D p3;
     qDebug() << "calculating tract density for " << fibs.size() << " fibers...";
@@ -155,23 +160,25 @@ DatasetScalar* Fibers::tractDensity()
         }
     }
 
-    int dims[8] = { 3, m_nx, m_ny, m_nz, 1, 1, 1 };
-    nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
-    header->dx = m_dx;
-    header->dy = m_dy;
-    header->dz = m_dz;
+    nifti_image* header = createHeader( 1 );
     DatasetScalar* out = new DatasetScalar( QDir( "tract density" ), data, header );
     return out;
 }
 
 Dataset3D* Fibers::tractColor()
 {
+    QVector3D lowerCorner = m_dataset->getBoundingBox().first;
+    QVector3D upperCorner = m_dataset->getBoundingBox().second;
     m_dx = Models::getGlobal( Fn::Property::G_TRACT_TEX_RESOLUTION ).toFloat();
     m_dy = m_dx;
     m_dz = m_dx;
-    m_nx = 160 / m_dx;
-    m_ny = 200 / m_dy;
-    m_nz = 160 / m_dz;
+    m_ax = lowerCorner.x();
+    m_ay = lowerCorner.y();
+    m_az = lowerCorner.z();
+    m_nx = ( upperCorner.x() - m_ax ) / m_dx;
+    m_ny = ( upperCorner.y() - m_ay ) / m_dx;
+    m_nz = ( upperCorner.z() - m_az ) / m_dx;
+
     int source = Models::getGlobal( Fn::Property::G_TRACT_TEXT_SOURCE ).toInt();
     m_blockSize = m_nx * m_ny * m_nz;
     std::vector<QVector3D> data( m_blockSize );
@@ -288,11 +295,7 @@ Dataset3D* Fibers::tractColor()
             break;
     }
 
-    int dims[8] = { 3, m_nx, m_ny, m_nz, 3, 1, 1 };
-    nifti_image* header = nifti_make_new_nim( dims, NIFTI_TYPE_FLOAT32, 1 );
-    header->dx = m_dx;
-    header->dy = m_dy;
-    header->dz = m_dz;
+    nifti_image* header = createHeader( 3 );
     Dataset3D* out = new Dataset3D( QDir( "tract color" ), data, header );
     return out;
 }
@@ -339,5 +342,58 @@ DatasetFibers* Fibers::downSample()
     DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), newFibs, m_dataset->getDataNames() );
     out->setDataMins( m_dataset->getDataMins() );
     out->setDataMaxes( m_dataset->getDataMaxes() );
+    return out;
+}
+
+nifti_image* Fibers::createHeader( int dim )
+{
+    nifti_image* out = nifti_simple_init_nim();
+
+    out->nx = m_nx;
+    out->ny = m_ny;
+    out->nz = m_nz;
+
+    out->nvox = out->nx * out->ny * out->nz * dim;
+
+    out->dx = m_dx;
+    out->dy = m_dy;
+    out->dz = m_dz;
+
+    out->nifti_type = 1; // 1==NIFTI-1 (1 file)
+
+    out->freq_dim = 1;
+    out->phase_dim = 2;
+    out->slice_dim = 3;
+
+    out->nt = dim;
+    out->nv = 4;
+    out->ndim = 4;
+
+    QMatrix4x4 qform;
+    out->qform_code = 1;
+
+    QMatrix4x4 sform;
+    out->sform_code = 0;
+
+    out->qto_xyz.m[0][0] = m_dx;
+    out->qto_xyz.m[1][1] = m_dy;
+    out->qto_xyz.m[2][2] = m_dz;
+
+    out->qto_xyz.m[0][3] = m_ax + m_dx / 2;
+    out->qto_xyz.m[1][3] = m_ay + m_dy / 2;
+    out->qto_xyz.m[2][3] = m_az + m_dz / 2;
+
+    {
+        float dx, dy, dz;
+        nifti_mat44_to_quatern( out->qto_xyz, &( out->quatern_b ), &( out->quatern_c ), &( out->quatern_d ), &( out->qoffset_x ), &( out->qoffset_y ),
+                &( out->qoffset_z ), &dx, &dy, &dz, &( out->qfac ) );
+    }
+
+    out->qto_ijk = nifti_mat44_inverse( out->qto_xyz );
+    out->sto_ijk = nifti_mat44_inverse( out->sto_xyz );
+
+    out->nbyper = 4;
+    out->datatype = DT_FLOAT;
+
     return out;
 }

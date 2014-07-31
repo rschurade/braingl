@@ -45,6 +45,7 @@ DatasetFibers::DatasetFibers( QDir filename, std::vector<Fib> fibs, QList<QStrin
     m_numLines( 0 )
 {
     createProps();
+    calcBoundingBox();
 }
 
 DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
@@ -58,6 +59,7 @@ DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
 {
     copyFromLoader( lv );
     createProps();
+    calcBoundingBox();
 }
 
 DatasetFibers::~DatasetFibers()
@@ -560,4 +562,35 @@ unsigned int DatasetFibers::numVerts()
 unsigned int DatasetFibers::numLines()
 {
     return m_numLines;
+}
+
+void DatasetFibers::calcBoundingBox()
+{
+    float xMin = 1000;
+    float yMin = 1000;
+    float zMin = 1000;
+    float xMax = -1000;
+    float yMax = -1000;
+    float zMax = -1000;
+
+    for ( unsigned int i = 0; i < m_fibs.size(); ++i )
+    {
+        Fib fib = m_fibs[i];
+        for ( unsigned int k = 0; k < fib.length(); ++k )
+        {
+            QVector3D vert = fib[k];
+            xMin = qMin( xMin, vert.x() );
+            yMin = qMin( yMin, vert.y() );
+            zMin = qMin( zMin, vert.z() );
+            xMax = qMax( xMax, vert.x() );
+            yMax = qMax( yMax, vert.y() );
+            zMax = qMax( zMax, vert.z() );
+        }
+    }
+    m_boundingBox.first.setX( xMin );
+    m_boundingBox.first.setY( yMin );
+    m_boundingBox.first.setZ( zMin );
+    m_boundingBox.second.setX( xMax );
+    m_boundingBox.second.setY( yMax );
+    m_boundingBox.second.setZ( zMax );
 }
