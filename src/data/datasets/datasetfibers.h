@@ -16,10 +16,11 @@
 #include <QList>
 #include <QString>
 
+class ColormapRenderer;
 class FiberRenderer;
-class TubeRenderer;
 class FiberSelector;
 class LoaderVTK;
+class TubeRenderer;
 
 class DatasetFibers : public Dataset
 {
@@ -63,6 +64,8 @@ protected:
 
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
+    ColormapRenderer* m_colormapRenderer;
+
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;
     unsigned int m_numPoints;

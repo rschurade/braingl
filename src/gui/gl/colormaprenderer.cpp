@@ -12,7 +12,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 ColormapRenderer::ColormapRenderer() :
-    vboIds( new GLuint[ 2 ] ),
+    vboIds( new GLuint[ 3 ] ),
     m_orient( 0 ),
     m_x( 0.0f ),
     m_y( 0.0f ),
@@ -22,7 +22,8 @@ ColormapRenderer::ColormapRenderer() :
     m_min( 0.0 ),
     m_max( 1.0 ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 )
+    m_upperThreshold( 1.0 ),
+    m_textLabel( "" )
 {
 }
 
@@ -225,7 +226,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
 
         GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, m_textColor, renderMode );
     }
-
+    GLFunctions::renderText( m_textLabel, m_x, m_y, m_textSize, width, height, m_textColor, renderMode );
 }
 
 void ColormapRenderer::setX( float x )
@@ -287,4 +288,9 @@ void ColormapRenderer::setTextSize( int size )
 void ColormapRenderer::setTextColor( QColor color )
 {
     m_textColor = color;
+}
+
+void ColormapRenderer::setTextLabel( QString label )
+{
+    m_textLabel = label;
 }
