@@ -46,6 +46,7 @@ private:
     float m_lowerThreshold;
     float m_upperThreshold;
     std::vector<QVector3D>m_labels;
+    QString m_textLabel;
 
 public slots:
     void setX( float x );
@@ -62,6 +63,7 @@ public slots:
     void setSelectedMax( float value );
     void setLowerThreshold( float value );
     void setUpperThreshold( float value );
+    void setTextLabel( QString label );
 };
 
 #endif /* COLORMAPRENDERER_H_ */
