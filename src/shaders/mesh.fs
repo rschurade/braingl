@@ -103,5 +103,5 @@ void main()
         color = light( frontColor ).rgb;
     }
     
-    writePeel( color );
+    writePeel( vec4( color, u_alpha ) );
 }
