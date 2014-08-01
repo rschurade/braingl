@@ -361,6 +361,7 @@ namespace Fn
         G_TRACT_TEX_RESOLUTION,
         G_TRACT_TEXT_SOURCE,
         G_ISOLINE_STANDARD_COLOR,
+        G_MESH_TRANSPARENCY,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         D_X = 1000,
@@ -621,6 +622,7 @@ namespace Fn
                 case Property::G_TRACT_TEX_RESOLUTION: return QString( "resolution of tract textures" ); break;
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
                 case Property::G_ISOLINE_STANDARD_COLOR: return QString( "isoline standard color" ); break;
+                case Property::G_MESH_TRANSPARENCY: return QString( "mesh transparency" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::D_X: return QString( "x" ); break;

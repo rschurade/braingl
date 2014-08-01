@@ -66,6 +66,7 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createColor( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
     m_properties->createBool( Fn::Property::G_SHOW_NAV_SLIDERS, true, "general" );
     m_properties->createList( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );
+    m_properties->createList( Fn::Property::G_MESH_TRANSPARENCY, {"normal", "outer shell"}, 0, "general" );
     m_properties->createBool( Fn::Property::G_UNSELECTED_FIBERS_GREY, false, "general" );
 
     m_properties->createInt( Fn::Property::G_SCREENSHOT_QUALITY, 1, 50, 1000000 );
