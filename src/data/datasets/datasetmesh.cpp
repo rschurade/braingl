@@ -11,15 +11,18 @@
 #include "../vptr.h"
 
 #include "../mesh/trianglemesh2.h"
-#include "../../gui/gl/meshrenderer.h"
+
 #include "../../gui/gl/colormapfunctions.h"
+#include "../../gui/gl/colormaprenderer.h"
+#include "../../gui/gl/meshrenderer.h"
 
 #include <QFile>
 #include <QFileDialog>
 
 DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
     Dataset( fileName, Fn::DatasetType::MESH_BINARY ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_colormapRenderer( 0 )
 {
     m_mesh.push_back( mesh );
     initProperties();
@@ -28,7 +31,8 @@ DatasetMesh::DatasetMesh( TriangleMesh2* mesh, QDir fileName ) :
 
 DatasetMesh::DatasetMesh( QDir fileName, Fn::DatasetType type ) :
     Dataset( fileName, type ),
-    m_renderer( 0 )
+    m_renderer( 0 ),
+    m_colormapRenderer( 0 )
 {
     initProperties();
 }
@@ -240,6 +244,30 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     }
     m_renderer->setMesh( getMesh(target) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+
+    if ( properties( target ).get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
+    {
+        if ( !m_colormapRenderer )
+        {
+            m_colormapRenderer = new ColormapRenderer();
+            m_colormapRenderer->init();
+        }
+        m_colormapRenderer->setColormap( properties( target ).get( Fn::Property::D_COLORMAP ).toInt() );
+        m_colormapRenderer->setX( properties( target ).get( Fn::Property::D_COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( properties( target ).get( Fn::Property::D_COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( properties( target ).get( Fn::Property::D_COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( properties( target ).get( Fn::Property::D_COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
+
+        m_colormapRenderer->setMin( properties( target ).get( Fn::Property::D_MIN ).toFloat() );
+        m_colormapRenderer->setMax( properties( target ).get( Fn::Property::D_MAX ).toFloat() );
+        m_colormapRenderer->setSelectedMin( properties( target ).get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        m_colormapRenderer->setSelectedMax( properties( target ).get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        m_colormapRenderer->setLowerThreshold( properties( target ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->setUpperThreshold( properties( target ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+        m_colormapRenderer->draw( width, height, renderMode );
+    }
 }
 
 bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
