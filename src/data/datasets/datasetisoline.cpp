@@ -23,9 +23,14 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_dirty( true ),
     vbo0( 0 ),
     vbo1( 0 ),
+    vbo2( 0 ),
+    vbo3( 0 ),
     m_vertCountAxial( 0 ),
     m_vertCountCoronal( 0 ),
     m_vertCountSagittal( 0 ),
+    m_stripeVertCountAxial( 0 ),
+    m_stripeVertCountCoronal( 0 ),
+    m_stripeVertCountSagittal( 0 ),
     m_x( 0 ),
     m_y( 0 ),
     m_z( 0 )
@@ -74,6 +79,8 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
 
     m_properties["maingl"].createList( Fn::Property::D_ISOLINE_STRIPES, { "none", "45 degrees right", "45 degrees left", "vertical", "horizontal", "dots" }, 0, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISOLINE_STRIPES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
+
+    m_properties["maingl"].createFloat( Fn::Property::D_ISOLINE_STRIPES_WIDTH, 1, 1, 10, "general" );
 
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
@@ -206,6 +213,82 @@ void DatasetIsoline::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, i
             GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
         }
     }
+
+    if ( ( m_stripeVertCountAxial + m_stripeVertCountCoronal + m_stripeVertCountSagittal ) > 0 )
+    {
+        program->bind();
+
+        intptr_t offset = 0;
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
+
+        int vertexLocation = program->attributeLocation( "a_position" );
+        program->enableAttributeArray( vertexLocation );
+        GLFunctions::f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int offsetLocation = program->attributeLocation( "a_vec" );
+        program->enableAttributeArray( offsetLocation );
+        GLFunctions::f->glVertexAttribPointer( offsetLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+
+        offset += sizeof(float) * 3;
+        int dirLocation = program->attributeLocation( "a_dir2" );
+        program->enableAttributeArray( dirLocation );
+        GLFunctions::f->glVertexAttribPointer( dirLocation, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (const void *) offset );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo3 );
+        int colorLocation = program->attributeLocation( "a_color" );
+        program->enableAttributeArray( colorLocation );
+        GLFunctions::f->glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        // Set modelview-projection matrix
+        program->setUniformValue( "mvp_matrix", pMatrix * mvMatrix );
+        program->setUniformValue( "u_scaling", 1.0f );
+
+        program->setUniformValue( "u_alpha", 1.0f );
+        program->setUniformValue( "u_renderMode", renderMode );
+        program->setUniformValue( "u_canvasSize", width, height );
+        program->setUniformValue( "D0", 9 );
+        program->setUniformValue( "D1", 10 );
+        program->setUniformValue( "D2", 11 );
+        program->setUniformValue( "P0", 12 );
+
+        program->setUniformValue( "u_aVec", 1., 0., 0. );
+        program->setUniformValue( "u_bVec", 0., 1., 0. );
+        program->setUniformValue( "u_orient", 0 );
+
+        program->setUniformValue( "u_glyphThickness", m_properties["maingl"].get( Fn::Property::D_ISOLINE_STRIPES_WIDTH ).toFloat() );
+        program->setUniformValue( "u_glyphSize", m_properties["maingl"].get( Fn::Property::D_STIPPLE_GLYPH_SIZE ).toFloat() );
+        program->setUniformValue( "u_constantThickness", true );
+
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_AXIAL ).toBool() && m_stripeVertCountAxial > 0 )
+        {
+            glDrawArrays( GL_TRIANGLES, 0, m_stripeVertCountAxial );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
+
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_CORONAL ).toBool() && m_stripeVertCountCoronal > 0 )
+        {
+            program->setUniformValue( "u_aVec", 1., 0., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            program->setUniformValue( "u_orient", 1 );
+
+            glDrawArrays( GL_TRIANGLES, m_stripeVertCountAxial, m_stripeVertCountCoronal );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
+
+        if ( m_properties["maingl"].get( Fn::Property::D_RENDER_SAGITTAL ).toBool() && m_stripeVertCountSagittal > 0 )
+        {
+            program->setUniformValue( "u_aVec", 0., 1., 0. );
+            program->setUniformValue( "u_bVec", 0., 0., 1. );
+            program->setUniformValue( "u_orient", 2 );
+
+            glDrawArrays( GL_TRIANGLES, m_stripeVertCountAxial + m_stripeVertCountCoronal, m_stripeVertCountSagittal );
+            GLFunctions::getAndPrintGLError( "render stipples: opengl error" );
+        }
+    }
 }
 
 void DatasetIsoline::initGeometry()
@@ -233,7 +316,9 @@ void DatasetIsoline::initGeometry()
     int stripeType = m_properties["maingl"].get( Fn::Property::D_ISOLINE_STRIPES ).toInt();
 
     std::vector<float>verts;
+    std::vector<float>stripeVerts;
     std::vector<float>colors;
+    std::vector<float>stripeColors;
 
     m_vertCountAxial = 0;
     m_vertCountCoronal = 0;
@@ -263,10 +348,11 @@ void DatasetIsoline::initGeometry()
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, tmpVerts2[4*i] + ax, tmpVerts2[4*i+1] + ay, m_z, tmpVerts2[4*i+2] + ax, tmpVerts2[4*i+3] + ay, m_z );
+                    addGlyph( stripeVerts, stripeColors, tmpVerts2[4*i] + ax, tmpVerts2[4*i+1] + ay, m_z, tmpVerts2[4*i+2] + ax, tmpVerts2[4*i+3] + ay, m_z );
                 }
             }
             m_vertCountAxial = verts.size() / 8;
+            m_stripeVertCountAxial = stripeVerts.size() / 8;
         }
     }
 
@@ -294,10 +380,11 @@ void DatasetIsoline::initGeometry()
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, tmpVerts2[4*i] + ax, m_y, tmpVerts2[4*i+1] + az, tmpVerts2[4*i+2] + ax, m_y, tmpVerts2[4*i+3] + az );
+                    addGlyph( stripeVerts, stripeColors, tmpVerts2[4*i] + ax, m_y, tmpVerts2[4*i+1] + az, tmpVerts2[4*i+2] + ax, m_y, tmpVerts2[4*i+3] + az );
                 }
             }
             m_vertCountCoronal = verts.size() / 8 - m_vertCountAxial;
+            m_stripeVertCountCoronal = stripeVerts.size() / 8 - m_stripeVertCountAxial;
         }
     }
 
@@ -325,10 +412,11 @@ void DatasetIsoline::initGeometry()
             {
                 for ( unsigned int i = 0; i < tmpVerts2.size() / 4; ++i )
                 {
-                    addGlyph( verts, colors, m_x, tmpVerts2[4*i] + ay, tmpVerts2[4*i+1] + az, m_x, tmpVerts2[4*i+2] + ay, tmpVerts2[4*i+3] + az );
+                    addGlyph( stripeVerts, stripeColors, m_x, tmpVerts2[4*i] + ay, tmpVerts2[4*i+1] + az, m_x, tmpVerts2[4*i+2] + ay, tmpVerts2[4*i+3] + az );
                 }
             }
             m_vertCountSagittal = verts.size() / 8 - ( m_vertCountCoronal + m_vertCountAxial );
+            m_stripeVertCountSagittal = stripeVerts.size() / 8 - ( m_stripeVertCountCoronal + m_stripeVertCountAxial );
         }
     }
 
@@ -344,6 +432,17 @@ void DatasetIsoline::initGeometry()
             GLFunctions::f->glDeleteBuffers( 1, &vbo1 );
         }
         GLFunctions::f->glGenBuffers( 1, &vbo1 );
+        if( vbo2 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo2 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo2 );
+        if( vbo3 )
+        {
+            GLFunctions::f->glDeleteBuffers( 1, &vbo3 );
+        }
+        GLFunctions::f->glGenBuffers( 1, &vbo3 );
+
 
         GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo0 );
         GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, verts.size() * sizeof( float ), verts.data(), GL_DYNAMIC_DRAW );
@@ -351,6 +450,14 @@ void DatasetIsoline::initGeometry()
 
         GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo1 );
         GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, colors.size() * sizeof( float ), colors.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo2 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, stripeVerts.size() * sizeof( float ), stripeVerts.data(), GL_DYNAMIC_DRAW );
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+        GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, vbo3 );
+        GLFunctions::f->glBufferData( GL_ARRAY_BUFFER, stripeColors.size() * sizeof( float ), stripeColors.data(), GL_DYNAMIC_DRAW );
         GLFunctions::f->glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
     m_dirty = false;
