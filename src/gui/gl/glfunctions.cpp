@@ -10,10 +10,12 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/roi.h"
+#include "../../data/properties/propertygroup.h"
 
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 
+#include "colormaprenderer.h"
 #include "shaperenderer.h"
 #include "../text/textrenderer.h"
 
@@ -34,6 +36,7 @@ int GLFunctions::maxDim = 250;
 
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
+ColormapRenderer* GLFunctions::m_colormapRenderer = new ColormapRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 100;
@@ -661,9 +664,11 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
     return tl;
 }
 
-void GLFunctions::initTextRenderer()
+void GLFunctions::initRenderers()
 {
     GLFunctions::m_textRenderer->init();
+    GLFunctions::m_shapeRenderer->init();
+    GLFunctions::m_colormapRenderer->init();
 }
 
 void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode )
@@ -671,11 +676,6 @@ void GLFunctions::renderText( QString text, int x, int y, int size, int width, i
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
     GLFunctions::m_textRenderer->renderText( text, x, y, width, height, renderMode );
-}
-
-void GLFunctions::initShapeRenderer()
-{
-    GLFunctions::m_shapeRenderer->init();
 }
 
 void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
@@ -716,4 +716,45 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
 void GLFunctions::deleteTexture( GLuint tex )
 {
     m_texturesToDelete.push_back( tex );
+}
+
+void GLFunctions::createColormapBarProps( PropertyGroup& props )
+{
+    props.createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    props.createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    props.createCharString( Fn::Property::D_COLORMAP_LABEL, "label", "colormap" );
+}
+
+void GLFunctions::drawColormapBar( PropertyGroup& props, int width, int height, int renderMode )
+{
+    if ( props.get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
+    {
+        if ( !m_colormapRenderer )
+        {
+            m_colormapRenderer = new ColormapRenderer();
+            m_colormapRenderer->init();
+        }
+        m_colormapRenderer->setColormap( props.get( Fn::Property::D_COLORMAP ).toInt() );
+        m_colormapRenderer->setX( props.get( Fn::Property::D_COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( props.get( Fn::Property::D_COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( props.get( Fn::Property::D_COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( props.get( Fn::Property::D_COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( props.get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( props.get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
+
+        m_colormapRenderer->setMin( props.get( Fn::Property::D_MIN).toFloat() );
+        m_colormapRenderer->setMax( props.get( Fn::Property::D_MAX).toFloat() );
+        m_colormapRenderer->setSelectedMin( props.get( Fn::Property::D_SELECTED_MIN).toFloat() );
+        m_colormapRenderer->setSelectedMax( props.get( Fn::Property::D_SELECTED_MAX).toFloat() );
+        m_colormapRenderer->setLowerThreshold( props.get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setUpperThreshold( props.get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setTextLabel( props.get( Fn::Property::D_COLORMAP_LABEL ).toString() );
+
+        m_colormapRenderer->draw( width, height, renderMode );
+    }
 }

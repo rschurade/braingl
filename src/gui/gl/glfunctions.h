@@ -16,10 +16,12 @@
 
 #include <QOpenGLFunctions_3_3_Core>
 
+class ColormapRenderer;
+class PropertyGroup;
 class QGLShaderProgram;
+class ROI;
 class ShapeRenderer;
 class TextRenderer;
-class ROI;
 
 struct VertexData
 {
@@ -54,16 +56,18 @@ public:
 
     static void updateColormapShader();
 
-    static void initTextRenderer();
+    static void initRenderers();
     static void renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode );
 
-    static void initShapeRenderer();
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                             float x, float y, float z, float dx, float dy, float dz,
                             QColor color, int pickID, int width, int height, int renderMode );
     static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                float x, float y, float z, float dx, float dy, float dz,
                                QColor color, int pickID, int width, int height, int renderMode );
+
+    static void createColormapBarProps( PropertyGroup& props );
+    static void drawColormapBar( PropertyGroup& props, int width, int height, int renderMode );
 
     static bool getAndPrintGLError( QString prefix = "" );
 
@@ -84,6 +88,7 @@ private:
 
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;
+    static ColormapRenderer* m_colormapRenderer;
 
     static QHash< QString, QString >m_shaderIncludes;
     static QHash< QString, QString >m_shaderSources;

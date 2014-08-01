@@ -16,7 +16,6 @@
 #include <QList>
 #include <QString>
 
-class ColormapRenderer;
 class FiberRenderer;
 class FiberSelector;
 class LoaderVTK;
@@ -64,7 +63,6 @@ protected:
 
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
-    ColormapRenderer* m_colormapRenderer;
 
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;

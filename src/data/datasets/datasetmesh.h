@@ -12,7 +12,6 @@
 
 #include <QString>
 
-class ColormapRenderer;
 class MeshRenderer;
 class TriangleMesh2;
 
@@ -45,7 +44,6 @@ public:
 protected:
     std::vector<TriangleMesh2*> m_mesh;
     MeshRenderer* m_renderer;
-    ColormapRenderer* m_colormapRenderer;
     std::vector<QString> m_displayList;
     QMatrix4x4 m_transform;
 
