@@ -24,3 +24,5 @@ uniform bool u_cutLowerZ;
 uniform bool u_cutHigherX;
 uniform bool u_cutHigherY;
 uniform bool u_cutHigherZ;
+
+uniform int u_meshTransparency;

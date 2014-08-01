@@ -117,3 +117,89 @@ void writePeel( vec4 color )
         }
     }
 }
+
+void writePeel2( vec4 color )
+{
+    // opaque
+    vec4 c = encode( 1.0 - gl_FragCoord.z );
+    float z = decode(c);
+    float zmin;
+    float zmax;
+    if ( u_renderMode == 1 || u_renderMode == 0 )
+    { 
+        fragColor = color;
+        fragDepth = c;
+        pickColor = u_pickColor;
+    }
+    else
+    {
+        vec2 loc = vec2( gl_FragCoord.x/u_canvasSize.x, gl_FragCoord.y/u_canvasSize.y );
+        z = decode( encode( 1.0 - gl_FragCoord.z ) ); // bigger number => closer to camera; distance out of screen
+        zmin = decode( texture( D0, loc ) );
+        if ( u_renderMode == 2 )
+        {
+            //first creation of D1
+            if ( z > zmin ) 
+            {
+                fragColor = color;
+                fragDepth = c;
+                pickColor = u_pickColor;
+            } 
+            else 
+            {
+                discard;
+            }
+            
+        }
+        else if ( u_renderMode == 3 )
+        {
+            zmax = decode( texture( D1, loc ) );
+            if ( zmin < z && z < zmax )
+            {
+                fragColor = vec4( 0.0 ); //color;
+                fragDepth = c;
+                vec4 pc = texture( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+        else if ( u_renderMode == 4 )
+        {
+            zmax = decode( texture( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                fragColor =  vec4( 0.0 ); //color;
+                fragDepth = c;
+                vec4 pc = texture( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+        else if ( u_renderMode == 5 )
+        {
+            zmax = decode( texture( D2, loc ) );
+            if ( zmin < z && z < zmax ) 
+            {
+                vec4 accuColor = texture( C5, loc );
+                
+                fragColor = vec4( accuColor.r + color.r * color.a, accuColor.g + color.g * color.a, accuColor.b + color.b * color.a, accuColor.a + color.a );
+                float count = decode( texture( D1, loc ) );
+                count += 1.0;
+                fragDepth = encode( count );
+                
+                vec4 pc = texture( P0, loc );
+                pickColor = pc;
+            } 
+            else 
+            {
+                discard;
+            }
+        }
+    }
+}

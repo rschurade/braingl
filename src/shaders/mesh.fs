@@ -103,5 +103,12 @@ void main()
         color = light( frontColor ).rgb;
     }
     
-    writePeel( vec4( color, u_alpha ) );
+    if ( u_meshTransparency == 0 )
+    {
+        writePeel( vec4( color, u_alpha ) );
+    }
+    else
+    {
+        writePeel2( vec4( color, u_alpha ) );
+    }
 }
