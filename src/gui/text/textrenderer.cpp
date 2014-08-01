@@ -20,10 +20,20 @@ TextRenderer::TextRenderer() :
     m_textSizeY( 0.1 )
 {
     int pos = 0;
-    for ( int i = 33; i < 127; ++i )
+    for ( int i = 33; i < 126; ++i )
     {
         m_characterPositions[ QChar( i ) ] = pos++;
     }
+    pos++;
+    m_characterPositions[ QChar( 'ß' ) ] = pos++;
+    m_characterPositions[ QChar( 'ä' ) ] = pos++;
+    m_characterPositions[ QChar( 'Ä' ) ] = pos++;
+    m_characterPositions[ QChar( 'ö' ) ] = pos++;
+    m_characterPositions[ QChar( 'Ö' ) ] = pos++;
+    m_characterPositions[ QChar( 'ü' ) ] = pos++;
+    m_characterPositions[ QChar( 'Ü' ) ] = pos++;
+    m_characterPositions[ QChar( '€' ) ] = pos++;
+    m_characterPositions[ ' ' ] = pos++;
 }
 
 TextRenderer::~TextRenderer()

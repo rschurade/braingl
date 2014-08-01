@@ -283,6 +283,7 @@ namespace Fn
         D_HANDLE_2,
         D_ISOLINE_STRIPES,
         D_ISOLINE_STRIPES_WIDTH,
+        D_COLORMAP_LABEL,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -543,6 +544,7 @@ namespace Fn
                 case Property::D_HANDLE_2: return QString( "handle 2 position" ); break;
                 case Property::D_ISOLINE_STRIPES: return QString( "hatching" ); break;
                 case Property::D_ISOLINE_STRIPES_WIDTH: return QString( "hatching line width" ); break;
+                case Property::D_COLORMAP_LABEL: return QString( "Label" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

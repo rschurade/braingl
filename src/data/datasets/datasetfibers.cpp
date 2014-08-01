@@ -19,8 +19,7 @@
 #include "../properties/propertystring.h"
 #include "../properties/propertyselection.h"
 
-#include "../../gui/gl/colormapfunctions.h"
-#include "../../gui/gl/colormaprenderer.h"
+#include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/fiberrenderer.h"
 #include "../../gui/gl/tuberenderer.h"
 
@@ -29,7 +28,6 @@ DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     m_kdVerts( 0 ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_colormapRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
     m_numLines( 0 )
@@ -43,7 +41,6 @@ DatasetFibers::DatasetFibers( QDir filename, std::vector<Fib> fibs, QList<QStrin
     m_kdVerts( 0 ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_colormapRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
     m_numLines( 0 )
@@ -63,7 +60,6 @@ DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
     m_kdVerts( 0 ),
     m_renderer( 0 ),
     m_tubeRenderer( 0 ),
-    m_colormapRenderer( 0 ),
     m_selector( 0 ),
     m_numPoints( 0 ),
     m_numLines( 0 )
@@ -106,13 +102,7 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createFloat( Fn::Property::D_MIN, 0.0f );
     m_properties["maingl"].createFloat( Fn::Property::D_MAX, 1.0f );
 
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
-    m_properties["maingl"].createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
     if ( hasData )
     {
@@ -341,34 +331,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
-
-    if ( properties( target ).get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
-    {
-        if ( !m_colormapRenderer )
-        {
-            m_colormapRenderer = new ColormapRenderer();
-            m_colormapRenderer->init();
-        }
-        m_colormapRenderer->setColormap( properties( target ).get( Fn::Property::D_COLORMAP ).toInt() );
-        m_colormapRenderer->setX( properties( target ).get( Fn::Property::D_COLORMAP_X ).toFloat() );
-        m_colormapRenderer->setY( properties( target ).get( Fn::Property::D_COLORMAP_Y ).toFloat() );
-        m_colormapRenderer->setDX( properties( target ).get( Fn::Property::D_COLORMAP_DX ).toFloat() );
-        m_colormapRenderer->setDY( properties( target ).get( Fn::Property::D_COLORMAP_DY ).toFloat() );
-        m_colormapRenderer->setTextSize( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
-        m_colormapRenderer->setTextColor( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
-
-        m_colormapRenderer->setMin( properties( target ).get( Fn::Property::D_MIN).toFloat() );
-        m_colormapRenderer->setMax( properties( target ).get( Fn::Property::D_MAX).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target ).get( Fn::Property::D_SELECTED_MIN).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target ).get( Fn::Property::D_SELECTED_MAX).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target ).get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target ).get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
-        if ( m_dataNames.size() > 0 )
-        {
-            m_colormapRenderer->setTextLabel( m_dataNames[properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt()] );
-        }
-        m_colormapRenderer->draw( width, height, renderMode );
-    }
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
 void DatasetFibers::transformChanged( QVariant value )

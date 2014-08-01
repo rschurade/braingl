@@ -10,8 +10,6 @@
 
 #include "datasetnifti.h"
 
-class ColormapRenderer;
-
 class DatasetScalar: public DatasetNifti
 {
 public:
@@ -35,8 +33,6 @@ public:
 
 private:
     std::vector<float> m_data;
-
-    ColormapRenderer* m_colormapRenderer;
 
     void examineDataset(); //!< calls misc function to determine properties like min/max of the dataset
     void createTexture();
