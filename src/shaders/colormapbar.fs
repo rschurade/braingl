@@ -11,5 +11,5 @@ void main( void )
     float value2 = ( value - u_min ) / ( u_max - u_min );
     value2 = max( 0.0, min( 1.0, value2 ) );
     
-    writePeel( colormap( value2, u_colormap, 0.0, 1.0, 0.0, 1.0 ).rgb );
+    writePeel( vec4( colormap( value2, u_colormap, 0.0, 1.0, 0.0, 1.0 ).rgb, 1.0 ) );
 }

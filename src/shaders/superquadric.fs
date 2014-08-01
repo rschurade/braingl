@@ -216,7 +216,7 @@ void main( void )
         vec3 ambient = vec3( 1.0, 1.0, 1.0 );
     
         // draw shaded pixel
-        writePeel( blinnPhongIllumination(
+        writePeel( vec4( blinnPhongIllumination(
         // material properties
         frontColor.rgb * 0.2,                    // ambient color
         frontColor.rgb * 2.0,                    // diffuse color
@@ -230,7 +230,7 @@ void main( void )
         // directions
         normalize( grad ),                     // normal
         v_viewDir.xyz,                         // viewdir
-        v_lightDir.xyz ).rgb );                      // light direction
+        v_lightDir.xyz ).rgb, 1.0 ) );                      // light direction
     }
     else // no hit: discard
     {

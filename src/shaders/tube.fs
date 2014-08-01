@@ -48,5 +48,5 @@ void main()
     color = clamp( view_dot_normal * ( color + 0.15 * pow( view_dot_normal, 10. ) * pow( v_tangent_dot_view, 10. ) ), 0., 1. );
     color.a = 1.0;
     
-    writePeel( color.rgb );
+    writePeel( vec4( color.rgb, u_alpha ) );
 }

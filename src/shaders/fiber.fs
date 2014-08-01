@@ -42,5 +42,5 @@ void main()
         color = frontColor.rgb;
     }
     
-    writePeel( light( vec4( color, 1.0 ) ).rgb );
+    writePeel( vec4( light( vec4( color, 1.0 ) ).rgb, u_alpha ) );
 }
