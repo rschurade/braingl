@@ -9,15 +9,13 @@ void main()
 {
     float fontRatio = 0.5;
 
-    float originX = ( ( u_x * u_scaleX / u_width ) * 2.0 ) - 1.0;
-    float originY = ( ( u_y * u_scaleY / u_height ) * 2.0 ) - 1.0;
+    float originX = ( ( u_x / u_width ) * 2.0  * ( u_width  / 1000 ) ) - 1.0;
+    float originY = ( ( u_y / u_height ) * 2.0 * ( u_height / 1000 ) ) - 1.0;
 
-    float x = ( a_position.x * u_scaleX * u_sizeX * fontRatio ) + ( u_pos * u_scaleX * u_sizeX * fontRatio ) + originX;
-    float y = ( a_position.y * u_scaleY * u_sizeY ) + originY;
-
+    float x = ( a_position.x * u_sizeX * fontRatio * ( u_width / 1000 ) ) + ( u_pos * u_sizeX * fontRatio * ( u_width  / 1000 ) ) + originX;
+    float y = ( a_position.y * u_sizeY * ( u_height / 1000 ) ) + originY;
     v_position = vec4( x, y, a_position.z, 1.0 );
     gl_Position = v_position; 
-    
         
     float row = 8.0 - floor( u_char / 12.0 );
     float column = u_char - ( row * 12.0 ); 
