@@ -58,6 +58,7 @@ public:
 
     static void initRenderers();
     static void renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode );
+    static void renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QString text, int size, float x, float y, float z, QColor color, float alpha, int width, int height, int renderMode );
 
     static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                             float x, float y, float z, float dx, float dy, float dz,

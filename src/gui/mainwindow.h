@@ -126,6 +126,7 @@ private:
 
     QAction* newPlaneAct;
     QAction* newGuideAct;
+    QAction* newLabelAct;
 
     QAction* showAxialAct;
     QAction* showCoronalAct;
@@ -188,6 +189,7 @@ private slots:
 
     void newPlane();
     void newGuide();
+    void newLabel();
 };
 
 #endif

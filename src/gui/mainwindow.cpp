@@ -51,6 +51,7 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetplane.h"
 #include "../data/datasets/datasetguides.h"
+#include "../data/datasets/datasetlabel.h"
 
 #include <QAction>
 #include <QtGui>
@@ -1363,6 +1364,12 @@ void MainWindow::createActions()
     newGuideAct->setChecked( false );
     connect( newGuideAct, SIGNAL(triggered()), this, SLOT(newGuide()) );
 
+    newLabelAct = new QAction( QIcon( ":/icons/label.png" ), tr( "new Label" ), this );
+    newLabelAct->setStatusTip( tr( "create a new label" ) );
+    newLabelAct->setCheckable( false );
+    newLabelAct->setChecked( false );
+    connect( newLabelAct, SIGNAL(triggered()), this, SLOT(newLabel()) );
+
 }
 
 void MainWindow::createMenus()
@@ -1414,6 +1421,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( screenshotAct );
     fileToolBar->addAction( newPlaneAct );
     fileToolBar->addAction( newGuideAct );
+    fileToolBar->addAction( newLabelAct );
     //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
@@ -1822,5 +1830,11 @@ void MainWindow::newPlane()
 void MainWindow::newGuide()
 {
     DatasetGuides* g = new DatasetGuides();
+    Models::addDataset( g );
+}
+
+void MainWindow::newLabel()
+{
+    DatasetLabel* g = new DatasetLabel();
     Models::addDataset( g );
 }
