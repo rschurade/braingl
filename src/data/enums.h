@@ -37,7 +37,8 @@ namespace Fn
         CONGLYPHS = 0x40000,
         PLANE = 0x80000,
         ISO_LINE = 0x100000,
-        GUIDE = 0x200000
+        GUIDE = 0x200000,
+        LABEL = 0x400000,
     };
 
     enum class ColormapEnum : int
@@ -410,8 +411,8 @@ namespace Fn
                 case Property::D_COLORMAP_Y: return QString( "colormap y position" ); break;
                 case Property::D_COLORMAP_DX: return QString( "colormap x size" ); break;
                 case Property::D_COLORMAP_DY: return QString( "colormap y size" ); break;
-                case Property::D_COLORMAP_TEXT_SIZE: return QString( "colormap text size" ); break;
-                case Property::D_COLORMAP_TEXT_COLOR: return QString( "colormap text color" ); break;
+                case Property::D_COLORMAP_TEXT_SIZE: return QString( "text size" ); break;
+                case Property::D_COLORMAP_TEXT_COLOR: return QString( "text color" ); break;
                 case Property::D_INTERPOLATION: return QString( "interpolation" ); break;
                 case Property::D_ALPHA: return QString( "alpha" ); break;
                 case Property::D_ACTIVE: return QString( "active" ); break;

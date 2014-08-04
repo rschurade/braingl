@@ -11,10 +11,14 @@ void main()
 {
     vec4 color = texture( fontTex, v_texCoord );
     
+    if ( color.a < 0.01 )
+    {
+        discard;
+    }
+
     float mult = 1.0 - color.r;
     
     color.rgb = u_textColor * mult;
-    color.a = mult;
     
-	writePeel( color );
+    writePeel( color );
 }

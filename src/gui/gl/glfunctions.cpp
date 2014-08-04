@@ -675,7 +675,15 @@ void GLFunctions::renderText( QString text, int x, int y, int size, int width, i
 {
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
-    GLFunctions::m_textRenderer->renderText( text, x, y, width, height, renderMode );
+    GLFunctions::m_textRenderer->renderOverlay( text, x, y, width, height, renderMode );
+}
+
+void GLFunctions::renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QString text, int size, float x, float y, float z, QColor color, float alpha, int width, int height, int renderMode )
+{
+    GLFunctions::m_textRenderer->setSize( size );
+    GLFunctions::m_textRenderer->setColor( color );
+    GLFunctions::m_textRenderer->renderLabel( p_matrix, mv_matrix, text, x, y, z, alpha, width, height, renderMode );
+
 }
 
 void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,

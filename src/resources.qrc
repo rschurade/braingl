@@ -48,6 +48,7 @@
         <file>icons/bundle.png</file>
         <file>icons/new_cons.png</file>
         <file>icons/palette_brush.png</file>
+        <file>icons/label.png</file>
         <file>shaders/colormapbar.vs</file>
         <file>shaders/colormapbar.fs</file>
         <file>shaders/colormapscale.vs</file>
