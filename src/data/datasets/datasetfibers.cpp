@@ -9,7 +9,6 @@
 #include "fiberselector.h"
 
 #include "../models.h"
-#include "../loadervtk.h"
 
 #include "../properties/propertybool.h"
 #include "../properties/propertycolor.h"
@@ -22,6 +21,8 @@
 #include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/fiberrenderer.h"
 #include "../../gui/gl/tuberenderer.h"
+
+#include "../../io/loadervtk.h"
 
 DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     Dataset( filename, type ),

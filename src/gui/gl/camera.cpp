@@ -311,8 +311,11 @@ void Camera::setMoveY( float y )
 QList<QVariant> Camera::getState()
 {
     QList<QVariant> state;
+    state.push_back( "position" );
     state.push_back( m_position );
+    state.push_back( "lookAt" );
     state.push_back( m_lookAt );
+    state.push_back( "up" );
     state.push_back( m_up );
     return state;
 }
@@ -322,6 +325,14 @@ void Camera::setState( QList<QVariant> state )
     m_position = state[0].value<QVector3D>();
     m_lookAt = state[1].value<QVector3D>();
     m_up = state[2].value<QVector3D>();
+    setGlobals();
+}
+
+void Camera::setState( QMap<QString, QVariant> state )
+{
+    m_position = state["position"].value<QVector3D>();
+    m_lookAt = state["lockAt"].value<QVector3D>();
+    m_up = state["up"].value<QVector3D>();
     setGlobals();
 }
 

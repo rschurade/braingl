@@ -58,6 +58,7 @@ public:
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
+    void setState( QMap<QString, QVariant> state );
 
 private:
     void getGlobals();

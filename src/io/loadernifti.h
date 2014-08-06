@@ -8,7 +8,7 @@
 #ifndef LOADERNIFTI_H_
 #define LOADERNIFTI_H_
 
-#include "datasets/dataset.h"
+#include "../data/datasets/dataset.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 

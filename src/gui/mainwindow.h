@@ -44,9 +44,9 @@ public:
     bool load( QString fileName );
     bool loadRoi( QString fileName );
 
-    void saveScene( QString fileName );
-    void packAndGo( QString fileName );
+    void saveScene( QString fileName, bool packAndGo );
     void loadScene( QString fileName );
+    void loadSceneDeprecated( QString fileName );
 
 private:
     void createActions();
@@ -60,7 +60,6 @@ private:
     void saveRoi( ROIArea* roi );
 
     void saveSettings();
-    QModelIndex createIndex( int branch, int pos, int column );
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
@@ -71,10 +70,6 @@ private:
     QString strippedName( const QString &fullFileName );
 
     bool load( QString fileName, QList<QVariant> state );
-
-    void loadScene_0_9_0( QString path, QSettings& settings );
-    QVariant getFromStateList( Fn::Property prop, QList<QVariant>& state );
-
 
     Dataset* selectedDataset();
 

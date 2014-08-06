@@ -37,9 +37,6 @@
 #include "gl/glfunctions.h"
 #include "gl/colormapfunctions.h"
 
-#include "../data/loader.h"
-#include "../data/writer.h"
-#include "../data/roiwriter.h"
 #include "../data/vptr.h"
 #include "../data/enums.h"
 #include "../data/models.h"
@@ -52,6 +49,13 @@
 #include "../data/datasets/datasetplane.h"
 #include "../data/datasets/datasetguides.h"
 #include "../data/datasets/datasetlabel.h"
+
+#include "../io/loader.h"
+#include "../io/writer.h"
+#include "../io/roiwriter.h"
+#include "../io/statewriter.h"
+
+#include "../io/statereader.h"
 
 #include <QAction>
 #include <QtGui>
@@ -406,7 +410,7 @@ bool MainWindow::load( QString fileName )
     mainGLWidget->makeCurrent();
     if ( !fileName.isEmpty() )
     {
-        if ( fileName.endsWith( "scn" ) )
+        if ( fileName.endsWith( "scn" ) || fileName.endsWith( "xml" )  )
         {
             loadScene( fileName );
             return true;
@@ -557,9 +561,9 @@ void MainWindow::save()
 bool MainWindow::save( Dataset* ds )
 {
     int type = ds->properties().get( Fn::Property::D_TYPE ).toInt();
-    if ( type == (int)Fn::DatasetType::PLANE || type == (int)Fn::DatasetType::GUIDE )
+    if ( type == (int)Fn::DatasetType::PLANE || type == (int)Fn::DatasetType::GUIDE || type == (int)Fn::DatasetType::LABEL )
     {
-        return false;
+        return true;
     }
 
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
@@ -619,8 +623,8 @@ void MainWindow::saveFilterChanged( QString filterString )
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
     int type = ds->properties().get( Fn::Property::D_TYPE ).toInt();
-    qDebug() << type << " " << (int)Fn::DatasetType::PLANE << " " << (int)Fn::DatasetType::GUIDE;
-    if ( type == (int)Fn::DatasetType::PLANE || type == (int)Fn::DatasetType::GUIDE )
+    //qDebug() << type << " " << (int)Fn::DatasetType::PLANE << " " << (int)Fn::DatasetType::GUIDE;
+    if ( type == (int)Fn::DatasetType::PLANE || type == (int)Fn::DatasetType::GUIDE || type == (int)Fn::DatasetType::LABEL )
     {
         return;
     }
@@ -707,81 +711,56 @@ void MainWindow::importColormaps()
     Models::g()->submit();
 }
 
-
 //TODO
 void MainWindow::saveScene()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", fn );
-    if( !fileName.endsWith( ".scn" ) )
+    if( !fileName.endsWith( ".xml" ) )
     {
-        fileName += ".scn";
+        fileName += ".xml";
     }
-    saveScene( fileName );
+    saveScene( fileName, false );
 }
 
 void MainWindow::packAndGo()
 {
     QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", fn );
-    if( !fileName.endsWith( ".scn" ) )
+    if( !fileName.endsWith( ".xml" ) )
     {
-        fileName += ".scn";
+        fileName += ".xml";
     }
-    packAndGo( fileName );
+    saveScene( fileName, true );
 }
 
-void MainWindow::saveScene( QString fileName )
+void MainWindow::saveScene( QString fileName, bool packAndGo )
 {
     QFileInfo fi( fileName );
     QString newScenePath = fi.path();
 
-    QSettings settings( fileName, QSettings::IniFormat );
-    settings.clear();
-
-    settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.9.0" );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save global settings
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    settings.setValue( "globalState", dynamic_cast<GlobalPropertyModel*>( Models::g() )->getState() );
-
-    settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
-    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
-    settings.setValue( "camera_maingl2", mainGLWidget2->getCamera()->getState() );
-    settings.setValue( "arcball_maingl2", mainGLWidget2->getArcBall()->getState() );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save loaded datasets
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     int countDatasets = Models::d()->rowCount();
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  save datasets to file if not formerly done so
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
         QString fn = ds->properties().get( Fn::Property::D_FILENAME ).toString();
 
         QDir dir;
-        if ( !dir.exists( fn ) )
+        if ( packAndGo || !dir.exists( fn ) )
         {
+            // create tmp name
             ds->properties().set( Fn::Property::D_FILENAME, newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + "." + ds->getDefaultSuffix() );
             saveDataset( ds, "(*." +  ds->getDefaultSuffix() + ")" );
         }
-        QList<QVariant>state = ds->properties().getState();
-        settings.setValue( "file_" + QString::number( i ) + "_state", state );
-
     }
-    settings.setValue( "countDatasets", countDatasets );
-    settings.setValue( "packAndGo", true );
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //  save loaded rois
+    //  save rois to file
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
     int numBranches = Models::r()->rowCount( QModelIndex() );
@@ -789,298 +768,74 @@ void MainWindow::saveScene( QString fileName )
 
     for ( int i = 0; i < numBranches; ++i )
     {
-        int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
+        int leafCount = Models::getBranchSize( i );
 
-        QList<QVariant> branch;
-        for ( int k = 0; k < leafCount + 1; ++k )
+        QList<QVariant>branch;
+        for ( int k = 0; k < leafCount+1; ++k )
         {
-            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int) Fn::Property::D_POINTER ), Qt::DisplayRole ) );
+            ROI* roi = Models::getRoi( i, k );
 
             if ( roi->properties()->get( Fn::Property::D_SHAPE ) == 10 )
             {
                 QString fn = roi->properties()->get( Fn::Property::D_FILENAME ).toString();
                 QDir dir;
-                if ( !dir.exists( fn ) )
+                if ( packAndGo || !dir.exists( fn ) )
                 {
-                    roi->properties()->set( Fn::Property::D_FILENAME,
-                            newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + ".nii.gz" );
+                    roi->properties()->set( Fn::Property::D_FILENAME, newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + ".nii.gz" );
                     ROIArea* roi2save = dynamic_cast<ROIArea*>( roi );
                     saveRoi( roi2save );
                 }
             }
-
-            QList<QVariant> state = roi->properties()->getState();
-            branch.push_back( state );
-        }
-        if ( branch.size() > 0 )
-        {
-            roiStates.push_back( branch );
-        }
-    }
-    settings.setValue( "roiStates", roiStates );
-
-    settings.sync();
-}
-
-void MainWindow::packAndGo( QString fileName )
-{
-    QFileInfo fi( fileName );
-    QString newScenePath = fi.path();
-
-    QSettings settings( fileName, QSettings::IniFormat );
-    settings.clear();
-
-    settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.9.0" );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save global settings
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    settings.setValue( "globalState", dynamic_cast<GlobalPropertyModel*>( Models::g() )->getState() );
-
-    settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
-    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
-    settings.setValue( "camera_maingl2", mainGLWidget2->getCamera()->getState() );
-    settings.setValue( "arcball_maingl2", mainGLWidget2->getArcBall()->getState() );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save datasets
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    int countDatasets = Models::d()->rowCount();
-
-    for ( int i = 0; i < countDatasets; ++i )
-    {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        QString fn = ds->properties().get( Fn::Property::D_FILENAME ).toString();
-
-        // create tmp name
-        ds->properties().set( Fn::Property::D_FILENAME, newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + "." + ds->getDefaultSuffix() );
-        saveDataset( ds, "(*." +  ds->getDefaultSuffix() + ")" );
-
-        QList<QVariant>state = ds->properties().getState();
-        settings.setValue( "file_" + QString::number( i ) + "_state", state );
-
-    }
-    settings.setValue( "countDatasets", countDatasets );
-    settings.setValue( "packAndGo", true );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save loaded rois
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    int numBranches = Models::r()->rowCount( QModelIndex() );
-    QList<QVariant> roiStates;
-
-    for ( int i = 0; i < numBranches; ++i )
-    {
-        int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
-
-        QList<QVariant>branch;
-        for ( int k = 0; k < leafCount+1; ++k )
-        {
-            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
-
-            if ( roi->properties()->get( Fn::Property::D_SHAPE ) == 10 )
-            {
-                roi->properties()->set( Fn::Property::D_FILENAME, newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + ".nii.gz" );
-                ROIArea* roi2save = dynamic_cast<ROIArea*>( roi );
-                saveRoi( roi2save );
-            }
-
-            QList<QVariant>state = roi->properties()->getState();
-            branch.push_back( state );
-        }
-        if ( branch.size() > 0 )
-        {
-            roiStates.push_back( branch );
-        }
-    }
-    settings.setValue(  "roiStates", roiStates );
-
-    settings.sync();
-}
-
-void MainWindow::loadScene_0_9_0( QString path, QSettings& settings )
-{
-    int countDatasets = 0;
-    if ( settings.contains( "countDatasets" ) )
-    {
-        countDatasets = settings.value( "countDatasets" ).toInt();
-    }
-
-    bool packAndGo = false;
-    if ( settings.contains( "packAndGo" ) )
-    {
-        packAndGo = settings.value( "packAndGo" ).toBool();
-    }
-
-    for ( int i = 0; i < countDatasets; ++i )
-    {
-        if ( settings.contains( "file_" + QString::number( i ) + "_state" ) )
-        {
-            QList<QVariant> state = settings.value( "file_" + QString::number( i ) + "_state" ).toList();
-            int type = getFromStateList( Fn::Property::D_TYPE, state ).toInt();
-            if ( type == (int)Fn::DatasetType::GUIDE  )
-            {
-                DatasetGuides* g = new DatasetGuides();
-                g->properties().setState( state );
-                Models::addDataset( g );
-            }
-            else if ( type == (int)Fn::DatasetType::PLANE  )
-            {
-                DatasetPlane* plane = new DatasetPlane();
-                plane->properties().setState( state );
-                Models::addDataset( plane );
-            }
-            else
-            {
-                QString fileName = getFromStateList( Fn::Property::D_FILENAME, state ).toString();
-                if ( packAndGo )
-                {
-                    QFileInfo fi( fileName );
-                    QString fn = fi.fileName();
-                    qDebug() << path + QDir::separator() + fn;
-                    load( path + QDir::separator() + fn, state );
-                }
-                else
-                {
-                    load( fileName, state );
-                }
-            }
         }
     }
 
-    int numBranches = Models::r()->rowCount( QModelIndex() );
-    QList<QVariant> rois = settings.value( "roiStates" ).toList();
-    for ( int i = 0; i < rois.size(); ++i )
-    {
-        QList<QVariant>branch = rois[i].toList();
-
-        QList<QVariant>roiState = branch[0].toList();
-
-        int shape = getFromStateList( Fn::Property::D_SHAPE, roiState ).toInt();
-
-        if ( shape == 10 )
-        {
-            if ( packAndGo )
-            {
-                QFileInfo fi( getFromStateList( Fn::Property::D_FILENAME, roiState ).toString() );
-                QString fn = fi.fileName();
-                GLFunctions::roi = loadRoi2( path + QDir::separator() + fn );
-            }
-            else
-            {
-                QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
-                GLFunctions::roi = loadRoi2( fn );
-                GLFunctions::roi->properties()->setState( roiState );
-            }
-        }
-        else
-        {
-            GLFunctions::roi = new ROIBox();
-            GLFunctions::roi->properties()->setState( roiState );
-        }
-
-        for ( int l = 0; l < roiState.size() / 2; ++l )
-        {
-            if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::D_COLOR )
-            {
-                GLFunctions::roi->properties()->set( (Fn::Property)( roiState[l*2].toInt() ), roiState[l*2+1] );
-            }
-        }
-
-        Models::r()->insertRows( 0, 0, QModelIndex() );
-
-        if ( branch.size() > 1 )
-        {
-            for ( int k = 1; k < branch.size(); ++k )
-            {
-                QList<QVariant>roiState = branch[k].toList();
-
-                int shape = getFromStateList( Fn::Property::D_SHAPE, roiState ).toInt();
-                qDebug() << "roi shape: " << shape;
-                if ( shape == 10 )
-                {
-                    if ( packAndGo )
-                    {
-                        QFileInfo fi( getFromStateList( Fn::Property::D_FILENAME, roiState ).toString() );
-                        QString fn = fi.fileName();
-                        GLFunctions::roi = loadRoi2( path + QDir::separator() + fn );
-                    }
-                    else
-                    {
-                        QString fn = getFromStateList( Fn::Property::D_FILENAME, roiState ).toString();
-                        GLFunctions::roi = loadRoi2( fn );
-                        GLFunctions::roi->properties()->setState( roiState );
-                    }
-                    Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
-                }
-                else
-                {
-                    GLFunctions::roi = new ROIBox();
-                    GLFunctions::roi->properties()->setState( roiState );
-                    Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
-                }
-                for ( int l = 0; l < roiState.size() / 2; ++l )
-                {
-                    if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::D_COLOR )
-                    {
-                        GLFunctions::roi->properties()->set( (Fn::Property)( roiState[l*2].toInt() ), roiState[l*2+1] );
-                    }
-                }
-            }
-        }
-    }
-
-
-    if ( settings.contains( "globalState" ) )
-    {
-        dynamic_cast<GlobalPropertyModel*>( Models::g() )->setState( settings.value( "globalState" ).toList() );
-    }
-
-    if ( settings.contains( "camera_maingl" ) )
-    {
-        mainGLWidget->getCamera()->setState( settings.value( "camera_maingl" ).toList() );
-    }
-    if ( settings.contains( "arcball_maingl" ) )
-    {
-        mainGLWidget->getArcBall()->setState( settings.value( "arcball_maingl" ).toList() );
-    }
-
-    if ( settings.contains( "camera_maingl2" ) )
-    {
-        mainGLWidget2->getCamera()->setState( settings.value( "camera_maingl2" ).toList() );
-    }
-    if ( settings.contains( "arcball_maingl2" ) )
-    {
-        mainGLWidget2->getArcBall()->setState( settings.value( "arcball_maingl2" ).toList() );
-    }
-
-    Models::g()->submit();
-}
-
-QModelIndex MainWindow::createIndex( int branch, int pos, int column )
-{
-    int row;
-    QModelIndex parent;
-    if ( pos == 0 )
-    {
-        row = branch;
-    }
-    else
-    {
-        row = pos - 1;
-        parent = Models::r()->index( branch, 0 );
-    }
-    return Models::r()->index( row, column, parent );
+    StateWriter writer;
+    writer.saveScene( fileName, packAndGo, mainGLWidget->getCamera()->getState(),
+                                       mainGLWidget->getArcBall()->getState(),
+                                       mainGLWidget2->getCamera()->getState(),
+                                       mainGLWidget2->getArcBall()->getState() );
 }
 
 void MainWindow::loadScene( QString fileName )
+{
+    if( fileName.endsWith( ".scn" ) )
+    {
+        qWarning() << "*****************************************************************************************";
+        qWarning() << "***                                                                                   ***";
+        qWarning() << "***          Warning! Use of .scn is deprecated. Please re-save your scenes!          ***";
+        qWarning() << "***                                                                                   ***";
+        qWarning() << "*****************************************************************************************";
+        loadSceneDeprecated( fileName );
+        return;
+    }
+
+    StateReader reader;
+    reader.load( fileName );
+
+    QMap< QString, QMap< QString, QVariant > > cameras = reader.getCameras();
+    if ( cameras.contains( "camera_maingl" ) )
+    {
+        mainGLWidget->getCamera()->setState( cameras["camera_maingl"] );
+    }
+    if ( cameras.contains( "arcball_maingl" ) )
+    {
+        mainGLWidget->getArcBall()->setState( cameras["arcball_maingl"] );
+    }
+
+    if ( cameras.contains( "camera_maingl2" ) )
+    {
+        mainGLWidget2->getCamera()->setState( cameras["camera_maingl2"] );
+    }
+    if ( cameras.contains( "arcball_maingl2" ) )
+    {
+        mainGLWidget2->getArcBall()->setState( cameras["arcball_maingl2"] );
+    }
+
+    GLFunctions::reloadShaders();
+    Models::g()->submit();
+}
+
+void MainWindow::loadSceneDeprecated( QString fileName )
 {
     QSettings settings( fileName, QSettings::IniFormat );
     //qDebug() << settings.status();
@@ -1089,14 +844,6 @@ void MainWindow::loadScene( QString fileName )
     if ( settings.contains( "version" ) )
     {
         versionString = settings.value( "version" ).toString();
-    }
-
-    if ( versionString == "0.9.0" )
-    {
-        QFileInfo fi( fileName );
-        QString scenePath = fi.path();
-        loadScene_0_9_0( scenePath, settings );
-        return;
     }
 
     QList<QVariant> files = settings.value( "fileNames" ).toList();
@@ -1132,7 +879,7 @@ void MainWindow::loadScene( QString fileName )
                 QList<QVariant>roiState = branch[k].toList();
                 GLFunctions::roi = new ROIBox();
                 GLFunctions::roi->properties()->setState( roiState );
-                Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
+                Models::r()->insertRows( 0, 0, Models::createRoiIndex( numBranches + i, 0, 0 ) );
 
                 for ( int l = 0; l < roiState.size() / 2; ++l )
                 {
@@ -1193,17 +940,6 @@ void MainWindow::loadScene( QString fileName )
     Models::g()->submit();
 }
 
-QVariant MainWindow::getFromStateList( Fn::Property prop, QList<QVariant>& state )
-{
-    for ( int i = 0; i < state.size() / 2; ++i )
-    {
-        if ( (Fn::Property)( state[i*2].toInt() ) == prop )
-        {
-            return state[i*2+1];
-        }
-    }
-    return QVariant();
-}
 
 void MainWindow::about()
 {

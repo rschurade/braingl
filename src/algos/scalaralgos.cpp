@@ -13,7 +13,8 @@
 
 #include "../data/models.h"
 #include "../data/roiarea.h"
-#include "../data/writer.h"
+
+#include "../io/writer.h"
 
 #include <QQueue>
 
