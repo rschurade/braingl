@@ -15,6 +15,7 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasetscalar.h"
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
 
@@ -295,15 +296,39 @@ void GLWidget::calcMVPMatrix()
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
     setFocus();
-    if ( event->buttons() & Qt::LeftButton )
+    if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
+    {
+        int x = event->x();
+        int y = event->y();
+        m_sceneRenderer->renderPick();
+        QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
+
+        QString text = "X: " + QString::number( pickPos.x(), 'f', 2 ) + "  Y: " + QString::number( pickPos.y(), 'f', 2 ) + "  Z: " + QString::number( pickPos.z(), 'f', 2 );
+        text += "<br>-------------------------------";
+
+        QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, true );
+
+        for ( int i = 0; i < dsl.size(); ++i )
+        {
+            DatasetScalar* dss = dynamic_cast<DatasetScalar*>( dsl[i] );
+            text += "<br>";
+            text += dss->properties().get( Fn::Property::D_NAME ).toString();
+            text += " : ";
+            text += QString::number( dss->getValueAtPos( pickPos ), 'f', 2 );
+        }
+
+        QToolTip::showText( event->globalPos(), text );
+    }
+    else if ( event->buttons() & Qt::LeftButton )
     {
         m_cameraInUse->click( event->x(), event->y() );
-
     }
+
     if ( event->buttons() & Qt::MiddleButton )
     {
         m_cameraInUse->midClick( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::RightButton )
     {
         rightMouseDown( event );
@@ -313,14 +338,19 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
 
 void GLWidget::mouseMoveEvent( QMouseEvent *event )
 {
-    if ( event->buttons() & Qt::LeftButton )
+    if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
+    {
+    }
+    else if ( event->buttons() & Qt::LeftButton )
     {
         m_cameraInUse->drag( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::MiddleButton )
     {
         m_cameraInUse->midDrag( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::RightButton )
     {
         rightMouseDrag( event );
@@ -330,6 +360,7 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
+    QToolTip::hideText();
     update();
 }
 

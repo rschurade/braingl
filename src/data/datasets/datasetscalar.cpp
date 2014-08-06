@@ -203,6 +203,11 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
     return true;
 }
 
+float DatasetScalar::getValueAtPos( QVector3D pos )
+{
+    return m_data[ getIdFromPos( pos ) ];
+}
+
 float DatasetScalar::getInterpolatedValueAtPos( QVector3D pos )
 {
     float x = pos.x() / m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
