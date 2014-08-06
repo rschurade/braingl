@@ -10,28 +10,27 @@
 
 #include "../data/enums.h"
 
-#include <QMainWindow>
-#include <QSettings>
 #include <QAbstractItemModel>
 #include <QFileDialog>
+#include <QMainWindow>
+#include <QSettings>
+
+class ColormapEditWidget;
+class Dataset;
+class DatasetListWidget;
+class FNDockWidget;
+class GLWidget;
+class ROIArea;
+class ROIWidget;
+class ScriptWidget;
+class ShaderEditWidget;
+class ToolBar;
 
 class QAction;
 class QListView;
 class QMenu;
 class QTabWidget;
 class QTableView;
-
-class Dataset;
-class DatasetListWidget;
-class ROIWidget;
-class ShaderEditWidget;
-class ScriptWidget;
-class FNDockWidget;
-class ColormapEditWidget;
-class ROIArea;
-
-class GLWidget;
-class ToolBar;
 
 class MainWindow: public QMainWindow
 {
@@ -97,7 +96,10 @@ private:
     QToolBar* editToolBar;
     ToolBar* m_toolsToolBar;
 
-    enum { MaxRecentFiles = 5 };
+    enum
+    {
+        MaxRecentFiles = 5
+    };
     QAction *recentFileActs[MaxRecentFiles];
     QAction *separatorAct;
     QString curFile;
@@ -180,7 +182,7 @@ private slots:
 
     void slotDatasetSelectionChanged();
 
-    void saveFilterChanged(QString filterString);
+    void saveFilterChanged( QString filterString );
 
     void newPlane();
     void newGuide();
