@@ -108,7 +108,7 @@ void StippleRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
             program->setUniformValue( "u_bVec", 0., 0., 1. );
             break;
         default:
-            qDebug() << "error, wrong orientation in stipples renderer";
+            qCritical() << "error, wrong orientation in stipples renderer";
             return;
     }
 

@@ -18,7 +18,6 @@ Sorts::~Sorts()
 
 void Sorts::quickFindFirstK( std::vector<int>& ids, std::vector<float>& vals, int left, int right, int k )
 {
-    //qDebug() << "qffk: " << left << right;
     if ( right > left )
     {
         int pivotIndex = left + ( right - left ) / 2;

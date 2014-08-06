@@ -60,7 +60,6 @@ DatasetFibers* Fibers::thinOut()
 
         for ( unsigned int i = 0; i < fibs.size(); ++i )
         {
-            //if ( i % 1000 == 0 ) qDebug() << i << fibs.size() << mergedFibs.size() << unmergedFibs.size();
             currentMerged = false;
             Fib currentFib = fibs.at( i );
             for( unsigned int k = i + 1; k < fibs.size(); ++k )

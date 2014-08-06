@@ -108,7 +108,7 @@ void Fib::setVert( const unsigned int id, QVector3D& vert )
     }
     else
     {
-        qDebug() << "Fib: tried to access vert id out of range" << __LINE__;
+        qCritical() << "Fib: tried to access vert id out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -144,7 +144,7 @@ QVector3D Fib::getVert( const unsigned int& id ) const
     }
     else
     {
-        qDebug() << "Fib: tried to access vert id out of range" << __LINE__;
+        qCritical() << "Fib: tried to access vert id out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -157,7 +157,7 @@ QVector3D Fib::firstVert() const
     }
     else
     {
-        qDebug() << "Fib: tried to access first vert of empty fib" << __LINE__;
+        qCritical() << "Fib: tried to access first vert of empty fib" << __LINE__;
         exit( 0 );
     }
 }
@@ -170,14 +170,14 @@ QVector3D Fib::lastVert() const
     }
     else
     {
-        qDebug() << "Fib: tried to access last vert of empty fib" << __LINE__;
+        qCritical() << "Fib: tried to access last vert of empty fib" << __LINE__;
         exit( 0 );
     }
 }
 
 const std::vector<QVector3D>* Fib::getTangents() const
 {
-    qDebug() << "to implement Fib::getTangents()" << __LINE__;
+    qCritical() << "to implement Fib::getTangents()" << __LINE__;
     exit( 0 );
 }
 
@@ -192,7 +192,7 @@ QVector3D Fib::getTangent( const unsigned int& id ) const
     }
     else
     {
-        qDebug() << "Fib: tried to access tangent id out of range" << __LINE__;
+        qCritical() << "Fib: tried to access tangent id out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -216,7 +216,7 @@ const std::vector<float>* Fib::getDataField( const unsigned int& fieldId ) const
     }
     else
     {
-        qDebug() << "Fib: tried to access data field out of range" << __LINE__;
+        qCritical() << "Fib: tried to access data field out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -240,7 +240,7 @@ void Fib::setDataField( const unsigned int& fieldId, std::vector<float>& dataFie
     }
     else
     {
-        qDebug() << "Fib: tried to access data field out of range" << __LINE__;
+        qCritical() << "Fib: tried to access data field out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -255,13 +255,13 @@ float Fib::getData( const unsigned int& fieldId, const unsigned int& vertId )
         }
         else
         {
-            qDebug() << "Fib: tried to access data point out of range" << __LINE__;
+            qCritical() << "Fib: tried to access data point out of range" << __LINE__;
             exit( 0 );
         }
     }
     else
     {
-        qDebug() << "Fib: tried to access data field " << fieldId << " out of range" << __LINE__;
+        qCritical() << "Fib: tried to access data field " << fieldId << " out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -274,7 +274,7 @@ void Fib::addData( const unsigned int& fieldId, const float& value )
     }
     else
     {
-        qDebug() << "Fib: tried to access data field out of range" << __LINE__;
+        qCritical() << "Fib: tried to access data field out of range" << __LINE__;
         exit( 0 );
     }
 }
@@ -289,13 +289,13 @@ void Fib::setData( const unsigned int& fieldId, const unsigned int& vertId, cons
         }
         else
         {
-            qDebug() << "Fib: tried to access data point out of range" << __LINE__;
+            qCritical() << "Fib: tried to access data point out of range" << __LINE__;
             exit( 0 );
         }
     }
     else
     {
-        qDebug() << "Fib: tried to access data field out of range" << __LINE__;
+        qCritical() << "Fib: tried to access data field out of range" << __LINE__;
         exit( 0 );
     }
 }

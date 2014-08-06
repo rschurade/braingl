@@ -150,8 +150,6 @@ void BinghamRenderer::initGeometry( PropertyGroup& props )
     }
     m_previousSettings = s;
 
-    //qDebug() << "Bingham Renderer: using lod " << lod;
-
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
 

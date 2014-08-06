@@ -26,21 +26,25 @@ void logOutput( QtMsgType type, const QMessageLogContext& context, const QString
     {
     case QtDebugMsg:
         debugdate += " [D]";
+        if ( verbose )
+        {
+            (*out) << debugdate << " " << message << endl;
+        }
         break;
     case QtWarningMsg:
         debugdate += " [W]";
+        (*out) << debugdate << " " << message << endl;
         break;
     case QtCriticalMsg:
         debugdate += " [C]";
+        (*out) << debugdate << " " << message << endl;
         break;
     case QtFatalMsg:
         debugdate += " [F]";
+        (*out) << debugdate << " " << message << endl;
         break;
     }
-    if ( verbose )
-    {
-        (*out) << debugdate << " " << message << endl;
-    }
+
     if ( logToFile )
     {
         QFile outFile("log.txt");

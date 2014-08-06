@@ -200,7 +200,7 @@ bool LoaderNifti::loadData( QString fileName )
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -378,7 +378,7 @@ bool LoaderNifti::loadNiftiTensor()
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -432,7 +432,7 @@ bool LoaderNifti::loadNiftiSH()
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -474,7 +474,7 @@ bool LoaderNifti::loadNiftiBingham()
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -514,7 +514,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
 
     if ( (int)bvals.size() == 0 || (int)bvals.size() != m_header->dim[4] )
     {
-        qDebug() << "*** ERROR *** while loading dwi dataset, count bvals doesn't match nifti image dim!";
+        qCritical() << "*** ERROR *** while loading dwi dataset, count bvals doesn't match nifti image dim!";
         return false;
     }
     int numB0 = 0;
@@ -535,7 +535,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     std::vector<QVector3D> bvecs = loadBvecs( fileName, bvals );
     if ( bvecs.size() == 0 )
     {
-        qDebug() << "*** ERROR *** while loading bvecs!";
+        qCritical() << "*** ERROR *** while loading bvecs!";
         return false;
     }
 
@@ -549,7 +549,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
 
     if ( numData > dim || bvals2.size() != bvecs.size() )
     {
-        qDebug() << "*** ERROR *** parsing bval and bvec files!";
+        qCritical() << "*** ERROR *** parsing bval and bvec files!";
         return false;
     }
 
@@ -561,7 +561,7 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -627,7 +627,7 @@ bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "*** error *** failed to allocate memory for dataset";
+        qCritical() << "*** error *** failed to allocate memory for dataset";
         return false;
     }
 
@@ -755,14 +755,13 @@ std::vector<float> LoaderNifti::loadBvals( QString fileName )
             for ( int i = 0; i < slBvals.size(); ++i )
             {
                 bool ok;
-                //qDebug() << i << slBvals[i] << slBvals[i].toFloat( &ok );
                 bvals.push_back( slBvals[i].toFloat( &ok ) );
                 if ( !ok )
                 {
                     QMessageBox msgBox;
                     msgBox.setText( "Error! While parsing bvals (" + QString::number( i ) + "), conversion failure string to float!" );
                     msgBox.exec();
-                    qDebug() << "error while parsing bvals (" << i << "), conversion failure string to float";
+                    qCritical() << "error while parsing bvals (" << i << "), conversion failure string to float";
                     bvals.clear();
                     return bvals;
                 }
@@ -777,7 +776,7 @@ std::vector<float> LoaderNifti::loadBvals( QString fileName )
         QMessageBox msgBox;
         msgBox.setText( "Error! Couldn't open" + fn );
         msgBox.exec();
-        qDebug() << "couldn't open " << fn;
+        qCritical() << "couldn't open " << fn;
         return bvals;
     }
 }
@@ -808,7 +807,7 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
             QMessageBox msgBox;
             msgBox.setText( "Error! Couldn't open" + fn );
             msgBox.exec();
-            qDebug() << "couldn't open " << fn;
+            qCritical() << "couldn't open " << fn;
             return bvecs;
         }
 
@@ -824,13 +823,12 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
         QStringList slY = sY.split( " ", QString::SkipEmptyParts );
         QStringList slZ = sZ.split( " ", QString::SkipEmptyParts );
 
-        //qDebug() << "count bvals" << bvals.size() << bvals;
         if ( (int)bvals.size() != slX.size() || (int)bvals.size() != slY.size() || (int)bvals.size() != slZ.size() )
         {
             QMessageBox msgBox;
             msgBox.setText( "Error! While loading dwi dataset, bvals don't match bvecs!" );
             msgBox.exec();
-            qDebug() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
+            qCritical() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
             return bvecs;
         }
 
@@ -845,11 +843,10 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
                     QMessageBox msgBox;
                     msgBox.setText( "Error! While parsing bvecs(" + QString::number( i ) + "), conversion failure string to float" );
                     msgBox.exec();
-                    qDebug() << "error while parsing bvecs(" << i << "), conversion failure string to float";
+                    qCritical() << "error while parsing bvecs(" << i << "), conversion failure string to float";
                     bvecs.clear();
                     return bvecs;
                 }
-                //qDebug() << bvecs.last();
             }
         }
         return bvecs;
@@ -859,7 +856,7 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
         QMessageBox msgBox;
         msgBox.setText( "Error! Couldn't open" + fn );
         msgBox.exec();
-        qDebug() << "couldn't open " << fn;
+        qCritical() << "couldn't open " << fn;
         return bvecs;
     }
 }
@@ -889,14 +886,14 @@ bool LoaderNifti::isRadialogical()
 
     if ( qform.determinant() < 0.0 && qform( 0, 0 ) < 0 )
     {
-        qDebug() << m_fileName.path() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
+        qWarning() << m_fileName.path() << ": RADIOLOGICAL orientation in q-form detected. Flipping voxels on X-Axis";
         rad = true;
     }
     else
     {
         if ( sform.determinant() < 0.0 && sform( 0, 0 ) < 0 )
         {
-            qDebug() << m_fileName.path() << ": RADIOLOGICAL orientation in s-form detected. Flipping voxels on X-Axis";
+            qWarning() << m_fileName.path() << ": RADIOLOGICAL orientation in s-form detected. Flipping voxels on X-Axis";
             rad = true;
         }
     }

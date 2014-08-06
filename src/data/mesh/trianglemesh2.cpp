@@ -136,7 +136,6 @@ void TriangleMesh2::finalize()
 
     calcTriNormals();
     calcVertNormals();
-    //qDebug() << m_numVerts << "vertices";
 }
 
 void TriangleMesh2::setVertex( unsigned int id, float x, float y, float z )
@@ -174,7 +173,6 @@ bool TriangleMesh2::addVertex( float x, float y, float z )
     }
     else
     {
-        //qDebug() << "adding vertex beyond field size";
         m_vertices.push_back( x );
         m_vertices.push_back( y );
         m_vertices.push_back( z );
@@ -204,7 +202,7 @@ QVector3D TriangleMesh2::getVertex( unsigned int id )
 {
     if ( id > m_numVerts )
     {
-        qDebug() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
+        qCritical() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
         exit( 0 );
     }
     QVector3D vert( m_vertices[id * m_bufferSize], m_vertices[id * m_bufferSize + 1], m_vertices[id * m_bufferSize + 2]);
@@ -215,7 +213,7 @@ QVector3D TriangleMesh2::getVertexNormal( unsigned int id )
 {
     if ( id > m_numVerts )
     {
-        qDebug() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
+        qCritical() << "***error*** index out of range, numVerts =" << m_numVerts << "id:" << id;
         exit( 0 );
     }
     QVector3D normal( m_vertices[id * m_bufferSize + 3], m_vertices[id * m_bufferSize + 4], m_vertices[id * m_bufferSize + 5]);
@@ -320,7 +318,7 @@ std::vector<unsigned int> TriangleMesh2::getTriangle( unsigned int id )
 {
     if ( id > m_numTris )
     {
-        qDebug() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
+        qCritical() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
         exit( 0 );
     }
     std::vector<unsigned int> out;
@@ -334,7 +332,7 @@ Triangle TriangleMesh2::getTriangle2( unsigned int id )
 {
     if ( id > m_numTris )
     {
-        qDebug() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
+        qCritical() << "***error*** index out of range, numTris =" << m_numTris << "id:" << id;
         exit( 0 );
     }
     Triangle out;
@@ -444,7 +442,6 @@ void TriangleMesh2::buildOcTree()
         }
         */
     }
-    //qDebug() << "collapsed" << m_toRemove.size() << "vertexes";
     qDebug() << "end building OcTree";
 }
 

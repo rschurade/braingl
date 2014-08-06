@@ -38,7 +38,7 @@ void StateReader::load( QString fileName )
     QFile file(fileName);
     if ( !file.open( QFile::ReadOnly | QFile::Text ) )
     {
-        qDebug() << "StateReader: Cannot read file " << fileName << " : " << file.errorString();
+        qCritical() << "StateReader: Cannot read file " << fileName << " : " << file.errorString();
         return;
     }
     xml.read( &file );
@@ -152,7 +152,6 @@ void StateReader::loadScene()
                 QList<QVariant>roiState = branch[k];
 
                 int shape = getFromStateList( Fn::Property::D_SHAPE, roiState ).toInt();
-                qDebug() << "roi shape: " << shape;
                 if ( shape == 10 )
                 {
                     if ( packAndGo )

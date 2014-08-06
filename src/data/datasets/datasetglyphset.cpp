@@ -310,7 +310,7 @@ void DatasetGlyphset::colorLittleBrains()
             {
                 float r, g, b;
                 in >> r >> g >> b;
-                //qDebug() << "color: " << r << " " << g << " " << b;
+
                 for ( int i = 0; i < m_n; i++ )
                 {
                     if ( littleBrains[i] != NULL )
@@ -376,8 +376,6 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
     }
 
     QMatrix4x4 mvp = pMatrix * mvMatrix;
-
-    //qDebug() << "little brains size: " << littleBrains.size();
 
     if ( ( target == "maingl" ) && properties( target ).get( Fn::Property::D_LITTLE_BRAIN_VISIBILITY ).toBool() )
     {
@@ -693,7 +691,6 @@ void DatasetGlyphset::makeDiffPoints()
     for ( unsigned int tri = 0; tri < tris.size(); tri += 3 )
     {
     // all three edges
-    //qDebug() << "tri: " << tri;
         idPairs.push_back( tris.at( tri ) );
         idPairs.push_back( tris.at( tri + 1 ) );
 
@@ -730,17 +727,12 @@ void DatasetGlyphset::makeDiffPoints()
     for ( unsigned int idpair = 0; idpair < idPairs.size(); idpair += 2 )
     {
     //get two point ids i1,i2
-
-    //qDebug() << "idpair: " << idpair;
-
         int i1 = idPairs.at( idpair );
         int i2 = idPairs.at( idpair + 1 );
 
         //if triangle on one side...
         if ( i1 > i2 )
         {
-
-            //qDebug() << "point: " << i1 << " " << i2;
             for ( int j = 0; j < m_n; ++j )
             {
                 //float v = qAbs( conn[i1][j] - conn[i2][j] );
@@ -975,8 +967,6 @@ void DatasetGlyphset::makePies()
         {
             maxNodeCount = count;
         }
-        //qDebug() << numbers->at( i ) << " connections above threshold at node: " << i;
-
         //Magic!:
         int colorMode = m_properties["maingl"].get( Fn::Property::D_GLYPH_COLORMODE ).toInt();
         if ( colorMode == 0 )
@@ -1139,7 +1129,6 @@ void DatasetGlyphset::loadROI( QString filename, bool* roin )
         {
             float r, g, b;
             in >> r >> g >> b;
-            //qDebug() << r << g << b;
             //if color is not white, assume point is in ROI...
             if ( (r < 1.0) || (g < 1.0) || (b < 1.0) )
             {
@@ -1158,7 +1147,6 @@ void DatasetGlyphset::loadROI( QString filename, bool* roin )
         while ( !in.atEnd() )
         {
             QString line = in.readLine();
-            //qDebug() << line << " " << ids.size();
             QStringList sl = line.split( " " );
             ids.push_back( sl.at( 0 ).toInt() );
         }

@@ -326,7 +326,6 @@ void GLFunctions::updateColormapShader()
     code += "} \n";
 
     GLFunctions::m_shaderIncludes[ "colormap_fs" ] = code;
-    //qDebug() << code;
 }
 
 QString GLFunctions::copyShaderToString( QString name, QString ext )
@@ -715,7 +714,7 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
             case GL_OUT_OF_MEMORY:                  errString="OUT_OF_MEMORY";                  break;
             case GL_INVALID_FRAMEBUFFER_OPERATION:  errString="INVALID_FRAMEBUFFER_OPERATION";  break;
         }
-        qDebug() << "OpenGL Error:" << prefix << QString( errString );
+        qCritical() << "OpenGL Error:" << prefix << QString( errString );
         isError = true;
     }
     return isError;

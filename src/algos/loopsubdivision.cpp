@@ -25,8 +25,6 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
     m_numVerts = m_mesh->numVerts();
     m_numTris = m_mesh->numTris();
 
-    //qDebug() << m_numVerts << m_numTris;
-
     m_mesh->resize( m_numVerts * 4, m_numTris * 4 );
 
     std::vector<QVector3D> newVertexPositions( m_numVerts );
@@ -53,8 +51,6 @@ LoopSubdivision::LoopSubdivision( TriangleMesh2* mesh ) :
 
     m_numVerts = m_mesh->numVerts();
     m_numTris = m_mesh->numTris();
-
-    //qDebug() << m_numVerts << m_numTris;
 
     m_mesh->finalize();
 

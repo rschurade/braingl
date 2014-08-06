@@ -41,13 +41,10 @@ ROIBox::ROIBox() :
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( propChanged() ) );
-
-    //qDebug() << "new ROI created: " << m_properties.get( Fn::Property::D_ID ).toInt();
 }
 
 ROIBox::~ROIBox()
 {
-    //qDebug() << "ROI deleted: " << m_properties.get( Fn::Property::D_ID ).toInt();
 }
 
 void ROIBox::propChanged()
@@ -79,7 +76,6 @@ void ROIBox::propChanged()
         m_properties.getWidget( Fn::Property::D_DY )->show();
         m_properties.getWidget( Fn::Property::D_DZ )->show();
     }
-    //qDebug() << "emitting: " << m_properties.get( Fn::Property::D_ID ).toInt();
     emit ( signalPropChanged( m_properties.get( Fn::Property::D_ID ).toInt() ) );
 }
 

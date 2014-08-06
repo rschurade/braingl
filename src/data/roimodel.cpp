@@ -27,7 +27,6 @@ ROIModel::~ROIModel()
 
 int ROIModel::rowCount( const QModelIndex &parent ) const
 {
-    //qDebug() << "rowCount():" << parent;
     if ( parent.isValid() )
     {
         if ( parent.internalId() == - 1 )
@@ -52,7 +51,6 @@ int ROIModel::columnCount( const QModelIndex &parent ) const
 
 QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    //qDebug() << "index():" << row << column << parent;
     if ( parent.isValid() )
     {
         return createIndex( row, column, parent.row() );
@@ -65,7 +63,6 @@ QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) c
 
 QModelIndex ROIModel::parent( const QModelIndex & index ) const
 {
-    //qDebug() << "parent():" << index;
     if ( index.internalId() == -1 )
     {
         return QModelIndex();

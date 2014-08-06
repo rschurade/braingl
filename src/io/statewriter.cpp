@@ -40,7 +40,7 @@ void StateWriter::saveScene( QString fileName, bool packAndGo, QList<QVariant>ca
     if ( !file.open( QFile::WriteOnly | QFile::Text ) )
     {
 
-        qDebug() << "Cannot write file " + fileName + " : " + file.errorString();
+        qCritical() << "Cannot write file " + fileName + " : " + file.errorString();
         return;
     }
 

@@ -51,7 +51,6 @@ void FiberSelector::init( std::vector<Fib>& fibs )
 {
     qDebug() << "start creating kdtree";
     m_numLines = fibs.size();
-    //qDebug() << "num lines:" << data.size();
     int ls = 0;
 
     if ( m_numPoints > 0 )
@@ -64,7 +63,7 @@ void FiberSelector::init( std::vector<Fib>& fibs )
         }
         catch ( std::bad_alloc& )
         {
-            qDebug() << "***error*** failed to allocate enough memory for kd tree";
+            qCritical() << "***error*** failed to allocate enough memory for kd tree";
             exit ( 0 );
         }
     }
@@ -109,7 +108,7 @@ void FiberSelector::init( std::vector<Fib>& fibs )
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "***error*** failed to allocate enough memory for kd tree";
+        qCritical() << "***error*** failed to allocate enough memory for kd tree";
         exit ( 0 );
     }
 
@@ -132,7 +131,6 @@ void FiberSelector::init( std::vector<Fib>& fibs )
 
 void FiberSelector::updatePresentRois()
 {
-    //qDebug() << "updatePresentRois";
     int numBranches = Models::r()->rowCount( QModelIndex() );
 
     for ( int i = 0; i < numBranches; ++i )
@@ -159,7 +157,7 @@ void FiberSelector::updatePresentRois()
 void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
     if ( topLeft.row() == -1 ) return;
-    //qDebug() << "roi changed" << topLeft.row() << topLeft.column() << topLeft.internalId();
+
     int branch = 0;
     int pos = 0;
     if ( topLeft.internalId() == -1 )
@@ -179,7 +177,6 @@ void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &b
 
 void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
 {
-    //qDebug() << "roi inserted" << parent.row() << start << end;
     if ( parent.row() == -1 )
     {
         // inserted top level roi
@@ -201,7 +198,6 @@ void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
 
 void FiberSelector::roiDeleted( const QModelIndex &parent, int start, int end )
 {
-    //qDebug() << "roi deleted" << parent.row() << start << end;
     if ( parent.row() == -1 )
     {
         m_bitfields.removeAt( start );
@@ -374,7 +370,6 @@ void FiberSelector::sphereTest( std::vector<bool>& workfield )
 
 void FiberSelector::updateBranch( int branch )
 {
-    //qDebug() << "update branch" << branch;
     int current = 0;
 
     bool neg = Models::r()->data( createIndex( branch, current, (int)Fn::Property::D_NEG ), Qt::DisplayRole ).toBool();
@@ -432,7 +427,6 @@ void FiberSelector::updateRoot()
         active |= Models::r()->data( createIndex( i, 0, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool();
     }
 
-    //qDebug() << "update root";
     if ( m_branchfields.size() > 0 && active )
     {
         for ( int i = 0; i < m_numLines; ++i )

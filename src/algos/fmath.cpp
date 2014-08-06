@@ -66,8 +66,7 @@ double FMath::boostLegendre_p( int order, int arg1, double arg2 )
 
 Matrix FMath::sh_base( Matrix g, int maxOrder )
 {
-    //qDebug() << "start calculating sh base";
-    // allcoate result matrix
+     // allcoate result matrix
     unsigned long sh_dirs( ( maxOrder + 2 ) * ( maxOrder + 1 ) / 2 );
     Matrix out( g.Nrows(), sh_dirs );
     out = 0.0;
@@ -88,7 +87,6 @@ Matrix FMath::sh_base( Matrix g, int maxOrder )
             }
         }
     }
-    //qDebug() << "finished calculating sh base";
     return out;
 }
 
@@ -463,7 +461,7 @@ void FMath::debugColumnVector3( const ColumnVector& v, QString name )
 {
     if ( v.Nrows() != 3 )
     {
-        qDebug() << name << "error not 3 elements in vector";
+        qCritical() << name << "error not 3 elements in vector";
     }
     qDebug() << name << v( 1 ) << v( 2 ) << v( 3 );
 }

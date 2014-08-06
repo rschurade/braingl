@@ -261,7 +261,6 @@ void ShapeRenderer::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
     float green = (float)(( pickID >> 8 ) & 0xFF) / 255.f;
     float red =   (float)(( pickID >> 16 ) & 0xFF) / 255.f;
 
-    //qDebug() << " input" << red << green << blue << alpha ;
     program->setUniformValue( "u_pickColor", red, green , blue, pAlpha );
     program->setUniformValue( "u_color", color.redF(), color.greenF(), color.blueF(), color.alphaF() );
     program->setUniformValue( "u_alpha", (float)color.alphaF() );

@@ -754,13 +754,13 @@ void ScriptWidget::loadScript( QString fileName, bool append )
     {
         if( ( settings.value( "appName").toString() != "braingl" ) || ( settings.value( "fileType").toString() != "script" ) )
         {
-            qDebug() << "*** ERROR *** No braingl script file.";
+            qCritical() << "*** ERROR *** No braingl script file.";
             return;
         }
     }
     else
     {
-        qDebug() << "*** ERROR *** No braingl script file.";
+        qCritical() << "*** ERROR *** No braingl script file.";
         return;
     }
 
@@ -777,7 +777,7 @@ void ScriptWidget::loadScript( QString fileName, bool append )
     }
     else
     {
-        qDebug() << "*** ERROR *** No size entry in script file.";
+        qCritical() << "*** ERROR *** No size entry in script file.";
     }
 
     if ( !append )
@@ -805,7 +805,7 @@ void ScriptWidget::loadScript( QString fileName, bool append )
         }
         else
         {
-            qDebug() << "*** ERROR *** script file corrupt.";
+            qCritical() << "*** ERROR *** script file corrupt.";
         }
     }
     m_beginSlider->setMax( qMax( 0, m_script.size() - 2 ) );
@@ -840,7 +840,7 @@ void ScriptWidget::saveScript( QString fileName )
 {
     if ( m_script.size() == 0 )
     {
-        qDebug() << "script size is zero, no file saved ";
+        qCritical() << "script size is zero, no file saved ";
         return;
     }
     QSettings settings( fileName, QSettings::IniFormat );
@@ -1098,7 +1098,6 @@ void ScriptWidget::run()
                     }
                     if ( loopLine[0] == "d" )
                     {
-                        //qDebug() << loopLine[3] <<  loopLine[4] << div << FMath::interpolateQVariant( loopLine[3], loopLine[4], div ).toInt();
                         Models::d()->setData( Models::d()->index( loopLine[1].toInt(), loopLine[2].toInt() ), FMath::interpolateQVariant( loopLine[3], loopLine[4], div ), Qt::DisplayRole );
                     }
                     if ( loopLine[0] == "r" )

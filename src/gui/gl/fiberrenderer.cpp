@@ -208,7 +208,7 @@ void FiberRenderer::initGeometry()
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "***error*** failed to allocate enough memory for vbo";
+        qCritical() << "***error*** failed to allocate enough memory for vbo";
         exit ( 0 );
     }
 
