@@ -109,7 +109,6 @@ void TreeRenderer::initGeometryRec( Tree* tree, int left, int right )
         Tree* child = children[i];
 
         int size = child->getNumLeaves();
-        //qDebug() << size << child->getValue();
 
         if ( size > 1 )
         {

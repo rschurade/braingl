@@ -382,7 +382,7 @@ void DatasetConGlyphs::makePies()
     QMultiHash<QVector3D, Edge*> hedges = m_cons->m_hashed_edges;
 
     m_n = hedges.uniqueKeys().size();
-    //qDebug() << "m_n: " << m_n;
+
     pieArrays = new std::vector<float*>( m_n, NULL );
     numbers = new std::vector<int>( m_n );
     int i = 0;
@@ -393,9 +393,9 @@ void DatasetConGlyphs::makePies()
         {
             sortlist.push_back( new Connection( e->fn, e->tn - e->fn, e->m_value ) );
         }
-        //qDebug() << sortlist.size() << " edges for node: " << node;
+
         int count = hedges.values(node).size();
-        //qDebug() << "count: " << count;
+
         numbers->at( i ) = count;
         if ( count > maxNodeCount )
         {

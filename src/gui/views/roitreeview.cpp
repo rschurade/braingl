@@ -91,7 +91,6 @@ void ROITreeView::selectionChanged( const QItemSelection &selected, const QItemS
 
 void ROITreeView::rowsInserted (const QModelIndex &parent, int start, int end )
 {
-    //qDebug() << parent << start << end;
     if ( selectionModel()->hasSelection() )
     {
         expand( selectionModel()->selectedIndexes().first() );

@@ -93,7 +93,7 @@ void CombinedNavRenderer::adjustRatios()
     {
         float textureRatio = yb / ( yb + zb + zb );
         float mult = textureRatio / m_ratio;
-        //qDebug() << "ratio: " << m_ratio << " trat: " << textureRatio << " mult: " << mult;
+
         if ( m_ratio > textureRatio )
         {
             pMatrix.ortho( 0, yb / mult, 0, ( yb + zb + zb ), -3000, 3000 );
@@ -108,7 +108,7 @@ void CombinedNavRenderer::adjustRatios()
     else
     {
         float mult = 1.0 / m_ratio;
-        //qDebug() << "ratio: " << m_ratio << " trat: " << textureRatio << " mult: " << mult;
+
         if ( m_ratio > 1.0 )
         {
             pMatrix.ortho( 0, ( xb + yb ) / mult, 0, xb + yb, -3000, 3000 );
@@ -421,7 +421,6 @@ void CombinedNavRenderer::draw()
     QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
-    //qDebug() << "combined draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     setupTextures();

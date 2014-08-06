@@ -361,8 +361,6 @@ void GLWidget::screenshot( QString fn )
 void GLWidget::rightMouseDown( QMouseEvent* event )
 {
 
-    //qDebug() << "Object name:" << m_sceneRenderer->getRenderTarget();
-
     QString target = m_sceneRenderer->getRenderTarget();
 
     int x = event->x();
@@ -374,8 +372,6 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
     GLFunctions::f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    //qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
@@ -743,7 +739,6 @@ void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVect
     eyepos = basis_mat * bvec;
     viewdir = -zdir;
     updir = ydir;
-    //qDebug() << eyepos << viewdir << updir;
 }
 
 void GLWidget::cameraCircle( bool dir )

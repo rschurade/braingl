@@ -145,7 +145,7 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
                 }
                 else
                 {
-                    qDebug() << "node id error";
+                    qCritical() << "node id error";
                 }
             }
             else

@@ -58,7 +58,7 @@ void SceneRenderer::initGL()
     initializeOpenGLFunctions();
     if ( m_renderTarget == "maingl" )
     {
-        qDebug() << "Get GL stats";
+        qWarning() << "Get GL stats";
 
         const GLubyte *renderer = glGetString( GL_RENDERER );
         const GLubyte *vendor = glGetString( GL_VENDOR );
@@ -69,17 +69,17 @@ void SceneRenderer::initGL()
         glGetIntegerv( GL_MAJOR_VERSION, &major );
         glGetIntegerv( GL_MINOR_VERSION, &minor );
 
-        qDebug() << "GL Vendor :" << QString( (char*) vendor );
-        qDebug() << "GL Renderer :" << QString( (char*) renderer );
-        qDebug() << "GL Version (string) :" << QString( (char*) version );
-        qDebug() << "GL Version (integer) :" << major << "." << minor;
-        qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
+        qWarning() << "GL Vendor :" << QString( (char*) vendor );
+        qWarning() << "GL Renderer :" << QString( (char*) renderer );
+        qWarning() << "GL Version (string) :" << QString( (char*) version );
+        qWarning() << "GL Version (integer) :" << major << "." << minor;
+        qWarning() << "GLSL Version :" << QString( (char*) glslVersion );
 
         if ( ( major < 3 ) || ( major == 3 && minor < 3 ) )
         {
-            std::cout << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting." << std::endl;
-            std::cout << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers." << std::endl;
-            std::cout << "Note: braingl will not run remotely." << std::endl;
+            qCritical() << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting.";
+            qCritical() << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers.";
+            qCritical() << "Note: braingl will not run remotely.";
             exit( 0 );
         }
 
@@ -219,7 +219,7 @@ void SceneRenderer::renderScene()
         case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS" ); break;
         default: errstr = QString( fbstat ); break;
         }
-        qDebug() << "frame buffer incomplete:" << errstr;
+        qCritical() << "frame buffer incomplete:" << errstr;
     }
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -584,7 +584,6 @@ GLuint SceneRenderer::get_object_id( int x, int y, int width, int height )
         //alpha = ptr[pixel_index + 3];
         //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
         object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
-        //qDebug() << "output" << red << green << blue << alpha;
     }
     glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
@@ -697,7 +696,7 @@ void SceneRenderer::initFBO( int width, int height )
     if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
     {
         /* handle an error : frame buffer incomplete */
-        qDebug() << "frame buffer incomplete";
+        qCritical() << "frame buffer incomplete";
     }
 
     /* unbind the render buffer */

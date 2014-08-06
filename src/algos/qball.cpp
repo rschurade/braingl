@@ -28,7 +28,6 @@ QBall::~QBall()
 
 Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
 {
-    //qDebug() << "start calculating qBall base";
     double sh_size( ( maxOrder + 1 ) * ( maxOrder + 2 ) / 2 );
 
     // check validity of input:
@@ -79,9 +78,6 @@ Matrix QBall::calcQBallBase( Matrix gradients, double lambda, int maxOrder )
             out( i + 1, j + 1 ) *= FRT( i + 1 );
         }
     }
-
-    //qDebug() << "finished calculating qBall base";
-
     return out;
 }
 
@@ -102,32 +98,28 @@ void QBall::sharpQBall( DatasetDWI* ds, int order, std::vector<ColumnVector>& ou
     int numThreads = GLFunctions::idealThreadCount;
 
     std::vector<SharpQBallThread*> threads;
-    //qDebug() << "create threads";
+
     for ( int i = 0; i < numThreads; ++i )
     {
         threads.push_back( new SharpQBallThread( ds, order, i ) );
     }
 
-    //qDebug() << "run threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         threads[i]->start();
     }
 
-    //qDebug() << "wait for all threads to finish";
     for ( int i = 0; i < numThreads; ++i )
     {
         threads[i]->wait();
     }
 
     out.clear();
-    //qDebug() << "combine result from all threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         out.insert( out.end(), threads[i]->getQBallVector().begin(), threads[i]->getQBallVector().end() );
     }
 
-    //qDebug() << "delete threads";
     for ( int i = 0; i < numThreads; ++i )
     {
         delete threads[i];

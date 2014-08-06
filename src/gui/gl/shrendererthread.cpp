@@ -262,6 +262,6 @@ void SHRendererThread::run()
     }
     catch (std::bad_alloc& ba)
     {
-        qDebug() << "bad alloc sh renderer thread";
+        qCritical() << "bad alloc sh renderer thread";
     }
 }

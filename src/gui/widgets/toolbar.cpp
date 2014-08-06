@@ -461,7 +461,6 @@ void ToolBar::slot( Fn::Algo algo )
             break;
 
     }
-    //qDebug() << "adding " << l.size() << " datasets";
     for ( int i = 0; i < l.size(); ++i )
     {
         index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );

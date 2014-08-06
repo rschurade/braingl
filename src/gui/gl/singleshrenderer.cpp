@@ -250,7 +250,6 @@ void SingleSHRenderer::draw()
             if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
             {
                 rl.push_back( i );
-                //qDebug() << "found QBall to render";
             }
         }
     }

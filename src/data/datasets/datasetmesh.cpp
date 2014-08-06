@@ -504,7 +504,6 @@ void DatasetMesh::slotCopyColors()
             }
 
             mesh->setVertexColor( i, c );
-            //qDebug() << texDS->getColorAtPos( mesh->getVertex( i ) );
         }
         m_renderer->endUpdateColor();
     }

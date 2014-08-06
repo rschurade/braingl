@@ -31,7 +31,7 @@ bool RoiWriter::save()
     out->data = data->data();
     if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
     {
-        qDebug() << "NIfTI filename Problem" << endl;
+        qCritical() << "NIfTI filename Problem" << endl;
         return false;
     }
     setDescrip( out, "braingl_roi" );
@@ -133,7 +133,7 @@ void RoiWriter::setDescrip( nifti_image* hdr, QString descrip )
 {
     if ( descrip.length() > 80 )
     {
-        qDebug() << "Writer: descrip too long ";
+        qCritical() << "Writer: descrip too long ";
         return;
     }
     for ( int i = 0; i < 80; ++i )

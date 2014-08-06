@@ -465,7 +465,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
         }
     }
 
-    qDebug() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
+    qCritical() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
 //    exit( 0 );
     return false;
 }
@@ -509,7 +509,7 @@ Property* PropertyGroup::getNthProperty( int n )
 {
     if ( n < 0 || n >= (int)m_properties.size() )
     {
-        qDebug() << "***ERROR*** getNthProperty index out of range";
+        qCritical() << "***ERROR*** getNthProperty index out of range";
         exit( 0 );
     }
     return m_properties[n].second;
@@ -519,7 +519,7 @@ QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n ) const
 {
     if ( n < 0 || n >= (int)m_properties.size() )
     {
-        qDebug() << "***ERROR*** getNthPropertyPair index out of range";
+        qCritical() << "***ERROR*** getNthPropertyPair index out of range";
         exit( 0 );
     }
     return m_properties[n];
@@ -561,7 +561,6 @@ void PropertyGroup::setState( QList<QVariant> state )
 {
     for ( int i = 0; i < state.size() / 2; ++i )
     {
-        //qDebug() << Fn::Prop2String::s( (Fn::Property)( state[i*2].toInt() ) ) << state[i*2+1];
         set( (Fn::Property)( state[i*2].toInt() ), state[i*2+1] );
     }
 }

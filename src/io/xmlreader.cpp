@@ -136,7 +136,7 @@ bool XmlReader::readHeader()
                 m_header[name] = m_xml.readElementText();
                 if( name == "content" )
                 {
-                    qDebug() << "reading braingGL " << m_header["content"] << " file";
+                    qDebug() << "reading braingGL " << m_header["content"].toString() << " file";
                 }
             }
 

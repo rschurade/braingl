@@ -64,8 +64,7 @@ void TextRenderer::createFontTexture()
 
 void TextRenderer::renderOverlay( QString text, int x, int y, int width, int height, int renderMode )
 {
-    //qDebug() << text << x << y;
-    glActiveTexture( GL_TEXTURE13 );
+     glActiveTexture( GL_TEXTURE13 );
     glBindTexture( GL_TEXTURE_2D, m_fontTextureGLuint[0] );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );

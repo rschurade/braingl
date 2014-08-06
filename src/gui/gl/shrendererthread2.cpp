@@ -44,7 +44,6 @@ TriangleMesh2* SHRendererThread2::getMesh()
 
 void SHRendererThread2::run()
 {
-    //qDebug() << "SH Renderer: using lod " << lod;
     int lod = m_props.get( Fn::Property::D_LOD ).toInt();
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );
@@ -131,7 +130,7 @@ void SHRendererThread2::run()
     }
     catch (std::bad_alloc& ba)
     {
-        qDebug() << "bad alloc sh renderer";
+        qCritical() << "bad alloc sh renderer";
     }
     m_mesh->finalize();
 

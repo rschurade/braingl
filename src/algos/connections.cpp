@@ -182,7 +182,7 @@ void Connections::loadFib( QString fib )
     ns.seek( n.pos() + np * 3 * 4 + 1 ); //Textstream aufs Zeichen nach den Punkten...
     qDebug() << ns.pos();
     nl = ns.readLine();
-    //qDebug() << nl;
+
     vals = nl.split( " " );
     float ncons = ( (QString) ( vals.at( 1 ) ) ).toInt();
 
@@ -191,7 +191,7 @@ void Connections::loadFib( QString fib )
     {
         qint32 numpoints;
         ins >> numpoints;
-        //qDebug() << numpoints;
+
         qint32* ps = new qint32[numpoints];
         for ( int pn = 0; pn < numpoints; pn++ )
         {
@@ -242,7 +242,6 @@ void Connections::attract()
         connect( t, SIGNAL( progress() ), this, SLOT( attractThreadProgress() ), Qt::QueuedConnection );
         connect( t, SIGNAL( finished() ), this, SLOT( attractThreadFinished() ), Qt::QueuedConnection );
     }
-    //qDebug() << "start attraction iteration, m_athreads.size: " << m_athreads.size();
 
     // run threads
     for ( int i = 0; i < numThreads; ++i )
@@ -253,7 +252,6 @@ void Connections::attract()
     {
         m_athreads[i]->wait();
     }
-    //qDebug() << "multithreading finished";
 
     // delete threads
     for ( unsigned int i = 0; i < m_athreads.size(); ++i )
@@ -266,7 +264,6 @@ void Connections::attract()
     {
         edges.at( e )->applyForces();
     }
-    //qDebug() << "iteration finished";
 }
 
 void Connections::startBundling()
@@ -295,7 +292,6 @@ void Connections::fullAttract()
         qDebug() << "starting " << i << " iterations with c_thr:" << c_thr << "segments: " << edges.first()->points.length() - 1;
         for ( int j = 0; j < i; j++ )
         {
-            //qDebug() << j;
             attract();
         }
         i--;
@@ -330,7 +326,6 @@ void Connections::calcComps()
         connect( t, SIGNAL( progress() ), this, SLOT( compThreadProgress() ), Qt::QueuedConnection );
         connect( t, SIGNAL( finished() ), this, SLOT( compThreadFinished() ), Qt::QueuedConnection );
     }
-    //qDebug() << "start calculating compatibilities, m_compthreads.size: " << m_compthreads.size();
     // run threads
     for ( int i = 0; i < numThreads; ++i )
     {
@@ -568,10 +563,8 @@ void Connections::attractThreadProgress()
 }
 void Connections::compThreadFinished()
 {
-    //qDebug() << "compthread finished";
 }
 
 void Connections::compThreadProgress()
 {
-    //qDebug() << "compthread progress";
 }

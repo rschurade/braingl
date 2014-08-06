@@ -88,7 +88,7 @@ void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     GLenum error;
     int i = 0;
     while ((error = glGetError()) != GL_NO_ERROR) {
-        qDebug() << "render tensor lines: opengl error" << error;
+        qCritical() << "render tensor lines: opengl error" << error;
         i++;
     }
     glBindBuffer( GL_ARRAY_BUFFER, 0 );

@@ -623,7 +623,6 @@ void MainWindow::saveFilterChanged( QString filterString )
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
     int type = ds->properties().get( Fn::Property::D_TYPE ).toInt();
-    //qDebug() << type << " " << (int)Fn::DatasetType::PLANE << " " << (int)Fn::DatasetType::GUIDE;
     if ( type == (int)Fn::DatasetType::PLANE || type == (int)Fn::DatasetType::GUIDE || type == (int)Fn::DatasetType::LABEL )
     {
         return;
@@ -678,7 +677,6 @@ void MainWindow::importColormaps()
     for ( int i = 0; i < fileNames.size(); ++i )
     {
         QSettings settings( fileNames[i], QSettings::IniFormat );
-        //qDebug() << settings.status();
 
         QVariant versionString = "0.0.0";
         if ( settings.contains( "version" ) )
@@ -838,7 +836,6 @@ void MainWindow::loadScene( QString fileName )
 void MainWindow::loadSceneDeprecated( QString fileName )
 {
     QSettings settings( fileName, QSettings::IniFormat );
-    //qDebug() << settings.status();
 
     QString versionString = "0.0.0";
     if ( settings.contains( "version" ) )

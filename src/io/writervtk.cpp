@@ -44,7 +44,6 @@ bool WriterVTK::save()
 {
     if ( m_fileName.endsWith( ".vtk" ) || m_fileName.endsWith( ".fib" ) )
     {
-        //qDebug() << "filter:" << m_filter;
         switch ( (Fn::DatasetType)( m_dataset->properties().get( Fn::Property::D_TYPE ).toInt() ) )
         {
             case Fn::DatasetType::FIBERS:
@@ -169,7 +168,7 @@ void WriterVTK::saveFibs( QString filename, bool binary )
 
      if ( ! writer->Write() )
      {
-         qDebug() << "Error writing " << filename;
+         qCritical() << "Error writing " << filename;
      }
 }
 
@@ -264,6 +263,6 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
 #endif
     if ( !writer->Write() )
     {
-        qDebug() << "Error writing " << filename;
+        qCritical() << "Error writing " << filename;
     }
 }

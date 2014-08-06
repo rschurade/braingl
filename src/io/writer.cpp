@@ -57,7 +57,7 @@ bool Writer::save()
             out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -95,7 +95,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -135,7 +135,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -174,7 +174,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -213,7 +213,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -273,7 +273,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -309,7 +309,7 @@ bool Writer::save()
             out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
             setDescrip( out, "braingl_isoline" );
 
@@ -367,7 +367,7 @@ bool Writer::save()
                 out->data = data->data();
                 if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
                 {
-                    qDebug() << "NIfTI filename Problem" << endl;
+                    qCritical() << "NIfTI filename Problem" << endl;
                 }
                 setDescrip( out, "braingl_isosurface" );
                 nifti_image_write( out );
@@ -495,7 +495,7 @@ void Writer::setDescrip( nifti_image* hdr, QString descrip )
 {
     if ( descrip.length() > 80 )
     {
-        qDebug() << "Writer: descrip too long ";
+        qCritical() << "Writer: descrip too long ";
         return;
     }
     for ( int i = 0; i < 80; ++i )
