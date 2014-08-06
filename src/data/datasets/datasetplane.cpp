@@ -29,6 +29,9 @@ DatasetPlane::DatasetPlane() :
     float dx = 1.0f;
     float dy = 1.0f;
     float dz = 1.0f;
+    float ax = 0.0f;
+    float ay = 0.0f;
+    float az = 0.0f;
     if ( dsl.size() > 0 )
     {
         nx = dsl[0]->properties().get( Fn::Property::D_NX ).toInt();
@@ -37,11 +40,14 @@ DatasetPlane::DatasetPlane() :
         dx = dsl[0]->properties().get( Fn::Property::D_DX ).toFloat();
         dy = dsl[0]->properties().get( Fn::Property::D_DY ).toFloat();
         dz = dsl[0]->properties().get( Fn::Property::D_DZ ).toFloat();
+        ax = dsl[0]->properties().get( Fn::Property::D_ADJUST_X ).toFloat();
+        ay = dsl[0]->properties().get( Fn::Property::D_ADJUST_Y ).toFloat();
+        az = dsl[0]->properties().get( Fn::Property::D_ADJUST_Z ).toFloat();
     }
 
-    QVector3D h0( nx * dx / 2, ny * dy / 2, nz * dz / 2 );
-    QVector3D h1( 0.0, h0.y(), h0.z() );
-    QVector3D h2( h0.x(), 0.0, h0.z() );
+    QVector3D h0( nx * dx / 2 + ax, ny * dy / 2 + ay, nz * dz / 2 + az );
+    QVector3D h1( ax, h0.y(), h0.z() );
+    QVector3D h2( h0.x(), ay, h0.z() );
 
     m_properties["maingl"].createBool( Fn::Property::D_SHOW_PLANE_HANDLES, true, "general" );
     m_properties["maingl"].createColor( Fn::Property::D_HANDLE_COLOR, QColor( 255, 0, 0 ), "general" );
