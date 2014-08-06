@@ -6,7 +6,7 @@
  */
 #include "roiwriter.h"
 
-#include "roiarea.h"
+#include "../data/roiarea.h"
 
 #include <QBuffer>
 #include <QDebug>

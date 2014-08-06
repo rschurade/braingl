@@ -7,13 +7,13 @@
 
 #include "writervtk.h"
 
-#include "datasets/datasetfibers.h"
-#include "datasets/datasetmesh.h"
-#include "datasets/datasetmeshtimeseries.h"
-#include "datasets/datasetglyphset.h"
-#include "datasets/datasetisosurface.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetmeshtimeseries.h"
+#include "../data/datasets/datasetglyphset.h"
+#include "../data/datasets/datasetisosurface.h"
 
-#include "mesh/trianglemesh2.h"
+#include "../data/mesh/trianglemesh2.h"
 
 #include <QDebug>
 #include <QFile>

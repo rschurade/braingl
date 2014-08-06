@@ -7,15 +7,15 @@
 
 #include "loadernifti.h"
 
-#include "datasets/datasetscalar.h"
-#include "datasets/dataset3d.h"
-#include "datasets/datasetbingham.h"
-#include "datasets/datasetdwi.h"
-#include "datasets/datasetfmri.h"
-#include "datasets/datasettensor.h"
-#include "datasets/datasetsh.h"
-#include "datasets/datasetisosurface.h"
-#include "datasets/datasetisoline.h"
+#include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/dataset3d.h"
+#include "../data/datasets/datasetbingham.h"
+#include "../data/datasets/datasetdwi.h"
+#include "../data/datasets/datasetfmri.h"
+#include "../data/datasets/datasettensor.h"
+#include "../data/datasets/datasetsh.h"
+#include "../data/datasets/datasetisosurface.h"
+#include "../data/datasets/datasetisoline.h"
 
 #include <QDebug>
 #include <QDataStream>

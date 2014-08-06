@@ -5,10 +5,12 @@
 
 #include <buildtime.h>
 
+#include "data/enums.h"
 #include "data/models.h"
-#include "data/loader.h"
 #include "data/vptr.h"
 #include "gui/mainwindow.h"
+
+#include "io/loader.h"
 
 QTextStream *out = 0;
 bool logToFile = false;
@@ -70,7 +72,7 @@ int main( int argc, char *argv[] )
     QCoreApplication::setOrganizationDomain( "braingl.de" );
 	QCoreApplication::setOrganizationName( "MPI_CBS" );
 	QCoreApplication::setApplicationName( "braingl" );
-	QCoreApplication::setApplicationVersion( "0.8.1" );
+	QCoreApplication::setApplicationVersion( "0.9.1" );
 
     Q_INIT_RESOURCE( resources );
 

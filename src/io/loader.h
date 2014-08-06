@@ -8,8 +8,8 @@
 #ifndef LOADER_H_
 #define LOADER_H_
 
-#include "datasets/dataset.h"
-#include "datasets/datasetmesh.h"
+#include "../data/datasets/dataset.h"
+#include "../data/datasets/datasetmesh.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 

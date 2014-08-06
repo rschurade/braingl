@@ -9,16 +9,16 @@
 #include "loadervtk.h"
 #include "loaderfreesurfer.h"
 
-#include "datasets/datasetglyphset.h"
-#include "datasets/datasetcons.h"
-#include "datasets/datasetmeshtimeseries.h"
-#include "datasets/datasettree.h"
-#include "datasets/datasetmesh.h"
-#include "datasets/datasetfibers.h"
-#include "datasets/dataset3d.h"
-#include "datasets/datasetscalar.h"
+#include "../data/datasets/datasetglyphset.h"
+#include "../data/datasets/datasetcons.h"
+#include "../data/datasets/datasetmeshtimeseries.h"
+#include "../data/datasets/datasettree.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/dataset3d.h"
+#include "../data/datasets/datasetscalar.h"
 
-#include "mesh/trianglemesh2.h"
+#include "../data/mesh/trianglemesh2.h"
 
 #include "../algos/fib.h"
 
@@ -1217,7 +1217,18 @@ bool Loader::loadJSON()
         return false;
     }
 
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+
+    vertList = nl.split( "," );
+
     // skip normals
+    ns.readLine();
     ns.readLine();
 
     nl = ns.readLine();
@@ -1243,6 +1254,15 @@ bool Loader::loadJSON()
     nl.replace( "[", "" );
     nl.replace( "],", "" );
     nl.replace( "]", "" );
+    colorList = nl.split( "," );
+
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
 
     QStringList indexList = nl.split( "," );
 
@@ -1252,12 +1272,21 @@ bool Loader::loadJSON()
         return false;
     }
 
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+    indexList = nl.split( "," );
+
     std::vector<Fib> fibs;
     Fib fib;
 
-    int pc = 1;
+    int pc = 0;
 
-    for ( int i = 1; i < indexList.size(); ++i )
+    for ( int i = 0; i < indexList.size(); ++i )
     {
         int length = indexList[i].toInt();
         for ( int k = 0; k < length; ++k )
@@ -1265,7 +1294,7 @@ bool Loader::loadJSON()
             float x = vertList[pc++].toFloat();
             float y = vertList[pc++].toFloat();
             float z = vertList[pc++].toFloat();
-            fib.addVert( x,y ,z );
+            fib.addVert( x, y ,z );
         }
         fibs.push_back( fib );
         fib.clear();
@@ -1278,5 +1307,4 @@ bool Loader::loadJSON()
     m_dataset.push_back( dataset );
 
     return true;
-
 }

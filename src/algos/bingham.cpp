@@ -10,7 +10,7 @@
 #include "gradients.h"
 #include "sorts.h"
 
-#include "../data/writer.h"
+#include "../io/writer.h"
 
 #include "../data/datasets/dataset.h"
 #include "../data/datasets/datasetdwi.h"

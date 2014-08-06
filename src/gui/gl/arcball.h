@@ -38,6 +38,7 @@ public:
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
+    void setState( QMap<QString, QVariant> state );
 
     QQuaternion getRotation();
     void setRotation( QQuaternion quat );

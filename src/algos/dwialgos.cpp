@@ -5,9 +5,13 @@
  * @author Ralph Schurade
  */
 #include "dwialgos.h"
-#include "../data/enums.h"
-#include "../data/writer.h"
 
+#include "fmath.h"
+#include "track.h"
+#include "qball.h"
+#include "bingham.h"
+
+#include "../data/enums.h"
 #include "../data/mesh/trianglemesh2.h"
 #include "../data/mesh/tesselation.h"
 #include "../data/datasets/dataset3d.h"
@@ -19,10 +23,7 @@
 #include "../data/datasets/datasettensor.h"
 #include "../data/datasets/datasetsh.h"
 
-#include "fmath.h"
-#include "track.h"
-#include "qball.h"
-#include "bingham.h"
+#include "../io/writer.h"
 
 #include "../thirdparty/newmat10/newmat.h"
 #include "../thirdparty/newmat10/newmatap.h"
