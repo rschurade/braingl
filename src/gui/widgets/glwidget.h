@@ -80,6 +80,8 @@ private:
 
     void cameraCircle( bool dir );
 
+    void showValuePickTooltip( QMouseEvent* event );
+
 protected:
     void initializeGL();
     void paintGL();
