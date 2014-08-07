@@ -100,7 +100,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     QIcon logo( ":/icons/logo_blue_orange_64.png" );
     setWindowIcon( logo );
 
-    setUnifiedTitleAndToolBarOnMac( true );
+    setUnifiedTitleAndToolBarOnMac( false );
 
     if ( !resetSettings )
     {
@@ -1137,6 +1137,7 @@ void MainWindow::createToolBars()
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
     addToolBar( m_toolsToolBar );
+    
 }
 
 void MainWindow::createStatusBar()
