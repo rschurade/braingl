@@ -292,32 +292,37 @@ void GLWidget::calcMVPMatrix()
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );
 }
 
+void GLWidget::showValuePickTooltip( QMouseEvent* event )
+{
+    int x = event->x();
+    int y = event->y();
+    m_sceneRenderer->renderPick();
+    QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
+
+    QString text = "X: " + QString::number( pickPos.x(), 'f', 2 ) + "  Y: " + QString::number( pickPos.y(), 'f', 2 ) + "  Z: " + QString::number( pickPos.z(), 'f', 2 );
+    text += "<br>-------------------------------";
+
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, true );
+
+    for ( int i = 0; i < dsl.size(); ++i )
+    {
+        DatasetScalar* dss = dynamic_cast<DatasetScalar*>( dsl[i] );
+        text += "<br>";
+        text += dss->properties().get( Fn::Property::D_NAME ).toString();
+        text += " : ";
+        text += QString::number( dss->getValueAtPos( pickPos ), 'f', 2 );
+    }
+
+    QToolTip::showText( event->globalPos(), text );
+}
+
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
     setFocus();
     if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
     {
-        int x = event->x();
-        int y = event->y();
-        m_sceneRenderer->renderPick();
-        QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
-
-        QString text = "X: " + QString::number( pickPos.x(), 'f', 2 ) + "  Y: " + QString::number( pickPos.y(), 'f', 2 ) + "  Z: " + QString::number( pickPos.z(), 'f', 2 );
-        text += "<br>-------------------------------";
-
-        QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, true );
-
-        for ( int i = 0; i < dsl.size(); ++i )
-        {
-            DatasetScalar* dss = dynamic_cast<DatasetScalar*>( dsl[i] );
-            text += "<br>";
-            text += dss->properties().get( Fn::Property::D_NAME ).toString();
-            text += " : ";
-            text += QString::number( dss->getValueAtPos( pickPos ), 'f', 2 );
-        }
-
-        QToolTip::showText( event->globalPos(), text );
+        showValuePickTooltip( event );
     }
     else if ( event->buttons() & Qt::LeftButton )
     {
@@ -340,6 +345,7 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 {
     if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
     {
+        showValuePickTooltip( event );
     }
     else if ( event->buttons() & Qt::LeftButton )
     {
