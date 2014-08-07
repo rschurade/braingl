@@ -240,4 +240,5 @@ ROIArea* StateReader::loadRoi( QString fileName )
 
         return roiOut;
     }
+    return NULL;
 }

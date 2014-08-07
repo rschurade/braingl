@@ -62,7 +62,6 @@ private:
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
-    ROIArea* loadRoi2( QString fn );
 
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();

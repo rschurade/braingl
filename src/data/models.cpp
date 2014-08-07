@@ -90,7 +90,7 @@ ROI* Models::getRoi( int branch, int pos )
 
 int Models::getBranchSize( int branch )
 {
-    m_roiModel->rowCount( createRoiIndex( branch, 0, 0 ) );
+    return m_roiModel->rowCount( createRoiIndex( branch, 0, 0 ) );
 }
 
 void Models::setROIProp( int branch, int pos, int prop, QVariant value )

@@ -368,40 +368,6 @@ bool MainWindow::loadRoi( QString fn )
     return false;
 }
 
-ROIArea* MainWindow::loadRoi2( QString fn )
-{
-    if ( !fn.isEmpty() )
-    {
-        if ( fn.endsWith( ".nii.gz" ) || fn.endsWith( ".nii" ) || fn.endsWith( ".hdr" ) || fn.endsWith( ".ima" ) || fn.endsWith( ".img" ) )
-        {
-            Loader loader( selectedDataset() );
-            loader.setFilename( QDir( fn ) );
-            if ( loader.load() )
-            {
-                DatasetScalar* dss = static_cast<DatasetScalar*>( loader.getDataset( 0 ) );
-                std::vector<float>* data = dss->getData();
-                std::vector<float> out( data->size(), 0.0 );
-
-                for ( unsigned int i = 0; i < data->size(); ++i )
-                {
-                    out[i] = data->at( i );
-                }
-
-                ROIArea* roiOut = new ROIArea( out, dss->properties() );
-
-                QFileInfo fi( fn );
-                QDir dir = fi.absoluteDir();
-                QString lastPath = dir.absolutePath();
-                Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
-                setCurrentFile( fn );
-
-                return roiOut;
-            }
-        }
-    }
-    return NULL;
-}
-
 bool MainWindow::load( QString fileName )
 {
     mainGLWidget->makeCurrent();
