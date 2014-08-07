@@ -324,6 +324,7 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_MAX, 1.0 );
 
     DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
     iso->properties().set( Fn::Property::D_ISO_VALUE, 0.10 );
