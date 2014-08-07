@@ -95,30 +95,17 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
     }
     m_globalInfo = "[";
 
-    QModelIndex mi;
-    mi = Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_x = Models::g()->data( mi ).toInt();
-        m_globalInfo +=  QString::number( m_x );
-        m_globalInfo += ",";
-    }
+    m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    m_globalInfo +=  QString::number( m_x, 'f', 2 );
+    m_globalInfo += ",";
 
-    mi = Models::g()->index( (int)Fn::Property::G_CORONAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_y = Models::g()->data( mi ).toInt();
-        m_globalInfo += QString::number( m_y );
-        m_globalInfo += ",";
-    }
+    m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    m_globalInfo += QString::number( m_y, 'f', 2 );
+    m_globalInfo += ",";
 
-    mi = Models::g()->index( (int)Fn::Property::G_AXIAL, 0 );
-    if ( mi.isValid() )
-    {
-        m_z = Models::g()->data( mi ).toInt();
-        m_globalInfo += QString::number( m_z );
-        m_globalInfo += "]";
-    }
+    m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+    m_globalInfo += QString::number( m_z, 'f', 2 );
+    m_globalInfo += "]";
 
     Dataset* ds = VPtr<Dataset>::asPtr( model()->data( model()->index( m_selected, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
     if ( ds )

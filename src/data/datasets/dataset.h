@@ -35,7 +35,7 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
 
-    virtual QString getValueAsString( int x, int y, int z );
+    virtual QString getValueAsString( float x, float y, float z );
     virtual QString getColormapShader( int num );
 
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );

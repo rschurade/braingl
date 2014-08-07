@@ -26,7 +26,6 @@ public:
     //nifti_image* getHeader();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
-    virtual QString getValueAsString( int x, int y, int z ) = 0;
 
     static QString getNiftiDataType( const int type );
 
