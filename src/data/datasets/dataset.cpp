@@ -53,7 +53,7 @@ PropertyGroup& Dataset::properties( QString target )
     }
 }
 
-QString Dataset::getValueAsString( int x, int y, int z )
+QString Dataset::getValueAsString( float x, float y, float z )
 {
     return QString( "0" );
 }

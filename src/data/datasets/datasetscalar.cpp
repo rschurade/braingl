@@ -148,9 +148,9 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
     GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
-QString DatasetScalar::getValueAsString( int x, int y, int z )
+QString DatasetScalar::getValueAsString( float x, float y, float z )
 {
-    float data = m_data[ getId( x, y, z ) ];
+    float data = m_data[ getIdFromPos( x, y, z ) ];
     return QString::number( data );
 }
 

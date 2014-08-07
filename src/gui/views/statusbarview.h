@@ -36,9 +36,9 @@ private:
     int m_selected;
     QString m_globalInfo;
     QString m_datasetInfo;
-    int m_x;
-    int m_y;
-    int m_z;
+    float m_x;
+    float m_y;
+    float m_z;
 
 
 signals:

@@ -187,9 +187,9 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
     }
 }
 
-QString Dataset3D::getValueAsString( int x, int y, int z )
+QString Dataset3D::getValueAsString( float x, float y, float z )
 {
-    QVector3D data = m_data[ getId( x, y, z ) ];
+    QVector3D data = m_data[ getIdFromPos( x, y, z ) ];
 
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }

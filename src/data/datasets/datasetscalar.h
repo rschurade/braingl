@@ -19,7 +19,7 @@ public:
     std::vector<float>* getData();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
-    QString getValueAsString( int x, int y, int z );
+    QString getValueAsString( float x, float y, float z );
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
