@@ -1021,7 +1021,8 @@ void Writer::saveFibTrk()
         file.open( QIODevice::WriteOnly );
         QDataStream out( &file );
         out.setFloatingPointPrecision( QDataStream::SinglePrecision );
-        char* s = "TRACK";
+        const char* s = const_cast<char *>("TRACK");
+
         out.writeRawData( s, 6 ); // ID string for track file. The first 5 characters must be "TRACK".
         out << (short) 128; // Dimension of the image volume.
         out << (short) 128;

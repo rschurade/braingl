@@ -160,7 +160,7 @@ void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &b
 
     int branch = 0;
     int pos = 0;
-    if ( topLeft.internalId() == -1 )
+    if ( (int)topLeft.internalId() == -1 )
     {
         // top level box
         branch = topLeft.row();
