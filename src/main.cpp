@@ -15,6 +15,7 @@
 QTextStream *out = 0;
 bool logToFile = false;
 bool verbose = false;
+bool debug = false;
 bool makeScreenshot = false;
 
 void logOutput( QtMsgType type, const QMessageLogContext& context, const QString &message )
@@ -26,7 +27,7 @@ void logOutput( QtMsgType type, const QMessageLogContext& context, const QString
     {
     case QtDebugMsg:
         debugdate += " [D]";
-        if ( verbose )
+        if ( debug )
         {
             (*out) << debugdate << " " << message << endl;
         }
@@ -61,6 +62,11 @@ void noOutput( QtMsgType type, const QMessageLogContext& context, const QString 
 
 int main( int argc, char *argv[] )
 {
+#ifdef __DEBUG__
+    debug = true;
+    verbose = true;
+#endif
+
     QString hg = HGTIP;
     hg.remove( ";" );
     hg.remove( "changeset:" );
@@ -82,7 +88,6 @@ int main( int argc, char *argv[] )
 
     QStringList args = app.arguments();
 
-    bool debug = false;
     bool resetSettings = false;
     bool runScript = false;
 
@@ -176,11 +181,6 @@ int main( int argc, char *argv[] )
     qInstallMessageHandler( noOutput );
     out = new QTextStream( stdout );
     qInstallMessageHandler( logOutput );
-
-#ifdef __DEBUG__
-    debug = true;
-    verbose = true;
-#endif
 
     Models::init();
 
