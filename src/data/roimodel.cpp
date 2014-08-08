@@ -321,17 +321,21 @@ void ROIModel::propChanged( int value )
             break;
         }
     }
-    if ( kk == 0 )
+    if ( found )
     {
-        QModelIndex parent;
-        QModelIndex index = this->index( ii, 0, parent );
-        emit ( dataChanged( index, index ) );
-    }
-    else
-    {
-        QModelIndex parent = this->index( ii, 0, QModelIndex() );
-        QModelIndex index = this->index( kk - 1, 0, parent );
-        emit ( dataChanged( index, index ) );
+        if ( kk == 0 )
+        {
+
+            QModelIndex parent;
+            QModelIndex index = this->index( ii, 0, parent );
+            emit ( dataChanged( index, index ) );
+        }
+        else
+        {
+            QModelIndex parent = this->index( ii, 0, QModelIndex() );
+            QModelIndex index = this->index( kk - 1, 0, parent );
+            emit ( dataChanged( index, index ) );
+        }
     }
 }
 
@@ -361,4 +365,16 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
     }
 
     return l;
+}
+
+ROI* ROIModel::getRoi( int branch, int pos )
+{
+    if ( m_rois.size() < branch && m_rois[branch].size() < pos )
+    {
+        return VPtr<ROI>::asPtr( m_rois[branch][pos] );
+    }
+    else
+    {
+        return NULL;
+    }
 }

@@ -35,6 +35,7 @@ public:
 
     QModelIndexList match( const QModelIndex &start, int role, const QVariant &value, int hits=1, Qt::MatchFlags flags=Qt::MatchFlags( Qt::MatchStartsWith | Qt::MatchWrap ) ) const;
 
+    ROI* getRoi( int branch, int column );
 private:
     QList< QList<QVariant> >m_rois;
     int m_count;

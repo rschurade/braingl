@@ -172,7 +172,6 @@ void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &b
         pos = topLeft.row() + 1;
     }
     updateROI( branch, pos );
-
 }
 
 void FiberSelector::roiInserted( const QModelIndex &parent, int start, int end )
@@ -230,7 +229,8 @@ QModelIndex FiberSelector::createIndex( int branch, int pos, int column )
 void FiberSelector::updateROI( int branch, int pos )
 {
 	int shape = Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_SHAPE ), Qt::DisplayRole ).toInt();
-    if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
+
+	if ( Models::r()->data( createIndex( branch, pos, (int)Fn::Property::D_ACTIVE ), Qt::DisplayRole ).toBool() )
     {
         if ( shape == 10 )
         {
