@@ -124,9 +124,10 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createFloat( Fn::Property::D_DX, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DY, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, 0, 2000, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createBool( Fn::Property::D_STICK_TO_CROSSHAIR, true, "special" );
 
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
 
@@ -188,6 +189,8 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
+
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
 
 //    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false );
 //    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
@@ -604,4 +607,16 @@ void DatasetFibers::calcBoundingBox()
     m_boundingBox.second.setX( xMax );
     m_boundingBox.second.setY( yMax );
     m_boundingBox.second.setZ( zMax );
+}
+
+void DatasetFibers::globalChanged()
+{
+    if ( m_properties["maingl"].get( Fn::Property::D_STICK_TO_CROSSHAIR ).toBool() )
+    {
+        m_properties["maingl"].set( Fn::Property::D_NX, Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NY, Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NZ, Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * 10 );
+    }
+
+    Models::d()->submit();
 }
