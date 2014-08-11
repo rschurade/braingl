@@ -78,6 +78,7 @@ private slots:
     void dataModeChanged();
     void transformChanged( QVariant value );
     void applyTransform();
+    void globalChanged();
 };
 
 #endif /* DATASETFIBERS_H_ */
