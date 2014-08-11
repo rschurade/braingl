@@ -157,10 +157,23 @@ void TubeRenderer::setShaderVars( PropertyGroup& props )
     program->setUniformValue( "u_colorMode", props.get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props.get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-    program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-    program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    if ( props.get( Fn::Property::D_COLORMODE ).toInt() == 3 )
+    {
+        float texMin = props.get( Fn::Property::D_MIN ).toFloat();
+        float texMax = props.get( Fn::Property::D_MAX ).toFloat();
+        program->setUniformValue( "u_lowerThreshold", ( props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_upperThreshold", ( props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMin", ( props.get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMax", ( props.get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+    }
+    else
+    {
+        program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    }
+
     program->setUniformValue( "u_thickness", props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() / 100.f );
 }
 

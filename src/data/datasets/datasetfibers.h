@@ -71,6 +71,8 @@ protected:
 
     QMatrix4x4 m_userTransform;
 
+    QList<Dataset*>m_scalarDSL;
+
 private:
 
 private slots:
@@ -79,6 +81,8 @@ private slots:
     void transformChanged( QVariant value );
     void applyTransform();
     void globalChanged();
+    void sourceMRIChanged();
+    void updateSourceMRI();
 };
 
 #endif /* DATASETFIBERS_H_ */
