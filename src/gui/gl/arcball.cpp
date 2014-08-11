@@ -106,12 +106,12 @@ void ArcBall::mouseWheel( float step )
 {
     if ( step < 0 )
     {
-        m_zoom *= 1.1;
+        m_zoom /= 1.1;
+        m_zoom = qMax( 0.2f, m_zoom );
     }
     else
     {
-        m_zoom /= 1.1;
-        m_zoom = qMax( 0.2f, m_zoom );
+        m_zoom *= 1.1;
     }
 }
 
