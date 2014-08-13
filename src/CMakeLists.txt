@@ -52,7 +52,7 @@ ADD_DEFINITIONS( -DHAVE_ZLIB )
 # REQUIRED third party libs
 #
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
-IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+IF( APPLE )
     FIND_PACKAGE( OpenGL REQUIRED )
 ENDIF()
 
@@ -94,11 +94,11 @@ ELSE()
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++0x" )
 ENDIF()
 
-IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+IF( APPLE )
     SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
-IF( CMAKE_HOST_SYSTEM MATCHES "Windows" )
+IF( WIN32 )
     OPTION( SURPRESS_CMD_WINDOW "No cmd window" OFF )
     IF ( SURPRESS_CMD_WINDOW MATCHES ON )
         SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -mwindows")
@@ -125,7 +125,7 @@ IF ( CMAKE_VERBOSE_MAKEFILE )
       MESSAGE(STATUS "*******************************************************************************")
       MESSAGE(STATUS "*        SUMMARY OF USED VARIABLES -> Details in AllVariables.txt             *")
       MESSAGE(STATUS "*******************************************************************************")
-IF(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
+IF( APPLE )
           MESSAGE(STATUS "COMPILING FOR OSX, platforms: ${CMAKE_OSX_ARCHITECTURES}")
 ENDIF()
       MESSAGE(STATUS "CMAKE_ROOT ........................... = ${CMAKE_ROOT}")
@@ -148,15 +148,52 @@ ENDIF()
       MESSAGE(STATUS "BOOST_INCLUDE_DIR..................... = ${Boost_INCLUDE_DIR}" )          
 ENDIF()
 
+IF( NOT  APPLE )
+    ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS} )
+
+    ReadProjectRevisionStatus()
+
+    QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
+
+    TARGET_LINK_LIBRARIES( ${BinName} ${VTK_LIBRARIES} z  )
+ENDIF()
+
+
+IF( APPLE )
+    SET( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
+    SET_SOURCE_FILES_PROPERTIES( ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns
+                               PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+
+    # XXX merge with definition above
+    ADD_EXECUTABLE( ${BinName} MACOSX_BUNDLE ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${FNAV_HEADERS_MOC} ${QtIcon_RCC_SRCS} ${MACOSX_RESOURCE_FILES} )
+
+    # XXX ditto
+    ReadProjectRevisionStatus()
+
+    SET( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${__HGTIP__}" )
+    # XXX value should be formed like 1.2.3
+    SET( MACOSX_BUNDLE_BUNDLE_VERSION ${__HGTIP__} )
+    SET( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
+    SET( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
+    SET( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
     
-ADD_EXECUTABLE( ${BinName} ${TARGET_CPP_FILES} ${TARGET_H_FILES} ${QtIcon_RCC_SRCS} )
+    QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
+    TARGET_LINK_LIBRARIES( ${BinName} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
 
-ReadProjectRevisionStatus()
+    SET( BUNDLED_DIR ${CMAKE_CURRENT_BINARY_DIR}/selfcontained )
 
-QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
+    # create self-contained application bundle with embedded Frameworks
+    # and dylibs
+    INSTALL( CODE "
+      INCLUDE( BundleUtilities )
+      FILE( REMOVE_RECURSE ${BUNDLED_DIR} )
+      COPY_AND_FIXUP_BUNDLE( ${BinName}.app ${BUNDLED_DIR}/${BinName}.app \"\" \"\" ) 
+    ")
 
-TARGET_LINK_LIBRARIES( ${BinName} ${VTK_LIBRARIES} z  )
+    # create distribution disk image (`package´ build target)
+    SET( CPACK_GENERATOR "DragNDrop" )
+    SET( CPACK_INSTALLED_DIRECTORIES ${BUNDLED_DIR} . )
+    INCLUDE( CPack )
 
-IF( CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin" )
-    TARGET_LINK_LIBRARIES( ${BinName} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} z  )
+    ADD_CUSTOM_TARGET( makedmg COMMAND macdeployqt ${BinName}.app -dmg -no-plugins WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} ) 
 ENDIF()
