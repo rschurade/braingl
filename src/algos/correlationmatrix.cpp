@@ -7,16 +7,17 @@
 
 #include "correlationmatrix.h"
 
-#include <QDebug>
+#include <QApplication>
 #include <QtCore>
+#include <QDebug>
+#include <QDomDocument>
 #include <QFile>
+#include <QHttpMultiPart>
+#include <QInputDialog>
+#include <QStringList>
+#include <QThread>
 #include <QUrl>
 #include <QUrlQuery>
-#include <QThread>
-#include <QApplication>
-#include <QDomDocument>
-#include <QStringList>
-#include <QInputDialog>
 
 #include <cmath>
 
@@ -231,16 +232,15 @@ void CorrelationMatrix::load( int i )
 void CorrelationMatrix::loadMetaData()
 {
     QUrl serviceUrl = QUrl( m_filename + "&metadata=true");
-    QUrl postData;
+    QHttpMultiPart *multiPart = new QHttpMultiPart( QHttpMultiPart::FormDataType );
     QNetworkRequest request( serviceUrl );
     request.setHeader( QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded" );
     // HTTP Basic authentication header value: base64(username:password)
-    QString concatenated = m_id+":"+m_passwd;
+    QString concatenated = m_id + ":" + m_passwd;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
-    //TODO: QT5
-    QNetworkReply* reply;//  = networkManager->post( request, postData.query() );
+    QNetworkReply* reply = networkManager->post( request, multiPart );
 
     while ( !reply->isFinished() )
     {
@@ -307,7 +307,7 @@ void CorrelationMatrix::loadRemote( int i )
     }
     QString id = QString::number( m_index[i] - 1 );
     QUrl serviceUrl = QUrl( m_filename + "&row-index=" + id );
-    QUrl postData;
+    QHttpMultiPart *multiPart = new QHttpMultiPart( QHttpMultiPart::FormDataType );
     QNetworkRequest request( serviceUrl );
     request.setHeader( QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded" );
     // HTTP Basic authentication header value: base64(username:password)
@@ -315,15 +315,14 @@ void CorrelationMatrix::loadRemote( int i )
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader( "Authorization", headerData.toLocal8Bit() );
-    //TODO: QT5
-    QNetworkReply* reply; // = networkManager->post( request, postData.query() );
+    QNetworkReply* reply = networkManager->post( request, multiPart );
     while ( !reply->isFinished() )
     {
         QApplication::processEvents();
     }
     QByteArray array = reply->readAll();
 
-    float values[array.size() / 4];
+    std::vector<float> values( array.size() / 4 );
     QDataStream stream( array );
     stream.setByteOrder( QDataStream::LittleEndian );
     stream.setFloatingPointPrecision( QDataStream::SinglePrecision );

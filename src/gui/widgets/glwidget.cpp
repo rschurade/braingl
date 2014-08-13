@@ -484,6 +484,24 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         Models::g()->submit();
     }
 
+    if ( m_roiSelectionModel->hasSelection() )
+    {
+        QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
+        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::D_POINTER, mi.parent() ), Qt::DisplayRole ) );
+        float newx = roi->properties()->get( Fn::Property::D_X ).toFloat() + dir.x();
+        float newy = roi->properties()->get( Fn::Property::D_Y ).toFloat() + dir.y();
+        float newz = roi->properties()->get( Fn::Property::D_Z ).toFloat() + dir.z();
+
+        roi->properties()->set( Fn::Property::D_X, newx );
+        roi->properties()->set( Fn::Property::D_Y, newy );
+        roi->properties()->set( Fn::Property::D_Z, newz );
+        roi->slotPropChanged();
+    }
+
+    if ( Models::d()->rowCount() == 0 )
+    {
+        return;
+    }
     Dataset* ds = Models::getDataset( 0 );
     QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
 
@@ -559,19 +577,6 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
             }
             default:
             {
-                if ( m_roiSelectionModel->hasSelection() )
-                {
-                    QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::D_POINTER, mi.parent() ), Qt::DisplayRole ) );
-                    float newx = roi->properties()->get( Fn::Property::D_X ).toFloat() + dir.x();
-                    float newy = roi->properties()->get( Fn::Property::D_Y ).toFloat() + dir.y();
-                    float newz = roi->properties()->get( Fn::Property::D_Z ).toFloat() + dir.z();
-
-                    roi->properties()->set( Fn::Property::D_X, newx );
-                    roi->properties()->set( Fn::Property::D_Y, newy );
-                    roi->properties()->set( Fn::Property::D_Z, newz );
-                    roi->slotPropChanged();
-                }
                 break;
             }
         }

@@ -84,8 +84,7 @@ QVariant Models::getGlobal( int var )
 
 ROI* Models::getRoi( int branch, int pos )
 {
-    ROI* roi = VPtr<ROI>::asPtr( m_roiModel->data( createRoiIndex( branch, pos, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
-    return roi;
+    return dynamic_cast<ROIModel*>( m_roiModel )->getRoi( branch, pos );
 }
 
 int Models::getBranchSize( int branch )
