@@ -9,6 +9,7 @@
 #include "fiberselector.h"
 
 #include "../models.h"
+#include "../vptr.h"
 
 #include "../properties/propertybool.h"
 #include "../properties/propertycolor.h"
@@ -97,6 +98,9 @@ void DatasetFibers::createProps()
         m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
         m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0 );
     }
+    m_properties["maingl"].createList( Fn::Property::D_SELECTED_TEXTURE, { "none" }, 0, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( sourceMRIChanged() ) );
+    m_properties["maingl"].createInt( Fn::Property::D_STIPPLE_PROB_MASK, 0 );
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "color" );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "color" );
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
@@ -105,28 +109,19 @@ void DatasetFibers::createProps()
 
     GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
-    if ( hasData )
-    {
-        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
-    }
-    else
-    {
-        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1 );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-    }
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
+
     m_properties["maingl"].createFloat( Fn::Property::D_DX, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DY, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, 0, 2000, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createBool( Fn::Property::D_STICK_TO_CROSSHAIR, true, "special" );
 
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
 
@@ -188,6 +183,10 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
+
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
+
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateSourceMRI() ) );
 
 //    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false );
 //    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
@@ -604,4 +603,100 @@ void DatasetFibers::calcBoundingBox()
     m_boundingBox.second.setX( xMax );
     m_boundingBox.second.setY( yMax );
     m_boundingBox.second.setZ( zMax );
+}
+
+void DatasetFibers::globalChanged()
+{
+    if ( m_properties["maingl"].get( Fn::Property::D_STICK_TO_CROSSHAIR ).toBool() )
+    {
+        m_properties["maingl"].set( Fn::Property::D_NX, Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NY, Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NZ, Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * 10 );
+    }
+
+    Models::d()->submit();
+}
+
+void DatasetFibers::updateSourceMRI()
+{
+    QList<Dataset*>dsl1 = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, false );
+
+    if( dsl1.size() != m_scalarDSL.size() )
+    {
+        QWidget* widget = m_properties["maingl"].getWidget( Fn::Property::D_SELECTED_TEXTURE );
+        widget->blockSignals( true );
+
+        int curScalar = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+
+        PropertySelection* prop = static_cast<PropertySelection*> ( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ) );
+        prop->clear();
+
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            prop->addOption( dsl1[i]->properties().get( Fn::Property::D_NAME ).toString() );
+        }
+
+        if ( dsl1.size() > m_scalarDSL.size() )
+        {
+            m_properties["maingl"].set( Fn::Property::D_SELECTED_TEXTURE, qMax( 0, curScalar ) );
+        }
+        else
+        {
+            m_properties["maingl"].set( Fn::Property::D_SELECTED_TEXTURE, 0 );
+        }
+        m_scalarDSL.clear();
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            m_scalarDSL.push_back( dsl1[i] );
+        }
+        widget->blockSignals( false );
+    }
+}
+
+void DatasetFibers::sourceMRIChanged()
+{
+    int curScalar = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    Dataset* selectedDS = m_scalarDSL[curScalar];
+
+    QAbstractItemModel* model = Models::d();
+    int countDatasets = model->rowCount();
+    int allocatedTextureCount = 0;
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        if ( selectedDS == ds )
+        {
+            m_properties["maingl"].set( Fn::Property::D_STIPPLE_PROB_MASK, allocatedTextureCount );
+
+            float min = selectedDS->properties().get( Fn::Property::D_MIN ).toFloat();
+            float max = selectedDS->properties().get( Fn::Property::D_MAX ).toFloat();
+
+            m_properties["maingl"].set( Fn::Property::D_MIN, min );
+            m_properties["maingl"].set( Fn::Property::D_MAX, max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
+            Models::d()->submit();
+            return;
+        }
+
+        PropertyGroup* props = &ds->properties();
+        bool active = props->get( Fn::Property::D_ACTIVE ).toBool();
+        bool isTex = props->get( Fn::Property::D_HAS_TEXTURE ).toBool();
+
+        if ( active && isTex )
+        {
+            ++allocatedTextureCount;
+        }
+    }
 }
