@@ -8,7 +8,6 @@
 
 #include "glfunctions.h"
 #include "arcball.h"
-#include "slicerenderer.h"
 #include "colormaprenderer.h"
 
 #include "../../data/datastore.h"
@@ -42,8 +41,6 @@ SceneRenderer::SceneRenderer( QString renderTarget ) :
     RBO( 0 ),
     FBO( 0 )
 {
-    m_sliceRenderer = new SliceRenderer();
-
     m_mvMatrix.setToIdentity();
     m_pMatrix.setToIdentity();
 }
@@ -100,8 +97,6 @@ void SceneRenderer::initGL()
     glEnable( GL_DEPTH_TEST );
 
     glEnable( GL_MULTISAMPLE );
-
-    m_sliceRenderer->init();
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
@@ -299,7 +294,7 @@ void SceneRenderer::renderScenePart( int renderMode, QString target0, QString ta
     setRenderTargets( target0, target1 );
 
     GLFunctions::getAndPrintGLError( m_renderTarget + "---" );
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderSlices( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     //GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
     renderDatasets();
     renderRois();
@@ -463,7 +458,7 @@ void SceneRenderer::renderPick()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     //render_picking_scene();
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderSlices( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderRois();
     renderDatasets();
 }

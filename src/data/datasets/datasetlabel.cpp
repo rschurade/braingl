@@ -55,7 +55,7 @@ void DatasetLabel::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     if ( m_properties["maingl"].get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
     {
         color.setAlpha( 254 );
-        GLFunctions::drawSphere( pMatrix, mvMatrix, h0.x(), h0.y(), h0.z(), 5, 5, 5,
+        GLFunctions::renderSphere( pMatrix, mvMatrix, h0.x(), h0.y(), h0.z(), 5, 5, 5,
                                   color, m_handle0, width, height, renderMode );
     }
 

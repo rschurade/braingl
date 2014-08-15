@@ -123,16 +123,16 @@ void DatasetCorrelation::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int widt
             float s = 5.0;
             float t = 0.5;
 
-            GLFunctions::drawSphere( pMatrix, mvMatrix, sx, sy, sz, s, s, s, color, 0, width, height, renderMode );
+            GLFunctions::renderSphere( pMatrix, mvMatrix, sx, sy, sz, s, s, s, color, 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx + s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx - s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx + s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx - s, sy, sz, s, t, t, QColor( 255.0, 0.0, 0.0 ), 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy + s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy - s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx, sy + s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx, sy - s, sz, t, s, t, QColor( 0.0, 255.0, 0.0 ), 0, width, height, renderMode );
 
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz + s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
-            GLFunctions::drawBox( pMatrix, mvMatrix, sx, sy, sz - s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx, sy, sz + s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, sx, sy, sz - s, t, t, s, QColor( 0.0, 0.0, 255.0 ), 0, width, height, renderMode );
         }
     }
 }

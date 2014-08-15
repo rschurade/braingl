@@ -95,11 +95,11 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heigh
     {
         if ( m_properties.get( Fn::Property::D_SHAPE ).toInt() == 0 || m_properties.get( Fn::Property::D_SHAPE ).toInt() == 1 )
         {
-            GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
+            GLFunctions::renderSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
         }
         else
         {
-            GLFunctions::drawBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
         }
     }
 }
