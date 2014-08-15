@@ -17,6 +17,7 @@
 
 #include "colormaprenderer.h"
 #include "shaperenderer.h"
+#include "slicerenderer.h"
 #include "../text/textrenderer.h"
 
 #include <QAbstractItemModel>
@@ -37,6 +38,7 @@ int GLFunctions::maxDim = 250;
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 ColormapRenderer* GLFunctions::m_colormapRenderer = new ColormapRenderer();
+SliceRenderer* GLFunctions::m_sliceRenderer = new SliceRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 100;
@@ -665,6 +667,7 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
 
 void GLFunctions::initRenderers()
 {
+    GLFunctions::m_sliceRenderer->init();
     GLFunctions::m_textRenderer->init();
     GLFunctions::m_shapeRenderer->init();
     GLFunctions::m_colormapRenderer->init();
@@ -685,18 +688,23 @@ void GLFunctions::renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QStrin
 
 }
 
-void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+void GLFunctions::renderBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                               float x, float y, float z, float dx, float dy, float dz,
                               QColor color, int pickID, int width, int height, int renderMode )
 {
     GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
-void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+void GLFunctions::renderSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                  float x, float y, float z, float dx, float dy, float dz,
                                  QColor color, int pickID, int width, int height, int renderMode )
 {
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
+}
+
+void GLFunctions::renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target )
+{
+    GLFunctions::m_sliceRenderer->draw( p_matrix, mv_matrix, width, height, renderMode, target );
 }
 
 bool GLFunctions::getAndPrintGLError( QString prefix )

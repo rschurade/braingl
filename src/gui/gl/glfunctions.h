@@ -21,6 +21,7 @@ class PropertyGroup;
 class QGLShaderProgram;
 class ROI;
 class ShapeRenderer;
+class SliceRenderer;
 class TextRenderer;
 
 struct VertexData
@@ -60,12 +61,14 @@ public:
     static void renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode );
     static void renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QString text, int size, float x, float y, float z, QColor color, float alpha, int width, int height, int renderMode );
 
-    static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+    static void renderBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                             float x, float y, float z, float dx, float dy, float dz,
                             QColor color, int pickID, int width, int height, int renderMode );
-    static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+    static void renderSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                float x, float y, float z, float dx, float dy, float dz,
                                QColor color, int pickID, int width, int height, int renderMode );
+    static void renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target );
+
 
     static void createColormapBarProps( PropertyGroup& props );
     static void drawColormapBar( PropertyGroup& props, int width, int height, int renderMode );
@@ -87,6 +90,7 @@ private:
 
     static QString copyShaderToString( QString name, QString ext );
 
+    static SliceRenderer* m_sliceRenderer;
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;
     static ColormapRenderer* m_colormapRenderer;

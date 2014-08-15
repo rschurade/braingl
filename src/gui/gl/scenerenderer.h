@@ -18,7 +18,6 @@
 
 class ArcBall;
 class DataStore;
-class SliceRenderer;
 class QItemSelectionModel;
 
 class SceneRenderer : public ObjectRenderer
@@ -58,8 +57,6 @@ private:
     void setRenderTargets( QString target0, QString target1 );
     GLuint getTexture( QString name );
     void clearTexture( QString name, float r, float g, float b, float a );
-
-	SliceRenderer* m_sliceRenderer;
 
 	QString m_renderTarget;
 
