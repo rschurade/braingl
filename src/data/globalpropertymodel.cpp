@@ -92,7 +92,7 @@ GlobalPropertyModel::GlobalPropertyModel()
 
     m_properties->createBool( Fn::Property::G_SCREENSHOT_DO_MAINGL, true, "screenshot" );
     m_properties->createBool( Fn::Property::G_SCREENSHOT_DO_MAINGL2, false, "screenshot" );
-    m_properties->createBool( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false, "screenshot" );
+    m_properties->createBool( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false );
 
     m_properties->createBool( Fn::Property::G_LIGHT_SWITCH, true, "light" );
     m_properties->createFloat( Fn::Property::G_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
