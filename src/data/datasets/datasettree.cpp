@@ -490,9 +490,9 @@ void DatasetTree::updateMeshColor()
 
         for ( unsigned int i = 0; i < m_projection.size(); ++i )
         {
-            for ( unsigned int m = 0; m < m_mesh.size(); ++m )
+            if ( m_projection[i] != -1 )
             {
-                if ( m_projection[i] != -1 )
+                for ( unsigned int m = 0; m < m_mesh.size(); ++m )
                 {
                     m_mesh[m]->setVertexColor( i, m_nodes[ m_projection[i] ]->getColor( colorID ) );
                 }
