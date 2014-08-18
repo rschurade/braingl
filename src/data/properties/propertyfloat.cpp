@@ -18,6 +18,8 @@ PropertyFloat::PropertyFloat( QString name, float value, float min, float max ) 
     widget->setMax( max );
     widget->setValue( value );
     connect( widget, SIGNAL( valueChanged( float, int ) ), this, SLOT( widgetChanged( float, int ) ) );
+    connect( widget, SIGNAL( minChanged( QVariant ) ), this, SLOT( setMin( QVariant ) ) );
+    connect( widget, SIGNAL( maxChanged( QVariant ) ), this, SLOT( setMax( QVariant ) ) );
     m_widget = widget;
 }
 
@@ -46,7 +48,15 @@ void PropertyFloat::setValue( QVariant value )
 
 void PropertyFloat::setMin( QVariant min )
 {
-    m_min = min.toFloat();
+    if ( min.toFloat() >= m_max.toFloat() )
+    {
+        m_min = m_max.toFloat() - 1;
+    }
+    else
+    {
+        m_min = min.toFloat();
+    }
+
     if ( m_value.toFloat() < m_min.toFloat() )
     {
         m_value = m_min;
@@ -58,7 +68,14 @@ void PropertyFloat::setMin( QVariant min )
 
 void PropertyFloat::setMax( QVariant max )
 {
-    m_max = max.toFloat();
+    if ( m_max.toFloat() <= m_min.toFloat() )
+    {
+        m_max = m_min.toFloat() + 1;
+    }
+    else
+    {
+        m_max = max.toFloat();
+    }
     if ( m_value.toFloat() > m_max.toFloat() )
     {
         m_value = m_max;
