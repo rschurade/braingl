@@ -147,7 +147,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    rx = qMax( 0.0f, qMin( rx - add, dim ) );
+                    rx = qMax( -dim, qMin( rx - add, dim ) );
                 }
                 break;
             }
@@ -159,7 +159,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    rx = qMax( 0.0f, qMin( rx + add, dim ) );
+                    rx = qMax( -dim, qMin( rx + add, dim ) );
                 }
                 break;
             }
@@ -171,7 +171,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    ry = qMax( 0.0f, qMin( ry + add, dim ) );
+                    ry = qMax( -dim, qMin( ry + add, dim ) );
                 }
                 break;
             }
@@ -183,7 +183,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    ry = qMax( 0.0f, qMin( ry - add, dim ) );
+                    ry = qMax( -dim, qMin( ry - add, dim ) );
                 }
                 break;
             }
@@ -195,7 +195,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    rz = qMax( 0.0f, qMin( rz + add, dim ) );
+                    rz = qMax( -dim, qMin( rz + add, dim ) );
                 }
                 break;
             }
@@ -207,7 +207,7 @@ void ROIWidget::keyPressEvent( QKeyEvent* event )
                 }
                 else
                 {
-                    rz = qMax( 0.0f, qMin( rz - add, dim ) );
+                    rz = qMax( -dim, qMin( rz - add, dim ) );
                 }
                 break;
             }

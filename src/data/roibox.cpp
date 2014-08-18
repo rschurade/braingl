@@ -27,9 +27,9 @@ ROIBox::ROIBox() :
     m_properties.createBool( Fn::Property::D_RENDER, true, "general" );
     m_properties.createBool( Fn::Property::D_NEG, false, "general" );
     m_properties.createList( Fn::Property::D_SHAPE, { "ellipsoid", "sphere", "cube", "box" }, 0, "general" );
-    m_properties.createFloat( Fn::Property::D_X, x, 0., xMax, "general" );
-    m_properties.createFloat( Fn::Property::D_Y, y, 0., yMax, "general" );
-    m_properties.createFloat( Fn::Property::D_Z, z, 0., zMax, "general" );
+    m_properties.createFloat( Fn::Property::D_X, x, -xMax, xMax, "general" );
+    m_properties.createFloat( Fn::Property::D_Y, y, -yMax, yMax, "general" );
+    m_properties.createFloat( Fn::Property::D_Z, z, -zMax, zMax, "general" );
     m_properties.createFloat( Fn::Property::D_DX, 20., 0., xMax, "general" );
     m_properties.createFloat( Fn::Property::D_DY, 20., 0., yMax, "general" );
     m_properties.createFloat( Fn::Property::D_DZ, 20., 0., zMax, "general" );
