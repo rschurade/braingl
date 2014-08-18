@@ -95,7 +95,7 @@ void DatasetScalar::examineDataset()
     m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"].createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
-    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
+    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false );
 }
 
 void DatasetScalar::createTexture()
@@ -170,9 +170,12 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
 
     int brushSize = m_properties["maingl"].get( Fn::Property::D_PAINTSIZE ).toInt() - 1;
 
-    int x = pos.x() / dx + 0.5 * dx;
-    int y = pos.y() / dy + 0.5 * dy;
-    int z = pos.z() / dz + 0.5 * dz;
+    int id = getIdFromPos( pos );
+
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    getXYZ( id, x, y, z );
 
     m_data[ getId( x, y, z ) ] = paintValue;
 
