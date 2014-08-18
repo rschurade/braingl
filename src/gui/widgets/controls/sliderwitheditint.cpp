@@ -43,11 +43,49 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
 
     QVBoxLayout* vLayout = new QVBoxLayout();
 
+    QPushButton* hideMinMax = new QPushButton( " - " );
+    QPushButton* showMinMax = new QPushButton( "+" );
+
     QHBoxLayout* hLayout = new QHBoxLayout();
+    m_label = new QLabel( name );
+    hLayout->addWidget( hideMinMax );
+    hideMinMax->hide();
+    hLayout->addWidget( showMinMax );
     m_label = new QLabel( name, this );
     hLayout->addWidget( m_label );
     hLayout->addStretch();
     hLayout->addWidget( m_edit );
+
+    QHBoxLayout* minMaxLayout = new QHBoxLayout();
+    QLabel* lab1 = new QLabel( "min" );
+    m_edit1 = new QLineEdit();
+    QLabel* lab2 = new QLabel( "max" );
+    m_edit2 = new QLineEdit();
+    minMaxLayout->addWidget( lab1 );
+    minMaxLayout->addWidget( m_edit1 );
+    minMaxLayout->addWidget( lab2 );
+    minMaxLayout->addWidget( m_edit2 );
+
+    connect( m_edit1, SIGNAL( editingFinished() ), this, SLOT( minEdited() ) );
+    connect( m_edit2, SIGNAL( editingFinished() ), this, SLOT( maxEdited() ) );
+
+    lab1->hide();
+    lab2->hide();
+    m_edit1->hide();
+    m_edit2->hide();
+    connect( hideMinMax, SIGNAL( clicked() ), lab1, SLOT( hide() ) );
+    connect( showMinMax, SIGNAL( clicked() ), lab1, SLOT( show() ) );
+    connect( hideMinMax, SIGNAL( clicked() ), lab2, SLOT( hide() ) );
+    connect( showMinMax, SIGNAL( clicked() ), lab2, SLOT( show() ) );
+    connect( hideMinMax, SIGNAL( clicked() ), m_edit1, SLOT( hide() ) );
+    connect( showMinMax, SIGNAL( clicked() ), m_edit1, SLOT( show() ) );
+    connect( hideMinMax, SIGNAL( clicked() ), m_edit2, SLOT( hide() ) );
+    connect( showMinMax, SIGNAL( clicked() ), m_edit2, SLOT( show() ) );
+
+    connect( showMinMax, SIGNAL( clicked() ), showMinMax, SLOT( hide() ) );
+    connect( showMinMax, SIGNAL( clicked() ), hideMinMax, SLOT( show() ) );
+    connect( hideMinMax, SIGNAL( clicked() ), hideMinMax, SLOT( hide() ) );
+    connect( hideMinMax, SIGNAL( clicked() ), showMinMax, SLOT( show() ) );
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
     hLayout2->addWidget( m_button1 );
@@ -55,6 +93,7 @@ SliderWithEditInt::SliderWithEditInt( QString name, int id, QWidget* parent ) :
     hLayout2->addWidget( m_button2 );
 
     vLayout->addLayout( hLayout );
+    vLayout->addLayout( minMaxLayout );
     vLayout->addLayout( hLayout2 );
 
     hLayout->setContentsMargins( 0,0,0,0 );
@@ -121,6 +160,7 @@ int SliderWithEditInt::getValue()
 void SliderWithEditInt::setMin( int min )
 {
     m_slider->setMinimum( min );
+    m_edit1->setText( QString::number( min ) );
     if ( m_slider->value() < min )
     {
         m_slider->setValue( min );
@@ -133,6 +173,7 @@ void SliderWithEditInt::setMin( int min )
 void SliderWithEditInt::setMax( int max )
 {
     m_slider->setMaximum( max );
+    m_edit2->setText( QString::number( max ) );
     if ( m_slider->value() > max )
     {
         m_slider->setValue( max );
@@ -174,3 +215,16 @@ void SliderWithEditInt::increment()
     emit( valueChanged( value, m_id ) );
 
 }
+
+void SliderWithEditInt::minEdited()
+{
+    QString text = m_edit1->text();
+    emit( minChanged( text.toInt() ) );
+}
+
+void SliderWithEditInt::maxEdited()
+{
+    QString text = m_edit2->text();
+    emit( maxChanged( text.toInt() ) );
+}
+
