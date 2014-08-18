@@ -29,6 +29,7 @@ DatasetLabel::DatasetLabel() :
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 50, 1, 200, "general" );
 
     m_properties["maingl"].createVector( Fn::Property::D_HANDLE_0, h0, "handles" );
+    m_properties["maingl"].createFloat( Fn::Property::D_DX, 2.0, 0.0, 10.0, "handles" );
 
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
@@ -55,7 +56,8 @@ void DatasetLabel::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int
     if ( m_properties["maingl"].get( Fn::Property::D_SHOW_PLANE_HANDLES ).toBool() )
     {
         color.setAlpha( 254 );
-        GLFunctions::renderSphere( pMatrix, mvMatrix, h0.x(), h0.y(), h0.z(), 5, 5, 5,
+        float dx = m_properties["maingl"].get( Fn::Property::D_DX ).toFloat();
+        GLFunctions::renderSphere( pMatrix, mvMatrix, h0.x(), h0.y(), h0.z(), dx, dx, dx,
                                   color, m_handle0, width, height, renderMode );
     }
 
