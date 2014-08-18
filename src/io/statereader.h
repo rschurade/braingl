@@ -12,6 +12,7 @@
 
 #include "../data/enums.h"
 
+#include <QFileInfo>
 #include <QMap>
 #include <QString>
 #include <QVariant>
@@ -30,6 +31,7 @@ public:
 private:
     XmlReader xml;
     QMap< QString, QMap< QString, QVariant > >m_cameras;
+    QFileInfo m_fileInfo;
 
     void loadScene();
 

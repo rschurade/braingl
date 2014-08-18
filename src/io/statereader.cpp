@@ -35,6 +35,7 @@ StateReader::~StateReader()
 
 void StateReader::load( QString fileName )
 {
+    m_fileInfo = QFileInfo( fileName );
     QFile file(fileName);
     if ( !file.open( QFile::ReadOnly | QFile::Text ) )
     {
@@ -95,7 +96,7 @@ void StateReader::loadScene()
             {
                 QFileInfo fi( fn );
                 QString fn = fi.fileName();
-                loadDataset( fi.path() + QDir::separator() + fn, state );
+                loadDataset( m_fileInfo.path() + QDir::separator() + fn, state );
             }
             else
             {
@@ -120,7 +121,7 @@ void StateReader::loadScene()
             {
                 QFileInfo fi( getFromStateList( Fn::Property::D_FILENAME, roiState ).toString() );
                 QString fn = fi.fileName();
-                GLFunctions::roi = loadRoi( fi.path() + QDir::separator() + fn );
+                GLFunctions::roi = loadRoi( m_fileInfo.path() + QDir::separator() + fn );
             }
             else
             {
