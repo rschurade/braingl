@@ -8,7 +8,7 @@
 #ifndef DATASETTREE_H_
 #define DATASETTREE_H_
 
-#include "dataset.h"
+#include "datasetmesh.h"
 
 #include "../../algos/tree.h"
 
@@ -26,7 +26,7 @@ struct PtrGreater // public std::binary_function<bool, const T*, const T*>
   }
 };
 
-class DatasetTree : public Dataset
+class DatasetTree : public DatasetMesh
 {
     Q_OBJECT
 
@@ -44,19 +44,26 @@ public:
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void setZoom( int zoom ) { m_zoom = zoom; };
 
+    void setProjection( std::vector<int> projection ) { m_projection = projection; };
+
 private:
     void createTexture();
 
     void createTextureRec( Tree* tree );
     int pickClusterRec( Tree* tree, int left, int right, float x, float y );
 
+    void updateMeshColor();
+
     Tree* m_tree;
-    TreeRenderer* m_renderer;
+    TreeRenderer* m_treeRenderer;
+
+    std::vector<Tree*>m_nodes;
 
     int m_numLeaves;
     int m_numNodes;
 
     std::vector<float>m_textureData;
+    std::vector<int>m_projection;
 
     int m_width;
     int m_height;

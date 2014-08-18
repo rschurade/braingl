@@ -5,18 +5,19 @@
  * @author Ralph Schurade
  */
 #include "loader.h"
-#include "loadernifti.h"
-#include "loadervtk.h"
 #include "loaderfreesurfer.h"
+#include "loadernifti.h"
+#include "loadertree.h"
+#include "loadervtk.h"
 
-#include "../data/datasets/datasetglyphset.h"
-#include "../data/datasets/datasetcons.h"
-#include "../data/datasets/datasetmeshtimeseries.h"
-#include "../data/datasets/datasettree.h"
-#include "../data/datasets/datasetmesh.h"
-#include "../data/datasets/datasetfibers.h"
 #include "../data/datasets/dataset3d.h"
+#include "../data/datasets/datasetcons.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetglyphset.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetmeshtimeseries.h"
 #include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasettree.h"
 
 #include "../data/mesh/trianglemesh2.h"
 
@@ -123,7 +124,7 @@ bool Loader::load()
         return loadMEG();
     }
 
-    if ( m_fileName.path().endsWith( ".dtree" ) )
+    if ( m_fileName.path().endsWith( ".htree" ) )
     {
         return loadTree();
     }
@@ -794,54 +795,13 @@ bool Loader::loadMEG()
 bool Loader::loadTree()
 {
     QString fn = m_fileName.path();
-
-    DatasetTree* dataset = new DatasetTree( fn );
-
-    qDebug() << "loading tree: " << fn;
-
-    QFile setfile( fn );
-    if ( !setfile.open( QIODevice::ReadOnly ) )
+    LoaderTree lt( fn );
+    if ( lt.load() )
     {
-        qCritical( "set file unreadable" );
+        m_dataset.push_back( lt.getDataset() );
+        return true;
     }
-    QTextStream ts( &setfile );
-    QString nl;
-
-    QString dims;
-    std::vector<QString>coordinates;
-    std::vector<QString>clusters;
-
-    while ( !ts.atEnd() )
-    {
-        nl = ts.readLine();
-        if ( nl.startsWith( "#imagesize" ) )
-        {
-            dims = ts.readLine();
-        }
-
-        if ( nl.startsWith( "#coordinates" ) )
-        {
-            nl = ts.readLine();
-            while( nl != "#endcoordinates" )
-            {
-                coordinates.push_back( nl );
-                nl = ts.readLine();
-            }
-        }
-
-        if ( nl.startsWith( "#clusters" ) )
-        {
-            nl = ts.readLine();
-            while( nl != "#endclusters" )
-            {
-                clusters.push_back( nl );
-                nl = ts.readLine();
-            }
-        }
-    }
-    dataset->importTree( dims, coordinates, clusters );
-    m_dataset.push_back( dataset );
-    return true;
+    return false;
 }
 
 bool Loader::loadRGB()
