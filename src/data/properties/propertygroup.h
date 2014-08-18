@@ -71,6 +71,8 @@ public:
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
 
+    void unsetTab( QString tab );
+
 private:
     std::vector<QPair<Fn::Property, Property*> >m_properties;
 

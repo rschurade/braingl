@@ -90,7 +90,7 @@ void DatasetPropertyWidget::updateWidgetVisibility()
             m_tabs[tab] = layout;
         }
         // insert property in tab
-        if ( props->getNthProperty( i )->getName() == Fn::Prop2String::s( Fn::Property::D_COLORMAP ) )
+        if ( props->getNthProperty( i )->getName() == Fn::Prop2String::s( Fn::Property::D_COLORMAP ) && !props->getNthProperty( i )->getWidget()->isHidden() )
         {
             SelectWithLabel* cmapSel = new SelectWithLabel( "colormap", 0 );
             for ( int k = 0; k < ColormapFunctions::size(); ++k )

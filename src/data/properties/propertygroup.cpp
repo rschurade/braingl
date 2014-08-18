@@ -564,3 +564,14 @@ void PropertyGroup::setState( QList<QVariant> state )
         set( (Fn::Property)( state[i*2].toInt() ), state[i*2+1] );
     }
 }
+
+void PropertyGroup::unsetTab( QString tab )
+{
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
+    {
+        if ( m_properties[i].second->getPropertyTab() == tab )
+        {
+            m_properties[i].second->setPropertyTab( "none" );
+        }
+    }
+}
