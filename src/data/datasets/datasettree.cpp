@@ -62,14 +62,14 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_properties["maingl"].createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x clusters" }, 0, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( partitionModeChanged( QVariant ) ) );
-    connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_APPLY_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
-                        SLOT( applyPartitionMode() ) );
 
     m_properties["maingl"].createFloat( Fn::Property::D_TREE_PARTITION_LEVEL, 1.0f, 0.0f, 1.0f, "tree" );
     m_properties["maingl"].createInt( Fn::Property::D_TREE_PARTITION_SIZE, 10, 1, 1000, "tree" );
     m_properties["maingl"].getWidget( Fn::Property::D_TREE_PARTITION_SIZE )->setHidden( true );
 
     m_properties["maingl"].createButton( Fn::Property::D_TREE_APPLY_PARTITION_MODE, "tree" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_APPLY_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
+                            SLOT( applyPartitionMode() ) );
 
     m_properties["maingl"].unsetTab( "colormap" );
     m_properties["maingl"].unsetTab( "paint" );
@@ -208,7 +208,8 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
     qDebug() << "test num leaves:" << m_tree->getNumLeaves();
 
     createTexture();
-    m_properties["maingl"].set( Fn::Property::D_HAS_TEXTURE, false );
+    m_properties["maingl"].set( Fn::Property::D_HAS_TEXTURE, true );
+    m_properties["maingl"].getProperty( Fn::Property::D_HAS_TEXTURE )->setPropertyTab( "tree settings" );
 }
 
 void DatasetTree::createTexture()
@@ -349,8 +350,11 @@ int DatasetTree::pickClusterRec( Tree* tree, int left, int right, float x, float
 
 void DatasetTree::colorSelectionChanged( QVariant value )
 {
-    m_treeRenderer->setColorIndex( value.toInt() );
-    m_treeRenderer->update();
+    if ( m_treeRenderer != 0 )
+    {
+        m_treeRenderer->setColorIndex( value.toInt() );
+        m_treeRenderer->update();
+    }
 
     glDeleteTextures( 1, &m_textureGLuint );
     m_textureGLuint = 0;
