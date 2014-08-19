@@ -48,12 +48,12 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
 
     m_properties["maingl"].createInt( Fn::Property::D_TREE_SELECTED_CLUSTER, 0, 0, 0, "tree" );
-    connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_SELECTED_CLUSTER ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectCluster( QVariant ) ) );
-    m_properties["maingl"].createColor( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR, QColor( 255, 0, 0 ), "tree" );
-    m_properties["maingl"].createColor( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR, QColor( 128, 128, 128 ), "tree" );
     m_properties["maingl"].createList( Fn::Property::D_TREE_COLOR_SELECTION, { "base", "selected cluster", "user defined", "partion" }, 0, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_COLOR_SELECTION ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( colorSelectionChanged( QVariant ) ) );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_SELECTED_CLUSTER ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectCluster( QVariant ) ) );
+    m_properties["maingl"].createColor( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR, QColor( 255, 0, 0 ), "tree settings" );
+    m_properties["maingl"].createColor( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR, QColor( 128, 128, 128 ), "tree settings" );
     m_properties["maingl"].createColor( Fn::Property::D_TREE_USER_CLUSTER_COLOR, QColor( 0, 0, 255 ), "tree" );
     m_properties["maingl"].createButton( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR ), SIGNAL( valueChanged( QVariant ) ), this,
@@ -62,14 +62,14 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_properties["maingl"].createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x clusters" }, 0, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( partitionModeChanged( QVariant ) ) );
-
-    m_properties["maingl"].createButton( Fn::Property::D_TREE_APPLY_PARTITION_MODE, "tree" );
-        connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_APPLY_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_APPLY_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( applyPartitionMode() ) );
 
     m_properties["maingl"].createFloat( Fn::Property::D_TREE_PARTITION_LEVEL, 1.0f, 0.0f, 1.0f, "tree" );
     m_properties["maingl"].createInt( Fn::Property::D_TREE_PARTITION_SIZE, 10, 1, 1000, "tree" );
     m_properties["maingl"].getWidget( Fn::Property::D_TREE_PARTITION_SIZE )->setHidden( true );
+
+    m_properties["maingl"].createButton( Fn::Property::D_TREE_APPLY_PARTITION_MODE, "tree" );
 
     m_properties["maingl"].unsetTab( "colormap" );
     m_properties["maingl"].unsetTab( "paint" );
