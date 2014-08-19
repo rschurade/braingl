@@ -20,6 +20,7 @@
 #include "../data/datasets/datasetplane.h"
 #include "../data/datasets/datasetscalar.h"
 
+#include "../gui/gl/colormapfunctions.h"
 #include "../gui/gl/glfunctions.h"
 
 #include <QDebug>
@@ -53,6 +54,11 @@ void StateReader::load( QString fileName )
     if ( xml.getHeaderValue( "content" ).toString() == "scene" )
     {
         loadScene();
+    }
+
+    if ( xml.getHeaderValue( "content" ).toString() == "colormaps" )
+    {
+        loadColormaps();
     }
 
     file.close();
@@ -242,4 +248,16 @@ ROIArea* StateReader::loadRoi( QString fileName )
         return roiOut;
     }
     return NULL;
+}
+
+
+void StateReader::loadColormaps()
+{
+    QList< QList<QVariant> >cms = xml.getColormaps();
+
+    for ( int i = 0; i < cms.size(); ++i )
+    {
+        ColormapBase cm( cms[i] );
+        ColormapFunctions::addColormap( cm );
+    }
 }

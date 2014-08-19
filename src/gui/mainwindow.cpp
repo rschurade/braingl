@@ -623,64 +623,26 @@ void MainWindow::exportColormaps()
     QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Export colormaps", fn );
 
-    if ( !fileName.endsWith( ".cm" ) )
+    if ( !fileName.endsWith( ".xml" ) )
     {
-        fileName += ".cm";
+        fileName += ".xml";
     }
 
-    QSettings settings( fileName, QSettings::IniFormat );
-    settings.clear();
-
-    settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.8.1" );
-    settings.setValue( "content", "colormaps" );
-
-    int count = ColormapFunctions::size();
-    settings.setValue( "count", count );
-    QList<QVariant> cms;
-    for ( int i = 0; i < count; ++i )
-    {
-        cms.push_back( ColormapFunctions::get( i ).serialize() );
-    }
-    settings.setValue( "colormaps", cms );
+    StateWriter writer;
+    writer.saveColormaps( fileName );
 }
 
 void MainWindow::importColormaps()
 {
     QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
 
-    QString filter( "braingl colormaps (*.cm);;all files (*.*)" );
+    QString filter( "braingl colormaps (*.xml);;all files (*.*)" );
 
     QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn, filter );
     for ( int i = 0; i < fileNames.size(); ++i )
     {
-        QSettings settings( fileNames[i], QSettings::IniFormat );
-
-        QVariant versionString = "0.0.0";
-        if ( settings.contains( "version" ) )
-        {
-            QVariant versionString = settings.value( "version" ).toString();
-        }
-
-        if ( settings.contains( "content" ) )
-        {
-            if ( settings.value( "content" ).toString() != "colormaps" )
-            {
-                continue;
-            }
-        }
-        else
-        {
-            continue;
-        }
-
-        QList<QVariant> cms = settings.value( "colormaps" ).toList();
-
-        for ( int k = 0; k < cms.size(); ++k )
-        {
-            ColormapBase cm( cms[k].toList() );
-            ColormapFunctions::addColormap( cm );
-        }
+        StateReader reader;
+        reader.load( fileNames[i] );
     }
     m_colormapEditWidget->update();
 

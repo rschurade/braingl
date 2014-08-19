@@ -34,6 +34,7 @@ private:
     QFileInfo m_fileInfo;
 
     void loadScene();
+    void loadColormaps();
 
     QVariant getFromStateList( Fn::Property prop, QList<QVariant>& state );
     void loadDataset( QString fileName, QList<QVariant> state );

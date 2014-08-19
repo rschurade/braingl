@@ -16,6 +16,8 @@
 
 #include "../data/datasets/dataset.h"
 
+#include "../gui/gl/colormapfunctions.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
@@ -125,5 +127,59 @@ void StateWriter::saveScene( QString fileName, bool packAndGo, QList<QVariant>ca
     writer.endWriteFile();
 
     file.close();
+}
 
+void StateWriter::saveColormaps( QString fileName )
+{
+    QFileInfo fi( fileName );
+
+    XmlWriter writer;
+    QFile file( fileName );
+    if ( !file.open( QFile::WriteOnly | QFile::Text ) )
+    {
+
+        qCritical() << "Cannot write file " + fileName + " : " + file.errorString();
+        return;
+    }
+
+    writer.beginWriteFile( &file );
+
+    writer.beginElement( "header" );
+    writer.writeQVariant( "appName", "brainGL" );
+    writer.writeQVariant( "url", "http://code.google.com/p/braingl/" );
+    writer.writeQVariant( "version", "0.9.1" );
+    writer.writeQVariant( "content", "colormaps" );
+    writer.writeQVariant( "date", QDateTime::currentDateTime().toString( "yyyy.MM.dd" ) );
+    writer.writeQVariant( "time", QDateTime::currentDateTime().toString( "hh:mm:ss" ) );
+
+    writer.endElement(); // header
+
+    writer.beginElement( "colormaps" );
+
+    int count = ColormapFunctions::size();
+
+    QList<QVariant> cm;
+    for ( int i = 0; i < count; ++i )
+    {
+        cm = ColormapFunctions::get( i ).serialize();
+        writer.beginElement( "colormap" );
+        writer.writeAttribute( "name", cm[0].toString() );
+        for( int k = 1; k < cm.size(); k += 4 )
+        {
+            writer.beginElement( "entry" );
+            writer.writeQVariant( "value", cm[k] );
+            writer.writeQVariant( "red", cm[k+1] );
+            writer.writeQVariant( "green", cm[k+2] );
+            writer.writeQVariant( "blue", cm[k+3] );
+            writer.endElement(); // entry
+        }
+
+        writer.endElement(); // colormap
+    }
+
+
+    writer.endElement(); // scene
+    writer.endWriteFile();
+
+    file.close();
 }
