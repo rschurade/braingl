@@ -29,6 +29,8 @@ public:
     QList< QList<QVariant> >getDatasets() { return m_datasets; };
     QList< QList< QList<QVariant> > >getRois() { return m_rois; };
 
+    QList< QList<QVariant> >getColormaps() { return m_colormaps; };
+
 private:
     QXmlStreamReader m_xml;
     QMap< QString, QVariant >m_header;
@@ -36,6 +38,8 @@ private:
     QMap< QString, QMap< QString, QVariant > >m_cameras;
     QList< QList<QVariant> >m_datasets;
     QList< QList< QList<QVariant> > >m_rois;
+
+    QList< QList<QVariant> >m_colormaps;
 
     bool readHeader();
     bool readScene();
@@ -51,6 +55,9 @@ private:
     bool readRois();
     QList< QList<QVariant> >readBranch();
     QList<QVariant> readRoi();
+
+    bool readColormaps();
+    QList<QVariant> readColormap();
 
 
     bool isStart( QString name );

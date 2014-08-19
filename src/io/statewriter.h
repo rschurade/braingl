@@ -19,7 +19,7 @@ public:
     virtual ~StateWriter();
 
     void saveScene( QString fileName, bool packAndGo, QList<QVariant>camera1, QList<QVariant>arcball1, QList<QVariant>camera2, QList<QVariant>arcball2 );
-
+    void saveColormaps( QString fileName );
 
 
 private:

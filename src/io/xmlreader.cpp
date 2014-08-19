@@ -39,6 +39,10 @@ bool XmlReader::read( QIODevice* device )
         {
             readScene();
         }
+        else if ( isStart( "colormaps" ) )
+        {
+            readColormaps();
+        }
     }
 
     return !m_xml.error();
@@ -382,3 +386,81 @@ QList<QVariant> XmlReader::readRoi()
     return roi;
 }
 
+bool XmlReader::readColormaps()
+{
+    m_colormaps.clear();
+
+    while ( !m_xml.atEnd() )
+    {
+        m_xml.readNext();
+        if ( isStart( "colormap" ) )
+        {
+            m_colormaps.push_back( readColormap() );
+        }
+        if ( isEnd( "colormaps" ) )
+        {
+            break;
+        }
+    }
+
+    return true;
+}
+
+QList<QVariant> XmlReader::readColormap()
+{
+    QList<QVariant>colormap;
+    QString name;
+    QString value;
+    QString red;
+    QString green;
+    QString blue;
+
+    QXmlStreamAttributes attribs = m_xml.attributes();
+    if( attribs.hasAttribute( "name" ) )
+    {
+        name = attribs.value( "name" ).toString();
+        colormap.push_back( name );
+    }
+
+    while ( !m_xml.atEnd() )
+    {
+        m_xml.readNext();
+
+        if ( isStart( "entry" ) )
+        {
+            m_xml.readNext();
+        }
+        QXmlStreamAttributes attribs = m_xml.attributes();
+        if( attribs.hasAttribute( "name" ) && attribs.value( "name" ).toString() == "value" )
+        {
+            value = m_xml.readElementText();
+        }
+        if( attribs.hasAttribute( "name" ) && attribs.value( "name" ).toString() == "red" )
+        {
+            red = m_xml.readElementText();
+        }
+        if( attribs.hasAttribute( "name" ) && attribs.value( "name" ).toString() == "green" )
+        {
+            green = m_xml.readElementText();
+        }
+        if( attribs.hasAttribute( "name" ) && attribs.value( "name" ).toString() == "blue" )
+        {
+            blue = m_xml.readElementText();
+        }
+        if ( isEnd( "entry" ) )
+        {
+            colormap.push_back( value.toFloat() );
+            colormap.push_back( red.toFloat() );
+            colormap.push_back( green.toFloat() );
+            colormap.push_back( blue.toFloat() );
+            m_xml.readNext();
+        }
+
+
+        if ( isEnd( "colormap" ) )
+        {
+            break;
+        }
+    }
+    return colormap;
+}
