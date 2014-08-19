@@ -12,6 +12,7 @@
 #include "../../gui/gl/glfunctions.h"
 
 #include <QtOpenGL/QGLShaderProgram>
+#include <QVector3D>
 
 DatasetPlane::DatasetPlane() :
     Dataset( QDir( "new plane" ), Fn::DatasetType::PLANE ),
@@ -163,21 +164,34 @@ void DatasetPlane::initGeometry()
     QVector3D h1 = m_properties["maingl"].get( Fn::Property::D_HANDLE_1 ).value<QVector3D>();
     QVector3D h2 = m_properties["maingl"].get( Fn::Property::D_HANDLE_2 ).value<QVector3D>();
 
-    float x0 = h1.x();
-    float y0 = h2.y();
-    float z0 = h0.z() - ( h0.z() - h1.z() ) - ( h0.z() - h2.z() );
+    QVector3D d1 = ( h0 - h1 );
+    QVector3D d2 = ( h0 - h2 );
 
-    float x1 = h1.x();
-    float y1 = h0.y() + h0.y() - h2.y();
-    float z1 = h0.z() - ( h0.z() - h1.z() ) + ( h0.z() - h2.z() );
+    QVector3D h1m = h0 + d1;
+    QVector3D h2m = h0 + d2;
 
-    float x2 = h0.x() + h0.x() - h1.x();
-    float y2 = h0.y() + h0.y() - h2.y();
-    float z2 = h0.z() + ( h0.z() - h1.z() ) + ( h0.z() - h2.z() );
+     QVector3D e0 = h2 - d1;
+     QVector3D e1 = h2m - d1;
+     QVector3D e2 = h2m + d1;
+     QVector3D e3 = h2 + d1;
 
-    float x3 = h0.x() + h0.x() - h1.x();
-    float y3 = h2.y();
-    float z3 = h0.z() + ( h0.z() - h1.z() ) - ( h0.z() - h2.z() );
+
+
+    float x0 = e0.x();
+    float y0 = e0.y();
+    float z0 = e0.z();
+
+    float x1 = e1.x();
+    float y1 = e1.y();
+    float z1 = e1.z();
+
+    float x2 = e2.x();
+    float y2 = e2.y();
+    float z2 = e2.z();
+
+    float x3 = e3.x();
+    float y3 = e3.y();
+    float z3 = e3.z();
 
     float vertices[] =
     {
@@ -201,6 +215,9 @@ bool DatasetPlane::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifi
     QVector3D h1 = m_properties["maingl"].get( Fn::Property::D_HANDLE_1 ).value<QVector3D>();
     QVector3D h2 = m_properties["maingl"].get( Fn::Property::D_HANDLE_2 ).value<QVector3D>();
 
+    float dist1 = ( h0 - h1 ).length();
+    float dist2 = ( h0 - h2 ).length();
+
     if ( pickId == m_handle0 )
     {
         h0.setX( h0.x() + dir.x() );
@@ -222,18 +239,47 @@ bool DatasetPlane::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifi
     }
     else if ( pickId == m_handle1 )
     {
-        h1.setX( h1.x() + dir.x() );
-        h1.setY( h0.y() );
-        h1.setZ( h1.z() + dir.z() );
+        QVector3D d1 = QVector3D::crossProduct( ( h0 - h1 ).normalized(), ( h0 - h2 ).normalized() );
+        float dist = dir.length();
+        int neg = 1;
+        if ( QVector3D::dotProduct( d1, dir ) < 0 )
+        {
+            neg = -1;
+        }
+
+        h1.setX( h1.x() + d1.x() * dist * neg );
+        h1.setY( h1.y() + d1.y() * dist * neg );
+        h1.setZ( h1.z() + d1.z() * dist * neg  );
+
+
+        QVector3D e1 = ( h1 - h0 ).normalized();
+        h1.setX( h0.x() + e1.x() * dist1 );
+        h1.setY( h0.y() + e1.y() * dist1 );
+        h1.setZ( h0.z() + e1.z() * dist1 );
+
+
         m_properties["maingl"].set( Fn::Property::D_HANDLE_1, h1 );
         dirty = true;
         return true;
     }
     else if ( pickId == m_handle2 )
     {
-        h2.setX( h0.x() );
-        h2.setY( h2.y() + dir.y() );
-        h2.setZ( h2.z() + dir.z() );
+        QVector3D d1 = QVector3D::crossProduct( ( h0 - h1 ).normalized(), ( h0 - h2 ).normalized() );
+        float dist = dir.length();
+        int neg = 1;
+        if ( QVector3D::dotProduct( d1, dir ) < 0 )
+        {
+            neg = -1;
+        }
+        h2.setX( h2.x() + d1.x() * dist * neg );
+        h2.setY( h2.y() + d1.y() * dist * neg );
+        h2.setZ( h2.z() + d1.z() * dist * neg  );
+
+        QVector3D e2 = ( h2 - h0 ).normalized();
+        h2.setX( h0.x() + e2.x() * dist2 );
+        h2.setY( h0.y() + e2.y() * dist2 );
+        h2.setZ( h0.z() + e2.z() * dist2 );
+
         m_properties["maingl"].set( Fn::Property::D_HANDLE_2, h2 );
         dirty = true;
         return true;
