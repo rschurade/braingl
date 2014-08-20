@@ -140,16 +140,19 @@ void GLWidget::paintGL()
 {
     if ( m_doScreenshot )
     {
-        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
-        {
-            // insert code for stereoscopic screenshots here
-        }
-        else
+//        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
+//        {
+//            // insert code for stereoscopic screenshots here
+//        }
+//        else
         {
             calcMVPMatrix();
             m_doScreenshot = false;
             QImage* image = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
-            image->save(  m_screenshotFileName, "PNG" );
+            if ( !image->save(  m_screenshotFileName, "PNG" ) )
+            {
+                qCritical() << "error while saving screenshot to file";
+            }
             delete image;
             calcMVPMatrix();
         }
