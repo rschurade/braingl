@@ -1378,9 +1378,9 @@ void MainWindow::screenshot()
 {
 
     QString path = Models::getGlobal(  Fn::Property::G_SCREENSHOT_PATH ).toString();
-    if ( !path.endsWith( '/' ) )
+    if ( !path.endsWith( QDir::separator() ) )
     {
-        path += '/';
+        path += QDir::separator();
     }
     QString numberString = Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toString();
     Models::setGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER, Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toInt() + 1 );
