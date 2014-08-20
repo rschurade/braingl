@@ -41,6 +41,7 @@ private:
     void initGeometry();
 
     void initGeometryRec( Tree* tree, int left, int right );
+    void initGeometryCircleRec( Tree* tree, int left, int right );
 
 	QString m_name;
 	Tree* m_tree;
@@ -57,6 +58,10 @@ private:
     bool m_dirty;
     int m_colorIndex;
     int m_selected;
+
+    int m_numLeaves;
+    double m_pi;
+    float m_radius;
 };
 
 #endif /* SCENERENDERER_H_ */
