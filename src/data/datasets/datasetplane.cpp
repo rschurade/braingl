@@ -247,16 +247,37 @@ bool DatasetPlane::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifi
             neg = -1;
         }
 
-        h1.setX( h1.x() + d1.x() * dist * neg );
-        h1.setY( h1.y() + d1.y() * dist * neg );
-        h1.setZ( h1.z() + d1.z() * dist * neg  );
+        if ( modifiers & Qt::ShiftModifier )
+        {
+            QVector3D e1 = ( h1 - h0 ).normalized();
+            h1.setX( h1.x() + dir.x() );
+            h1.setY( h1.y() + dir.y() );
+            h1.setZ( h1.z() + dir.z()  );
 
+            if ( ( h0 - h1 ).length() < dist1 )
+            {
+                h1.setX( h0.x() + e1.x() * ( dist1 - dist ) );
+                h1.setY( h0.y() + e1.y() * ( dist1 - dist ) );
+                h1.setZ( h0.z() + e1.z() * ( dist1 - dist ) );
+            }
+            else
+            {
+                h1.setX( h0.x() + e1.x() * ( dist1 + dist ) );
+                h1.setY( h0.y() + e1.y() * ( dist1 + dist ) );
+                h1.setZ( h0.z() + e1.z() * ( dist1 + dist ) );
+            }
+        }
+        else
+        {
+            h1.setX( h1.x() + d1.x() * dist * neg );
+            h1.setY( h1.y() + d1.y() * dist * neg );
+            h1.setZ( h1.z() + d1.z() * dist * neg  );
 
-        QVector3D e1 = ( h1 - h0 ).normalized();
-        h1.setX( h0.x() + e1.x() * dist1 );
-        h1.setY( h0.y() + e1.y() * dist1 );
-        h1.setZ( h0.z() + e1.z() * dist1 );
-
+            QVector3D e1 = ( h1 - h0 ).normalized();
+            h1.setX( h0.x() + e1.x() * dist1 );
+            h1.setY( h0.y() + e1.y() * dist1 );
+            h1.setZ( h0.z() + e1.z() * dist1 );
+        }
 
         m_properties["maingl"].set( Fn::Property::D_HANDLE_1, h1 );
         dirty = true;
@@ -271,15 +292,37 @@ bool DatasetPlane::rightMouseDrag( int pickId, QVector3D dir, Qt::KeyboardModifi
         {
             neg = -1;
         }
-        h2.setX( h2.x() + d1.x() * dist * neg );
-        h2.setY( h2.y() + d1.y() * dist * neg );
-        h2.setZ( h2.z() + d1.z() * dist * neg  );
+        if ( modifiers & Qt::ShiftModifier )
+        {
+            QVector3D e2 = ( h2 - h0 ).normalized();
+            h2.setX( h2.x() + dir.x() );
+            h2.setY( h2.y() + dir.y() );
+            h2.setZ( h2.z() + dir.z()  );
 
-        QVector3D e2 = ( h2 - h0 ).normalized();
-        h2.setX( h0.x() + e2.x() * dist2 );
-        h2.setY( h0.y() + e2.y() * dist2 );
-        h2.setZ( h0.z() + e2.z() * dist2 );
+            if ( ( h0 - h2 ).length() < dist2 )
+            {
+                h2.setX( h0.x() + e2.x() * ( dist2 - dist ) );
+                h2.setY( h0.y() + e2.y() * ( dist2 - dist ) );
+                h2.setZ( h0.z() + e2.z() * ( dist2 - dist ) );
+            }
+            else
+            {
+                h2.setX( h0.x() + e2.x() * ( dist2 + dist ) );
+                h2.setY( h0.y() + e2.y() * ( dist2 + dist ) );
+                h2.setZ( h0.z() + e2.z() * ( dist2 + dist ) );
+            }
+        }
+        else
+        {
+            h2.setX( h2.x() + d1.x() * dist * neg );
+            h2.setY( h2.y() + d1.y() * dist * neg );
+            h2.setZ( h2.z() + d1.z() * dist * neg  );
 
+            QVector3D e2 = ( h2 - h0 ).normalized();
+            h2.setX( h0.x() + e2.x() * dist2 );
+            h2.setY( h0.y() + e2.y() * dist2 );
+            h2.setZ( h0.z() + e2.z() * dist2 );
+        }
         m_properties["maingl"].set( Fn::Property::D_HANDLE_2, h2 );
         dirty = true;
         return true;
