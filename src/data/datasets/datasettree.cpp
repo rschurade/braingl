@@ -44,7 +44,6 @@ DatasetTree::DatasetTree( QDir fn ) :
 
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0 );
-    m_properties["maingl"].getWidget( Fn::Property::D_ALPHA )->hide();
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
 
     m_properties["maingl"].createInt( Fn::Property::D_TREE_SELECTED_CLUSTER, 0, 0, 0, "tree" );
