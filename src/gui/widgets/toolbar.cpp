@@ -384,6 +384,10 @@ void ToolBar::slot( Fn::Algo algo )
             {
                 ( (DatasetGlyphset*)ds )->deleteLittleBrains();
             }
+            else if ( mods & Qt::ControlModifier )
+            {
+                ( (DatasetGlyphset*)ds )->deleteRowFromMatrix();
+            }
             else
             {
                 ( (DatasetGlyphset*)ds )->makeLittleBrains();
