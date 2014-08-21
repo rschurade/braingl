@@ -369,10 +369,8 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
 
 ROI* ROIModel::getRoi( int branch, int pos )
 {
-    qDebug() << m_rois.size() << m_rois[branch].size() << branch << pos;
     if ( branch < m_rois.size() && pos < m_rois[branch].size() )
     {
-        qDebug() << "huhu";
         return VPtr<ROI>::asPtr( m_rois[branch][pos] );
     }
     else
