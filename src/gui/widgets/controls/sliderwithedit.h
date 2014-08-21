@@ -12,7 +12,7 @@
 
 #include <QFrame>
 
-class QSlider;
+class MySlider;
 class QLineEdit;
 class QLabel;
 class QHBoxLayout;
@@ -46,7 +46,7 @@ signals:
     void maxChanged( QVariant value );
 
 private:
-   QSlider*  m_slider;
+   MySlider*  m_slider;
    QLineEdit* m_edit;
    QLineEdit* m_edit1;
    QLineEdit* m_edit2;

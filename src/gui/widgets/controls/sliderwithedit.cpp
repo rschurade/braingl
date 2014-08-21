@@ -6,12 +6,13 @@
  */
 #include "sliderwithedit.h"
 
+#include "myslider.h"
+
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
-#include <QSlider>
 #include <QVBoxLayout>
 
 #define SLIDERMULT 1000.f
@@ -21,7 +22,7 @@ SliderWithEdit::SliderWithEdit( QString name,  Fn::Position editPos, int id, QWi
     m_id( id ),
     m_digits( 2 )
 {
-    m_slider = new QSlider();
+    m_slider = new MySlider();
     m_slider->setOrientation( Qt::Horizontal );
     m_slider->setValue( -1 );
 
