@@ -44,7 +44,7 @@ void DatasetMesh::initProperties()
     float min = 0.0;
     float max = 1.0;
 
-    m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
     m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
