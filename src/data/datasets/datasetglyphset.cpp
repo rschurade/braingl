@@ -246,6 +246,21 @@ void DatasetGlyphset::addCorrelation( float** corr )
     m_properties["maingl"].createInt( Fn::Property::D_GLYPHSET_PICKED_ID, -1, -1, m_n - 1, "general" );
 }
 
+void DatasetGlyphset::deleteRowFromMatrix()
+{
+    for ( int i = 0; i < m_n; ++i )
+    {
+        if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>() )
+        {
+            for ( int k = 0; k < m_n; ++k )
+            {
+                m_correlations->setValue( i, k, 0.0 );
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
 void DatasetGlyphset::makeLittleBrains()
 {
     for ( int i = 0; i < m_n; ++i )

@@ -63,6 +63,7 @@ public:
     void deleteLittleBrains();
     void switchGlyphsOff();
     void applyROI();
+    void deleteRowFromMatrix();
 
     int m_tris_middle;
     int m_points_middle;
