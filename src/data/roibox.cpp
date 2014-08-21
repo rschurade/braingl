@@ -41,6 +41,8 @@ ROIBox::ROIBox() :
 
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( propChanged() ) );
+
+    m_properties.set( Fn::Property::D_SHAPE, 1 );
 }
 
 ROIBox::~ROIBox()

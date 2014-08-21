@@ -87,15 +87,15 @@ void DatasetFibers::createProps()
 
     m_properties["maingl"].createInt( Fn::Property::D_NUM_POINTS, m_numPoints );
     m_properties["maingl"].createInt( Fn::Property::D_NUM_LINES, m_fibs.size() );
-    m_properties["maingl"].createList( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
     if ( hasData )
     {
-        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
+        m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
         m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0, "general" );
     }
     else
     {
-        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
+        m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
         m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0 );
     }
     m_properties["maingl"].createList( Fn::Property::D_SELECTED_TEXTURE, { "none" }, 0, "general" );

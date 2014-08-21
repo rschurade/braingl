@@ -131,6 +131,11 @@ PropertyGroup& PropertyGroup::operator=( const PropertyGroup& pg )
         {
             this->createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
         }
+        if ( dynamic_cast<PropertyRadio*>( prop ) )
+        {
+            PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+            createRadioGroup( pair.first, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
     }
     return *this;
 }
@@ -162,6 +167,11 @@ void PropertyGroup::copy( Fn::Property name, Property* prop )
 		PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
 		this->createList( name, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
 	}
+	if ( dynamic_cast<PropertyRadio*>( prop ) )
+    {
+        PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+        createRadioGroup( name, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+    }
 	if ( dynamic_cast<PropertyString*>( prop ) )
 	{
 		this->createString( name, prop->getValue().toString(), prop->getPropertyTab() );
