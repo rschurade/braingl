@@ -58,7 +58,7 @@ void DatasetMesh::initProperties()
 
     GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
-    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTSIZE, 20.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"].createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );

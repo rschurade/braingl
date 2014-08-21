@@ -47,7 +47,7 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
 
     m_properties["maingl"].createInt( Fn::Property::D_TREE_SELECTED_CLUSTER, 0, 0, 0, "tree" );
-    m_properties["maingl"].createList( Fn::Property::D_TREE_COLOR_SELECTION, { "base", "selected cluster", "user defined", "partion" }, 0, "tree" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_TREE_COLOR_SELECTION, { "base", "selected cluster", "user defined", "partion" }, 0, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_COLOR_SELECTION ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( colorSelectionChanged( QVariant ) ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_SELECTED_CLUSTER ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( selectCluster( QVariant ) ) );
@@ -58,7 +58,7 @@ DatasetTree::DatasetTree( QDir fn ) :
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_SET_USER_CLUSTER_COLOR ), SIGNAL( valueChanged( QVariant ) ), this,
                     SLOT( setClusterColor() ) );
 
-    m_properties["maingl"].createList( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x clusters" }, 0, "tree" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_TREE_PARTITION_MODE, { "level", "x clusters" }, 0, "tree" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_TREE_PARTITION_MODE ), SIGNAL( valueChanged( QVariant ) ), this,
                         SLOT( partitionModeChanged( QVariant ) ) );
 
