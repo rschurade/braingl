@@ -13,6 +13,7 @@
 #include "propertypath.h"
 #include "propertystring.h"
 #include "propertytext.h"
+#include "propertyradio.h"
 #include "propertyselection.h"
 #include "propertybutton.h"
 #include "propertymatrix.h"
@@ -403,6 +404,55 @@ bool PropertyGroup::createList( Fn::Property name, QList<QString> options, int v
     }
     return true;
 }
+
+bool PropertyGroup::createRadioGroup( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createRadioGroup( Fn::Property name, std::vector<QString> options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createRadioGroup( Fn::Property name, QList<QString> options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
 
 bool PropertyGroup::createButton( Fn::Property name, QString tab )
 {

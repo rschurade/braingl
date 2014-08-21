@@ -56,6 +56,9 @@ public:
     bool createMatrix( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
     bool createVector( Fn::Property name, QVector3D value, QString tab = "none" );
     bool createText( Fn::Property name, QString value, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, QList<QString> options, int value = 0, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, std::vector<QString> options, int value = 0, QString tab = "none" );
 
     bool setMin( Fn::Property name,  QVariant value );
     bool setMax( Fn::Property name,  QVariant value );
