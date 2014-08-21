@@ -59,6 +59,11 @@ PropertyGroup::PropertyGroup( const PropertyGroup& pg )
             PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
             createList( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
         }
+        if ( dynamic_cast<PropertyRadio*>( prop ) )
+        {
+            PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+            createRadioGroup( pair.first, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
         if ( dynamic_cast<PropertyString*>( prop ) )
         {
             createString( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
