@@ -107,7 +107,7 @@ DatasetDWI::DatasetDWI( QDir fileName, std::vector<float>* data, std::vector<flo
     }
     if ( fileName.path().endsWith( ".nii" ) )
     {
-        b0fn.replace( ".nii.gz", "_b0.nii" );
+        b0fn.replace( ".nii", "_b0.nii" );
     }
 
     nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
