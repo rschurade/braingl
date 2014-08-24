@@ -11,8 +11,6 @@
 #include "../data/datasets/dataset.h"
 #include "../data/datasets/datasetmesh.h"
 
-#include "../thirdparty/nifti/nifti1_io.h"
-
 #include <QDir>
 #include <QVector>
 
@@ -47,7 +45,6 @@ private:
     bool loadPNG();
     bool loadJSON();
 
-    nifti_image* m_header;
     QDir m_fileName;
 
     Fn::DatasetType m_datasetType;

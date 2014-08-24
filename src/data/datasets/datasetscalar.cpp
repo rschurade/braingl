@@ -12,6 +12,7 @@
 #include "../../gui/gl/glfunctions.h"
 
 #include <QDebug>
+#include <QMessageBox>
 
 DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_image* header ) :
     DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ),
@@ -48,6 +49,7 @@ DatasetScalar::~DatasetScalar()
 {
     m_properties["maingl"].set( Fn::Property::D_ACTIVE, false );
     m_data.clear();
+    std::vector<float>().swap( m_data );
     GLFunctions::deleteTexture( m_textureGLuint );
     //glDeleteTextures( 1, &m_textureGLuint );
 }
