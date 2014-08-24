@@ -462,6 +462,7 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_NAME, name );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
@@ -527,6 +528,7 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_NAME, name );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
