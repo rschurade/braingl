@@ -20,7 +20,8 @@ class DatasetDWI: public DatasetNifti
     Q_OBJECT
 
 public:
-    DatasetDWI( QDir filename, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QDir fileName, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header );
+    DatasetDWI( QDir fileName, std::vector<float>* data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header );
     virtual ~DatasetDWI();
 
     std::vector<ColumnVector>* getData();
@@ -38,6 +39,8 @@ public:
     void flipY();
     void flipZ();
 
+    bool isOK() { return m_isOK; };
+
 private:
     void examineDataset();
     void createTexture();
@@ -46,6 +49,8 @@ private:
     std::vector<float> m_b0Data;
     std::vector<float> m_bvals;
     std::vector<QVector3D> m_bvecs;
+
+    bool m_isOK;
 
 private slots:
     void selectTexture();

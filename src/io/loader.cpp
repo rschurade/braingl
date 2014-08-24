@@ -36,7 +36,6 @@
 #include <cmath>
 
 Loader::Loader( Dataset* selected ) :
-    m_header( 0 ),
     m_datasetType( Fn::DatasetType::UNKNOWN ),
     m_selectedDataset( selected ),
     m_success( false )
@@ -160,6 +159,7 @@ bool Loader::loadNifti()
     }
     else
     {
+        delete ln;
         return false;
     }
 }

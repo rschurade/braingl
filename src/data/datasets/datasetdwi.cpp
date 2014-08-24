@@ -5,6 +5,7 @@
  * @author Ralph Schurade
  */
 #include "datasetdwi.h"
+#include "datasetscalar.h"
 
 #include "../models.h"
 
@@ -12,13 +13,107 @@
 
 #include <QDebug>
 
-DatasetDWI::DatasetDWI( QDir filename, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header ) :
-    DatasetNifti( filename, Fn::DatasetType::NIFTI_DWI, header ),
+DatasetDWI::DatasetDWI( QDir fileName, std::vector<ColumnVector> data, std::vector<float> b0Data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header ) :
+    DatasetNifti( fileName, Fn::DatasetType::NIFTI_DWI, header ),
     m_data( data ),
     m_b0Data( b0Data ),
     m_bvals( bvals ),
-    m_bvecs( bvecs )
+    m_bvecs( bvecs ),
+    m_isOK( true )
 {
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
+
+    examineDataset();
+
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
+
+    PropertyGroup props2( m_properties["maingl"] );
+    m_properties.insert( "maingl2", props2 );
+    m_properties["maingl2"].getProperty( Fn::Property::D_ACTIVE )->setPropertyTab( "general" );
+}
+
+DatasetDWI::DatasetDWI( QDir fileName, std::vector<float>* data, std::vector<float> bvals, std::vector<QVector3D> bvecs, nifti_image* header ) :
+    DatasetNifti( fileName, Fn::DatasetType::NIFTI_DWI, header ),
+    m_bvals( bvals ),
+    m_bvecs( bvecs ),
+    m_isOK( true )
+{
+    int numB0 = 0;
+    std::vector<float> bvals2;
+    for ( unsigned int i = 0; i < bvals.size(); ++i )
+    {
+        if ( bvals[i] > 100 )
+        {
+            bvals2.push_back( bvals[i] );
+        }
+        else
+        {
+            ++numB0;
+        }
+    }
+    qDebug() << "num b0:" << numB0;
+
+    int dimX = m_header->dim[1];
+    int dimY = m_header->dim[2];
+    int dimZ = m_header->dim[3];
+    unsigned int blockSize = dimX * dimY * dimZ;
+    int dim = m_header->dim[4];
+    int numData = dim - numB0;
+    qDebug() << "num data:" << numData;
+
+    if ( numData > dim || bvals2.size() != bvecs.size() )
+    {
+        qCritical() << "*** ERROR *** parsing bval and bvec files!";
+        m_isOK = false;
+    }
+
+    try
+    {
+        m_data.reserve( blockSize );
+    }
+    catch ( std::bad_alloc& )
+    {
+        qCritical() << "*** error *** failed to allocate memory for dataset";
+        m_isOK = false;
+    }
+
+    std::vector<float> b0data( blockSize );
+    for ( unsigned int i = 0; i < blockSize; ++i )
+    {
+        ColumnVector v( numData );
+
+        int dataIndex = 1;
+        for ( int j = 0; j < dim; ++j )
+        {
+            if ( bvals[j] > 100 )
+            {
+                v( dataIndex ) = data->at( j * blockSize + i );
+                ++dataIndex;
+            }
+            else
+            {
+                b0data[i] += data->at( j * blockSize + i ) / numB0;
+            }
+        }
+        m_data.push_back( v );
+    }
+
+    QString b0fn = fileName.path();
+    if ( fileName.path().endsWith( ".nii.gz" ) )
+    {
+        b0fn.replace( ".nii.gz", "_b0.nii.gz" );
+    }
+    if ( fileName.path().endsWith( ".nii" ) )
+    {
+        b0fn.replace( ".nii.gz", "_b0.nii" );
+    }
+
+    nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
+    DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
+    Models::addDataset( datasetB0 );
+
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 0, 0, (int)Fn::ColormapEnum::NONE - 1, "color" );
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
@@ -35,9 +130,13 @@ DatasetDWI::DatasetDWI( QDir filename, std::vector<ColumnVector> data, std::vect
 DatasetDWI::~DatasetDWI()
 {
     m_data.clear();
+    std::vector<ColumnVector>().swap( m_data );
     m_b0Data.clear();
+    std::vector<float>().swap( m_b0Data );
     m_bvals.clear();
+    std::vector<float>().swap( m_bvals );
     m_bvecs.clear();
+    std::vector<QVector3D>().swap( m_bvecs );
 }
 
 std::vector<ColumnVector>* DatasetDWI::getData()

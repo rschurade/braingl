@@ -35,7 +35,13 @@ LoaderNifti::LoaderNifti( QDir fileName ) :
 LoaderNifti::~LoaderNifti()
 {
     m_data.clear();
+    std::vector<float>().swap( m_data );
     m_dataset.clear();
+    std::vector<Dataset*>().swap( m_dataset );
+    if ( m_header )
+    {
+        nifti_image_free( m_header );
+    }
 }
 
 std::vector<Dataset*> LoaderNifti::getDataset()
@@ -308,15 +314,15 @@ template<typename T> void LoaderNifti::copyData( T* inputData )
 bool LoaderNifti::loadNiftiScalar()
 {
     DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
-    m_data.clear();
     m_dataset.push_back( dataset );
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
 bool LoaderNifti::loadIsosurface()
 {
     DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
-    m_data.clear();
 
     DatasetIsosurface* iso = new DatasetIsosurface( dataset );
     if ( m_propStates.size() > 0 )
@@ -330,7 +336,6 @@ bool LoaderNifti::loadIsosurface()
 bool LoaderNifti::loadIsoline()
 {
     DatasetScalar* dataset = new DatasetScalar( m_fileName.path(), m_data, m_header );
-    m_data.clear();
 
     DatasetIsoline* iso = new DatasetIsoline( dataset );
     if ( m_propStates.size() > 0 )
@@ -358,7 +363,6 @@ bool LoaderNifti::loadNiftiVector3D()
     }
 
     Dataset3D* dataset = new Dataset3D( m_fileName.path(), vectorData, m_header );
-    m_data.clear();
     m_dataset.push_back( dataset );
     return true;
 }
@@ -398,7 +402,6 @@ bool LoaderNifti::loadNiftiTensor()
     }
     DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
     m_dataset.push_back( dataset );
-    m_data.clear();
 
     return true;
 }
@@ -517,20 +520,6 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
         qCritical() << "*** ERROR *** while loading dwi dataset, count bvals doesn't match nifti image dim!";
         return false;
     }
-    int numB0 = 0;
-    std::vector<float> bvals2;
-    for ( unsigned int i = 0; i < bvals.size(); ++i )
-    {
-        if ( bvals[i] > 100 )
-        {
-            bvals2.push_back( bvals[i] );
-        }
-        else
-        {
-            ++numB0;
-        }
-    }
-    qDebug() << "num b0:" << numB0;
 
     std::vector<QVector3D> bvecs = loadBvecs( fileName, bvals );
     if ( bvecs.size() == 0 )
@@ -539,73 +528,22 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
         return false;
     }
 
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    unsigned int blockSize = dimX * dimY * dimZ;
-    int dim = m_header->dim[4];
-    int numData = dim - numB0;
-    qDebug() << "num data:" << numData;
-
-    if ( numData > dim || bvals2.size() != bvecs.size() )
-    {
-        qCritical() << "*** ERROR *** parsing bval and bvec files!";
-        return false;
-    }
-
-    std::vector<ColumnVector> dataVector;
-
-    try
-    {
-        dataVector.reserve( blockSize );
-    }
-    catch ( std::bad_alloc& )
-    {
-        qCritical() << "*** error *** failed to allocate memory for dataset";
-        return false;
-    }
-
-    std::vector<float> b0data( blockSize );
-    for ( unsigned int i = 0; i < blockSize; ++i )
-    {
-        ColumnVector v( numData );
-
-        int dataIndex = 1;
-        for ( int j = 0; j < dim; ++j )
-        {
-            if ( bvals[j] > 100 )
-            {
-                v( dataIndex ) = m_data[j * blockSize + i];
-                ++dataIndex;
-            }
-            else
-            {
-                b0data[i] += m_data[j * blockSize + i] / numB0;
-            }
-        }
-        dataVector.push_back( v );
-    }
-
-    QString b0fn = m_fileName.path();
-    if ( m_fileName.path().endsWith( ".nii.gz" ) )
-    {
-        b0fn.replace( ".nii.gz", "_b0.nii.gz" );
-    }
-    if ( m_fileName.path().endsWith( ".nii" ) )
-    {
-        b0fn.replace( ".nii.gz", "_b0.nii" );
-    }
-    m_data.clear();
-
-    nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
-    DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
-    m_dataset.push_back( datasetB0 );
-
     nifti_image* dsHdr = nifti_copy_nim_info( m_header );
-    DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
-    m_dataset.push_back( dataset );
+    DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), &m_data, bvals, bvecs, dsHdr );
 
-    return true;
+    m_data.clear();
+    std::vector<float>().swap( m_data );
+
+    if ( dataset->isOK() )
+    {
+        m_dataset.push_back( dataset );
+        return true;
+    }
+    else
+    {
+        delete dataset;
+        return false;
+    }
 }
 
 bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
