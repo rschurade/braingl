@@ -138,6 +138,8 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_CROSSHAIR_COLOR ), Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::getGlobal( Fn::Property::G_SHOW_NAV_SLIDERS ) );
 
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PATH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PATH ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_WIDTH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_WIDTH ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_HEIGHT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_HEIGHT ) );
@@ -158,6 +160,8 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_RENDER_CROSSHAIRS_2 ), Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS_2 ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_TRANSPARENCY ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_MESH_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_MESH_TRANSPARENCY ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_FILTER_SIZE ), Models::getGlobal( Fn::Property::G_FILTER_SIZE ) );
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -206,6 +210,8 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
     loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
 
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX2 );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_WIDTH );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_HEIGHT );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_KEEP_ASPECT );
@@ -225,6 +231,8 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS_2 );
     loadSetting( settings, Fn::Property::G_TRANSPARENCY );
     loadSetting( settings, Fn::Property::G_MESH_TRANSPARENCY );
+
+    loadSetting( settings, Fn::Property::G_FILTER_SIZE );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
