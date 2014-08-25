@@ -36,6 +36,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_width( 0 ),
     m_height( 0 ),
     m_doScreenshot( false ),
+    m_exitAfterScreenshot( false ),
     m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
@@ -64,6 +65,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_width( 0 ),
     m_height( 0 ),
     m_doScreenshot( false ),
+    m_exitAfterScreenshot( false ),
     m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
@@ -155,6 +157,10 @@ void GLWidget::paintGL()
             }
             delete image;
             calcMVPMatrix();
+            if ( m_exitAfterScreenshot )
+            {
+                exit( 0 );
+            }
         }
     }
 
@@ -392,9 +398,10 @@ void GLWidget::setView( Fn::Orient view )
     update();
 }
 
-void GLWidget::screenshot( QString fn )
+void GLWidget::screenshot( QString fn, bool exitAfter )
 {
     m_doScreenshot = true;
+    m_exitAfterScreenshot = exitAfter;
     m_screenshotFileName = fn;
 }
 

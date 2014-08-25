@@ -214,8 +214,7 @@ int main( int argc, char *argv[] )
 
     if ( makeScreenshot )
     {
-        mainWin.screenshot();
-        exit( 0 );
+        mainWin.screenshot( true );
     }
 
     return app.exec();
