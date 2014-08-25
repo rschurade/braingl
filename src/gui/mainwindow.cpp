@@ -59,6 +59,7 @@
 #include <QAction>
 #include <QWebView>
 #include <QGLFormat>
+#include <QKeySequence>
 
 #include <iostream>
 
@@ -943,6 +944,7 @@ void MainWindow::createActions()
 
     screenshotAct = new QAction( QIcon( ":/icons/camera.png" ), tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
+    screenshotAct->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_P ) );
     connect( screenshotAct, SIGNAL( triggered() ), this, SLOT( screenshot() ) );
 
     resetSettingsAct = new QAction( tr( "Reset Settings" ), this );
@@ -1402,6 +1404,7 @@ void MainWindow::screenshot()
     {
         mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ) );
     }
+    Models::g()->submit();
 }
 
 void MainWindow::resetSettings()
