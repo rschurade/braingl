@@ -1376,9 +1376,8 @@ void MainWindow::slotRenderCrosshairs( bool value )
     Models::g()->setData( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ), value );
 }
 
-void MainWindow::screenshot()
+void MainWindow::screenshot( bool exitAfter )
 {
-
     QString path = Models::getGlobal(  Fn::Property::G_SCREENSHOT_PATH ).toString();
     if ( !path.endsWith( QDir::separator() ) )
     {
@@ -1398,11 +1397,11 @@ void MainWindow::screenshot()
 
     if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ).toBool() )
     {
-        mainGLWidget->screenshot( path + prefix + numberString + QString( ".png" ) );
+        mainGLWidget->screenshot( path + prefix + numberString + QString( ".png" ), exitAfter );
     }
     if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ).toBool() )
     {
-        mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ) );
+        mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ), exitAfter );
     }
     Models::g()->submit();
 }

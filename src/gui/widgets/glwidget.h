@@ -33,7 +33,7 @@ public:
     QSize sizeHint() const;
 
     void setView( Fn::Orient view );
-    void screenshot( QString fn );
+    void screenshot( QString fn, bool exitAfter = false );
 
     CameraBase* getCameraInUse();
     ArcBall* getArcBall();
@@ -69,6 +69,7 @@ private:
     int m_height;
 
     bool m_doScreenshot;
+    bool m_exitAfterScreenshot;
     QString m_screenshotFileName;
 
     int m_copyCameraMode;

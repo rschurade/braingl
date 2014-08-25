@@ -148,7 +148,7 @@ private:
     static int countMainGL;
 
 public slots:
-    void screenshot();
+    void screenshot( bool exitAfter = false );
     void runScript();
 
 private slots:
