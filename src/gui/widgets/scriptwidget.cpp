@@ -1532,11 +1532,15 @@ void ScriptWidget::slotCheckboxChanged2( int state, int line )
 
 void ScriptWidget::slotKeyPressed( int key, Qt::KeyboardModifiers mods )
 {
-    if ( key == 32 )
+    if ( key == Qt::Key_Space )
     {
         if ( mods & Qt::ShiftModifier )
         {
             m_runButton->toggle();
+        }
+        if ( mods & Qt::ControlModifier )
+        {
+            //m_runButton->toggle();
         }
         else
         {

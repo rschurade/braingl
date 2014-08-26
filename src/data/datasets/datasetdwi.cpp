@@ -68,10 +68,11 @@ DatasetDWI::DatasetDWI( QDir fileName, std::vector<float>* data, std::vector<flo
         qCritical() << "*** ERROR *** parsing bval and bvec files!";
         m_isOK = false;
     }
-
+    ColumnVector vTest( numData * 2 );
+    qDebug() << sizeof( vTest );
     try
     {
-        m_data.reserve( blockSize );
+        m_data.reserve( blockSize * sizeof( vTest ) );
     }
     catch ( std::bad_alloc& )
     {

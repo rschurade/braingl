@@ -330,6 +330,8 @@ bool LoaderNifti::loadIsosurface()
         iso->properties().setState( m_propStates );
     }
     m_dataset.push_back( iso );
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
@@ -343,6 +345,8 @@ bool LoaderNifti::loadIsoline()
         iso->properties().setState( m_propStates );
     }
     m_dataset.push_back( iso );
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
@@ -364,6 +368,8 @@ bool LoaderNifti::loadNiftiVector3D()
 
     Dataset3D* dataset = new Dataset3D( m_fileName.path(), vectorData, m_header );
     m_dataset.push_back( dataset );
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
@@ -402,7 +408,8 @@ bool LoaderNifti::loadNiftiTensor()
     }
     DatasetTensor* dataset = new DatasetTensor( m_fileName.path(), dataVector, m_header );
     m_dataset.push_back( dataset );
-
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
@@ -458,6 +465,8 @@ bool LoaderNifti::loadNiftiSH()
     out->properties().set( Fn::Property::D_RENDER_SLICE, 1 );
 
     m_dataset.push_back( out );
+    m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 
@@ -492,12 +501,13 @@ bool LoaderNifti::loadNiftiBingham()
         dataVector.push_back( v );
     }
     m_data.clear();
-
+    std::vector<float>().swap( m_data );
     DatasetBingham* out = new DatasetBingham( m_fileName.path(), dataVector, m_header );
     out->properties().set( Fn::Property::D_CREATED_BY, (int) Fn::Algo::BINGHAM );
     out->properties().set( Fn::Property::D_LOD, 2 );
 
     m_dataset.push_back( out );
+
 
     return true;
 }
@@ -508,6 +518,7 @@ bool LoaderNifti::loadNiftiFMRI()
     DatasetFMRI* dataset = new DatasetFMRI( m_fileName.path(), m_data, dsHdr );
     m_dataset.push_back( dataset );
     m_data.clear();
+    std::vector<float>().swap( m_data );
     return true;
 }
 

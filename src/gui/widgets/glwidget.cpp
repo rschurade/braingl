@@ -159,6 +159,9 @@ void GLWidget::paintGL()
             calcMVPMatrix();
             if ( m_exitAfterScreenshot )
             {
+                QSettings settings;
+                settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
+                settings.sync();
                 exit( 0 );
             }
         }
@@ -645,6 +648,20 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
 
         Models::g()->submit();
     }
+    else if ( event->modifiers() & Qt::ControlModifier )
+    {
+        switch( event->key() )
+        {
+            case Qt::Key_Space:
+            {
+                m_cameraInUse->setZoom( 1.0 );
+                m_cameraInUse->setMoveX( 0.0 );
+                m_cameraInUse->setMoveY( 0.0 );
+                setView( Fn::Orient::AXIAL );
+                break;
+            }
+        }
+    }
     else
     {
         if ( dynamic_cast<Camera*>( m_cameraInUse) )
@@ -747,13 +764,6 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                 case 72: //H
                     emit ( signalCopyCameraToScript( 3 ) );
                     break;
-                case Qt::Key_Space:
-                {
-                    m_cameraInUse->setZoom( 1.0 );
-                    m_cameraInUse->setMoveX( 0.0 );
-                    m_cameraInUse->setMoveY( 0.0 );
-                    setView( Fn::Orient::AXIAL );
-                }
             }
         }
     }
