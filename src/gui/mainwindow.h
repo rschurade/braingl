@@ -97,7 +97,7 @@ private:
 
     enum
     {
-        MaxRecentFiles = 5
+        MaxRecentFiles = 15
     };
     QAction *recentFileActs[MaxRecentFiles];
     QAction *separatorAct;
