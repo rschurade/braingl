@@ -54,6 +54,8 @@ public:
 
     static Fn::Property s2p( QString s );
 
+    static float zoom;
+
 private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;

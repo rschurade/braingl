@@ -389,7 +389,8 @@ void GLWidget::wheelEvent( QWheelEvent *event )
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
     m_cameraInUse->mouseWheel( numSteps );
-    update();
+    //update();
+    Models::g()->submit();
 }
 
 void GLWidget::setView( Fn::Orient view )
@@ -745,10 +746,18 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                     break;
                 case 72: //H
                     emit ( signalCopyCameraToScript( 3 ) );
+                    break;
+                case Qt::Key_Space:
+                {
+                    m_cameraInUse->setZoom( 1.0 );
+                    m_cameraInUse->setMoveX( 0.0 );
+                    m_cameraInUse->setMoveY( 0.0 );
+                    setView( Fn::Orient::AXIAL );
+                }
             }
         }
     }
-    update();
+    Models::g()->submit();
 
     emit signalKeyPressed( event->key(), event->modifiers() );
 }

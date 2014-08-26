@@ -7,6 +7,8 @@
 
 #include "camerabase.h"
 
+#include "../../data/models.h"
+
 CameraBase::CameraBase( int width, int height ) :
     m_width( width ),
     m_height( height ),
@@ -38,4 +40,5 @@ float CameraBase::getZoom()
 void CameraBase::setZoom( float zoom )
 {
     m_zoom = zoom;
+    Models::zoom = m_zoom;
 }

@@ -113,5 +113,7 @@ void StatusBarView::dataChanged( const QModelIndex &topLeft, const QModelIndex &
         m_datasetInfo = ds->getValueAsString( m_x, m_y, m_z );
     }
 
-    emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo ) );
+    QString zoom = "[Zoom] " + QString::number( Models::zoom );
+
+    emit( sigStatusChanged( m_globalInfo + " " + m_datasetInfo + " " + zoom ) );
 }
