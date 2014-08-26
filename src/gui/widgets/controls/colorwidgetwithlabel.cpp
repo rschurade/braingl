@@ -17,7 +17,7 @@
 ColorWidgetWithLabel::ColorWidgetWithLabel( QString label, int id, QWidget* parent ) :
     QFrame( parent ),
     m_id( id ),
-    m_value( QColor( 0, 0, 0 ) )
+    m_value( QColor( 255, 255, 255 ) )
 {
     m_button = new QPushButton( QString( "set color" ), this );
     m_label = new QLabel( label, this );
@@ -42,7 +42,14 @@ ColorWidgetWithLabel::ColorWidgetWithLabel( QString label, int id, QWidget* pare
 
     setFrameStyle( QFrame::Panel | QFrame::Raised );
 
-    m_button->setStyleSheet("* { background-color: " + m_value.name() + " }");
+    //m_button->setStyleSheet("* { background-color: " + m_value.name() + "; }");
+
+    QPalette pal = m_button->palette();
+    pal.setColor( QPalette::Button, m_value );
+    m_button->setAutoFillBackground(true);
+    m_button->setPalette( pal );
+    m_button->update();
+
     setStyleSheet( "QLabel { font:  bold 12px } "
                    "QPushButton { font:  bold 12px; max-height: 16px; } ");
 }
@@ -54,10 +61,12 @@ ColorWidgetWithLabel::~ColorWidgetWithLabel()
 void ColorWidgetWithLabel::setValue( QColor value )
 {
     m_value = value;
-    m_button->setStyleSheet("* { background-color: " + m_value.name() + " }");
-    setStyleSheet( "QLabel { font:  bold 12px } "
-                   "QPushButton { font:  bold 12px; max-height: 16px; } ");
-
+    //m_button->setStyleSheet("* { background-color: " + m_value.name() + " }");
+    QPalette pal = m_button->palette();
+    pal.setColor( QPalette::Button, value );
+    m_button->setAutoFillBackground(true);
+    m_button->setPalette( pal );
+    m_button->update();
 }
 
 QColor ColorWidgetWithLabel::getValue()
@@ -75,10 +84,11 @@ void ColorWidgetWithLabel::slotButton()
 void ColorWidgetWithLabel::currentColorChanged( QColor color )
 {
     m_value = color;
-    m_button->setStyleSheet("* { background-color: " + m_value.name() + " }");
-    setStyleSheet( "QLabel { font:  bold 12px } "
-                   "QPushButton { font:  bold 12px; max-height: 16px; } ");
-
+    //m_button->setStyleSheet("* { background-color: " + m_value.name() + "; }");
+    QPalette pal = m_button->palette();
+    pal.setColor( QPalette::Button, color );
+    m_button->setAutoFillBackground(true);
+    m_button->setPalette( pal );
+    m_button->update();
     emit( colorChanged( m_value, m_id ) );
-
 }
