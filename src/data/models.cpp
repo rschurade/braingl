@@ -23,6 +23,8 @@ QAbstractItemModel* Models::m_roiModel = 0;
 ROIWidget* Models::m_roiWidget = 0;
 QMap<QString, Fn::Property>Models::m_propMap;
 
+float Models::zoom = 1.0;
+
 void Models::init()
 {
     m_globalModel = new GlobalPropertyModel();

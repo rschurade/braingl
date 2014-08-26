@@ -113,6 +113,8 @@ void ArcBall::mouseWheel( float step )
     {
         m_zoom *= 1.1;
     }
+
+    Models::zoom = m_zoom;
 }
 
 void ArcBall::midDrag( int x, int y )
