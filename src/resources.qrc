@@ -67,6 +67,8 @@
         <file>shaders/merge.fs</file>
         <file>shaders/mesh.vs</file>
         <file>shaders/mesh.fs</file>
+        <file>shaders/orienthelper.vs</file>
+        <file>shaders/orienthelper.fs</file>
         <file>shaders/peel.vs</file>
         <file>shaders/peel.fs</file>
         <file>shaders/pies.vs</file>

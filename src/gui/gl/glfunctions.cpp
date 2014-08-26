@@ -16,6 +16,7 @@
 #include "../../data/vptr.h"
 
 #include "colormaprenderer.h"
+#include  "orientationhelperrenderer.h"
 #include "shaperenderer.h"
 #include "slicerenderer.h"
 #include "../text/textrenderer.h"
@@ -35,6 +36,7 @@
 int GLFunctions::idealThreadCount = qMax( 1, QThread::idealThreadCount() - 1 );
 int GLFunctions::maxDim = 250;
 
+OrientationHelperRenderer* GLFunctions::m_orientationRenderer = new OrientationHelperRenderer();
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
 ColormapRenderer* GLFunctions::m_colormapRenderer = new ColormapRenderer();
@@ -280,6 +282,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "vectors" );
         GLFunctions::m_shaderNames.push_back( "pies" );
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
+        GLFunctions::m_shaderNames.push_back( "orienthelper" );
 
         for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
@@ -671,6 +674,7 @@ void GLFunctions::initRenderers()
     GLFunctions::m_textRenderer->init();
     GLFunctions::m_shapeRenderer->init();
     GLFunctions::m_colormapRenderer->init();
+    GLFunctions::m_orientationRenderer->init();
 }
 
 void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode )
@@ -706,6 +710,12 @@ void GLFunctions::renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
 {
     GLFunctions::m_sliceRenderer->draw( p_matrix, mv_matrix, width, height, renderMode, target );
 }
+
+void GLFunctions::renderOrientHelper( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target )
+{
+    GLFunctions::m_orientationRenderer->drawBox( p_matrix, mv_matrix, width, height, renderMode );
+}
+
 
 bool GLFunctions::getAndPrintGLError( QString prefix )
 {

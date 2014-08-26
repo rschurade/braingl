@@ -370,6 +370,11 @@ namespace Fn
         G_TRACT_TEXT_SOURCE,
         G_ISOLINE_STANDARD_COLOR,
         G_MESH_TRANSPARENCY,
+        G_SHOW_ORIENTHELPER,
+        G_ORIENTHELPER_X,
+        G_ORIENTHELPER_Y,
+        G_ORIENTHELPER_Z,
+        G_ORIENTHELPER_SIZE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         D_X = 1000,
@@ -630,6 +635,11 @@ namespace Fn
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "G_TRACT_TEXT_SOURCE" ); break;
                 case Property::G_ISOLINE_STANDARD_COLOR: return QString( "G_ISOLINE_STANDARD_COLOR" ); break;
                 case Property::G_MESH_TRANSPARENCY: return QString( "G_MESH_TRANSPARENCY" ); break;
+                case Property::G_SHOW_ORIENTHELPER: return QString( "G_SHOW_ORIENTHELPER" ); break;
+                case Property::G_ORIENTHELPER_X: return QString( "G_ORIENTHELPER_X" ); break;
+                case Property::G_ORIENTHELPER_Y: return QString( "G_ORIENTHELPER_Y" ); break;
+                case Property::G_ORIENTHELPER_Z: return QString( "G_ORIENTHELPER_Z" ); break;
+                case Property::G_ORIENTHELPER_SIZE: return QString( "G_ORIENTHELPER_SIZE" ); break;
                 case Property::G_LAST: return QString( "G_LAST" ); break;
                 case Property::D_X: return QString( "D_X" ); break;
                 case Property::D_Y: return QString( "D_Y" ); break;
@@ -889,6 +899,11 @@ namespace Fn
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
                 case Property::G_ISOLINE_STANDARD_COLOR: return QString( "isoline standard color" ); break;
                 case Property::G_MESH_TRANSPARENCY: return QString( "mesh transparency" ); break;
+                case Property::G_SHOW_ORIENTHELPER: return QString( "show orient helper" ); break;
+                case Property::G_ORIENTHELPER_X: return QString( "orient helper x" ); break;
+                case Property::G_ORIENTHELPER_Y: return QString( "orient helper y" ); break;
+                case Property::G_ORIENTHELPER_Z: return QString( "orient helper z" ); break;
+                case Property::G_ORIENTHELPER_SIZE: return QString( "orient helper size" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::D_X: return QString( "x" ); break;
