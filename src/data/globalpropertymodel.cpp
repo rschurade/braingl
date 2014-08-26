@@ -54,6 +54,11 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createInt( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS, 360, 1, 360, "camera" );
 
     m_properties->createFloat( Fn::Property::G_ARCBALL_DISTANCE, 500.0f, 1.0f, 20000.0f, "arcball" );
+    m_properties->createBool( Fn::Property::G_SHOW_ORIENTHELPER, false, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_X, 1.6f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_Y, -1.6f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_Z, -0.9f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_SIZE, 10.0f, 1.0f, 10.f, "arcball" );
 
     m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
     m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN2, QColor( 255, 255, 255 ), "general" );

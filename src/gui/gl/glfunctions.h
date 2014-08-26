@@ -17,6 +17,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 
 class ColormapRenderer;
+class OrientationHelperRenderer;
 class PropertyGroup;
 class QGLShaderProgram;
 class ROI;
@@ -69,6 +70,8 @@ public:
                                QColor color, int pickID, int width, int height, int renderMode );
     static void renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target );
 
+    static void renderOrientHelper( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target );
+
 
     static void createColormapBarProps( PropertyGroup& props );
     static void drawColormapBar( PropertyGroup& props, int width, int height, int renderMode );
@@ -94,6 +97,7 @@ private:
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;
     static ColormapRenderer* m_colormapRenderer;
+    static OrientationHelperRenderer* m_orientationRenderer;
 
     static QHash< QString, QString >m_shaderIncludes;
     static QHash< QString, QString >m_shaderSources;

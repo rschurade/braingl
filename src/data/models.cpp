@@ -424,6 +424,11 @@ void Models::initPropMap()
     m_propMap.insert( "G_TRACT_TEXT_SOURCE", Fn::Property::G_TRACT_TEXT_SOURCE );
     m_propMap.insert( "G_ISOLINE_STANDARD_COLOR", Fn::Property::G_ISOLINE_STANDARD_COLOR );
     m_propMap.insert( "G_MESH_TRANSPARENCY", Fn::Property::G_MESH_TRANSPARENCY );
+    m_propMap.insert( "G_SHOW_ORIENTHELPER", Fn::Property::G_SHOW_ORIENTHELPER );
+    m_propMap.insert( "G_ORIENTHELPER_X", Fn::Property::G_ORIENTHELPER_X );
+    m_propMap.insert( "G_ORIENTHELPER_Y", Fn::Property::G_ORIENTHELPER_Y );
+    m_propMap.insert( "G_ORIENTHELPER_Z", Fn::Property::G_ORIENTHELPER_Z );
+    m_propMap.insert( "G_ORIENTHELPER_SIZE", Fn::Property::G_ORIENTHELPER_SIZE );
     m_propMap.insert( "G_LAST", Fn::Property::G_LAST );
     m_propMap.insert( "D_X", Fn::Property::D_X );
     m_propMap.insert( "D_Y", Fn::Property::D_Y );

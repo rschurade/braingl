@@ -163,6 +163,13 @@ void MainWindow::saveSettings()
 
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_FILTER_SIZE ), Models::getGlobal( Fn::Property::G_FILTER_SIZE ) );
 
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SHOW_ORIENTHELPER ), Models::getGlobal( Fn::Property::G_SHOW_ORIENTHELPER ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_X ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_X ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_Y ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_Y ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_Z ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_Z ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_SIZE ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_SIZE ) );
+
+
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
 
@@ -233,6 +240,11 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_MESH_TRANSPARENCY );
 
     loadSetting( settings, Fn::Property::G_FILTER_SIZE );
+    loadSetting( settings, Fn::Property::G_SHOW_ORIENTHELPER );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_X );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_Y );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_Z );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_SIZE );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )

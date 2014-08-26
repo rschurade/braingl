@@ -295,6 +295,7 @@ void SceneRenderer::renderScenePart( int renderMode, QString target0, QString ta
 
     GLFunctions::getAndPrintGLError( m_renderTarget + "---" );
     GLFunctions::renderSlices( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderOrientHelper( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     //GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
     renderDatasets();
     renderRois();
