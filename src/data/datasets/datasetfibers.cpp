@@ -495,12 +495,15 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 
 void DatasetFibers::colorChanged()
 {
-    std::vector<bool>*selected = m_selector->getSelection();
-    for ( unsigned int i = 0; i < m_numLines; ++i )
+    if ( m_selector != 0 )
     {
-        if ( selected->at( i ) )
+        std::vector<bool>*selected = m_selector->getSelection();
+        for ( unsigned int i = 0; i < m_numLines; ++i )
         {
-            m_fibs[ i ].setCustomColor( m_properties["maingl"].getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+            if ( selected->at( i ) )
+            {
+                m_fibs[ i ].setCustomColor( m_properties["maingl"].getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+            }
         }
     }
     if ( m_renderer != 0 )
