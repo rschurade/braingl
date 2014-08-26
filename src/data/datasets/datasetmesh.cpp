@@ -502,8 +502,15 @@ void DatasetMesh::slotCopyColors()
                 c.setGreenF( ( 1.0 - c2.alphaF() ) * c.greenF() + c2.alphaF() * c2.greenF() );
                 c.setBlueF( ( 1.0 - c2.alphaF() ) * c.blueF() + c2.alphaF() * c2.blueF() );
             }
-
-            mesh->setVertexColor( i, c );
+            if ( c.redF() + c.greenF() + c.blueF() > 0 )
+            {
+                mesh->setVertexColor( i, c );
+            }
+            else
+            {
+                QColor col = m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
+                mesh->setVertexColor( i, col );
+            }
         }
         m_renderer->endUpdateColor();
     }
