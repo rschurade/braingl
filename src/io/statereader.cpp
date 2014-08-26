@@ -69,7 +69,6 @@ void StateReader::loadScene()
     bool packAndGo = xml.getHeaderValue( "packAndGo" ).toBool();
 
     QList<QVariant>globals = xml.getGlobals();
-    dynamic_cast<GlobalPropertyModel*>( Models::g() )->setState( globals );
     m_cameras = xml.getCameras();
 
     QList< QList<QVariant> >datasets = xml.getDatasets();
@@ -191,6 +190,7 @@ void StateReader::loadScene()
             }
         }
     }
+    dynamic_cast<GlobalPropertyModel*>( Models::g() )->setState( globals );
 }
 
 QVariant StateReader::getFromStateList( Fn::Property prop, QList<QVariant>& state )
