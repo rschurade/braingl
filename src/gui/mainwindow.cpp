@@ -501,13 +501,14 @@ void MainWindow::setCurrentFile( const QString &fileName )
 
     settings.setValue( "recentFileList", files );
 
-    foreach (QWidget *widget, QApplication::topLevelWidgets()){
-    MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
-    if ( mainWin )
+    foreach ( QWidget *widget, QApplication::topLevelWidgets() )
     {
-        mainWin->updateRecentFileActions();
+        MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
+        if ( mainWin )
+        {
+            mainWin->updateRecentFileActions();
+        }
     }
-}
 }
 
 void MainWindow::updateRecentFileActions()
@@ -519,7 +520,8 @@ void MainWindow::updateRecentFileActions()
 
     for ( int i = 0; i < numRecentFiles; ++i )
     {
-        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[i] ) );
+        //QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[i] ) );
+        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( files[i] );
         recentFileActs[i]->setText( text );
         recentFileActs[i]->setData( files[i] );
         recentFileActs[i]->setVisible( true );
@@ -1069,9 +1071,11 @@ void MainWindow::createMenus()
     fileMenu->addAction( importColormapsAct );
     separatorAct = fileMenu->addSeparator();
 
+    recentFilesMenu = fileMenu->addMenu( "Recent files" );
+
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
-        fileMenu->addAction( recentFileActs[i] );
+        recentFilesMenu->addAction( recentFileActs[i] );
     }
     fileMenu->addSeparator();
     fileMenu->addAction( quitAct );
