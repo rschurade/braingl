@@ -128,8 +128,15 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     std::vector<bool>*selected = m_selector->getSelection();
 
+    int percent = props.get( Fn::Property::D_FIBER_THIN_OUT ).toFloat() * 10;
+
     for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
+        if ( ( i % 1000 ) > percent )
+        {
+            continue;
+        }
+
         if ( selected->at( i ) )
         {
             QColor c = m_fibs->at( i ).customColor();

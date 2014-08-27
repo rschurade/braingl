@@ -348,6 +348,7 @@ void Models::initPropMap()
     m_propMap.insert( "D_ISOLINE_STRIPES", Fn::Property::D_ISOLINE_STRIPES );
     m_propMap.insert( "D_ISOLINE_STRIPES_WIDTH", Fn::Property::D_ISOLINE_STRIPES_WIDTH );
     m_propMap.insert( "D_COLORMAP_LABEL", Fn::Property::D_COLORMAP_LABEL );
+    m_propMap.insert( "D_FIBER_THIN_OUT", Fn::Property::D_FIBER_THIN_OUT );
     m_propMap.insert( "G_FIRST", Fn::Property::G_FIRST );
     m_propMap.insert( "G_LOCK_WIDGETS", Fn::Property::G_LOCK_WIDGETS );
     m_propMap.insert( "G_RENDER_CROSSHAIRS", Fn::Property::G_RENDER_CROSSHAIRS );
@@ -429,6 +430,7 @@ void Models::initPropMap()
     m_propMap.insert( "G_ORIENTHELPER_Y", Fn::Property::G_ORIENTHELPER_Y );
     m_propMap.insert( "G_ORIENTHELPER_Z", Fn::Property::G_ORIENTHELPER_Z );
     m_propMap.insert( "G_ORIENTHELPER_SIZE", Fn::Property::G_ORIENTHELPER_SIZE );
+    m_propMap.insert( "G_FIBERS_INITIAL_PERCENTAGE", Fn::Property::G_FIBERS_INITIAL_PERCENTAGE );
     m_propMap.insert( "G_LAST", Fn::Property::G_LAST );
     m_propMap.insert( "D_X", Fn::Property::D_X );
     m_propMap.insert( "D_Y", Fn::Property::D_Y );

@@ -292,6 +292,7 @@ namespace Fn
         D_ISOLINE_STRIPES,
         D_ISOLINE_STRIPES_WIDTH,
         D_COLORMAP_LABEL,
+        D_FIBER_THIN_OUT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -375,6 +376,7 @@ namespace Fn
         G_ORIENTHELPER_Y,
         G_ORIENTHELPER_Z,
         G_ORIENTHELPER_SIZE,
+        G_FIBERS_INITIAL_PERCENTAGE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         D_X = 1000,
@@ -559,6 +561,8 @@ namespace Fn
                 case Property::D_ISOLINE_STRIPES: return QString( "D_ISOLINE_STRIPES" ); break;
                 case Property::D_ISOLINE_STRIPES_WIDTH: return QString( "D_ISOLINE_STRIPES_WIDTH" ); break;
                 case Property::D_COLORMAP_LABEL: return QString( "D_COLORMAP_LABEL" ); break;
+                case Property::D_FIBER_THIN_OUT: return QString( "D_FIBER_THIN_OUT" ); break;
+                //
                 case Property::G_FIRST: return QString( "G_FIRST" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "G_LOCK_WIDGETS" ); break;
                 case Property::G_RENDER_CROSSHAIRS: return QString( "G_RENDER_CROSSHAIRS" ); break;
@@ -640,7 +644,9 @@ namespace Fn
                 case Property::G_ORIENTHELPER_Y: return QString( "G_ORIENTHELPER_Y" ); break;
                 case Property::G_ORIENTHELPER_Z: return QString( "G_ORIENTHELPER_Z" ); break;
                 case Property::G_ORIENTHELPER_SIZE: return QString( "G_ORIENTHELPER_SIZE" ); break;
+                case Property::G_FIBERS_INITIAL_PERCENTAGE: return QString( "G_FIBERS_INITIAL_PERCENTAGE" ); break;
                 case Property::G_LAST: return QString( "G_LAST" ); break;
+                //
                 case Property::D_X: return QString( "D_X" ); break;
                 case Property::D_Y: return QString( "D_Y" ); break;
                 case Property::D_Z: return QString( "D_Z" ); break;
@@ -653,6 +659,7 @@ namespace Fn
                 case Property::D_UPDATED: return QString( "D_UPDATED" ); break;
                 case Property::D_POINTER: return QString( "D_POINTER" ); break;
                 case Property::D_DESCRIPTION: return QString( "D_DESCRIPTION" ); break;
+
             }
             return QString( "property not defined" );
         }
@@ -822,6 +829,7 @@ namespace Fn
                 case Property::D_ISOLINE_STRIPES: return QString( "hatching" ); break;
                 case Property::D_ISOLINE_STRIPES_WIDTH: return QString( "hatching line width" ); break;
                 case Property::D_COLORMAP_LABEL: return QString( "Label" ); break;
+                case Property::D_FIBER_THIN_OUT: return QString( "render percentage of fibers" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
@@ -904,6 +912,7 @@ namespace Fn
                 case Property::G_ORIENTHELPER_Y: return QString( "orient helper y" ); break;
                 case Property::G_ORIENTHELPER_Z: return QString( "orient helper z" ); break;
                 case Property::G_ORIENTHELPER_SIZE: return QString( "orient helper size" ); break;
+                case Property::G_FIBERS_INITIAL_PERCENTAGE: return QString( "initial percentage of fibers shown" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::D_X: return QString( "x" ); break;
