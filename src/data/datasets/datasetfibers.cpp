@@ -88,6 +88,8 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createInt( Fn::Property::D_NUM_POINTS, m_numPoints );
     m_properties["maingl"].createInt( Fn::Property::D_NUM_LINES, m_fibs.size() );
     m_properties["maingl"].createRadioGroup( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    float percent = Models::getGlobal( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ).toFloat();
+    m_properties["maingl"].createFloat( Fn::Property::D_FIBER_THIN_OUT, percent, 0.1f, 100.f, "general" );
     if ( hasData )
     {
         m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );

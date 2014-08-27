@@ -169,6 +169,8 @@ void MainWindow::saveSettings()
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_Z ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_Z ) );
     settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_SIZE ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_SIZE ) );
 
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ), Models::getGlobal( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ) );
+
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -245,6 +247,7 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_ORIENTHELPER_Y );
     loadSetting( settings, Fn::Property::G_ORIENTHELPER_Z );
     loadSetting( settings, Fn::Property::G_ORIENTHELPER_SIZE );
+    loadSetting( settings, Fn::Property::G_FIBERS_INITIAL_PERCENTAGE );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
