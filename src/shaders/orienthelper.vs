@@ -22,7 +22,7 @@ void main()
     v_position = mvp_matrix * vec4( pos, 1.0 );
     v_position.x += u_x;
     v_position.y += u_y;
-    v_position.z += u_z;
+    v_position.z = u_z - fract( v_position.z );
     
     gl_Position = v_position;     
 }
