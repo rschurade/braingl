@@ -58,17 +58,20 @@ QList<Dataset*> DWIAlgos::qBall( Dataset* ds )
     int order = 4;
     Matrix qBallBase = QBall::calcQBallBase( gradients, lambda, order );
 
-    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<float>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
 
     std::vector<ColumnVector> qBallVector;
 
+    unsigned int blockSize = ds->properties().get( Fn::Property::D_NX ).toInt() * ds->properties().get( Fn::Property::D_NY ).toInt() * ds->properties().get( Fn::Property::D_NZ ).toInt();
+    unsigned int dim = ds->properties().get( Fn::Property::D_DIM ).toInt();
+
     for ( unsigned int i = 0; i < data->size(); ++i )
     {
-        qBallVector.push_back( qBallBase * data->at( i ) );
+        qBallVector.push_back( qBallBase * FMath::createVector( i, *data, blockSize, dim ) );
     }
 
     Writer writer( ds, QFileInfo() );
-    DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, writer.createHeader( data->at( 0 ).Nrows() ) );
+    DatasetSH* out = new DatasetSH( QDir( "Q-Ball" ), qBallVector, writer.createHeader( qBallVector.at( 0 ).Nrows() ) );
     out->properties( "maingl" ).set( Fn::Property::D_NAME, "QBall" );
     out->properties( "maingl" ).set( Fn::Property::D_CREATED_BY, (int)Fn::Algo::QBALL );
     out->properties( "maingl" ).set( Fn::Property::D_LOD, 2 );
@@ -116,7 +119,7 @@ QList<Dataset*> DWIAlgos::tensorFit( Dataset* ds )
 {
     std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<float>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     std::vector<Matrix> tensors;
@@ -137,7 +140,7 @@ QList<Dataset*> DWIAlgos::calcFAFromDWI( Dataset* ds )
 {
     std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<float>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     std::vector<Matrix> tensors;
@@ -161,7 +164,7 @@ QList<Dataset*> DWIAlgos::calcEVFromDWI( Dataset* ds )
 {
     std::vector<QVector3D> bvecs = dynamic_cast<DatasetDWI*>( ds )->getBvecs();
     std::vector<float> bvals = dynamic_cast<DatasetDWI*>( ds )->getBvals();
-    std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
+    std::vector<float>* data = dynamic_cast<DatasetDWI*>( ds )->getData();
     std::vector<float>* b0Images = dynamic_cast<DatasetDWI*>( ds )->getB0Data();
 
     std::vector<Matrix> tensors;
@@ -320,4 +323,3 @@ QList<Dataset*> DWIAlgos::sh2mesh( Dataset* ds )
     l.push_back( dsm );
     return l;
 }
-

@@ -479,9 +479,12 @@ Matrix FMath::pseudoInverse( const Matrix& A )
     return ( ( A.t() * A ).i() * A.t() );
 }
 
-void FMath::fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out )
+void FMath::fitTensors( std::vector<float>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out )
 {
     int N = bvecs.size();
+    unsigned int blockSize = b0Images.size();
+
+    qDebug() << N << blockSize;
 
     Matrix B( N, 6 );
     Matrix U( N, 6 );
@@ -516,13 +519,14 @@ void FMath::fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0I
     vector<double> log_s0_si_pixel( N );
 
     out.clear();
-    out.reserve( data.size() );
+    out.reserve( blockSize );
 
     Matrix blank( 3, 3 );
     blank = 0.0;
-
-    for ( unsigned int i = 0; i < data.size(); ++i )
+    qDebug() << "start big loop";
+    for ( unsigned int i = 0; i < blockSize; ++i )
     {
+        ColumnVector dataVector = createVector( i, data, blockSize, N );
         s0 = b0Images.at( i );
 
         if ( s0 > 0 )
@@ -531,7 +535,7 @@ void FMath::fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0I
             s0 = log( s0 );
             for ( int j = 0; j < N; ++j )
             {
-                si = data.at( i )( j + 1 ); //dti[j*blockSize+i];
+                si = dataVector( j + 1 ); //dti[j*blockSize+i];
                 if ( si > 0 )
                 {
                     si = log( si );
@@ -1281,4 +1285,14 @@ QVariant FMath::interpolateQVariant( QVariant &lhs, QVariant &rhs, float div )
         }
             break;
     }
+}
+
+ColumnVector FMath::createVector( unsigned int id, std::vector<float>& data, unsigned int blockSize, unsigned int dim )
+{
+    ColumnVector out( dim );
+    for( auto i = 1; i <= dim; ++i )
+    {
+        out( i ) = data.at( ( i - 1 ) * blockSize + id );
+    }
+    return out;
 }

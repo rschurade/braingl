@@ -12,7 +12,6 @@
 #include "../../gui/gl/vectorglyphrenderer.h"
 #include "../../gui/gl/pieglyphrenderer.h"
 #include "../../gui/gl/littlebrainrenderer.h"
-#include "../../gui/gl/colormaprenderer.h"
 
 #include "../../gui/gl/meshrenderer.h"
 
@@ -86,8 +85,6 @@ private:
     DiffPointGlyphRenderer* m_dprenderer;
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
-
-    ColormapRenderer* m_colormapRenderer;
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode, prevThreshSign;
     float prevThresh, prevMinlength;

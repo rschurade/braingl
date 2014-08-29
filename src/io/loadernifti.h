@@ -38,7 +38,6 @@ private:
     bool loadNiftiBingham();
     bool loadNiftiFMRI();
     bool loadNiftiDWI( QString fileName );
-    bool loadNiftiDWI_FNAV2( QString fileName );
     std::vector<float> loadBvals( QString fileName );
     std::vector<QVector3D> loadBvecs( QString fileName, std::vector<float> bvals );
 

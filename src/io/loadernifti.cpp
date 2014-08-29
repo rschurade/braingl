@@ -73,13 +73,6 @@ bool LoaderNifti::load()
         return false;
     }
 
-    if ( QString( m_header->descrip ) == QString( "fnav2_dwi" ) || QString( m_header->descrip ) == QString( "braingl_dwi" ) )
-    {
-        qDebug() << "braingl dwi dataset found";
-        m_datasetType = Fn::DatasetType::NIFTI_DWI;
-        return loadNiftiDWI_FNAV2( fn );
-    }
-
     if( m_header->ext_list )
     {
         char* extData = reinterpret_cast<char*>( m_header->ext_list[0].edata );
@@ -108,11 +101,11 @@ bool LoaderNifti::load()
 
     int dim = m_header->dim[4];
 
-    if ( dim > 3 && askTimeSeries( dim ) )
-    {
-        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
-        return loadNiftiFMRI();
-    }
+//    if ( dim > 3 && askTimeSeries( dim ) )
+//    {
+//        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
+//        return loadNiftiFMRI();
+//    }
 
     switch ( dim )
     {
@@ -555,117 +548,6 @@ bool LoaderNifti::loadNiftiDWI( QString fileName )
         delete dataset;
         return false;
     }
-}
-
-bool LoaderNifti::loadNiftiDWI_FNAV2( QString fileName )
-{
-    nifti_image* filedata = nifti_image_read( fileName.toStdString().c_str(), 1 );
-    int dimX = m_header->dim[1];
-    int dimY = m_header->dim[2];
-    int dimZ = m_header->dim[3];
-    int blockSize = dimX * dimY * dimZ;
-    int dim = m_header->dim[4] - 1;
-
-    qDebug() << "num data:" << dim;
-
-    std::vector<ColumnVector> dataVector;
-
-    try
-    {
-        dataVector.reserve( blockSize );
-    }
-    catch ( std::bad_alloc& )
-    {
-        qCritical() << "*** error *** failed to allocate memory for dataset";
-        return false;
-    }
-
-    qDebug() << "start loading data";
-    switch ( m_header->datatype )
-    {
-        case NIFTI_TYPE_FLOAT32:
-        {
-            std::vector<float> b0data( blockSize );
-            qDebug() << "block size: " << blockSize;
-            float* inputData;
-
-            inputData = reinterpret_cast<float*>( filedata->data );
-
-            nifti_image* b0Hdr = nifti_copy_nim_info( m_header );
-
-            qDebug() << "extract data ";
-
-            for ( int i = 0; i < blockSize; ++i )
-            {
-                b0data[i] = inputData[i];
-            }
-
-            for ( int z = 0; z < dimZ; ++z )
-            {
-                for ( int y = 0; y < dimY; ++y )
-                {
-                    for ( int x = 0; x < dimX; ++x )
-                    {
-                        ColumnVector v( dim );
-                        for ( int j = 1; j < dim + 1; ++j )
-                        {
-                            v( j ) = inputData[j * blockSize + x + y * dimX + z * dimX * dimY];
-                        }
-                        dataVector.push_back( v );
-                    }
-                }
-            }
-
-            qDebug() << "extract data done";
-            nifti_image_free( filedata );
-
-            QString b0fn = m_fileName.path();
-            if ( m_fileName.path().endsWith( ".nii.gz" ) )
-            {
-                b0fn.replace( ".nii.gz", "_b0.nii.gz" );
-            }
-            if ( m_fileName.path().endsWith( ".nii" ) )
-            {
-                b0fn.replace( ".nii.gz", "_b0.nii" );
-            }
-
-            DatasetScalar* datasetB0 = new DatasetScalar( b0fn, b0data, b0Hdr );
-            m_dataset.push_back( datasetB0 );
-
-            nifti_image* dsHdr = nifti_copy_nim_info( m_header );
-
-            std::vector<float> bvals2;
-            std::vector<QVector3D> bvecs;
-
-            float* extData;
-            extData = reinterpret_cast<float*>( m_header->ext_list[0].edata );
-            int extSize = m_header->ext_list[0].esize;
-            qDebug() << extSize;
-
-            for ( int i = 0; i < dim; ++i )
-            {
-                bvals2.push_back( extData[i] );
-            }
-
-            for ( int i = 0; i < dim; ++i )
-            {
-                QVector3D v( extData[dim + 3 * i], extData[dim + 3 * i + 1], extData[dim + 3 * i + 2] );
-                bvecs.push_back( v );
-            }
-
-            DatasetDWI* dataset = new DatasetDWI( m_fileName.path(), dataVector, b0data, bvals2, bvecs, dsHdr );
-            if ( m_propStates.size() > 0 )
-            {
-                dataset->properties().setState( m_propStates );
-            }
-            m_dataset.push_back( dataset );
-
-            qDebug() << "end loading data";
-            return true;
-            break;
-        }
-    }
-    return false;
 }
 
 std::vector<float> LoaderNifti::loadBvals( QString fileName )
