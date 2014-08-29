@@ -16,9 +16,9 @@ DatasetSH::DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image
 {
     m_properties["maingl"].createInt( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
     //m_properties["maingl"].create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, true );
-    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false, "general" );
-    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false );
+    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f );
+    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false );
     m_properties["maingl"].createInt( Fn::Property::D_LOD, 0, 0, 4, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );

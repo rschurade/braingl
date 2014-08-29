@@ -138,9 +138,19 @@ void SHRendererThread::run()
 
                             for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( ( (*vertices)( i, 1 ) ) * r( i ) + locX );
-                                m_verts->push_back( ( (*vertices)( i, 2 ) ) * r( i ) + locY );
-                                m_verts->push_back( ( (*vertices)( i, 3 ) ) * r( i ) + m_z + m_offset );
+                                if ( r( i ) < 0 )
+                                {
+                                    m_verts->push_back( locX );
+                                    m_verts->push_back( locY );
+                                    m_verts->push_back( m_z + m_offset );
+                                }
+                                else
+                                {
+                                    m_verts->push_back( ( (*vertices)( i, 1 ) ) * r( i ) + locX );
+                                    m_verts->push_back( ( (*vertices)( i, 2 ) ) * r( i ) + locY );
+                                    m_verts->push_back( ( (*vertices)( i, 3 ) ) * r( i ) + m_z + m_offset );
+                                }
+
 
                                 m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
                                 m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
