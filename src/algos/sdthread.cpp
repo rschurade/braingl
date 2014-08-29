@@ -50,5 +50,5 @@ void SDThread::run()
 
 ColumnVector SDThread::calcSD( int id )
 {
-    return m_dwi->at( id );
+    return ColumnVector( 20 );
 }

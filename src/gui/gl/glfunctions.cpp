@@ -284,6 +284,8 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
         GLFunctions::m_shaderNames.push_back( "orienthelper" );
 
+        //GLFunctions::m_shaderSources[ "mesh_gs" ] = copyShaderToString( "mesh", QString("gs") );
+
         for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
@@ -350,11 +352,7 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-    QGLShaderProgram* program = new BugfixGLShaderProgram;
-#else
     QGLShaderProgram* program = new QGLShaderProgram;
-#endif
 
     // Overriding system locale until shaders are compiled
     setlocale( LC_NUMERIC, "C" );
@@ -375,6 +373,19 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     }
 
     const QString code_vs(code);
+
+    if ( GLFunctions::m_shaderSources.contains( name + "_gs" ) )
+    {
+        code = GLFunctions::m_shaderSources[ name + "_gs" ];
+        // Compiling geometry shader
+        if ( !program->addShaderFromSourceCode( QGLShader::Geometry, code ) )
+        {
+            qCritical() << "Error while compiling geometry shader: " << name << "!";
+            qDebug() << code;
+            //exit( false );
+        }
+    }
+
     code = GLFunctions::m_shaderSources[ name + "_fs" ];
     QHashIterator<QString, QString> j( GLFunctions::m_shaderIncludes );
     while (j.hasNext() )

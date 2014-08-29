@@ -233,10 +233,10 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
-        Writer writer( ds, QFileInfo() );
-        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, writer.createHeader( gradientsSize + 1 ) );
-
-        dsout.push_back( out );
+//        Writer writer( ds, QFileInfo() );
+//        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, writer.createHeader( gradientsSize + 1 ) );
+//
+//        dsout.push_back( out );
     }
 
     qDebug() << "finished bingham to dwi";

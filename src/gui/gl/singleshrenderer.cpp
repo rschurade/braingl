@@ -120,6 +120,9 @@ void SingleSHRenderer::initGeometry()
     m_ny = props.get( Fn::Property::D_NY ).toInt();
     m_nz = props.get( Fn::Property::D_NZ ).toInt();
 
+    int blockSize = m_nx * m_ny * m_nz;
+    int dim = props.get( Fn::Property::D_DIM ).toInt();
+
     int xi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
     int yi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
     int zi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
@@ -149,9 +152,7 @@ void SingleSHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    std::vector<ColumnVector>* data = m_dataset->getData();
-
-    Matrix m = base * data->at( 0 );
+    std::vector<float>* data = m_dataset->getData();
 
     std::vector<float>verts;
     verts.reserve( numVerts * 10 );
@@ -159,9 +160,9 @@ void SingleSHRenderer::initGeometry()
     indexes.reserve( numTris * 3 );
     m_tris = 0;
 
-    if ( ( fabs( data->at( xi + yi * m_nx + zi * m_nx * m_ny )(1) ) > 0.0001 ) )
+    if ( ( fabs( data->at( xi + yi * m_nx + zi * m_nx * m_ny ) ) > 0.0001 ) )
     {
-        ColumnVector dv = data->at( xi + yi * m_nx + zi * m_nx * m_ny );
+        ColumnVector dv = FMath::createVector( xi + yi * m_nx + zi * m_nx * m_ny, *data, blockSize, dim );
         ColumnVector r = base * dv;
 
         float max = 0;

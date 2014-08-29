@@ -224,10 +224,12 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_DWI:
         {
-            std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
+            qDebug() << "dwi saving disabled for now";
+            /*
+            std::vector<float>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
             std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
-            int dim = data->at( 0 ).Nrows() + 1;
+            int dim = m_dataset->properties().get( Fn::Property::D_DIM ).toInt();
             nifti_image* out = createHeader( dim );
             std::vector<float> outData( nx * ny * nz * dim );
 
@@ -255,6 +257,11 @@ bool Writer::save()
                 outData[i] = b0data->at( i );
             }
 
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                outData[blockSize + i ] = b0data->at( i );
+            }
+
             for ( int z = 0; z < nz; ++z )
             {
                 for ( int y = 0; y < ny; ++y )
@@ -280,6 +287,7 @@ bool Writer::save()
 
             out->data = NULL;
             nifti_image_free( out );
+            */
         }
             break;
         case Fn::DatasetType::FIBERS:

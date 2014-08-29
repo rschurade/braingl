@@ -47,7 +47,7 @@ public:
 
     static Matrix pseudoInverse( const Matrix& A );
 
-    static void fitTensors( std::vector<ColumnVector>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out );
+    static void fitTensors( std::vector<float>& data, std::vector<float>& b0Images, std::vector<QVector3D>& bvecs, std::vector<float>& bvals, std::vector<Matrix>& out );
 
     static void fa( std::vector<Matrix>& tensors, std::vector<float>& faOut );
     static float fa( Matrix tensor );
@@ -86,6 +86,8 @@ public:
         x |= x >> 16;
         return x + 1;
     }
+
+    static ColumnVector createVector( unsigned int id, std::vector<float>& data, unsigned int blockSize, unsigned int dim );
 
 private:
     FMath();

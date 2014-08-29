@@ -40,7 +40,6 @@ DatasetGlyphset::DatasetGlyphset( QDir filename, float minThreshold, float maxTh
                 m_dprenderer( NULL ),
                 m_vrenderer( NULL ),
                 m_pierenderer( NULL ),
-                m_colormapRenderer( 0 ),
                 prevGeo( -1 ),
                 prevGlyph( -1 ),
                 prevCol( -1 ),
@@ -144,13 +143,7 @@ void DatasetGlyphset::addProperties()
     m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( -1 );
     m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( -1 );
 
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
-    m_properties["maingl"].createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
     ( (PropertyFloat*) m_properties["maingl"].getProperty( Fn::Property::D_GLYPHRADIUS ) )->setDigits( 4 );
     ( (PropertyFloat*) m_properties["maingl"].getProperty( Fn::Property::D_THRESHOLD_PERC ) )->setDigits( 4 );
@@ -248,13 +241,15 @@ void DatasetGlyphset::addCorrelation( float** corr )
 
 void DatasetGlyphset::deleteRowFromMatrix()
 {
+    m_n = m_correlations->getN();
     for ( int i = 0; i < m_n; ++i )
     {
         if ( m_mesh[0]->getVertexColor( i ) != m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>() )
         {
+            m_mesh[0]->setVertexColor( i, QColor( 0, 255, 0 ) );
             for ( int k = 0; k < m_n; ++k )
             {
-                m_correlations->setValue( i, k, 0.0 );
+                m_correlations->setValue( i, k, -1.0 );
             }
         }
     }
@@ -539,30 +534,7 @@ void DatasetGlyphset::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, 
         m_dprenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
 
-    if ( properties( target ).get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
-    {
-        if ( !m_colormapRenderer )
-        {
-            m_colormapRenderer = new ColormapRenderer();
-            m_colormapRenderer->init();
-        }
-        m_colormapRenderer->setColormap( properties( target ).get( Fn::Property::D_COLORMAP ).toInt() );
-        m_colormapRenderer->setX( properties( target ).get( Fn::Property::D_COLORMAP_X ).toFloat() );
-        m_colormapRenderer->setY( properties( target ).get( Fn::Property::D_COLORMAP_Y ).toFloat() );
-        m_colormapRenderer->setDX( properties( target ).get( Fn::Property::D_COLORMAP_DX ).toFloat() );
-        m_colormapRenderer->setDY( properties( target ).get( Fn::Property::D_COLORMAP_DY ).toFloat() );
-        m_colormapRenderer->setTextSize( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
-        m_colormapRenderer->setTextColor( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
-
-        m_colormapRenderer->setMin( properties( target ).get( Fn::Property::D_MIN ).toFloat() );
-        m_colormapRenderer->setMax( properties( target ).get( Fn::Property::D_MAX ).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target ).get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target ).get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target ).get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target ).get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
-
-        m_colormapRenderer->draw( width, height, renderMode );
-    }
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
 bool DatasetGlyphset::filter( int i, int j, int lr, float threshold, int sign )
