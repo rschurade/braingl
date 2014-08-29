@@ -15,18 +15,14 @@
 #include <math.h>
 #include <limits>
 
-SHRendererThread::SHRendererThread( int id,
-                                        std::vector<ColumnVector>* data,
-                                        QMatrix4x4 pMatrix,
-                                        QMatrix4x4 mvMatrix,
-                                        PropertyGroup& props ) :
-    m_id( id ),
+SHRendererThread::SHRendererThread( std::vector<ColumnVector>* data,
+                                    QMatrix4x4 pMatrix,
+                                    QMatrix4x4 mvMatrix,
+                                    PropertyGroup& props ) :
     m_data( data ),
     m_pMatrix( pMatrix ),
     m_mvMatrix( mvMatrix )
 {
-    m_verts = new std::vector<float>();
-
     m_x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
     m_y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
     m_z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
@@ -52,6 +48,7 @@ SHRendererThread::SHRendererThread( int id,
     m_order = props.get( Fn::Property::D_ORDER ).toInt();
     m_hideNegative = props.get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
     m_orient = 0;
+    m_offset = props.get( Fn::Property::D_OFFSET ).toFloat();
     if ( props.get( Fn::Property::D_RENDER_AXIAL ).toBool() )
     {
         m_orient = 1;
@@ -64,36 +61,46 @@ SHRendererThread::SHRendererThread( int id,
     {
         m_orient += 4;
     }
+
+    m_verts = new std::vector<float>();
+    m_normals = new std::vector<float>();
+    m_indices = new std::vector<unsigned int>();
+    m_colors = new std::vector<float>();
 }
 
 SHRendererThread::~SHRendererThread()
 {
+    m_indices->clear();
+    std::vector<unsigned int>().swap( *m_indices );
     m_verts->clear();
-}
-
-std::vector<float>* SHRendererThread::getVerts()
-{
-    return m_verts;
+    std::vector<float>().swap( *m_verts );
+    m_normals->clear();
+    std::vector<float>().swap( *m_normals );
+    m_colors->clear();
+    std::vector<float>().swap( *m_colors );
 }
 
 void SHRendererThread::run()
 {
     const Matrix* vertices = tess::vertices( m_lod );
-    int numVerts = tess::n_vertices( m_lod );
+    const int* faces = tess::faces( m_lod );
 
+    int numVerts = tess::n_vertices( m_lod );
+    int numTris = tess::n_faces( m_lod );
     Matrix base = ( FMath::sh_base( (*vertices), m_order ) );
 
-    int numThreads = GLFunctions::idealThreadCount;
     QMatrix4x4 mvp = m_pMatrix * m_mvMatrix;
+
+    int numBalls = 0;
 
     try
     {
         if ( ( m_orient & 1 ) == 1 )
         {
             int glyphs = m_nx * m_ny;
-            m_verts->reserve( numVerts * glyphs * 7 );
+            //verts->reserve( numVerts * glyphs * 3 );
             QVector4D pos( 0, 0, m_z, 1.0 );
-            for( int yy = m_id; yy < m_ny; yy += numThreads )
+            for( int yy = 0; yy < m_ny; ++yy )
             {
                 for ( int xx = 0; xx < m_nx; ++xx )
                 {
@@ -109,34 +116,36 @@ void SHRendererThread::run()
 
                         if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
+                            ++numBalls;
                             ColumnVector r = base * dv;
 
                             if ( m_scaling )
                             {
                                 float max = 0;
                                 float min = std::numeric_limits<float>::max();
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    max = qMax( max, (float)r(i+1) );
-                                    min = qMin( min, (float)r(i+1) );
+                                    max = qMax( max, (float)r( i ) );
+                                    min = qMin( min, (float)r( i ) );
                                 }
 
 
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    r(i+1) = r(i+1) / max * 0.8;
+                                    r( i ) = r( i ) / max * 0.8;
                                 }
                             }
 
-                            for ( int i = 0; i < numVerts; ++i )
+                            for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( (*vertices)( i+1, 1 ) );
-                                m_verts->push_back( (*vertices)( i+1, 2 ) );
-                                m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                m_verts->push_back( locX );
-                                m_verts->push_back( locY );
-                                m_verts->push_back( m_z );
-                                m_verts->push_back( r(i + 1) );
+                                m_verts->push_back( ( (*vertices)( i, 1 ) ) * r( i ) + locX );
+                                m_verts->push_back( ( (*vertices)( i, 2 ) ) * r( i ) + locY );
+                                m_verts->push_back( ( (*vertices)( i, 3 ) ) * r( i ) + m_z + m_offset );
+
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                m_colors->push_back( 1.0 );
                             }
                         }
                     }
@@ -146,9 +155,9 @@ void SHRendererThread::run()
         if ( ( m_orient & 2 ) == 2 )
         {
             int glyphs = m_nx * m_nz;
-            m_verts->reserve( numVerts * glyphs * 7 );
+            //verts->reserve( numVerts * glyphs * 3 );
             QVector4D pos( 0, m_y, 0, 1.0 );
-            for( int zz = m_id; zz < m_nz; zz += numThreads )
+            for( int zz = 0; zz < m_nz; ++zz )
             {
                 for ( int xx = 0; xx < m_nx; ++xx )
                 {
@@ -164,35 +173,37 @@ void SHRendererThread::run()
 
                         if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
+                            ++numBalls;
                             ColumnVector r = base * dv;
 
                             if ( m_scaling )
                             {
                                 float max = 0;
                                 float min = std::numeric_limits<float>::max();
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    max = qMax( max, (float)r(i+1) );
-                                    min = qMin( min, (float)r(i+1) );
+                                    max = qMax( max, (float)r( i ) );
+                                    min = qMin( min, (float)r( i ) );
                                 }
 
 
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    r(i+1) = r(i+1) / max * 0.8;
+                                    r( i ) = r( i ) / max * 0.8;
                                 }
                             }
 
 
-                            for ( int i = 0; i < numVerts; ++i )
+                            for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( (*vertices)( i+1, 1 ) );
-                                m_verts->push_back( (*vertices)( i+1, 2 ) );
-                                m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                m_verts->push_back( locX );
-                                m_verts->push_back( m_y );
-                                m_verts->push_back( locZ );
-                                m_verts->push_back( r(i + 1) );
+                                m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + locX );
+                                m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + m_y + m_offset );
+                                m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
+
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                m_colors->push_back( 1.0 );
                             }
                         }
                     }
@@ -202,10 +213,10 @@ void SHRendererThread::run()
         if ( ( m_orient & 4 ) == 4 )
         {
             int glyphs = m_ny * m_nz;
-            m_verts->reserve( numVerts * glyphs * 7 );
+            //verts->reserve( numVerts * glyphs * 3 );
 
             QVector4D pos( m_x, 0, 0, 1.0 );
-            for( int yy = m_id; yy < m_ny; yy += numThreads )
+            for( int yy = 0; yy < m_ny; ++yy )
             {
                 for ( int zz = 0; zz < m_nz; ++zz )
                 {
@@ -221,47 +232,124 @@ void SHRendererThread::run()
 
                         if ( fabs( test.x() / 2.0 ) < 1.0 && fabs( test.y() / 2.0 ) < 1.0 )
                         {
+                            ++numBalls;
                             ColumnVector r = base * dv;
 
                             if ( m_scaling )
                             {
                                 float max = 0;
                                 float min = std::numeric_limits<float>::max();
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    max = qMax( max, (float)r(i+1) );
-                                    min = qMin( min, (float)r(i+1) );
+                                    max = qMax( max, (float)r( i ) );
+                                    min = qMin( min, (float)r( i ) );
                                 }
 
 
-                                for ( int i = 0; i < r.Nrows(); ++i )
+                                for ( int i = 1; i <= r.Nrows(); ++i )
                                 {
-                                    r(i+1) = r(i+1) / max * 0.8;
+                                    r( i ) = r( i ) / max * 0.8;
                                 }
                             }
 
-                            for ( int i = 0; i < numVerts; ++i )
+                            for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( (*vertices)( i+1, 1 ) );
-                                m_verts->push_back( (*vertices)( i+1, 2 ) );
-                                m_verts->push_back( (*vertices)( i+1, 3 ) );
-                                m_verts->push_back( m_x );
-                                m_verts->push_back( locY );
-                                m_verts->push_back( locZ );
-                                m_verts->push_back( r(i + 1) );
+                                m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + m_x + m_offset );
+                                m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + locY );
+                                m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
+
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                m_colors->push_back( 1.0 );
                             }
                         }
                     }
                 }
             }
         }
-        else
-        {
-            return;
-        }
     }
     catch (std::bad_alloc& ba)
     {
-        qCritical() << "bad alloc sh renderer thread";
+        qCritical() << "bad alloc sh renderer";
+        emit( finished( false ) );
+        return;
     }
+
+    for ( auto i = 0; i < numBalls; ++i )
+    {
+        for ( int k = 0; k < numTris; ++k )
+        {
+            m_indices->push_back( faces[k*3  ] + numVerts * i );
+            m_indices->push_back( faces[k*3+2] + numVerts * i );
+            m_indices->push_back( faces[k*3+1] + numVerts * i );
+        }
+    }
+
+    numTris = m_indices->size() / 3;
+    std::vector<float>triNormals;
+
+    float v1x, v1y, v1z;
+    float v2x, v2y, v2z;
+
+    for ( auto i = 0; i < numTris; ++i )
+    {
+        v1x = m_verts->at( 3 * m_indices->at( 3 * i + 1 ) )     - m_verts->at( 3 * m_indices->at( 3 * i ) );
+        v1y = m_verts->at( 3 * m_indices->at( 3 * i + 1 ) + 1 ) - m_verts->at( 3 * m_indices->at( 3 * i ) + 1 );
+        v1z = m_verts->at( 3 * m_indices->at( 3 * i + 1 ) + 2 ) - m_verts->at( 3 * m_indices->at( 3 * i ) + 2 );
+
+        v2x = m_verts->at( 3 * m_indices->at( 3 * i + 2 ) )     - m_verts->at( 3 * m_indices->at( 3 * i ) );
+        v2y = m_verts->at( 3 * m_indices->at( 3 * i + 2 ) + 1 ) - m_verts->at( 3 * m_indices->at( 3 * i ) + 1 );
+        v2z = m_verts->at( 3 * m_indices->at( 3 * i + 2 ) + 2 ) - m_verts->at( 3 * m_indices->at( 3 * i ) + 2 );
+
+        triNormals.push_back( v1y * v2z - v1z * v2y );
+        triNormals.push_back( v1z * v2x - v1x * v2z );
+        triNormals.push_back( v1x * v2y - v1y * v2x );
+    }
+
+    std::vector<std::vector<float> >vertTriNormals( m_verts->size() / 3 );
+
+    for ( auto i = 0; i < numTris; ++i )
+    {
+        vertTriNormals[ m_indices->at( 3 * i     ) ].push_back( triNormals[3*i] );
+        vertTriNormals[ m_indices->at( 3 * i     ) ].push_back( triNormals[3*i+1] );
+        vertTriNormals[ m_indices->at( 3 * i     ) ].push_back( triNormals[3*i+2] );
+
+        vertTriNormals[ m_indices->at( 3 * i + 1 ) ].push_back( triNormals[3*i] );
+        vertTriNormals[ m_indices->at( 3 * i + 1 ) ].push_back( triNormals[3*i+1] );
+        vertTriNormals[ m_indices->at( 3 * i + 1 ) ].push_back( triNormals[3*i+2] );
+
+        vertTriNormals[ m_indices->at( 3 * i + 2 ) ].push_back( triNormals[3*i] );
+        vertTriNormals[ m_indices->at( 3 * i + 2 ) ].push_back( triNormals[3*i+1] );
+        vertTriNormals[ m_indices->at( 3 * i + 2 ) ].push_back( triNormals[3*i+2] );
+    }
+
+
+    for( auto i = 0; i < vertTriNormals.size(); ++i )
+    {
+        float x = 0;
+        float y = 0;
+        float z = 0;
+        int numNorms = vertTriNormals[i].size() / 3;
+        for( auto k = 0; k < numNorms; ++k )
+        {
+            x += vertTriNormals[i][k*3];
+            y += vertTriNormals[i][k*3+1];
+            z += vertTriNormals[i][k*3+2];
+        }
+        x /= numNorms;
+        y /= numNorms;
+        z /= numNorms;
+
+        m_normals->push_back( x );
+        m_normals->push_back( y );
+        m_normals->push_back( z );
+
+        std::vector<float>().swap( vertTriNormals[i] );
+    }
+
+    std::vector<float>().swap( triNormals );
+    std::vector<std::vector<float> >().swap( vertTriNormals );
+
+    emit( finished( true ) );
 }

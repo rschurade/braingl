@@ -83,11 +83,17 @@ TriangleMesh2::TriangleMesh2( TriangleMesh2* trim ) :
 TriangleMesh2::~TriangleMesh2()
 {
     m_vertices.clear();
+    std::vector<float>().swap( m_vertices );
     m_vertexColors.clear();
+    std::vector<float>().swap( m_vertexColors );
     m_vertIsInTriangle.clear();
+    std::vector<std::vector< unsigned int > >().swap( m_vertIsInTriangle );
     m_vertNeighbors.clear();
+    std::vector<std::vector< unsigned int> >().swap( m_vertNeighbors );
     m_triangles.clear();
+    std::vector<unsigned int>().swap( m_triangles );
     m_triNormals.clear();
+    std::vector<QVector3D>().swap( m_triNormals );
     m_threads.clear();
     m_toRemove.clear();
 }
