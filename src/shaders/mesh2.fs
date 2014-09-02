@@ -1,9 +1,11 @@
 #version 330
 
-in vec3 vertex;
-in vec3 v_normal;
-in vec4 v_color;
-in float v_value;
+in vec3 g_vertex[3];
+in vec3 g_normal[3];
+flat in vec3 g_color[3];
+in float g_value[3];
+
+in vec3 g_coord; //barycentric weights as a result of interp
 
 uniform int u_colorMode;
 uniform int u_colormap;
@@ -27,14 +29,25 @@ uniform bool u_cutHigherZ;
 
 uniform int u_meshTransparency;
 
+int getVertexId()
+{
+    return ( g_coord.x > g_coord.y && g_coord.x > g_coord.z ) ? 0 : ( ( g_coord.y > g_coord.z ) ? 1 : 2 );
+}
+
 #include colormap_fs
-#include textures_fs
-#include lighting_fs
+#include meshtextures_fs
+#include meshlighting_fs
 #include peel_fs
+
 
 void main()
 {
+    int vertexId = getVertexId();
+
+    vec3 vertex = g_vertex[vertexId];
+
     bool dis = false;
+/*
     if ( u_cutLowerX && vertex.x < u_x + 0.1 )
     {
         if ( u_cutLowerY && vertex.y < u_y + 0.1 )
@@ -85,7 +98,7 @@ void main()
             }
         }
     }   
-
+*/
     if ( dis )
     {
         discard;
@@ -109,7 +122,7 @@ void main()
     else if ( u_colorMode == 3 )
     {
         vec4 mcol = vec4( 0.0, 0.0, 0.0, 1.0 );
-        mcol = colormap( v_value, u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax );
+        mcol = colormap( g_value[vertexId], u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax );
         color = light( mcol ).rgb;
         
         if ( length( color.rgb ) < 0.00001 )
@@ -119,9 +132,10 @@ void main()
     }
     else
     {
-        color = light( v_color ).rgb;
+        color = light( vec4( g_color[vertexId].rgb, 1.0 ) ).rgb;
     }
-    
+
+
     if ( u_meshTransparency == 0 )
     {
         writePeel( vec4( color, u_alpha ) );

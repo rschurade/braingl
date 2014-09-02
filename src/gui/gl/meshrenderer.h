@@ -15,6 +15,7 @@
 class TriangleMesh2;
 class PropertyGroup;
 class ROIPropertyGroup;
+class QGLShaderProgram;
 
 class MeshRenderer : public ObjectRenderer
 {
@@ -33,7 +34,7 @@ public:
     void updateColor( int id, float r, float g, float b, float a );
 
 protected:
-    void setShaderVars();
+    void setShaderVars( QGLShaderProgram* program );
     virtual void setRenderParams( PropertyGroup& props );
     void initGeometry();
     int m_colorMode;

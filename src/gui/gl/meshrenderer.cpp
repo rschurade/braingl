@@ -90,12 +90,21 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     setRenderParams( props );
 
-    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
+    QGLShaderProgram* program;
+
+    if ( props.get( Fn::Property::D_INTERPOLATION ).toBool() )
+    {
+        program = GLFunctions::getShader( "mesh" );
+    }
+    else
+    {
+        program = GLFunctions::getShader( "mesh2" );
+    }
 
     program->bind();
 
     GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
+    GLFunctions::setTextureUniforms( program, "maingl" );
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix * m_mMatrix );
     program->setUniformValue( "mv_matrixInvert", ( mv_matrix * m_mMatrix ).inverted() );
@@ -158,7 +167,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( program );
 
     glEnable(GL_CULL_FACE);
     glCullFace( GL_BACK );
@@ -192,12 +201,8 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void MeshRenderer::setShaderVars()
+void MeshRenderer::setShaderVars( QGLShaderProgram* program )
 {
-    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
-
-    program->bind();
-
     intptr_t offset = 0;
 
     int bufferSize = m_mesh->bufferSize();

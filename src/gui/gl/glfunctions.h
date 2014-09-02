@@ -87,6 +87,8 @@ public:
     static ROI* roi;
     static QOpenGLFunctions_3_3_Core* f;
 
+    static bool m_debug;
+
 private:
     GLFunctions() {};
     virtual ~GLFunctions() {};

@@ -51,6 +51,7 @@ QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 std::vector< QString > GLFunctions::m_shaderNames;
 std::vector< GLuint > GLFunctions::m_texturesToDelete;
+bool GLFunctions::m_debug = false;
 
 ROI* GLFunctions::roi = 0;
 QOpenGLFunctions_3_3_Core* GLFunctions::f = 0;
@@ -253,6 +254,8 @@ void GLFunctions::loadShaders()
     {
         GLFunctions::m_shaderIncludes[ "textures_vs" ] = copyShaderToString( "textures", QString("vs") );
         GLFunctions::m_shaderIncludes[ "textures_fs" ] = copyShaderToString( "textures", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "meshtextures_fs" ] = copyShaderToString( "meshtextures", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "meshlighting_fs" ] = copyShaderToString( "meshlighting", QString("fs") );
         GLFunctions::m_shaderIncludes[ "lighting_vs" ] = copyShaderToString( "lighting", QString("vs") );
         GLFunctions::m_shaderIncludes[ "lighting_fs" ] = copyShaderToString( "lighting", QString("fs") );
         GLFunctions::m_shaderIncludes[ "uniforms_vs" ] = copyShaderToString( "uniforms", QString("vs") );
@@ -267,6 +270,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "tube" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
+        GLFunctions::m_shaderNames.push_back( "mesh2" );
         GLFunctions::m_shaderNames.push_back( "line" );
         GLFunctions::m_shaderNames.push_back( "colormapscale" );
         GLFunctions::m_shaderNames.push_back( "qball" );
@@ -284,7 +288,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
         GLFunctions::m_shaderNames.push_back( "orienthelper" );
 
-        //GLFunctions::m_shaderSources[ "mesh_gs" ] = copyShaderToString( "mesh", QString("gs") );
+        GLFunctions::m_shaderSources[ "mesh2_gs" ] = copyShaderToString( "mesh2", QString("gs") );
 
         for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
@@ -381,7 +385,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
         if ( !program->addShaderFromSourceCode( QGLShader::Geometry, code ) )
         {
             qCritical() << "Error while compiling geometry shader: " << name << "!";
-            qDebug() << code;
+            //qDebug() << code;
             //exit( false );
         }
     }
@@ -398,7 +402,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->addShaderFromSourceCode( QGLShader::Fragment, code ) )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
-        qDebug() << code;
+        //qDebug() << code;
         //exit( false );
     }
 
@@ -406,7 +410,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->link() )
     {
         qCritical() << "Error while linking shader: " << name << "!";
-        qDebug() << "vertex shader:" << code_vs << "fragment shader:" << code;
+        //qDebug() << "vertex shader:" << code_vs << "fragment shader:" << code;
         //exit( false );
     }
 
@@ -414,7 +418,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->bind() )
     {
         qCritical() << "Error while binding shader: " << name << "!";
-        qDebug() << code;
+        //qDebug() << code;
         //exit( false );
     }
 
@@ -730,6 +734,11 @@ void GLFunctions::renderOrientHelper( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
 
 bool GLFunctions::getAndPrintGLError( QString prefix )
 {
+    if ( !GLFunctions::m_debug )
+    {
+        return false;
+    }
+
     GLenum errCode;
     const char *errString;
     bool isError = false;
