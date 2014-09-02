@@ -349,6 +349,7 @@ void Models::initPropMap()
     m_propMap.insert( "D_ISOLINE_STRIPES_WIDTH", Fn::Property::D_ISOLINE_STRIPES_WIDTH );
     m_propMap.insert( "D_COLORMAP_LABEL", Fn::Property::D_COLORMAP_LABEL );
     m_propMap.insert( "D_FIBER_THIN_OUT", Fn::Property::D_FIBER_THIN_OUT );
+    m_propMap.insert( "D_RENDER_MESH", Fn::Property::D_RENDER_MESH );
     m_propMap.insert( "G_FIRST", Fn::Property::G_FIRST );
     m_propMap.insert( "G_LOCK_WIDGETS", Fn::Property::G_LOCK_WIDGETS );
     m_propMap.insert( "G_RENDER_CROSSHAIRS", Fn::Property::G_RENDER_CROSSHAIRS );

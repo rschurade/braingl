@@ -43,6 +43,7 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_properties["maingl"].getWidget( Fn::Property::D_COPY_COLORS )->hide();
 
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_MESH, true, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0 );
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
 
@@ -104,7 +105,10 @@ void DatasetTree::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
         m_renderer->init();
     }
     m_renderer->setMesh( getMesh(target) );
-    m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    if ( m_properties[target].get( Fn::Property::D_RENDER_MESH).toBool() )
+    {
+        m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+    }
 
     GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
@@ -199,6 +203,16 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
         QColor c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, v ) ) );
         m_nodes[i]->setColor( 0, c, true, false );
     }
+
+//    for ( int i = 0; i < m_projection.size(); ++i )
+//    {
+//        float v = ( (float)i/(float)m_projection.size() );
+//        QColor c = cmap.getColor( qMax( 0.0f, qMin( 1.0f, v ) ) );
+//        if ( m_projection[i] != -1 )
+//        {
+//            m_nodes[m_projection[i]]->setColor( 0, c, true, false );
+//        }
+//    }
 
     QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
     m_tree->setColor( 2, unselectedColor , false, true );
