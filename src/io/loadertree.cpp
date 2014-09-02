@@ -146,6 +146,7 @@ bool LoaderTree::loadProjection( QString fileName )
     QString nl = ts.readLine();
     QStringList sl = nl.split( ' ' );
     std::vector<int>projection;
+
     for ( int i = 0; i < sl.size(); ++i )
     {
         projection.push_back( sl[i].toInt() );
