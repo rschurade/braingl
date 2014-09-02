@@ -67,6 +67,11 @@
         <file>shaders/merge.fs</file>
         <file>shaders/mesh.vs</file>
         <file>shaders/mesh.fs</file>
+        <file>shaders/mesh2.vs</file>
+        <file>shaders/mesh2.fs</file>
+        <file>shaders/mesh2.gs</file>
+        <file>shaders/meshtextures.fs</file>
+        <file>shaders/meshlighting.fs</file>
         <file>shaders/orienthelper.vs</file>
         <file>shaders/orienthelper.fs</file>
         <file>shaders/peel.vs</file>

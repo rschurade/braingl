@@ -77,6 +77,8 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
+	GLFunctions::m_debug = debug;
+
     QGLFormat fmt;
     fmt.setVersion( 3, 3 );
     fmt.setProfile( QGLFormat::CoreProfile );

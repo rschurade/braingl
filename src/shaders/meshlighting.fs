@@ -1,5 +1,5 @@
-in vec4 v_lightDir;
-in vec4 v_viewDir;
+in vec4 g_lightDir[3];
+in vec4 g_viewDir[3];
 
 uniform bool u_lighting;
 
@@ -62,6 +62,11 @@ vec4 light( vec4 color )
     vec3 diffuse = vec3( 1.0, 1.0, 1.0 );
     vec3 ambient = vec3( 1.0, 1.0, 1.0 );
 
+    int vertexId = getVertexId();
+    vec4 lightDir = g_lightDir[vertexId];
+    vec4 viewDir = g_viewDir[vertexId];
+    vec3 normal = g_normal[vertexId];
+
     return blinnPhongIllumination(
             // material properties
             color.rgb * u_materialAmbient,                    // ambient color
@@ -74,7 +79,7 @@ vec4 light( vec4 color )
             ambient * u_lightAmbient,         // ambient light
         
             // directions
-            normalize( v_normal ),               // normal
-            v_viewDir.xyz,                       // viewdir
-            v_lightDir.xyz );                    // light direction
+            normalize( normal ),               // normal
+            viewDir.xyz,                       // viewdir
+            lightDir.xyz );                    // light direction
 }

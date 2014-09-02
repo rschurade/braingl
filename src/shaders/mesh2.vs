@@ -7,7 +7,7 @@ in float a_value;
 
 out vec3 v_vertex;
 out vec3 v_normal;
-out vec4 v_color;
+out vec3 v_color;
 out float v_value;
 
 uniform mat4 mvp_matrix;
@@ -21,6 +21,7 @@ uniform float u_adjustZ;
 #include lighting_vs
 #include peel_vs
 
+
 void main()
 {
 	v_normal = normalize( a_normal );
@@ -28,7 +29,7 @@ void main()
    
     prepareLight();
 	
-	v_color = a_color;
+	v_color = a_color.rgb;
 	
 	calcTexCoords();
 	
