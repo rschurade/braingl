@@ -36,6 +36,8 @@ public:
 	void setColorIndex( int index ) { m_colorIndex = index; };
 	void setSelected( int index ) { m_selected = index; };
 
+	void setTree( Tree* tree ) { m_tree = tree; };
+
 private:
     void setShaderVars();
     void initGeometry();

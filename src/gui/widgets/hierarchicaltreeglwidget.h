@@ -38,6 +38,7 @@ protected:
     void wheelEvent( QWheelEvent *event );
 
 private:
+    QString m_name;
     TreeWidgetRenderer* m_renderer;
     bool m_visible;
 };

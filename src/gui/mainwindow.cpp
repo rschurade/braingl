@@ -1356,12 +1356,20 @@ void MainWindow::createDockWindows()
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
     connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
 
+    HierarchicalTreeGLWidget* htw2 = new HierarchicalTreeGLWidget( QString( "tree2" ), this, mainGLWidget );
+    FNDockWidget* dockHTW2 = new FNDockWidget( QString( "tree2" ), htw2, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW2 );
+    viewMenu->addAction( dockHTW2->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW2, SLOT( toggleTitleWidget() ) );
+    connect( dockHTW2, SIGNAL( visibilityChanged( bool ) ), htw2, SLOT( setWidgetVisible( bool ) ) );
+
     dockNav1->hide();
     dockNav2->hide();
     dockNav3->hide();
 //    dockNav4->hide();
     dockMainGL2->hide();
     dockHTW->hide();
+    dockHTW2->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString( "single sh" ), sshw, this );

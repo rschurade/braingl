@@ -36,10 +36,12 @@ public:
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     void drawTree( QMatrix4x4 mvpMatrix, int width, int height );
+    void drawRoot( QMatrix4x4 mvpMatrix, int width, int height );
 
     void importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters );
 
     Tree* getTree() { return m_tree; };
+    Tree* getRoot() { return m_root; };
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void setZoom( int zoom ) { m_zoom = zoom; };
@@ -57,6 +59,7 @@ private:
     Tree* m_tree;
     Tree* m_root;
     TreeRenderer* m_treeRenderer;
+    TreeRenderer* m_treeRenderer2;
 
     std::vector<Tree*>m_nodes;
 
@@ -70,6 +73,10 @@ private:
     int m_height;
     int m_picked;
     int m_zoom;
+
+    int m_width2;
+    int m_height2;
+    int m_zoom2;
 
 private slots:
     void selectCluster( QVariant id );
