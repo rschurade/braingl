@@ -55,6 +55,7 @@ private:
     void updateMeshColor();
 
     Tree* m_tree;
+    Tree* m_root;
     TreeRenderer* m_treeRenderer;
 
     std::vector<Tree*>m_nodes;

@@ -26,6 +26,7 @@
 DatasetTree::DatasetTree( QDir fn ) :
     DatasetMesh( fn , Fn::DatasetType::TREE ),
     m_tree( 0 ),
+    m_root( 0 ),
     m_treeRenderer( 0 ),
     m_numLeaves( 0 ),
     m_numNodes( 0 ),
@@ -213,6 +214,8 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
 //            m_nodes[m_projection[i]]->setColor( 0, c, true, false );
 //        }
 //    }
+
+    m_root = m_tree;
 
     QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
     m_tree->setColor( 2, unselectedColor , false, true );
