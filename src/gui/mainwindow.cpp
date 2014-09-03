@@ -346,6 +346,15 @@ void MainWindow::openRecentFile()
     }
 }
 
+void MainWindow::openRecentScene()
+{
+    QAction *action = qobject_cast<QAction *>( sender() );
+    if ( action )
+    {
+        load( action->data().toString() );
+    }
+}
+
 void MainWindow::loadRoi()
 {
     QString fn = Models::getGlobal(  Fn::Property::G_LAST_PATH ).toString();
@@ -547,6 +556,53 @@ void MainWindow::updateRecentFileActions()
         recentFileActs[j]->setVisible( false );
 
     separatorAct->setVisible( numRecentFiles > 0 );
+}
+
+void MainWindow::setCurrentScene( const QString &fileName )
+{
+    curFile = fileName;
+    setWindowFilePath( curFile );
+
+    QSettings settings;
+    QStringList files = settings.value( "recentSceneList" ).toStringList();
+    files.removeAll( fileName );
+    files.prepend( fileName );
+    while ( files.size() > MaxRecentFiles )
+    {
+        files.removeLast();
+    }
+
+    settings.setValue( "recentSceneList", files );
+
+    foreach ( QWidget *widget, QApplication::topLevelWidgets() )
+    {
+        MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
+        if ( mainWin )
+        {
+            mainWin->updateRecentSceneActions();
+        }
+    }
+}
+
+void MainWindow::updateRecentSceneActions()
+{
+    QSettings settings;
+    QStringList files = settings.value( "recentSceneList" ).toStringList();
+
+    int numRecentScenes = qMin( files.size(), (int) MaxRecentFiles );
+
+    for ( int i = 0; i < numRecentScenes; ++i )
+    {
+        //QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[i] ) );
+        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( files[i] );
+        recentSceneActs[i]->setText( text );
+        recentSceneActs[i]->setData( files[i] );
+        recentSceneActs[i]->setVisible( true );
+    }
+    for ( int j = numRecentScenes; j < MaxRecentFiles; ++j )
+        recentSceneActs[j]->setVisible( false );
+
+    separatorAct->setVisible( numRecentScenes > 0 );
 }
 
 QString MainWindow::strippedName( const QString &fullFileName )
@@ -797,6 +853,7 @@ void MainWindow::loadScene( QString fileName )
         mainGLWidget2->getArcBall()->setState( cameras["arcball_maingl2"] );
     }
 
+    setCurrentScene( fileName );
     GLFunctions::reloadShaders();
     Models::g()->submit();
 }
@@ -1045,6 +1102,13 @@ void MainWindow::createActions()
         connect( recentFileActs[i], SIGNAL( triggered() ), this, SLOT( openRecentFile() ) );
     }
 
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        recentSceneActs[i] = new QAction( this );
+        recentSceneActs[i]->setVisible( false );
+        connect( recentSceneActs[i], SIGNAL( triggered() ), this, SLOT( openRecentScene() ) );
+    }
+
     continousRenderingAct = new QAction( QIcon( ":/icons/continous.png" ), tr( "Continous Rendering" ), this );
     continousRenderingAct->setStatusTip( tr( "continous rendering, warning this might slow down your computer" ) );
     continousRenderingAct->setCheckable( true );
@@ -1094,9 +1158,18 @@ void MainWindow::createMenus()
     {
         recentFilesMenu->addAction( recentFileActs[i] );
     }
+
+    recentScenesMenu = fileMenu->addMenu( "Recent scenes" );
+
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        recentScenesMenu->addAction( recentSceneActs[i] );
+    }
+
     fileMenu->addSeparator();
     fileMenu->addAction( quitAct );
     updateRecentFileActions();
+    updateRecentSceneActions();
 
     viewMenu = menuBar()->addMenu( tr( "&Widgets" ) );
     viewMenu->addAction( lockDockTitlesAct );
