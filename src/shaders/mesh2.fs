@@ -1,7 +1,7 @@
 #version 330
 
-in vec3 g_vertex[3];
-in vec3 g_normal[3];
+in vec3 g_vertex;
+in vec3 g_normal;
 flat in vec3 g_color[3];
 in float g_value[3];
 
@@ -42,9 +42,7 @@ int getVertexId()
 
 void main()
 {
-    int vertexId = getVertexId();
-
-    vec3 vertex = g_vertex[vertexId];
+    vec3 vertex = g_vertex;
 
     bool dis = false;
 /*
@@ -121,6 +119,7 @@ void main()
     }
     else if ( u_colorMode == 3 )
     {
+        int vertexId = getVertexId();
         vec4 mcol = vec4( 0.0, 0.0, 0.0, 1.0 );
         mcol = colormap( g_value[vertexId], u_colormap, u_lowerThreshold, u_upperThreshold, u_selectedMin, u_selectedMax );
         color = light( mcol ).rgb;
@@ -132,6 +131,7 @@ void main()
     }
     else
     {
+        int vertexId = getVertexId();
         color = light( vec4( g_color[vertexId].rgb, 1.0 ) ).rgb;
     }
 
