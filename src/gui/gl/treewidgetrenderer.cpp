@@ -70,36 +70,19 @@ void TreeWidgetRenderer::draw()
    QMatrix4x4 pMatrix;
    pMatrix.setToIdentity();
 
-    QList<int>rl;
-    int countDatasets = Models::d()->rowCount();
-    for ( int i = 0; i < countDatasets; ++i )
-    {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
-        {
-            index = Models::d()->index( i, (int)Fn::Property::D_TYPE );
-            if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::TREE )
-            {
-                rl.push_back( i );
-            }
-        }
-    }
-
-    DatasetTree* ds = 0;
-    if ( rl.size() > 0 )
-    {
-        ds = VPtr<DatasetTree>::asPtr( Models::d()->data( Models::d()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        int leaves = ds->getTree()->getNumLeaves();
-        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
-        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
-        //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
-        ds->drawTree( pMatrix, m_width, m_height );
-    }
-    else
+    QList<Dataset*> dl = Models::getDatasets( Fn::DatasetType::TREE );
+    if ( dl.empty() )
     {
         return;
     }
 
+    DatasetTree* ds = dynamic_cast<DatasetTree*>( dl[0] );
+
+    int leaves = ds->getTree()->getNumLeaves();
+    float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+    pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
+    //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
+    ds->drawTree( pMatrix, m_width, m_height );
 }
 
 void TreeWidgetRenderer::resizeGL( int width, int height )
