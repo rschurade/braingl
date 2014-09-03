@@ -294,6 +294,7 @@ namespace Fn
         D_COLORMAP_LABEL,
         D_FIBER_THIN_OUT,
         D_RENDER_MESH,
+        D_COPY_VALUES,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -564,6 +565,7 @@ namespace Fn
                 case Property::D_COLORMAP_LABEL: return QString( "D_COLORMAP_LABEL" ); break;
                 case Property::D_FIBER_THIN_OUT: return QString( "D_FIBER_THIN_OUT" ); break;
                 case Property::D_RENDER_MESH: return QString( "D_RENDER_MESH" ); break;
+                case Property::D_COPY_VALUES: return QString( "D_COPY_VALUES" ); break;
                 //
                 case Property::G_FIRST: return QString( "G_FIRST" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "G_LOCK_WIDGETS" ); break;
@@ -833,6 +835,7 @@ namespace Fn
                 case Property::D_COLORMAP_LABEL: return QString( "Label" ); break;
                 case Property::D_FIBER_THIN_OUT: return QString( "render percentage of fibers" ); break;
                 case Property::D_RENDER_MESH: return QString( "render mesh" ); break;
+                case Property::D_COPY_VALUES: return QString( "copy values" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

@@ -53,6 +53,7 @@ private slots:
     void transformChanged( QVariant value );
     void applyTransform();
     virtual void slotCopyColors();
+    virtual void slotCopyValues();
 
 };
 
