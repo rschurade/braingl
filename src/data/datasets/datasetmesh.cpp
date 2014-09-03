@@ -532,13 +532,25 @@ void DatasetMesh::slotCopyValues()
         return;
     }
 
+    float min = std::numeric_limits<float>::max();
+    float max = -std::numeric_limits<float>::max();
+
     DatasetScalar* ds = dynamic_cast<DatasetScalar*>( texList[0] );
     //TriangleMesh2* mesh = getMesh();
     m_renderer->beginUpdateColor();
     for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
     {
         float value = ds->getValueAtPos( mesh->getVertex( i ) );
+        min = qMin( value, min );
+        max = qMax( value, max );
         mesh->setVertexData( i, value );
     }
     m_renderer->endUpdateColor();
+    m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_MAX )->setValue( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
+    m_properties["maingl"].set( Fn::Property::D_COLORMODE, 3 );
 }
