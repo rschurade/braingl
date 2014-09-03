@@ -18,7 +18,10 @@
 
 LoaderTree::LoaderTree( QString fileName ) :
     m_fileName( fileName ),
-    m_dataset( 0 )
+    m_dataset( 0 ),
+    m_meshoffsetX( 0 ),
+    m_meshoffsetY( 0 ),
+    m_meshoffsetZ( 0 )
 {
 }
 
@@ -42,6 +45,7 @@ bool LoaderTree::load()
     QString nl;
 
     QString dims;
+    QString meshoffset;
     std::vector<QString>voxels;
     std::vector<QString>nodes;
     QFileInfo fi( m_fileName );
@@ -72,6 +76,19 @@ bool LoaderTree::load()
                 nl = ts.readLine();
             }
         }
+
+        if ( nl.startsWith( "#meshoffset" ) )
+        {
+            meshoffset = ts.readLine();
+            QStringList mol = meshoffset.split( ' ' );
+            if ( mol.size() == 3 )
+            {
+                m_meshoffsetX = mol[0].toFloat();
+                m_meshoffsetY = mol[1].toFloat();
+                m_meshoffsetZ = mol[2].toFloat();
+            }
+        }
+
 
         if ( nl.startsWith( "#surface" ) )
         {
@@ -110,8 +127,6 @@ bool LoaderTree::loadSurfaceMesh( QString fileName )
         return false;
     }
 
-    float offset = 128;
-
     std::vector<float>* points = lf.getPoints();
     std::vector<int> triangles = lf.getTriangles();
     int numPoints = points->size() / 3;
@@ -120,7 +135,7 @@ bool LoaderTree::loadSurfaceMesh( QString fileName )
     TriangleMesh2* mesh = new TriangleMesh2( numPoints, numTriangles );
     for ( int i = 0; i < numPoints; ++i )
     {
-        mesh->addVertex( points->at( i * 3 ) + offset, points->at( i * 3 + 1 ) + offset, points->at( i * 3 + 2 ) + offset );
+        mesh->addVertex( points->at( i * 3 ) + m_meshoffsetX, points->at( i * 3 + 1 ) + m_meshoffsetY, points->at( i * 3 + 2 ) + m_meshoffsetZ );
     }
     for ( int i = 0; i < numTriangles; ++i )
     {

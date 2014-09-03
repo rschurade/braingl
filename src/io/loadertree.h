@@ -29,6 +29,10 @@ private:
     bool loadSurfaceMesh( QString fileName );
     bool loadProjection( QString fileName );
 
+    float m_meshoffsetX;
+    float m_meshoffsetY;
+    float m_meshoffsetZ;
+
 };
 
 #endif /* LOADERTREE_H_ */
