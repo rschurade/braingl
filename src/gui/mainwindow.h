@@ -67,6 +67,9 @@ private:
     void updateRecentFileActions();
     QString strippedName( const QString &fullFileName );
 
+    void setCurrentScene( const QString &fileName );
+    void updateRecentSceneActions();
+
     bool load( QString fileName, QList<QVariant> state );
 
     Dataset* selectedDataset();
@@ -90,6 +93,7 @@ private:
     QMenu* tabMenu;
     QMenu* helpMenu;
     QMenu *recentFilesMenu;
+    QMenu *recentScenesMenu;
 
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
@@ -102,6 +106,9 @@ private:
     QAction *recentFileActs[MaxRecentFiles];
     QAction *separatorAct;
     QString curFile;
+
+    QAction *recentSceneActs[MaxRecentFiles];
+    QString curScene;
 
     QAction* newAct;
     QAction* openAct;
@@ -155,6 +162,7 @@ private slots:
     void slotNew();
     void open();
     void openRecentFile();
+    void openRecentScene();
     void save();
     void loadRoi();
     void saveScene();
