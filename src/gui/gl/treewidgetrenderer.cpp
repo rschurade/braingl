@@ -78,11 +78,22 @@ void TreeWidgetRenderer::draw()
 
     DatasetTree* ds = dynamic_cast<DatasetTree*>( dl[0] );
 
-    int leaves = ds->getTree()->getNumLeaves();
-    float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
-    pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
-    //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
-    ds->drawTree( pMatrix, m_width, m_height );
+    if ( m_name == "tree" )
+    {
+        int leaves = ds->getTree()->getNumLeaves();
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
+        //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
+        ds->drawTree( pMatrix, m_width, m_height );
+    }
+    else if ( m_name == "tree2" )
+    {
+        int leaves = ds->getRoot()->getNumLeaves();
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
+        //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
+        ds->drawRoot( pMatrix, m_width, m_height );
+    }
 }
 
 void TreeWidgetRenderer::resizeGL( int width, int height )

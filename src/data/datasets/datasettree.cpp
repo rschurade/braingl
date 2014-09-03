@@ -28,9 +28,11 @@ DatasetTree::DatasetTree( QDir fn ) :
     m_tree( 0 ),
     m_root( 0 ),
     m_treeRenderer( 0 ),
+    m_treeRenderer2( 0 ),
     m_numLeaves( 0 ),
     m_numNodes( 0 ),
-    m_zoom( 1 )
+    m_zoom( 1 ),
+    m_zoom2( 1 )
 {
     m_properties["maingl"].set( Fn::Property::D_COLORMAP, -1 );
     m_properties["maingl"].getWidget( Fn::Property::D_COLORMAP )->hide();
@@ -126,6 +128,21 @@ void DatasetTree::drawTree( QMatrix4x4 mvpMatrix, int width, int height )
     }
     m_treeRenderer->draw( mvpMatrix );
 }
+
+void DatasetTree::drawRoot( QMatrix4x4 mvpMatrix, int width, int height )
+{
+    m_width2 = width;
+    m_height2 = height;
+
+    if ( m_treeRenderer2 == 0 )
+    {
+        m_treeRenderer2 = new TreeRenderer( "tree2", m_root );
+        m_treeRenderer2->init();
+    }
+    m_treeRenderer2->setColorIndex( 1 );
+    m_treeRenderer2->draw( mvpMatrix );
+}
+
 
 void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters )
 {
@@ -226,6 +243,7 @@ void DatasetTree::importTree( QString dims, std::vector<QString>coords, std::vec
     createTexture();
     m_properties["maingl"].set( Fn::Property::D_HAS_TEXTURE, true );
     m_properties["maingl"].getProperty( Fn::Property::D_HAS_TEXTURE )->setPropertyTab( "tree settings" );
+    m_properties["maingl"].set( Fn::Property::D_TREE_SELECTED_CLUSTER, m_root->getId() );
 }
 
 void DatasetTree::createTexture()
@@ -297,39 +315,88 @@ void DatasetTree::selectCluster( QVariant id )
 
 bool DatasetTree::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
 {
-    if( target != "tree" )
+    if( target == "tree" )
     {
-        return false;
+        float moveX = pos.z();
+        int leaves = m_tree->getNumLeaves();
+
+        float y = 1.0 - ( pos.y() / static_cast<float>( m_height ) );
+
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        float range = ( leaves - moveX - zoom ) - ( 0 - moveX + zoom );
+        float posXNormalized = ( pos.x() / static_cast<float>( m_width ) );
+        float x = ( 0 - moveX + zoom ) + range * posXNormalized;
+
+        qDebug() << x << moveX << zoom;
+        int id = pickClusterRec( m_tree, 0, m_width * m_numLeaves, x, y );
+        qDebug() << id;
+        if ( id != -1 )
+        {
+            if ( m_nodes[id]->getParent() )
+            {
+                m_tree = m_nodes[id]->getParent();
+            }
+            m_properties["maingl"].set( Fn::Property::D_TREE_SELECTED_CLUSTER, id );
+            QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
+            QColor selectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR ).value<QColor>();
+            m_root->setColor( 1, unselectedColor , false, true );
+            m_tree->setColor( id, 1, selectedColor );
+            m_treeRenderer->setTree( m_tree );
+            m_treeRenderer->setSelected( id );
+            m_treeRenderer->update();
+            m_treeRenderer2->setSelected( id );
+            m_treeRenderer2->update();
+
+            glDeleteTextures( 1, &m_textureGLuint );
+            m_textureGLuint = 0;
+            updateMeshColor();
+
+            Models::g()->submit();
+        }
+        return true;
     }
-    float moveX = pos.z();
-    int leaves = m_tree->getNumLeaves();
-
-    float y = 1.0 - ( pos.y() / static_cast<float>( m_height ) );
-
-    float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
-    float range = ( leaves - moveX - zoom ) - ( 0 - moveX + zoom );
-    float posXNormalized = ( pos.x() / static_cast<float>( m_width ) );
-    float x = ( 0 - moveX + zoom ) + range * posXNormalized;
-
-    qDebug() << x << moveX << zoom;
-    int id = pickClusterRec( m_tree, 0, m_width * m_numLeaves, x, y );
-    qDebug() << id;
-    if ( id != -1 )
+    if( target == "tree2" )
     {
-        m_properties["maingl"].set( Fn::Property::D_TREE_SELECTED_CLUSTER, id );
-        QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
-        QColor selectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR ).value<QColor>();
-        m_tree->setColor( 1, unselectedColor , false, true );
-        m_tree->setColor( id, 1, selectedColor );
-        m_treeRenderer->setSelected( id );
-        m_treeRenderer->update();
+        qDebug() << "huhu";
+        float moveX = pos.z();
+        int leaves = m_root->getNumLeaves();
 
-        glDeleteTextures( 1, &m_textureGLuint );
-        m_textureGLuint = 0;
-        updateMeshColor();
-        Models::g()->submit();
+        float y = 1.0 - ( pos.y() / static_cast<float>( m_height2 ) );
+
+        float zoom = qMin( leaves, m_width2 * ( m_zoom2 - 1 ) ) / 2;
+        float range = ( leaves - moveX - zoom ) - ( 0 - moveX + zoom );
+        float posXNormalized = ( pos.x() / static_cast<float>( m_width2 ) );
+        float x = ( 0 - moveX + zoom ) + range * posXNormalized;
+
+        qDebug() << x << moveX << zoom;
+        int id = pickClusterRec( m_root, 0, m_width2 * leaves, x, y );
+        qDebug() << id;
+        if ( id != -1 )
+        {
+            if ( m_nodes[id]->getParent() )
+            {
+                m_tree = m_nodes[id]->getParent();
+            }
+            m_properties["maingl"].set( Fn::Property::D_TREE_SELECTED_CLUSTER, id );
+            QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
+            QColor selectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_SELECTED_CLUSTER_COLOR ).value<QColor>();
+            m_root->setColor( 1, unselectedColor , false, true );
+            m_tree->setColor( id, 1, selectedColor );
+            m_treeRenderer->setTree( m_tree );
+            m_treeRenderer->setSelected( id );
+            m_treeRenderer->update();
+            m_treeRenderer2->setSelected( id );
+            m_treeRenderer2->update();
+
+            glDeleteTextures( 1, &m_textureGLuint );
+            m_textureGLuint = 0;
+            updateMeshColor();
+
+            Models::g()->submit();
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 int DatasetTree::pickClusterRec( Tree* tree, int left, int right, float x, float y )
@@ -413,6 +480,9 @@ void DatasetTree::applyPartitionMode()
 {
     int mode = m_properties["maingl"].get( Fn::Property::D_TREE_PARTITION_MODE ).toInt();
 
+    int id = m_properties["maingl"].get( Fn::Property::D_TREE_SELECTED_CLUSTER ).toInt();
+    Tree* selected = m_nodes[id];
+
     switch ( mode )
     {
         case 0:
@@ -420,7 +490,7 @@ void DatasetTree::applyPartitionMode()
             float value = m_properties["maingl"].get( Fn::Property::D_TREE_PARTITION_LEVEL ).toFloat();
             QList<int>parts;
             QQueue<Tree*>todo;
-            todo.enqueue( m_tree );
+            todo.enqueue( selected );
 
             QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
             m_tree->setColor( 3, unselectedColor , false, true );
@@ -456,10 +526,10 @@ void DatasetTree::applyPartitionMode()
             int targetCount = m_properties["maingl"].get( Fn::Property::D_TREE_PARTITION_SIZE ).toInt();
             QList<int>parts;
             QQueue<Tree*>todo;
-            todo.enqueue( m_tree );
+            todo.enqueue( selected );
 
             QColor unselectedColor = m_properties["maingl"].get( Fn::Property::D_TREE_UNSELECTED_CLUSTER_COLOR ).value<QColor>();
-            m_tree->setColor( 3, unselectedColor , false, true );
+            //m_tree->setColor( 3, unselectedColor , false, true );
 
             while( !todo.empty() )
             {
