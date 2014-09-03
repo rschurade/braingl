@@ -56,6 +56,8 @@ void DatasetMesh::initProperties()
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
     m_properties["maingl"].createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+    m_properties["maingl"].createButton( Fn::Property::D_COPY_VALUES, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_COPY_VALUES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyValues() ) );
 
     GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
@@ -450,7 +452,6 @@ void DatasetMesh::slotCopyColors()
 
     if( m_properties["maingl"].get( Fn::Property::D_COLORMODE ).toInt() == 3 )
     {
-
         QColor color;
 
         float selectedMin = properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
@@ -515,4 +516,29 @@ void DatasetMesh::slotCopyColors()
         }
         m_renderer->endUpdateColor();
     }
+}
+
+void DatasetMesh::slotCopyValues()
+{
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
+
+    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+    QList<Dataset*> texList = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR );
+
+    if ( texList.empty() )
+    {
+        return;
+    }
+
+    DatasetScalar* ds = dynamic_cast<DatasetScalar*>( texList[0] );
+    //TriangleMesh2* mesh = getMesh();
+    m_renderer->beginUpdateColor();
+    for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
+    {
+        float value = ds->getValueAtPos( mesh->getVertex( i ) );
+        mesh->setVertexData( i, value );
+    }
+    m_renderer->endUpdateColor();
 }

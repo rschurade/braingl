@@ -350,6 +350,7 @@ void Models::initPropMap()
     m_propMap.insert( "D_COLORMAP_LABEL", Fn::Property::D_COLORMAP_LABEL );
     m_propMap.insert( "D_FIBER_THIN_OUT", Fn::Property::D_FIBER_THIN_OUT );
     m_propMap.insert( "D_RENDER_MESH", Fn::Property::D_RENDER_MESH );
+    m_propMap.insert( "D_COPY_VALUES", Fn::Property::D_COPY_VALUES );
     m_propMap.insert( "G_FIRST", Fn::Property::G_FIRST );
     m_propMap.insert( "G_LOCK_WIDGETS", Fn::Property::G_LOCK_WIDGETS );
     m_propMap.insert( "G_RENDER_CROSSHAIRS", Fn::Property::G_RENDER_CROSSHAIRS );
@@ -445,6 +446,7 @@ void Models::initPropMap()
     m_propMap.insert( "D_UPDATED", Fn::Property::D_UPDATED );
     m_propMap.insert( "D_POINTER", Fn::Property::D_POINTER );
     m_propMap.insert( "D_DESCRIPTION", Fn::Property::D_DESCRIPTION );
+
 }
 
 Fn::Property Models::s2p( QString s )
