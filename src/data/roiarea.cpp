@@ -131,9 +131,9 @@ void ROIArea::renameVerticesAndTriangles()
     m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
 
 
-    float plusX = m_properties.get( Fn::Property::D_ADJUST_X ).toFloat();
-    float plusY = m_properties.get( Fn::Property::D_ADJUST_Y ).toFloat();
-    float plusZ = m_properties.get( Fn::Property::D_ADJUST_Z ).toFloat();
+    float plusX = 0; //m_properties.get( Fn::Property::D_ADJUST_X ).toFloat();
+    float plusY = 0; //m_properties.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float plusZ = 0; //m_properties.get( Fn::Property::D_ADJUST_Z ).toFloat();
 
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )

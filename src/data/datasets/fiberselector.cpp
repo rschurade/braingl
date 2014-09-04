@@ -243,6 +243,9 @@ void FiberSelector::updateROI( int branch, int pos )
             float dx = roi->properties()->get( Fn::Property::D_DX ).toFloat();
             float dy = roi->properties()->get( Fn::Property::D_DY ).toFloat();
             float dz = roi->properties()->get( Fn::Property::D_DZ ).toFloat();
+            float ax = roi->properties()->get( Fn::Property::D_ADJUST_X ).toFloat();
+            float ay = roi->properties()->get( Fn::Property::D_ADJUST_Y ).toFloat();
+            float az = roi->properties()->get( Fn::Property::D_ADJUST_Z ).toFloat();
             for ( int i = 0; i < m_numLines; ++i )
             {
                 m_bitfields[branch][pos][i] = false;
@@ -253,13 +256,13 @@ void FiberSelector::updateROI( int branch, int pos )
                 float y = m_kdVerts->at( i*3+1 );
                 float z = m_kdVerts->at( i*3+2 );
 
-                int px = x / dx;
-                int py = y / dy;
-                int pz = z / dz;
+                int px = ( x + dx / 2 - ax ) / dx;
+                int py = ( y + dy / 2 - ay ) / dy;
+                int pz = ( z + dz / 2 - az ) / dz;
 
-                px = qMax( 0, qMin( px, nx - 1) );
-                py = qMax( 0, qMin( py, ny - 1) );
-                pz = qMax( 0, qMin( pz, nz - 1) );
+                px = qMax( 0, qMin( px, nx - 1 ) );
+                py = qMax( 0, qMin( py, ny - 1 ) );
+                pz = qMax( 0, qMin( pz, nz - 1 ) );
 
                 int id = px + py * nx + pz * nx * ny;
 
