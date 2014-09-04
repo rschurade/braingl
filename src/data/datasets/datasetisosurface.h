@@ -20,7 +20,7 @@ class IsoSurfaceThread;
 class DatasetIsosurface : public DatasetMesh
 {
 public:
-    DatasetIsosurface( DatasetScalar* ds );
+    DatasetIsosurface( DatasetScalar* ds, float isoValue = -1.0 );
     virtual ~DatasetIsosurface();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
