@@ -95,87 +95,121 @@ int main( int argc, char *argv[] )
     int y = -1;
     int z = -1;
 
+    QList<QString> filesToLoad;
+
     for ( int i = 1; i < args.size(); ++i )
     {
-        if ( args.at( i ) == "-v" )
+        QString arg = args.at( i );
+        if ( arg.size() == 2 && arg.startsWith( '-' ) )
         {
-            verbose = true;
-        }
-        if ( args.at( i ) == "-d" )
-        {
-            debug = true;
-        }
-        if ( args.at( i ) == "-l" )
-        {
-            logToFile = true;
-        }
-        if ( args.at( i ) == "-r" )
-        {
-            // reset saved settings
-            resetSettings = true;
-        }
-        if ( args.at( i ) == "-s" )
-        {
-            makeScreenshot = true;
-        }
-        if ( args.at( i ) == "-rs" )
-        {
-            runScript = true;
-        }
+            char c = arg[ arg.length() - 1 ].toLatin1();
 
-        if ( args.at( i ) == "-x" )
-        {
-            bool ok = false;
-            if ( args.size() > i + 1 )
+            switch( c )
             {
-                int tmp = args.at( i + 1 ).toInt( &ok );
-                if ( ok )
+                case 'd':
+                    debug = true;
+                    break;
+                case 'h':
+                    qDebug() << "Command line options:";
+                    qDebug() << "-d : debug mode, show more messages at the console, enables shader edit widget";
+                    qDebug() << "-h : displays this message";
+                    qDebug() << "-l : logs debug messages to text file";
+                    qDebug() << "-r : resets saved settings";
+                    qDebug() << "-s : makes a screenshot and quits";
+                    qDebug() << "-t : runs the loaded script";
+                    qDebug() << "-v : toggles verbose mode, warning: this will spam your console with messages";
+                    qDebug() << "---";
+                    exit( 0 );
+                    break;
+                case 'l':
+                    logToFile = true;
+                    break;
+                case'r':
+                    // reset saved settings
+                    resetSettings = true;
+                    break;
+                case's':
+                    makeScreenshot = true;
+                    break;
+                case't':
+                    runScript = true;
+                    break;
+                case 'v':
+                    verbose = true;
+                    break;
+                case'x':
                 {
-                    x = tmp;
+                    bool ok = false;
+                    if ( args.size() > i + 1 )
+                    {
+                        int tmp = args.at( i + 1 ).toInt( &ok );
+                        if ( ok )
+                        {
+                            x = tmp;
+                        }
+                    }
+                    break;
+                }
+                case'y':
+                {
+                    bool ok = false;
+                    if ( args.size() > i + 1 )
+                    {
+                        int tmp = args.at( i + 1 ).toInt( &ok );
+                        if ( ok )
+                        {
+                            y = tmp;
+                        }
+                    }
+                    break;
+                }
+
+                case'z':
+                {
+                    bool ok = false;
+                    if ( args.size() > i + 1 )
+                    {
+                        int tmp = args.at( i + 1 ).toInt( &ok );
+                        if ( ok )
+                        {
+                            z = tmp;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if ( arg == "--isosurface")
+            {
+                if ( args.length() > i + 1 )
+                {
+                    QString isoValue = args.at( ++i );
+                    QString fileName = args.at( ++i );
+                    QFile file( fileName );
+                    if ( file.exists() )
+                    {
+                        filesToLoad.push_back( fileName );
+                        filesToLoad.push_back( "isosurface" );
+                        filesToLoad.push_back( isoValue );
+                    }
+                }
+
+            }
+            else
+            {
+                QFile file( arg );
+                if ( file.exists() )
+                {
+                    qDebug() << "load " << arg;
+                    filesToLoad.push_back( arg );
+                    filesToLoad.push_back( "" );
+                    filesToLoad.push_back( 0 );
                 }
             }
         }
 
-        if ( args.at( i ) == "-y" )
-        {
-            bool ok = false;
-            if ( args.size() > i + 1 )
-            {
-                int tmp = args.at( i + 1 ).toInt( &ok );
-                if ( ok )
-                {
-                    y = tmp;
-                }
-            }
-        }
-
-        if ( args.at( i ) == "-z" )
-        {
-            bool ok = false;
-            if ( args.size() > i + 1 )
-            {
-                int tmp = args.at( i + 1 ).toInt( &ok );
-                if ( ok )
-                {
-                    z = tmp;
-                }
-            }
-        }
-
-
-
-        if ( args.at( i ) == "-h" || args.at( i ) == "?" )
-        {
-            qDebug() << "Command line options:";
-            qDebug() << "-h : displays this message";
-            qDebug() << "-v : toggles verbose mode, warning: this will spam your console with messages";
-            qDebug() << "-l : logs debug messages to text file";
-            qDebug() << "-r : resets saved settings";
-            qDebug() << "-s : makes a screenshot and quits";
-            qDebug() << "-rs : runs the loaded script";
-            qDebug() << "---";
-
-        }
     }
 
     qInstallMessageHandler( noOutput );
@@ -187,9 +221,9 @@ int main( int argc, char *argv[] )
     MainWindow mainWin( debug, resetSettings );
     mainWin.show();
 
-    for ( int i = 1; i < args.size(); ++i )
+    for ( int i = 0; i < filesToLoad.size(); i += 3 )
     {
-        mainWin.load( args.at( i ) );
+        mainWin.loadAndAlgo( filesToLoad.at( i ), filesToLoad.at( i + 1 ), filesToLoad.at( i + 2 ) );
     }
 
     if ( x != - 1 )

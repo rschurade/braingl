@@ -41,6 +41,7 @@ public:
 
     void closeEvent( QCloseEvent *event );
     bool load( QString fileName );
+    bool loadAndAlgo( QString fileName, QString algo, QVariant param );
     bool loadRoi( QString fileName );
 
     void saveScene( QString fileName, bool packAndGo );

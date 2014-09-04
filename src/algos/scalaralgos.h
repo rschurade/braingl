@@ -18,7 +18,7 @@ public:
     ScalarAlgos();
     virtual ~ScalarAlgos();
 
-    static QList<Dataset*> isoSurface( Dataset* ds );
+    static QList<Dataset*> isoSurface( Dataset* ds, float isoValue = -1 );
     static QList<Dataset*> isoLine( Dataset* ds );
     static QList<Dataset*> distanceMap( Dataset* ds );
     static QList<Dataset*> gauss( Dataset* ds );

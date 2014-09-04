@@ -36,6 +36,8 @@
 #include "gl/colormapfunctions.h"
 #include "gl/glfunctions.h"
 
+#include "../algos/scalaralgos.h"
+
 #include "../data/enums.h"
 #include "../data/globalpropertymodel.h"
 #include "../data/models.h"
@@ -493,6 +495,39 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
                 GLFunctions::reloadShaders();
                 return true;
             }
+        }
+    }
+    return false;
+}
+
+bool MainWindow::loadAndAlgo( QString fileName, QString algo, QVariant param )
+{
+    if ( algo == "" )
+    {
+        return load( fileName );
+    }
+    else if ( algo == "isosurface" )
+    {
+        Loader loader;
+        loader.setFilename( QDir( fileName ) );
+        if ( loader.load() )
+        {
+            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            {
+                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                        VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+            }
+            QFileInfo fi( fileName );
+            QDir dir = fi.absoluteDir();
+            QString lastPath = dir.absolutePath();
+            Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
+
+            Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                                    VPtr<Dataset>::asQVariant( ScalarAlgos::isoSurface( loader.getDataset( 0 ), param.toFloat() )[0] ), Qt::DisplayRole );
+            setCurrentFile( fileName );
+
+            GLFunctions::reloadShaders();
+            return true;
         }
     }
     return false;
