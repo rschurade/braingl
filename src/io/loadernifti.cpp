@@ -101,11 +101,11 @@ bool LoaderNifti::load()
 
     int dim = m_header->dim[4];
 
-//    if ( dim > 3 && askTimeSeries( dim ) )
-//    {
-//        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
-//        return loadNiftiFMRI();
-//    }
+    if ( dim > 3 && askTimeSeries( dim ) )
+    {
+        m_datasetType = Fn::DatasetType::NIFTI_FMRI;
+        return loadNiftiFMRI();
+    }
 
     switch ( dim )
     {
