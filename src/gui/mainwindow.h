@@ -88,6 +88,9 @@ private:
     FNDockWidget* m_dockDSP;
     ColormapEditWidget* m_colormapEditWidget;
 
+    FNDockWidget* m_dockHTW;
+    FNDockWidget* m_dockHTW2;
+
     QMenu* fileMenu;
     QMenu* optionMenu;
     QMenu* viewMenu;
