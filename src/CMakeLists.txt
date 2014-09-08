@@ -24,7 +24,7 @@ INCLUDE( Utils )
 INCLUDE( HGVersion )
 
 OPTION( FN_VERBOSE_MAKEFILE "More output on compilation" OFF )
-IF ( FN_VERBOSE_MAKEFILE MATCHES ON )
+IF ( FN_VERBOSE_MAKEFILE )
     SET( CMAKE_VERBOSE_MAKEFILE ON )
 ENDIF()
 
@@ -160,8 +160,8 @@ ENDIF()
 
 
 IF( APPLE )
-    SET( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns )
-    SET_SOURCE_FILES_PROPERTIES( ${CMAKE_SOURCE_DIR}/icons/${BinName}.icns
+    SET( MACOSX_RESOURCE_FILES ${CMAKE_SOURCE_DIR}/icons/brainGL.icns )
+    SET_SOURCE_FILES_PROPERTIES( ${CMAKE_SOURCE_DIR}/icons/brainGL.icns
                                PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
 
     # XXX merge with definition above
@@ -173,27 +173,55 @@ IF( APPLE )
     SET( MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME} - Version ${__HGTIP__}" )
     # XXX value should be formed like 1.2.3
     SET( MACOSX_BUNDLE_BUNDLE_VERSION ${__HGTIP__} )
-    SET( MACOSX_BUNDLE_ICON_FILE "${BinName}.icns" )
+    SET( MACOSX_BUNDLE_ICON_FILE "brainGL.icns" )
     SET( MACOSX_BUNDLE_GUI_IDENTIFIER "de.braingl" )
     SET( MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}" )
     
     QT5_USE_MODULES( ${BinName} Widgets OpenGL Network Xml WebKit WebKitWidgets )
     TARGET_LINK_LIBRARIES( ${BinName} ${OPENGL_LIBRARY} ${VTK_LIBRARIES} "-framework Foundation" "-framework Cocoa" z)
 
+    # create self-contained application bundle with embedded Frameworks and dylibs
     SET( BUNDLED_DIR ${CMAKE_CURRENT_BINARY_DIR}/selfcontained )
 
-    # create self-contained application bundle with embedded Frameworks
-    # and dylibs
+    # path to macdeployqt
+    GET_FILENAME_COMPONENT( MACDEPLOYQT_DIR ${QT_MOC_EXECUTABLE} DIRECTORY CACHE )
+
     INSTALL( CODE "
       INCLUDE( BundleUtilities )
-      FILE( REMOVE_RECURSE ${BUNDLED_DIR} )
-      COPY_AND_FIXUP_BUNDLE( ${BinName}.app ${BUNDLED_DIR}/${BinName}.app \"\" \"\" ) 
-    ")
 
-    # create distribution disk image (`package´ build target)
+      # prepare a clean copy of the bundle
+      FILE( REMOVE_RECURSE ${BUNDLED_DIR} )
+      FILE( COPY ${CMAKE_CURRENT_BINARY_DIR}/${BinName}.app DESTINATION ${BUNDLED_DIR} )
+
+      # let macdeployqt handle Qt frameworks and plugins, qt.conf
+      MESSAGE( \"Running macdeployqt (${MACDEPLOYQT_DIR}/macdeployqt) on ${BUNDLED_DIR}/${BinName}.app.\" )
+      EXECUTE_PROCESS( 
+        COMMAND ${MACDEPLOYQT_DIR}/macdeployqt ${BUNDLED_DIR}/${BinName}.app 
+        RESULT_VARIABLE result
+        ERROR_VARIABLE errorstr
+      )
+      IF(result)
+        MESSAGE(FATAL_ERROR \"Error (\${result}) running ${MACDEPLOYQT_DIR}/macdeployqt: \${errstr}\")
+      ENDIF(result)
+
+      # fixup remaining non-Qt dependencies (MacPorts) 
+      # XXX Qt plugins as LIBS arg?
+      MESSAGE( \"Running FIXUP_BUNDLE on ${BUNDLED_DIR}/${BinName}.app.\" )
+      FIXUP_BUNDLE( ${BUNDLED_DIR}/${BinName}.app \"\" \"\" )
+ 
+      MESSAGE( \"Verifying application bundle.\" )
+      VERIFY_APP( ${BUNDLED_DIR}/${BinName}.app )
+   ")
+ 
+    # create distribution disk image (build target: package)
     SET( CPACK_GENERATOR "DragNDrop" )
     SET( CPACK_INSTALLED_DIRECTORIES ${BUNDLED_DIR} . )
+    SET( CPACK_PACKAGE_VENDOR "de.braingl" )
+    # replace colon from filename; XXX filename is now unambiguous, but user-unfriendly
+    STRING( REPLACE ":" "-" CPACK_PACKAGE_VERSION "${__HGTIP__}" )
+    # XXX on some Macs the Finder takes a very long time to show the contents of the dmg
+    #SET( CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}/icons/brainGL.icns )
+    #SET( CPACK_DMG_BACKGROUND_IMAGE ${CMAKE_SOURCE_DIR}/icons/brainGL.icns )
     INCLUDE( CPack )
 
-    ADD_CUSTOM_TARGET( makedmg COMMAND macdeployqt ${BinName}.app -dmg -no-plugins WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} ) 
 ENDIF()
