@@ -442,6 +442,11 @@ bool MainWindow::load( QString fileName )
                 {
                     Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
                             VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                    if ( loader.getDataset( k )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::TREE )
+                    {
+                        m_dockHTW->show();
+                    }
+
                 }
                 QFileInfo fi( fileName );
                 QDir dir = fi.absoluteDir();
@@ -1385,26 +1390,26 @@ void MainWindow::createDockWindows()
 //    connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
     HierarchicalTreeGLWidget* htw = new HierarchicalTreeGLWidget( QString( "tree" ), this, mainGLWidget );
-    FNDockWidget* dockHTW = new FNDockWidget( QString( "tree" ), htw, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW );
-    viewMenu->addAction( dockHTW->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
-    connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
+    m_dockHTW = new FNDockWidget( QString( "tree" ), htw, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, m_dockHTW );
+    viewMenu->addAction( m_dockHTW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockHTW, SLOT( toggleTitleWidget() ) );
+    connect( m_dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
 
     HierarchicalTreeGLWidget* htw2 = new HierarchicalTreeGLWidget( QString( "tree2" ), this, mainGLWidget );
-    FNDockWidget* dockHTW2 = new FNDockWidget( QString( "tree2" ), htw2, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW2 );
-    viewMenu->addAction( dockHTW2->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW2, SLOT( toggleTitleWidget() ) );
-    connect( dockHTW2, SIGNAL( visibilityChanged( bool ) ), htw2, SLOT( setWidgetVisible( bool ) ) );
+    m_dockHTW2 = new FNDockWidget( QString( "tree2" ), htw2, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, m_dockHTW2 );
+    viewMenu->addAction( m_dockHTW2->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockHTW2, SLOT( toggleTitleWidget() ) );
+    connect( m_dockHTW2, SIGNAL( visibilityChanged( bool ) ), htw2, SLOT( setWidgetVisible( bool ) ) );
 
     dockNav1->hide();
     dockNav2->hide();
     dockNav3->hide();
 //    dockNav4->hide();
     dockMainGL2->hide();
-    dockHTW->hide();
-    dockHTW2->hide();
+    m_dockHTW->hide();
+    m_dockHTW2->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
     FNDockWidget* dockSSHW = new FNDockWidget( QString( "single sh" ), sshw, this );
