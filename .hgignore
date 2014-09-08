@@ -1,0 +1,20 @@
+#syntax: blob
+.autotools
+.project
+.cproject
+.settings
+syntax: regexp
+^build$
+syntax: regexp
+^tmp$
+
+syntax: regexp
+^build2$
+syntax: regexp
+^CMakeCache\.txt$
+syntax: regexp
+^CMakeFiles$
+syntax: regexp
+^CMakeFiles/cmake\.check_cache$
+syntax: regexp
+^CMakeFiles/cmake\.check_cache$
