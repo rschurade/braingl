@@ -267,9 +267,8 @@ template<typename T> void LoaderNifti::copyData( T* inputData )
 
     int index = 0;
 
-    if ( isRadialogical() )
+    if ( m_isRadiological )
     {
-
         for ( int z = 0; z < dimZ; ++z )
         {
             for ( int y = 0; y < dimY; ++y )
@@ -670,7 +669,14 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
             if ( bvals[i] > 100 )
             {
                 bool okX, okY, okZ;
-                bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
+                if ( m_isRadiological )
+                {
+                    bvecs.push_back( QVector3D( -slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
+                }
+                else
+                {
+                    bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
+                }
 
                 if ( !( okX && okY && okZ ) )
                 {

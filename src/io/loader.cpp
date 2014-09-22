@@ -149,7 +149,6 @@ bool Loader::load()
 bool Loader::loadNifti()
 {
     LoaderNifti* ln = new LoaderNifti( m_fileName );
-
     if( ln->load() )
     {
         m_dataset = ln->getDataset();
