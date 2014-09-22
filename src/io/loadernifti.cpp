@@ -28,7 +28,8 @@
 LoaderNifti::LoaderNifti( QDir fileName ) :
     m_fileName( fileName ),
     m_header( 0 ),
-    m_datasetType( Fn::DatasetType::UNKNOWN )
+    m_datasetType( Fn::DatasetType::UNKNOWN ),
+    m_isRadiological( false )
 {
 }
 
@@ -173,6 +174,8 @@ bool LoaderNifti::loadNiftiHeader( QString hdrPath )
     {
         // failed to read header
     }
+    m_isRadiological = isRadialogical();
+
     if ( m_header )
     {
         return true;
@@ -662,13 +665,13 @@ std::vector<QVector3D> LoaderNifti::loadBvecs( QString fileName, std::vector<flo
             qCritical() << "*** ERROR *** while loading dwi dataset, bvals don't match bvecs!";
             return bvecs;
         }
-
         for ( int i = 0; i < slX.size(); ++i )
         {
             if ( bvals[i] > 100 )
             {
                 bool okX, okY, okZ;
                 bvecs.push_back( QVector3D( slX[i].toDouble( &okX ), slY[i].toDouble( &okY ), slZ[i].toDouble( &okZ ) ) );
+
                 if ( !( okX && okY && okZ ) )
                 {
                     QMessageBox msgBox;
