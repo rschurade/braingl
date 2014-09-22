@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 vertex;
+in vec3 v_vertex;
 in vec3 v_normal;
 in vec4 v_color;
 in float v_value;
@@ -35,51 +35,51 @@ uniform int u_meshTransparency;
 void main()
 {
     bool dis = false;
-    if ( u_cutLowerX && vertex.x < u_x + 0.1 )
+    if ( u_cutLowerX && v_vertex.x < u_x + 0.1 )
     {
-        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        if ( u_cutLowerY && v_vertex.y < u_y + 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1)
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1)
             {
                 dis = true;
             }
         }
-        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        if ( u_cutHigherY && v_vertex.y > u_y - 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
         }
     }   
-    if ( u_cutHigherX && vertex.x > u_x - 0.1 )
+    if ( u_cutHigherX && v_vertex.x > u_x - 0.1 )
     {
-        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        if ( u_cutLowerY && v_vertex.y < u_y + 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
         }
-        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        if ( u_cutHigherY && v_vertex.y > u_y - 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
