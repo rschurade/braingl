@@ -45,7 +45,7 @@ void main()
     vec3 vertex = g_vertex;
 
     bool dis = false;
-/*
+
     if ( u_cutLowerX && vertex.x < u_x + 0.1 )
     {
         if ( u_cutLowerY && vertex.y < u_y + 0.1 )
@@ -96,7 +96,7 @@ void main()
             }
         }
     }   
-*/
+
     if ( dis )
     {
         discard;
