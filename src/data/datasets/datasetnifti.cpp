@@ -114,17 +114,17 @@ void DatasetNifti::parseNiftiHeader()
     m_properties["maingl"].createFloat( Fn::Property::D_DX, m_header->dx, 0.01, 10.0, "transform" );
     m_properties["maingl"].createFloat( Fn::Property::D_DY, m_header->dy, 0.01, 10.0, "transform" );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, m_header->dz, 0.01, 10.0, "transform" );
-    if ( m_header->sform_code > 0 )
+    if ( m_header->qform_code > 0 )
     {
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, sform( 0, 3 ), -250, 250, "transform" );
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, sform( 1, 3 ), -250, 250, "transform" );
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, sform( 2, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, qform( 0, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, qform( 1, 3 ), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, qform( 2, 3 ), -250, 250, "transform" );
     }
     else if ( m_header->sform_code > 0 )
     {
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, qform( 0, 3), -250, 250, "transform" );
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, qform( 1, 3), -250, 250, "transform" );
-        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, qform( 2, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_X, sform( 0, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Y, sform( 1, 3), -250, 250, "transform" );
+        m_properties["maingl"].createFloat( Fn::Property::D_ADJUST_Z, sform( 2, 3), -250, 250, "transform" );
     }
     else
     {

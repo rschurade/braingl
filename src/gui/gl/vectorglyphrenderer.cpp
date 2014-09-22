@@ -29,6 +29,7 @@ VectorGlyphRenderer::~VectorGlyphRenderer()
 
 void VectorGlyphRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 
@@ -110,9 +111,6 @@ void VectorGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int w
         glBindBuffer( GL_ARRAY_BUFFER, vboIds[0] );
 
         setShaderVars( props );
-
-        //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
-        //glEnable( GL_POINT_SMOOTH );// XXX not in Core/deprecated
 
         if ( props.get( Fn::Property::D_DRAW_GLYPHS ).toBool() )
         {

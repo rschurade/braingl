@@ -22,7 +22,9 @@ TubeRenderer::TubeRenderer( FiberSelector* selector, std::vector<Fib>* fibs )  :
     m_fibs( fibs ),
     m_numLines( fibs->size() ),
     m_numPoints( 0 ),
-    m_isInitialized( false )
+    m_isInitialized( false ),
+    m_updateExtraData( false ),
+    m_selectedExtraData( 0 )
 {
 }
 
@@ -33,6 +35,7 @@ TubeRenderer::~TubeRenderer()
 
 void TubeRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 4, vboIds );
 }
 
@@ -61,6 +64,11 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
         }
     }
 
+    if ( m_updateExtraData )
+	{
+		updateExtraData( m_selectedExtraData );
+	}
+
     QGLShaderProgram* program = GLFunctions::getShader( "tube" );
     program->bind();
 
@@ -70,7 +78,7 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
-
+    program->setUniformValue( "userTransformMatrix", props.get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>() );
 
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
@@ -99,16 +107,20 @@ void TubeRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "P0", 12 );
 
     std::vector<bool>*selected = m_selector->getSelection();
+    int percent = props.get( Fn::Property::D_FIBER_THIN_OUT ).toFloat() * 10;
     for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
+        if ( ( i % 1000 ) > percent )
+        {
+            continue;
+        }
         if ( selected->at( i ) )
         {
             QColor c = m_fibs->at( i ).customColor();
             program->setUniformValue( "u_color", c.redF(), c.greenF(), c.blueF(), 1.0 );
             c = m_fibs->at( i ).globalColor();
             program->setUniformValue( "u_globalColor", c.redF(), c.greenF(), c.blueF(), 1.0 );
-            //glDrawArrays( GL_QUAD_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 ); // XXX not in Core
-            glDrawArrays( GL_TRIANGLE_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 ); // XXX quadstrip indices should also work for tristrip
+            glDrawArrays( GL_TRIANGLE_STRIP, m_startIndexes[i]*2, m_pointsPerLine[i]*2 );
         }
     }
 
@@ -150,10 +162,23 @@ void TubeRenderer::setShaderVars( PropertyGroup& props )
     program->setUniformValue( "u_colorMode", props.get( Fn::Property::D_COLORMODE ).toInt() );
     program->setUniformValue( "u_colormap", props.get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-    program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-    program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    if ( props.get( Fn::Property::D_COLORMODE ).toInt() == 3 )
+    {
+        float texMin = props.get( Fn::Property::D_MIN ).toFloat();
+        float texMax = props.get( Fn::Property::D_MAX ).toFloat();
+        program->setUniformValue( "u_lowerThreshold", ( props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_upperThreshold", ( props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMin", ( props.get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMax", ( props.get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+    }
+    else
+    {
+        program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    }
+
     program->setUniformValue( "u_thickness", props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() / 100.f );
 }
 
@@ -225,6 +250,12 @@ void TubeRenderer::colorChanged()
 {
 }
 
+void TubeRenderer::setExtraData( unsigned int dataFieldId )
+{
+	m_updateExtraData = true;
+	m_selectedExtraData = dataFieldId;
+}
+
 void TubeRenderer::updateExtraData( unsigned int dataFieldId )
 {
     std::vector<float>data;
@@ -253,4 +284,6 @@ void TubeRenderer::updateExtraData( unsigned int dataFieldId )
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[3] );
     glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    m_updateExtraData = false;
 }

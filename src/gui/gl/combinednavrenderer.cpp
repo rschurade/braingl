@@ -42,20 +42,7 @@ void CombinedNavRenderer::init()
 
 void CombinedNavRenderer::initGL()
 {
-    qDebug() << "gl init " << m_name << " widget";
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
+    initializeOpenGLFunctions();
     glGenBuffers( 4, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -65,12 +52,7 @@ void CombinedNavRenderer::initGL()
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable( GL_BLEND );
 
-    //glShadeModel( GL_SMOOTH );    // XXX not in Core
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-    //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );   // XXX not in Core
 }
 
 void CombinedNavRenderer::resizeGL( int width, int height )
@@ -111,7 +93,7 @@ void CombinedNavRenderer::adjustRatios()
     {
         float textureRatio = yb / ( yb + zb + zb );
         float mult = textureRatio / m_ratio;
-        //qDebug() << "ratio: " << m_ratio << " trat: " << textureRatio << " mult: " << mult;
+
         if ( m_ratio > textureRatio )
         {
             pMatrix.ortho( 0, yb / mult, 0, ( yb + zb + zb ), -3000, 3000 );
@@ -126,7 +108,7 @@ void CombinedNavRenderer::adjustRatios()
     else
     {
         float mult = 1.0 / m_ratio;
-        //qDebug() << "ratio: " << m_ratio << " trat: " << textureRatio << " mult: " << mult;
+
         if ( m_ratio > 1.0 )
         {
             pMatrix.ortho( 0, ( xb + yb ) / mult, 0, xb + yb, -3000, 3000 );
@@ -404,6 +386,7 @@ void CombinedNavRenderer::initGeometry()
                            4, 5, 6, 4, 6, 7,
                            8, 9, 10, 8, 10, 11};
 
+
     // Transfer index data to VBO 0
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 18 * sizeof(GLushort), indices, GL_STATIC_DRAW );
@@ -438,7 +421,6 @@ void CombinedNavRenderer::draw()
     QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
-    //qDebug() << "combined draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     setupTextures();
@@ -451,6 +433,7 @@ void CombinedNavRenderer::draw()
     GLFunctions::getShader( "slice" )->setUniformValue( "u_renderMode", 0 );
 
     initGeometry();
+
 
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );

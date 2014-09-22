@@ -27,10 +27,9 @@ ROIModel::~ROIModel()
 
 int ROIModel::rowCount( const QModelIndex &parent ) const
 {
-    //qDebug() << "rowCount():" << parent;
     if ( parent.isValid() )
     {
-        if ( parent.internalId() == - 1 )
+        if ( (int)parent.internalId() == - 1 )
         {
             return m_rois[parent.row()].size() - 1;
         }
@@ -52,7 +51,6 @@ int ROIModel::columnCount( const QModelIndex &parent ) const
 
 QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) const
 {
-    //qDebug() << "index():" << row << column << parent;
     if ( parent.isValid() )
     {
         return createIndex( row, column, parent.row() );
@@ -65,8 +63,7 @@ QModelIndex ROIModel::index( int row, int column, const QModelIndex & parent ) c
 
 QModelIndex ROIModel::parent( const QModelIndex & index ) const
 {
-    //qDebug() << "parent():" << index;
-    if ( index.internalId() == -1 )
+    if ( (int)index.internalId() == -1 )
     {
         return QModelIndex();
     }
@@ -79,7 +76,7 @@ QModelIndex ROIModel::parent( const QModelIndex & index ) const
 QVariant ROIModel::data( const QModelIndex &index, int role ) const
 {
     QVariant roi;
-    if ( index.internalId() == -1 )
+    if ( (int)index.internalId() == -1 )
     {
         if ( index.row() < m_rois.size() )
         {
@@ -91,7 +88,7 @@ QVariant ROIModel::data( const QModelIndex &index, int role ) const
     }
     else
     {
-        if ( index.internalId() < m_rois.size() )
+        if ( (int)index.internalId() < m_rois.size() )
         {
             if ( m_rois[index.internalId()].size() > index.row()+1 )
             {
@@ -157,7 +154,7 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
     {
         case Qt::CheckStateRole:
         {
-            if ( index.internalId() == -1 )
+            if ( (int)index.internalId() == -1 )
             {
                 VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( Fn::Property::D_ACTIVE, !VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->get( Fn::Property::D_ACTIVE ).toBool() );
             }
@@ -171,7 +168,7 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
         {
             if ( index.column() == (int)Fn::Property::D_POINTER )
             {
-                if ( index.internalId() == -1 )
+                if ( (int)index.internalId() == -1 )
                 {
                     m_rois[index.row()][0] = value;
                 }
@@ -190,7 +187,7 @@ bool ROIModel::setData( const QModelIndex &index, const QVariant &value, int rol
                 emit( dataChanged( QModelIndex(), QModelIndex() ) );
                 return true;
             }
-            if ( index.internalId() == -1 )
+            if ( (int)index.internalId() == -1 )
             {
                 VPtr<ROI>::asPtr( m_rois[index.row()][0] )->properties()->set( (Fn::Property)index.column(), value );
             }
@@ -324,17 +321,21 @@ void ROIModel::propChanged( int value )
             break;
         }
     }
-    if ( kk == 0 )
+    if ( found )
     {
-        QModelIndex parent;
-        QModelIndex index = this->index( ii, 0, parent );
-        emit ( dataChanged( index, index ) );
-    }
-    else
-    {
-        QModelIndex parent = this->index( ii, 0, QModelIndex() );
-        QModelIndex index = this->index( kk - 1, 0, parent );
-        emit ( dataChanged( index, index ) );
+        if ( kk == 0 )
+        {
+
+            QModelIndex parent;
+            QModelIndex index = this->index( ii, 0, parent );
+            emit ( dataChanged( index, index ) );
+        }
+        else
+        {
+            QModelIndex parent = this->index( ii, 0, QModelIndex() );
+            QModelIndex index = this->index( kk - 1, 0, parent );
+            emit ( dataChanged( index, index ) );
+        }
     }
 }
 
@@ -364,4 +365,16 @@ QModelIndexList ROIModel::match( const QModelIndex &start, int role, const QVari
     }
 
     return l;
+}
+
+ROI* ROIModel::getRoi( int branch, int pos )
+{
+    if ( branch < m_rois.size() && pos < m_rois[branch].size() )
+    {
+        return VPtr<ROI>::asPtr( m_rois[branch][pos] );
+    }
+    else
+    {
+        return NULL;
+    }
 }

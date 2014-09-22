@@ -10,7 +10,8 @@
 
 #include <QFrame>
 
-class QSlider;
+class MySlider;
+
 class QLineEdit;
 class QPushButton;
 
@@ -38,7 +39,7 @@ signals:
     void valueChanged( int value );
 
 private:
-   QSlider*  m_slider;
+   MySlider*  m_slider;
    QLineEdit* m_edit;
    QPushButton* m_button1;
    QPushButton* m_button2;

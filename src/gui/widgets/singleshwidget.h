@@ -8,8 +8,7 @@
 #ifndef SINGLESHWIDGET_H_
 #define SINGLESHWIDGET_H_
 
-#include "GL/glew.h"
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class SingleSHRenderer;
 

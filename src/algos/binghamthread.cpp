@@ -147,12 +147,6 @@ std::vector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
         Sorts::quickSort( maxima, qfRadius, 0, maxima.size() - 1 );
     }
 
-//    qDebug() << "found the following maxima:";
-//    for ( int i = 0; i < maxima.size(); ++i )
-//    {
-//        qDebug() << i << maxima[i] << qfRadius[maxima[i]] << adj[maxima[i]];
-//    }
-
     // For all maxima:
     for ( int n_max = 0; ( n_max < (int)maxima.size() / 2 ) && ( n_max < num_max ); ++n_max )
     {
@@ -205,13 +199,6 @@ std::vector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 
         // sort maxima biggest radi first
         Sorts::quickSort( gv, qfRadius, 0, gv.size() - 1 );
-
-//        qDebug() << "=================================================";
-//        for ( int i = 0; i < gv.size(); ++i )
-//        {
-//            qDebug() << gv[i] << qfRadius[gv[i]];
-//        }
-//        qDebug() << "=================================================";
 
         // preprocessing for moment of inertia matrix:
         ColumnVector values( gv.size() );
@@ -266,8 +253,6 @@ std::vector<float> BinghamThread::fit_bingham( const ColumnVector& sh_data,
 
         // the eigenvectors are the bingham parameter mu:
         //FMath::evd3x3_2( m_inertia, vecs, vals );
-        //qDebug() << vecs[0](1) << vecs[0](2) << vecs[0](3);
-
         maxV = FMath::sphere2cart( FMath::SH_opt_max( FMath::cart2sphere( vecs[0] ), sh_data ) );
 
         double angle( acos( FMath::iprod( maxV, vecs[0] ) ) );

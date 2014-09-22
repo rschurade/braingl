@@ -8,11 +8,14 @@
 #ifndef LOADIMAGEWIDGET_H_
 #define LOADIMAGEWIDGET_H_
 
-#include <QtGui>
+#include <QDialog>
 
 class CheckBox;
 class SelectWithLabel;
 class SliderWithEditInt;
+
+class QPushButton;
+class QVBoxLayout;
 
 class LoadImageWidget  : public QDialog
 {

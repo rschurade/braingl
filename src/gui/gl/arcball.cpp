@@ -104,21 +104,17 @@ void ArcBall::midClick( int x, int y )
 
 void ArcBall::mouseWheel( float step )
 {
-    if ( m_zoom < 2.0f )
+    if ( step < 0 )
     {
-        step /= 2.0;
+        m_zoom /= 1.1;
+        m_zoom = qMax( 0.2f, m_zoom );
     }
-    if ( m_zoom < 1.5f )
+    else
     {
-        step /= 3.0;
+        m_zoom *= 1.1;
     }
-    if ( m_zoom < 1.0f )
-    {
-        step /= 4.0;
-    }
-    m_zoom += step;
 
-    m_zoom = qMax( 0.2f, m_zoom );
+    Models::zoom = m_zoom;
 }
 
 void ArcBall::midDrag( int x, int y )
@@ -224,16 +220,27 @@ void ArcBall::setMoveY( float y )
 QList<QVariant> ArcBall::getState()
 {
     QList<QVariant> state;
+    state.push_back( "currentRot" );
     state.push_back( m_currentRot );
+    state.push_back( "lastRot" );
     state.push_back( m_lastRot );
+    state.push_back( "moveX" );
     state.push_back( m_moveX );
+    state.push_back( "moveY" );
     state.push_back( m_moveY );
+    state.push_back( "oldMoveX" );
     state.push_back( m_oldMoveX );
+    state.push_back( "oldMoveY" );
     state.push_back( m_oldMoveY );
+    state.push_back( "midClickX" );
     state.push_back( m_midClickX );
+    state.push_back( "midClickY" );
     state.push_back( m_midClickY );
+    state.push_back( "zoom" );
     state.push_back( m_zoom );
+    state.push_back( "rotCenter" );
     state.push_back( m_rotCenter );
+    state.push_back( "current_rotation" );
     state.push_back( q_current_rotation );
     return state;
 }
@@ -252,6 +259,22 @@ void ArcBall::setState( QList<QVariant> state )
     m_rotCenter = state[9].value<QVector3D>();
     q_current_rotation = state[10].value<QQuaternion>();
 }
+
+void ArcBall::setState( QMap<QString, QVariant> state )
+{
+    m_currentRot = state["currentRot"].value<QMatrix4x4>();
+    m_lastRot = state["lastRot"].value<QMatrix4x4>();
+    m_moveX = state["moveX"].toInt();
+    m_moveY = state["moveY"].toInt();
+    m_oldMoveX = state["oldMoveX"].toInt();
+    m_oldMoveY = state["oldMoveY"].toInt();
+    m_midClickX = state["midClickX"].toInt();
+    m_midClickY = state["midClickY"].toInt();
+    m_zoom = state["zoom"].toFloat();
+    m_rotCenter = state["rotCenter"].value<QVector3D>();
+    q_current_rotation = state["current_rotation"].value<QQuaternion>();
+}
+
 
 QQuaternion ArcBall::getRotation()
 {

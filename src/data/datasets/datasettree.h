@@ -8,7 +8,7 @@
 #ifndef DATASETTREE_H_
 #define DATASETTREE_H_
 
-#include "dataset.h"
+#include "datasetmesh.h"
 
 #include "../../algos/tree.h"
 
@@ -26,7 +26,7 @@ struct PtrGreater // public std::binary_function<bool, const T*, const T*>
   }
 };
 
-class DatasetTree : public Dataset
+class DatasetTree : public DatasetMesh
 {
     Q_OBJECT
 
@@ -36,13 +36,17 @@ public:
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
     void drawTree( QMatrix4x4 mvpMatrix, int width, int height );
+    void drawRoot( QMatrix4x4 mvpMatrix, int width, int height );
 
     void importTree( QString dims, std::vector<QString>coords, std::vector<QString>clusters );
 
     Tree* getTree() { return m_tree; };
+    Tree* getRoot() { return m_root; };
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
     void setZoom( int zoom ) { m_zoom = zoom; };
+
+    void setProjection( std::vector<int> projection ) { m_projection = projection; };
 
 private:
     void createTexture();
@@ -50,18 +54,29 @@ private:
     void createTextureRec( Tree* tree );
     int pickClusterRec( Tree* tree, int left, int right, float x, float y );
 
+    void updateMeshColor();
+
     Tree* m_tree;
-    TreeRenderer* m_renderer;
+    Tree* m_root;
+    TreeRenderer* m_treeRenderer;
+    TreeRenderer* m_treeRenderer2;
+
+    std::vector<Tree*>m_nodes;
 
     int m_numLeaves;
     int m_numNodes;
 
     std::vector<float>m_textureData;
+    std::vector<int>m_projection;
 
     int m_width;
     int m_height;
     int m_picked;
     int m_zoom;
+
+    int m_width2;
+    int m_height2;
+    int m_zoom2;
 
 private slots:
     void selectCluster( QVariant id );

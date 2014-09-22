@@ -47,8 +47,10 @@ void SharpQBallThread::run()
         gradients( i + 1, 3 ) = bvecs.at( i ).z();
     }
 
-    std::vector<ColumnVector>* data = m_ds->getData();
+    std::vector<float>* data = m_ds->getData();
     std::vector<float>* b0Data = m_ds->getB0Data();
+    unsigned int blockSize = m_ds->properties().get( Fn::Property::D_NX ).toInt() * m_ds->properties().get( Fn::Property::D_NY ).toInt() * m_ds->properties().get( Fn::Property::D_NZ ).toInt();
+    unsigned int dim = m_ds->properties().get( Fn::Property::D_DIM ).toInt();
 
     m_qBallVector.clear();
 
@@ -59,20 +61,21 @@ void SharpQBallThread::run()
 
     int numThreads = GLFunctions::idealThreadCount;
 
-    int chunkSize = data->size() / numThreads;
+    int chunkSize = blockSize / numThreads;
 
     int begin = m_id * chunkSize;
     int end = m_id * chunkSize + chunkSize;
 
     if ( m_id == numThreads - 1 )
     {
-        end = data->size();
+        end = blockSize;
     }
 
     // for all voxels:
     for ( int i = begin; i < end; ++i )
     {
-        ColumnVector voxel( data->at( i ) / b0Data->at( i ) );
+        ColumnVector dataVec = FMath::createVector( i, *data, blockSize, dim );
+        ColumnVector voxel( dataVec / b0Data->at( i ) );
 
         // regularize data data:
         regularize_sqball( 0.15, 0.15, voxel );

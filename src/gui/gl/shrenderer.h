@@ -18,7 +18,7 @@
 
 class PropertyGroup;
 class TriangleMesh2;
-class SHRendererThread2;
+class SHRendererThread;
 
 class SHRenderer : public ObjectRenderer
 {
@@ -32,22 +32,20 @@ public:
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
-    void createMesh( PropertyGroup& props );
+//    void createMesh( PropertyGroup& props );
     TriangleMesh2* getMesh();
 
 protected:
-    void initGeometry( PropertyGroup& props );
     void setShaderVars( PropertyGroup& props );
-
     void setRenderParams( PropertyGroup& props );
-    void updateMesh();
+
+    void initGeometry( PropertyGroup& props );
+    void updateGlyphs();
 
 private:
     int m_tris;
 
     GLuint *vboIds;
-    TriangleMesh2* m_mesh;
-    TriangleMesh2* m_newMesh;
 
     std::vector<ColumnVector>* m_data;
 
@@ -77,13 +75,14 @@ private:
     float m_upperThreshold;
     QColor m_color;
 
-    SHRendererThread2* m_masterThread;
-    bool m_meshUpdated;
-    bool m_updateWaiting;
+    SHRendererThread* m_updateThread;
+    bool m_glyphsUpdated;
+    bool m_updateRunning;
 
 
 private slots:
-    void slotNewMeshCreated( TriangleMesh2* mesh );
+    void updateThreadFinished( bool );
+    //void slotNewMeshCreated( TriangleMesh2* mesh );
 };
 
 #endif /* SHRENDERER_H_ */

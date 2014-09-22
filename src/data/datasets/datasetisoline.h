@@ -22,6 +22,10 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
 
+    std::vector<float>* getData();
+    QString getSaveFilter();
+    QString getDefaultSuffix();
+
 private:
     std::vector<float> m_scalarField;
 
@@ -29,8 +33,19 @@ private:
 
     GLuint vbo0;
     GLuint vbo1;
+    GLuint vbo2;
+    GLuint vbo3;
 
-    int m_countLines;
+    int m_vertCountAxial;
+    int m_vertCountCoronal;
+    int m_vertCountSagittal;
+
+    int m_stripeVertCountAxial;
+    int m_stripeVertCountCoronal;
+    int m_stripeVertCountSagittal;
+
+
+    QColor m_color;
 
     float m_x;
     float m_y;
@@ -47,6 +62,8 @@ private:
 private slots:
     void isoValueChanged();
     void globalChanged();
+
+    void addGlyph( std::vector<float> &verts, std::vector<float> &colors, float x1, float y1, float z1, float x2, float y2, float z2 );
 
 };
 

@@ -8,7 +8,7 @@
 #ifndef SCRIPTWIDGET_H_
 #define SCRIPTWIDGET_H_
 
-#include <QtGui>
+#include <QtWidgets>
 
 enum class ScriptCommand : int
 {

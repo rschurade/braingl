@@ -10,50 +10,58 @@
 #include <buildtime.h>
 
 #include "views/datasetinfoview.h"
-
-#include "widgets/glwidget.h"
-#include "widgets/fndockwidget.h"
-#include "widgets/datasetpropertywidget.h"
-#include "widgets/roipropertywidget.h"
-#include "widgets/globalpropertywidget.h"
-#include "widgets/docknavglwidget.h"
-#include "widgets/combinednavglwidget.h"
-#include "widgets/singleshwidget.h"
-#include "widgets/roiwidget.h"
-#include "widgets/datasetlistwidget.h"
-#include "widgets/navglwidget.h"
-#include "widgets/combinednavglwidget.h"
-#include "widgets/toolbar.h"
-#include "widgets/statusbar.h"
-#include "widgets/shadereditwidget.h"
 #include "widgets/colormapeditwidget.h"
-#include "widgets/scriptwidget.h"
+#include "widgets/combinednavglwidget.h"
+
+#include "widgets/datasetlistwidget.h"
+#include "widgets/datasetpropertywidget.h"
+#include "widgets/docknavglwidget.h"
+#include "widgets/fndockwidget.h"
+#include "widgets/globalpropertywidget.h"
+#include "widgets/glwidget.h"
 #include "widgets/hierarchicaltreeglwidget.h"
+#include "widgets/navglwidget.h"
+#include "widgets/roipropertywidget.h"
+#include "widgets/roiwidget.h"
+#include "widgets/scriptwidget.h"
+#include "widgets/shadereditwidget.h"
+#include "widgets/singleshwidget.h"
+#include "widgets/statusbar.h"
+#include "widgets/toolbar.h"
 #include "widgets/algoStarterWidgets/newdatasetwidget.h"
 
-#include "gl/camerabase.h"
 #include "gl/arcball.h"
 #include "gl/camera.h"
-#include "gl/glfunctions.h"
+#include "gl/camerabase.h"
 #include "gl/colormapfunctions.h"
+#include "gl/glfunctions.h"
 
-#include "../data/loader.h"
-#include "../data/writer.h"
-#include "../data/vptr.h"
+#include "../algos/scalaralgos.h"
+
 #include "../data/enums.h"
-#include "../data/models.h"
 #include "../data/globalpropertymodel.h"
+#include "../data/models.h"
 #include "../data/roi.h"
 #include "../data/roiarea.h"
 #include "../data/roibox.h"
+#include "../data/vptr.h"
 
-#include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasetguides.h"
+#include "../data/datasets/datasetlabel.h"
 #include "../data/datasets/datasetplane.h"
+#include "../data/datasets/datasetscalar.h"
 
-#include <QtGui>
+#include "../io/loader.h"
+#include "../io/roiwriter.h"
+#include "../io/statewriter.h"
+#include "../io/writer.h"
+
+#include "../io/statereader.h"
+
+#include <QAction>
 #include <QWebView>
 #include <QGLFormat>
-#include "core_3_3_context.h"
+#include <QKeySequence>
 
 #include <iostream>
 
@@ -71,9 +79,11 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	m_centralWidget->setDocumentMode( true );
 	setCentralWidget( m_centralWidget );
 
+	GLFunctions::m_debug = debug;
+
     QGLFormat fmt;
     fmt.setVersion( 3, 3 );
-    fmt.setProfile( QGLFormat::CoreProfile );       // CompatibilityProfile is not implemented by Apple
+    fmt.setProfile( QGLFormat::CoreProfile );
     fmt.setSampleBuffers( true );
     QGLFormat::setDefaultFormat( fmt );
 
@@ -82,9 +92,8 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     createActions();
     createMenus();
     createToolBars();
-    //this->show();   // XXX work around "invalid drawable"?
-    createDockWindows();
 
+    createDockWindows();
 
     // this needs to be done after the view is created
     m_toolsToolBar->setSelectionModel( m_datasetWidget->selectionModel() );
@@ -96,11 +105,11 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     QIcon logo( ":/icons/logo_blue_orange_64.png" );
     setWindowIcon( logo );
 
-    setUnifiedTitleAndToolBarOnMac( true );
+    setUnifiedTitleAndToolBarOnMac( false );
 
     if ( !resetSettings )
     {
-        mainGLWidget->makeCurrent();    // need GL context for this XXXX
+        mainGLWidget->makeCurrent();
         loadSettings();
     }
 }
@@ -121,31 +130,51 @@ void MainWindow::saveSettings()
     settings.setValue( "centralWidgetState", m_centralWidget->saveState() );
 
     settings.setValue( "lockDockTitles", lockDockTitlesAct->isChecked() );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_LAST_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PATH ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_MAIN2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_MAIN2, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_COMBINED, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV1, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV3, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_CROSSHAIR_COLOR ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_CROSSHAIR_COLOR, 0 ) ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::g()->data( Models::g()->index( (int)Fn::Property::G_SHOW_NAV_SLIDERS, 0 ) ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_LAST_PATH ), Models::getGlobal( Fn::Property::G_LAST_PATH ) );
 
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_WIDTH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_WIDTH ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_HEIGHT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_HEIGHT ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_SIZE_RATIO ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_RATIO ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_COPY_CURRENT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_COPY_CURRENT ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DO_MAINGL ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ), Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PREFIX ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_DIGITS ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DIGITS ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
-    settings.setValue( Fn::Prop2String::s( Fn::Property::G_ISOLINE_STANDARD_COLOR ), Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_MAIN ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_MAIN ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_MAIN2 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_MAIN2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_COMBINED ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_COMBINED ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_NAV1 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV1 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_NAV2 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_BACKGROUND_COLOR_NAV3 ), Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_CROSSHAIR_COLOR ), Models::getGlobal( Fn::Property::G_CROSSHAIR_COLOR ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SHOW_NAV_SLIDERS ), Models::getGlobal( Fn::Property::G_SHOW_NAV_SLIDERS ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PATH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PATH ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_WIDTH ), Models::getGlobal( Fn::Property::G_SCREENSHOT_WIDTH ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_HEIGHT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_HEIGHT ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_KEEP_ASPECT ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_SIZE_RATIO ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_RATIO ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ), Models::getGlobal( Fn::Property::G_SCREENSHOT_SIZE_SELECTION ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_COPY_CURRENT ), Models::getGlobal( Fn::Property::G_SCREENSHOT_COPY_CURRENT ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_DO_MAINGL ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ), Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_PREFIX2 ), Models::getGlobal( Fn::Property::G_SCREENSHOT_PREFIX2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_DIGITS ), Models::getGlobal( Fn::Property::G_SCREENSHOT_DIGITS ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ISOLINE_STANDARD_COLOR ), Models::getGlobal( Fn::Property::G_ISOLINE_STANDARD_COLOR ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_RENDER_CROSSHAIRS ), Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_RENDER_CROSSHAIRS_2 ), Models::getGlobal( Fn::Property::G_RENDER_CROSSHAIRS_2 ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_TRANSPARENCY ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_MESH_TRANSPARENCY ), Models::getGlobal( Fn::Property::G_MESH_TRANSPARENCY ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_FILTER_SIZE ), Models::getGlobal( Fn::Property::G_FILTER_SIZE ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_SHOW_ORIENTHELPER ), Models::getGlobal( Fn::Property::G_SHOW_ORIENTHELPER ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_X ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_X ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_Y ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_Y ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_Z ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_Z ) );
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_ORIENTHELPER_SIZE ), Models::getGlobal( Fn::Property::G_ORIENTHELPER_SIZE ) );
+
+    settings.setValue( Fn::Prop2String::e( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ), Models::getGlobal( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ) );
+
 
     QByteArray ar;
     QDataStream out( &ar, QIODevice::WriteOnly );   // write the data
@@ -176,7 +205,7 @@ void MainWindow::loadSettings()
     m_centralWidget->restoreGeometry( settings.value( "centralWidgetGeometry" ).toByteArray() );
     m_centralWidget->restoreState( settings.value( "centralWidgetState" ).toByteArray() );
 
-    if ( settings.contains( "lockDockTitles") )
+    if ( settings.contains( "lockDockTitles" ) )
     {
         if ( settings.value( "lockDockTitles" ).toBool() )
         {
@@ -194,6 +223,8 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_CROSSHAIR_COLOR );
     loadSetting( settings, Fn::Property::G_SHOW_NAV_SLIDERS );
 
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX );
+    loadSetting( settings, Fn::Property::G_SCREENSHOT_PREFIX2 );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_WIDTH );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_HEIGHT );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_KEEP_ASPECT );
@@ -208,14 +239,27 @@ void MainWindow::loadSettings()
     loadSetting( settings, Fn::Property::G_SCREENSHOT_DIGITS );
     loadSetting( settings, Fn::Property::G_SCREENSHOT_CURRENT_NUMBER );
     loadSetting( settings, Fn::Property::G_ISOLINE_STANDARD_COLOR );
+
+    loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS );
+    loadSetting( settings, Fn::Property::G_RENDER_CROSSHAIRS_2 );
+    loadSetting( settings, Fn::Property::G_TRANSPARENCY );
+    loadSetting( settings, Fn::Property::G_MESH_TRANSPARENCY );
+
+    loadSetting( settings, Fn::Property::G_FILTER_SIZE );
+    loadSetting( settings, Fn::Property::G_SHOW_ORIENTHELPER );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_X );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_Y );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_Z );
+    loadSetting( settings, Fn::Property::G_ORIENTHELPER_SIZE );
+    loadSetting( settings, Fn::Property::G_FIBERS_INITIAL_PERCENTAGE );
 }
 
 void MainWindow::loadSetting( QSettings &settings, Fn::Property setting )
 {
-    if ( settings.contains( Fn::Prop2String::s( setting) ) )
+    if ( settings.contains( Fn::Prop2String::e( setting ) ) )
     {
-        QVariant s = settings.value( Fn::Prop2String::s( setting ) );
-        Models::g()->setData( Models::g()->index( (int)setting, 0 ), s );
+        QVariant s = settings.value( Fn::Prop2String::e( setting ) );
+        Models::setGlobal( setting, s );
     }
 }
 
@@ -224,19 +268,19 @@ void MainWindow::loadColormaps( bool resetSettings )
     QSettings settings;
     if ( settings.contains( "colormaps" ) && !resetSettings )
     {
-        qDebug() << "restore colormaps";
+        qDebug( ) << "restore colormaps";
         QByteArray ar = settings.value( "colormaps" ).toByteArray();
-        QDataStream in( &ar,QIODevice::ReadOnly );
+        QDataStream in( &ar, QIODevice::ReadOnly );
         int countColormaps;
         in >> countColormaps;
         for ( int i = 0; i < countColormaps; ++i )
         {
             QString name;
-            std::vector< ColormapPair >values;
+            std::vector<ColormapPair> values;
             in >> name;
             int cmapSize;
             in >> cmapSize;
-            for ( int k = 0; k < cmapSize; ++k)
+            for ( int k = 0; k < cmapSize; ++k )
             {
                 ColormapPair pair;
                 in >> pair.value;
@@ -249,7 +293,7 @@ void MainWindow::loadColormaps( bool resetSettings )
     }
     else
     {
-        qDebug() << "create colormaps";
+        qDebug( ) << "create colormaps";
         ColormapBase colormap( "grey", QColor( 3, 3, 3 ), QColor( 255, 255, 255 ) );
         ColormapFunctions::addColormap( colormap );
 
@@ -274,7 +318,7 @@ void MainWindow::loadColormaps( bool resetSettings )
 
 void MainWindow::open()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal(  Fn::Property::G_LAST_PATH ).toString();
 
     QString filter( "all files (*.*);;niftii (*.nii *.nii.gz);;fib files (*.fib *.vtk *.asc *.json);;surfaces (*.vtk *.asc)" );
 
@@ -293,12 +337,20 @@ void MainWindow::open()
     {
         load( fileNames[i] );
     }
-
 }
 
 void MainWindow::openRecentFile()
 {
-    QAction *action = qobject_cast< QAction * >( sender() );
+    QAction *action = qobject_cast<QAction *>( sender() );
+    if ( action )
+    {
+        load( action->data().toString() );
+    }
+}
+
+void MainWindow::openRecentScene()
+{
+    QAction *action = qobject_cast<QAction *>( sender() );
     if ( action )
     {
         load( action->data().toString() );
@@ -307,7 +359,7 @@ void MainWindow::openRecentFile()
 
 void MainWindow::loadRoi()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal(  Fn::Property::G_LAST_PATH ).toString();
 
     QString filter( "all files (*.*);;niftii (*.nii *.nii.gz)" );
 
@@ -328,14 +380,14 @@ void MainWindow::loadRoi()
     }
 }
 
-bool MainWindow::loadRoi( QString fileName )
+bool MainWindow::loadRoi( QString fn )
 {
-    if ( !fileName.isEmpty() )
+    if ( !fn.isEmpty() )
     {
-        if ( fileName.endsWith( "nii" ) || fileName.endsWith( "nii.gz" )  )
+        if ( fn.endsWith( ".nii.gz" ) || fn.endsWith( ".nii" ) || fn.endsWith( ".hdr" ) || fn.endsWith( ".ima" ) || fn.endsWith( ".img" ) )
         {
             Loader loader( selectedDataset() );
-            loader.setFilename( QDir( fileName ) );
+            loader.setFilename( QDir( fn ) );
             if ( loader.load() )
             {
                 for ( int k = 0; k < loader.getNumDatasets(); ++k )
@@ -352,11 +404,11 @@ bool MainWindow::loadRoi( QString fileName )
                     ROIArea* roiOut = new ROIArea( out, dss->properties() );
                     Models::addROIArea( roiOut );
                 }
-                QFileInfo fi( fileName );
+                QFileInfo fi( fn );
                 QDir dir = fi.absoluteDir();
                 QString lastPath = dir.absolutePath();
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
-                setCurrentFile( fileName );
+                Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
+                setCurrentFile( fn );
 
                 return true;
             }
@@ -365,18 +417,17 @@ bool MainWindow::loadRoi( QString fileName )
     return false;
 }
 
-
 bool MainWindow::load( QString fileName )
 {
-    mainGLWidget->makeCurrent();    // XXX load* needs GL context
+    mainGLWidget->makeCurrent();
     if ( !fileName.isEmpty() )
     {
-        if ( fileName.endsWith( "scn" ) )
+        if ( fileName.endsWith( "scn" ) || fileName.endsWith( "xml" ) )
         {
             loadScene( fileName );
             return true;
         }
-        else if( fileName.endsWith( "bgscript" ) )
+        else if ( fileName.endsWith( "bgscript" ) )
         {
             m_scriptWidget->loadScript( fileName, true );
             return true;
@@ -389,12 +440,18 @@ bool MainWindow::load( QString fileName )
             {
                 for ( int k = 0; k < loader.getNumDatasets(); ++k )
                 {
-                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                            VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                    if ( loader.getDataset( k )->properties().get( Fn::Property::D_TYPE ).toInt() == (int)Fn::DatasetType::TREE )
+                    {
+                        m_dockHTW->show();
+                    }
+
                 }
                 QFileInfo fi( fileName );
                 QDir dir = fi.absoluteDir();
                 QString lastPath = dir.absolutePath();
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+                Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
 
                 setCurrentFile( fileName );
 
@@ -408,7 +465,7 @@ bool MainWindow::load( QString fileName )
 
 bool MainWindow::load( QString fileName, QList<QVariant> state )
 {
-    mainGLWidget->makeCurrent();    // XXX load* needs GL context
+    mainGLWidget->makeCurrent();
     if ( !fileName.isEmpty() )
     {
         if ( fileName.endsWith( "scn" ) )
@@ -416,7 +473,7 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
             loadScene( fileName );
             return true;
         }
-        else if( fileName.endsWith( "bgscript" ) )
+        else if ( fileName.endsWith( "bgscript" ) )
         {
             m_scriptWidget->loadScript( fileName, true );
             return true;
@@ -430,12 +487,13 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
                 for ( int k = 0; k < loader.getNumDatasets(); ++k )
                 {
                     loader.getDataset( k )->properties().setState( state );
-                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int)Fn::Property::D_NEW_DATASET ), VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+                    Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                            VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
                 }
                 QFileInfo fi( fileName );
                 QDir dir = fi.absoluteDir();
                 QString lastPath = dir.absolutePath();
-                Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+                Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
 
                 setCurrentFile( fileName );
 
@@ -447,13 +505,48 @@ bool MainWindow::load( QString fileName, QList<QVariant> state )
     return false;
 }
 
+bool MainWindow::loadAndAlgo( QString fileName, QString algo, QVariant param )
+{
+    if ( algo == "" )
+    {
+        return load( fileName );
+    }
+    else if ( algo == "isosurface" )
+    {
+        Loader loader;
+        loader.setFilename( QDir( fileName ) );
+        if ( loader.load() )
+        {
+            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            {
+                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                        VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+            }
+            QFileInfo fi( fileName );
+            QDir dir = fi.absoluteDir();
+            QString lastPath = dir.absolutePath();
+            Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
+
+            Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                                    VPtr<Dataset>::asQVariant( ScalarAlgos::isoSurface( loader.getDataset( 0 ), param.toFloat() )[0] ), Qt::DisplayRole );
+            setCurrentFile( fileName );
+
+            GLFunctions::reloadShaders();
+            return true;
+        }
+    }
+    return false;
+}
+
 Dataset* MainWindow::selectedDataset()
 {
     int selectedIndex = m_datasetWidget->getSelected();
-    if (selectedIndex > -1)
+    if ( selectedIndex > -1 )
     {
-        return VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selectedIndex, (int)Fn::Property::D_DATASET_POINTER) ) );
-    } else {
+        return VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selectedIndex, (int) Fn::Property::D_DATASET_POINTER ) ) );
+    }
+    else
+    {
         return NULL;
     }
 }
@@ -474,7 +567,7 @@ void MainWindow::setCurrentFile( const QString &fileName )
 
     settings.setValue( "recentFileList", files );
 
-    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    foreach ( QWidget *widget, QApplication::topLevelWidgets() )
     {
         MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
         if ( mainWin )
@@ -493,15 +586,63 @@ void MainWindow::updateRecentFileActions()
 
     for ( int i = 0; i < numRecentFiles; ++i )
     {
-        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[ i ] ) );
-        recentFileActs[ i ]->setText( text );
-        recentFileActs[ i ]->setData( files[ i ] );
-        recentFileActs[ i ]->setVisible( true );
+        //QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[i] ) );
+        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( files[i] );
+        recentFileActs[i]->setText( text );
+        recentFileActs[i]->setData( files[i] );
+        recentFileActs[i]->setVisible( true );
     }
     for ( int j = numRecentFiles; j < MaxRecentFiles; ++j )
-        recentFileActs[ j ]->setVisible( false );
+        recentFileActs[j]->setVisible( false );
 
     separatorAct->setVisible( numRecentFiles > 0 );
+}
+
+void MainWindow::setCurrentScene( const QString &fileName )
+{
+    curFile = fileName;
+    setWindowFilePath( curFile );
+
+    QSettings settings;
+    QStringList files = settings.value( "recentSceneList" ).toStringList();
+    files.removeAll( fileName );
+    files.prepend( fileName );
+    while ( files.size() > MaxRecentFiles )
+    {
+        files.removeLast();
+    }
+
+    settings.setValue( "recentSceneList", files );
+
+    foreach ( QWidget *widget, QApplication::topLevelWidgets() )
+    {
+        MainWindow *mainWin = qobject_cast< MainWindow * >( widget );
+        if ( mainWin )
+        {
+            mainWin->updateRecentSceneActions();
+        }
+    }
+}
+
+void MainWindow::updateRecentSceneActions()
+{
+    QSettings settings;
+    QStringList files = settings.value( "recentSceneList" ).toStringList();
+
+    int numRecentScenes = qMin( files.size(), (int) MaxRecentFiles );
+
+    for ( int i = 0; i < numRecentScenes; ++i )
+    {
+        //QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( strippedName( files[i] ) );
+        QString text = tr( "&%1 %2" ).arg( i + 1 ).arg( files[i] );
+        recentSceneActs[i]->setText( text );
+        recentSceneActs[i]->setData( files[i] );
+        recentSceneActs[i]->setVisible( true );
+    }
+    for ( int j = numRecentScenes; j < MaxRecentFiles; ++j )
+        recentSceneActs[j]->setVisible( false );
+
+    separatorAct->setVisible( numRecentScenes > 0 );
 }
 
 QString MainWindow::strippedName( const QString &fullFileName )
@@ -514,16 +655,22 @@ void MainWindow::save()
     int selected = m_datasetWidget->getSelected();
     if ( selected != -1 )
     {
-        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selected, (int)Fn::Property::D_DATASET_POINTER) ) );
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( selected, (int) Fn::Property::D_DATASET_POINTER ) ) );
         save( ds );
     }
 }
 
 bool MainWindow::save( Dataset* ds )
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    int type = ds->properties().get( Fn::Property::D_TYPE ).toInt();
+    if ( type == (int) Fn::DatasetType::PLANE || type == (int) Fn::DatasetType::GUIDE || type == (int) Fn::DatasetType::LABEL )
+    {
+        return true;
+    }
 
-    QString name =  fn + "/" + ds->properties().get( Fn::Property::D_NAME ).toString().replace( " ", "" );
+    QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
+
+    QString name = fn + "/" + ds->properties().get( Fn::Property::D_NAME ).toString().replace( " ", "" );
     name.replace( "." + ds->getDefaultSuffix(), "" );
     name += ".";
     name += ds->getDefaultSuffix();
@@ -538,19 +685,20 @@ bool MainWindow::save( Dataset* ds )
     if ( fd->exec() )
     {
         QString fileName = fd->selectedFiles().first();
-        qDebug() << fileName << fd->selectedFilter();
+        // TODO: Qt5
+        qDebug( ) << fileName << fd->selectedNameFilter();
 
         if ( !fileName.isEmpty() )
         {
             QDir dir;
             ds->properties().set( Fn::Property::D_FILENAME, fileName );
             ds->properties().set( Fn::Property::D_NAME, QDir( fileName ).path().split( "/" ).last() );
-            saveDataset( ds, fd->selectedFilter() );
+            saveDataset( ds, fd->selectedNameFilter() );
 
             QFileInfo fi( fileName );
             dir = fi.absoluteDir();
             QString lastPath = dir.absolutePath();
-            Models::g()->setData( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ), lastPath );
+            Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
             delete fd;
             return true;
         }
@@ -569,161 +717,113 @@ void MainWindow::saveFilterChanged( QString filterString )
     suffix = suffix.left( suffix.indexOf( ")" ) );
     if ( suffix != "*" )
     {
-        qDebug() << "set default suffix: " << suffix;
+        qDebug( ) << "set default suffix: " << suffix;
         fd->setDefaultSuffix( suffix );
     }
 }
 
 void MainWindow::saveDataset( Dataset* ds, QString filter )
 {
+    int type = ds->properties().get( Fn::Property::D_TYPE ).toInt();
+    if ( type == (int) Fn::DatasetType::PLANE || type == (int) Fn::DatasetType::GUIDE || type == (int) Fn::DatasetType::LABEL )
+    {
+        return;
+    }
+
     QString fileName = ds->properties().get( Fn::Property::D_FILENAME ).toString();
     Writer writer( ds, QFileInfo( fileName ), filter );
     writer.save();
 }
 
+void MainWindow::saveRoi( ROIArea* roi )
+{
+    QString fileName = roi->properties()->get( Fn::Property::D_FILENAME ).toString();
+    RoiWriter writer( roi, QFileInfo( fileName ) );
+    writer.save();
+}
+
 void MainWindow::exportColormaps()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Export colormaps", fn );
 
-    QSettings settings( fileName, QSettings::IniFormat );
-    settings.clear();
-
-    settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.8.1" );
-    settings.setValue( "content", "colormaps" );
-
-    int count = ColormapFunctions::size();
-    settings.setValue( "count", count );
-    QList<QVariant>cms;
-    for ( int i = 0; i < count; ++i )
+    if ( !fileName.endsWith( ".xml" ) )
     {
-        cms.push_back( ColormapFunctions::get( i ).serialize() );
+        fileName += ".xml";
     }
-    settings.setValue( "colormaps", cms );
+
+    StateWriter writer;
+    writer.saveColormaps( fileName );
 }
 
 void MainWindow::importColormaps()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
 
-    QString filter( "braingl colormaps (*.cm);;all files (*.*)" );
+    QString filter( "braingl colormaps (*.xml);;all files (*.*)" );
 
     QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open File", fn, filter );
     for ( int i = 0; i < fileNames.size(); ++i )
     {
-        QSettings settings( fileNames[i], QSettings::IniFormat );
-        //qDebug() << settings.status();
-
-        QVariant versionString = "0.0.0";
-        if ( settings.contains( "version" ) )
-        {
-            QVariant versionString = settings.value( "version" ).toString();
-        }
-
-        if ( settings.contains( "content" ) )
-        {
-            if ( settings.value( "content" ).toString() != "colormaps" )
-            {
-                continue;
-            }
-        }
-        else
-        {
-            continue;
-        }
-
-        QList<QVariant>cms = settings.value( "colormaps" ).toList();
-
-        for ( int k = 0; k < cms.size(); ++k )
-        {
-            ColormapBase cm( cms[k].toList() );
-            ColormapFunctions::addColormap( cm );
-        }
+        StateReader reader;
+        reader.load( fileNames[i] );
     }
     m_colormapEditWidget->update();
 
     Models::g()->submit();
 }
 
-
 //TODO
 void MainWindow::saveScene()
 {
-    QString fn = Models::g()->data( Models::g()->index( (int)Fn::Property::G_LAST_PATH, 0 ) ).toString();
+    QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
     QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", fn );
-    saveScene( fileName );
+    if ( !fileName.endsWith( ".xml" ) )
+    {
+        fileName += ".xml";
+    }
+    saveScene( fileName, false );
 }
 
-void MainWindow::saveScene( QString fileName )
+void MainWindow::packAndGo()
 {
-    QSettings settings( fileName, QSettings::IniFormat );
-    settings.clear();
-    //qDebug() << settings.status();
+    QString fn = Models::getGlobal( Fn::Property::G_LAST_PATH ).toString();
+    QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", fn );
+    if ( !fileName.endsWith( ".xml" ) )
+    {
+        fileName += ".xml";
+    }
+    saveScene( fileName, true );
+}
 
-    settings.setValue( "appName", "braingl" );
-    settings.setValue( "version", "0.8.1" );
+void MainWindow::saveScene( QString fileName, bool packAndGo )
+{
+    QFileInfo fi( fileName );
+    QString newScenePath = fi.path();
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save global settings
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    settings.setValue( "globalState", dynamic_cast<GlobalPropertyModel*>( Models::g() )->getState() );
-
-    settings.setValue( "camera_maingl", mainGLWidget->getCamera()->getState() );
-    settings.setValue( "arcball_maingl", mainGLWidget->getArcBall()->getState() );
-    settings.setValue( "camera_maingl2", mainGLWidget2->getCamera()->getState() );
-    settings.setValue( "arcball_maingl2", mainGLWidget2->getArcBall()->getState() );
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  save loaded datasets
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     int countDatasets = Models::d()->rowCount();
-
-
-    QList<QVariant> fileNames;
-
-    int storeIndex = 0;
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  save datasets to file if not formerly done so
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     for ( int i = 0; i < countDatasets; ++i )
     {
         Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int) Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        QVariant fn = ds->properties().get( Fn::Property::D_FILENAME );
+        QString fn = ds->properties().get( Fn::Property::D_FILENAME ).toString();
 
-        if ( !fn.toString().isEmpty() )
+        QDir dir;
+        if ( packAndGo || !dir.exists( fn ) )
         {
-            QDir dir;
-            if ( !dir.exists( fn.toString() ) )
-            {
-                qDebug() << "saving scene with file not on file system";
-                if ( save( ds ) )
-                {
-                    fn = ds->properties().get( Fn::Property::D_FILENAME );
-                    fileNames.push_back( fn );
-                    QList<QVariant>state = ds->properties().getState();
-                    settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
-                }
-            }
-            else
-            {
-                fileNames.push_back( fn );
-                QList<QVariant>state = ds->properties().getState();
-                settings.setValue( "file_" + QString::number( storeIndex++ ) + "_state", state );
-
-            }
+            // create tmp name
+            ds->properties().set( Fn::Property::D_FILENAME,
+                    newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + "." + ds->getDefaultSuffix() );
+            saveDataset( ds, "(*." + ds->getDefaultSuffix() + ")" );
         }
-
-
     }
-    settings.setValue( "countDatasets", fileNames.size() );
-    settings.setValue( "fileNames", fileNames );
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //  save loaded rois
+    //  save rois to file
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
     int numBranches = Models::r()->rowCount( QModelIndex() );
@@ -731,51 +831,76 @@ void MainWindow::saveScene( QString fileName )
 
     for ( int i = 0; i < numBranches; ++i )
     {
-        int leafCount = Models::r()->rowCount( createIndex( i, 0, 0 ) );
+        int leafCount = Models::getBranchSize( i );
 
-        QList<QVariant>branch;
-        for ( int k = 0; k < leafCount+1; ++k )
+        QList<QVariant> branch;
+        for ( int k = 0; k < leafCount + 1; ++k )
         {
-            ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( createIndex( i, k, (int)Fn::Property::D_POINTER ), Qt::DisplayRole ) );
+            ROI* roi = Models::getRoi( i, k );
 
-            QList<QVariant>state = roi->properties()->getState();
-            if ( roi->properties()->get( Fn::Property::D_SHAPE).toInt() != 10 )
+            if ( roi->properties()->get( Fn::Property::D_SHAPE ) == 10 )
             {
-                branch.push_back( state );
+                QString fn = roi->properties()->get( Fn::Property::D_FILENAME ).toString();
+                QDir dir;
+                if ( packAndGo || !dir.exists( fn ) )
+                {
+                    roi->properties()->set( Fn::Property::D_FILENAME,
+                            newScenePath + QDir::separator() + QString::number( QDateTime::currentMSecsSinceEpoch() ) + ".nii.gz" );
+                    ROIArea* roi2save = dynamic_cast<ROIArea*>( roi );
+                    saveRoi( roi2save );
+                }
             }
-
-            //settings.setValue( "roi" + QString::number( i ) + "_" + QString::number( k ) + "state", state );
-        }
-        if ( branch.size() > 0 )
-        {
-            roiStates.push_back( branch );
         }
     }
-    settings.setValue(  "roiStates", roiStates );
 
-    settings.sync();
-}
-
-QModelIndex MainWindow::createIndex( int branch, int pos, int column )
-{
-    int row;
-    QModelIndex parent;
-    if ( pos == 0 )
-    {
-        row = branch;
-    }
-    else
-    {
-        row = pos - 1;
-        parent = Models::r()->index( branch, 0 );
-    }
-    return Models::r()->index( row, column, parent );
+    StateWriter writer;
+    writer.saveScene( fileName, packAndGo, mainGLWidget->getCamera()->getState(), mainGLWidget->getArcBall()->getState(),
+            mainGLWidget2->getCamera()->getState(), mainGLWidget2->getArcBall()->getState() );
 }
 
 void MainWindow::loadScene( QString fileName )
 {
+    if ( fileName.endsWith( ".scn" ) )
+    {
+        qWarning( ) << "*****************************************************************************************";
+        qWarning( ) << "***                                                                                   ***";
+        qWarning( ) << "***          Warning! Use of .scn is deprecated. Please re-save your scenes!          ***";
+        qWarning( ) << "***                                                                                   ***";
+        qWarning( ) << "*****************************************************************************************";
+        loadSceneDeprecated( fileName );
+        return;
+    }
+
+    StateReader reader;
+    reader.load( fileName );
+
+    QMap<QString, QMap<QString, QVariant> > cameras = reader.getCameras();
+    if ( cameras.contains( "camera_maingl" ) )
+    {
+        mainGLWidget->getCamera()->setState( cameras["camera_maingl"] );
+    }
+    if ( cameras.contains( "arcball_maingl" ) )
+    {
+        mainGLWidget->getArcBall()->setState( cameras["arcball_maingl"] );
+    }
+
+    if ( cameras.contains( "camera_maingl2" ) )
+    {
+        mainGLWidget2->getCamera()->setState( cameras["camera_maingl2"] );
+    }
+    if ( cameras.contains( "arcball_maingl2" ) )
+    {
+        mainGLWidget2->getArcBall()->setState( cameras["arcball_maingl2"] );
+    }
+
+    setCurrentScene( fileName );
+    GLFunctions::reloadShaders();
+    Models::g()->submit();
+}
+
+void MainWindow::loadSceneDeprecated( QString fileName )
+{
     QSettings settings( fileName, QSettings::IniFormat );
-    //qDebug() << settings.status();
 
     QString versionString = "0.0.0";
     if ( settings.contains( "version" ) )
@@ -801,9 +926,9 @@ void MainWindow::loadScene( QString fileName )
     QList<QVariant> rois = settings.value( "roiStates" ).toList();
     for ( int i = 0; i < rois.size(); ++i )
     {
-        QList<QVariant>branch = rois[i].toList();
+        QList<QVariant> branch = rois[i].toList();
 
-        QList<QVariant>roiState = branch[0].toList();
+        QList<QVariant> roiState = branch[0].toList();
         GLFunctions::roi = new ROIBox();
         GLFunctions::roi->properties()->setState( roiState );
 
@@ -813,16 +938,16 @@ void MainWindow::loadScene( QString fileName )
         {
             for ( int k = 1; k < branch.size(); ++k )
             {
-                QList<QVariant>roiState = branch[k].toList();
+                QList<QVariant> roiState = branch[k].toList();
                 GLFunctions::roi = new ROIBox();
                 GLFunctions::roi->properties()->setState( roiState );
-                Models::r()->insertRows( 0, 0, createIndex( numBranches +i, 0, 0 ) );
+                Models::r()->insertRows( 0, 0, Models::createRoiIndex( numBranches + i, 0, 0 ) );
 
                 for ( int l = 0; l < roiState.size() / 2; ++l )
                 {
-                    if ( (Fn::Property)( roiState[l*2].toInt() ) == Fn::Property::D_COLOR )
+                    if ( (Fn::Property) ( roiState[l * 2].toInt() ) == Fn::Property::D_COLOR )
                     {
-                        GLFunctions::roi->properties()->set( (Fn::Property)( roiState[l*2].toInt() ), roiState[l*2+1] );
+                        GLFunctions::roi->properties()->set( (Fn::Property) ( roiState[l * 2].toInt() ), roiState[l * 2 + 1] );
                     }
                 }
             }
@@ -883,15 +1008,18 @@ void MainWindow::about()
     QString hg = HGTIP;
     hg.remove( ";" );
     hg.remove( "changeset:" );
-    hg.replace( " ","" );
+    hg.replace( " ", "" );
 
-    QString message ( "<b>brainGL development version " + hg + "<br><br> </b>"
-            "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
-            "For questions please consult the <a href=\"https://code.google.com/p/braingl/wiki/Main\"><b>documentation</b></a>.<br><br>"
-            "Please report bugs and feature requests <a href=\"https://code.google.com/p/braingl/issues/list\"><b>here</b></a>.<br><br>"
-
-
-    );
+    QString message( "<b>brainGL development version " + hg +
+#ifdef __DEBUG__
+            " (debug)"
+#elif __RELEASE__
+            " (release)"
+#endif
+            "<br><br> </b>"
+                    "Exploring and visualizing anatomical and functional connectivity in the brain.<br><br>"
+                    "For questions please consult the <a href=\"https://code.google.com/p/braingl/wiki/Main\"><b>documentation</b></a>.<br><br>"
+                    "Please report bugs and feature requests <a href=\"https://code.google.com/p/braingl/issues/list\"><b>here</b></a>.<br><br>" );
 
     QMessageBox::about( this, tr( "About brainGL" ), message );
 }
@@ -906,51 +1034,54 @@ void MainWindow::createActions()
     openAct = new QAction( QIcon( ":/icons/open.png" ), tr( "&Open..." ), this );
     openAct->setShortcuts( QKeySequence::Open );
     openAct->setStatusTip( tr( "Load Dataset" ) );
-    connect( openAct, SIGNAL(triggered()), this, SLOT(open()) );
+    connect( openAct, SIGNAL( triggered() ), this, SLOT( open() ) );
 
     saveAct = new QAction( QIcon( ":/icons/save.png" ), tr( "&Save..." ), this );
     saveAct->setShortcuts( QKeySequence::Save );
     saveAct->setStatusTip( tr( "Save the current form letter" ) );
-    connect( saveAct, SIGNAL(triggered()), this, SLOT(save()) );
+    connect( saveAct, SIGNAL( triggered() ), this, SLOT( save() ) );
 
     quitAct = new QAction( tr( "&Quit" ), this );
     quitAct->setShortcuts( QKeySequence::Quit );
     quitAct->setStatusTip( tr( "Quit the application" ) );
-    connect( quitAct, SIGNAL(triggered()), this, SLOT(close()) );
+    connect( quitAct, SIGNAL( triggered() ), this, SLOT( close() ) );
 
     loadRoiAct = new QAction( tr( "Load ROI" ), this );
     loadRoiAct->setStatusTip( tr( "Load a ROI from a Nifti file " ) );
-    connect( loadRoiAct, SIGNAL(triggered()), this, SLOT( loadRoi() ) );
+    connect( loadRoiAct, SIGNAL( triggered() ), this, SLOT( loadRoi() ) );
 
     saveSceneAct = new QAction( tr( "Save Scene" ), this );
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
-    connect( saveSceneAct, SIGNAL(triggered()), this, SLOT(saveScene()) );
+    connect( saveSceneAct, SIGNAL( triggered() ), this, SLOT( saveScene() ) );
+
+    packAndGoAct = new QAction( tr( "Pack and Go" ), this );
+    packAndGoAct->setStatusTip( tr( "Copy all loaded datasets into selected directory and save scene" ) );
+    connect( packAndGoAct, SIGNAL( triggered() ), this, SLOT( packAndGo() ) );
 
     exportColormapsAct = new QAction( tr( "Export Colormaps" ), this );
     exportColormapsAct->setStatusTip( tr( "Save current colormaps to a file" ) );
-    connect( exportColormapsAct, SIGNAL(triggered()), this, SLOT( exportColormaps()) );
+    connect( exportColormapsAct, SIGNAL( triggered() ), this, SLOT( exportColormaps() ) );
 
     importColormapsAct = new QAction( tr( "Import Colormaps" ), this );
     importColormapsAct->setStatusTip( tr( "Loads current colormaps from a file" ) );
-    connect( importColormapsAct, SIGNAL(triggered()), this, SLOT( importColormaps()) );
+    connect( importColormapsAct, SIGNAL( triggered() ), this, SLOT( importColormaps() ) );
 
     screenshotAct = new QAction( QIcon( ":/icons/camera.png" ), tr( "Screenshot" ), this );
     screenshotAct->setStatusTip( tr( "Sreenshot" ) );
-    connect( screenshotAct, SIGNAL(triggered()), this, SLOT(screenshot()) );
+    screenshotAct->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_P ) );
+    connect( screenshotAct, SIGNAL( triggered() ), this, SLOT( screenshot() ) );
 
     resetSettingsAct = new QAction( tr( "Reset Settings" ), this );
     resetSettingsAct->setStatusTip( tr( "Reset Settings" ) );
-    connect( resetSettingsAct, SIGNAL(triggered()), this, SLOT(resetSettings()) );
-
+    connect( resetSettingsAct, SIGNAL( triggered() ), this, SLOT( resetSettings() ) );
 
     aboutAct = new QAction( tr( "&About" ), this );
     aboutAct->setStatusTip( tr( "Show the application's About box" ) );
-    connect( aboutAct, SIGNAL(triggered()), this, SLOT(about()) );
-
+    connect( aboutAct, SIGNAL( triggered() ), this, SLOT( about() ) );
 
     newMainGLAct = new QAction( tr( "New 3D view" ), this );
     newMainGLAct->setStatusTip( tr( "New 3D view" ) );
-    connect( newMainGLAct, SIGNAL(triggered()), this, SLOT( newMainGL() ) );
+    connect( newMainGLAct, SIGNAL( triggered() ), this, SLOT( newMainGL() ) );
 
     showAxialAct = new QAction( QIcon( ":/icons/axial.png" ), tr( "Show Axial Slice" ), this );
     showAxialAct->setStatusTip( tr( "Toggle rendering of the axial slice." ) );
@@ -999,16 +1130,23 @@ void MainWindow::createActions()
 
     newSelectionBoxAct = new QAction( QIcon( ":/icons/box.png" ), tr( "New ROI" ), this );
     newSelectionBoxAct->setStatusTip( tr( "Add a new ROI." ) );
-#ifndef __WINDOWS__
+
     dilbertAct = new QAction( QIcon( ":/icons/box.png" ), tr( "Dilbert" ), this );
     dilbertAct->setStatusTip( tr( "Dilbert" ) );
     connect( dilbertAct, SIGNAL( triggered() ), this, SLOT( slotDilbert() ) );
-#endif
+
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
-        recentFileActs[ i ] = new QAction( this );
-        recentFileActs[ i ]->setVisible( false );
-        connect( recentFileActs[ i ], SIGNAL(triggered()), this, SLOT(openRecentFile()) );
+        recentFileActs[i] = new QAction( this );
+        recentFileActs[i]->setVisible( false );
+        connect( recentFileActs[i], SIGNAL( triggered() ), this, SLOT( openRecentFile() ) );
+    }
+
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        recentSceneActs[i] = new QAction( this );
+        recentSceneActs[i]->setVisible( false );
+        connect( recentSceneActs[i], SIGNAL( triggered() ), this, SLOT( openRecentScene() ) );
     }
 
     continousRenderingAct = new QAction( QIcon( ":/icons/continous.png" ), tr( "Continous Rendering" ), this );
@@ -1021,8 +1159,19 @@ void MainWindow::createActions()
     newPlaneAct->setStatusTip( tr( "create a new plane" ) );
     newPlaneAct->setCheckable( false );
     newPlaneAct->setChecked( false );
-    connect( newPlaneAct, SIGNAL(triggered()), this, SLOT(newPlane()) );
+    connect( newPlaneAct, SIGNAL( triggered() ), this, SLOT( newPlane() ) );
 
+    newGuideAct = new QAction( QIcon( ":/icons/crosshair.png" ), tr( "new Guide" ), this );
+    newGuideAct->setStatusTip( tr( "create a new guides" ) );
+    newGuideAct->setCheckable( false );
+    newGuideAct->setChecked( false );
+    connect( newGuideAct, SIGNAL( triggered() ), this, SLOT( newGuide() ) );
+
+    newLabelAct = new QAction( QIcon( ":/icons/label.png" ), tr( "new Label" ), this );
+    newLabelAct->setStatusTip( tr( "create a new label" ) );
+    newLabelAct->setCheckable( false );
+    newLabelAct->setChecked( false );
+    connect( newLabelAct, SIGNAL( triggered() ), this, SLOT( newLabel() ) );
 }
 
 void MainWindow::createMenus()
@@ -1036,19 +1185,31 @@ void MainWindow::createMenus()
     separatorAct = fileMenu->addSeparator();
 
     fileMenu->addAction( saveSceneAct );
+    fileMenu->addAction( packAndGoAct );
     separatorAct = fileMenu->addSeparator();
 
     fileMenu->addAction( exportColormapsAct );
     fileMenu->addAction( importColormapsAct );
     separatorAct = fileMenu->addSeparator();
 
+    recentFilesMenu = fileMenu->addMenu( "Recent files" );
+
     for ( int i = 0; i < MaxRecentFiles; ++i )
     {
-        fileMenu->addAction( recentFileActs[ i ] );
+        recentFilesMenu->addAction( recentFileActs[i] );
     }
+
+    recentScenesMenu = fileMenu->addMenu( "Recent scenes" );
+
+    for ( int i = 0; i < MaxRecentFiles; ++i )
+    {
+        recentScenesMenu->addAction( recentSceneActs[i] );
+    }
+
     fileMenu->addSeparator();
     fileMenu->addAction( quitAct );
     updateRecentFileActions();
+    updateRecentSceneActions();
 
     viewMenu = menuBar()->addMenu( tr( "&Widgets" ) );
     viewMenu->addAction( lockDockTitlesAct );
@@ -1059,9 +1220,8 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu( tr( "&Help" ) );
     helpMenu->addAction( screenshotAct );
     helpMenu->addAction( resetSettingsAct );
-#ifndef __WINDOWS__
     helpMenu->addAction( dilbertAct );
-#endif
+
     helpMenu->addAction( aboutAct );
 }
 
@@ -1073,13 +1233,15 @@ void MainWindow::createToolBars()
     fileToolBar->addAction( saveAct );
     fileToolBar->addAction( screenshotAct );
     fileToolBar->addAction( newPlaneAct );
+    fileToolBar->addAction( newGuideAct );
+    fileToolBar->addAction( newLabelAct );
     //fileToolBar->addAction( continousRenderingAct );
     //fileToolBar->addAction( printAct );
     if ( m_debug )
     {
         fileToolBar->addAction( toggleShaderEditAct );
     }
-    fileToolBar->setObjectName( "fileToolbar");
+    fileToolBar->setObjectName( "fileToolbar" );
 
     editToolBar = addToolBar( tr( "Edit" ) );
     editToolBar->addAction( showAxialAct );
@@ -1089,10 +1251,11 @@ void MainWindow::createToolBars()
     editToolBar->addAction( standardViewCoronalAct );
     editToolBar->addAction( standardViewSagittalAct );
     editToolBar->addAction( newSelectionBoxAct );
-    editToolBar->setObjectName( "editToolbar");
+    editToolBar->setObjectName( "editToolbar" );
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
     addToolBar( m_toolsToolBar );
+    
 }
 
 void MainWindow::createStatusBar()
@@ -1105,40 +1268,41 @@ void MainWindow::createStatusBar()
 void MainWindow::createDockWindows()
 {
     m_datasetWidget = new DatasetListWidget();
-	FNDockWidget* dockDSW = new FNDockWidget( QString("Dataset List"), m_datasetWidget, this );
-	addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
-	viewMenu->addAction( dockDSW->toggleViewAction() );
-	connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSW, SLOT( toggleTitleWidget() ) );
+    FNDockWidget* dockDSW = new FNDockWidget( QString( "Dataset List" ), m_datasetWidget, this );
+    addDockWidget( Qt::LeftDockWidgetArea, dockDSW );
+    viewMenu->addAction( dockDSW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSW, SLOT( toggleTitleWidget() ) );
 
-	connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), Models::d(), SLOT( moveItemUp( int ) ) );
-	connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), Models::d(), SLOT( moveItemDown( int ) ) );
-	connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), Models::d(), SLOT( deleteItem( int ) ) );
+    connect( m_datasetWidget, SIGNAL( moveSelectedItemUp( int ) ), Models::d(), SLOT( moveItemUp( int ) ) );
+    connect( m_datasetWidget, SIGNAL( moveSelectedItemDown( int ) ), Models::d(), SLOT( moveItemDown( int ) ) );
+    connect( m_datasetWidget, SIGNAL( deleteSelectedItem( int ) ), Models::d(), SLOT( deleteItem( int ) ) );
 
-	m_colormapEditWidget = new ColormapEditWidget( this );
-    FNDockWidget* dockCE = new FNDockWidget( QString("colormap edit"), m_colormapEditWidget, this );
+    m_colormapEditWidget = new ColormapEditWidget( this );
+    FNDockWidget* dockCE = new FNDockWidget( QString( "colormap edit" ), m_colormapEditWidget, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockCE );
     viewMenu->addAction( dockCE->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockCE, SLOT( toggleTitleWidget() ) );
     dockCE->hide();
 
-	m_roiWidget = new ROIWidget( this );
-	Models::setRoiWidget( m_roiWidget );
-	FNDockWidget* dockSBW = new FNDockWidget( QString("ROIs"), m_roiWidget, this );
+    m_roiWidget = new ROIWidget( this );
+    Models::setRoiWidget( m_roiWidget );
+    FNDockWidget* dockSBW = new FNDockWidget( QString( "ROIs" ), m_roiWidget, this );
     addDockWidget( Qt::RightDockWidgetArea, dockSBW );
     viewMenu->addAction( dockSBW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSBW, SLOT( toggleTitleWidget() ) );
     connect( newSelectionBoxAct, SIGNAL( triggered() ), m_roiWidget, SLOT( addBox() ) );
 
-	DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( "maingl", this );
-	m_dockDSP = new FNDockWidget( QString("dataset properties"), dsProperties, this );
+    DatasetPropertyWidget* dsProperties = new DatasetPropertyWidget( "maingl", this );
+    m_dockDSP = new FNDockWidget( QString( "dataset properties" ), dsProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, m_dockDSP );
     dsProperties->setSelectionModel( m_datasetWidget->selectionModel() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockDSP, SLOT( toggleTitleWidget() ) );
     connect( m_colormapEditWidget, SIGNAL( signalUpdate() ), dsProperties, SLOT( update() ) );
-    connect( m_datasetWidget->selectionModel(), SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), this, SLOT( slotDatasetSelectionChanged() ) );
+    connect( m_datasetWidget->selectionModel(), SIGNAL( selectionChanged( QItemSelection, QItemSelection ) ), this,
+            SLOT( slotDatasetSelectionChanged() ) );
 
     DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl2", this );
-    FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties 2"), dsProperties2, this );
+    FNDockWidget* dockDSP2 = new FNDockWidget( QString( "dataset properties 2" ), dsProperties2, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
     dsProperties2->setSelectionModel( m_datasetWidget->selectionModel() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSP2, SLOT( toggleTitleWidget() ) );
@@ -1146,45 +1310,40 @@ void MainWindow::createDockWindows()
     dockDSP2->hide();
 
     ROIPropertyWidget* roiProperties = new ROIPropertyWidget( this );
-    FNDockWidget* dockRP = new FNDockWidget( QString("roi properties"), roiProperties, this );
+    FNDockWidget* dockRP = new FNDockWidget( QString( "roi properties" ), roiProperties, this );
     addDockWidget( Qt::RightDockWidgetArea, dockRP );
     roiProperties->setModel( Models::r() );
     roiProperties->setSelectionModel( m_roiWidget->selectionModel() );
     viewMenu->addAction( dockRP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockRP, SLOT( toggleTitleWidget() ) );
 
-
     GlobalPropertyWidget* globalProperties = new GlobalPropertyWidget( this );
-    FNDockWidget* dockGP = new FNDockWidget( QString("Global Properties"), globalProperties, this );
+    FNDockWidget* dockGP = new FNDockWidget( QString( "Global Properties" ), globalProperties, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockGP );
     globalProperties->setModel( Models::g() );
     viewMenu->addAction( dockGP->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockGP, SLOT( toggleTitleWidget() ) );
 
-	DatasetInfoView *dsInfo = new DatasetInfoView( this );
-	FNDockWidget* dockDSI = new FNDockWidget( QString("dataset info"), dsInfo, this );
-	addDockWidget( Qt::BottomDockWidgetArea, dockDSI );
-	dsInfo->setModel( Models::d() );
+    DatasetInfoView *dsInfo = new DatasetInfoView( this );
+    FNDockWidget* dockDSI = new FNDockWidget( QString( "dataset info" ), dsInfo, this );
+    addDockWidget( Qt::BottomDockWidgetArea, dockDSI );
+    dsInfo->setModel( Models::d() );
     dsInfo->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSI->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockDSI, SLOT( toggleTitleWidget() ) );
     dockDSI->hide();
-
 
     tabifyDockWidget( dockGP, m_dockDSP );
     tabifyDockWidget( dockGP, dockCE );
     tabifyDockWidget( dockGP, dockDSP2 );
 
     // GL Widgets
-
-    //this->show();   // XXX work around "invalid drawable"?
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
-    FNDockWidget* dockMainGL = new FNDockWidget( QString("main gl"), mainGLWidget, this );
+    FNDockWidget* dockMainGL = new FNDockWidget( QString( "main gl" ), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL, SIGNAL( visibilityChanged( bool ) ), mainGLWidget, SLOT( visibilityChanged( bool ) ) );
     mainGLWidget->update();
-
     m_scriptWidget = new ScriptWidget( mainGLWidget, this );
     FNDockWidget* dockSW = new FNDockWidget( "script", m_scriptWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSW );
@@ -1197,55 +1356,63 @@ void MainWindow::createDockWindows()
     //dockSW->hide();
 
     mainGLWidget2 = new GLWidget( "maingl2", m_roiWidget->selectionModel(), this, mainGLWidget );
-    FNDockWidget* dockMainGL2 = new FNDockWidget( QString("main gl 2"), mainGLWidget2, this );
+    FNDockWidget* dockMainGL2 = new FNDockWidget( QString( "main gl 2" ), mainGLWidget2, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL2 );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL2, SLOT( toggleTitleWidget() ) );
     connect( dockMainGL2, SIGNAL( visibilityChanged( bool ) ), mainGLWidget2, SLOT( visibilityChanged( bool ) ) );
 
-    DockNavGLWidget* nav1 = new DockNavGLWidget( QString("axial"), 2, this, mainGLWidget );
-    FNDockWidget* dockNav1 = new FNDockWidget( QString("axial"), nav1, this );
+    DockNavGLWidget* nav1 = new DockNavGLWidget( QString( "axial" ), 2, this, mainGLWidget );
+    FNDockWidget* dockNav1 = new FNDockWidget( QString( "axial" ), nav1, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav1 );
     viewMenu->addAction( dockNav1->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav1, SLOT( toggleTitleWidget() ) );
     connect( dockNav1, SIGNAL( visibilityChanged( bool ) ), nav1, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav2 = new DockNavGLWidget( QString( "sagittal" ), 0, this, mainGLWidget );
-    FNDockWidget* dockNav2 = new FNDockWidget( QString("sagittal"), nav2, this );
+    FNDockWidget* dockNav2 = new FNDockWidget( QString( "sagittal" ), nav2, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav2 );
     viewMenu->addAction( dockNav2->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav2, SLOT( toggleTitleWidget() ) );
     connect( dockNav2, SIGNAL( visibilityChanged( bool ) ), nav2, SLOT( setWidgetVisible( bool) ) );
 
     DockNavGLWidget* nav3 = new DockNavGLWidget( QString( "coronal" ), 1, this, mainGLWidget );
-    FNDockWidget* dockNav3 = new FNDockWidget( QString("coronal"), nav3, this );
+    FNDockWidget* dockNav3 = new FNDockWidget( QString( "coronal" ), nav3, this );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockNav3 );
     viewMenu->addAction( dockNav3->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav3, SLOT( toggleTitleWidget() ) );
     connect( dockNav3, SIGNAL( visibilityChanged( bool ) ), nav3, SLOT( setWidgetVisible( bool ) ) );
 
-    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
-    FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
+//    CombinedNavGLWidget* nav4 = new CombinedNavGLWidget( QString( "combined" ), this, mainGLWidget );
+//    FNDockWidget* dockNav4 = new FNDockWidget( QString("Combined Nav"), nav4, this );
 //    m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockNav4 );
 //    viewMenu->addAction( dockNav4->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
-    connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
+//    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockNav4, SLOT( toggleTitleWidget() ) );
+//    connect( dockNav4, SIGNAL( visibilityChanged( bool ) ), nav4, SLOT( setWidgetVisible( bool ) ) );
 
     HierarchicalTreeGLWidget* htw = new HierarchicalTreeGLWidget( QString( "tree" ), this, mainGLWidget );
-    FNDockWidget* dockHTW = new FNDockWidget( QString("tree"), htw, this );
-    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockHTW );
-    viewMenu->addAction( dockHTW->toggleViewAction() );
-    connect( lockDockTitlesAct, SIGNAL( triggered() ), dockHTW, SLOT( toggleTitleWidget() ) );
-    connect( dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
+    m_dockHTW = new FNDockWidget( QString( "tree" ), htw, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, m_dockHTW );
+    viewMenu->addAction( m_dockHTW->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockHTW, SLOT( toggleTitleWidget() ) );
+    connect( m_dockHTW, SIGNAL( visibilityChanged( bool ) ), htw, SLOT( setWidgetVisible( bool ) ) );
+
+    HierarchicalTreeGLWidget* htw2 = new HierarchicalTreeGLWidget( QString( "tree2" ), this, mainGLWidget );
+    m_dockHTW2 = new FNDockWidget( QString( "tree2" ), htw2, this );
+    m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, m_dockHTW2 );
+    viewMenu->addAction( m_dockHTW2->toggleViewAction() );
+    connect( lockDockTitlesAct, SIGNAL( triggered() ), m_dockHTW2, SLOT( toggleTitleWidget() ) );
+    connect( m_dockHTW2, SIGNAL( visibilityChanged( bool ) ), htw2, SLOT( setWidgetVisible( bool ) ) );
 
     dockNav1->hide();
     dockNav2->hide();
     dockNav3->hide();
-    dockNav4->hide();
+//    dockNav4->hide();
     dockMainGL2->hide();
-    dockHTW->hide();
+    m_dockHTW->hide();
+    m_dockHTW2->hide();
 
     SingleSHWidget* sshw = new SingleSHWidget( QString( "single sh" ), this, mainGLWidget );
-    FNDockWidget* dockSSHW = new FNDockWidget( QString("single sh" ), sshw, this );
+    FNDockWidget* dockSSHW = new FNDockWidget( QString( "single sh" ), sshw, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockSSHW );
     viewMenu->addAction( dockSSHW->toggleViewAction() );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockSSHW, SLOT( toggleTitleWidget() ) );
@@ -1259,34 +1426,36 @@ void MainWindow::createDockWindows()
     viewMenu->addAction( dockDSP2->toggleViewAction() );
 
     //m_centralWidget->tabifyDockWidget( dockSSHW, dockNav4 );
-    m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
+//    m_centralWidget->tabifyDockWidget( dockNav4, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockMainGL2, dockMainGL );
     m_centralWidget->tabifyDockWidget( dockSW, dockMainGL );
     //m_centralWidget->tabifyDockWidget( dockFS, dockMainGL );
 
-    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
-    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget, SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
+    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_datasetWidget,
+            SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
+    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), m_scriptWidget,
+            SLOT( slotKeyPressed( int, Qt::KeyboardModifiers ) ) );
 }
 
 void MainWindow::slotToggleAxialSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SHOW_AXIAL, 0 ), showAxialAct->isChecked() );
     Models::g()->submit();
 }
 
 void MainWindow::slotToggleCoronalSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SHOW_CORONAL, 0 ), showCoronalAct->isChecked() );
     Models::g()->submit();
 }
 
 void MainWindow::slotToggleSagittalSlice()
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_SHOW_SAGITTAL, 0 ), showSagittalAct->isChecked() );
     Models::g()->submit();
 }
 
-void  MainWindow::slotStandardAxialView()
+void MainWindow::slotStandardAxialView()
 {
     Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
     GLWidget* target = mainGLWidget;
@@ -1305,7 +1474,7 @@ void  MainWindow::slotStandardAxialView()
     }
 }
 
-void  MainWindow::slotStandardCoronalView()
+void MainWindow::slotStandardCoronalView()
 {
     Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
     GLWidget* target = mainGLWidget;
@@ -1324,7 +1493,7 @@ void  MainWindow::slotStandardCoronalView()
     }
 }
 
-void  MainWindow::slotStandardSagittalView()
+void MainWindow::slotStandardSagittalView()
 {
     Qt::KeyboardModifiers mods = QApplication::queryKeyboardModifiers();
     GLWidget* target = mainGLWidget;
@@ -1346,7 +1515,7 @@ void  MainWindow::slotStandardSagittalView()
 void MainWindow::slotToggleShaderEdit()
 {
     m_shaderEditWidget = new ShaderEditWidget( this );
-    FNDockWidget* dockSEW = new FNDockWidget( QString("shader edit" ), m_shaderEditWidget, this );
+    FNDockWidget* dockSEW = new FNDockWidget( QString( "shader edit" ), m_shaderEditWidget, this );
     viewMenu->addAction( dockSEW->toggleViewAction() );
     m_centralWidget->addDockWidget( Qt::RightDockWidgetArea, dockSEW );
     tabifiedDockWidgets( dockSEW );
@@ -1354,16 +1523,15 @@ void MainWindow::slotToggleShaderEdit()
 
 void MainWindow::slotRenderCrosshairs( bool value )
 {
-    Models::g()->setData( Models::g()->index( (int)Fn::Property::G_RENDER_CROSSHAIRS, 0 ), value );
+    Models::g()->setData( Models::g()->index( (int) Fn::Property::G_RENDER_CROSSHAIRS, 0 ), value );
 }
 
-void MainWindow::screenshot()
+void MainWindow::screenshot( bool exitAfter )
 {
-
-    QString path = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SCREENSHOT_PATH, 0 ) ).toString();
-    if ( !path.endsWith( '/') )
+    QString path = Models::getGlobal(  Fn::Property::G_SCREENSHOT_PATH ).toString();
+    if ( !path.endsWith( QDir::separator() ) )
     {
-        path += '/';
+        path += QDir::separator();
     }
     QString numberString = Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toString();
     Models::setGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER, Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ).toInt() + 1 );
@@ -1379,25 +1547,26 @@ void MainWindow::screenshot()
 
     if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL ).toBool() )
     {
-        mainGLWidget->screenshot( path + prefix + numberString + QString( ".png" ) );
+        mainGLWidget->screenshot( path + prefix + numberString + QString( ".png" ), exitAfter );
     }
     if ( Models::getGlobal( Fn::Property::G_SCREENSHOT_DO_MAINGL2 ).toBool() )
     {
-        mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ) );
+        mainGLWidget2->screenshot( path + prefix2 + numberString + QString( ".png" ), exitAfter );
     }
+    Models::g()->submit();
 }
 
 void MainWindow::resetSettings()
 {
     QMessageBox msgBox;
-    msgBox.setText("Reset settings.");
-    msgBox.setInformativeText("This will shut down brainGL. Continue?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Yes);
+    msgBox.setText( "Reset settings." );
+    msgBox.setInformativeText( "This will shut down brainGL. Continue?" );
+    msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Yes );
     int ret = msgBox.exec();
     switch ( ret )
     {
-        case QMessageBox::Yes :
+        case QMessageBox::Yes:
         {
             QSettings settings;
             settings.clear();
@@ -1405,24 +1574,22 @@ void MainWindow::resetSettings()
             exit( 0 );
             break;
         }
-        case QMessageBox::Cancel :
+        case QMessageBox::Cancel:
             break;
     }
 }
 
 void MainWindow::slotDilbert()
 {
-#ifndef __WINDOWS__
     QWidget* widget = new QWidget();
     QVBoxLayout* vLayout = new QVBoxLayout();
     vLayout->setContentsMargins( 1, 1, 1, 1 );
     vLayout->setSpacing( 1 );
     QWebView* wv = new QWebView( this );
-    wv->setUrl( QUrl( "http://www.dilbert.com/fast/") );
+    wv->setUrl( QUrl( "http://www.dilbert.com/fast/" ) );
     vLayout->addWidget( wv );
     widget->setLayout( vLayout );
     widget->show();
-#endif
 }
 
 void MainWindow::slotNew()
@@ -1448,9 +1615,8 @@ void MainWindow::newMainGL()
         ds->copySettings( "maingl" + QString::number( MainWindow::countMainGL ) );
     }
 
-
     DatasetPropertyWidget* dsProperties2 = new DatasetPropertyWidget( "maingl" + QString::number( MainWindow::countMainGL ), this );
-    FNDockWidget* dockDSP2 = new FNDockWidget( QString("dataset properties " + QString::number( MainWindow::countMainGL ) ), dsProperties2, this );
+    FNDockWidget* dockDSP2 = new FNDockWidget( QString( "dataset properties " + QString::number( MainWindow::countMainGL ) ), dsProperties2, this );
     addDockWidget( Qt::LeftDockWidgetArea, dockDSP2 );
     dsProperties2->setSelectionModel( m_datasetWidget->selectionModel() );
     viewMenu->addAction( dockDSP2->toggleViewAction() );
@@ -1482,4 +1648,16 @@ void MainWindow::newPlane()
 {
     DatasetPlane* plane = new DatasetPlane();
     Models::addDataset( plane );
+}
+
+void MainWindow::newGuide()
+{
+    DatasetGuides* g = new DatasetGuides();
+    Models::addDataset( g );
+}
+
+void MainWindow::newLabel()
+{
+    DatasetLabel* g = new DatasetLabel();
+    Models::addDataset( g );
 }

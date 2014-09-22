@@ -1,62 +1,85 @@
 #version 330
 
+in vec3 v_vertex;
+in vec3 v_normal;
+in vec4 v_color;
+in float v_value;
+
+uniform int u_colorMode;
+uniform int u_colormap;
+uniform float u_min;
+uniform float u_max;
+uniform float u_selectedMin;
+uniform float u_selectedMax;
+uniform float u_lowerThreshold;
+uniform float u_upperThreshold;
+
+uniform float u_x;
+uniform float u_y;
+uniform float u_z;
+
+uniform bool u_cutLowerX;
+uniform bool u_cutLowerY;
+uniform bool u_cutLowerZ;
+uniform bool u_cutHigherX;
+uniform bool u_cutHigherY;
+uniform bool u_cutHigherZ;
+
+uniform int u_meshTransparency;
+
 #include colormap_fs
 #include textures_fs
-#include uniforms_fs
 #include lighting_fs
 #include peel_fs
-
-in float v_value;
-in vec3 vertex;
 
 void main()
 {
     bool dis = false;
-    if ( u_cutLowerX && vertex.x < u_x + 0.1 )
+    if ( u_cutLowerX && v_vertex.x < u_x + 0.1 )
     {
-        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        if ( u_cutLowerY && v_vertex.y < u_y + 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1)
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1)
             {
                 dis = true;
             }
         }
-        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        if ( u_cutHigherY && v_vertex.y > u_y - 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
         }
     }   
-    if ( u_cutHigherX && vertex.x > u_x - 0.1 )
+    if ( u_cutHigherX && v_vertex.x > u_x - 0.1 )
     {
-        if ( u_cutLowerY && vertex.y < u_y + 0.1 )
+        if ( u_cutLowerY && v_vertex.y < u_y + 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
         }
-        if ( u_cutHigherY && vertex.y > u_y - 0.1 )
+        if ( u_cutHigherY && v_vertex.y > u_y - 0.1 )
         {
-            if ( u_cutLowerZ && vertex.z < u_z + 0.1 )
+            if ( u_cutLowerZ && v_vertex.z < u_z + 0.1 )
             {
                 dis = true;
             }
-            if ( u_cutHigherZ && vertex.z > u_z - 0.1 )
+            if ( u_cutHigherZ && v_vertex.z > u_z - 0.1 )
             {
                 dis = true;
             }
@@ -68,9 +91,7 @@ void main()
         discard;
     }
 
-
     vec3 color = light( u_color ).rgb;
-    float test1 = dot( v_lightDir.xyz, v_normal.xyz );
        
     if ( u_colorMode == 0 )
     {
@@ -78,9 +99,7 @@ void main()
     }
     else if ( u_colorMode == 1 )
     {
-        vec4 tcol = texColor();
-        
-        color = light( tcol ).rgb;
+        color = light( texColor() ).rgb;
         
         if ( length( color.rgb ) < 0.00001 )
         {
@@ -100,8 +119,15 @@ void main()
     }
     else
     {
-        color = light( frontColor ).rgb;
+        color = light( v_color ).rgb;
     }
     
-    writePeel( color );
+    if ( u_meshTransparency == 0 )
+    {
+        writePeel( vec4( color, u_alpha ) );
+    }
+    else
+    {
+        writePeel2( vec4( color, u_alpha ) );
+    }
 }

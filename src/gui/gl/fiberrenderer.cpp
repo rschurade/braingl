@@ -29,7 +29,9 @@ FiberRenderer::FiberRenderer( FiberSelector* selector,
     m_fibs( fibs ),
     m_numLines( fibs->size() ),
     m_numPoints( numPoints ),
-    m_isInitialized( false )
+    m_isInitialized( false ),
+    m_updateExtraData( false ),
+    m_selectedExtraData( 0 )
 {
 }
 
@@ -42,6 +44,7 @@ FiberRenderer::~FiberRenderer()
 
 void FiberRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, &vbo );
     glGenBuffers( 1, &dataVbo );
     glGenBuffers( 1, &indexVbo );
@@ -71,6 +74,11 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
         }
     }
 
+    if ( m_updateExtraData )
+    {
+    	updateExtraData( m_selectedExtraData );
+    }
+
     QGLShaderProgram* program = GLFunctions::getShader( "fiber" );
     program->bind();
 
@@ -81,6 +89,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
     program->setUniformValue( "mv_matrixTI", mv_matrix.transposed().inverted() );
+    program->setUniformValue( "userTransformMatrix", props.get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>() );
 
     initGeometry();
 
@@ -119,8 +128,15 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
 
     std::vector<bool>*selected = m_selector->getSelection();
 
+    int percent = props.get( Fn::Property::D_FIBER_THIN_OUT ).toFloat() * 10;
+
     for ( unsigned int i = 0; i < m_fibs->size(); ++i )
     {
+        if ( ( i % 1000 ) > percent )
+        {
+            continue;
+        }
+
         if ( selected->at( i ) )
         {
             QColor c = m_fibs->at( i ).customColor();
@@ -169,12 +185,26 @@ void FiberRenderer::setShaderVars( PropertyGroup& props )
     offset += sizeof(float) * 3;
 
     program->setUniformValue( "u_colorMode", props.get( Fn::Property::D_COLORMODE ).toInt() );
+    program->setUniformValue( "u_mriSource", props.get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() );
     program->setUniformValue( "u_colormap", props.get( Fn::Property::D_COLORMAP ).toInt() );
     program->setUniformValue( "u_color", 1.0, 0.0, 0.0, 1.0 );
-    program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
-    program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
-    program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
-    program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+
+    if ( props.get( Fn::Property::D_COLORMODE ).toInt() == 3 )
+    {
+        float texMin = props.get( Fn::Property::D_MIN ).toFloat();
+        float texMax = props.get( Fn::Property::D_MAX ).toFloat();
+        program->setUniformValue( "u_lowerThreshold", ( props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_upperThreshold", ( props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMin", ( props.get( Fn::Property::D_SELECTED_MIN ).toFloat() - texMin ) / ( texMax - texMin ) );
+        program->setUniformValue( "u_selectedMax", ( props.get( Fn::Property::D_SELECTED_MAX ).toFloat() - texMin ) / ( texMax - texMin ) );
+    }
+    else
+    {
+        program->setUniformValue( "u_selectedMin", props.get( Fn::Property::D_SELECTED_MIN ).toFloat() );
+        program->setUniformValue( "u_selectedMax", props.get( Fn::Property::D_SELECTED_MAX ).toFloat() );
+        program->setUniformValue( "u_lowerThreshold", props.get( Fn::Property::D_LOWER_THRESHOLD ).toFloat() );
+        program->setUniformValue( "u_upperThreshold", props.get( Fn::Property::D_UPPER_THRESHOLD ).toFloat() );
+    }
     program->setUniformValue( "u_cutdx", props.get( Fn::Property::D_DX ).toFloat() );
     program->setUniformValue( "u_cutdy", props.get( Fn::Property::D_DY ).toFloat() );
     program->setUniformValue( "u_cutdz", props.get( Fn::Property::D_DZ ).toFloat() );
@@ -199,7 +229,7 @@ void FiberRenderer::initGeometry()
     }
     catch ( std::bad_alloc& )
     {
-        qDebug() << "***error*** failed to allocate enough memory for vbo";
+        qCritical() << "***error*** failed to allocate enough memory for vbo";
         exit ( 0 );
     }
 
@@ -289,6 +319,12 @@ void FiberRenderer::colorChanged()
 {
 }
 
+void FiberRenderer::setExtraData( unsigned int dataFieldId )
+{
+	m_updateExtraData = true;
+	m_selectedExtraData = dataFieldId;
+}
+
 void FiberRenderer::updateExtraData( unsigned int dataFieldId )
 {
     std::vector<float>data;
@@ -317,4 +353,5 @@ void FiberRenderer::updateExtraData( unsigned int dataFieldId )
     glBufferData( GL_ARRAY_BUFFER, indexes.size() * sizeof(GLfloat), indexes.data(), GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
+    m_updateExtraData = false;
 }

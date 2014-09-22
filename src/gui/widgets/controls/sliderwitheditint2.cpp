@@ -6,7 +6,8 @@
  */
 #include "sliderwitheditint2.h"
 
-#include <QSlider>
+#include "myslider.h"
+
 #include <QLineEdit>
 #include <QLabel>
 #include <QDebug>
@@ -17,7 +18,7 @@
 SliderWithEditInt2::SliderWithEditInt2( QWidget* parent ) :
     QFrame( parent )
 {
-    m_slider = new QSlider( this );
+    m_slider = new MySlider( this );
     m_slider->setOrientation( Qt::Horizontal );
 
     m_edit = new QLineEdit( this );

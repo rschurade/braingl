@@ -8,7 +8,10 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+#include <QDebug>
+#include <QMap>
 #include <QMetaType>
+#include <QString>
 
 namespace Fn
 {
@@ -35,12 +38,19 @@ namespace Fn
         TREE = 0x20000,
         CONGLYPHS = 0x40000,
         PLANE = 0x80000,
-        ISO_LINE = 0x100000
+        ISO_LINE = 0x100000,
+        GUIDE = 0x200000,
+        LABEL = 0x400000,
     };
 
     enum class ColormapEnum : int
     {
-        GRAY, RAINBOW1, RAINBOW2, BLUEWHITERED, NONE // used for RGB datasets, takes values directly from texture                                             // other colormaps use float packing
+        GRAY,
+        RAINBOW1,
+        RAINBOW2,
+        BLUEWHITERED,
+        NONE // used for RGB datasets, takes values directly from texture
+        // other colormaps use float packing
     };
 
     enum class Algo : int
@@ -87,7 +97,10 @@ namespace Fn
         DELETE_LITTLE_BRAINS,
         COLOR_LITTLE_BRAINS,
         APPLY_ROI_BRAINS,
-        BRAINGL_MATH
+        BRAINGL_MATH,
+        FLIP_X,
+        FLIP_Y,
+        FLIP_Z
     };
 
     enum class Orient : int
@@ -105,13 +118,13 @@ namespace Fn
     {
         CENTER = 0x00,
         NORTH = 0x01,
-        NORTH_EAST = 0x02,
-        EAST = 0x04,
-        SOUTH_EAST = 0x08,
-        SOUTH = 0x10,
-        SOUTH_WEST = 0x11,
-        WEST = 0x12,
-        NORTH_WEST = 0x14
+        EAST = 0x02,
+        SOUTH = 0x04,
+        WEST = 0x08,
+        NORTH_EAST = 0x10,
+        NORTH_WEST = 0x20,
+        SOUTH_EAST = 0x40,
+        SOUTH_WEST = 0x80
     };
 
     enum class Property : int
@@ -270,6 +283,18 @@ namespace Fn
         D_STIPPLE_THICKNESS,
         D_STIPPLE_GLYPH_SIZE,
         D_STIPPLE_SLICE_ORIENT,
+        D_GUIDE_X,
+        D_GUIDE_Y,
+        D_GUIDE_Z,
+        D_HANDLE_0,
+        D_HANDLE_1,
+        D_HANDLE_2,
+        D_ISOLINE_STRIPES,
+        D_ISOLINE_STRIPES_WIDTH,
+        D_COLORMAP_LABEL,
+        D_FIBER_THIN_OUT,
+        D_RENDER_MESH,
+        D_COPY_VALUES,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -347,6 +372,13 @@ namespace Fn
         G_TRACT_TEX_RESOLUTION,
         G_TRACT_TEXT_SOURCE,
         G_ISOLINE_STANDARD_COLOR,
+        G_MESH_TRANSPARENCY,
+        G_SHOW_ORIENTHELPER,
+        G_ORIENTHELPER_X,
+        G_ORIENTHELPER_Y,
+        G_ORIENTHELPER_Z,
+        G_ORIENTHELPER_SIZE,
+        G_FIBERS_INITIAL_PERCENTAGE,
         G_LAST, // insert all global properties before this one
         // ROI Properties
         D_X = 1000,
@@ -365,6 +397,276 @@ namespace Fn
 
     struct Prop2String
     {
+        static QString e( Property p )
+        {
+            switch ( p )
+            {
+                case Property::D_NAME: return QString( "D_NAME" ); break;
+                case Property::D_DIM: return QString( "D_DIM" ); break;
+                case Property::D_DATATYPE: return QString( "D_DATATYPE" ); break;
+                case Property::D_SIZE: return QString( "D_SIZE" ); break;
+                case Property::D_NX: return QString( "D_NX" ); break;
+                case Property::D_NY: return QString( "D_NY" ); break;
+                case Property::D_NZ: return QString( "D_NZ" ); break;
+                case Property::D_DX: return QString( "D_DX" ); break;
+                case Property::D_DY: return QString( "D_DY" ); break;
+                case Property::D_DZ: return QString( "D_DZ" ); break;
+                case Property::D_MIN: return QString( "D_MIN" ); break;
+                case Property::D_MAX: return QString( "D_MAX" ); break;
+                case Property::D_TYPE: return QString( "D_TYPE" ); break;
+                case Property::D_CREATED_BY: return QString( "D_CREATED_BY" ); break;
+                case Property::D_FILENAME: return QString( "D_FILENAME" ); break;
+                case Property::D_SELECTED_MIN: return QString( "D_SELECTED_MIN" ); break;
+                case Property::D_SELECTED_MAX: return QString( "D_SELECTED_MAX" ); break;
+                case Property::D_LOWER_THRESHOLD: return QString( "D_LOWER_THRESHOLD" ); break;
+                case Property::D_UPPER_THRESHOLD: return QString( "D_UPPER_THRESHOLD" ); break;
+                case Property::D_COLORMAP: return QString( "D_COLORMAP" ); break;
+                case Property::D_RENDER_COLORMAP: return QString( "D_RENDER_COLORMAP" ); break;
+                case Property::D_COLORMAP_ORIENT: return QString( "D_COLORMAP_ORIENT" ); break;
+                case Property::D_COLORMAP_X: return QString( "D_COLORMAP_X" ); break;
+                case Property::D_COLORMAP_Y: return QString( "D_COLORMAP_Y" ); break;
+                case Property::D_COLORMAP_DX: return QString( "D_COLORMAP_DX" ); break;
+                case Property::D_COLORMAP_DY: return QString( "D_COLORMAP_DY" ); break;
+                case Property::D_COLORMAP_TEXT_SIZE: return QString( "D_COLORMAP_TEXT_SIZE" ); break;
+                case Property::D_COLORMAP_TEXT_COLOR: return QString( "D_COLORMAP_TEXT_COLOR" ); break;
+                case Property::D_INTERPOLATION: return QString( "D_INTERPOLATION" ); break;
+                case Property::D_ALPHA: return QString( "D_ALPHA" ); break;
+                case Property::D_ACTIVE: return QString( "D_ACTIVE" ); break;
+                case Property::D_ORDER: return QString( "D_ORDER" ); break;
+                case Property::D_LOD: return QString( "D_LOD" ); break;
+                case Property::D_SCALING: return QString( "D_SCALING" ); break;
+                case Property::D_FA_THRESHOLD: return QString( "D_FA_THRESHOLD" ); break;
+                case Property::D_EV_THRESHOLD: return QString( "D_EV_THRESHOLD" ); break;
+                case Property::D_GAMMA: return QString( "D_GAMMA" ); break;
+                case Property::D_OFFSET: return QString( "D_OFFSET" ); break;
+                case Property::D_RENDER_SLICE: return QString( "D_RENDER_SLICE" ); break;
+                case Property::D_RENDER_SAGITTAL: return QString( "D_RENDER_SAGITTAL" ); break;
+                case Property::D_RENDER_CORONAL: return QString( "D_RENDER_CORONAL" ); break;
+                case Property::D_RENDER_AXIAL: return QString( "D_RENDER_AXIAL" ); break;
+                case Property::D_MINMAX_SCALING: return QString( "D_MINMAX_SCALING" ); break;
+                case Property::D_HIDE_NEGATIVE_LOBES: return QString( "D_HIDE_NEGATIVE_LOBES" ); break;
+                case Property::D_BVALUE: return QString( "D_BVALUE" ); break;
+                case Property::D_TENSOR_RENDERMODE: return QString( "D_TENSOR_RENDERMODE" ); break;
+                case Property::D_RENDER_FIRST: return QString( "D_RENDER_FIRST" ); break;
+                case Property::D_RENDER_SECOND: return QString( "D_RENDER_SECOND" ); break;
+                case Property::D_RENDER_THIRD: return QString( "D_RENDER_THIRD" ); break;
+                case Property::D_RENDER_VECTORS_STICKS: return QString( "D_RENDER_VECTORS_STICKS" ); break;
+                case Property::D_RENDER_VECTORS_STIPPLES: return QString( "D_RENDER_VECTORS_STIPPLES" ); break;
+                case Property::D_ISO_VALUE: return QString( "D_ISO_VALUE" ); break;
+                case Property::D_NUM_POINTS: return QString( "D_NUM_POINTS" ); break;
+                case Property::D_NUM_LINES: return QString( "D_NUM_LINES" ); break;
+                case Property::D_COLOR: return QString( "D_COLOR" ); break;
+                case Property::D_COLORMODE: return QString( "D_COLORMODE" ); break;
+                case Property::D_DATAMODE: return QString( "D_DATAMODE" ); break;
+                case Property::D_PAINTMODE: return QString( "D_PAINTMODE" ); break;
+                case Property::D_PAINTSIZE: return QString( "D_PAINTSIZE" ); break;
+                case Property::D_PAINTCOLOR: return QString( "D_PAINTCOLOR" ); break;
+                case Property::D_PAINTVALUE: return QString( "D_PAINTVALUE" ); break;
+                case Property::D_PAINT_LINK_CURSOR: return QString( "D_PAINT_LINK_CURSOR" ); break;
+                case Property::D_FIBER_RENDERMODE: return QString( "D_FIBER_RENDERMODE" ); break;
+                case Property::D_FIBER_THICKNESS: return QString( "D_FIBER_THICKNESS" ); break;
+                case Property::D_HAS_TEXTURE: return QString( "D_HAS_TEXTURE" ); break;
+                case Property::D_SELECTED_TEXTURE: return QString( "D_SELECTED_TEXTURE" ); break;
+                case Property::D_TEXTURE_GLUINT: return QString( "D_TEXTURE_GLUINT" ); break;
+                case Property::D_DATASET_POINTER: return QString( "D_DATASET_POINTER" ); break;
+                case Property::D_NEW_DATASET: return QString( "D_NEW_DATASET" ); break;
+                case Property::D_DATASET_LIST: return QString( "D_DATASET_LIST" ); break;
+                case Property::D_SURFACE: return QString( "D_SURFACE" ); break;
+                case Property::D_THRESHOLD: return QString( "D_THRESHOLD" ); break;
+                case Property::D_GLYPHSTYLE: return QString( "D_GLYPHSTYLE" ); break;
+                case Property::D_GLYPHRADIUS: return QString( "D_GLYPHRADIUS" ); break;
+                case Property::D_NORMALIZATION: return QString( "D_NORMALIZATION" ); break;
+                case Property::D_PRIMSIZE: return QString( "D_PRIMSIZE" ); break;
+                case Property::D_MINLENGTH: return QString( "D_MINLENGTH" ); break;
+                case Property::D_DRAW_SURFACE: return QString( "D_DRAW_SURFACE" ); break;
+                case Property::D_DRAW_GLYPHS: return QString( "D_DRAW_GLYPHS" ); break;
+                case Property::D_SURFACE_GLYPH_GEOMETRY: return QString( "D_SURFACE_GLYPH_GEOMETRY" ); break;
+                case Property::D_SURFACE_GLYPH_COLOR: return QString( "D_SURFACE_GLYPH_COLOR" ); break;
+                case Property::D_RENDER_TARGET: return QString( "D_RENDER_TARGET" ); break;
+                case Property::D_GLYPH_ROT_X: return QString( "D_GLYPH_ROT_X" ); break;
+                case Property::D_GLYPH_ROT_Y: return QString( "D_GLYPH_ROT_Y" ); break;
+                case Property::D_GLYPH_ROT_Z: return QString( "D_GLYPH_ROT_Z" ); break;
+                case Property::D_GLYPH_ALPHA: return QString( "D_GLYPH_ALPHA" ); break;
+                case Property::D_LITTLE_BRAIN_VISIBILITY: return QString( "D_LITTLE_BRAIN_VISIBILITY" ); break;
+                case Property::D_IS_ATLAS: return QString( "D_IS_ATLAS" ); break;
+                case Property::D_LOCK_PROPS: return QString( "D_LOCK_PROPS" ); break;
+                case Property::D_AUTOPLAY: return QString( "D_AUTOPLAY" ); break;
+                case Property::D_AUTOPLAY_INTERVAL: return QString( "D_AUTOPLAY_INTERVAL" ); break;
+                case Property::D_MESH_CUT_LOWER_X: return QString( "D_MESH_CUT_LOWER_X" ); break;
+                case Property::D_MESH_CUT_LOWER_Y: return QString( "D_MESH_CUT_LOWER_Y" ); break;
+                case Property::D_MESH_CUT_LOWER_Z: return QString( "D_MESH_CUT_LOWER_Z" ); break;
+                case Property::D_MESH_CUT_HIGHER_X: return QString( "D_MESH_CUT_HIGHER_X" ); break;
+                case Property::D_MESH_CUT_HIGHER_Y: return QString( "D_MESH_CUT_HIGHER_Y" ); break;
+                case Property::D_MESH_CUT_HIGHER_Z: return QString( "D_MESH_CUT_HIGHER_Z" ); break;
+                case Property::D_FIBER_GROW_LENGTH: return QString( "D_FIBER_GROW_LENGTH" ); break;
+                case Property::D_ADJUST_X: return QString( "D_ADJUST_X" ); break;
+                case Property::D_ADJUST_Y: return QString( "D_ADJUST_Y" ); break;
+                case Property::D_ADJUST_Z: return QString( "D_ADJUST_Z" ); break;
+                case Property::D_GLYPHSET_PICKED_ID: return QString( "D_GLYPHSET_PICKED_ID" ); break;
+                case Property::D_GLYPH_COLORMODE: return QString( "D_GLYPH_COLORMODE" ); break;
+                case Property::D_GLYPH_ROTATION: return QString( "D_GLYPH_ROTATION" ); break;
+                case Property::D_LIGHT_SWITCH: return QString( "D_LIGHT_SWITCH" ); break;
+                case Property::D_LIGHT_AMBIENT: return QString( "D_LIGHT_AMBIENT" ); break;
+                case Property::D_LIGHT_DIFFUSE: return QString( "D_LIGHT_DIFFUSE" ); break;
+                case Property::D_LIGHT_SPECULAR: return QString( "D_LIGHT_SPECULAR" ); break;
+                case Property::D_MATERIAL_AMBIENT: return QString( "D_MATERIAL_AMBIENT" ); break;
+                case Property::D_MATERIAL_DIFFUSE: return QString( "D_MATERIAL_DIFFUSE" ); break;
+                case Property::D_MATERIAL_SPECULAR: return QString( "D_MATERIAL_SPECULAR" ); break;
+                case Property::D_MATERIAL_SHININESS: return QString( "D_MATERIAL_SHININESS" ); break;
+                case Property::D_COPY_COLORS: return QString( "D_COPY_COLORS" ); break;
+                case Property::D_RENDER_WIREFRAME: return QString( "D_RENDER_WIREFRAME" ); break;
+                case Property::D_ROTATE_X: return QString( "D_ROTATE_X" ); break;
+                case Property::D_ROTATE_Y: return QString( "D_ROTATE_Y" ); break;
+                case Property::D_ROTATE_Z: return QString( "D_ROTATE_Z" ); break;
+                case Property::D_SCALE_X: return QString( "D_SCALE_X" ); break;
+                case Property::D_SCALE_Y: return QString( "D_SCALE_Y" ); break;
+                case Property::D_SCALE_Z: return QString( "D_SCALE_Z" ); break;
+                case Property::D_MESH_MAKE_PERMANENT: return QString( "D_MESH_MAKE_PERMANENT" ); break;
+                case Property::D_MESH_NUM_VERTEX: return QString( "D_MESH_NUM_VERTEX" ); break;
+                case Property::D_MESH_NUM_TRIANGLES: return QString( "D_MESH_NUM_TRIANGLES" ); break;
+                case Property::D_TREE_SELECTED_CLUSTER: return QString( "D_TREE_SELECTED_CLUSTER" ); break;
+                case Property::D_TREE_SELECTED_CLUSTER_COLOR: return QString( "D_TREE_SELECTED_CLUSTER_COLOR" ); break;
+                case Property::D_TREE_UNSELECTED_CLUSTER_COLOR: return QString( "D_TREE_UNSELECTED_CLUSTER_COLOR" ); break;
+                case Property::D_S_FORM: return QString( "D_S_FORM" ); break;
+                case Property::D_Q_FORM: return QString( "D_Q_FORM" ); break;
+                case Property::D_USE_TRANSFORM: return QString( "D_USE_TRANSFORM" ); break;
+                case Property::D_TRANSFORM: return QString( "D_TRANSFORM" ); break;
+                case Property::D_APPLY_TRANSFORM: return QString( "D_APPLY_TRANSFORM" ); break;
+                case Property::D_INVERT_VERTEX_ORDER: return QString( "D_INVERT_VERTEX_ORDER" ); break;
+                case Property::D_START_INDEX: return QString( "D_START_INDEX" ); break;
+                case Property::D_END_INDEX: return QString( "D_END_INDEX" ); break;
+                case Property::D_LEFT_RIGHT: return QString( "D_LEFT_RIGHT" ); break;
+                case Property::D_TREE_COLOR_SELECTION: return QString( "D_TREE_COLOR_SELECTION" ); break;
+                case Property::D_TREE_USER_CLUSTER_COLOR: return QString( "D_TREE_USER_CLUSTER_COLOR" ); break;
+                case Property::D_TREE_SET_USER_CLUSTER_COLOR: return QString( "D_TREE_SET_USER_CLUSTER_COLOR" ); break;
+                case Property::D_TREE_PARTITION_MODE: return QString( "D_TREE_PARTITION_MODE" ); break;
+                case Property::D_TREE_APPLY_PARTITION_MODE: return QString( "D_TREE_APPLY_PARTITION_MODE" ); break;
+                case Property::D_TREE_PARTITION_LEVEL: return QString( "D_TREE_PARTITION_LEVEL" ); break;
+                case Property::D_TREE_PARTITION_SIZE: return QString( "D_TREE_PARTITION_SIZE" ); break;
+                case Property::D_GLYPH_THRESHOLD_SIGN: return QString( "D_GLYPH_THRESHOLD_SIGN" ); break;
+                case Property::D_LITTLE_BRAINS_COLORMODE: return QString( "D_LITTLE_BRAINS_COLORMODE" ); break;
+                case Property::D_THRESHOLD_PERC: return QString( "D_THRESHOLD_PERC" ); break;
+                case Property::D_FIBER_MORPH: return QString( "D_FIBER_MORPH" ); break;
+                case Property::D_SHOW_PLANE_HANDLES: return QString( "D_SHOW_PLANE_HANDLES" ); break;
+                case Property::D_HANDLE_COLOR: return QString( "D_HANDLE_COLOR" ); break;
+                case Property::D_LINE_WIDTH: return QString( "D_LINE_WIDTH" ); break;
+                case Property::D_STIPPLE_PROB_MASK: return QString( "D_STIPPLE_PROB_MASK" ); break;
+                case Property::D_STIPPLE_THICKNESS: return QString( "D_STIPPLE_THICKNESS" ); break;
+                case Property::D_STIPPLE_GLYPH_SIZE: return QString( "D_STIPPLE_GLYPH_SIZE" ); break;
+                case Property::D_STIPPLE_SLICE_ORIENT: return QString( "D_STIPPLE_SLICE_ORIENT" ); break;
+                case Property::D_GUIDE_X: return QString( "D_GUIDE_X" ); break;
+                case Property::D_GUIDE_Y: return QString( "D_GUIDE_Y" ); break;
+                case Property::D_GUIDE_Z: return QString( "D_GUIDE_Z" ); break;
+                case Property::D_HANDLE_0: return QString( "D_HANDLE_0" ); break;
+                case Property::D_HANDLE_1: return QString( "D_HANDLE_1" ); break;
+                case Property::D_HANDLE_2: return QString( "D_HANDLE_2" ); break;
+                case Property::D_ISOLINE_STRIPES: return QString( "D_ISOLINE_STRIPES" ); break;
+                case Property::D_ISOLINE_STRIPES_WIDTH: return QString( "D_ISOLINE_STRIPES_WIDTH" ); break;
+                case Property::D_COLORMAP_LABEL: return QString( "D_COLORMAP_LABEL" ); break;
+                case Property::D_FIBER_THIN_OUT: return QString( "D_FIBER_THIN_OUT" ); break;
+                case Property::D_RENDER_MESH: return QString( "D_RENDER_MESH" ); break;
+                case Property::D_COPY_VALUES: return QString( "D_COPY_VALUES" ); break;
+                //
+                case Property::G_FIRST: return QString( "G_FIRST" ); break;
+                case Property::G_LOCK_WIDGETS: return QString( "G_LOCK_WIDGETS" ); break;
+                case Property::G_RENDER_CROSSHAIRS: return QString( "G_RENDER_CROSSHAIRS" ); break;
+                case Property::G_SAGITTAL: return QString( "G_SAGITTAL" ); break;
+                case Property::G_CORONAL: return QString( "G_CORONAL" ); break;
+                case Property::G_AXIAL: return QString( "G_AXIAL" ); break;
+                case Property::G_CORONAL_AXIAL: return QString( "G_CORONAL_AXIAL" ); break;
+                case Property::G_SAGITTAL_AXIAL: return QString( "G_SAGITTAL_AXIAL" ); break;
+                case Property::G_SAGITTAL_CORONAL: return QString( "G_SAGITTAL_CORONAL" ); break;
+                case Property::G_SHOW_SAGITTAL: return QString( "G_SHOW_SAGITTAL" ); break;
+                case Property::G_SHOW_CORONAL: return QString( "G_SHOW_CORONAL" ); break;
+                case Property::G_SHOW_AXIAL: return QString( "G_SHOW_AXIAL" ); break;
+                case Property::G_SHOW_NAV_SLIDERS: return QString( "G_SHOW_NAV_SLIDERS" ); break;
+                case Property::G_ZOOM: return QString( "G_ZOOM" ); break;
+                case Property::G_MOVEX: return QString( "G_MOVEX" ); break;
+                case Property::G_MOVEY: return QString( "G_MOVEY" ); break;
+                case Property::G_CAMERA_TYPE: return QString( "G_CAMERA_TYPE" ); break;
+                case Property::G_CAMERA_PROJECTION: return QString( "G_CAMERA_PROJECTION" ); break;
+                case Property::G_CAMERA_POS_X: return QString( "G_CAMERA_POS_X" ); break;
+                case Property::G_CAMERA_POS_Y: return QString( "G_CAMERA_POS_Y" ); break;
+                case Property::G_CAMERA_POS_Z: return QString( "G_CAMERA_POS_Z" ); break;
+                case Property::G_CAMERA_LOOKAT_X: return QString( "G_CAMERA_LOOKAT_X" ); break;
+                case Property::G_CAMERA_LOOKAT_Y: return QString( "G_CAMERA_LOOKAT_Y" ); break;
+                case Property::G_CAMERA_LOOKAT_Z: return QString( "G_CAMERA_LOOKAT_Z" ); break;
+                case Property::G_CAMERA_UP_X: return QString( "G_CAMERA_UP_X" ); break;
+                case Property::G_CAMERA_UP_Y: return QString( "G_CAMERA_UP_Y" ); break;
+                case Property::G_CAMERA_UP_Z: return QString( "G_CAMERA_UP_Z" ); break;
+                case Property::G_CAMERA_NEAR: return QString( "G_CAMERA_NEAR" ); break;
+                case Property::G_CAMERA_FAR: return QString( "G_CAMERA_FAR" ); break;
+                case Property::G_CAMERA_ANGLE: return QString( "G_CAMERA_ANGLE" ); break;
+                case Property::G_SCREENSHOT_QUALITY: return QString( "G_SCREENSHOT_QUALITY" ); break;
+                case Property::G_TRANSPARENCY: return QString( "G_TRANSPARENCY" ); break;
+                case Property::G_LAST_PATH: return QString( "G_LAST_PATH" ); break;
+                case Property::G_SCREENSHOT_PATH: return QString( "G_SCREENSHOT_PATH" ); break;
+                case Property::G_OBJECT: return QString( "G_OBJECT" ); break;
+                case Property::G_NEED_SHADER_UPDATE: return QString( "G_NEED_SHADER_UPDATE" ); break;
+                case Property::G_BACKGROUND_COLOR_MAIN: return QString( "G_BACKGROUND_COLOR_MAIN" ); break;
+                case Property::G_BACKGROUND_COLOR_MAIN2: return QString( "G_BACKGROUND_COLOR_MAIN2" ); break;
+                case Property::G_BACKGROUND_COLOR_COMBINED: return QString( "G_BACKGROUND_COLOR_COMBINED" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV1: return QString( "G_BACKGROUND_COLOR_NAV1" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV2: return QString( "G_BACKGROUND_COLOR_NAV2" ); break;
+                case Property::G_BACKGROUND_COLOR_NAV3: return QString( "G_BACKGROUND_COLOR_NAV3" ); break;
+                case Property::G_CROSSHAIR_COLOR: return QString( "G_CROSSHAIR_COLOR" ); break;
+                case Property::G_SCREENSHOT_WIDTH: return QString( "G_SCREENSHOT_WIDTH" ); break;
+                case Property::G_SCREENSHOT_HEIGHT: return QString( "G_SCREENSHOT_HEIGHT" ); break;
+                case Property::G_SCREENSHOT_KEEP_ASPECT: return QString( "G_SCREENSHOT_KEEP_ASPECT" ); break;
+                case Property::G_SCREENSHOT_SIZE_RATIO: return QString( "G_SCREENSHOT_SIZE_RATIO" ); break;
+                case Property::G_SCREENSHOT_SIZE_SELECTION: return QString( "G_SCREENSHOT_SIZE_SELECTION" ); break;
+                case Property::G_SCREENSHOT_COPY_CURRENT: return QString( "G_SCREENSHOT_COPY_CURRENT" ); break;
+                case Property::G_WIDTH_MAINGL: return QString( "G_WIDTH_MAINGL" ); break;
+                case Property::G_HEIGHT_MAINGL: return QString( "G_HEIGHT_MAINGL" ); break;
+                case Property::G_WIDTH_MAINGL2: return QString( "G_WIDTH_MAINGL2" ); break;
+                case Property::G_HEIGHT_MAINGL2: return QString( "G_HEIGHT_MAINGL2" ); break;
+                case Property::G_SCREENSHOT_DO_MAINGL: return QString( "G_SCREENSHOT_DO_MAINGL" ); break;
+                case Property::G_SCREENSHOT_DO_MAINGL2: return QString( "G_SCREENSHOT_DO_MAINGL2" ); break;
+                case Property::G_SCREENSHOT_STEREOSCOPIC: return QString( "G_SCREENSHOT_STEREOSCOPIC" ); break;
+                case Property::G_SCREENSHOT_PREFIX: return QString( "G_SCREENSHOT_PREFIX" ); break;
+                case Property::G_SCREENSHOT_PREFIX2: return QString( "G_SCREENSHOT_PREFIX2" ); break;
+                case Property::G_SCREENSHOT_DIGITS: return QString( "G_SCREENSHOT_DIGITS" ); break;
+                case Property::G_SCREENSHOT_CURRENT_NUMBER: return QString( "G_SCREENSHOT_CURRENT_NUMBER" ); break;
+                case Property::G_ARCBALL_DISTANCE: return QString( "G_ARCBALL_DISTANCE" ); break;
+                case Property::G_CAMERA_KEYBOARD_STEP: return QString( "G_CAMERA_KEYBOARD_STEP" ); break;
+                case Property::G_CAMERA_FIXATE_Z: return QString( "G_CAMERA_FIXATE_Z" ); break;
+                case Property::G_CAMERA_FULLCIRCLE_STEPS: return QString( "G_CAMERA_FULLCIRCLE_STEPS" ); break;
+                case Property::G_LIGHT_SWITCH: return QString( "G_LIGHT_SWITCH" ); break;
+                case Property::G_LIGHT_AMBIENT: return QString( "G_LIGHT_AMBIENT" ); break;
+                case Property::G_LIGHT_DIFFUSE: return QString( "G_LIGHT_DIFFUSE" ); break;
+                case Property::G_FILTER_SIZE: return QString( "G_FILTER_SIZE" ); break;
+                case Property::G_DECIMATE_EPSILON: return QString( "G_DECIMATE_EPSILON" ); break;
+                case Property::G_MIN_COMPONENT_SIZE: return QString( "G_MIN_COMPONENT_SIZE" ); break;
+                case Property::G_RENDER_CROSSHAIRS_2: return QString( "G_RENDER_CROSSHAIRS_2" ); break;
+                case Property::G_UNSELECTED_FIBERS_GREY: return QString( "G_UNSELECTED_FIBERS_GREY" ); break;
+                case Property::G_TRACT_TEX_RESOLUTION: return QString( "G_TRACT_TEX_RESOLUTION" ); break;
+                case Property::G_TRACT_TEXT_SOURCE: return QString( "G_TRACT_TEXT_SOURCE" ); break;
+                case Property::G_ISOLINE_STANDARD_COLOR: return QString( "G_ISOLINE_STANDARD_COLOR" ); break;
+                case Property::G_MESH_TRANSPARENCY: return QString( "G_MESH_TRANSPARENCY" ); break;
+                case Property::G_SHOW_ORIENTHELPER: return QString( "G_SHOW_ORIENTHELPER" ); break;
+                case Property::G_ORIENTHELPER_X: return QString( "G_ORIENTHELPER_X" ); break;
+                case Property::G_ORIENTHELPER_Y: return QString( "G_ORIENTHELPER_Y" ); break;
+                case Property::G_ORIENTHELPER_Z: return QString( "G_ORIENTHELPER_Z" ); break;
+                case Property::G_ORIENTHELPER_SIZE: return QString( "G_ORIENTHELPER_SIZE" ); break;
+                case Property::G_FIBERS_INITIAL_PERCENTAGE: return QString( "G_FIBERS_INITIAL_PERCENTAGE" ); break;
+                case Property::G_LAST: return QString( "G_LAST" ); break;
+                //
+                case Property::D_X: return QString( "D_X" ); break;
+                case Property::D_Y: return QString( "D_Y" ); break;
+                case Property::D_Z: return QString( "D_Z" ); break;
+                case Property::D_NEG: return QString( "D_NEG" ); break;
+                case Property::D_RENDER: return QString( "D_RENDER" ); break;
+                case Property::D_SHAPE: return QString( "D_SHAPE" ); break;
+                case Property::D_STICK_TO_CROSSHAIR: return QString( "D_STICK_TO_CROSSHAIR" ); break;
+                case Property::D_ID: return QString( "D_ID" ); break;
+                case Property::D_PICK_ID: return QString( "D_PICK_ID" ); break;
+                case Property::D_UPDATED: return QString( "D_UPDATED" ); break;
+                case Property::D_POINTER: return QString( "D_POINTER" ); break;
+                case Property::D_DESCRIPTION: return QString( "D_DESCRIPTION" ); break;
+
+            }
+            return QString( "property not defined" );
+        }
         static QString s( Property p )
         {
             switch ( p )
@@ -395,8 +697,8 @@ namespace Fn
                 case Property::D_COLORMAP_Y: return QString( "colormap y position" ); break;
                 case Property::D_COLORMAP_DX: return QString( "colormap x size" ); break;
                 case Property::D_COLORMAP_DY: return QString( "colormap y size" ); break;
-                case Property::D_COLORMAP_TEXT_SIZE: return QString( "colormap text size" ); break;
-                case Property::D_COLORMAP_TEXT_COLOR: return QString( "colormap text color" ); break;
+                case Property::D_COLORMAP_TEXT_SIZE: return QString( "text size" ); break;
+                case Property::D_COLORMAP_TEXT_COLOR: return QString( "text color" ); break;
                 case Property::D_INTERPOLATION: return QString( "interpolation" ); break;
                 case Property::D_ALPHA: return QString( "alpha" ); break;
                 case Property::D_ACTIVE: return QString( "active" ); break;
@@ -522,6 +824,18 @@ namespace Fn
                 case Property::D_STIPPLE_THICKNESS: return QString( "thickness" ); break;
                 case Property::D_STIPPLE_GLYPH_SIZE: return QString( "glyph size" ); break;
                 case Property::D_STIPPLE_SLICE_ORIENT: return QString( "slice orientation" ); break;
+                case Property::D_GUIDE_X: return QString( "guide x position" ); break;
+                case Property::D_GUIDE_Y: return QString( "guide y position" ); break;
+                case Property::D_GUIDE_Z: return QString( "guide z position" ); break;
+                case Property::D_HANDLE_0: return QString( "handle 0 position" ); break;
+                case Property::D_HANDLE_1: return QString( "handle 1 position" ); break;
+                case Property::D_HANDLE_2: return QString( "handle 2 position" ); break;
+                case Property::D_ISOLINE_STRIPES: return QString( "hatching" ); break;
+                case Property::D_ISOLINE_STRIPES_WIDTH: return QString( "hatching line width" ); break;
+                case Property::D_COLORMAP_LABEL: return QString( "Label" ); break;
+                case Property::D_FIBER_THIN_OUT: return QString( "render percentage of fibers" ); break;
+                case Property::D_RENDER_MESH: return QString( "render mesh" ); break;
+                case Property::D_COPY_VALUES: return QString( "copy values" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;
@@ -598,6 +912,13 @@ namespace Fn
                 case Property::G_TRACT_TEX_RESOLUTION: return QString( "resolution of tract textures" ); break;
                 case Property::G_TRACT_TEXT_SOURCE: return QString( "source for tract textures" ); break;
                 case Property::G_ISOLINE_STANDARD_COLOR: return QString( "isoline standard color" ); break;
+                case Property::G_MESH_TRANSPARENCY: return QString( "mesh transparency" ); break;
+                case Property::G_SHOW_ORIENTHELPER: return QString( "show orient helper" ); break;
+                case Property::G_ORIENTHELPER_X: return QString( "orient helper x" ); break;
+                case Property::G_ORIENTHELPER_Y: return QString( "orient helper y" ); break;
+                case Property::G_ORIENTHELPER_Z: return QString( "orient helper z" ); break;
+                case Property::G_ORIENTHELPER_SIZE: return QString( "orient helper size" ); break;
+                case Property::G_FIBERS_INITIAL_PERCENTAGE: return QString( "initial percentage of fibers shown" ); break;
                 case Property::G_LAST: return QString( "placeholder global last" ); break;
                 // ROI Properties
                 case Property::D_X: return QString( "x" ); break;

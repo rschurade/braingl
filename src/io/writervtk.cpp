@@ -7,13 +7,13 @@
 
 #include "writervtk.h"
 
-#include "datasets/datasetfibers.h"
-#include "datasets/datasetmesh.h"
-#include "datasets/datasetmeshtimeseries.h"
-#include "datasets/datasetglyphset.h"
-#include "datasets/datasetisosurface.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetmeshtimeseries.h"
+#include "../data/datasets/datasetglyphset.h"
+#include "../data/datasets/datasetisosurface.h"
 
-#include "mesh/trianglemesh2.h"
+#include "../data/mesh/trianglemesh2.h"
 
 #include <QDebug>
 #include <QFile>
@@ -44,7 +44,6 @@ bool WriterVTK::save()
 {
     if ( m_fileName.endsWith( ".vtk" ) || m_fileName.endsWith( ".fib" ) )
     {
-        //qDebug() << "filter:" << m_filter;
         switch ( (Fn::DatasetType)( m_dataset->properties().get( Fn::Property::D_TYPE ).toInt() ) )
         {
             case Fn::DatasetType::FIBERS:
@@ -72,7 +71,7 @@ bool WriterVTK::save()
                 {
                     saveMesh( m_fileName, mesh, false );
                 }
-                else if ( m_filter.startsWith( "Mesh binary") )
+                else
                 {
                     saveMesh( m_fileName, mesh, true );
                 }
@@ -169,7 +168,7 @@ void WriterVTK::saveFibs( QString filename, bool binary )
 
      if ( ! writer->Write() )
      {
-         qDebug() << "Error writing " << filename;
+         qCritical() << "Error writing " << filename;
      }
 }
 
@@ -264,6 +263,6 @@ void WriterVTK::saveMesh( QString filename, TriangleMesh2* mesh, bool binary )
 #endif
     if ( !writer->Write() )
     {
-        qDebug() << "Error writing " << filename;
+        qCritical() << "Error writing " << filename;
     }
 }

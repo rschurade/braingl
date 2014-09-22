@@ -253,12 +253,6 @@ bool LoaderVTK::open()
 
         unsigned int numberOfArrays = output->GetPointData()->GetNumberOfArrays();
         qDebug() << "NumArrays: " << numberOfArrays;
-        //qDebug() << "key: ";
-        //more values can be found in <VTK_DIR>/Common/vtkSetGet.h
-//        qDebug() << VTK_UNSIGNED_CHAR << " unsigned char";
-//        qDebug() << VTK_UNSIGNED_INT << " unsigned int";
-//        qDebug() << VTK_FLOAT << " float";
-//        qDebug() << VTK_DOUBLE << " double";
 
         for ( unsigned int i = 0; i < numberOfArrays; ++i )
         {

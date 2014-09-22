@@ -16,9 +16,9 @@ DatasetSH::DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image
 {
     m_properties["maingl"].createInt( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
     //m_properties["maingl"].create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, true );
-    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false, "general" );
-    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false );
+    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f );
+    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false );
     m_properties["maingl"].createInt( Fn::Property::D_LOD, 0, 0, 4, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
@@ -96,6 +96,17 @@ void DatasetSH::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
     {
         return;
     }
+
+    if ( m_resetRenderer )
+    {
+        if ( m_renderer != 0 )
+        {
+            delete m_renderer;
+            m_renderer = 0;
+        }
+        m_resetRenderer = false;
+    }
+
     if ( m_renderer == 0 )
     {
         m_renderer = new SHRenderer( &m_data );
@@ -118,4 +129,70 @@ TriangleMesh2* DatasetSH::getMeshFromCurrent()
         m_renderer->init();
     }
     return m_renderer->getMesh();
+}
+
+void DatasetSH::flipX()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                ColumnVector tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void DatasetSH::flipY()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                ColumnVector tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void DatasetSH::flipZ()
+{
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                ColumnVector tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
 }

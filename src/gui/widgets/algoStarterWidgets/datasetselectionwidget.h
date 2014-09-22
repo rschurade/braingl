@@ -10,7 +10,7 @@
 
 #include "../../../data/enums.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 class Dataset;
 class SelectWithLabel;

@@ -6,7 +6,6 @@
  */
 
 #include "glwidget.h"
-#include "../core_3_3_context.h"
 #include "../gl/arcball.h"
 #include "../gl/camera.h"
 #include "../gl/camerabase.h"
@@ -16,13 +15,16 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
+#include "../../data/datasets/datasetscalar.h"
 #include "../../data/vptr.h"
 #include "../../data/roi.h"
 
-#include <QtGui>
+#include <QtWidgets>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions_3_3_Core>
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent ),
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -34,6 +36,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_width( 0 ),
     m_height( 0 ),
     m_doScreenshot( false ),
+    m_exitAfterScreenshot( false ),
     m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
@@ -50,7 +53,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
 }
 
 GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_name( name ),
     m_roiSelectionModel( roiSelectionModel ),
     m_visible( false ),
@@ -62,6 +65,7 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_width( 0 ),
     m_height( 0 ),
     m_doScreenshot( false ),
+    m_exitAfterScreenshot( false ),
     m_copyCameraMode( 0 )
 {
     m_arcBall = new ArcBall( 400, 400 );
@@ -108,42 +112,58 @@ Camera* GLWidget::getCamera()
 
 void GLWidget::initializeGL()
 {
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
+    QOpenGLFunctions_3_3_Core* funcs = 0;
+
+    funcs = context()->contextHandle()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+
+    if (!funcs) {
+        qWarning() << "Could not obtain required OpenGL context version";
+        exit(1);
+    }
+    funcs->initializeOpenGLFunctions();
+
+    if ( m_name == "maingl" )
     {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
+        GLFunctions::f = funcs;
     }
 
     // needed per OpenGL context and so per QGLWidget
+    // TODO: Qt5
     GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    funcs->glGenVertexArrays(1, &vao);
+    funcs->glBindVertexArray(vao);
 
     Q_ASSERT( m_sceneRenderer );
     m_sceneRenderer->initGL();
-    GLFunctions::initTextRenderer();
-    GLFunctions::initShapeRenderer();
+    GLFunctions::initRenderers();
 }
 
 void GLWidget::paintGL()
 {
     if ( m_doScreenshot )
     {
-        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
-        {
-            // insert code for stereoscopic screenshots here
-        }
-        else
+//        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
+//        {
+//            // insert code for stereoscopic screenshots here
+//        }
+//        else
         {
             calcMVPMatrix();
             m_doScreenshot = false;
             QImage* image = m_sceneRenderer->screenshot( m_mvMatrix, m_pMatrix );
-            image->save(  m_screenshotFileName, "PNG" );
+            if ( !image->save(  m_screenshotFileName, "PNG" ) )
+            {
+                qCritical() << "error while saving screenshot to file";
+            }
             delete image;
             calcMVPMatrix();
+            if ( m_exitAfterScreenshot )
+            {
+                QSettings settings;
+                settings.setValue( Fn::Prop2String::e( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ), Models::getGlobal( Fn::Property::G_SCREENSHOT_CURRENT_NUMBER ) );
+                settings.sync();
+                exit( 0 );
+            }
         }
     }
 
@@ -284,19 +304,48 @@ void GLWidget::calcMVPMatrix()
     Models::g()->setData( Models::g()->index( (int)Fn::Property::G_MOVEY, 0 ), m_cameraInUse->getMoveY() );
 }
 
+void GLWidget::showValuePickTooltip( QMouseEvent* event )
+{
+    int x = event->x();
+    int y = event->y();
+    m_sceneRenderer->renderPick();
+    QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
+
+    QString text = "X: " + QString::number( pickPos.x(), 'f', 2 ) + "  Y: " + QString::number( pickPos.y(), 'f', 2 ) + "  Z: " + QString::number( pickPos.z(), 'f', 2 );
+    text += "<br>-------------------------------";
+
+    QList<Dataset*>dsl = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, true );
+
+    for ( int i = 0; i < dsl.size(); ++i )
+    {
+        DatasetScalar* dss = dynamic_cast<DatasetScalar*>( dsl[i] );
+        text += "<br>";
+        text += dss->properties().get( Fn::Property::D_NAME ).toString();
+        text += " : ";
+        text += QString::number( dss->getValueAtPos( pickPos ), 'f', 2 );
+    }
+
+    QToolTip::showText( event->globalPos(), text );
+}
+
 
 void GLWidget::mousePressEvent( QMouseEvent *event )
 {
     setFocus();
-    if ( event->buttons() & Qt::LeftButton )
+    if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
+    {
+        showValuePickTooltip( event );
+    }
+    else if ( event->buttons() & Qt::LeftButton )
     {
         m_cameraInUse->click( event->x(), event->y() );
-
     }
+
     if ( event->buttons() & Qt::MiddleButton )
     {
         m_cameraInUse->midClick( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::RightButton )
     {
         rightMouseDown( event );
@@ -306,14 +355,20 @@ void GLWidget::mousePressEvent( QMouseEvent *event )
 
 void GLWidget::mouseMoveEvent( QMouseEvent *event )
 {
-    if ( event->buttons() & Qt::LeftButton )
+    if ( ( event->buttons() & Qt::LeftButton ) && ( event->modifiers() & Qt::ShiftModifier ) )
+    {
+        showValuePickTooltip( event );
+    }
+    else if ( event->buttons() & Qt::LeftButton )
     {
         m_cameraInUse->drag( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::MiddleButton )
     {
         m_cameraInUse->midDrag( event->x(), event->y() );
     }
+
     if ( event->buttons() & Qt::RightButton )
     {
         rightMouseDrag( event );
@@ -323,6 +378,7 @@ void GLWidget::mouseMoveEvent( QMouseEvent *event )
 
 void GLWidget::mouseReleaseEvent( QMouseEvent *event )
 {
+    QToolTip::hideText();
     update();
 }
 
@@ -336,7 +392,8 @@ void GLWidget::wheelEvent( QWheelEvent *event )
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
     m_cameraInUse->mouseWheel( numSteps );
-    update();
+    //update();
+    Models::g()->submit();
 }
 
 void GLWidget::setView( Fn::Orient view )
@@ -345,16 +402,15 @@ void GLWidget::setView( Fn::Orient view )
     update();
 }
 
-void GLWidget::screenshot( QString fn )
+void GLWidget::screenshot( QString fn, bool exitAfter )
 {
     m_doScreenshot = true;
+    m_exitAfterScreenshot = exitAfter;
     m_screenshotFileName = fn;
 }
 
 void GLWidget::rightMouseDown( QMouseEvent* event )
 {
-
-    //qDebug() << "Object name:" << m_sceneRenderer->getRenderTarget();
 
     QString target = m_sceneRenderer->getRenderTarget();
 
@@ -366,9 +422,7 @@ void GLWidget::rightMouseDown( QMouseEvent* event )
 
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     m_picked = m_sceneRenderer->get_object_id( x, y, m_width, m_height );
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-    //qDebug() << "picked object id:" << m_picked << "at position:" << pickPos;
+    GLFunctions::f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     for ( int i = 0; i < countDatasets; ++i )
@@ -423,7 +477,7 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
     m_sceneRenderer->renderPick();
     QVector3D pickPos = m_sceneRenderer->mapMouse2World( x, y );
     /* return to the default frame buffer */
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+    GLFunctions::f->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     int countDatasets = Models::d()->rowCount();
     bool updateRequired = false;
@@ -444,6 +498,24 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
         Models::g()->submit();
     }
 
+    if ( m_roiSelectionModel->hasSelection() )
+    {
+        QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
+        ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::D_POINTER, mi.parent() ), Qt::DisplayRole ) );
+        float newx = roi->properties()->get( Fn::Property::D_X ).toFloat() + dir.x();
+        float newy = roi->properties()->get( Fn::Property::D_Y ).toFloat() + dir.y();
+        float newz = roi->properties()->get( Fn::Property::D_Z ).toFloat() + dir.z();
+
+        roi->properties()->set( Fn::Property::D_X, newx );
+        roi->properties()->set( Fn::Property::D_Y, newy );
+        roi->properties()->set( Fn::Property::D_Z, newz );
+        roi->slotPropChanged();
+    }
+
+    if ( Models::d()->rowCount() == 0 )
+    {
+        return;
+    }
     Dataset* ds = Models::getDataset( 0 );
     QPair<QVector3D, QVector3D>bb = ds->getBoundingBox();
 
@@ -519,19 +591,6 @@ void GLWidget::rightMouseDrag( QMouseEvent* event )
             }
             default:
             {
-                if ( m_roiSelectionModel->hasSelection() )
-                {
-                    QModelIndex mi = m_roiSelectionModel->selectedIndexes().first();
-                    ROI* roi = VPtr<ROI>::asPtr( Models::r()->data( Models::r()->index( mi.row(), (int)Fn::Property::D_POINTER, mi.parent() ), Qt::DisplayRole ) );
-                    float newx = roi->properties()->get( Fn::Property::D_X ).toFloat() + dir.x();
-                    float newy = roi->properties()->get( Fn::Property::D_Y ).toFloat() + dir.y();
-                    float newz = roi->properties()->get( Fn::Property::D_Z ).toFloat() + dir.z();
-
-                    roi->properties()->set( Fn::Property::D_X, newx );
-                    roi->properties()->set( Fn::Property::D_Y, newy );
-                    roi->properties()->set( Fn::Property::D_Z, newz );
-                    roi->slotPropChanged();
-                }
                 break;
             }
         }
@@ -588,6 +647,20 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ), m_z );
 
         Models::g()->submit();
+    }
+    else if ( event->modifiers() & Qt::ControlModifier )
+    {
+        switch( event->key() )
+        {
+            case Qt::Key_Space:
+            {
+                m_cameraInUse->setZoom( 1.0 );
+                m_cameraInUse->setMoveX( 0.0 );
+                m_cameraInUse->setMoveY( 0.0 );
+                setView( Fn::Orient::AXIAL );
+                break;
+            }
+        }
     }
     else
     {
@@ -655,6 +728,12 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
         {
             switch( event->key() )
             {
+                case 43: // +
+                    m_cameraInUse->setZoom( m_cameraInUse->getZoom() * 1.1 );
+                    break;
+                case 45: // -
+                    m_cameraInUse->setZoom( m_cameraInUse->getZoom() * 0.9 );
+                    break;
                 case Qt::Key_Left :
                 {
                     m_cameraInUse->click( x, y );
@@ -684,10 +763,11 @@ void GLWidget::keyPressEvent( QKeyEvent* event )
                     break;
                 case 72: //H
                     emit ( signalCopyCameraToScript( 3 ) );
+                    break;
             }
         }
     }
-    update();
+    Models::g()->submit();
 
     emit signalKeyPressed( event->key(), event->modifiers() );
 }
@@ -730,7 +810,6 @@ void GLWidget::getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVect
     eyepos = basis_mat * bvec;
     viewdir = -zdir;
     updir = ydir;
-    //qDebug() << eyepos << viewdir << updir;
 }
 
 void GLWidget::cameraCircle( bool dir )

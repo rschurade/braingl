@@ -176,8 +176,6 @@ void DatasetConGlyphs::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width,
 
     //TODO: How do we get this to work properly again?
     glEnable( GL_BLEND );
-    //glShadeModel( GL_SMOOTH );    // XXX not in CoreProfile; use shader
-    // XXX not in Core/deprecated //glEnable( GL_POINT_SMOOTH );
     glPointSize( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
     glLineWidth( properties( "maingl" ).get( Fn::Property::D_PRIMSIZE ).toFloat() );
 
@@ -384,7 +382,7 @@ void DatasetConGlyphs::makePies()
     QMultiHash<QVector3D, Edge*> hedges = m_cons->m_hashed_edges;
 
     m_n = hedges.uniqueKeys().size();
-    //qDebug() << "m_n: " << m_n;
+
     pieArrays = new std::vector<float*>( m_n, NULL );
     numbers = new std::vector<int>( m_n );
     int i = 0;
@@ -395,9 +393,9 @@ void DatasetConGlyphs::makePies()
         {
             sortlist.push_back( new Connection( e->fn, e->tn - e->fn, e->m_value ) );
         }
-        //qDebug() << sortlist.size() << " edges for node: " << node;
+
         int count = hedges.values(node).size();
-        //qDebug() << "count: " << count;
+
         numbers->at( i ) = count;
         if ( count > maxNodeCount )
         {

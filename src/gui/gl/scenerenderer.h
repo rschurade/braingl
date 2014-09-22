@@ -8,7 +8,7 @@
 #ifndef SCENERENDERER_H_
 #define SCENERENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../data/enums.h"
 
@@ -18,10 +18,9 @@
 
 class ArcBall;
 class DataStore;
-class SliceRenderer;
 class QItemSelectionModel;
 
-class SceneRenderer
+class SceneRenderer : public ObjectRenderer
 {
 public:
 	SceneRenderer( QString name );
@@ -58,8 +57,6 @@ private:
     void setRenderTargets( QString target0, QString target1 );
     GLuint getTexture( QString name );
     void clearTexture( QString name, float r, float g, float b, float a );
-
-	SliceRenderer* m_sliceRenderer;
 
 	QString m_renderTarget;
 

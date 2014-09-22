@@ -119,10 +119,9 @@ QVariant DataStore::getDatasetProperties( const QModelIndex &index ) const
 
 bool DataStore::setData( const QModelIndex &index, const QVariant &value, int role )
 {
-    //qDebug() << "row: " << index.row() << "column: " << index.column() << "role: " << role;
     if ( index.column() != (int)Fn::Property::D_NEW_DATASET && !index.isValid() )
     {
-        qDebug() << "index not valid";
+        qCritical() << "index not valid";
         return false;
     }
 
@@ -155,7 +154,7 @@ bool DataStore::setData( const QModelIndex &index, const QVariant &value, int ro
         }
         return true;
     }
-    //qDebug() << "general failure";
+    //qCritical() << "general failure";
     return false;
 }
 
@@ -179,7 +178,6 @@ Qt::ItemFlags DataStore::flags( const QModelIndex& index ) const
 {
     if ( !index.isValid() )
     {
-        qDebug() << "Item can be dropped here";
         return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled ;
     }
 
@@ -202,7 +200,7 @@ QModelIndex DataStore::index( int row, int column, const QModelIndex & parent ) 
     }
     else if ( row == m_datasetList.size() && column == (int)Fn::Property::D_NEW_DATASET )
     {
-        return createIndex( 0, column, 0 );
+        return createIndex( 0, column, (quintptr)0 );
     }
     else
     {
@@ -254,7 +252,7 @@ void DataStore::deleteItem( int row )
         endRemoveRows();
 
         beginResetModel();
-        reset();
+
         endResetModel();
 
         Models::g()->setData( Models::g()->index( (int)Fn::Property::G_NEED_SHADER_UPDATE, 0 ), true );

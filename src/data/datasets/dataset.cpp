@@ -7,7 +7,8 @@
 #include "dataset.h"
 
 Dataset::Dataset( QDir fileName, Fn::DatasetType type ) :
-    m_textureGLuint( 0 )
+    m_textureGLuint( 0 ),
+    m_resetRenderer( false )
 {
     PropertyGroup props;
     // add standard properties
@@ -52,7 +53,7 @@ PropertyGroup& Dataset::properties( QString target )
     }
 }
 
-QString Dataset::getValueAsString( int x, int y, int z )
+QString Dataset::getValueAsString( float x, float y, float z )
 {
     return QString( "0" );
 }

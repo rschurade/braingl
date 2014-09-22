@@ -14,11 +14,12 @@
 
 #include "../../../data/models.h"
 #include "../../../data/vptr.h"
-#include "../../../data/writer.h"
 #include "../../../data/roiarea.h"
 
 #include "../../../data/datasets/dataset.h"
 #include "../../../data/datasets/datasetscalar.h"
+
+#include "../../../io/writer.h"
 
 #include <QPushButton>
 #include <QProgressBar>

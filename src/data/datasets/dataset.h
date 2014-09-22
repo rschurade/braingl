@@ -8,8 +8,6 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include "GL/glew.h"
-
 #include "../enums.h"
 #include "../properties/propertygroup.h"
 
@@ -20,6 +18,8 @@
 #include <QString>
 #include <QVariant>
 #include <QMatrix4x4>
+
+#include <QOpenGLFunctions_3_3_Core>
 
 #include <limits>
 
@@ -35,7 +35,7 @@ public:
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target ) = 0;
 
-    virtual QString getValueAsString( int x, int y, int z );
+    virtual QString getValueAsString( float x, float y, float z );
     virtual QString getColormapShader( int num );
 
     virtual bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
@@ -57,6 +57,8 @@ protected:
 
     GLuint m_textureGLuint;
     QPair<QVector3D, QVector3D>m_boundingBox;
+
+    bool m_resetRenderer;
 };
 
 #endif /* DATASET_H_ */

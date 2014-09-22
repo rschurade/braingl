@@ -13,10 +13,8 @@
 
 #include <QtGui>
 
-#include "../core_3_3_context.h"
-
 SingleSHWidget::SingleSHWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget ),
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget ),
     m_visible( false )
 {
     m_renderer = new SingleSHRenderer();
@@ -43,8 +41,8 @@ void SingleSHWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
     GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GLFunctions::f->glGenVertexArrays(1, &vao);
+    GLFunctions::f->glBindVertexArray(vao);
 
     m_renderer->initGL();
 }

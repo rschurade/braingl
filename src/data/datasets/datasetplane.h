@@ -30,10 +30,6 @@ private:
     int m_handle1;
     int m_handle2;
 
-    QVector3D m_h0;
-    QVector3D m_h1;
-    QVector3D m_h2;
-
     bool dirty;
 
     void initGeometry();

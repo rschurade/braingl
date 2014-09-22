@@ -10,27 +10,27 @@
 
 #include "../data/enums.h"
 
-#include <QMainWindow>
-#include <QSettings>
 #include <QAbstractItemModel>
 #include <QFileDialog>
+#include <QMainWindow>
+#include <QSettings>
+
+class ColormapEditWidget;
+class Dataset;
+class DatasetListWidget;
+class FNDockWidget;
+class GLWidget;
+class ROIArea;
+class ROIWidget;
+class ScriptWidget;
+class ShaderEditWidget;
+class ToolBar;
 
 class QAction;
 class QListView;
 class QMenu;
 class QTabWidget;
 class QTableView;
-
-class Dataset;
-class DatasetListWidget;
-class ROIWidget;
-class ShaderEditWidget;
-class ScriptWidget;
-class FNDockWidget;
-class ColormapEditWidget;
-
-class GLWidget;
-class ToolBar;
 
 class MainWindow: public QMainWindow
 {
@@ -41,10 +41,12 @@ public:
 
     void closeEvent( QCloseEvent *event );
     bool load( QString fileName );
+    bool loadAndAlgo( QString fileName, QString algo, QVariant param );
     bool loadRoi( QString fileName );
 
-    void saveScene( QString fileName );
+    void saveScene( QString fileName, bool packAndGo );
     void loadScene( QString fileName );
+    void loadSceneDeprecated( QString fileName );
 
 private:
     void createActions();
@@ -55,9 +57,9 @@ private:
 
     bool save( Dataset* ds );
     void saveDataset( Dataset* ds, QString filter = "" );
+    void saveRoi( ROIArea* roi );
 
     void saveSettings();
-    QModelIndex createIndex( int branch, int pos, int column );
     void loadSettings();
     void loadSetting( QSettings &settings, Fn::Property setting );
     void loadColormaps( bool resetSettings );
@@ -65,6 +67,9 @@ private:
     void setCurrentFile( const QString &fileName );
     void updateRecentFileActions();
     QString strippedName( const QString &fullFileName );
+
+    void setCurrentScene( const QString &fileName );
+    void updateRecentSceneActions();
 
     bool load( QString fileName, QList<QVariant> state );
 
@@ -83,21 +88,31 @@ private:
     FNDockWidget* m_dockDSP;
     ColormapEditWidget* m_colormapEditWidget;
 
+    FNDockWidget* m_dockHTW;
+    FNDockWidget* m_dockHTW2;
+
     QMenu* fileMenu;
     QMenu* optionMenu;
     QMenu* viewMenu;
     QMenu* tabMenu;
     QMenu* helpMenu;
     QMenu *recentFilesMenu;
+    QMenu *recentScenesMenu;
 
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
     ToolBar* m_toolsToolBar;
 
-    enum { MaxRecentFiles = 5 };
+    enum
+    {
+        MaxRecentFiles = 15
+    };
     QAction *recentFileActs[MaxRecentFiles];
     QAction *separatorAct;
     QString curFile;
+
+    QAction *recentSceneActs[MaxRecentFiles];
+    QString curScene;
 
     QAction* newAct;
     QAction* openAct;
@@ -106,6 +121,7 @@ private:
 
     QAction* loadRoiAct;
     QAction* saveSceneAct;
+    QAction* packAndGoAct;
 
     QAction* exportColormapsAct;
     QAction* importColormapsAct;
@@ -116,6 +132,8 @@ private:
     QAction* renderCrosshairsAct;
 
     QAction* newPlaneAct;
+    QAction* newGuideAct;
+    QAction* newLabelAct;
 
     QAction* showAxialAct;
     QAction* showCoronalAct;
@@ -141,16 +159,18 @@ private:
     static int countMainGL;
 
 public slots:
-    void screenshot();
+    void screenshot( bool exitAfter = false );
     void runScript();
 
 private slots:
     void slotNew();
     void open();
     void openRecentFile();
+    void openRecentScene();
     void save();
     void loadRoi();
     void saveScene();
+    void packAndGo();
     void exportColormaps();
     void importColormaps();
     void about();
@@ -173,9 +193,11 @@ private slots:
 
     void slotDatasetSelectionChanged();
 
-    void saveFilterChanged(QString filterString);
+    void saveFilterChanged( QString filterString );
 
     void newPlane();
+    void newGuide();
+    void newLabel();
 };
 
 #endif

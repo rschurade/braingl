@@ -18,6 +18,8 @@ PropertyInt::PropertyInt( QString name, int value, int min, int max ) :
     widget->setMax( max );
     widget->setValue( value );
     connect( widget, SIGNAL( valueChanged( int, int ) ), this, SLOT( widgetChanged( int, int ) ) );
+    connect( widget, SIGNAL( minChanged( QVariant ) ), this, SLOT( setMin( QVariant ) ) );
+    connect( widget, SIGNAL( maxChanged( QVariant ) ), this, SLOT( setMax( QVariant ) ) );
     m_widget = widget;
 }
 
@@ -28,17 +30,28 @@ PropertyInt::~PropertyInt()
 void PropertyInt::setValue( QVariant value )
 {
     m_value = value.toInt();
+    if ( m_value.toInt() < m_min.toInt() )
+    {
+        setMin( value );
+    }
     if ( m_value.toInt() > m_max.toInt() )
     {
-        m_max = m_value;
-        ( ( SliderWithEditInt* )m_widget )->setMax( m_max.toInt() );
+        setMax( value );
     }
+
     ( ( SliderWithEditInt* )m_widget )->setValue( m_value.toInt() );
 }
 
 void PropertyInt::setMin( QVariant min )
 {
-    m_min = min.toInt();
+    if ( min.toInt() >= m_max.toInt() )
+    {
+        m_min = m_max.toInt() - 1;
+    }
+    else
+    {
+        m_min = min.toInt();
+    }
     if ( m_value.toInt() < m_min.toInt() )
     {
         m_value = m_min;
@@ -49,7 +62,14 @@ void PropertyInt::setMin( QVariant min )
 
 void PropertyInt::setMax( QVariant max )
 {
-    m_max = max.toInt();
+    if ( m_max.toInt() <= m_min.toInt() )
+    {
+        m_max = m_min.toInt() + 1;
+    }
+    else
+    {
+        m_max = max.toInt();
+    }
     if ( m_value.toInt() > m_max.toInt() )
     {
         m_value = m_max;
@@ -60,6 +80,6 @@ void PropertyInt::setMax( QVariant max )
 
 void PropertyInt::widgetChanged( int value, int id )
 {
-    m_value = value;
+    setValue( value );
     emit( valueChanged( value ) );
 }

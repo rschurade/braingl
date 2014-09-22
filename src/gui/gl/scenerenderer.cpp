@@ -4,11 +4,10 @@
  * Created on: 09.05.2012
  * @author Ralph Schurade
  */
-#include "glfunctions.h"
-
 #include "scenerenderer.h"
+
+#include "glfunctions.h"
 #include "arcball.h"
-#include "slicerenderer.h"
 #include "colormaprenderer.h"
 
 #include "../../data/datastore.h"
@@ -20,8 +19,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtOpenGL/QGLShaderProgram>
-#include <GL/glu.h>     // XXX removed in OS X 10.9
+#include <QGLShaderProgram>
 #include <QDebug>
 
 #include <math.h>
@@ -32,6 +30,7 @@
 #endif
 
 SceneRenderer::SceneRenderer( QString renderTarget ) :
+    ObjectRenderer(),
     m_renderTarget( renderTarget ),
     vbo( 0 ),
     m_width( 1 ),
@@ -42,8 +41,6 @@ SceneRenderer::SceneRenderer( QString renderTarget ) :
     RBO( 0 ),
     FBO( 0 )
 {
-    m_sliceRenderer = new SliceRenderer();
-
     m_mvMatrix.setToIdentity();
     m_pMatrix.setToIdentity();
 }
@@ -55,21 +52,10 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::initGL()
 {
     qDebug() << "gl init " + m_renderTarget;
-
+    initializeOpenGLFunctions();
     if ( m_renderTarget == "maingl" )
     {
-        glewExperimental = true;
-        GLenum errorCode = glewInit();
-        if ( GLEW_OK != errorCode )
-        {
-            qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-            qDebug() << glewGetErrorString( errorCode );
-            exit( false );
-        }
-        else
-        {
-            qDebug() << "OpenGL initialized.";
-        }
+        qWarning() << "Get GL stats";
 
         const GLubyte *renderer = glGetString( GL_RENDERER );
         const GLubyte *vendor = glGetString( GL_VENDOR );
@@ -80,17 +66,17 @@ void SceneRenderer::initGL()
         glGetIntegerv( GL_MAJOR_VERSION, &major );
         glGetIntegerv( GL_MINOR_VERSION, &minor );
 
-        qDebug() << "GL Vendor :" << QString( (char*) vendor );
-        qDebug() << "GL Renderer :" << QString( (char*) renderer );
-        qDebug() << "GL Version (string) :" << QString( (char*) version );
-        qDebug() << "GL Version (integer) :" << major << "." << minor;
-        qDebug() << "GLSL Version :" << QString( (char*) glslVersion );
+        qWarning() << "GL Vendor :" << QString( (char*) vendor );
+        qWarning() << "GL Renderer :" << QString( (char*) renderer );
+        qWarning() << "GL Version (string) :" << QString( (char*) version );
+        qWarning() << "GL Version (integer) :" << major << "." << minor;
+        qWarning() << "GLSL Version :" << QString( (char*) glslVersion );
 
         if ( ( major < 3 ) || ( major == 3 && minor < 3 ) )
         {
-            std::cout << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting." << std::endl;
-            std::cout << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers." << std::endl;
-            std::cout << "Note: braingl will not run remotely." << std::endl;
+            qCritical() << "Sorry, brainGL needs OpenGL version 3.3 or higher, quitting.";
+            qCritical() << "If you think your graphics card should be able to support OpenGL 3.3, install the latest drivers.";
+            qCritical() << "Note: braingl will not run remotely.";
             exit( 0 );
         }
 
@@ -110,15 +96,7 @@ void SceneRenderer::initGL()
 
     glEnable( GL_DEPTH_TEST );
 
-    //glShadeModel( GL_SMOOTH );  // XXXX invalid operation/crash XXX not in Core
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-
-    //static GLfloat lightPosition[4] = { 0.5, 5.0, -3000.0, 1.0 };
-    //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );   // XXX not in Core
-
-    m_sliceRenderer->init();
 
     int textureSizeMax;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &textureSizeMax );
@@ -127,7 +105,6 @@ void SceneRenderer::initGL()
 
     VertexData vertices[] =
     {
-        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         { QVector3D( -1.0, -1.0, 0 ), QVector3D( 0.0, 0.0, 0.0 ) },
         { QVector3D(  1.0, -1.0, 0 ), QVector3D( 1.0, 0.0, 0.0 ) },
         { QVector3D( -1.0,  1.0, 0 ), QVector3D( 0.0, 1.0, 0.0 ) },
@@ -137,6 +114,8 @@ void SceneRenderer::initGL()
     glBindBuffer( GL_ARRAY_BUFFER, vbo);
     glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(VertexData), vertices, GL_STATIC_DRAW );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    qDebug() << "done gl init " + m_renderTarget;
 }
 
 void SceneRenderer::resizeGL( int width, int height )
@@ -219,7 +198,7 @@ void SceneRenderer::renderScene()
     GLFunctions::getAndPrintGLError( "before pass 1" );
     glClearColor( bgColor.redF(), bgColor.greenF(), bgColor.blueF(), 1.0 );
     GLFunctions::getAndPrintGLError( "before clear" );
-    GLenum fbstat = glCheckFramebufferStatus( GL_FRAMEBUFFER );   // XXX debug
+    GLenum fbstat = glCheckFramebufferStatus( GL_FRAMEBUFFER );
     if ( fbstat != GL_FRAMEBUFFER_COMPLETE )
     {
         /* handle an error : frame buffer incomplete */
@@ -235,7 +214,7 @@ void SceneRenderer::renderScene()
         case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: errstr = QString( "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS" ); break;
         default: errstr = QString( fbstat ); break;
         }
-        qDebug() << "frame buffer incomplete:" << errstr;
+        qCritical() << "frame buffer incomplete:" << errstr;
     }
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -315,7 +294,8 @@ void SceneRenderer::renderScenePart( int renderMode, QString target0, QString ta
     setRenderTargets( target0, target1 );
 
     GLFunctions::getAndPrintGLError( m_renderTarget + "---" );
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderSlices( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderOrientHelper( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     //GLFunctions::getAndPrintGLError( m_renderTarget + "+++" );
     renderDatasets();
     renderRois();
@@ -388,7 +368,6 @@ void SceneRenderer::renderMerge()
     program->setUniformValue( "C5", 10 );
     program->setUniformValue( "D1", 11 );
 
-    //glDrawArrays( GL_QUADS, 0, 4 );       // XXX not in Core
     glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -480,7 +459,7 @@ void SceneRenderer::renderPick()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     //render_picking_scene();
-    m_sliceRenderer->draw( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
+    GLFunctions::renderSlices( m_pMatrix, m_mvMatrix, m_width, m_height, m_renderMode, m_renderTarget );
     renderRois();
     renderDatasets();
 }
@@ -493,14 +472,16 @@ QString SceneRenderer::getRenderTarget()
 QVector3D SceneRenderer::mapMouse2World( int x, int y, int z )
 {
     GLint viewport[4];
-    GLfloat winX, winY;
+    float winX, winY;
 
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     winX = (float) x;
     winY = (float) viewport[3] - (float) y;
-    GLdouble posX, posY, posZ;
-    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+    float posX, posY, posZ;
+
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    unproject( winX, winY, z, m_mvMatrix, m_pMatrix, vViewport, posX, posY, posZ );
 
     QVector3D v( posX, posY, posZ );
     return v;
@@ -510,15 +491,16 @@ QVector2D SceneRenderer::mapWorld2Mouse( float x, float y, float z )
 {
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
-    GLdouble winX, winY, winZ;
-    gluProject( x, y, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &winX, &winY, &winZ );
+    float winX, winY, winZ;
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    project( x, y, z, m_mvMatrix, m_pMatrix, vViewport, winX, winY, winZ );
     return QVector2D( winX, winY );
 }
 
 QVector3D SceneRenderer::mapMouse2World( float x, float y )
 {
     GLint viewport[4];
-    GLfloat winX, winY;
+    float winX, winY;
 
     glGetIntegerv( GL_VIEWPORT, viewport );
 
@@ -528,8 +510,9 @@ QVector3D SceneRenderer::mapMouse2World( float x, float y )
     GLfloat z;
     glReadPixels( winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, (void*) &z );
 
-    GLdouble posX, posY, posZ;
-    gluUnProject( winX, winY, z, m_mvMatrix.data(), m_pMatrix.data(), viewport, &posX, &posY, &posZ );
+    float posX, posY, posZ;
+    QVector4D vViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    unproject( winX, winY, z, m_mvMatrix, m_pMatrix, vViewport, posX, posY, posZ );
 
     QVector3D v( posX, posY, posZ );
     return v;
@@ -597,7 +580,6 @@ GLuint SceneRenderer::get_object_id( int x, int y, int width, int height )
         //alpha = ptr[pixel_index + 3];
         //object_id = alpha + ( red << 24 ) + ( green << 16 ) + ( blue << 8 );
         object_id = ( red << 16 ) + ( green << 8 ) + ( blue );
-        //qDebug() << "output" << red << green << blue << alpha;
     }
     glUnmapBuffer( GL_PIXEL_PACK_BUFFER );
     glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
@@ -710,7 +692,7 @@ void SceneRenderer::initFBO( int width, int height )
     if ( glCheckFramebufferStatus( GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
     {
         /* handle an error : frame buffer incomplete */
-        qDebug() << "frame buffer incomplete";
+        qCritical() << "frame buffer incomplete";
     }
 
     /* unbind the render buffer */

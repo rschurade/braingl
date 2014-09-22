@@ -7,28 +7,9 @@
 void main( void )
 {
     float value = 0.0;
-    float min_ = 0.0;
-    float max_ = 1.0;
-    if ( u_min >= u_lowerThreshold )
-    {
-        min_ = 0.0;
-    }
-    else
-    {
-        min_ = u_min - u_lowerThreshold;
-    }
+    value = v_texcoord.x * ( u_upperThreshold - u_lowerThreshold ) + u_lowerThreshold;
+    float value2 = ( value - u_min ) / ( u_max - u_min );
+    value2 = max( 0.0, min( 1.0, value2 ) );
     
-    if ( u_max <= u_upperThreshold )
-    {
-        max_ = 1.0; 
-    }
-    else
-    {
-        max_ = 1.0 - ( u_upperThreshold - u_max ) ;
-    } 
-    value = ( v_texcoord.x - min_ ) / ( max_ - min_ );
-
-    value = max( 0.0, min( 1.0, value ) );
-    
-    writePeel( colormap( value, u_colormap, 0.0, 1.0, 0.0, 1.0 ).rgb );
+    writePeel( vec4( colormap( value2, u_colormap, 0.0, 1.0, 0.0, 1.0 ).rgb, 1.0 ) );
 }

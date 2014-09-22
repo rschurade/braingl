@@ -37,7 +37,7 @@ bool LoaderFreesurfer::loadASC( QString fn )
     QFile n( fn );
     if ( !n.open( QIODevice::ReadOnly ) )
     {
-        qDebug() << "nodes unreadable" << fn;
+        qCritical() << "nodes unreadable" << fn;
         return false;
     }
     QTextStream ns( &n );

@@ -6,7 +6,6 @@
  */
 #include "shrenderer.h"
 #include "shrendererthread.h"
-#include "shrendererthread2.h"
 #include "glfunctions.h"
 
 #include "../../data/datasets/datasetsh.h"
@@ -21,18 +20,15 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 #include <QDebug>
-#include <QVector3D>
-#include <QMatrix4x4>
 
 #include <limits>
 
 SHRenderer::SHRenderer( std::vector<ColumnVector>* data ) :
     ObjectRenderer(),
     m_tris( 0 ),
-    vboIds( new GLuint[ 3 ] ),
-    m_mesh( 0 ),
+    vboIds( new GLuint[ 4 ] ),
     m_data( data ),
     m_scaling( 1.0 ),
     m_orient( 0 ),
@@ -42,9 +38,9 @@ SHRenderer::SHRenderer( std::vector<ColumnVector>* data ) :
     m_order( 4 ),
     m_oldLoD( -1 ),
     m_pickId( GLFunctions::getPickIndex() ),
-    m_masterThread( 0 ),
-    m_meshUpdated( false ),
-    m_updateWaiting( false )
+    m_updateThread( 0 ),
+    m_glyphsUpdated( false ),
+    m_updateRunning( false )
 {
 }
 
@@ -53,11 +49,13 @@ SHRenderer::~SHRenderer()
     glDeleteBuffers(1, &( vboIds[ 0 ] ) );
     glDeleteBuffers(1, &( vboIds[ 1 ] ) );
     glDeleteBuffers(1, &( vboIds[ 2 ] ) );
+    glDeleteBuffers(1, &( vboIds[ 3 ] ) );
 }
 
 void SHRenderer::init()
 {
-    glGenBuffers( 3, vboIds );
+    initializeOpenGLFunctions();
+    glGenBuffers( 4, vboIds );
 }
 
 void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props )
@@ -92,6 +90,11 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     setRenderParams( props );
 
+    if ( m_orient == 0 )
+    {
+        return;
+    }
+
     QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
 
     program->bind();
@@ -101,6 +104,9 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix );
     program->setUniformValue( "mv_matrixInvert", mv_matrix.inverted() );
+
+    QMatrix4x4 mat;
+    program->setUniformValue( "userTransformMatrix", mat );
 
     program->setUniformValue( "u_colorMode", 2 );
     program->setUniformValue( "u_colormap", m_colormap );
@@ -159,14 +165,17 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     program->setUniformValue( "u_dims", nx * dx, ny * dy, nz * dz );
 
-    initGeometry( props );
-
-    if ( m_meshUpdated )
+    if ( !m_updateRunning )
     {
-        updateMesh();
+        initGeometry( props );
     }
 
-    if ( !m_mesh )
+    if ( m_glyphsUpdated )
+    {
+        updateGlyphs();
+    }
+
+    if ( m_tris == 0 )
     {
         return;
     }
@@ -183,7 +192,6 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
 
     glDisable(GL_CULL_FACE);
 
-    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
@@ -197,49 +205,23 @@ void SHRenderer::setShaderVars( PropertyGroup& props )
     intptr_t offset = 0;
     // Tell OpenGL programmable pipeline how to locate vertex position data
 
-    int bufferSize = m_mesh->bufferSize();
-
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
-    offset += sizeof(float) * 3;
+    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void *) offset );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
     int normalLocation = program->attributeLocation( "a_normal" );
     program->enableAttributeArray( normalLocation );
-    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
-    offset += sizeof(float) * 3;
-
-    int valueLocation = program->attributeLocation( "a_value" );
-    program->enableAttributeArray( valueLocation );
-    glVertexAttribPointer( valueLocation, 1, GL_FLOAT, GL_FALSE, sizeof(float) * bufferSize, (const void *) offset );
-    offset += sizeof(float) * 1;
-
+    glVertexAttribPointer( normalLocation, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void *) offset );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
     int colorLocation = program->attributeLocation( "a_color" );
     program->enableAttributeArray( colorLocation );
     glVertexAttribPointer( colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0 );
-}
-
-void SHRenderer::initGeometry( PropertyGroup& props )
-{
-    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
-    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
-    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
-
-    float zoom = Models::getGlobal( Fn::Property::G_ZOOM ).toFloat();
-    float moveX = Models::getGlobal( Fn::Property::G_MOVEX ).toFloat();
-    float moveY = Models::getGlobal( Fn::Property::G_MOVEY ).toFloat();
-
-    QString s = createSettingsString( { x, y, z, m_orient, zoom, m_minMaxScaling, m_scaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
-    if ( !m_updateWaiting && ( s == m_previousSettings || m_orient == 0 ) )
-    {
-        return;
-    }
-    m_previousSettings = s;
-
-    createMesh( props );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
 void SHRenderer::setRenderParams( PropertyGroup& props )
@@ -274,64 +256,76 @@ void SHRenderer::setRenderParams( PropertyGroup& props )
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
-void SHRenderer::createMesh( PropertyGroup& props )
-{
-    if ( m_masterThread && m_masterThread->isRunning() )
-    {
-        m_updateWaiting = true;
-        return;
-    }
-
-    m_updateWaiting = false;
-
-    m_masterThread = new SHRendererThread2( 0, m_data, m_pMatrix, m_mvMatrix, props );
-    connect( m_masterThread, SIGNAL( finished( TriangleMesh2* ) ), this, SLOT( slotNewMeshCreated( TriangleMesh2* ) ) );
-
-    m_masterThread->start();
-}
 
 TriangleMesh2* SHRenderer::getMesh()
 {
-    return m_mesh;
+    //return m_mesh;
 }
 
-void SHRenderer::slotNewMeshCreated( TriangleMesh2* mesh )
+
+void SHRenderer::initGeometry( PropertyGroup& props )
 {
-    m_newMesh = mesh;
-    m_meshUpdated = true;
+    float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+    float y = Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+    float z = Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+    float zoom = Models::getGlobal( Fn::Property::G_ZOOM ).toFloat();
+    float moveX = Models::getGlobal( Fn::Property::G_MOVEX ).toFloat();
+    float moveY = Models::getGlobal( Fn::Property::G_MOVEY ).toFloat();
+
+    QString s = createSettingsString( { x, y, z, m_orient, zoom, m_minMaxScaling, m_scaling, m_hideNegativeLobes, moveX, moveY, m_lod, m_offset } );
+    if ( ( s == m_previousSettings ) || ( m_orient == 0 ) )
+    {
+        return;
+    }
+    m_previousSettings = s;
+
+    m_updateRunning = true;
+    m_glyphsUpdated = false;
+
+    if ( m_updateThread )
+    {
+        delete m_updateThread;
+    }
+    m_updateThread = new SHRendererThread( m_data, m_pMatrix, m_mvMatrix, props );
+    connect( m_updateThread, SIGNAL( finished( bool ) ), this, SLOT( updateThreadFinished( bool ) ) );
+    m_updateThread->start();
+}
+
+void SHRenderer::updateThreadFinished( bool success )
+{
+    if ( success )
+    {
+        m_glyphsUpdated = true;
+    }
+    m_updateRunning = false;
     Models::g()->submit();
 }
 
-void SHRenderer::updateMesh()
+void SHRenderer::updateGlyphs()
 {
-    if ( m_mesh != 0 )
-    {
-        delete m_mesh;
+    glDeleteBuffers( 4, vboIds );
+    glGenBuffers( 4, vboIds );
 
-        glDeleteBuffers( 3, vboIds );
-        glGenBuffers( 3, vboIds );
-    }
+    m_tris = m_updateThread->getIndices()->size();
 
-    if ( m_newMesh )
-    {
-        m_mesh = m_newMesh;
-        int bufferSize = m_mesh->bufferSize();
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_tris * sizeof(GLuint), m_updateThread->getIndices()->data(), GL_STATIC_DRAW );
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_mesh->numTris() * 3 * sizeof(GLuint), m_mesh->getIndexes(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_updateThread->getVerts()->size() * sizeof(GLfloat), m_updateThread->getVerts()->data(), GL_STATIC_DRAW );
 
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-        glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * bufferSize * sizeof(GLfloat), m_mesh->getVertices(), GL_STATIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_updateThread->getColors()->size() * sizeof(GLfloat), m_updateThread->getColors()->data(), GL_DYNAMIC_DRAW );
 
-        glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 2 ] );
-        glBufferData( GL_ARRAY_BUFFER, m_mesh->numVerts() * 4 * sizeof(GLfloat), m_mesh->getVertexColors(), GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 3 ] );
+    glBufferData( GL_ARRAY_BUFFER, m_updateThread->getNormals()->size() * sizeof(GLfloat), m_updateThread->getNormals()->data(), GL_STATIC_DRAW );
 
-        m_tris = m_mesh->numTris() * 3;
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
-        m_newMesh = 0;
-    }
-    m_meshUpdated = false;
+    delete m_updateThread;
+    m_updateThread = 0;
+    m_glyphsUpdated = false;
 }

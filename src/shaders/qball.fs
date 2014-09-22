@@ -6,5 +6,5 @@ in vec4 frontColor;
 
 void main()
 {
-    writePeel( frontColor.rgb );
+    writePeel( frontColor );
 }

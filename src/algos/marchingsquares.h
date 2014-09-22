@@ -17,6 +17,7 @@ public:
     virtual ~MarchingSquares();
 
     std::vector<float> run();
+    std::vector<float> runStripes( int stripeType, int distance );
 
 private:
     std::vector<float>* m_data;
@@ -31,8 +32,11 @@ private:
     float m_dy2;
 
     bool m_interpolation;
+    int m_stripeType;
+    int m_stripeDistance;
 
     std::vector<float>m_verts;
+    std::vector<float>m_stripeVerts;
 
     int step( int x, int y );
     int id( int x, int y );

@@ -8,16 +8,16 @@
 #ifndef MESHRENDERER_H_
 #define MESHRENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include <QColor>
-#include <QMatrix4x4>
 
 class TriangleMesh2;
 class PropertyGroup;
 class ROIPropertyGroup;
+class QGLShaderProgram;
 
-class MeshRenderer
+class MeshRenderer : public ObjectRenderer
 {
 public:
     MeshRenderer( TriangleMesh2* mesh );
@@ -34,7 +34,7 @@ public:
     void updateColor( int id, float r, float g, float b, float a );
 
 protected:
-    void setShaderVars();
+    void setShaderVars( QGLShaderProgram* program );
     virtual void setRenderParams( PropertyGroup& props );
     void initGeometry();
     int m_colorMode;

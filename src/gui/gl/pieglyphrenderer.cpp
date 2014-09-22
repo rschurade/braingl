@@ -22,7 +22,6 @@ PieGlyphRenderer::PieGlyphRenderer() :
 
 PieGlyphRenderer::~PieGlyphRenderer()
 {
-    qDebug() << "pie renderer delete";
     glDeleteBuffers( 1, &( vboIds[0] ) );
     delete[] pies;
     pies = NULL;
@@ -118,6 +117,7 @@ void PieGlyphRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
 
 void PieGlyphRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 
@@ -174,7 +174,6 @@ void PieGlyphRenderer::initGeometry( std::vector<float*>* pieArrays, std::vector
     {
         if ( numbers->at( i ) != 0 )
             numPoints += numbers->at( i ) + 2; // +2 for middle and closing point
-        //qDebug() << numPoints;
     }
     qDebug() << "numPoints: " << numPoints;
     delete[] pies;
@@ -188,7 +187,7 @@ void PieGlyphRenderer::initGeometry( std::vector<float*>* pieArrays, std::vector
     for ( int i = 0; i < n; i++ )  //for all pie charts:
     {
         float* ps = pieArrays->at( i );
-        //qDebug() << "numbers at: " << i << " is: " << numbers->at(i);
+
         if ( numbers->at( i ) != 0 )
         {
             //first point:

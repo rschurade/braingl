@@ -29,6 +29,7 @@ public:
     static QVariant getGlobal( int var );
 
     static ROI* getRoi( int branch, int pos );
+    static int getBranchSize( int branch );
     static void setROIProp( int branch, int pos, Fn::Property prop, QVariant value );
     static void setROIProp( int branch, int pos, int prop, QVariant value );
 
@@ -51,14 +52,22 @@ public:
 
     static void addDataset( Dataset* ds );
 
+    static Fn::Property s2p( QString s );
+
+    static float zoom;
+
 private:
     static QAbstractItemModel* m_globalModel;
     static QAbstractItemModel* m_dataModel;
     static QAbstractItemModel* m_roiModel;
     static ROIWidget* m_roiWidget;
 
+    static QMap<QString, Fn::Property>m_propMap;
+
     Models() {};
     virtual ~Models() {};
+
+    static void initPropMap();
 };
 
 #endif /* MODELS_H_ */

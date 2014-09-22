@@ -9,7 +9,7 @@
 #include "fiberselector.h"
 
 #include "../models.h"
-#include "../loadervtk.h"
+#include "../vptr.h"
 
 #include "../properties/propertybool.h"
 #include "../properties/propertycolor.h"
@@ -19,8 +19,11 @@
 #include "../properties/propertystring.h"
 #include "../properties/propertyselection.h"
 
+#include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/fiberrenderer.h"
 #include "../../gui/gl/tuberenderer.h"
+
+#include "../../io/loadervtk.h"
 
 DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     Dataset( filename, type ),
@@ -44,7 +47,14 @@ DatasetFibers::DatasetFibers( QDir filename, std::vector<Fib> fibs, QList<QStrin
     m_numPoints( 0 ),
     m_numLines( 0 )
 {
+    if ( fibs.size() > 0 )
+    {
+        int count = fibs[0].getCountDataFields();
+        m_dataMins = std::vector<float>( count, 0.0f );
+        m_dataMaxes = std::vector<float>( count, 1.0f );
+    }
     createProps();
+    calcBoundingBox();
 }
 
 DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
@@ -58,6 +68,7 @@ DatasetFibers::DatasetFibers( QDir filename, LoaderVTK* lv ) :
 {
     copyFromLoader( lv );
     createProps();
+    calcBoundingBox();
 }
 
 DatasetFibers::~DatasetFibers()
@@ -76,45 +87,43 @@ void DatasetFibers::createProps()
 
     m_properties["maingl"].createInt( Fn::Property::D_NUM_POINTS, m_numPoints );
     m_properties["maingl"].createInt( Fn::Property::D_NUM_LINES, m_fibs.size() );
-    m_properties["maingl"].createList( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_FIBER_RENDERMODE, {"lines", "tubes"}, 0, "general" );
+    float percent = Models::getGlobal( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE ).toFloat();
+    m_properties["maingl"].createFloat( Fn::Property::D_FIBER_THIN_OUT, percent, 0.1f, 100.f, "general" );
     if ( hasData )
     {
-        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
+        m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri", "data" }, 0, "general" );
         m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0, "general" );
     }
     else
     {
-        m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
+        m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "global", "local", "user defined", "mri" }, 0, "general" );
         m_properties["maingl"].createList( Fn::Property::D_DATAMODE, m_dataNames, 0 );
     }
+    m_properties["maingl"].createList( Fn::Property::D_SELECTED_TEXTURE, { "none" }, 0, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( sourceMRIChanged() ) );
+    m_properties["maingl"].createInt( Fn::Property::D_STIPPLE_PROB_MASK, 0 );
     m_properties["maingl"].createColor( Fn::Property::D_COLOR, QColor( 255, 0, 0 ), "color" );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "color" );
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_THICKNESS, 1.0f, 0.1f, 5.0f, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_MIN, 0.0f );
     m_properties["maingl"].createFloat( Fn::Property::D_MAX, 1.0f );
 
-    if ( hasData )
-    {
-        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
-        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
-    }
-    else
-    {
-        m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1 );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f );
-        m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f );
-    }
+    GLFunctions::createColormapBarProps( m_properties["maingl"] );
+
+    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, 0.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, 1.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LOWER_THRESHOLD, 0.0f, 0.0f, 1.0f, "color" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UPPER_THRESHOLD, 1.0f, 0.0f, 1.0f, "color" );
+
     m_properties["maingl"].createFloat( Fn::Property::D_DX, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DY, 2000.0f, 0.0f, 2000.0f, "special" );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, 2000.0f, 0.0f, 2000.0f, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, 0, 2000, "special" );
-    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, 0, 2000, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NX, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NY, 1000, -2500, 2500, "special" );
+    m_properties["maingl"].createInt( Fn::Property::D_NZ, 800, -2500, 2500, "special" );
+    m_properties["maingl"].createBool( Fn::Property::D_STICK_TO_CROSSHAIR, true, "special" );
 
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_MORPH, 1.0f, 0.0f, 1.0f, "special" );
 
@@ -165,21 +174,25 @@ void DatasetFibers::createProps()
                   m_properties["maingl2"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
         //connect( m_properties["maingl2"]->getProperty( Fn::Property::D_DATAMODE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( dataModeChanged() ) );
+        dataModeChanged();
     }
 
-    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
+    m_transform.setToIdentity();
     m_properties["maingl"].createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
     m_properties["maingl"].createButton( Fn::Property::D_APPLY_TRANSFORM, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_APPLY_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( applyTransform() ) );
 
+    connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( globalChanged() ) );
+
+    connect( Models::d(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( updateSourceMRI() ) );
+
 //    m_properties["maingl"].createBool( Fn::Property::D_AUTOPLAY, false );
 //    m_properties["maingl"].createInt( Fn::Property::D_AUTOPLAY_INTERVAL, 25, 10, 1000 );
 //    connect( m_properties["maingl"].getProperty( Fn::Property::D_AUTOPLAY ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( autoplay() ) );
-
-    transformChanged( 3 );
 }
 
 std::vector<Fib>* DatasetFibers::getFibs()
@@ -264,6 +277,33 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         return;
     }
 
+    if ( m_resetRenderer )
+    {
+        delete m_renderer;
+        m_renderer = 0;
+        delete m_tubeRenderer;
+        m_tubeRenderer = 0;
+        delete m_selector;
+        m_selector = 0;
+        if ( !m_kdVerts )
+        {
+            m_kdVerts = new std::vector<float>();
+        }
+        m_kdVerts->clear();
+        m_kdVerts->reserve( m_numPoints * 3 );
+        for ( unsigned int i = 0; i < m_fibs.size(); ++i )
+        {
+            for ( unsigned int k = 0; k < m_fibs[i].length(); ++k )
+            {
+                m_kdVerts->push_back( m_fibs[i][k].x() );
+                m_kdVerts->push_back( m_fibs[i][k].y() );
+                m_kdVerts->push_back( m_fibs[i][k].z() );
+            }
+
+        }
+        m_resetRenderer = false;
+    }
+
     if ( m_selector == 0 )
     {
         m_selector = new FiberSelector( m_kdVerts, m_numPoints );
@@ -293,6 +333,7 @@ void DatasetFibers::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
 
         m_tubeRenderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
     }
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
 void DatasetFibers::transformChanged( QVariant value )
@@ -334,94 +375,33 @@ void DatasetFibers::transformChanged( QVariant value )
     }
 
     m_properties["maingl"].set( Fn::Property::D_TRANSFORM, m_transform );
+    Models::d()->submit();
 }
 
 void DatasetFibers::applyTransform()
 {
-    int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
-
     m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
 
-    switch( selectedMatrix )
-    {
-        case 0:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-        case 1:
-        case 2:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-        case 3:
-        case 4:
-        {
-            for ( unsigned int i = 0; i < m_fibs.size(); ++i )
-            {
-                Fib fib = m_fibs[i];
-                for ( unsigned int k = 0; k < fib.length(); ++k )
-                {
-                    QVector3D vert = fib.getVert( k );
-                    vert = m_transform * vert;
-                    fib.setVert( k, vert );
-                }
-                m_fibs[i] = fib;
-            }
-            break;
-        }
-    }
-
-    delete m_renderer;
-    m_renderer = 0;
-    delete m_tubeRenderer;
-    m_tubeRenderer = 0;
-    delete m_selector;
-    m_selector = 0;
-    if ( !m_kdVerts )
-    {
-        m_kdVerts = new std::vector<float>();
-    }
-    m_kdVerts->clear();
-    m_kdVerts->reserve( m_numPoints * 3 );
     for ( unsigned int i = 0; i < m_fibs.size(); ++i )
     {
-        for ( unsigned int k = 0; k < m_fibs[i].length(); ++k )
+        Fib fib = m_fibs[i];
+        for ( unsigned int k = 0; k < fib.length(); ++k )
         {
-            m_kdVerts->push_back( m_fibs[i][k].x() );
-            m_kdVerts->push_back( m_fibs[i][k].y() );
-            m_kdVerts->push_back( m_fibs[i][k].z() );
+            QVector3D vert = fib.getVert( k );
+            vert = m_transform * vert;
+            fib.setVert( k, vert );
         }
-
+        m_fibs[i] = fib;
     }
 
+    m_resetRenderer = true;
+    transformChanged( 0 );
     Models::d()->submit();
 }
 
 QString DatasetFibers::getSaveFilter()
 {
-    return QString( "fib files binary(*.fib *.vtk);;fib files ascii (*.fib *.vtk);;fib files json (*.json);;all files (*.*)" );
+    return QString( "fib files binary(*.fib *.vtk);;fib files ascii (*.fib *.vtk);;fib files json (*.json);;trackvis (*.trk);;all files (*.*)" );
 }
 
 QString DatasetFibers::getDefaultSuffix()
@@ -486,7 +466,7 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
                 min = qMin( min, value );
                 max = qMax( max, value );
             }
-            qDebug() << m_dataNames[curField] << min << " " << max;
+            qDebug() << m_dataNames[curField] << "min: " << min << " max: " << max;
             m_dataMins.push_back( min );
             m_dataMaxes.push_back( max );
         }
@@ -517,12 +497,15 @@ void DatasetFibers::copyFromLoader( LoaderVTK* lv )
 
 void DatasetFibers::colorChanged()
 {
-    std::vector<bool>*selected = m_selector->getSelection();
-    for ( unsigned int i = 0; i < m_numLines; ++i )
+    if ( m_selector != 0 )
     {
-        if ( selected->at( i ) )
+        std::vector<bool>*selected = m_selector->getSelection();
+        for ( unsigned int i = 0; i < m_numLines; ++i )
         {
-            m_fibs[ i ].setCustomColor( m_properties["maingl"].getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+            if ( selected->at( i ) )
+            {
+                m_fibs[ i ].setCustomColor( m_properties["maingl"].getProperty( Fn::Property::D_COLOR )->getValue().value<QColor>() );
+            }
         }
     }
     if ( m_renderer != 0 )
@@ -539,11 +522,11 @@ void DatasetFibers::dataModeChanged()
 {
     if ( m_renderer != 0 )
     {
-        m_renderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
+        m_renderer->setExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     if ( m_tubeRenderer != 0 )
     {
-        m_tubeRenderer->updateExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
+        m_tubeRenderer->setExtraData( properties( "maingl" ).get( Fn::Property::D_DATAMODE).toInt() );
     }
     float min = m_dataMins[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
     float max = m_dataMaxes[ m_properties["maingl"].get( Fn::Property::D_DATAMODE).toInt()];
@@ -556,6 +539,11 @@ void DatasetFibers::dataModeChanged()
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
     m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( max );
     m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
     m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
     Models::d()->submit();
@@ -589,4 +577,131 @@ unsigned int DatasetFibers::numVerts()
 unsigned int DatasetFibers::numLines()
 {
     return m_numLines;
+}
+
+void DatasetFibers::calcBoundingBox()
+{
+    float xMin = 1000;
+    float yMin = 1000;
+    float zMin = 1000;
+    float xMax = -1000;
+    float yMax = -1000;
+    float zMax = -1000;
+
+    for ( unsigned int i = 0; i < m_fibs.size(); ++i )
+    {
+        Fib fib = m_fibs[i];
+        for ( unsigned int k = 0; k < fib.length(); ++k )
+        {
+            QVector3D vert = fib[k];
+            xMin = qMin( xMin, vert.x() );
+            yMin = qMin( yMin, vert.y() );
+            zMin = qMin( zMin, vert.z() );
+            xMax = qMax( xMax, vert.x() );
+            yMax = qMax( yMax, vert.y() );
+            zMax = qMax( zMax, vert.z() );
+        }
+    }
+    m_boundingBox.first.setX( xMin );
+    m_boundingBox.first.setY( yMin );
+    m_boundingBox.first.setZ( zMin );
+    m_boundingBox.second.setX( xMax );
+    m_boundingBox.second.setY( yMax );
+    m_boundingBox.second.setZ( zMax );
+}
+
+void DatasetFibers::globalChanged()
+{
+    if ( m_properties["maingl"].get( Fn::Property::D_STICK_TO_CROSSHAIR ).toBool() )
+    {
+        m_properties["maingl"].set( Fn::Property::D_NX, Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NY, Models::getGlobal( Fn::Property::G_CORONAL ).toFloat() * 10 );
+        m_properties["maingl"].set( Fn::Property::D_NZ, Models::getGlobal( Fn::Property::G_AXIAL ).toFloat() * 10 );
+    }
+
+    Models::d()->submit();
+}
+
+void DatasetFibers::updateSourceMRI()
+{
+    QList<Dataset*>dsl1 = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR, false );
+
+    if( dsl1.size() != m_scalarDSL.size() )
+    {
+        QWidget* widget = m_properties["maingl"].getWidget( Fn::Property::D_SELECTED_TEXTURE );
+        widget->blockSignals( true );
+
+        int curScalar = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+
+        PropertySelection* prop = static_cast<PropertySelection*> ( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_TEXTURE ) );
+        prop->clear();
+
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            prop->addOption( dsl1[i]->properties().get( Fn::Property::D_NAME ).toString() );
+        }
+
+        if ( dsl1.size() > m_scalarDSL.size() )
+        {
+            m_properties["maingl"].set( Fn::Property::D_SELECTED_TEXTURE, qMax( 0, curScalar ) );
+        }
+        else
+        {
+            m_properties["maingl"].set( Fn::Property::D_SELECTED_TEXTURE, 0 );
+        }
+        m_scalarDSL.clear();
+        for ( int i = 0; i < dsl1.size(); ++i )
+        {
+            m_scalarDSL.push_back( dsl1[i] );
+        }
+        widget->blockSignals( false );
+    }
+}
+
+void DatasetFibers::sourceMRIChanged()
+{
+    int curScalar = m_properties["maingl"].get( Fn::Property::D_SELECTED_TEXTURE ).toInt();
+    Dataset* selectedDS = m_scalarDSL[curScalar];
+
+    QAbstractItemModel* model = Models::d();
+    int countDatasets = model->rowCount();
+    int allocatedTextureCount = 0;
+    for ( int i = 0; i < countDatasets; ++i )
+    {
+        Dataset* ds = VPtr<Dataset>::asPtr( Models::d()->data( Models::d()->index( i, (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
+        if ( selectedDS == ds )
+        {
+            m_properties["maingl"].set( Fn::Property::D_STIPPLE_PROB_MASK, allocatedTextureCount );
+
+            float min = selectedDS->properties().get( Fn::Property::D_MIN ).toFloat();
+            float max = selectedDS->properties().get( Fn::Property::D_MAX ).toFloat();
+
+            m_properties["maingl"].set( Fn::Property::D_MIN, min );
+            m_properties["maingl"].set( Fn::Property::D_MAX, max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMin( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setMax( max );
+            m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
+            m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
+            Models::d()->submit();
+            return;
+        }
+
+        PropertyGroup* props = &ds->properties();
+        bool active = props->get( Fn::Property::D_ACTIVE ).toBool();
+        bool isTex = props->get( Fn::Property::D_HAS_TEXTURE ).toBool();
+
+        if ( active && isTex )
+        {
+            ++allocatedTextureCount;
+        }
+    }
 }

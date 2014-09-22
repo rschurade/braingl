@@ -41,6 +41,7 @@ TensorRendererEV::~TensorRendererEV()
 
 void TensorRendererEV::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 1, vboIds );
 }
 
@@ -82,15 +83,12 @@ void TensorRendererEV::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int widt
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars( props );
 
-    //GLfloat lightpos[] = {0.0, 0.0, 1., 0.};
-     // XXX not in CoreProfile; use shader //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-
     glDrawArrays( GL_LINES, 0, m_quads );
 
     GLenum error;
     int i = 0;
     while ((error = glGetError()) != GL_NO_ERROR) {
-        qDebug() << "render tensor lines: opengl error" << error;
+        qCritical() << "render tensor lines: opengl error" << error;
         i++;
     }
     glBindBuffer( GL_ARRAY_BUFFER, 0 );

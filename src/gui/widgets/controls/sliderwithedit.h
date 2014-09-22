@@ -12,9 +12,10 @@
 
 #include <QFrame>
 
-class QSlider;
+class MySlider;
 class QLineEdit;
 class QLabel;
+class QHBoxLayout;
 
 class SliderWithEdit : public QFrame
 {
@@ -36,13 +37,19 @@ public slots:
     void sliderChanged( int value );
     void sliderMoved( int value );
     void editEdited();
+    void minEdited();
+    void maxEdited();
 
 signals:
     void valueChanged( float value, int id );
+    void minChanged( QVariant value );
+    void maxChanged( QVariant value );
 
 private:
-   QSlider*  m_slider;
+   MySlider*  m_slider;
    QLineEdit* m_edit;
+   QLineEdit* m_edit1;
+   QLineEdit* m_edit2;
    QLabel* m_label;
 
    int m_id;

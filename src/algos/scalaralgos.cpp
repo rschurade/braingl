@@ -9,10 +9,12 @@
 #include "../data/datasets/datasetscalar.h"
 #include "../data/datasets/datasetisosurface.h"
 #include "../data/datasets/datasetisoline.h"
+#include "../data/datasets/datasetguides.h"
 
 #include "../data/models.h"
 #include "../data/roiarea.h"
-#include "../data/writer.h"
+
+#include "../io/writer.h"
 
 #include <QQueue>
 
@@ -24,9 +26,9 @@ ScalarAlgos::~ScalarAlgos()
 {
 }
 
-QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds )
+QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds, float isoValue )
 {
-    DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( ds ) );
+    DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( ds ), isoValue );
     QList<Dataset*> l;
     l.push_back( iso );
     return l;
@@ -322,6 +324,7 @@ QList<Dataset*> ScalarAlgos::distanceMap( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_MAX, 1.0 );
 
     DatasetIsosurface* iso = new DatasetIsosurface( dynamic_cast<DatasetScalar*>( dsOut ) );
     iso->properties().set( Fn::Property::D_ISO_VALUE, 0.10 );
@@ -459,6 +462,7 @@ QList<Dataset*> ScalarAlgos::gauss( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_NAME, name );
 
     QList<Dataset*> l;
     l.push_back( dsOut );
@@ -524,6 +528,7 @@ QList<Dataset*> ScalarAlgos::median( Dataset* ds )
     Writer writer( ds, QFileInfo() );
     DatasetScalar* dsOut = new DatasetScalar( QDir( name ), out, writer.createHeader( 1 ) );
     dsOut->copyPropertyObject( ( ds->properties( "maingl" ) ), "maingl" );
+    dsOut->properties().set( Fn::Property::D_NAME, name );
 
     QList<Dataset*> l;
     l.push_back( dsOut );

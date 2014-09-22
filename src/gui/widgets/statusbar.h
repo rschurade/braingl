@@ -8,8 +8,9 @@
 #ifndef STATUSBAR_H_
 #define STATUSBAR_H_
 
-#include <QtGui>
+#include <QStatusBar>
 
+class QItemSelectionModel;
 class StatusBarView;
 
 class StatusBar : public QStatusBar

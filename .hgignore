@@ -10,3 +10,11 @@ syntax: regexp
 
 syntax: regexp
 ^build2$
+syntax: regexp
+^CMakeCache\.txt$
+syntax: regexp
+^CMakeFiles$
+syntax: regexp
+^CMakeFiles/cmake\.check_cache$
+syntax: regexp
+^CMakeFiles/cmake\.check_cache$

@@ -11,9 +11,7 @@
 #include "../../data/datasets/dataset.h"
 
 #include <QDebug>
-#include <QtOpenGL/QGLShaderProgram>
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <QGLShaderProgram>
 
 #include <cmath>
 
@@ -152,7 +150,6 @@ void NavRendererCoronal::draw()
     QColor color = Models::getGlobal( Fn::Property::G_BACKGROUND_COLOR_NAV3 ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
-    //qDebug() << "nav draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     setupTextures();

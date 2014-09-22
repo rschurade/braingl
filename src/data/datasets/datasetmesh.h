@@ -12,8 +12,8 @@
 
 #include <QString>
 
-class TriangleMesh2;
 class MeshRenderer;
+class TriangleMesh2;
 
 class DatasetMesh: public Dataset
 {
@@ -53,6 +53,7 @@ private slots:
     void transformChanged( QVariant value );
     void applyTransform();
     virtual void slotCopyColors();
+    virtual void slotCopyValues();
 
 };
 

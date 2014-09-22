@@ -1,18 +1,8 @@
-// point on projection plane of current pixel
-// USAGE:
-// x,y,z components:        the point
-// w component:             unused
 out vec4 v_viewDir;
-
-// light direction
-// USAGE:
-// x,y,z components:        the light direction vector
-// w component:             unused
-// (4 varying floats)
 out vec4 v_lightDir;
 
-
 uniform bool u_lighting;
+uniform mat4 mv_matrixInvert;
 
 void prepareLight()
 {

@@ -20,7 +20,7 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 #include <QDebug>
 #include <QVector3D>
 #include <QMatrix4x4>
@@ -50,20 +50,7 @@ void SingleSHRenderer::init()
 
 void SingleSHRenderer::initGL()
 {
-    qDebug() << "gl init single sh widget";
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 
     glClearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -72,12 +59,7 @@ void SingleSHRenderer::initGL()
 
     glEnable( GL_DEPTH_TEST );
 
-    //glShadeModel( GL_SMOOTH );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-    // XXX not in CoreProfile; use shader //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 }
 
 void SingleSHRenderer::resizeGL( int width, int height )
@@ -138,6 +120,9 @@ void SingleSHRenderer::initGeometry()
     m_ny = props.get( Fn::Property::D_NY ).toInt();
     m_nz = props.get( Fn::Property::D_NZ ).toInt();
 
+    int blockSize = m_nx * m_ny * m_nz;
+    int dim = props.get( Fn::Property::D_DIM ).toInt();
+
     int xi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_SAGITTAL, 0 ) ).toFloat();
     int yi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_CORONAL, 0 ) ).toFloat();
     int zi = Models::g()->data( Models::g()->index( (int)Fn::Property::G_AXIAL, 0 ) ).toFloat();
@@ -167,9 +152,7 @@ void SingleSHRenderer::initGeometry()
     }
     m_previousSettings = s;
 
-    std::vector<ColumnVector>* data = m_dataset->getData();
-
-    Matrix m = base * data->at( 0 );
+    std::vector<float>* data = m_dataset->getData();
 
     std::vector<float>verts;
     verts.reserve( numVerts * 10 );
@@ -177,9 +160,9 @@ void SingleSHRenderer::initGeometry()
     indexes.reserve( numTris * 3 );
     m_tris = 0;
 
-    if ( ( fabs( data->at( xi + yi * m_nx + zi * m_nx * m_ny )(1) ) > 0.0001 ) )
+    if ( ( fabs( data->at( xi + yi * m_nx + zi * m_nx * m_ny ) ) > 0.0001 ) )
     {
-        ColumnVector dv = data->at( xi + yi * m_nx + zi * m_nx * m_ny );
+        ColumnVector dv = FMath::createVector( xi + yi * m_nx + zi * m_nx * m_ny, *data, blockSize, dim );
         ColumnVector r = base * dv;
 
         float max = 0;
@@ -268,7 +251,6 @@ void SingleSHRenderer::draw()
             if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::NIFTI_SH )
             {
                 rl.push_back( i );
-                //qDebug() << "found QBall to render";
             }
         }
     }

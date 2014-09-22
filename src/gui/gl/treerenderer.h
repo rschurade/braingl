@@ -8,14 +8,12 @@
 #ifndef TREERENDERER_H_
 #define TREERENDERER_H_
 
-#include "GL/glew.h"
-
-#include <QMatrix4x4>
+#include "objectrenderer.h"
 
 class Tree;
 class QGLShaderProgram;
 
-class TreeRenderer
+class TreeRenderer : public ObjectRenderer
 {
 public:
 	TreeRenderer( QString name, Tree* tree );
@@ -38,11 +36,14 @@ public:
 	void setColorIndex( int index ) { m_colorIndex = index; };
 	void setSelected( int index ) { m_selected = index; };
 
+	void setTree( Tree* tree ) { m_tree = tree; };
+
 private:
     void setShaderVars();
     void initGeometry();
 
     void initGeometryRec( Tree* tree, int left, int right );
+    void initGeometryCircleRec( Tree* tree, int left, int right );
 
 	QString m_name;
 	Tree* m_tree;
@@ -59,6 +60,10 @@ private:
     bool m_dirty;
     int m_colorIndex;
     int m_selected;
+
+    int m_numLeaves;
+    double m_pi;
+    float m_radius;
 };
 
 #endif /* SCENERENDERER_H_ */

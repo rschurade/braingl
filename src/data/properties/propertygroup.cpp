@@ -13,9 +13,11 @@
 #include "propertypath.h"
 #include "propertystring.h"
 #include "propertytext.h"
+#include "propertyradio.h"
 #include "propertyselection.h"
 #include "propertybutton.h"
 #include "propertymatrix.h"
+#include "propertyvector.h"
 
 #include "../models.h"
 
@@ -57,6 +59,11 @@ PropertyGroup::PropertyGroup( const PropertyGroup& pg )
             PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
             createList( pair.first, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
         }
+        if ( dynamic_cast<PropertyRadio*>( prop ) )
+        {
+            PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+            createRadioGroup( pair.first, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
         if ( dynamic_cast<PropertyString*>( prop ) )
         {
             createString( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
@@ -64,6 +71,14 @@ PropertyGroup::PropertyGroup( const PropertyGroup& pg )
         if ( dynamic_cast<PropertyText*>( prop ) )
         {
             createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyMatrix*>( prop ) )
+        {
+            createMatrix( pair.first, prop->getValue().value<QMatrix4x4>(), prop->getPropertyTab() );
+        }
+        if ( dynamic_cast<PropertyVector*>( prop ) )
+        {
+            createVector( pair.first, prop->getValue().value<QVector3D>(), prop->getPropertyTab() );
         }
     }
 }
@@ -116,8 +131,55 @@ PropertyGroup& PropertyGroup::operator=( const PropertyGroup& pg )
         {
             this->createText( pair.first, prop->getValue().toString(), prop->getPropertyTab() );
         }
+        if ( dynamic_cast<PropertyRadio*>( prop ) )
+        {
+            PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+            createRadioGroup( pair.first, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+        }
     }
     return *this;
+}
+
+void PropertyGroup::copy( Fn::Property name, Property* prop )
+{
+	if ( dynamic_cast<PropertyBool*>( prop ) )
+	{
+		this->createBool( name, prop->getValue().toBool(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyColor*>( prop ) )
+	{
+		this->createColor( name, prop->getValue().value<QColor>(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyFloat*>( prop ) )
+	{
+		this->createFloat( name, prop->getValue().toFloat(), prop->getMin().toFloat(), prop->getMax().toFloat(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyInt*>( prop ) )
+	{
+		this->createInt( name, prop->getValue().toInt(), prop->getMin().toInt(), prop->getMax().toInt(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyPath*>( prop ) )
+	{
+		this->createDir( name, QDir( prop->getValue().toString() ), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertySelection*>( prop ) )
+	{
+		PropertySelection* propSel = dynamic_cast<PropertySelection*>( prop );
+		this->createList( name, propSel->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyRadio*>( prop ) )
+    {
+        PropertyRadio* propRad = dynamic_cast<PropertyRadio*>( prop );
+        createRadioGroup( name, propRad->getOptions(), prop->getValue().toInt(), prop->getPropertyTab() );
+    }
+	if ( dynamic_cast<PropertyString*>( prop ) )
+	{
+		this->createString( name, prop->getValue().toString(), prop->getPropertyTab() );
+	}
+	if ( dynamic_cast<PropertyText*>( prop ) )
+	{
+		this->createText( name, prop->getValue().toString(), prop->getPropertyTab() );
+	}
 }
 
 bool PropertyGroup::createBool( Fn::Property name, bool value, QString tab )
@@ -277,6 +339,23 @@ bool PropertyGroup::createMatrix( Fn::Property name, QMatrix4x4 value, QString t
     return true;
 }
 
+bool PropertyGroup::createVector( Fn::Property name, QVector3D value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyVector* prop = new PropertyVector( Fn::Prop2String::s( (Fn::Property)name ), value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+
 bool PropertyGroup::createDir( Fn::Property name, QDir value, QString tab )
 {
     if ( contains( name ) )
@@ -341,6 +420,55 @@ bool PropertyGroup::createList( Fn::Property name, QList<QString> options, int v
     return true;
 }
 
+bool PropertyGroup::createRadioGroup( Fn::Property name, std::initializer_list<QString>options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createRadioGroup( Fn::Property name, std::vector<QString> options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+bool PropertyGroup::createRadioGroup( Fn::Property name, QList<QString> options, int value, QString tab )
+{
+    if ( contains( name ) )
+    {
+        set( name, value );
+    }
+    else
+    {
+        PropertyRadio* prop = new PropertyRadio( Fn::Prop2String::s( (Fn::Property)name ), options, value );
+        prop->setPropertyTab( tab );
+        m_properties.push_back( QPair<Fn::Property, Property*>( name, prop ) );
+        connect( prop, SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotPropChanged() ) );
+    }
+    return true;
+}
+
+
 bool PropertyGroup::createButton( Fn::Property name, QString tab )
 {
     if ( contains( name ) )
@@ -402,7 +530,7 @@ bool PropertyGroup::set( Fn::Property name, QVariant value )
         }
     }
 
-    qDebug() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
+    qCritical() << "*** ERROR *** SET" << "property doesnt exist:" << Fn::Prop2String::s( name ) << propName;
 //    exit( 0 );
     return false;
 }
@@ -446,7 +574,7 @@ Property* PropertyGroup::getNthProperty( int n )
 {
     if ( n < 0 || n >= (int)m_properties.size() )
     {
-        qDebug() << "***ERROR*** getNthProperty index out of range";
+        qCritical() << "***ERROR*** getNthProperty index out of range";
         exit( 0 );
     }
     return m_properties[n].second;
@@ -456,7 +584,7 @@ QPair<Fn::Property, Property*> PropertyGroup::getNthPropertyPair( int n ) const
 {
     if ( n < 0 || n >= (int)m_properties.size() )
     {
-        qDebug() << "***ERROR*** getNthPropertyPair index out of range";
+        qCritical() << "***ERROR*** getNthPropertyPair index out of range";
         exit( 0 );
     }
     return m_properties[n];
@@ -498,7 +626,17 @@ void PropertyGroup::setState( QList<QVariant> state )
 {
     for ( int i = 0; i < state.size() / 2; ++i )
     {
-        //qDebug() << Fn::Prop2String::s( (Fn::Property)( state[i*2].toInt() ) ) << state[i*2+1];
         set( (Fn::Property)( state[i*2].toInt() ), state[i*2+1] );
+    }
+}
+
+void PropertyGroup::unsetTab( QString tab )
+{
+    for ( unsigned int i = 0; i < m_properties.size(); ++i )
+    {
+        if ( m_properties[i].second->getPropertyTab() == tab )
+        {
+            m_properties[i].second->setPropertyTab( "none" );
+        }
     }
 }

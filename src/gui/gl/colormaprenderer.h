@@ -8,14 +8,11 @@
 #ifndef COLORMAPRENDERER_H_
 #define COLORMAPRENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include <QColor>
-#include <QVector3D>
-#include <QMatrix4x4>
-#include <QObject>
 
-class ColormapRenderer : public QObject
+class ColormapRenderer : public ObjectRenderer
 {
     Q_OBJECT
 
@@ -49,6 +46,7 @@ private:
     float m_lowerThreshold;
     float m_upperThreshold;
     std::vector<QVector3D>m_labels;
+    QString m_textLabel;
 
 public slots:
     void setX( float x );
@@ -65,6 +63,7 @@ public slots:
     void setSelectedMax( float value );
     void setLowerThreshold( float value );
     void setUpperThreshold( float value );
+    void setTextLabel( QString label );
 };
 
 #endif /* COLORMAPRENDERER_H_ */

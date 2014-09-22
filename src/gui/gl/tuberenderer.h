@@ -8,19 +8,18 @@
 #ifndef TUBERENDERER_H_
 #define TUBERENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../algos/fib.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
 
 #include <QColor>
-#include <QObject>
 
 class FiberSelector;
 class PropertyGroup;
 
-class TubeRenderer : public QObject
+class TubeRenderer : public ObjectRenderer
 {
     Q_OBJECT
 
@@ -29,7 +28,7 @@ public:
     virtual ~TubeRenderer();
 
     void init();
-    void updateExtraData( unsigned int dataFieldId );
+    void setExtraData( unsigned int dataFieldId );
 
     void draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, PropertyGroup& props );
 
@@ -41,6 +40,7 @@ protected:
 
     void initIndexBuffer( int lod );
 
+    void updateExtraData( unsigned int dataFieldId );
 private:
     FiberSelector* m_selector;
     GLuint *vboIds;
@@ -56,6 +56,9 @@ private:
     std::vector<int>m_startIndexes;
 
     bool m_isInitialized;
+    bool m_updateExtraData;
+    unsigned int m_selectedExtraData;
+
 
 public slots:
     void colorChanged();
