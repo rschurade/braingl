@@ -18,3 +18,5 @@ syntax: regexp
 ^CMakeFiles/cmake\.check_cache$
 syntax: regexp
 ^CMakeFiles/cmake\.check_cache$
+syntax: regexp
+^CMakeFiles$
