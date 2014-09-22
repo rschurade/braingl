@@ -13,7 +13,6 @@
 PropertyText::PropertyText( QString name, QString value ) :
     Property( name, value )
 {
-    qDebug() << value;
     TextEditWithLabel* widget = new TextEditWithLabel( m_name );
     widget->setText( value );
     connect( widget, SIGNAL( valueChanged( QString, int ) ), this, SLOT( widgetChanged( QString, int ) ) );

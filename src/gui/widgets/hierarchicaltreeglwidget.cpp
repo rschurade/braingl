@@ -8,6 +8,7 @@
 #include "hierarchicaltreeglwidget.h"
 
 #include "../gl/treewidgetrenderer.h"
+#include "../gl/glfunctions.h"
 
 #include "../../data/models.h"
 #include "../../data/datasets/dataset.h"
@@ -16,12 +17,11 @@
 #include <QtGui>
 #include <QDebug>
 
-#include "../core_3_3_context.h"
-
 HierarchicalTreeGLWidget::HierarchicalTreeGLWidget( QString name, QWidget *parent, const QGLWidget *shareWidget ) :
-    QGLWidget( new core_3_3_context(QGLFormat::defaultFormat()), parent, shareWidget )
+    QGLWidget( new QGLContext(QGLFormat::defaultFormat()), parent, shareWidget ),
+    m_name( name )
 {
-    m_renderer = new TreeWidgetRenderer( "tree renderer" );
+    m_renderer = new TreeWidgetRenderer( name );
 
 
     connect( Models::g(), SIGNAL( dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( update() ) );
@@ -47,8 +47,8 @@ void HierarchicalTreeGLWidget::initializeGL()
 {
     // needed per OpenGL context and so per QGLWidget
     GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GLFunctions::f->glGenVertexArrays(1, &vao);
+    GLFunctions::f->glBindVertexArray(vao);
 
     m_renderer->initGL();
 }
@@ -75,7 +75,7 @@ void HierarchicalTreeGLWidget::mousePressEvent( QMouseEvent *event )
         for ( int i = 0; i < dl.size(); ++i )
         {
             dynamic_cast<DatasetTree*>( dl[i] )->setZoom( m_renderer->getZoom() );
-            dl[i]->mousePick( 0, QVector3D( event->x(), event->y(), m_renderer->getMoveX() ), event->modifiers(), "tree" );
+            dl[i]->mousePick( 0, QVector3D( event->x(), event->y(), m_renderer->getMoveX() ), event->modifiers(), m_name );
         }
     }
     if ( event->buttons() & Qt::MiddleButton )

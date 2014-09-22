@@ -12,6 +12,8 @@
 #include "../controls/selectwithlabel.h"
 #include "../controls/checkbox.h"
 
+#include <QtWidgets>
+
 LoadImageWidget::LoadImageWidget( QWidget* parent ) :
     QDialog( parent )
 {

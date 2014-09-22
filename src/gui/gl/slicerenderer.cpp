@@ -32,6 +32,8 @@ SliceRenderer::~SliceRenderer()
 
 void SliceRenderer::init()
 {
+    initializeOpenGLFunctions();
+
     glGenBuffers( 1, &vbo0 );
     glGenBuffers( 1, &vbo1 );
     glGenBuffers( 1, &vbo2 );

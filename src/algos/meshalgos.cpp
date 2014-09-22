@@ -109,7 +109,6 @@ QList<Dataset*> MeshAlgos::biggestComponent( Dataset* ds )
         }
         components.push_back( component );
         sumTris += component.size();
-        //qDebug() << "new component of size:" << component.size();
     }
     while( sumTris < numTris );
 

@@ -11,8 +11,10 @@
 #include "../vptr.h"
 
 #include "../mesh/trianglemesh2.h"
-#include "../../gui/gl/meshrenderer.h"
+
+#include "../../gui/gl/glfunctions.h"
 #include "../../gui/gl/colormapfunctions.h"
+#include "../../gui/gl/meshrenderer.h"
 
 #include <QFile>
 #include <QFileDialog>
@@ -42,7 +44,8 @@ void DatasetMesh::initProperties()
     float min = 0.0;
     float max = 1.0;
 
-    m_properties["maingl"].createList( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_COLORMODE, { "per mesh", "mri", "per vertex", "vertex data" }, 0, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, true, "general" );
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 1, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MIN, min, min, max, "general"  );
     m_properties["maingl"].createFloat( Fn::Property::D_SELECTED_MAX, max, min, max, "general"  );
@@ -53,15 +56,12 @@ void DatasetMesh::initProperties()
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.f, 0.01f, 1.f, "general" );
     m_properties["maingl"].createButton( Fn::Property::D_COPY_COLORS, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_COPY_COLORS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyColors() ) );
+    m_properties["maingl"].createButton( Fn::Property::D_COPY_VALUES, "general" );
+    connect( m_properties["maingl"].getProperty( Fn::Property::D_COPY_VALUES ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotCopyValues() ) );
 
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
-    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_PAINTMODE, { "off", "paint", "paint values" }, 0, "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTSIZE, 20.f, 1.f, 1000.f, "paint" );
     m_properties["maingl"].createColor( Fn::Property::D_PAINTCOLOR, QColor( 255, 0, 0 ), "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, 0.5f, -1.0f, 1.0f, "paint" );
@@ -127,7 +127,7 @@ void DatasetMesh::initProperties()
         m_properties["maingl"].set( Fn::Property::D_END_INDEX, m_mesh[0]->numTris() );
     }
 
-    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 3, "transform" );
+    m_properties["maingl"].createList( Fn::Property::D_USE_TRANSFORM, { "user defined", "qform", "sform", "qform inverted", "sform inverted" }, 0, "transform" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_USE_TRANSFORM ), SIGNAL( valueChanged( QVariant ) ), this,
                 SLOT( transformChanged( QVariant ) ) );
     m_properties["maingl"].createMatrix( Fn::Property::D_TRANSFORM, m_transform, "transform" );
@@ -136,7 +136,7 @@ void DatasetMesh::initProperties()
                 SLOT( applyTransform() ) );
     m_properties["maingl"].createBool( Fn::Property::D_INVERT_VERTEX_ORDER, false, "transform" );
 
-    transformChanged( 3 );
+    transformChanged( 0 );
 
 }
 
@@ -225,6 +225,14 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     {
         return;
     }
+
+    if ( m_resetRenderer )
+    {
+        delete m_renderer;
+        m_renderer = 0;
+        m_resetRenderer = false;
+    }
+
     if ( m_renderer == 0 )
     {
         m_renderer = new MeshRenderer( getMesh(target) );
@@ -232,6 +240,8 @@ void DatasetMesh::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int 
     }
     m_renderer->setMesh( getMesh(target) );
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
 bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target )
@@ -264,7 +274,7 @@ bool DatasetMesh::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers mo
         for ( unsigned int i = 0; i < picked.size(); ++i )
         {
             m_renderer->updateColor( picked[i], color.redF(), color.greenF(), color.blueF(), 1.0 );
-            for ( unsigned int m = 0; m < m_mesh.size(); m++ )
+            for ( unsigned int m = 0; m < m_mesh.size(); ++m )
             {
                 if ( paintMode == 1 ) //paint color
                 {
@@ -343,8 +353,8 @@ void DatasetMesh::makePermanent()
     }
 
     m_mesh[0]->finalize();
-    delete m_renderer;
-    m_renderer = 0;
+
+    m_resetRenderer = true;
 
     m_properties["maingl"].set( Fn::Property::D_ROTATE_X, 0 );
     m_properties["maingl"].set( Fn::Property::D_ROTATE_Y, 0 );
@@ -357,6 +367,8 @@ void DatasetMesh::makePermanent()
     m_properties["maingl"].set( Fn::Property::D_SCALE_X, 1 );
     m_properties["maingl"].set( Fn::Property::D_SCALE_Y, 1 );
     m_properties["maingl"].set( Fn::Property::D_SCALE_Z, 1 );
+
+    Models::d()->submit();
 }
 
 QString DatasetMesh::getSaveFilter()
@@ -407,6 +419,7 @@ void DatasetMesh::transformChanged( QVariant value )
     }
 
     m_properties["maingl"].set( Fn::Property::D_TRANSFORM, m_transform );
+    Models::d()->submit();
 }
 
 void DatasetMesh::applyTransform()
@@ -416,49 +429,19 @@ void DatasetMesh::applyTransform()
     int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
     TriangleMesh2* mesh = m_mesh[n];
 
-    int selectedMatrix = m_properties["maingl"].get( Fn::Property::D_USE_TRANSFORM ).toInt();
-
     m_transform = m_properties["maingl"].get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>();
 
-    switch( selectedMatrix )
+    for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
     {
-        case 0:
-        {
-            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
-            {
-                QVector3D vert = mesh->getVertex( i );
-                vert = m_transform * vert;
-                mesh->setVertex( i, vert );
-            }
-            break;
-        }
-        case 1:
-        case 2:
-        {
-            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
-            {
-                QVector3D vert = mesh->getVertex( i );
-                vert = m_transform * vert;
-                mesh->setVertex( i, vert );
-            }
-            break;
-        }
-        case 3:
-        case 4:
-        {
-            for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
-            {
-                QVector3D vert = mesh->getVertex( i );
-                vert = m_transform * vert;
-                mesh->setVertex( i, vert );
-            }
-            break;
-        }
+        QVector3D vert = mesh->getVertex( i );
+        vert = m_transform * vert;
+        mesh->setVertex( i, vert );
     }
 
     mesh->finalize();
-    delete m_renderer;
-    m_renderer = 0;
+
+    m_resetRenderer = true;
+    transformChanged( 0 );
     Models::d()->submit();
 }
 
@@ -469,7 +452,6 @@ void DatasetMesh::slotCopyColors()
 
     if( m_properties["maingl"].get( Fn::Property::D_COLORMODE ).toInt() == 3 )
     {
-
         QColor color;
 
         float selectedMin = properties( "maingl" ).get( Fn::Property::D_SELECTED_MIN ).toFloat();
@@ -522,10 +504,53 @@ void DatasetMesh::slotCopyColors()
                 c.setGreenF( ( 1.0 - c2.alphaF() ) * c.greenF() + c2.alphaF() * c2.greenF() );
                 c.setBlueF( ( 1.0 - c2.alphaF() ) * c.blueF() + c2.alphaF() * c2.blueF() );
             }
-
-            mesh->setVertexColor( i, c );
-            //qDebug() << texDS->getColorAtPos( mesh->getVertex( i ) );
+            if ( c.redF() + c.greenF() + c.blueF() > 0 )
+            {
+                mesh->setVertexColor( i, c );
+            }
+            else
+            {
+                QColor col = m_properties["maingl"].get( Fn::Property::D_COLOR ).value<QColor>();
+                mesh->setVertexColor( i, col );
+            }
         }
         m_renderer->endUpdateColor();
     }
+}
+
+void DatasetMesh::slotCopyValues()
+{
+    int n = properties( "maingl" ).get( Fn::Property::D_SURFACE ).toInt();
+    TriangleMesh2* mesh = m_mesh[n];
+
+    QList<QVariant>dsl =  Models::d()->data( Models::d()->index( 0, (int)Fn::Property::D_DATASET_LIST ), Qt::DisplayRole ).toList();
+
+    QList<Dataset*> texList = Models::getDatasets( Fn::DatasetType::NIFTI_SCALAR );
+
+    if ( texList.empty() )
+    {
+        return;
+    }
+
+    float min = std::numeric_limits<float>::max();
+    float max = -std::numeric_limits<float>::max();
+
+    DatasetScalar* ds = dynamic_cast<DatasetScalar*>( texList[0] );
+    //TriangleMesh2* mesh = getMesh();
+    m_renderer->beginUpdateColor();
+    for ( unsigned int i = 0; i < mesh->numVerts(); ++i )
+    {
+        float value = ds->getValueAtPos( mesh->getVertex( i ) );
+        min = qMin( value, min );
+        max = qMax( value, max );
+        mesh->setVertexData( i, value );
+    }
+    m_renderer->endUpdateColor();
+    m_properties["maingl"].getProperty( Fn::Property::D_MIN )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_MAX )->setValue( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX )->setValue( max );
+    m_properties["maingl"].getProperty( Fn::Property::D_LOWER_THRESHOLD )->setValue( min );
+    m_properties["maingl"].getProperty( Fn::Property::D_UPPER_THRESHOLD )->setValue( max );
+    m_properties["maingl"].set( Fn::Property::D_COLORMODE, 3 );
 }

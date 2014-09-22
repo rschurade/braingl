@@ -17,9 +17,9 @@
 #include <QString>
 
 class FiberRenderer;
-class TubeRenderer;
 class FiberSelector;
 class LoaderVTK;
+class TubeRenderer;
 
 class DatasetFibers : public Dataset
 {
@@ -51,6 +51,7 @@ public:
 protected:
     void copyFromLoader( LoaderVTK* lv );
     void createProps();
+    void calcBoundingBox();
 
     std::vector<Fib>m_fibs;
     QList<QString>m_dataNames;
@@ -62,10 +63,15 @@ protected:
 
     FiberRenderer* m_renderer;
     TubeRenderer* m_tubeRenderer;
+
     FiberSelector* m_selector;
     QMatrix4x4 m_transform;
     unsigned int m_numPoints;
     unsigned int m_numLines;
+
+    QMatrix4x4 m_userTransform;
+
+    QList<Dataset*>m_scalarDSL;
 
 private:
 
@@ -74,6 +80,9 @@ private slots:
     void dataModeChanged();
     void transformChanged( QVariant value );
     void applyTransform();
+    void globalChanged();
+    void sourceMRIChanged();
+    void updateSourceMRI();
 };
 
 #endif /* DATASETFIBERS_H_ */

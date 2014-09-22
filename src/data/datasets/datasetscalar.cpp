@@ -12,10 +12,11 @@
 #include "../../gui/gl/glfunctions.h"
 
 #include <QDebug>
+#include <QMessageBox>
 
 DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_image* header ) :
-        DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ), m_data( data ),
-        m_colormapRenderer( 0 )
+    DatasetNifti( filename, Fn::DatasetType::NIFTI_SCALAR, header ),
+    m_data( data )
 {
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, false, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_ALPHA, 1.0f, 0.0, 1.0, "general" );
@@ -25,14 +26,8 @@ DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_imag
     examineDataset();
 
     m_properties["maingl"].createInt( Fn::Property::D_COLORMAP, 0, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
-    m_properties["maingl"].createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
-    m_properties["maingl"].createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
-    //m_properties["maingl"].create( Fn::Property::D_IS_ATLAS, false, "colormap" );
+
+    GLFunctions::createColormapBarProps( m_properties["maingl"] );
 
     PropertyGroup props2( m_properties["maingl"] );
     m_properties.insert( "maingl2", props2 );
@@ -53,8 +48,8 @@ DatasetScalar::DatasetScalar( QDir filename, std::vector<float> data, nifti_imag
 DatasetScalar::~DatasetScalar()
 {
     m_properties["maingl"].set( Fn::Property::D_ACTIVE, false );
-    delete m_colormapRenderer;
     m_data.clear();
+    std::vector<float>().swap( m_data );
     GLFunctions::deleteTexture( m_textureGLuint );
     //glDeleteTextures( 1, &m_textureGLuint );
 }
@@ -99,10 +94,10 @@ void DatasetScalar::examineDataset()
     connect( m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MAX ), SIGNAL( valueChanged( QVariant ) ),
               m_properties["maingl"].getProperty( Fn::Property::D_SELECTED_MIN ), SLOT( setMax( QVariant ) ) );
 
-    m_properties["maingl"].createList( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
+    m_properties["maingl"].createRadioGroup( Fn::Property::D_PAINTMODE, { "off", "paint" }, 0, "paint" );
     m_properties["maingl"].createInt( Fn::Property::D_PAINTSIZE, 1, 1, 10, "paint" );
     m_properties["maingl"].createFloat( Fn::Property::D_PAINTVALUE, max - 1.0, min, max - 1.0, "paint" );
-    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false, "paint" );
+    m_properties["maingl"].createBool( Fn::Property::D_PAINT_LINK_CURSOR, false );
 }
 
 void DatasetScalar::createTexture()
@@ -115,9 +110,9 @@ void DatasetScalar::createTexture()
 
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
     int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
@@ -137,7 +132,7 @@ void DatasetScalar::createTexture()
         tmpData[4 * i + 0 ] = tmp % 256 ;
     }
 
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
+    GLFunctions::f->glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
 }
 
@@ -152,35 +147,12 @@ void DatasetScalar::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, in
         target = "maingl";
     }
 
-    if ( properties( target ).get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
-    {
-        if ( !m_colormapRenderer )
-        {
-            m_colormapRenderer = new ColormapRenderer();
-            m_colormapRenderer->init();
-        }
-        m_colormapRenderer->setColormap( properties( target ).get( Fn::Property::D_COLORMAP ).toInt() );
-        m_colormapRenderer->setX( properties( target ).get( Fn::Property::D_COLORMAP_X ).toFloat() );
-        m_colormapRenderer->setY( properties( target ).get( Fn::Property::D_COLORMAP_Y ).toFloat() );
-        m_colormapRenderer->setDX( properties( target ).get( Fn::Property::D_COLORMAP_DX ).toFloat() );
-        m_colormapRenderer->setDY( properties( target ).get( Fn::Property::D_COLORMAP_DY ).toFloat() );
-        m_colormapRenderer->setTextSize( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
-        m_colormapRenderer->setTextColor( properties( target ).get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
-
-        m_colormapRenderer->setMin( properties( target ).get( Fn::Property::D_MIN).toFloat() );
-        m_colormapRenderer->setMax( properties( target ).get( Fn::Property::D_MAX).toFloat() );
-        m_colormapRenderer->setSelectedMin( properties( target ).get( Fn::Property::D_SELECTED_MIN).toFloat() );
-        m_colormapRenderer->setSelectedMax( properties( target ).get( Fn::Property::D_SELECTED_MAX).toFloat() );
-        m_colormapRenderer->setLowerThreshold( properties( target ).get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
-        m_colormapRenderer->setUpperThreshold( properties( target ).get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
-
-        m_colormapRenderer->draw( width, height, renderMode );
-    }
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
 }
 
-QString DatasetScalar::getValueAsString( int x, int y, int z )
+QString DatasetScalar::getValueAsString( float x, float y, float z )
 {
-    float data = m_data[ getId( x, y, z ) ];
+    float data = m_data[ getIdFromPos( x, y, z ) ];
     return QString::number( data );
 }
 
@@ -200,9 +172,12 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
 
     int brushSize = m_properties["maingl"].get( Fn::Property::D_PAINTSIZE ).toInt() - 1;
 
-    int x = pos.x() / dx + 0.5 * dx;
-    int y = pos.y() / dy + 0.5 * dy;
-    int z = pos.z() / dz + 0.5 * dz;
+    int id = getIdFromPos( pos );
+
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    getXYZ( id, x, y, z );
 
     m_data[ getId( x, y, z ) ] = paintValue;
 
@@ -231,6 +206,11 @@ bool DatasetScalar::mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers 
     }
 
     return true;
+}
+
+float DatasetScalar::getValueAtPos( QVector3D pos )
+{
+    return m_data[ getIdFromPos( pos ) ];
 }
 
 float DatasetScalar::getInterpolatedValueAtPos( QVector3D pos )
@@ -296,4 +276,76 @@ QColor DatasetScalar::getColorAtPos( QVector3D pos )
     float alpha =  m_properties["maingl"].get( Fn::Property::D_ALPHA ).toFloat();
     QColor c = ColormapFunctions::getColor( colormapID, value, min, max, lower_t, upper_t, alpha );
     return c;
+}
+
+void DatasetScalar::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetScalar::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetScalar::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                float tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    Models::g()->submit();
 }

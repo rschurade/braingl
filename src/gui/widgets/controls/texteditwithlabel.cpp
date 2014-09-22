@@ -35,7 +35,7 @@ TextEditWithLabel::TextEditWithLabel( QString label, int id, QWidget* parent ) :
 
     setLayout( vLayout );
 
-    connect( m_textEdit, SIGNAL( textChanged() ), this, SLOT( slotTextChanged() ) );
+    connect( m_textEdit, SIGNAL( editingFinished() ), this, SLOT( slotTextChanged() ) );
 
     setFrameStyle( QFrame::Panel | QFrame::Raised );
 

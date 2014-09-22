@@ -35,6 +35,7 @@ ROIArea::ROIArea( std::vector<float> data, PropertyGroup& props ) :
     m_properties.createInt( Fn::Property::D_PICK_ID, 0 );
     m_properties.createInt( Fn::Property::D_SHAPE, 10 );
     m_properties.createFloat( Fn::Property::D_THRESHOLD, m_max / 100.f, 0.0f, m_max, "general" );
+    m_properties.createDir( Fn::Property::D_FILENAME, QDir( "" ) );
     m_isoLevel = m_max;
     m_oldIsoValue = m_max;
 
@@ -56,8 +57,6 @@ ROIArea::ROIArea( std::vector<float> data, PropertyGroup& props ) :
     m_properties.createFloat( Fn::Property::D_ADJUST_X, props.get( Fn::Property::D_ADJUST_X ).toFloat() );
     m_properties.createFloat( Fn::Property::D_ADJUST_Y, props.get( Fn::Property::D_ADJUST_Y ).toFloat() );
     m_properties.createFloat( Fn::Property::D_ADJUST_Z, props.get( Fn::Property::D_ADJUST_Z ).toFloat() );
-
-
 
     m_properties.createInt( Fn::Property::D_START_INDEX, 0 );
     m_properties.createInt( Fn::Property::D_END_INDEX, 0 );
@@ -132,9 +131,9 @@ void ROIArea::renameVerticesAndTriangles()
     m_mesh = new TriangleMesh2( m_i2pt3idVertices.size(), m_trivecTriangles.size() );
 
 
-    float plusX = m_properties.get( Fn::Property::D_ADJUST_X ).toFloat();
-    float plusY = m_properties.get( Fn::Property::D_ADJUST_Y ).toFloat();
-    float plusZ = m_properties.get( Fn::Property::D_ADJUST_Z ).toFloat();
+    float plusX = 0; //m_properties.get( Fn::Property::D_ADJUST_X ).toFloat();
+    float plusY = 0; //m_properties.get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float plusZ = 0; //m_properties.get( Fn::Property::D_ADJUST_Z ).toFloat();
 
     // Rename vertices.
     while ( mapIterator != m_i2pt3idVertices.end() )

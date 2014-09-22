@@ -12,8 +12,6 @@
 
 #include "../../thirdparty/newmat10/newmat.h"
 
-#include <QMatrix4x4>
-
 class PropertyGroup;
 
 class BinghamRenderer : public ObjectRenderer

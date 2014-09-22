@@ -10,7 +10,7 @@
 
 #include <QFrame>
 
-class QSlider;
+class MySlider;
 class QLineEdit;
 class QLabel;
 class QPushButton;
@@ -35,14 +35,20 @@ public slots:
     void editEdited();
     void increment();
     void decrement();
+    void minEdited();
+    void maxEdited();
 
 signals:
     void valueChanged( int value, int );
+    void minChanged( QVariant value );
+    void maxChanged( QVariant value );
 
 private:
     QLabel* m_label;
-    QSlider*  m_slider;
+    MySlider*  m_slider;
     QLineEdit* m_edit;
+    QLineEdit* m_edit1;
+    QLineEdit* m_edit2;
     QPushButton* m_button1;
     QPushButton* m_button2;
 

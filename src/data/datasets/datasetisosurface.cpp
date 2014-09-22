@@ -19,7 +19,7 @@
 
 #include <QString>
 
-DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
+DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds, float isoValue ) :
         DatasetMesh( QString( "isosurface" ), Fn::DatasetType::MESH_ISOSURFACE ),
         m_oldIsoValue( -1 )
 {
@@ -32,12 +32,15 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
     m_properties["maingl"].createFloat( Fn::Property::D_DY, ds->properties( "maingl" ).get( Fn::Property::D_DY ).toFloat() );
     m_properties["maingl"].createFloat( Fn::Property::D_DZ, ds->properties( "maingl" ).get( Fn::Property::D_DZ ).toFloat() );
 
-    m_properties["maingl"].createInt( Fn::Property::D_DIM, 0 );
+    m_properties["maingl"].createInt( Fn::Property::D_DIM, 1 );
     m_properties["maingl"].createInt( Fn::Property::D_CREATED_BY, (int)Fn::Algo::ISOSURFACE );
     m_properties["maingl"].createInt( Fn::Property::D_TYPE, (int)Fn::DatasetType::MESH_ISOSURFACE );
 
-    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString() + " (isosurface)";
-
+    QString name = ds->properties( "maingl" ).get( Fn::Property::D_NAME ).toString();
+    if ( !name.contains( "isosurface" ) )
+    {
+        name +=  " (isosurface)";
+    }
     m_properties["maingl"].createString( Fn::Property::D_NAME, name );
 
     m_properties["maingl"].createBool( Fn::Property::D_MESH_CUT_LOWER_X, false, "special" );
@@ -52,7 +55,21 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 
     finalizeProperties();
 
-    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 80.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    if ( isoValue > 0 )
+    {
+        m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE,
+            isoValue,
+            ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(),
+            ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    }
+    else
+    {
+        m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE,
+            ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat() * 0.3,
+            ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(),
+            ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    }
+
 
     m_nX = m_properties["maingl"].get( Fn::Property::D_NX ).toInt() - 1;
     m_nY = m_properties["maingl"].get( Fn::Property::D_NY ).toInt() - 1;
@@ -84,6 +101,11 @@ DatasetIsosurface::DatasetIsosurface( DatasetScalar* ds ) :
 
 DatasetIsosurface::~DatasetIsosurface()
 {
+}
+
+std::vector<float>* DatasetIsosurface::getData()
+{
+    return &m_scalarField;
 }
 
 void DatasetIsosurface::generateSurface()
@@ -169,4 +191,16 @@ void DatasetIsosurface::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width
     }
 
     m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
+
+    GLFunctions::drawColormapBar( properties( target ), width, height, renderMode );
+}
+
+QString DatasetIsosurface::getSaveFilter()
+{
+    return QString( "niftii (*.nii.gz);;Mesh binary (*.vtk);; Mesh ascii (*.asc);; Mesh 1D data (*.1D);; Mesh rgb data (*.rgb);; Mesh obj (*.obj);; Mesh VRML (*.wrl);; Mesh JSON (*.json);; all files (*.*)" );
+}
+
+QString DatasetIsosurface::getDefaultSuffix()
+{
+    return QString( "nii.gz" );
 }

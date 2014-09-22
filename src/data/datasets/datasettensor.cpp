@@ -224,3 +224,18 @@ QString DatasetTensor::getValueAsString( int x, int y, int z )
     return out;
 }
 
+void DatasetTensor::flipX()
+{
+
+}
+
+void DatasetTensor::flipY()
+{
+
+}
+
+void DatasetTensor::flipZ()
+{
+
+}
+

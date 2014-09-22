@@ -7,9 +7,7 @@
 #ifndef HIERARCHICALTREEGLWIDGET_H
 #define HIERARCHICALTREEGLWIDGET_H
 
-#include "GL/glew.h"
-
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class TreeWidgetRenderer;
 
@@ -40,6 +38,7 @@ protected:
     void wheelEvent( QWheelEvent *event );
 
 private:
+    QString m_name;
     TreeWidgetRenderer* m_renderer;
     bool m_visible;
 };

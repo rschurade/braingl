@@ -21,7 +21,7 @@
 #include "../../data/properties/property.h"
 #include "../../data/models.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 ColormapEditWidget::ColormapEditWidget( QWidget* parent ) :
     QWidget( parent ),

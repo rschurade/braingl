@@ -47,31 +47,12 @@ void TreeWidgetRenderer::init()
 
 void TreeWidgetRenderer::initGL()
 {
-    qDebug() << "gl init " << m_name << " widget";
-
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
+    initializeOpenGLFunctions();
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_DEPTH_TEST );
 
-    // XXX not in CoreProfile //glShadeModel( GL_SMOOTH );
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-     // XXX not in CoreProfile; use shader //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 }
 
 void TreeWidgetRenderer::draw()
@@ -81,7 +62,6 @@ void TreeWidgetRenderer::draw()
     QColor color = Models::g()->data( Models::g()->index( (int)Fn::Property::G_BACKGROUND_COLOR_NAV2, 0 ) ).value<QColor>();
     glClearColor( color.redF(), color.greenF(), color.blueF(), 1.0 );
 
-    //qDebug() << "nav draw";
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
@@ -90,35 +70,30 @@ void TreeWidgetRenderer::draw()
    QMatrix4x4 pMatrix;
    pMatrix.setToIdentity();
 
-    QList<int>rl;
-    int countDatasets = Models::d()->rowCount();
-    for ( int i = 0; i < countDatasets; ++i )
-    {
-        QModelIndex index = Models::d()->index( i, (int)Fn::Property::D_ACTIVE );
-        if ( Models::d()->data( index, Qt::DisplayRole ).toBool() )
-        {
-            index = Models::d()->index( i, (int)Fn::Property::D_TYPE );
-            if ( Models::d()->data( index, Qt::DisplayRole ).toInt() == (int)Fn::DatasetType::TREE )
-            {
-                rl.push_back( i );
-            }
-        }
-    }
-
-    DatasetTree* ds = 0;
-    if ( rl.size() > 0 )
-    {
-        ds = VPtr<DatasetTree>::asPtr( Models::d()->data( Models::d()->index( rl[0], (int)Fn::Property::D_DATASET_POINTER ), Qt::DisplayRole ) );
-        int leaves = ds->getTree()->getNumLeaves();
-        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
-        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
-        ds->drawTree( pMatrix, m_width, m_height );
-    }
-    else
+    QList<Dataset*> dl = Models::getDatasets( Fn::DatasetType::TREE );
+    if ( dl.empty() )
     {
         return;
     }
 
+    DatasetTree* ds = dynamic_cast<DatasetTree*>( dl[0] );
+
+    if ( m_name == "tree" )
+    {
+        int leaves = ds->getTree()->getNumLeaves();
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
+        //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
+        ds->drawTree( pMatrix, m_width, m_height );
+    }
+    else if ( m_name == "tree2" )
+    {
+        int leaves = ds->getRoot()->getNumLeaves();
+        float zoom = qMin( leaves, m_width * ( m_zoom - 1 ) ) / 2;
+        pMatrix.ortho(  0 - m_moveX + zoom,  leaves - m_moveX - zoom, 0, 1., -3000, 3000 );
+        //pMatrix.ortho(  -500,  500, -500, 500, -3000, 3000 );
+        ds->drawRoot( pMatrix, m_width, m_height );
+    }
 }
 
 void TreeWidgetRenderer::resizeGL( int width, int height )

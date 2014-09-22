@@ -55,6 +55,6 @@ void main()
     
     calcTexCoords();
 	
-	v_position = mvp_matrix * vec4( a_position, 1.0 );
+    v_position = mvp_matrix * userTransformMatrix * vec4( a_position, 1.0 );
     gl_Position = v_position;
 }

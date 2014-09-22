@@ -12,7 +12,7 @@
 #include "../../data/vptr.h"
 #include "../../data/properties/propertygroup.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 GlobalPropertyWidget::GlobalPropertyWidget( QWidget* parent ) :
     QTabWidget( parent )

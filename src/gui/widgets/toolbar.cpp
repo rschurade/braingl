@@ -218,6 +218,18 @@ void ToolBar::createActions()
     m_brainglMathAction = new FNAction( QIcon( ":/icons/calc.png" ), tr( "braingl math" ), this, Fn::Algo::BRAINGL_MATH );
     m_brainglMathAction->setStatusTip( tr( "math" ) );
     connect( m_brainglMathAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_flipXAction = new FNAction( QIcon( ":/icons/flipx.png" ), tr( "flip voxels on x axis" ), this, Fn::Algo::FLIP_X );
+    m_flipXAction->setStatusTip( tr( "flip x" ) );
+    connect( m_flipXAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_flipYAction = new FNAction( QIcon( ":/icons/flipy.png" ), tr( "flip voxels on y axis" ), this, Fn::Algo::FLIP_Y );
+    m_flipYAction->setStatusTip( tr( "flip y" ) );
+    connect( m_flipYAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
+
+    m_flipZAction = new FNAction( QIcon( ":/icons/flipz.png" ), tr( "flip voxels on z axis" ), this, Fn::Algo::FLIP_Z );
+    m_flipZAction->setStatusTip( tr( "flip z" ) );
+    connect( m_flipZAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -372,6 +384,10 @@ void ToolBar::slot( Fn::Algo algo )
             {
                 ( (DatasetGlyphset*)ds )->deleteLittleBrains();
             }
+            else if ( mods & Qt::ControlModifier )
+            {
+                ( (DatasetGlyphset*)ds )->deleteRowFromMatrix();
+            }
             else
             {
                 ( (DatasetGlyphset*)ds )->makeLittleBrains();
@@ -437,9 +453,18 @@ void ToolBar::slot( Fn::Algo algo )
                 ( (DatasetGlyphset*) ds )->applyROI();
                 break;
             }
+            break;
+        case Fn::Algo::FLIP_X:
+            ( (DatasetNifti*) ds )->flipX();
+            break;
+        case Fn::Algo::FLIP_Y:
+            ( (DatasetNifti*) ds )->flipY();
+            break;
+        case Fn::Algo::FLIP_Z:
+            ( (DatasetNifti*) ds )->flipZ();
+            break;
 
     }
-    //qDebug() << "adding " << l.size() << " datasets";
     for ( int i = 0; i < l.size(); ++i )
     {
         index = m_toolBarView->model()->index( m_toolBarView->model()->rowCount(), (int)Fn::Property::D_NEW_DATASET );
@@ -462,11 +487,17 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_medianAct );
             this->addAction( m_createROIAction );
             this->addAction( m_brainglMathAction );
+            this->addAction( m_flipXAction );
+            this->addAction( m_flipYAction );
+            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_VECTOR:
         {
             //this->addAction( m_vectorAction1 );
+            this->addAction( m_flipXAction );
+            this->addAction( m_flipYAction );
+            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_TENSOR:
@@ -475,17 +506,26 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_evAct );
             this->addAction( m_fiberTrackingAct );
             this->addAction( m_crossingTrackingAct );
+//            this->addAction( m_flipXAction );
+//            this->addAction( m_flipYAction );
+//            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_FMRI:
         {
             this->addAction( m_meshTimeSeriesAction );
+            this->addAction( m_flipXAction );
+            this->addAction( m_flipYAction );
+            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_SH:
         {
             this->addAction( m_binghamAction );
             this->addAction( m_sh2meshAction );
+//            this->addAction( m_flipXAction );
+//            this->addAction( m_flipYAction );
+//            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_DWI:
@@ -497,11 +537,17 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_tensorAct );
             this->addAction( m_faAct );
             this->addAction( m_evAct );
+            this->addAction( m_flipXAction );
+            this->addAction( m_flipYAction );
+            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::NIFTI_BINGHAM:
         {
             this->addAction( m_bingham2tensorAction );
+//            this->addAction( m_flipXAction );
+//            this->addAction( m_flipYAction );
+//            this->addAction( m_flipZAction );
             break;
         }
         case Fn::DatasetType::FIBERS:

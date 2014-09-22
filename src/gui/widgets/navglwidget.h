@@ -7,9 +7,7 @@
 #ifndef NAVGLWIDGET_H
 #define NAVGLWIDGET_H
 
-#include "GL/glew.h"
-
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class NavRenderer;
 

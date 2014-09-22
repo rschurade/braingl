@@ -13,6 +13,10 @@
         <file>icons/coronal.png</file>
         <file>icons/sagittal.png</file>
         <file>icons/continous.png</file>
+        <file>icons/crosshair.png</file>
+        <file>icons/flipx.png</file>
+        <file>icons/flipy.png</file>
+        <file>icons/flipz.png</file>
         <file>icons/tmp1.png</file>
         <file>icons/tmp3.png</file>
         <file>icons/tmpx.png</file>
@@ -44,6 +48,7 @@
         <file>icons/bundle.png</file>
         <file>icons/new_cons.png</file>
         <file>icons/palette_brush.png</file>
+        <file>icons/label.png</file>
         <file>shaders/colormapbar.vs</file>
         <file>shaders/colormapbar.fs</file>
         <file>shaders/colormapscale.vs</file>
@@ -62,6 +67,13 @@
         <file>shaders/merge.fs</file>
         <file>shaders/mesh.vs</file>
         <file>shaders/mesh.fs</file>
+        <file>shaders/mesh2.vs</file>
+        <file>shaders/mesh2.fs</file>
+        <file>shaders/mesh2.gs</file>
+        <file>shaders/meshtextures.fs</file>
+        <file>shaders/meshlighting.fs</file>
+        <file>shaders/orienthelper.vs</file>
+        <file>shaders/orienthelper.fs</file>
         <file>shaders/peel.vs</file>
         <file>shaders/peel.fs</file>
         <file>shaders/pies.vs</file>

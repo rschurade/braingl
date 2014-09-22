@@ -10,7 +10,7 @@
 
 #include "../../../data/enums.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 class QProgressBar;
 class QPushButton;

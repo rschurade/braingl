@@ -8,18 +8,16 @@
 #ifndef SINGLESHRENDERER_H_
 #define SINGLESHRENDERER_H_
 
-#include "GL/glew.h"
+#include "objectrenderer.h"
 
 #include "../../thirdparty/newmat10/newmat.h"
-
-#include <QMatrix4x4>
 
 #include <initializer_list>
 
 class ArcBall;
 class DatasetDWI;
 
-class SingleSHRenderer
+class SingleSHRenderer : public ObjectRenderer
 {
 public:
     SingleSHRenderer();

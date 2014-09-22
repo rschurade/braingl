@@ -52,6 +52,7 @@ void MeshRenderer::setMesh( TriangleMesh2* mesh )
 
 void MeshRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 3, vboIds );
 }
 
@@ -89,15 +90,25 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     setRenderParams( props );
 
-    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
+    QGLShaderProgram* program;
+
+    if ( props.get( Fn::Property::D_INTERPOLATION ).toBool() )
+    {
+        program = GLFunctions::getShader( "mesh" );
+    }
+    else
+    {
+        program = GLFunctions::getShader( "mesh2" );
+    }
 
     program->bind();
 
     GLFunctions::setupTextures();
-    GLFunctions::setTextureUniforms( GLFunctions::getShader( "mesh" ), "maingl" );
+    GLFunctions::setTextureUniforms( program, "maingl" );
     // Set modelview-projection matrix
     program->setUniformValue( "mvp_matrix", p_matrix * mv_matrix * m_mMatrix );
     program->setUniformValue( "mv_matrixInvert", ( mv_matrix * m_mMatrix ).inverted() );
+    program->setUniformValue( "userTransformMatrix", props.get( Fn::Property::D_TRANSFORM ).value<QMatrix4x4>() );
 
     program->setUniformValue( "u_colorMode", m_colorMode );
     program->setUniformValue( "u_colormap", m_colormap );
@@ -140,6 +151,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
     program->setUniformValue( "u_materialDiffuse", props.get( Fn::Property::D_MATERIAL_DIFFUSE ).toFloat() );
     program->setUniformValue( "u_materialSpecular", props.get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
     program->setUniformValue( "u_materialShininess", props.get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
+    program->setUniformValue( "u_meshTransparency", Models::getGlobal( Fn::Property::G_MESH_TRANSPARENCY ).toInt() );
 
 
     float pAlpha =  1.0;
@@ -155,7 +167,7 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
-    setShaderVars();
+    setShaderVars( program );
 
     glEnable(GL_CULL_FACE);
     glCullFace( GL_BACK );
@@ -185,19 +197,13 @@ void MeshRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, i
 
     glDisable(GL_CULL_FACE);
 
-    //glShadeModel( GL_SMOOTH );  // XXX not in CoreProfile; use shader
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
 
-void MeshRenderer::setShaderVars()
+void MeshRenderer::setShaderVars( QGLShaderProgram* program )
 {
-    QGLShaderProgram* program = GLFunctions::getShader( "mesh" );
-
-    program->bind();
-
     intptr_t offset = 0;
-    // Tell OpenGL programmable pipeline how to locate vertex position data
 
     int bufferSize = m_mesh->bufferSize();
 

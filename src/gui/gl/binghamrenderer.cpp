@@ -54,6 +54,7 @@ BinghamRenderer::~BinghamRenderer()
 
 void BinghamRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 2, vboIds );
 }
 
@@ -107,7 +108,6 @@ void BinghamRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width
 void BinghamRenderer::setShaderVars( PropertyGroup& props )
 {
     QGLShaderProgram* program = GLFunctions::getShader( "qball" );
-
     program->bind();
 
     intptr_t offset = 0;
@@ -149,8 +149,6 @@ void BinghamRenderer::initGeometry( PropertyGroup& props )
         return;
     }
     m_previousSettings = s;
-
-    //qDebug() << "Bingham Renderer: using lod " << lod;
 
     int numVerts = tess::n_vertices( lod );
     int numTris = tess::n_faces( lod );

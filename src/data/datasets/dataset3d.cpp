@@ -10,6 +10,7 @@
 
 #include "../../gui/gl/evrenderer.h"
 #include "../../gui/gl/stipplerenderer.h"
+#include "../../gui/gl/glfunctions.h"
 
 #include "../properties/propertyselection.h"
 
@@ -25,11 +26,11 @@ Dataset3D::Dataset3D( QDir filename, std::vector<QVector3D> data, nifti_image* h
     m_properties["maingl"].createInt( Fn::Property::D_DIM, 3 );
     m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, "general" );
     m_properties["maingl"].createFloat( Fn::Property::D_OFFSET, 0.0f, -0.5, 0.5, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_RENDER_VECTORS_STICKS, true, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_RENDER_VECTORS_STICKS, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
-    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, false );
+    m_properties["maingl"].createBool( Fn::Property::D_HAS_TEXTURE, true );
 
     connect( m_properties["maingl"].getProperty( Fn::Property::D_RENDER_VECTORS_STICKS ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( switchRenderSticks() ) );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_SCALING ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( scalingChanged() ) );
@@ -106,9 +107,9 @@ void Dataset3D::createTexture()
 
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 
     int type = m_properties["maingl"].get( Fn::Property::D_DATATYPE ).toInt();
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
@@ -129,12 +130,11 @@ void Dataset3D::createTexture()
 
     for ( int i = 0; i < blockSize; ++i )
     {
-        data[i * 3] = qMin( 1.0, fabs( m_data[i].x() ) / div );
-        data[i * 3 + 1] = qMin( 1.0, fabs( m_data[i].y() ) / div );
-        data[i * 3 + 2] = qMin( 1.0, fabs( m_data[i].z() ) / div );
+        data[i * 3]     = qMin( 1.0f, (float)( fabs( m_data[i].x() ) / div ) );
+        data[i * 3 + 1] = qMin( 1.0f, (float)( fabs( m_data[i].y() ) / div ) );
+        data[i * 3 + 2] = qMin( 1.0f, (float)( fabs( m_data[i].z() ) / div ) );
     }
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
-
+    GLFunctions::f->glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGB, GL_FLOAT, data );
 }
 
 std::vector<QVector3D>* Dataset3D::getData()
@@ -147,6 +147,21 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
     if ( !properties( target ).get( Fn::Property::D_ACTIVE ).toBool() )
     {
         return;
+    }
+
+    if ( m_resetRenderer )
+    {
+        if ( m_renderer != 0 )
+        {
+            delete m_renderer;
+            m_renderer = 0;
+        }
+        if ( m_stippleRenderer != 0 )
+        {
+            delete m_stippleRenderer;
+            m_stippleRenderer = 0;
+        }
+        m_resetRenderer = false;
     }
 
     if (  properties( target ).get( Fn::Property::D_RENDER_VECTORS_STIPPLES ).toBool() )
@@ -167,15 +182,14 @@ void Dataset3D::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int he
             {
                 m_renderer = new EVRenderer( &m_data );
             }
-
             m_renderer->draw( pMatrix, mvMatrix, width, height, renderMode, properties( target ) );
         }
     }
 }
 
-QString Dataset3D::getValueAsString( int x, int y, int z )
+QString Dataset3D::getValueAsString( float x, float y, float z )
 {
-    QVector3D data = m_data[ getId( x, y, z ) ];
+    QVector3D data = m_data[ getIdFromPos( x, y, z ) ];
 
     return QString::number( data.x() ) + ", " + QString::number( data.y() ) + ", " + QString::number( data.z() );
 }
@@ -293,4 +307,79 @@ void Dataset3D::probMaskChanged()
     {
         m_stippleRenderer->setMask( m_scalarDSL[ m_properties["maingl"].get( Fn::Property::D_STIPPLE_PROB_MASK ).toInt() ] );
     }
+}
+
+void Dataset3D::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx / 2; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( nx - x, y, z) ];
+                m_data[getId( nx - x, y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void Dataset3D::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny / 2; ++y )
+        {
+            for ( int z = 0; z < nz; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, ny - y, z) ];
+                m_data[getId( x, ny - y, z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
+}
+
+void Dataset3D::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+
+    for ( int x = 0; x < nx; ++x )
+    {
+        for ( int y = 0; y < ny; ++y )
+        {
+            for ( int z = 0; z < nz / 2; ++z )
+            {
+                QVector3D tmp = m_data[getId( x, y, z) ];
+                m_data[getId( x, y, z) ] = m_data[getId( x, y, nz - z) ];
+                m_data[getId( x, y, nz - z) ] = tmp;
+            }
+        }
+    }
+    m_resetRenderer = true;
+    Models::g()->submit();
 }

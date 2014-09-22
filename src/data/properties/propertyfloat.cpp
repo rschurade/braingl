@@ -18,6 +18,8 @@ PropertyFloat::PropertyFloat( QString name, float value, float min, float max ) 
     widget->setMax( max );
     widget->setValue( value );
     connect( widget, SIGNAL( valueChanged( float, int ) ), this, SLOT( widgetChanged( float, int ) ) );
+    connect( widget, SIGNAL( minChanged( QVariant ) ), this, SLOT( setMin( QVariant ) ) );
+    connect( widget, SIGNAL( maxChanged( QVariant ) ), this, SLOT( setMax( QVariant ) ) );
     m_widget = widget;
 }
 
@@ -33,24 +35,47 @@ PropertyFloat::~PropertyFloat()
 void PropertyFloat::setValue( QVariant value )
 {
     m_value = value;
+    if ( m_value.toFloat() < m_min.toFloat() )
+    {
+        setMin( value );
+    }
+    if ( m_value.toFloat() > m_max.toFloat() )
+    {
+        setMax( value );
+    }
     ( ( SliderWithEdit* )m_widget )->setValue( m_value.toFloat() );
 }
 
 void PropertyFloat::setMin( QVariant min )
 {
-    m_min = min.toFloat();
+    if ( min.toFloat() >= m_max.toFloat() )
+    {
+        m_min = m_max.toFloat() - 1;
+    }
+    else
+    {
+        m_min = min.toFloat();
+    }
+
     if ( m_value.toFloat() < m_min.toFloat() )
     {
         m_value = m_min;
     }
-
+    ( ( SliderWithEdit* )m_widget )->setDigits( determineDigits() );
     ( ( SliderWithEdit* )m_widget )->setMin( m_min.toFloat() );
     ( ( SliderWithEdit* )m_widget )->setValue( m_value.toFloat() );
 }
 
 void PropertyFloat::setMax( QVariant max )
 {
-    m_max = max.toFloat();
+    if ( m_max.toFloat() <= m_min.toFloat() )
+    {
+        m_max = m_min.toFloat() + 1;
+    }
+    else
+    {
+        m_max = max.toFloat();
+    }
     if ( m_value.toFloat() > m_max.toFloat() )
     {
         m_value = m_max;
@@ -62,7 +87,7 @@ void PropertyFloat::setMax( QVariant max )
 
 void PropertyFloat::widgetChanged( float value, int id )
 {
-    m_value = value;
+    setValue( value );
     emit( valueChanged( value ) );
 }
 

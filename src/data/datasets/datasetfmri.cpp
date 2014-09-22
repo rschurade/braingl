@@ -8,6 +8,8 @@
 #include "datasetfmri.h"
 #include "../models.h"
 
+#include "../../gui/gl/glfunctions.h"
+
 #include <QTimer>
 
 DatasetFMRI::DatasetFMRI( QDir filename, std::vector<float> data, nifti_image* header ) :
@@ -95,9 +97,9 @@ void DatasetFMRI::createTexture()
 
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, /*GL_CLAMP*/ GL_CLAMP_TO_EDGE );    // XXX CoreProfile
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 
     int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
     int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
@@ -130,7 +132,7 @@ void DatasetFMRI::createTexture()
         tmpData[4 * i + 0 ] = tmp % 256 ;
     }
 
-    glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
+    GLFunctions::f->glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_UNSIGNED_BYTE, tmpData );
     delete[] tmpData;
 }
 
@@ -180,4 +182,91 @@ void DatasetFMRI::slotPropSet( int id )
     {
         selectTexture();
     }
+}
+
+void DatasetFMRI::flipX()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx / 2; ++x )
+        {
+            for ( int y = 0; y < ny; ++y )
+            {
+                for ( int z = 0; z < nz; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset ];
+                    m_data[getId( x, y, z) + offset ] = m_data[getId( nx - x, y, z) + offset ];
+                    m_data[getId( nx - x, y, z) + offset ] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetFMRI::flipY()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx; ++x )
+        {
+            for ( int y = 0; y < ny / 2; ++y )
+            {
+                for ( int z = 0; z < nz; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset];
+                    m_data[getId( x, y, z) + offset] = m_data[getId( x, ny - y, z) + offset];
+                    m_data[getId( x, ny - y, z) + offset] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
+}
+
+void DatasetFMRI::flipZ()
+{
+    glDeleteTextures( 1, &m_textureGLuint );
+    m_textureGLuint = 0;
+
+    int nx = m_properties["maingl"].get( Fn::Property::D_NX ).toInt();
+    int ny = m_properties["maingl"].get( Fn::Property::D_NY ).toInt();
+    int nz = m_properties["maingl"].get( Fn::Property::D_NZ ).toInt();
+    int dim = m_properties["maingl"].get( Fn::Property::D_DIM ).toInt();
+
+    for ( int frame = 0; frame < dim; ++frame )
+    {
+        int offset = nx * ny * nz * frame;
+        for ( int x = 0; x < nx; ++x )
+        {
+            for ( int y = 0; y < ny; ++y )
+            {
+                for ( int z = 0; z < nz / 2; ++z )
+                {
+                    float tmp = m_data[getId( x, y, z) + offset];
+                    m_data[getId( x, y, z) + offset] = m_data[getId( x, y, nz - z) + offset];
+                    m_data[getId( x, y, nz - z) + offset] = tmp;
+                }
+            }
+        }
+    }
+    Models::g()->submit();
 }

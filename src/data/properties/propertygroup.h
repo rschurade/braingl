@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QColor>
 #include <QMatrix4x4>
+#include <QVector3D>
 #include <QObject>
 #include <QString>
 #include <QVariant>
@@ -37,6 +38,8 @@ public:
     QVariant get( Fn::Property name ) const;
     bool set( Fn::Property name, QVariant value );
 
+    void copy( Fn::Property name, Property* prop );
+
     bool createBool( Fn::Property name, bool value, QString tab = "none" );
     bool createInt( Fn::Property name, int value, QString tab = "none" );
     bool createInt( Fn::Property name, int value, int min, int max, QString tab = "none" );
@@ -51,7 +54,11 @@ public:
     bool createList( Fn::Property name, std::vector<QString> options, int value = 0, QString tab = "none" );
     bool createButton( Fn::Property name, QString tab = "none" );
     bool createMatrix( Fn::Property name, QMatrix4x4 value, QString tab = "none" );
+    bool createVector( Fn::Property name, QVector3D value, QString tab = "none" );
     bool createText( Fn::Property name, QString value, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, std::initializer_list<QString> options, int value = 0, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, QList<QString> options, int value = 0, QString tab = "none" );
+    bool createRadioGroup( Fn::Property name, std::vector<QString> options, int value = 0, QString tab = "none" );
 
     bool setMin( Fn::Property name,  QVariant value );
     bool setMax( Fn::Property name,  QVariant value );
@@ -66,6 +73,8 @@ public:
 
     QList<QVariant>getState();
     void setState( QList<QVariant> state );
+
+    void unsetTab( QString tab );
 
 private:
     std::vector<QPair<Fn::Property, Property*> >m_properties;

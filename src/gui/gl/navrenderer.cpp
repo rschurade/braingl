@@ -60,21 +60,7 @@ void NavRenderer::init()
 
 void NavRenderer::initGL()
 {
-    qDebug() << "gl init " << m_name << " widget";
-
-    glewExperimental = true;
-    GLenum errorCode = glewInit();
-    if ( GLEW_OK != errorCode )
-    {
-        qDebug() << "Problem: glewInit failed, something is seriously wrong.";
-        qDebug() << glewGetErrorString( errorCode );
-        exit( false );
-    }
-    else
-    {
-        //qDebug() << "OpenGL initialized.";
-    }
-
+    initializeOpenGLFunctions();
     glGenBuffers( 4, vboIds );
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -84,12 +70,7 @@ void NavRenderer::initGL()
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable( GL_BLEND );
 
-    //glShadeModel( GL_SMOOTH );    // XXX not in Core
-    //glEnable( GL_LIGHTING );    // XXX not in CoreProfile; use shader
-    //glEnable( GL_LIGHT0 );    // XXX not in CoreProfile; use shader
     glEnable( GL_MULTISAMPLE );
-    //static GLfloat lightPosition[ 4 ] = { 0.5, 5.0, -3000.0, 1.0 };
-    //glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );   // XXX not in Core
 
     GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
     GLushort crosshairIndices[] = { 0, 1, 2, 3 };

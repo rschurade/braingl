@@ -23,7 +23,7 @@ out float v_index;
 
 uniform mat4 mv_matrixTI;
 uniform mat4 mvp_matrix;
-uniform mat4 mv_matrixInvert;
+uniform mat4 userTransformMatrix;
 
 uniform int u_colorMode;
 uniform vec4 u_color;

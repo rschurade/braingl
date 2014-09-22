@@ -10,7 +10,7 @@
 #include "gradients.h"
 #include "sorts.h"
 
-#include "../data/writer.h"
+#include "../io/writer.h"
 
 #include "../data/datasets/dataset.h"
 #include "../data/datasets/datasetdwi.h"
@@ -21,7 +21,7 @@
 
 #include "../gui/gl/glfunctions.h"
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
+#include "boost/math/special_functions/spherical_harmonic.hpp"
 
 #include <QDebug>
 
@@ -233,10 +233,10 @@ QList<Dataset*> Bingham::bingham2Tensor( DatasetBingham* ds )
     QList<Dataset*> dsout;
     for ( int i = 0; i < 3; ++i )
     {
-        Writer writer( ds, QFileInfo() );
-        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, writer.createHeader( gradientsSize + 1 ) );
-
-        dsout.push_back( out );
+//        Writer writer( ds, QFileInfo() );
+//        DatasetDWI* out = new DatasetDWI( QDir( "dwifrombingham" ), *(sigs[i]), b0Data, bvals, bvecs, writer.createHeader( gradientsSize + 1 ) );
+//
+//        dsout.push_back( out );
     }
 
     qDebug() << "finished bingham to dwi";

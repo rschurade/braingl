@@ -4,41 +4,43 @@
  * Created on: 15.05.2012
  * @author Ralph Schurade
  */
-#include "GL/glew.h"
-
 #include "glfunctions.h"
+
 #include "colormapfunctions.h"
 #include "../../data/enums.h"
 #include "../../data/models.h"
 #include "../../data/roi.h"
+#include "../../data/properties/propertygroup.h"
 
 #include "../../data/datasets/dataset.h"
 #include "../../data/vptr.h"
 
+#include "colormaprenderer.h"
+#include  "orientationhelperrenderer.h"
 #include "shaperenderer.h"
+#include "slicerenderer.h"
 #include "../text/textrenderer.h"
 
 #include <QAbstractItemModel>
 #include <QHash>
 #include <QFile>
 #include <QThread>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QGLShaderProgram>
 #include <QVector3D>
 #include <QMatrix4x4>
 
 #include <locale.h>
-
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-#include "bugfixglshaderprogram.h"
-#endif
 
 #define NUM_TEXTURES 5
 
 int GLFunctions::idealThreadCount = qMax( 1, QThread::idealThreadCount() - 1 );
 int GLFunctions::maxDim = 250;
 
+OrientationHelperRenderer* GLFunctions::m_orientationRenderer = new OrientationHelperRenderer();
 TextRenderer* GLFunctions::m_textRenderer = new TextRenderer();
 ShapeRenderer* GLFunctions::m_shapeRenderer = new ShapeRenderer();
+ColormapRenderer* GLFunctions::m_colormapRenderer = new ColormapRenderer();
+SliceRenderer* GLFunctions::m_sliceRenderer = new SliceRenderer();
 
 bool GLFunctions::shadersLoaded = false;
 unsigned int GLFunctions::pickIndex = 100;
@@ -49,8 +51,10 @@ QHash< QString, QString > GLFunctions::m_shaderIncludes;
 QHash< QString, QString > GLFunctions::m_shaderSources;
 std::vector< QString > GLFunctions::m_shaderNames;
 std::vector< GLuint > GLFunctions::m_texturesToDelete;
+bool GLFunctions::m_debug = false;
 
 ROI* GLFunctions::roi = 0;
+QOpenGLFunctions_3_3_Core* GLFunctions::f = 0;
 
 unsigned int GLFunctions::getPickIndex()
 {
@@ -64,16 +68,15 @@ bool GLFunctions::setupTextures( QString target )
         glDeleteTextures( 1, &GLFunctions::m_texturesToDelete[i] );
     }
     GLFunctions::m_texturesToDelete.clear();
-
-    glActiveTexture( GL_TEXTURE4 );
+    f->glActiveTexture( GL_TEXTURE4 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE3 );
+    f->glActiveTexture( GL_TEXTURE3 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE2 );
+    f->glActiveTexture( GL_TEXTURE2 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE1 );
+    f->glActiveTexture( GL_TEXTURE1 );
     glBindTexture( GL_TEXTURE_3D, 0 );
-    glActiveTexture( GL_TEXTURE15 );
+    f->glActiveTexture( GL_TEXTURE15 );
     glBindTexture( GL_TEXTURE_3D, 0 );
 
     QAbstractItemModel* model = Models::d();
@@ -93,8 +96,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 4;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glf.glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE4 );
+            f->glActiveTexture( GL_TEXTURE4 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -107,8 +109,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 3;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE3 );
+            f->glActiveTexture( GL_TEXTURE3 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -121,8 +122,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 2;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE2 );
+            f->glActiveTexture( GL_TEXTURE2 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -135,8 +135,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 1;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( GL_TEXTURE1 );
+            f->glActiveTexture( GL_TEXTURE1 );
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -149,8 +148,7 @@ bool GLFunctions::setupTextures( QString target )
             texIndex = 0;
             index = model->index( tl.at( texIndex ),  (int)Fn::Property::D_TEXTURE_GLUINT );
             GLuint tex = static_cast< GLuint >( model->data( index, Qt::DisplayRole ).toInt() );
-            // XXX not in Core //glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-            glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
+            f->glActiveTexture( /*GL_TEXTURE0*/GL_TEXTURE15 ); // XXX test sampler validation error
             glBindTexture( GL_TEXTURE_3D, tex );
             setTexInterpolation( tl.at( texIndex ) );
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
@@ -196,16 +194,16 @@ bool GLFunctions::validateShader( QString name )
         qDebug()  << "log:" << log;
     }
 
-    glValidateProgram(program->programId());
+    f->glValidateProgram(program->programId());
     GLint status;
-    glGetProgramiv(program->programId(), GL_VALIDATE_STATUS, &status);
+    f->glGetProgramiv(program->programId(), GL_VALIDATE_STATUS, &status);
     if (status == GL_FALSE)
     {
         qCritical() << "Error validating shader program:" << name << "!";
         QByteArray buf(1024, 0);
         GLsizei length = 0;
 
-        glGetProgramInfoLog(program->programId(), buf.length(), &length, (char *)buf.data());
+        f->glGetProgramInfoLog(program->programId(), buf.length(), &length, (char *)buf.data());
         if (length > 0)
         {
             qDebug() << "program info log:" << buf;
@@ -256,6 +254,8 @@ void GLFunctions::loadShaders()
     {
         GLFunctions::m_shaderIncludes[ "textures_vs" ] = copyShaderToString( "textures", QString("vs") );
         GLFunctions::m_shaderIncludes[ "textures_fs" ] = copyShaderToString( "textures", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "meshtextures_fs" ] = copyShaderToString( "meshtextures", QString("fs") );
+        GLFunctions::m_shaderIncludes[ "meshlighting_fs" ] = copyShaderToString( "meshlighting", QString("fs") );
         GLFunctions::m_shaderIncludes[ "lighting_vs" ] = copyShaderToString( "lighting", QString("vs") );
         GLFunctions::m_shaderIncludes[ "lighting_fs" ] = copyShaderToString( "lighting", QString("fs") );
         GLFunctions::m_shaderIncludes[ "uniforms_vs" ] = copyShaderToString( "uniforms", QString("vs") );
@@ -270,6 +270,7 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "fiber" );
         GLFunctions::m_shaderNames.push_back( "tube" );
         GLFunctions::m_shaderNames.push_back( "mesh" );
+        GLFunctions::m_shaderNames.push_back( "mesh2" );
         GLFunctions::m_shaderNames.push_back( "line" );
         GLFunctions::m_shaderNames.push_back( "colormapscale" );
         GLFunctions::m_shaderNames.push_back( "qball" );
@@ -285,15 +286,15 @@ void GLFunctions::loadShaders()
         GLFunctions::m_shaderNames.push_back( "vectors" );
         GLFunctions::m_shaderNames.push_back( "pies" );
         GLFunctions::m_shaderNames.push_back( "diffpoints" );
+        GLFunctions::m_shaderNames.push_back( "orienthelper" );
+
+        GLFunctions::m_shaderSources[ "mesh2_gs" ] = copyShaderToString( "mesh2", QString("gs") );
 
         for ( unsigned int i = 0; i < GLFunctions::m_shaderNames.size(); ++i )
         {
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_vs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("vs") );
             GLFunctions::m_shaderSources[ GLFunctions::m_shaderNames[ i ] + "_fs" ] = copyShaderToString( GLFunctions::m_shaderNames[ i ], QString("fs") );
             GLFunctions::m_shaders[ GLFunctions::m_shaderNames[ i ] ] = initShader( GLFunctions::m_shaderNames[ i ] );
-            // Validate shader XXX too early, must be done after shader setup
-            //validateShader( GLFunctions::m_shaderNames[ i ] );
-
         }
 
         GLFunctions::shadersLoaded = true;
@@ -336,7 +337,6 @@ void GLFunctions::updateColormapShader()
     code += "} \n";
 
     GLFunctions::m_shaderIncludes[ "colormap_fs" ] = code;
-    //qDebug() << code;
 }
 
 QString GLFunctions::copyShaderToString( QString name, QString ext )
@@ -356,11 +356,7 @@ QString GLFunctions::copyShaderToString( QString name, QString ext )
 
 QGLShaderProgram* GLFunctions::initShader( QString name )
 {
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-    QGLShaderProgram* program = new BugfixGLShaderProgram;
-#else
     QGLShaderProgram* program = new QGLShaderProgram;
-#endif
 
     // Overriding system locale until shaders are compiled
     setlocale( LC_NUMERIC, "C" );
@@ -380,7 +376,20 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
         //exit( false );
     }
 
-    const QString code_vs(code);    // XXX
+    const QString code_vs(code);
+
+    if ( GLFunctions::m_shaderSources.contains( name + "_gs" ) )
+    {
+        code = GLFunctions::m_shaderSources[ name + "_gs" ];
+        // Compiling geometry shader
+        if ( !program->addShaderFromSourceCode( QGLShader::Geometry, code ) )
+        {
+            qCritical() << "Error while compiling geometry shader: " << name << "!";
+            //qDebug() << code;
+            //exit( false );
+        }
+    }
+
     code = GLFunctions::m_shaderSources[ name + "_fs" ];
     QHashIterator<QString, QString> j( GLFunctions::m_shaderIncludes );
     while (j.hasNext() )
@@ -393,7 +402,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->addShaderFromSourceCode( QGLShader::Fragment, code ) )
     {
         qCritical() << "Error while compiling fragment shader: " << name << "!";
-        qDebug() << code;
+        //qDebug() << code;
         //exit( false );
     }
 
@@ -401,7 +410,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->link() )
     {
         qCritical() << "Error while linking shader: " << name << "!";
-        qDebug() << "vertex shader:" << code_vs << "fragment shader:" << code;
+        //qDebug() << "vertex shader:" << code_vs << "fragment shader:" << code;
         //exit( false );
     }
 
@@ -409,7 +418,7 @@ QGLShaderProgram* GLFunctions::initShader( QString name )
     if ( !program->bind() )
     {
         qCritical() << "Error while binding shader: " << name << "!";
-        qDebug() << code;
+        //qDebug() << code;
         //exit( false );
     }
 
@@ -427,14 +436,14 @@ void GLFunctions::setShaderVarsSlice( QGLShaderProgram* program, QString target 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation( "a_position" );
     program->enableAttributeArray( vertexLocation );
-    glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+    f->glVertexAttribPointer( vertexLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
     // Offset for texture coordinate
     offset += sizeof(QVector3D);
     // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
     int texcoordLocation = program->attributeLocation( "a_texcoord" );
     program->enableAttributeArray( texcoordLocation );
-    glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
+    f->glVertexAttribPointer( texcoordLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (const void *) offset );
 
     setTextureUniforms( program, target );
 }
@@ -674,43 +683,66 @@ QList< int > GLFunctions::getTextureIndexes( QString target )
     return tl;
 }
 
-void GLFunctions::initTextRenderer()
+void GLFunctions::initRenderers()
 {
+    GLFunctions::m_sliceRenderer->init();
     GLFunctions::m_textRenderer->init();
+    GLFunctions::m_shapeRenderer->init();
+    GLFunctions::m_colormapRenderer->init();
+    GLFunctions::m_orientationRenderer->init();
 }
 
 void GLFunctions::renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode )
 {
     GLFunctions::m_textRenderer->setSize( size );
     GLFunctions::m_textRenderer->setColor( color );
-    GLFunctions::m_textRenderer->renderText( text, x, y, width, height, renderMode );
+    GLFunctions::m_textRenderer->renderOverlay( text, x, y, width, height, renderMode );
 }
 
-void GLFunctions::initShapeRenderer()
+void GLFunctions::renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QString text, int size, float x, float y, float z, QColor color, float alpha, int width, int height, int renderMode )
 {
-    GLFunctions::m_shapeRenderer->init();
+    GLFunctions::m_textRenderer->setSize( size );
+    GLFunctions::m_textRenderer->setColor( color );
+    GLFunctions::m_textRenderer->renderLabel( p_matrix, mv_matrix, text, x, y, z, alpha, width, height, renderMode );
+
 }
 
-void GLFunctions::drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+void GLFunctions::renderBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                               float x, float y, float z, float dx, float dy, float dz,
                               QColor color, int pickID, int width, int height, int renderMode )
 {
     GLFunctions::m_shapeRenderer->drawBox( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
-void GLFunctions::drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+void GLFunctions::renderSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                  float x, float y, float z, float dx, float dy, float dz,
                                  QColor color, int pickID, int width, int height, int renderMode )
 {
     GLFunctions::m_shapeRenderer->drawSphere( p_matrix, mv_matrix, x, y, z, dx, dy, dz, color, pickID, width, height, renderMode );
 }
 
+void GLFunctions::renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target )
+{
+    GLFunctions::m_sliceRenderer->draw( p_matrix, mv_matrix, width, height, renderMode, target );
+}
+
+void GLFunctions::renderOrientHelper( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target )
+{
+    GLFunctions::m_orientationRenderer->drawBox( p_matrix, mv_matrix, width, height, renderMode );
+}
+
+
 bool GLFunctions::getAndPrintGLError( QString prefix )
 {
+    if ( !GLFunctions::m_debug )
+    {
+        return false;
+    }
+
     GLenum errCode;
     const char *errString;
     bool isError = false;
-    while ( 0 && /*XXXXX disabled*/ ( errCode = glGetError() ) != GL_NO_ERROR )
+    while ( ( errCode = glGetError() ) != GL_NO_ERROR )
     {
         switch(errCode)
         {
@@ -720,7 +752,7 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
             case GL_OUT_OF_MEMORY:                  errString="OUT_OF_MEMORY";                  break;
             case GL_INVALID_FRAMEBUFFER_OPERATION:  errString="INVALID_FRAMEBUFFER_OPERATION";  break;
         }
-        qDebug() << "OpenGL Error:" << prefix << QString( errString );
+        qCritical() << "OpenGL Error:" << prefix << QString( errString );
         isError = true;
     }
     return isError;
@@ -729,4 +761,45 @@ bool GLFunctions::getAndPrintGLError( QString prefix )
 void GLFunctions::deleteTexture( GLuint tex )
 {
     m_texturesToDelete.push_back( tex );
+}
+
+void GLFunctions::createColormapBarProps( PropertyGroup& props )
+{
+    props.createBool( Fn::Property::D_RENDER_COLORMAP, false, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_X, 50, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_Y, 50, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_DX, 400, 1, 2000, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_DY, 20, 1, 100, "colormap" );
+    props.createInt( Fn::Property::D_COLORMAP_TEXT_SIZE, 30, 1, 100, "colormap" );
+    props.createColor( Fn::Property::D_COLORMAP_TEXT_COLOR, QColor( 1, 1, 1 ), "colormap" );
+    props.createCharString( Fn::Property::D_COLORMAP_LABEL, "label", "colormap" );
+}
+
+void GLFunctions::drawColormapBar( PropertyGroup& props, int width, int height, int renderMode )
+{
+    if ( props.get( Fn::Property::D_RENDER_COLORMAP ).toBool() )
+    {
+        if ( !m_colormapRenderer )
+        {
+            m_colormapRenderer = new ColormapRenderer();
+            m_colormapRenderer->init();
+        }
+        m_colormapRenderer->setColormap( props.get( Fn::Property::D_COLORMAP ).toInt() );
+        m_colormapRenderer->setX( props.get( Fn::Property::D_COLORMAP_X ).toFloat() );
+        m_colormapRenderer->setY( props.get( Fn::Property::D_COLORMAP_Y ).toFloat() );
+        m_colormapRenderer->setDX( props.get( Fn::Property::D_COLORMAP_DX ).toFloat() );
+        m_colormapRenderer->setDY( props.get( Fn::Property::D_COLORMAP_DY ).toFloat() );
+        m_colormapRenderer->setTextSize( props.get( Fn::Property::D_COLORMAP_TEXT_SIZE ).toFloat() );
+        m_colormapRenderer->setTextColor( props.get( Fn::Property::D_COLORMAP_TEXT_COLOR ).value<QColor>() );
+
+        m_colormapRenderer->setMin( props.get( Fn::Property::D_MIN).toFloat() );
+        m_colormapRenderer->setMax( props.get( Fn::Property::D_MAX).toFloat() );
+        m_colormapRenderer->setSelectedMin( props.get( Fn::Property::D_SELECTED_MIN).toFloat() );
+        m_colormapRenderer->setSelectedMax( props.get( Fn::Property::D_SELECTED_MAX).toFloat() );
+        m_colormapRenderer->setLowerThreshold( props.get( Fn::Property::D_LOWER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setUpperThreshold( props.get( Fn::Property::D_UPPER_THRESHOLD).toFloat() );
+        m_colormapRenderer->setTextLabel( props.get( Fn::Property::D_COLORMAP_LABEL ).toString() );
+
+        m_colormapRenderer->draw( width, height, renderMode );
+    }
 }

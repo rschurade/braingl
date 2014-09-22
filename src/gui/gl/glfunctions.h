@@ -8,22 +8,22 @@
 #ifndef GLFUNCTIONS_H_
 #define GLFUNCTIONS_H_
 
-#include "GL/glew.h"
-
 #include <QPoint>
 #include <QList>
 #include <QVector3D>
 #include <QImage>
 #include <QColor>
 
-#if defined(Q_OS_MAC) && QT_VERSION <= 0x040806 && QT_VERSION >= 0x040800    // if less or equal to 4.8.6
-#include "bugfixglshaderprogram.h"
-#endif
+#include <QOpenGLFunctions_3_3_Core>
 
+class ColormapRenderer;
+class OrientationHelperRenderer;
+class PropertyGroup;
 class QGLShaderProgram;
-class ShapeRenderer;
-class TextRenderer;
 class ROI;
+class ShapeRenderer;
+class SliceRenderer;
+class TextRenderer;
 
 struct VertexData
 {
@@ -58,16 +58,23 @@ public:
 
     static void updateColormapShader();
 
-    static void initTextRenderer();
+    static void initRenderers();
     static void renderText( QString text, int x, int y, int size, int width, int height, QColor color, int renderMode );
+    static void renderLabel( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, QString text, int size, float x, float y, float z, QColor color, float alpha, int width, int height, int renderMode );
 
-    static void initShapeRenderer();
-    static void drawBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+    static void renderBox( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                             float x, float y, float z, float dx, float dy, float dz,
                             QColor color, int pickID, int width, int height, int renderMode );
-    static void drawSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
+    static void renderSphere( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix,
                                float x, float y, float z, float dx, float dy, float dz,
                                QColor color, int pickID, int width, int height, int renderMode );
+    static void renderSlices( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target );
+
+    static void renderOrientHelper( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int height, int renderMode, QString target );
+
+
+    static void createColormapBarProps( PropertyGroup& props );
+    static void drawColormapBar( PropertyGroup& props, int width, int height, int renderMode );
 
     static bool getAndPrintGLError( QString prefix = "" );
 
@@ -78,6 +85,9 @@ public:
     static QHash<QString, float> sliceAlpha;
 
     static ROI* roi;
+    static QOpenGLFunctions_3_3_Core* f;
+
+    static bool m_debug;
 
 private:
     GLFunctions() {};
@@ -85,8 +95,11 @@ private:
 
     static QString copyShaderToString( QString name, QString ext );
 
+    static SliceRenderer* m_sliceRenderer;
     static TextRenderer* m_textRenderer;
     static ShapeRenderer* m_shapeRenderer;
+    static ColormapRenderer* m_colormapRenderer;
+    static OrientationHelperRenderer* m_orientationRenderer;
 
     static QHash< QString, QString >m_shaderIncludes;
     static QHash< QString, QString >m_shaderSources;

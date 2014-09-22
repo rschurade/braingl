@@ -33,3 +33,11 @@ void PropertyMatrix::widgetChanged( int id, QMatrix4x4 value )
     m_value = value;
     emit( valueChanged( value ) );
 }
+
+void PropertyMatrix::setValue( int row, int column, float val )
+{
+    QMatrix4x4 m = m_value.value<QMatrix4x4>();
+    m( row, column) = val;
+    m_value = m;
+    dynamic_cast<MatrixWidget*>( m_widget )->setValue( m );
+}

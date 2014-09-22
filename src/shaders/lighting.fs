@@ -1,21 +1,10 @@
-// light direction
-// USAGE:
-// x,y,z components:        the light direction vector
-// w component:             unused
-// (4 varying floats)
 in vec4 v_lightDir;
-
-// point on projection plane of current pixel
-// USAGE:
-// x,y,z components:        the point
-// w component:             unused
 in vec4 v_viewDir;
 
 uniform bool u_lighting;
 
 uniform float u_lightAmbient;
 uniform float u_lightDiffuse;
-
 
 uniform float u_materialAmbient;
 uniform float u_materialDiffuse;

@@ -27,9 +27,9 @@ ROIBox::ROIBox() :
     m_properties.createBool( Fn::Property::D_RENDER, true, "general" );
     m_properties.createBool( Fn::Property::D_NEG, false, "general" );
     m_properties.createList( Fn::Property::D_SHAPE, { "ellipsoid", "sphere", "cube", "box" }, 0, "general" );
-    m_properties.createFloat( Fn::Property::D_X, x, 0., xMax, "general" );
-    m_properties.createFloat( Fn::Property::D_Y, y, 0., yMax, "general" );
-    m_properties.createFloat( Fn::Property::D_Z, z, 0., zMax, "general" );
+    m_properties.createFloat( Fn::Property::D_X, x, -xMax, xMax, "general" );
+    m_properties.createFloat( Fn::Property::D_Y, y, -yMax, yMax, "general" );
+    m_properties.createFloat( Fn::Property::D_Z, z, -zMax, zMax, "general" );
     m_properties.createFloat( Fn::Property::D_DX, 20., 0., xMax, "general" );
     m_properties.createFloat( Fn::Property::D_DY, 20., 0., yMax, "general" );
     m_properties.createFloat( Fn::Property::D_DZ, 20., 0., zMax, "general" );
@@ -42,12 +42,11 @@ ROIBox::ROIBox() :
     connect( &m_properties, SIGNAL( signalPropChanged() ), this, SLOT( propChanged() ) );
     connect( Models::g(), SIGNAL(  dataChanged( QModelIndex, QModelIndex ) ), this, SLOT( propChanged() ) );
 
-    //qDebug() << "new ROI created: " << m_properties.get( Fn::Property::D_ID ).toInt();
+    m_properties.set( Fn::Property::D_SHAPE, 1 );
 }
 
 ROIBox::~ROIBox()
 {
-    //qDebug() << "ROI deleted: " << m_properties.get( Fn::Property::D_ID ).toInt();
 }
 
 void ROIBox::propChanged()
@@ -79,7 +78,6 @@ void ROIBox::propChanged()
         m_properties.getWidget( Fn::Property::D_DY )->show();
         m_properties.getWidget( Fn::Property::D_DZ )->show();
     }
-    //qDebug() << "emitting: " << m_properties.get( Fn::Property::D_ID ).toInt();
     emit ( signalPropChanged( m_properties.get( Fn::Property::D_ID ).toInt() ) );
 }
 
@@ -99,11 +97,11 @@ void ROIBox::draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int heigh
     {
         if ( m_properties.get( Fn::Property::D_SHAPE ).toInt() == 0 || m_properties.get( Fn::Property::D_SHAPE ).toInt() == 1 )
         {
-            GLFunctions::drawSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
+            GLFunctions::renderSphere( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
         }
         else
         {
-            GLFunctions::drawBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
+            GLFunctions::renderBox( pMatrix, mvMatrix, x, y ,z, dx, dy, dz, color, pickID, width, height, renderMode );
         }
     }
 }

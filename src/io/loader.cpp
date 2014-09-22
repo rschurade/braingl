@@ -5,20 +5,21 @@
  * @author Ralph Schurade
  */
 #include "loader.h"
-#include "loadernifti.h"
-#include "loadervtk.h"
 #include "loaderfreesurfer.h"
+#include "loadernifti.h"
+#include "loadertree.h"
+#include "loadervtk.h"
 
-#include "datasets/datasetglyphset.h"
-#include "datasets/datasetcons.h"
-#include "datasets/datasetmeshtimeseries.h"
-#include "datasets/datasettree.h"
-#include "datasets/datasetmesh.h"
-#include "datasets/datasetfibers.h"
-#include "datasets/dataset3d.h"
-#include "datasets/datasetscalar.h"
+#include "../data/datasets/dataset3d.h"
+#include "../data/datasets/datasetcons.h"
+#include "../data/datasets/datasetfibers.h"
+#include "../data/datasets/datasetglyphset.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetmeshtimeseries.h"
+#include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasettree.h"
 
-#include "mesh/trianglemesh2.h"
+#include "../data/mesh/trianglemesh2.h"
 
 #include "../algos/fib.h"
 
@@ -35,7 +36,6 @@
 #include <cmath>
 
 Loader::Loader( Dataset* selected ) :
-    m_header( 0 ),
     m_datasetType( Fn::DatasetType::UNKNOWN ),
     m_selectedDataset( selected ),
     m_success( false )
@@ -123,7 +123,7 @@ bool Loader::load()
         return loadMEG();
     }
 
-    if ( m_fileName.path().endsWith( ".dtree" ) )
+    if ( m_fileName.path().endsWith( ".htree" ) )
     {
         return loadTree();
     }
@@ -149,7 +149,6 @@ bool Loader::load()
 bool Loader::loadNifti()
 {
     LoaderNifti* ln = new LoaderNifti( m_fileName );
-
     if( ln->load() )
     {
         m_dataset = ln->getDataset();
@@ -159,6 +158,7 @@ bool Loader::loadNifti()
     }
     else
     {
+        delete ln;
         return false;
     }
 }
@@ -173,10 +173,11 @@ bool Loader::loadVTK()
 
     if ( !lv->load() )
     {
+        qCritical() << "Couldn't load vtk file";
         QStringList status = lv->getStatus();
         for ( int i = 0; i < status.size(); ++i )
         {
-            qDebug() << status[i];
+            qCritical() << status[i];
         }
         return false;
     }
@@ -188,7 +189,7 @@ bool Loader::loadVTK()
 
         if ( triangles[0] != 3 )
         {
-            qDebug() << "*ERROR* " << fn << " can only load triangle polygon data";
+            qCritical() << "*ERROR* " << fn << " can only load triangle polygon data";
             return false;
         }
 
@@ -270,7 +271,7 @@ bool Loader::loadASC( QVector3D offset )
 
     if ( !lf->loadASC( fn ) )
     {
-        qDebug() << "unable to load: " << fn;
+        qCritical() << "unable to load: " << fn;
         return false;
     }
 
@@ -307,7 +308,7 @@ bool Loader::loadSet()
     QFile setfile( fn );
     if ( !setfile.open( QIODevice::ReadOnly ) )
     {
-        qDebug( "set file unreadable" );
+        qCritical( "set file unreadable" );
     }
     QTextStream ts( &setfile );
     QString nl;
@@ -336,7 +337,7 @@ bool Loader::loadSet()
 
             if ( !lf.loadASC( fullname ) )
             {
-                qDebug() << "unable to load: " << fn;
+                qCritical() << "unable to load: " << fn;
                 return false;
             }
 
@@ -364,7 +365,6 @@ bool Loader::loadSet()
     dataset->initProperties();
     dataset->setProperties();
     dataset->finalizeProperties();
-    qDebug() << "properties set";
     m_dataset.push_back( dataset );
 
     return true;
@@ -376,7 +376,7 @@ bool Loader::loadGlyphset()
     QFile glyphsetfile( glyphsetname );
     if ( !glyphsetfile.open( QIODevice::ReadOnly ) )
     {
-        qDebug( "glyphset file unreadable" );
+        qCritical( "glyphset file unreadable" );
     }
     QTextStream gts( &glyphsetfile );
     //TODO: Will windows have a problem with this?
@@ -430,14 +430,14 @@ bool Loader::loadGlyphset()
         qDebug() << "...and loading glyph set: " << datasetNames.at( 1 );
         if ( datasetNames.length() > 2 )
         {
-            qDebug() << "only two hemispheres supported";
+            qCritical() << "only two hemispheres supported";
         }
     }
 
     QFile setfile( trunk + QDir::separator() + datasetName );
     if ( !setfile.open( QIODevice::ReadOnly ) )
     {
-        qDebug( "set file unreadable" );
+        qCritical( "set file unreadable" );
     }
     QTextStream ts( &setfile );
     QString nl;
@@ -450,7 +450,7 @@ bool Loader::loadGlyphset()
         QFile othersetfile( trunk + QDir::separator() + datasetNames.at( 1 ) );
         if ( !othersetfile.open( QIODevice::ReadOnly ) )
         {
-            qDebug( "second set file unreadable" );
+            qCritical( "second set file unreadable" );
         }
         ots = new QTextStream( &othersetfile );
         qDebug() << "ots initialized";
@@ -484,7 +484,7 @@ bool Loader::loadGlyphset()
 
             if ( !lf.loadASC( fullname ) )
             {
-                qDebug() << "unable to load: " << fullname;
+                qCritical() << "unable to load: " << fullname;
                 return false;
             }
 
@@ -517,7 +517,7 @@ bool Loader::loadGlyphset()
 
                 if ( !olf.loadASC( ofullname ) )
                 {
-                    qDebug() << "unable to load: " << ofullname;
+                    qCritical() << "unable to load: " << ofullname;
                     return false;
                 }
                 float ox = 0;
@@ -624,7 +624,7 @@ bool Loader::loadMEG()
     QFile setfile( fn );
     if ( !setfile.open( QIODevice::ReadOnly ) )
     {
-        qDebug( "set file unreadable" );
+        qCritical( "set file unreadable" );
     }
     QTextStream ts( &setfile );
     QString nl;
@@ -653,7 +653,7 @@ bool Loader::loadMEG()
                     QFile dataFile( trunk + QDir::separator() + numberString + ".txt" );
                     if ( !dataFile.open( QIODevice::ReadOnly ) )
                     {
-                        qDebug() << "data file unreadable, skipping"  << numberString + ".txt";
+                        qCritical() << "data file unreadable, skipping"  << numberString + ".txt";
                         continue;
                     }
                     std::vector<float>data;
@@ -673,7 +673,7 @@ bool Loader::loadMEG()
                     }
                     if ( !ok )
                     {
-                        qDebug() << "error while reading data file, skipping" << numberString + ".txt";
+                        qCritical() << "error while reading data file, skipping" << numberString + ".txt";
                         continue;
                     }
                     else
@@ -684,7 +684,7 @@ bool Loader::loadMEG()
             }
             else
             {
-                qDebug() << "can't read count meg data files";
+                qCritical() << "can't read count meg data files";
             }
         }
         else if ( !nl.startsWith( "#" ) )
@@ -712,7 +712,7 @@ bool Loader::loadMEG()
 
                 if ( !lf.loadASC( fullname ) )
                 {
-                    qDebug() << "unable to load: " << fn;
+                    qCritical() << "unable to load: " << fn;
                     return false;
                 }
 
@@ -746,7 +746,7 @@ bool Loader::loadMEG()
 
                 if ( !lv->load() )
                 {
-                    qDebug() << lv->getStatus();
+                    qCritical() << lv->getStatus();
                     return false;
                 }
 
@@ -757,7 +757,7 @@ bool Loader::loadMEG()
 
                     if ( triangles[0] != 3 )
                     {
-                        qDebug() << "*ERROR* " << fn << " can only load triangle polygon data";
+                        qCritical() << "*ERROR* " << fn << " can only load triangle polygon data";
                         return false;
                     }
 
@@ -794,54 +794,13 @@ bool Loader::loadMEG()
 bool Loader::loadTree()
 {
     QString fn = m_fileName.path();
-
-    DatasetTree* dataset = new DatasetTree( fn );
-
-    qDebug() << "loading tree: " << fn;
-
-    QFile setfile( fn );
-    if ( !setfile.open( QIODevice::ReadOnly ) )
+    LoaderTree lt( fn );
+    if ( lt.load() )
     {
-        qDebug( "set file unreadable" );
+        m_dataset.push_back( lt.getDataset() );
+        return true;
     }
-    QTextStream ts( &setfile );
-    QString nl;
-
-    QString dims;
-    std::vector<QString>coordinates;
-    std::vector<QString>clusters;
-
-    while ( !ts.atEnd() )
-    {
-        nl = ts.readLine();
-        if ( nl.startsWith( "#imagesize" ) )
-        {
-            dims = ts.readLine();
-        }
-
-        if ( nl.startsWith( "#coordinates" ) )
-        {
-            nl = ts.readLine();
-            while( nl != "#endcoordinates" )
-            {
-                coordinates.push_back( nl );
-                nl = ts.readLine();
-            }
-        }
-
-        if ( nl.startsWith( "#clusters" ) )
-        {
-            nl = ts.readLine();
-            while( nl != "#endclusters" )
-            {
-                clusters.push_back( nl );
-                nl = ts.readLine();
-            }
-        }
-    }
-    dataset->importTree( dims, coordinates, clusters );
-    m_dataset.push_back( dataset );
-    return true;
+    return false;
 }
 
 bool Loader::loadRGB()
@@ -869,7 +828,7 @@ bool Loader::loadRGB()
     }
     else
     {
-        qDebug() << "selected Dataset not a mesh";
+        qCritical() << "selected Dataset not a mesh";
     }
 
     file.close();
@@ -902,7 +861,7 @@ bool Loader::load1D()
     }
     else
     {
-        qDebug() << "selected Dataset not a mesh";
+        qCritical() << "selected Dataset not a mesh";
     }
 
     file.close();
@@ -915,7 +874,7 @@ bool Loader::loadMRtrix()
     QFile file( m_fileName.path() );
     if ( !file.open( QIODevice::ReadOnly ) )
     {
-        qDebug() << "Error opening the file";
+        qCritical() << "Error opening the file";
     }
     QByteArray qba;
 
@@ -1194,7 +1153,7 @@ bool Loader::loadJSON()
     QFile n( fn );
     if ( !n.open( QIODevice::ReadOnly ) )
     {
-        qDebug() << "nodes unreadable" << fn;
+        qCritical() << "nodes unreadable" << fn;
         return false;
     }
     QTextStream ns( &n );
@@ -1213,11 +1172,22 @@ bool Loader::loadJSON()
 
     if ( vertList.first() != "\"vertices\"" )
     {
-        qDebug() << "verts not found";
+        qCritical() << "verts not found";
         return false;
     }
 
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+
+    vertList = nl.split( "," );
+
     // skip normals
+    ns.readLine();
     ns.readLine();
 
     nl = ns.readLine();
@@ -1232,9 +1202,18 @@ bool Loader::loadJSON()
 
     if ( colorList.first() != "\"colors\"" )
     {
-        qDebug() << "colors not found";
+        qCritical() << "colors not found";
         return false;
     }
+
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+    colorList = nl.split( "," );
 
     nl = ns.readLine();
     nl = nl.simplified();
@@ -1248,16 +1227,25 @@ bool Loader::loadJSON()
 
     if ( indexList.first() != "\"indices\"" )
     {
-        qDebug() << "indices not found";
+        qCritical() << "indices not found";
         return false;
     }
+
+    nl = ns.readLine();
+    nl = nl.simplified();
+    nl.replace( " ", "" );
+    nl.replace( ":", "," );
+    nl.replace( "[", "" );
+    nl.replace( "],", "" );
+    nl.replace( "]", "" );
+    indexList = nl.split( "," );
 
     std::vector<Fib> fibs;
     Fib fib;
 
-    int pc = 1;
+    int pc = 0;
 
-    for ( int i = 1; i < indexList.size(); ++i )
+    for ( int i = 0; i < indexList.size(); ++i )
     {
         int length = indexList[i].toInt();
         for ( int k = 0; k < length; ++k )
@@ -1265,7 +1253,7 @@ bool Loader::loadJSON()
             float x = vertList[pc++].toFloat();
             float y = vertList[pc++].toFloat();
             float z = vertList[pc++].toFloat();
-            fib.addVert( x,y ,z );
+            fib.addVert( x, y ,z );
         }
         fibs.push_back( fib );
         fib.clear();
@@ -1278,5 +1266,4 @@ bool Loader::loadJSON()
     m_dataset.push_back( dataset );
 
     return true;
-
 }

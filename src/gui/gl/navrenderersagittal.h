@@ -10,8 +10,6 @@
 
 #include "navrenderer.h"
 
-#include <QMatrix4x4>
-
 class QGLShaderProgram;
 
 class NavRendererSagittal : public NavRenderer

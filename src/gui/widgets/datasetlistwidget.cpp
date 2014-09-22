@@ -13,14 +13,12 @@
 #include "../../data/vptr.h"
 #include "../../data/datasets/dataset.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 DatasetListWidget::DatasetListWidget( QWidget* parent ) :
 	QWidget( parent ),
 	m_selected( -1 )
 {
-    setMaximumHeight( 200 );
-
 	QFrame* frame = new QFrame( this );
 
 	QVBoxLayout* layout = new QVBoxLayout();

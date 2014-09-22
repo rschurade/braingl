@@ -13,14 +13,13 @@
 #include "../../data/enums.h"
 #include "../../data/models.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 DockNavGLWidget::DockNavGLWidget( QString name, int orient, QWidget* parent, const QGLWidget *shareWidget ) :
     QWidget( parent ),
     m_name( name ),
     m_visible( true )
 {
-
     setObjectName( QString("nav gl ") + name );
 
     m_glWidget = new NavFrame( name, orient, this, shareWidget );

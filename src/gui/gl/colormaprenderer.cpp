@@ -12,7 +12,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 
 ColormapRenderer::ColormapRenderer() :
-    vboIds( new GLuint[ 2 ] ),
+    vboIds( new GLuint[ 3 ] ),
     m_orient( 0 ),
     m_x( 0.0f ),
     m_y( 0.0f ),
@@ -22,7 +22,8 @@ ColormapRenderer::ColormapRenderer() :
     m_min( 0.0 ),
     m_max( 1.0 ),
     m_lowerThreshold( 0.0 ),
-    m_upperThreshold( 1.0 )
+    m_upperThreshold( 1.0 ),
+    m_textLabel( "" )
 {
 }
 
@@ -33,8 +34,8 @@ ColormapRenderer::~ColormapRenderer()
 
 void ColormapRenderer::init()
 {
+    initializeOpenGLFunctions();
     glGenBuffers( 3, vboIds );
-
     initGeometry();
 }
 
@@ -44,7 +45,6 @@ void ColormapRenderer::initGeometry()
     float z = -0.5f;
     VertexData vertices[] =
     {
-        // XXX rearrange quad vertices (1,2,3,4) to triangle strip (1,2,4,3)
         { QVector3D( m_x,        m_y - m_dy, z ), QVector3D( 0.0, 0.0, 0.0 ) },
         { QVector3D( m_x + m_dx, m_y - m_dy, z ), QVector3D( 1.0, 0.0, 0.0 ) },
         { QVector3D( m_x,        m_y,        z ), QVector3D( 0.0, 1.0, 0.0 ) },
@@ -113,8 +113,7 @@ void ColormapRenderer::initGeometry()
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     glBufferData( GL_ARRAY_BUFFER, 72 * sizeof(float), scaleVertices, GL_STATIC_DRAW );
 
-    // XXX
-    GLushort scaleTriangleIndices[] = // XXX quad-equivalent triangle-pair indices
+    GLushort scaleTriangleIndices[] =
     {
              0,  1,  3,     1,  2,  3,
              4,  5,  7,     5,  6,  7,
@@ -163,7 +162,6 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     {
         return;
     }
-
     // Tell OpenGL which VBOs to use
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 0 ] );
     setShaderVars();
@@ -184,9 +182,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "u_scaleY", 1.0f );
 
     // Draw cube geometry using indices from VBO 0
-    //glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
-    // XXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 4 );
-    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );    // XXX
+    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
@@ -215,8 +211,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
     program->setUniformValue( "D1", 10 );
     program->setUniformValue( "D2", 11 );
 
-    // XXXX not in Core/deprecated //glDrawArrays( GL_QUADS, 0, 24 ); // third argument is count verts in buffer, not count quads
-    glDrawElements( GL_TRIANGLES, 6*2*3, GL_UNSIGNED_SHORT, 0 );    // XXX
+    glDrawElements( GL_TRIANGLES, 6*2*3, GL_UNSIGNED_SHORT, 0 );
 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
@@ -231,7 +226,7 @@ void ColormapRenderer::draw( int width, int height, int renderMode )
 
         GLFunctions::renderText( label, m_labels[i].x() - xOffset, m_labels[i].y() - yOffset, m_textSize, width, height, m_textColor, renderMode );
     }
-
+    GLFunctions::renderText( m_textLabel, m_x, m_y, m_textSize, width, height, m_textColor, renderMode );
 }
 
 void ColormapRenderer::setX( float x )
@@ -293,4 +288,9 @@ void ColormapRenderer::setTextSize( int size )
 void ColormapRenderer::setTextColor( QColor color )
 {
     m_textColor = color;
+}
+
+void ColormapRenderer::setTextLabel( QString label )
+{
+    m_textLabel = label;
 }

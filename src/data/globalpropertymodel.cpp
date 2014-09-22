@@ -18,13 +18,21 @@ GlobalPropertyModel::GlobalPropertyModel()
     using namespace Fn;
 
     m_properties = new PropertyGroup();
-    m_properties->createList( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "general" );
-    m_properties->createList( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "general" );
-
     float dim = 250.0f;
     m_properties->createFloat( Fn::Property::G_SAGITTAL, 0.0f, -dim, dim, "general" );
     m_properties->createFloat( Fn::Property::G_CORONAL, 0.0f, -dim, dim, "general" );
     m_properties->createFloat( Fn::Property::G_AXIAL, 0.0f, -dim, dim, "general" );
+
+    m_properties->createRadioGroup( Fn::Property::G_CAMERA_TYPE, { "arcball", "camera" }, 0, "general" );
+    m_properties->createRadioGroup( Fn::Property::G_CAMERA_PROJECTION, { "orthogonal", "perspective" }, 0, "general" );
+    m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS, true, "general" );
+    m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS_2, true, "general" );
+    m_properties->createColor( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
+    m_properties->createRadioGroup( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );
+    m_properties->createRadioGroup( Fn::Property::G_MESH_TRANSPARENCY, {"normal", "outer shell"}, 0, "general" );
+    m_properties->createBool( Fn::Property::G_UNSELECTED_FIBERS_GREY, false, "general" );
+
+
     m_properties->createString( Fn::Property::G_LAST_PATH, QString("") );
     m_properties->createBool( Fn::Property::G_SHOW_AXIAL, true );
     m_properties->createBool( Fn::Property::G_SHOW_CORONAL, true );
@@ -37,36 +45,20 @@ GlobalPropertyModel::GlobalPropertyModel()
     m_properties->createInt( Fn::Property::G_MOVEX, 0 );
     m_properties->createInt( Fn::Property::G_MOVEY, 0 );
 
-    m_properties->createFloat( Fn::Property::G_CAMERA_POS_X, 0.0f, -1000.0f, 1000.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_POS_Y, 0.0f, -1000.0f, 1000.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_POS_Z, 40.0f, -1000.0f, 1000.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_X, 80.0f, -1000.f, 1000.f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_Y, 100.0f, -1000.f, 1000.f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_Z, 80.0f, -1000.f, 1000.f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_UP_X, 0.0f, -2.0f, 2.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_UP_Y, 0.0f, -2.0f, 2.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_UP_Z, 1.0f, -2.0f, 2.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_NEAR, 2.0f, -500.0f, 100.0f, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
-    m_properties->createInt( Fn::Property::G_CAMERA_ANGLE, 45, 1, 180, "camera" );
-    m_properties->createFloat( Fn::Property::G_CAMERA_KEYBOARD_STEP, 2.0f, 1.0f, 20.f, "camera" );
-    m_properties->createBool( Fn::Property::G_CAMERA_FIXATE_Z, false, "camera" );
-    m_properties->createInt( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS, 360, 1, 360, "camera" );
+    m_properties->createFloat( Fn::Property::G_FILTER_SIZE, 1.0f, 0.1f, 20.0f, "algos" );
+    m_properties->createInt( Fn::Property::G_MIN_COMPONENT_SIZE, 1000, 1, 100000, "algos" );
+    m_properties->createFloat( Fn::Property::G_DECIMATE_EPSILON, 2.0f, 0.0f, 20.f, "algos" );
+    m_properties->createFloat( Fn::Property::G_TRACT_TEX_RESOLUTION, 1.0f, 0.2f, 5.f, "algos" );
+    m_properties->createRadioGroup( Fn::Property::G_TRACT_TEXT_SOURCE, {"local", "global", "user defined", "data"}, 0, "algos" );
+    m_properties->createColor( Fn::Property::G_ISOLINE_STANDARD_COLOR, QColor( 0, 0, 0 ), "algos" );
+    m_properties->createFloat( Fn::Property::G_FIBERS_INITIAL_PERCENTAGE, 100.0f, 0.1f, 100.f, "algos" );
 
     m_properties->createFloat( Fn::Property::G_ARCBALL_DISTANCE, 500.0f, 1.0f, 20000.0f, "arcball" );
-
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "general" );
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN2, QColor( 255, 255, 255 ), "general" );
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "general" );
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "general" );
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), "general" );
-    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), "general" );
-    m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS, true, "general" );
-    m_properties->createBool( Fn::Property::G_RENDER_CROSSHAIRS_2, true, "general" );
-    m_properties->createColor( Fn::Property::G_CROSSHAIR_COLOR, QColor( 255, 0, 0 ), "general" );
-    m_properties->createBool( Fn::Property::G_SHOW_NAV_SLIDERS, true, "general" );
-    m_properties->createList( Fn::Property::G_TRANSPARENCY, {"classic", "new"}, 0, "general" );
-    m_properties->createBool( Fn::Property::G_UNSELECTED_FIBERS_GREY, false, "general" );
+    m_properties->createBool( Fn::Property::G_SHOW_ORIENTHELPER, false, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_X, 1.6f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_Y, -1.6f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_Z, -0.9f, -2.0, 2.0, "arcball" );
+    m_properties->createFloat( Fn::Property::G_ORIENTHELPER_SIZE, 10.0f, 1.0f, 10.f, "arcball" );
 
     m_properties->createInt( Fn::Property::G_SCREENSHOT_QUALITY, 1, 50, 1000000 );
     m_properties->createInt( Fn::Property::G_SCREENSHOT_QUALITY, 1, 50, 1000000 );
@@ -91,18 +83,37 @@ GlobalPropertyModel::GlobalPropertyModel()
 
     m_properties->createBool( Fn::Property::G_SCREENSHOT_DO_MAINGL, true, "screenshot" );
     m_properties->createBool( Fn::Property::G_SCREENSHOT_DO_MAINGL2, false, "screenshot" );
-    m_properties->createBool( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false, "screenshot" );
+    m_properties->createBool( Fn::Property::G_SCREENSHOT_STEREOSCOPIC, false );
+
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_MAIN2, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_COMBINED, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV1, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV2, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createColor( Fn::Property::G_BACKGROUND_COLOR_NAV3, QColor( 255, 255, 255 ), "gui" );
+    m_properties->createBool( Fn::Property::G_SHOW_NAV_SLIDERS, true, "gui" );
 
     m_properties->createBool( Fn::Property::G_LIGHT_SWITCH, true, "light" );
     m_properties->createFloat( Fn::Property::G_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
     m_properties->createFloat( Fn::Property::G_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
 
-    m_properties->createFloat( Fn::Property::G_FILTER_SIZE, 1.0f, 0.1f, 20.0f, "algos" );
-    m_properties->createInt( Fn::Property::G_MIN_COMPONENT_SIZE, 1000, 1, 100000, "algos" );
-    m_properties->createFloat( Fn::Property::G_DECIMATE_EPSILON, 2.0f, 0.0f, 20.f, "algos" );
-    m_properties->createFloat( Fn::Property::G_TRACT_TEX_RESOLUTION, 1.0f, 0.2f, 5.f, "algos" );
-    m_properties->createList( Fn::Property::G_TRACT_TEXT_SOURCE, {"local", "global", "user defined"}, 0, "algos" );
-    m_properties->createColor( Fn::Property::G_ISOLINE_STANDARD_COLOR, QColor( 0, 0, 0 ), "algos" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_POS_X, 0.0f, -1000.0f, 1000.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_POS_Y, 0.0f, -1000.0f, 1000.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_POS_Z, 40.0f, -1000.0f, 1000.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_X, 80.0f, -1000.f, 1000.f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_Y, 100.0f, -1000.f, 1000.f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_LOOKAT_Z, 80.0f, -1000.f, 1000.f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_UP_X, 0.0f, -2.0f, 2.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_UP_Y, 0.0f, -2.0f, 2.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_UP_Z, 1.0f, -2.0f, 2.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_NEAR, 2.0f, -500.0f, 100.0f, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_FAR, -10.0f, -100.0f, 100.0f, "camera" );
+    m_properties->createInt( Fn::Property::G_CAMERA_ANGLE, 45, 1, 180, "camera" );
+    m_properties->createFloat( Fn::Property::G_CAMERA_KEYBOARD_STEP, 2.0f, 1.0f, 20.f, "camera" );
+    m_properties->createBool( Fn::Property::G_CAMERA_FIXATE_Z, false, "camera" );
+    m_properties->createInt( Fn::Property::G_CAMERA_FULLCIRCLE_STEPS, 360, 1, 360, "camera" );
+
+
 
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_WIDTH ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotWidth( QVariant ) ) );
     connect( m_properties->getProperty( Fn::Property::G_SCREENSHOT_HEIGHT ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( slotScreenShotHeight( QVariant ) ) );
@@ -157,11 +168,11 @@ QModelIndex GlobalPropertyModel::index( int row, int column, const QModelIndex &
 {
     if ( m_properties->contains( (Fn::Property)row ) )
     {
-        return createIndex( row, 0, 0 );
+        return createIndex( row, 0, (quintptr)0 );
     }
     else if ( row == (int)Fn::Property::G_OBJECT )
     {
-        return createIndex( row, 0, 0 );
+        return createIndex( row, 0, (quintptr)0 );
     }
     return QModelIndex();
 }

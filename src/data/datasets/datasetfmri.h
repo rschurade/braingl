@@ -25,6 +25,10 @@ public:
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
 
+    void flipX();
+    void flipY();
+    void flipZ();
+
 private:
     std::vector<float> m_data;
 

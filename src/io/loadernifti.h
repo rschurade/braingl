@@ -8,7 +8,7 @@
 #ifndef LOADERNIFTI_H_
 #define LOADERNIFTI_H_
 
-#include "datasets/dataset.h"
+#include "../data/datasets/dataset.h"
 
 #include "../thirdparty/nifti/nifti1_io.h"
 
@@ -38,9 +38,11 @@ private:
     bool loadNiftiBingham();
     bool loadNiftiFMRI();
     bool loadNiftiDWI( QString fileName );
-    bool loadNiftiDWI_FNAV2( QString fileName );
     std::vector<float> loadBvals( QString fileName );
     std::vector<QVector3D> loadBvecs( QString fileName, std::vector<float> bvals );
+
+    bool loadIsosurface();
+    bool loadIsoline();
 
     bool isRadialogical();
     void flipX();
@@ -50,6 +52,8 @@ private:
     std::vector<float>m_data;
     Fn::DatasetType m_datasetType;
     std::vector<Dataset*> m_dataset;
+    QList<QVariant>m_propStates;
+    bool m_isRadiological;
 };
 
 #endif /* LOADERNIFTI_H_ */

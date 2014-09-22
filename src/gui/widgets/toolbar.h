@@ -12,7 +12,7 @@
 
 #include "../../data/enums.h"
 
-#include <QtGui>
+#include <QToolBar>
 
 class ToolBarView;
 class CorrelationWidget;
@@ -22,6 +22,7 @@ class SDWidget;
 class BundlingWidget;
 class FiberBundleWidget;
 class MathWidget;
+class QItemSelectionModel;
 
 class ToolBar : public QToolBar
 {
@@ -79,6 +80,9 @@ private:
     FNAction* m_colorLittleBrainsAction;
     FNAction* m_applyROIAction;
     FNAction* m_brainglMathAction;
+    FNAction* m_flipXAction;
+    FNAction* m_flipYAction;
+    FNAction* m_flipZAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;

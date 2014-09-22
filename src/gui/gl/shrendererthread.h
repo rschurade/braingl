@@ -19,16 +19,19 @@
 
 class SHRendererThread : public QThread
 {
+    Q_OBJECT
+
 public:
-    SHRendererThread( int id, std::vector<ColumnVector>* data, QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, PropertyGroup& props );
+    SHRendererThread( std::vector<ColumnVector>* data, QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, PropertyGroup& props );
     virtual ~SHRendererThread();
 
-    std::vector<float>* getVerts();
+    std::vector<float>* getVerts() { return m_verts; };
+    std::vector<float>* getNormals() { return m_normals; };
+    std::vector<float>* getColors() { return m_colors; };
+    std::vector<unsigned int>* getIndices() { return m_indices; };
 
 private:
     void run();
-
-    int m_id;
 
     std::vector<ColumnVector>* m_data;
 
@@ -54,11 +57,18 @@ private:
     int m_orient;
     bool m_scaling;
     bool m_hideNegative;
+    float m_offset;
 
     QMatrix4x4 m_pMatrix;
     QMatrix4x4 m_mvMatrix;
 
     std::vector<float>* m_verts;
+    std::vector<float>* m_normals;
+    std::vector<float>* m_colors;
+    std::vector<unsigned int>* m_indices;
+
+signals:
+    void finished( bool success );
 };
 
 #endif /* SHRENDERERTHREAD_H_ */

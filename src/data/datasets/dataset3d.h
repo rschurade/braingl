@@ -27,11 +27,15 @@ public:
     virtual ~Dataset3D();
 
     void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );
-    QString getValueAsString( int x, int y, int z );
+    QString getValueAsString( float x, float y, float z );
 
     std::vector<QVector3D>* getData();
 
     bool mousePick( int pickId, QVector3D pos, Qt::KeyboardModifiers modifiers, QString target );
+
+    void flipX();
+    void flipY();
+    void flipZ();
 
 private:
     void examineDataset();

@@ -12,7 +12,6 @@
 #include "../../gui/gl/vectorglyphrenderer.h"
 #include "../../gui/gl/pieglyphrenderer.h"
 #include "../../gui/gl/littlebrainrenderer.h"
-#include "../../gui/gl/colormaprenderer.h"
 
 #include "../../gui/gl/meshrenderer.h"
 
@@ -63,6 +62,7 @@ public:
     void deleteLittleBrains();
     void switchGlyphsOff();
     void applyROI();
+    void deleteRowFromMatrix();
 
     int m_tris_middle;
     int m_points_middle;
@@ -85,8 +85,6 @@ private:
     DiffPointGlyphRenderer* m_dprenderer;
     VectorGlyphRenderer* m_vrenderer;
     PieGlyphRenderer* m_pierenderer;
-
-    ColormapRenderer* m_colormapRenderer;
 
     int prevGeo, prevGlyph, prevCol, prevGlyphstyle, prevLR, prevColorMode, prevThreshSign;
     float prevThresh, prevMinlength;

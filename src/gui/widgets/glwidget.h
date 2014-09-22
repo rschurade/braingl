@@ -8,13 +8,11 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include "GL/glew.h"
-
 #include "../gl/scenerenderer.h"
 
 #include "../../data/enums.h"
 
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 
 class ArcBall;
 class Camera;
@@ -35,7 +33,7 @@ public:
     QSize sizeHint() const;
 
     void setView( Fn::Orient view );
-    void screenshot( QString fn );
+    void screenshot( QString fn, bool exitAfter = false );
 
     CameraBase* getCameraInUse();
     ArcBall* getArcBall();
@@ -71,6 +69,7 @@ private:
     int m_height;
 
     bool m_doScreenshot;
+    bool m_exitAfterScreenshot;
     QString m_screenshotFileName;
 
     int m_copyCameraMode;
@@ -81,6 +80,8 @@ private:
     void rightMouseDrag( QMouseEvent* event );
 
     void cameraCircle( bool dir );
+
+    void showValuePickTooltip( QMouseEvent* event );
 
 protected:
     void initializeGL();

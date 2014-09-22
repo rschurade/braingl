@@ -7,22 +7,25 @@
 #include "writer.h"
 #include "writervtk.h"
 
-#include "datasets/dataset.h"
-#include "datasets/dataset3d.h"
-#include "datasets/datasetbingham.h"
-#include "datasets/datasetnifti.h"
-#include "datasets/datasetdwi.h"
-#include "datasets/datasetscalar.h"
-#include "datasets/datasettensor.h"
-#include "datasets/datasetsh.h"
-#include "datasets/datasetmesh.h"
-#include "datasets/datasetcons.h"
-#include "datasets/datasetcorrelation.h"
-#include "mesh/trianglemesh2.h"
+#include "../data/datasets/dataset.h"
+#include "../data/datasets/dataset3d.h"
+#include "../data/datasets/datasetbingham.h"
+#include "../data/datasets/datasetnifti.h"
+#include "../data/datasets/datasetdwi.h"
+#include "../data/datasets/datasetscalar.h"
+#include "../data/datasets/datasettensor.h"
+#include "../data/datasets/datasetsh.h"
+#include "../data/datasets/datasetmesh.h"
+#include "../data/datasets/datasetcons.h"
+#include "../data/datasets/datasetcorrelation.h"
+#include "../data/datasets/datasetisosurface.h"
+#include "../data/datasets/datasetisoline.h"
+#include "../data/mesh/trianglemesh2.h"
 
 #include "../algos/fib.h"
 #include "../algos/fmath.h"
 
+#include <QBuffer>
 #include <QDebug>
 #include <QImage>
 
@@ -54,7 +57,7 @@ bool Writer::save()
             out->data = data->data();
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -92,7 +95,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -132,7 +135,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -171,7 +174,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -210,7 +213,7 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
@@ -221,10 +224,12 @@ bool Writer::save()
             break;
         case Fn::DatasetType::NIFTI_DWI:
         {
-            std::vector<ColumnVector>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
+            qDebug() << "dwi saving disabled for now";
+            /*
+            std::vector<float>* data = dynamic_cast<DatasetDWI*>( m_dataset )->getData();
             std::vector<float>* b0data = dynamic_cast<DatasetDWI*>( m_dataset )->getB0Data();
 
-            int dim = data->at( 0 ).Nrows() + 1;
+            int dim = m_dataset->properties().get( Fn::Property::D_DIM ).toInt();
             nifti_image* out = createHeader( dim );
             std::vector<float> outData( nx * ny * nz * dim );
 
@@ -252,6 +257,11 @@ bool Writer::save()
                 outData[i] = b0data->at( i );
             }
 
+            for ( int i = 0; i < blockSize; ++i )
+            {
+                outData[blockSize + i ] = b0data->at( i );
+            }
+
             for ( int z = 0; z < nz; ++z )
             {
                 for ( int y = 0; y < ny; ++y )
@@ -270,13 +280,14 @@ bool Writer::save()
 
             if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
             {
-                qDebug() << "NIfTI filename Problem" << endl;
+                qCritical() << "NIfTI filename Problem" << endl;
             }
 
             nifti_image_write( out );
 
             out->data = NULL;
             nifti_image_free( out );
+            */
         }
             break;
         case Fn::DatasetType::FIBERS:
@@ -285,6 +296,10 @@ bool Writer::save()
             {
                 saveFibJson();
             }
+            else if ( m_filter.endsWith( "(*.trk)" ) )
+            {
+                saveFibTrk();
+            }
             else
             {
                 WriterVTK* vtkWriter = new WriterVTK( m_dataset, m_fileName.absoluteFilePath(), m_filter );
@@ -292,8 +307,28 @@ bool Writer::save()
             }
         }
             break;
-        case Fn::DatasetType::MESH_BINARY:
+        case Fn::DatasetType::ISO_LINE:
+        {
+            nifti_image* out = createHeader( 1 );
+            addPropsToHeader( out );
+
+            std::vector<float>* data = dynamic_cast<DatasetIsoline*>( m_dataset )->getData();
+
+            out->data = data->data();
+            if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
+            {
+                qCritical() << "NIfTI filename Problem" << endl;
+            }
+            setDescrip( out, "braingl_isoline" );
+
+            nifti_image_write( out );
+
+            out->data = NULL;
+            nifti_image_free( out );
+        }
+            break;
         case Fn::DatasetType::MESH_ISOSURFACE:
+        case Fn::DatasetType::MESH_BINARY:
         case Fn::DatasetType::MESH_TIME_SERIES :
         case Fn::DatasetType::GLYPHSET :
         case Fn::DatasetType::MESH_CORRELATION:
@@ -329,6 +364,24 @@ bool Writer::save()
             else if ( m_filter.endsWith( "(*.bin)" ) )
             {
                 saveBinaryConnectivity();
+            }
+            else if ( m_filter.endsWith( "(*.nii.gz)" ) )
+            {
+                nifti_image* out = createHeader( 1 );
+                addPropsToHeader( out );
+
+                std::vector<float>* data = dynamic_cast<DatasetIsosurface*>( m_dataset )->getData();
+
+                out->data = data->data();
+                if ( nifti_set_filenames( out, m_fileName.absoluteFilePath().toStdString().c_str(), 0, 1 ) )
+                {
+                    qCritical() << "NIfTI filename Problem" << endl;
+                }
+                setDescrip( out, "braingl_isosurface" );
+                nifti_image_write( out );
+
+                out->data = NULL;
+                nifti_image_free( out );
             }
             else
             {
@@ -372,21 +425,33 @@ nifti_image* Writer::createHeader( int dim )
     out->dy = props->get( Fn::Property::D_DY ).toFloat();
     out->dz = props->get( Fn::Property::D_DZ ).toFloat();
 
+    float ax = props->get( Fn::Property::D_ADJUST_X ).toFloat();
+    float ay = props->get( Fn::Property::D_ADJUST_Y ).toFloat();
+    float az = props->get( Fn::Property::D_ADJUST_Z ).toFloat();
+
     out->nifti_type = 1; // 1==NIFTI-1 (1 file)
 
     out->freq_dim = 1;
     out->phase_dim = 2;
     out->slice_dim = 3;
 
-    out->qform_code = 1;
-    out->sform_code = 1;
-
     out->nt = dim;
     out->nv = 4;
     out->ndim = 4;
 
-    QMatrix4x4 qform = props->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
-    QMatrix4x4 sform = props->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+    QMatrix4x4 qform;
+    QMatrix4x4 sform;
+
+    if ( props->contains( Fn::Property::D_Q_FORM ) )
+    {
+        qform = props->get( Fn::Property::D_Q_FORM ).value<QMatrix4x4>();
+        out->qform_code = 1;
+    }
+    if ( props->contains( Fn::Property::D_S_FORM ) )
+    {
+        sform = props->get( Fn::Property::D_S_FORM ).value<QMatrix4x4>();
+        out->sform_code = 1;
+    }
 
     for ( size_t i = 0; i < 4; ++i )
     {
@@ -396,6 +461,10 @@ nifti_image* Writer::createHeader( int dim )
             out->sto_xyz.m[i][j] = sform( i, j );
         }
     }
+
+    out->qto_xyz.m[0][3] = ax;
+    out->qto_xyz.m[1][3] = ay;
+    out->qto_xyz.m[2][3] = az;
 
     {
         float dx, dy, dz;
@@ -412,11 +481,29 @@ nifti_image* Writer::createHeader( int dim )
     return out;
 }
 
+void Writer::addPropsToHeader( nifti_image* header )
+{
+    PropertyGroup* props = &m_dataset->properties();
+
+    QList<QVariant> props1 = props->getState();
+
+    QByteArray ba;
+    QBuffer writeBuffer( &ba );
+    writeBuffer.open( QIODevice::WriteOnly );
+    QDataStream ds(&writeBuffer);
+    ds << props1;
+
+    writeBuffer.close();
+
+    char* extData = ba.data();
+    nifti_add_extension( header, extData, ba.size(), 0 );
+}
+
 void Writer::setDescrip( nifti_image* hdr, QString descrip )
 {
     if ( descrip.length() > 80 )
     {
-        qDebug() << "Writer: descrip too long ";
+        qCritical() << "Writer: descrip too long ";
         return;
     }
     for ( int i = 0; i < 80; ++i )
@@ -928,5 +1015,73 @@ void Writer::saveFibJson()
         out << "}";
 
         outFile.close();
+    }
+}
+
+void Writer::saveFibTrk()
+{
+    // http://www.trackvis.org/docs/?subsect=fileformat
+    if ( dynamic_cast<DatasetFibers*>( m_dataset ) )
+    {
+        DatasetFibers* dsf = dynamic_cast<DatasetFibers*>( m_dataset );
+
+        QFile file( m_fileName.absoluteFilePath() );
+        file.open( QIODevice::WriteOnly );
+        QDataStream out( &file );
+        out.setFloatingPointPrecision( QDataStream::SinglePrecision );
+        const char* s = const_cast<char *>("TRACK");
+
+        out.writeRawData( s, 6 ); // ID string for track file. The first 5 characters must be "TRACK".
+        out << (short) 128; // Dimension of the image volume.
+        out << (short) 128;
+        out << (short) 128;
+        out << (float) 1.0f; // Voxel size of the image volume.
+        out << (float) 1.0f;
+        out << (float) 1.0f;
+        out << (float) 0.0f; // Origin of the image volume. This field is not yet being used by TrackVis. That means the origin is always (0, 0, 0).
+        out << (float) 0.0f;
+        out << (float) 0.0f;
+        out << (short) 0; // Number of scalars saved at each track point (besides x, y and z coordinates).
+        for ( int i = 0; i < 200; ++i )
+        {
+            out << (qint8)0; // Name of each scalar. Can not be longer than 20 characters each. Can only store up to 10 names.
+        }
+        out << (short) 0; // Number of properties saved at each track.
+        for ( int i = 0; i < 200; ++i )
+        {
+            out << (qint8)0; // Name of each property. Can not be longer than 20 characters each. Can only store up to 10 names.
+        }
+        for ( int i = 0; i < 16; ++i )
+        {
+            out << (float)0; // 4x4 matrix for voxel to RAS (crs to xyz) transformation. If vox_to_ras[3][3] is 0, it means the matrix is not recorded. This field is added from version 2.
+        }
+        for ( int i = 0; i < 444; ++i )
+        {
+            out << (qint8)0; // Reserved space for future version.
+        }
+        for ( int i = 0; i < 40; ++i )
+        {
+            out << (qint8)0; // see documentation in link above
+        }
+        out << (qint32)dsf->numLines(); // Number of tracks stored in this track file. 0 means the number was NOT stored.
+        out << (qint32)2; // Version number. Current version is 2.
+        out << (qint32)1000; // Size of the header. Used to determine byte swap. Should be 1000.
+
+        std::vector<Fib>* fibs = dsf->getFibs();
+
+        for ( unsigned int i = 0; i < fibs->size(); ++i )
+        {
+            Fib fib = fibs->at(i);
+            out << (qint32)fib.length();
+            for ( unsigned int k = 0; k < fib.length(); ++k )
+            {
+                QVector3D vert = fib.getVert( k );
+                out << (float)vert.x();
+                out << (float)vert.y();
+                out << (float)vert.z();
+            }
+        }
+
+        file.close();
     }
 }
