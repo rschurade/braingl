@@ -523,7 +523,7 @@ void FMath::fitTensors( std::vector<float>& data, std::vector<float>& b0Images, 
 
     Matrix blank( 3, 3 );
     blank = 0.0;
-    qDebug() << "start big loop";
+
     for ( unsigned int i = 0; i < blockSize; ++i )
     {
         ColumnVector dataVector = createVector( i, data, blockSize, N );

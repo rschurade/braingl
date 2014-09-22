@@ -53,6 +53,7 @@ private:
     Fn::DatasetType m_datasetType;
     std::vector<Dataset*> m_dataset;
     QList<QVariant>m_propStates;
+    bool m_isRadiological;
 };
 
 #endif /* LOADERNIFTI_H_ */
