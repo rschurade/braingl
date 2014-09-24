@@ -19,19 +19,19 @@ DatasetSH::DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image
     m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false );
     m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f );
     m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false );
-    m_properties["maingl"].createInt( Fn::Property::D_LOD, 0, 0, 4, "general" );
+    m_properties["maingl"].createInt( Fn::Property::D_LOD, 0, 0, 5, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
 
     m_properties["maingl"].createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.3f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_DIFFUSE,   0.6f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.5f, 0.0f, 1.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_DIFFUSE,   0.5f, 0.0f, 1.0f, "light" );
     m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_SPECULAR,  0.5f, 0.0f, 1.0f, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_AMBIENT,   0.5f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_DIFFUSE,   0.8f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
-    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SHININESS, 1.0f, 0.0f, 200.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_AMBIENT,   2.0f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_DIFFUSE,   1.5f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.5f, 0.0f, 10.0f, "light" );
+    m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SHININESS, 150.0f, 0.0f, 200.0f, "light" );
 
     examineDataset();
 

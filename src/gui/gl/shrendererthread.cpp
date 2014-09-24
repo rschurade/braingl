@@ -151,10 +151,10 @@ void SHRendererThread::run()
                                     m_verts->push_back( ( (*vertices)( i, 3 ) ) * r( i ) + m_z + m_offset );
                                 }
 
-
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                float ro = ( r( i ) / 2. ) + 0.5;
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
                                 m_colors->push_back( 1.0 );
                             }
                         }
@@ -210,9 +210,10 @@ void SHRendererThread::run()
                                 m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + m_y + m_offset );
                                 m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
 
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                float ro = ( r( i ) / 2. ) + 0.5;
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
                                 m_colors->push_back( 1.0 );
                             }
                         }
@@ -268,9 +269,10 @@ void SHRendererThread::run()
                                 m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + locY );
                                 m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
 
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * r( i ) ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * r( i ) ) );
+                                float ro = ( r( i ) / 2. ) + 0.5;
+                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
                                 m_colors->push_back( 1.0 );
                             }
                         }
