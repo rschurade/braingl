@@ -304,10 +304,15 @@ void SHRenderer::updateThreadFinished( bool success )
 
 void SHRenderer::updateGlyphs()
 {
+    m_tris = m_updateThread->getIndices()->size();
+
+    if ( m_tris == 0 )
+    {
+        return;
+    }
+
     glDeleteBuffers( 4, vboIds );
     glGenBuffers( 4, vboIds );
-
-    m_tris = m_updateThread->getIndices()->size();
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIds[ 0 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_tris * sizeof(GLuint), m_updateThread->getIndices()->data(), GL_STATIC_DRAW );
