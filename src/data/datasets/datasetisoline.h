@@ -17,7 +17,7 @@ class DatasetIsoline : public Dataset
     Q_OBJECT
 
 public:
-    DatasetIsoline( DatasetScalar* ds );
+    DatasetIsoline( DatasetScalar* ds, float isoValue = 0.0 );
     virtual ~DatasetIsoline();
 
     virtual void draw( QMatrix4x4 pMatrix, QMatrix4x4 mvMatrix, int width, int height, int renderMode, QString target );

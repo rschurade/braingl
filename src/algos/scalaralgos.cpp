@@ -34,9 +34,9 @@ QList<Dataset*> ScalarAlgos::isoSurface( Dataset* ds, float isoValue )
     return l;
 }
 
-QList<Dataset*> ScalarAlgos::isoLine( Dataset* ds )
+QList<Dataset*> ScalarAlgos::isoLine( Dataset* ds, float isoValue )
 {
-    DatasetIsoline* iso = new DatasetIsoline( dynamic_cast<DatasetScalar*>( ds ) );
+    DatasetIsoline* iso = new DatasetIsoline( dynamic_cast<DatasetScalar*>( ds ), isoValue );
     QList<Dataset*> l;
     l.push_back( iso );
     return l;

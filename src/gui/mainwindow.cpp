@@ -535,6 +535,30 @@ bool MainWindow::loadAndAlgo( QString fileName, QString algo, QVariant param )
             return true;
         }
     }
+    else if ( algo == "isoline" )
+    {
+        Loader loader;
+        loader.setFilename( QDir( fileName ) );
+        if ( loader.load() )
+        {
+            for ( int k = 0; k < loader.getNumDatasets(); ++k )
+            {
+                Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                        VPtr<Dataset>::asQVariant( loader.getDataset( k ) ), Qt::DisplayRole );
+            }
+            QFileInfo fi( fileName );
+            QDir dir = fi.absoluteDir();
+            QString lastPath = dir.absolutePath();
+            Models::g()->setData( Models::g()->index( (int) Fn::Property::G_LAST_PATH, 0 ), lastPath );
+
+            Models::d()->setData( Models::d()->index( Models::d()->rowCount(), (int) Fn::Property::D_NEW_DATASET ),
+                                    VPtr<Dataset>::asQVariant( ScalarAlgos::isoLine( loader.getDataset( 0 ), param.toFloat() )[0] ), Qt::DisplayRole );
+            setCurrentFile( fileName );
+
+            GLFunctions::reloadShaders();
+            return true;
+        }
+    }
     return false;
 }
 

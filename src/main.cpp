@@ -119,6 +119,9 @@ int main( int argc, char *argv[] )
                     qDebug() << "-t : runs the loaded script";
                     qDebug() << "-v : toggles verbose mode, warning: this will spam your console with messages";
                     qDebug() << "---";
+                    qDebug() << "--isosurface <isoValue> <fileName> : creates an isosurface dataset";
+                    qDebug() << "--isoline <isoValue> <fileName> : creates an isoline dataset";
+                    qDebug() << "---";
                     exit( 0 );
                     break;
                 case 'l':
@@ -192,6 +195,22 @@ int main( int argc, char *argv[] )
                     {
                         filesToLoad.push_back( fileName );
                         filesToLoad.push_back( "isosurface" );
+                        filesToLoad.push_back( isoValue );
+                    }
+                }
+
+            }
+            else if ( arg == "--isoline")
+            {
+                if ( args.length() > i + 1 )
+                {
+                    QString isoValue = args.at( ++i );
+                    QString fileName = args.at( ++i );
+                    QFile file( fileName );
+                    if ( file.exists() )
+                    {
+                        filesToLoad.push_back( fileName );
+                        filesToLoad.push_back( "isoline" );
                         filesToLoad.push_back( isoValue );
                     }
                 }
