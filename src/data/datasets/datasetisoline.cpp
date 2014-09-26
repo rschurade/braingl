@@ -18,7 +18,7 @@
 
 #include <QGLShaderProgram>
 
-DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
+DatasetIsoline::DatasetIsoline( DatasetScalar* ds, float isoValue )  :
     Dataset( QDir( "new iso line" ), Fn::DatasetType::ISO_LINE ),
     m_dirty( true ),
     vbo0( 0 ),
@@ -74,7 +74,7 @@ DatasetIsoline::DatasetIsoline( DatasetScalar* ds )  :
     m_properties["maingl"].createBool( Fn::Property::D_INTERPOLATION, true, "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_INTERPOLATION ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
-    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, 0.0f, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_ISO_VALUE, isoValue, ds->properties( "maingl" ).get( Fn::Property::D_MIN ).toFloat(), ds->properties( "maingl" ).get( Fn::Property::D_MAX ).toFloat(), "general" );
     connect( m_properties["maingl"].getProperty( Fn::Property::D_ISO_VALUE ), SIGNAL( valueChanged( QVariant ) ), this, SLOT( isoValueChanged() ) );
 
     m_properties["maingl"].createList( Fn::Property::D_ISOLINE_STRIPES, { "none", "45 degrees right", "45 degrees left", "vertical", "horizontal", "dots" }, 0, "general" );
