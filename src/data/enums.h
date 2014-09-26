@@ -40,7 +40,7 @@ namespace Fn
         PLANE = 0x80000,
         ISO_LINE = 0x100000,
         GUIDE = 0x200000,
-        LABEL = 0x400000,
+        LABEL = 0x400000
     };
 
     enum class ColormapEnum : int
