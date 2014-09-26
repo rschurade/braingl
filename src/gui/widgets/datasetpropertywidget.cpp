@@ -60,6 +60,10 @@ void DatasetPropertyWidget::updateWidgetVisibility()
     // get properties
     QModelIndex index = m_propertyView->getSelectedIndex( (int)Fn::Property::D_DATASET_POINTER );
     Dataset* ds = VPtr<Dataset>::asPtr( m_propertyView->model()->data( index, Qt::DisplayRole ) );
+    if ( !ds )
+    {
+        return;
+    }
     PropertyGroup* props = &ds->properties( m_target );
     m_tabs.clear();
 
