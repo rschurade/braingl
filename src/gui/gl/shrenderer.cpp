@@ -40,7 +40,9 @@ SHRenderer::SHRenderer( std::vector<ColumnVector>* data ) :
     m_pickId( GLFunctions::getPickIndex() ),
     m_updateThread( 0 ),
     m_glyphsUpdated( false ),
-    m_updateRunning( false )
+    m_updateRunning( false ),
+    m_vertSize( 0 ),
+    m_colorSize( 0 )
 {
 }
 
@@ -256,13 +258,6 @@ void SHRenderer::setRenderParams( PropertyGroup& props )
     m_color = props.get( Fn::Property::D_COLOR ).value<QColor>();
 }
 
-
-TriangleMesh2* SHRenderer::getMesh()
-{
-    //return m_mesh;
-}
-
-
 void SHRenderer::initGeometry( PropertyGroup& props )
 {
     float x = Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
@@ -311,6 +306,9 @@ void SHRenderer::updateGlyphs()
         return;
     }
 
+    m_vertSize = m_updateThread->getVerts()->size();
+    m_colorSize = m_updateThread->getColors()->size();
+
     glDeleteBuffers( 4, vboIds );
     glGenBuffers( 4, vboIds );
 
@@ -334,3 +332,31 @@ void SHRenderer::updateGlyphs()
     m_updateThread = 0;
     m_glyphsUpdated = false;
 }
+
+TriangleMesh2* SHRenderer::getMesh()
+{
+    TriangleMesh2* mesh = new TriangleMesh2( m_vertSize / 3, m_tris / 3 );
+
+    qDebug() << m_vertSize / 3 << m_tris / 3;
+
+    float* verts = static_cast<float*>( glMapBuffer( vboIds[1], GL_READ_ONLY ) );
+
+    for ( auto i = 0; i < m_vertSize / 3; ++i )
+    {
+        mesh->addVertex( verts[i*3], verts[i*3+1], verts[i*3+2] );
+    }
+
+    glUnmapBuffer( vboIds[1] );
+
+    unsigned int* ids = static_cast<unsigned int*>( glMapBuffer( vboIds[0], GL_READ_ONLY ) );
+
+    for ( auto i = 0; i < m_tris / 3; ++i )
+    {
+        mesh->addVertex( ids[i*3], ids[i*3+1], ids[i*3+2] );
+    }
+
+    glUnmapBuffer( vboIds[0] );
+
+    return mesh;
+}
+
