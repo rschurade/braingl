@@ -522,7 +522,7 @@ void ToolBar::slotSelectionChanged( int type )
         case Fn::DatasetType::NIFTI_SH:
         {
             this->addAction( m_binghamAction );
-            this->addAction( m_sh2meshAction );
+//            this->addAction( m_sh2meshAction );
 //            this->addAction( m_flipXAction );
 //            this->addAction( m_flipYAction );
 //            this->addAction( m_flipZAction );

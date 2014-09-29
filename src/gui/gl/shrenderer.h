@@ -79,6 +79,9 @@ private:
     bool m_glyphsUpdated;
     bool m_updateRunning;
 
+    int m_vertSize;
+    int m_colorSize;
+
 
 private slots:
     void updateThreadFinished( bool );
