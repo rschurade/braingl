@@ -184,8 +184,8 @@ void SHRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, int
     glBindBuffer( GL_ARRAY_BUFFER, vboIds[ 1 ] );
     setShaderVars( props );
 
-    glEnable(GL_CULL_FACE);
-    glCullFace( GL_BACK );
+    //glEnable(GL_CULL_FACE);
+    //glCullFace( GL_BACK );
     glFrontFace( GL_CW );
 
     glDrawElements( GL_TRIANGLES, m_tris, GL_UNSIGNED_INT, 0 );
