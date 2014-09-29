@@ -5,7 +5,7 @@
 
 void main()
 {
-	v_normal = normalize( a_position );
+	v_normal = a_normal;
 	
 	float r = a_radius;
 	

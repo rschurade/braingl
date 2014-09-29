@@ -43,7 +43,7 @@ SHRendererThread::SHRendererThread( std::vector<ColumnVector>* data,
     m_yi = qMax( 0.0f, qMin( ( m_y + m_dy / 2 - m_ay ) / m_dy, m_ny - 1 ) );
     m_zi = qMax( 0.0f, qMin( ( m_z + m_dz / 2 - m_az ) / m_dz, m_nz - 1 ) );
 
-    m_scaling = props.get( Fn::Property::D_SCALING ).toFloat();
+    m_scaling = props.get( Fn::Property::D_MINMAX_SCALING ).toFloat();
     m_lod = props.get( Fn::Property::D_LOD ).toInt();
     m_order = props.get( Fn::Property::D_ORDER ).toInt();
     m_hideNegative = props.get( Fn::Property::D_HIDE_NEGATIVE_LOBES ).toBool();
@@ -138,7 +138,7 @@ void SHRendererThread::run()
 
                             for ( int i = 1; i <= numVerts; ++i )
                             {
-                                if ( r( i ) < 0 )
+                                if ( r( i ) < 0 && m_hideNegative )
                                 {
                                     m_verts->push_back( locX );
                                     m_verts->push_back( locY );
@@ -150,12 +150,21 @@ void SHRendererThread::run()
                                     m_verts->push_back( ( (*vertices)( i, 2 ) ) * r( i ) + locY );
                                     m_verts->push_back( ( (*vertices)( i, 3 ) ) * r( i ) + m_z + m_offset );
                                 }
-
-                                float ro = ( r( i ) / 2. ) + 0.5;
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
-                                m_colors->push_back( 1.0 );
+                                if ( r(i) > 0 )
+                                {
+                                    float ro = qMin( 1.0, ( r( i ) / 2. ) + 0.5 );
+                                    m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
+                                    m_colors->push_back( 1.0 );
+                                }
+                                else
+                                {
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 1.0 );
+                                }
                             }
                         }
                     }
@@ -206,15 +215,33 @@ void SHRendererThread::run()
 
                             for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + locX );
-                                m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + m_y + m_offset );
-                                m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
-
-                                float ro = ( r( i ) / 2. ) + 0.5;
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
-                                m_colors->push_back( 1.0 );
+                                if ( r( i ) < 0 && m_hideNegative )
+                                {
+                                    m_verts->push_back( locX );
+                                    m_verts->push_back( m_y + m_offset );
+                                    m_verts->push_back( locZ );
+                                }
+                                else
+                                {
+                                    m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + locX );
+                                    m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + m_y + m_offset );
+                                    m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
+                                }
+                                if ( r(i) > 0 )
+                                {
+                                    float ro = qMin( 1.0, ( r( i ) / 2. ) + 0.5 );
+                                    m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
+                                    m_colors->push_back( 1.0 );
+                                }
+                                else
+                                {
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 1.0 );
+                                }
                             }
                         }
                     }
@@ -265,15 +292,33 @@ void SHRendererThread::run()
 
                             for ( int i = 1; i <= numVerts; ++i )
                             {
-                                m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + m_x + m_offset );
-                                m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + locY );
-                                m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
-
-                                float ro = ( r( i ) / 2. ) + 0.5;
-                                m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
-                                m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
-                                m_colors->push_back( 1.0 );
+                                if ( r( i ) < 0 && m_hideNegative )
+                                {
+                                    m_verts->push_back( m_x + m_offset );
+                                    m_verts->push_back( locY );
+                                    m_verts->push_back( locZ );
+                                }
+                                else
+                                {
+                                    m_verts->push_back( (*vertices)( i, 1 ) * r( i ) + m_x + m_offset );
+                                    m_verts->push_back( (*vertices)( i, 2 ) * r( i ) + locY );
+                                    m_verts->push_back( (*vertices)( i, 3 ) * r( i ) + locZ );
+                                }
+                                if ( r(i) > 0 )
+                                {
+                                    float ro = qMin( 1.0, ( r( i ) / 2. ) + 0.5 );
+                                    m_colors->push_back( fabs( (*vertices)( i, 1 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 2 ) * ro ) );
+                                    m_colors->push_back( fabs( (*vertices)( i, 3 ) * ro ) );
+                                    m_colors->push_back( 1.0 );
+                                }
+                                else
+                                {
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 0.5 );
+                                    m_colors->push_back( 1.0 );
+                                }
                             }
                         }
                     }

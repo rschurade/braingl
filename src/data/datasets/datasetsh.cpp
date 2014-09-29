@@ -15,14 +15,13 @@ DatasetSH::DatasetSH( QDir filename, std::vector<ColumnVector> data, nifti_image
         DatasetNifti( filename, Fn::DatasetType::NIFTI_SH, header ), m_data( data ), m_renderer( 0 )
 {
     m_properties["maingl"].createInt( Fn::Property::D_OFFSET, 0, -1, 1, "general" );
-    //m_properties["maingl"].create( Fn::Property::D_SCALING, 1.0f, 0.0f, 2.0f, true );
-    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false );
-    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f );
-    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false );
     m_properties["maingl"].createInt( Fn::Property::D_LOD, 0, 0, 5, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_SAGITTAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_CORONAL, false, "general" );
     m_properties["maingl"].createBool( Fn::Property::D_RENDER_AXIAL, true, "general" );
+    m_properties["maingl"].createBool( Fn::Property::D_MINMAX_SCALING, false, "general" );
+    m_properties["maingl"].createFloat( Fn::Property::D_SCALING, 1.0f, 0.1f, 2.0f );
+    m_properties["maingl"].createBool( Fn::Property::D_HIDE_NEGATIVE_LOBES, false, "general" );
 
     m_properties["maingl"].createBool( Fn::Property::D_LIGHT_SWITCH, true, "light" );
     m_properties["maingl"].createFloat( Fn::Property::D_LIGHT_AMBIENT,   0.5f, 0.0f, 1.0f, "light" );
