@@ -76,7 +76,6 @@ int main( int argc, char *argv[] )
     qDebug() << "(c) 2012, 2014 Ralph Schurade, Joachim Boettger";
     qDebug() << "Submit suggestions, feature requests, bug reports to https://code.google.com/p/braingl/";
 
-
     QApplication app( argc, argv );
 
     QCoreApplication::setOrganizationDomain( "braingl.de" );
