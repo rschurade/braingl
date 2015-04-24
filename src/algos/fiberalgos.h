@@ -23,6 +23,7 @@ public:
     static QList<Dataset*> tractColor( Dataset* ds );
     static QList<Dataset*> cutSelecteded( Dataset* ds );
     static QList<Dataset*> downSample( Dataset* ds );
+    static QList<Dataset*> unfold( Dataset* ds );
 };
 
 #endif /* FIBERALGOS_H_ */
