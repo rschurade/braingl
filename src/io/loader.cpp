@@ -32,6 +32,7 @@
 #include <QVector3D>
 #include <QtGui>
 #include <QImage>
+#include <QJsonDocument>
 
 #include <cmath>
 
@@ -1150,109 +1151,32 @@ bool Loader::loadJSON()
 {
     QString fn = m_fileName.path();
 
-    QFile n( fn );
-    if ( !n.open( QIODevice::ReadOnly ) )
-    {
-        qCritical() << "nodes unreadable" << fn;
-        return false;
-    }
-    QTextStream ns( &n );
+    QString val;
+    QFile file;
+    file.setFileName( fn );
+    file.open( QIODevice::ReadOnly | QIODevice::Text );
+    val = file.readAll();
+    file.close();
 
-    //skip first line
-    ns.readLine();
-    QString nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-
-    QStringList vertList = nl.split( "," );
-
-    if ( vertList.first() != "\"vertices\"" )
-    {
-        qCritical() << "verts not found";
-        return false;
-    }
-
-    nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-
-    vertList = nl.split( "," );
-
-    // skip normals
-    ns.readLine();
-    ns.readLine();
-
-    nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-
-    QStringList colorList = nl.split( "," );
-
-    if ( colorList.first() != "\"colors\"" )
-    {
-        qCritical() << "colors not found";
-        return false;
-    }
-
-    nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-    colorList = nl.split( "," );
-
-    nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-
-    QStringList indexList = nl.split( "," );
-
-    if ( indexList.first() != "\"indices\"" )
-    {
-        qCritical() << "indices not found";
-        return false;
-    }
-
-    nl = ns.readLine();
-    nl = nl.simplified();
-    nl.replace( " ", "" );
-    nl.replace( ":", "," );
-    nl.replace( "[", "" );
-    nl.replace( "],", "" );
-    nl.replace( "]", "" );
-    indexList = nl.split( "," );
+    QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
+    QJsonObject set = d.object();
+    QVariantList jverts = set.value( "vertices" ).toArray().toVariantList();
+    QVariantList jcolors = set.value( "colors" ).toArray().toVariantList();
+    QVariantList jindices = set.value( "indices" ).toArray().toVariantList();
 
     std::vector<Fib> fibs;
     Fib fib;
 
     int pc = 0;
 
-    for ( int i = 0; i < indexList.size(); ++i )
+    for ( int i = 0; i < jindices.size(); ++i )
     {
-        int length = indexList[i].toInt();
+        int length = jindices[i].toInt();
         for ( int k = 0; k < length; ++k )
         {
-            float x = vertList[pc++].toFloat();
-            float y = vertList[pc++].toFloat();
-            float z = vertList[pc++].toFloat();
+            float x = jverts[pc++].toFloat();
+            float y = jverts[pc++].toFloat();
+            float z = jverts[pc++].toFloat();
             fib.addVert( x, y ,z );
         }
         fibs.push_back( fib );
@@ -1266,4 +1190,5 @@ bool Loader::loadJSON()
     m_dataset.push_back( dataset );
 
     return true;
+
 }

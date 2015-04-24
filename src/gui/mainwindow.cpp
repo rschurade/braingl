@@ -112,6 +112,18 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
         mainGLWidget->makeCurrent();
         loadSettings();
     }
+
+    m_tcpServer = new QTcpServer();
+    if ( !m_tcpServer->listen( QHostAddress( "127.0.0.1" ), 12345 ) )
+    {
+        qDebug() << "Unable to start the server: " << m_tcpServer->errorString();
+        m_tcpServer->close();
+    }
+    else
+    {
+        connect( m_tcpServer, &QTcpServer::newConnection , this, &MainWindow::receiveTCP );
+    }
+
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -1684,4 +1696,25 @@ void MainWindow::newLabel()
 {
     DatasetLabel* g = new DatasetLabel();
     Models::addDataset( g );
+}
+
+void MainWindow::receiveTCP()
+{
+    qDebug() << "something received!";
+
+    m_clientConnection = m_tcpServer->nextPendingConnection();
+    connect( m_clientConnection, &QTcpSocket::disconnected, m_clientConnection, &QTcpSocket::deleteLater );
+    connect( m_clientConnection, &QTcpSocket::readyRead, this, &MainWindow::readTCP );
+}
+
+void MainWindow::readTCP()
+{
+    QString stuff = m_clientConnection->readAll();
+    qDebug() << stuff;
+    QStringList sl = stuff.split( " " );
+    float x = sl.at(0).toFloat();
+
+    Models::setGlobal( Fn::Property::G_SAGITTAL, x );
+
+    Models::g()->submit();
 }
