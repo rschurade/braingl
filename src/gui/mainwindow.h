@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QMainWindow>
 #include <QSettings>
+#include <QTcpServer>
 
 class ColormapEditWidget;
 class Dataset;
@@ -102,6 +103,9 @@ private:
     QToolBar* fileToolBar;
     QToolBar* editToolBar;
     ToolBar* m_toolsToolBar;
+
+    QTcpServer* m_tcpServer;
+    QTcpSocket* m_clientConnection;
 
     enum
     {
@@ -198,6 +202,9 @@ private slots:
     void newPlane();
     void newGuide();
     void newLabel();
+
+    void receiveTCP();
+    void readTCP();
 };
 
 #endif
