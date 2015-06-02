@@ -230,10 +230,6 @@ void ToolBar::createActions()
     m_flipZAction = new FNAction( QIcon( ":/icons/flipz.png" ), tr( "flip voxels on z axis" ), this, Fn::Algo::FLIP_Z );
     m_flipZAction->setStatusTip( tr( "flip z" ) );
     connect( m_flipZAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
-
-    m_unfoldAction = new FNAction( QIcon( ":/icons/tmpx.png" ), tr( "unfold" ), this, Fn::Algo::UNFOLDING );
-    m_unfoldAction->setStatusTip( tr( "unfold" ) );
-    connect( m_unfoldAction, SIGNAL( sigTriggered( Fn::Algo ) ), this, SLOT( slot( Fn::Algo ) ) );
 }
 
 void ToolBar::slot( Fn::Algo algo )
@@ -345,9 +341,6 @@ void ToolBar::slot( Fn::Algo algo )
             break;
         case Fn::Algo::TRACT_DENSITY:
             l = FiberAlgos::tractDensity( ds );
-            break;
-        case Fn::Algo::UNFOLDING:
-            l = FiberAlgos::unfold( ds );
             break;
         case Fn::Algo::TRACT_COLOR:
             l = FiberAlgos::tractColor( ds );
@@ -565,7 +558,6 @@ void ToolBar::slotSelectionChanged( int type )
             this->addAction( m_fiberTractColorAct );
             this->addAction( m_fiberResampleAction );
             this->addAction( m_fiberBundlingAction );
-            this->addAction( m_unfoldAction );
             break;
         }
         case Fn::DatasetType::GLYPHSET:

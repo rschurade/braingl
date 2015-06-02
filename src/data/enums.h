@@ -100,8 +100,7 @@ namespace Fn
         BRAINGL_MATH,
         FLIP_X,
         FLIP_Y,
-        FLIP_Z,
-        UNFOLDING
+        FLIP_Z
     };
 
     enum class Orient : int
