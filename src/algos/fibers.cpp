@@ -20,8 +20,6 @@
 #include <limits>
 #include <math.h>
 
-#define kPI 3.14159265358979323846264338327950
-
 Fibers::Fibers( DatasetFibers* ds ) :
     m_dataset( ds ),
     m_nx( 1 ),
@@ -440,75 +438,4 @@ nifti_image* Fibers::createHeader( int dim )
     out->datatype = DT_FLOAT;
 
     return out;
-}
-
-DatasetFibers* Fibers::unfold()
-{
-    std::vector<Fib> fibs = *( m_dataset->getFibs() );
-
-    std::vector<Fib> newFibs = unfolder_sphere( fibs );
-
-    DatasetFibers* out = new DatasetFibers( QDir( "new fibers" ), newFibs, m_dataset->getDataNames() );
-    out->setDataMins( m_dataset->getDataMins() );
-    out->setDataMaxes( m_dataset->getDataMaxes() );
-    return out;
-}
-
-std::vector<Fib> Fibers::unfolder_sphere( std::vector<Fib>& fibs )
-{
-    int count = 0;
-    QVector3D origin( 0, 0, 0 );
-
-    std::vector<Fib> newFibs;
-
-    // compute barycentre
-    for( int i = 0; i < fibs.size(); ++i )
-    {
-        Fib fib = fibs[i];
-        for( int k = 0; k < fib.length(); ++k )
-        {
-            origin += fib[k];
-            ++count;
-        }
-    }
-    origin /= count;
-
-    // compute maximum radius
-    float maxRadius = 0.0;
-    for( int i = 0; i < fibs.size(); ++i )
-    {
-        Fib fib = fibs[i];
-        for( int k = 0; k < fib.length(); ++k )
-        {
-            QVector3D vert = fib[k];
-            float r = sqrt( ( vert.x() - origin.x() ) * ( vert.x() - origin.x() ) + ( vert.y() - origin.y() ) * ( vert.y() - origin.y() ) + ( vert.z() - origin.z() ) * ( vert.z() - origin.z() ) );
-            if( r > maxRadius )
-            {
-                maxRadius = r;
-            }
-        }
-    }
-
-    for( int i = 0; i < fibs.size(); ++i )
-    {
-        Fib fib = fibs[i];
-        Fib newFib;
-        for( int k = 0; k < fib.length(); ++k )
-        {
-            QVector3D vert = fib[k];
-
-            float r = sqrt( pow( vert.x() - origin.x(), 2 ) + pow( vert.y() - origin.y(),2 ) + pow( vert.z() - origin.z(),2 ) );
-            float a = atan2( vert.y() - origin.y(), vert.x() - origin.x() );
-            float d = atan2( sqrt( pow( vert.x() - origin.x(), 2 ) + pow( vert.y() - origin.y(), 2 ) ),vert.z() - origin.z() );
-            d = fabs( d );
-            float f = maxRadius * d / kPI;
-
-            QVector3D newVert( f*cos(a), f*sin(a), r );
-            newFib.addVert( newVert );
-        }
-        newFibs.push_back( newFib );
-    }
-
-    return newFibs;
-
 }
