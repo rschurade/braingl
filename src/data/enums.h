@@ -296,6 +296,11 @@ namespace Fn
         D_FIBER_THIN_OUT,
         D_RENDER_MESH,
         D_COPY_VALUES,
+        D_UNFOLDING_ACTIVE,
+        D_UNFOLDING_THETA,
+        D_UNFOLDING_BARYCENTER,
+        D_UNFOLDING_MAX_RADIUS,
+        D_UNFOLDING_MAX_HEIGHT,
         // Global Settings
         G_FIRST = 500, // insert all global properties after this one
         G_LOCK_WIDGETS,
@@ -567,6 +572,11 @@ namespace Fn
                 case Property::D_FIBER_THIN_OUT: return QString( "D_FIBER_THIN_OUT" ); break;
                 case Property::D_RENDER_MESH: return QString( "D_RENDER_MESH" ); break;
                 case Property::D_COPY_VALUES: return QString( "D_COPY_VALUES" ); break;
+                case Property::D_UNFOLDING_ACTIVE: return QString( "D_UNFOLDING_ACTIVE" ); break;
+                case Property::D_UNFOLDING_THETA: return QString( "D_UNFOLDING_THETA" ); break;
+                case Property::D_UNFOLDING_BARYCENTER: return QString( "D_UNFOLDING_BARYCENTER" ); break;
+                case Property::D_UNFOLDING_MAX_RADIUS: return QString( "D_UNFOLDING_MAX_RADIUS" ); break;
+                case Property::D_UNFOLDING_MAX_HEIGHT: return QString( "D_UNFOLDING_MAX_HEIGHT" ); break;
                 //
                 case Property::G_FIRST: return QString( "G_FIRST" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "G_LOCK_WIDGETS" ); break;
@@ -837,6 +847,11 @@ namespace Fn
                 case Property::D_FIBER_THIN_OUT: return QString( "render percentage of fibers" ); break;
                 case Property::D_RENDER_MESH: return QString( "render mesh" ); break;
                 case Property::D_COPY_VALUES: return QString( "copy values" ); break;
+                case Property::D_UNFOLDING_ACTIVE: return QString( "unfolding active" ); break;
+                case Property::D_UNFOLDING_THETA: return QString( "theta" ); break;
+                case Property::D_UNFOLDING_BARYCENTER: return QString( "barycenter" ); break;
+                case Property::D_UNFOLDING_MAX_RADIUS: return QString( "max radius" ); break;
+                case Property::D_UNFOLDING_MAX_HEIGHT: return QString( "max height" ); break;
                 // Global Settings
                 case Property::G_FIRST: return QString( "placeholder global first" ); break;
                 case Property::G_LOCK_WIDGETS: return QString( "lock widgets" ); break;

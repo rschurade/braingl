@@ -351,6 +351,13 @@ void Models::initPropMap()
     m_propMap.insert( "D_FIBER_THIN_OUT", Fn::Property::D_FIBER_THIN_OUT );
     m_propMap.insert( "D_RENDER_MESH", Fn::Property::D_RENDER_MESH );
     m_propMap.insert( "D_COPY_VALUES", Fn::Property::D_COPY_VALUES );
+    m_propMap.insert( "D_UNFOLDING_ACTIVE", Fn::Property::D_UNFOLDING_ACTIVE );
+    m_propMap.insert( "D_UNFOLDING_THETA", Fn::Property::D_UNFOLDING_THETA );
+    m_propMap.insert( "D_UNFOLDING_BARYCENTER", Fn::Property::D_UNFOLDING_BARYCENTER );
+    m_propMap.insert( "D_UNFOLDING_MAX_RADIUS", Fn::Property::D_UNFOLDING_MAX_RADIUS );
+    m_propMap.insert( "D_UNFOLDING_MAX_HEIGHT", Fn::Property::D_UNFOLDING_MAX_HEIGHT );
+
+
     m_propMap.insert( "G_FIRST", Fn::Property::G_FIRST );
     m_propMap.insert( "G_LOCK_WIDGETS", Fn::Property::G_LOCK_WIDGETS );
     m_propMap.insert( "G_RENDER_CROSSHAIRS", Fn::Property::G_RENDER_CROSSHAIRS );

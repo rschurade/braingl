@@ -55,6 +55,33 @@ void main()
     
     calcTexCoords();
 	
-    v_position = mvp_matrix * userTransformMatrix * vec4( a_position, 1.0 );
-    gl_Position = v_position;
+	if ( u_unfolding )
+	{
+	   float M_PI = 3.1415926535897932384626433832795;
+	
+	   vec3 newPos = a_position;
+	   
+	   float r = sqrt( ( ( newPos.x - u_unfolding_barycenter.x ) * ( newPos.x - u_unfolding_barycenter.x ) ) + ( ( newPos.y - u_unfolding_barycenter.y ) * ( newPos.y - u_unfolding_barycenter.y ) ) );
+	   float a = atan( newPos.y - u_unfolding_barycenter.y, newPos.x - u_unfolding_barycenter.x );
+	   float d = 0.0;
+	   if ( u_unfolding_theta > 0.00001 )
+	   {
+	       d  = ( M_PI * r ) * sin( u_unfolding_theta ) / u_unfolding_theta;
+	   }
+	   else
+	   {
+	       d = M_PI * r;
+	   }
+	   float b = u_unfolding_theta * a / M_PI;
+	   newPos.x = r - d * cos( b );
+	   newPos.y = d * sin( b );
+	      
+	   v_position = mvp_matrix * userTransformMatrix * vec4( newPos, 1.0 );
+       gl_Position = v_position;
+	}
+	else
+	{
+        v_position = mvp_matrix * userTransformMatrix * vec4( a_position, 1.0 );
+        gl_Position = v_position;
+    }
 }
