@@ -124,6 +124,13 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "u_materialSpecular", props.get( Fn::Property::D_MATERIAL_SPECULAR ).toFloat() );
     program->setUniformValue( "u_materialShininess", props.get( Fn::Property::D_MATERIAL_SHININESS ).toFloat() );
 
+    program->setUniformValue( "u_unfolding", props.get( Fn::Property::D_UNFOLDING_ACTIVE ).toBool() );
+    QVector3D bc = props.get( Fn::Property::D_UNFOLDING_BARYCENTER ).value<QVector3D>();
+    program->setUniformValue( "u_unfolding_barycenter", bc.x(), bc.y(), bc.z() );
+    program->setUniformValue( "u_unfolding_max_radius", props.get( Fn::Property::D_UNFOLDING_MAX_RADIUS ).toFloat() );
+    program->setUniformValue( "u_unfolding_max_height", props.get( Fn::Property::D_UNFOLDING_MAX_HEIGHT ).toFloat() );
+    program->setUniformValue( "u_unfolding_theta", props.get( Fn::Property::D_UNFOLDING_THETA ).toFloat() );
+
     glLineWidth( props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 
     std::vector<bool>*selected = m_selector->getSelection();

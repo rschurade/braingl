@@ -62,3 +62,9 @@ uniform float u_char;
 uniform float u_adjustX;
 uniform float u_adjustY;
 uniform float u_adjustZ; 
+
+uniform bool u_unfolding;
+uniform vec3 u_unfolding_barycenter;
+uniform float u_unfolding_max_height;
+uniform float u_unfolding_max_radius;
+uniform float u_unfolding_theta;

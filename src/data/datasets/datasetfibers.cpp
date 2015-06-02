@@ -136,11 +136,63 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SPECULAR,  0.61f, 0.0f, 10.0f, "light" );
     m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
 
+    m_properties["maingl"].createBool( Fn::Property::D_UNFOLDING_ACTIVE, false, "art" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_THETA,   0.0f, 0.0f, 3.14f, "art" );
+    m_properties["maingl"].createVector( Fn::Property::D_UNFOLDING_BARYCENTER, QVector3D( 0, 0, 0 ), "art" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_MAX_HEIGHT, 0.0f, -1000.f, 1000.f, "art" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_MAX_RADIUS, 0.0f, -1000.f, 1000.f, "art" );
+
     unsigned int maxLength = 0;
     for ( unsigned int i = 0; i < m_fibs.size(); ++i )
     {
         maxLength = qMax( maxLength, m_fibs[i].length() );
     }
+
+    // art stuff
+    // calculate barycenter, and max radius and height for unfolding
+    int count = 0;
+    QVector3D origin( 0, 0, 0 );
+
+    std::vector<Fib> newFibs;
+
+    // compute barycentre
+    for( int i = 0; i < m_fibs.size(); ++i )
+    {
+        Fib fib = m_fibs[i];
+        for( int k = 0; k < fib.length(); ++k )
+        {
+            origin += fib[k];
+            ++count;
+        }
+    }
+    origin /= count;
+
+    // compute maximum radius
+    float maxRadius = 0.0;
+    float maxHeight = 0.0;
+    for( int i = 0; i < m_fibs.size(); ++i )
+    {
+        Fib fib = m_fibs[i];
+        for( int k = 0; k < fib.length(); ++k )
+        {
+            QVector3D vert = fib[k];
+            //float r = sqrt( ( vert.x() - origin.x() ) * ( vert.x() - origin.x() ) + ( vert.y() - origin.y() ) * ( vert.y() - origin.y() ) + ( vert.z() - origin.z() ) * ( vert.z() - origin.z() ) );
+            float r = sqrt( ( vert.x() - origin.x() ) * ( vert.x() - origin.x() ) + ( vert.y() - origin.y() ) * ( vert.y() - origin.y() ) );
+            if( r > maxRadius )
+            {
+                maxRadius = r;
+            }
+            if ( vert.z() - origin.z() > maxHeight  )
+            {
+                maxHeight = vert.z() - origin.z();
+            }
+        }
+    }
+
+    m_properties["maingl"].set( Fn::Property::D_UNFOLDING_BARYCENTER, origin );
+    m_properties["maingl"].set( Fn::Property::D_UNFOLDING_MAX_HEIGHT, maxHeight );
+    m_properties["maingl"].set( Fn::Property::D_UNFOLDING_MAX_RADIUS, maxRadius );
+
 
     m_properties["maingl"].createFloat( Fn::Property::D_FIBER_GROW_LENGTH, (float)maxLength, 0.0f, (float)maxLength, "special" );
 
