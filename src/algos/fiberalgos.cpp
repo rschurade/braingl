@@ -75,3 +75,12 @@ QList<Dataset*> FiberAlgos::downSample( Dataset* ds )
     l.push_back( out );
     return l;
 }
+
+QList<Dataset*> FiberAlgos::unfold( Dataset* ds )
+{
+    Fibers* fa = new Fibers( dynamic_cast<DatasetFibers*>( ds ) );
+    DatasetFibers* out = fa->unfold();
+    QList<Dataset*> l;
+    l.push_back( out );
+    return l;
+}

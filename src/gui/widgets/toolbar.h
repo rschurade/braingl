@@ -83,6 +83,7 @@ private:
     FNAction* m_flipXAction;
     FNAction* m_flipYAction;
     FNAction* m_flipZAction;
+    FNAction* m_unfoldAction;
 
     TensorTrackWidget* m_ttw;
     CrossingTrackWidget* m_ctw;
