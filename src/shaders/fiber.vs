@@ -56,31 +56,64 @@ void main()
     calcTexCoords();
 	
 	if ( u_unfolding )
-	{
-	   float M_PI = 3.1415926535897932384626433832795;
-	
-	   vec3 newPos = a_position;
-	   
-	   float r = sqrt( ( ( newPos.x - u_unfolding_barycenter.x ) * ( newPos.x - u_unfolding_barycenter.x ) ) + ( ( newPos.y - u_unfolding_barycenter.y ) * ( newPos.y - u_unfolding_barycenter.y ) ) );
-	   float a = atan( newPos.y - u_unfolding_barycenter.y, newPos.x - u_unfolding_barycenter.x );
-	   float d = 0.0;
-	   if ( u_unfolding_theta > 0.00001 )
-	   {
-	       d  = ( M_PI * r ) * sin( u_unfolding_theta ) / u_unfolding_theta;
-	   }
-	   else
-	   {
-	       d = M_PI * r;
-	   }
-	   float b = u_unfolding_theta * a / M_PI;
-	   newPos.x = r - d * cos( b );
-	   newPos.y = d * sin( b );
-	      
-	   v_position = mvp_matrix * userTransformMatrix * vec4( newPos, 1.0 );
-       gl_Position = v_position;
-	}
-	else
-	{
+    {
+        float M_PI = 3.1415926535897932384626433832795;
+    
+        vec3 newPos = a_position;
+      
+        float x1 = newPos.x - u_unfolding_barycenter.x;
+        float y1 = newPos.y - u_unfolding_barycenter.y;
+        float z1 = newPos.z - u_unfolding_barycenter.z;
+
+       //float r = sqrt(  ( x1 * x1 ) + ( y1 * y1  ) );
+       //float a = atan( y1, x1 );
+
+       //float r = sqrt(  ( x1 * x1 ) + ( z1 * z1  ) );
+       //float a = atan( z1, x1 );
+       
+
+       //float r = sqrt(  ( y1 * y1 ) + ( x1 * x1  ) );
+       //float a = atan( x1, y1 );
+
+       //float r = sqrt(  ( y1 * y1 ) + ( z1 * z1  ) );
+       //float a = atan( z1, y1 );
+
+       // toll
+       float r = sqrt(  ( z1 * z1 ) + ( x1 * x1  ) );
+       float a = atan( x1, z1 );
+       if ( u_unfolding_neg )
+       {
+            a = atan( -x1, -z1 );
+       }
+       
+
+       //float r = sqrt(  ( z1 * z1 ) + ( y1 * y1  ) );
+       //float a = atan( y1, z1 );
+
+
+        float r1 = r * ( a / M_PI );
+        float a1 = ( a / M_PI ) * u_unfolding_theta;
+       
+        float d1 = 0.0;
+        if ( abs( a1 ) > 0.00001 )
+        {
+            d1 = M_PI * r1 * sin( a1 ) / a1; 
+        }
+        else
+        {
+            d1 = M_PI * r1;
+        }       
+       
+
+        float x2 = r - d1 * sin( a1 );
+        float y2 = newPos.y;
+        float z2 = d1 * cos( a1 );
+          
+        v_position = mvp_matrix * userTransformMatrix * vec4( x2, y2, z2, 1.0 );
+        gl_Position = v_position;
+    }
+    else
+    {
         v_position = mvp_matrix * userTransformMatrix * vec4( a_position, 1.0 );
         gl_Position = v_position;
     }

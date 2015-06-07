@@ -68,3 +68,4 @@ uniform vec3 u_unfolding_barycenter;
 uniform float u_unfolding_max_height;
 uniform float u_unfolding_max_radius;
 uniform float u_unfolding_theta;
+uniform bool u_unfolding_neg;
