@@ -130,6 +130,7 @@ void FiberRenderer::draw( QMatrix4x4 p_matrix, QMatrix4x4 mv_matrix, int width, 
     program->setUniformValue( "u_unfolding_max_radius", props.get( Fn::Property::D_UNFOLDING_MAX_RADIUS ).toFloat() );
     program->setUniformValue( "u_unfolding_max_height", props.get( Fn::Property::D_UNFOLDING_MAX_HEIGHT ).toFloat() );
     program->setUniformValue( "u_unfolding_theta", props.get( Fn::Property::D_UNFOLDING_THETA ).toFloat() );
+    program->setUniformValue( "u_unfolding_neg", props.get( Fn::Property::D_UNFOLDING_NEG ).toBool() );
 
     glLineWidth( props.get( Fn::Property::D_FIBER_THICKNESS ).toFloat() );
 

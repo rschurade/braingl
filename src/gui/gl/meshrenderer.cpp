@@ -263,6 +263,7 @@ void MeshRenderer::setRenderParams( PropertyGroup& props )
         m_mMatrix.rotate( props.get( Fn::Property::D_ROTATE_X ).toFloat(), 1.0, 0.0, 0.0 );
         m_mMatrix.rotate( props.get( Fn::Property::D_ROTATE_Y ).toFloat(), 0.0, 1.0, 0.0 );
         m_mMatrix.rotate( props.get( Fn::Property::D_ROTATE_Z ).toFloat(), 0.0, 0.0, 1.0 );
+        qDebug() << m_mMatrix;
         m_mMatrix.scale( props.get( Fn::Property::D_SCALE_X ).toFloat(),
                           props.get( Fn::Property::D_SCALE_Y ).toFloat(),
                           props.get( Fn::Property::D_SCALE_Z ).toFloat() );
