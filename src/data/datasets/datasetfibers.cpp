@@ -137,7 +137,7 @@ void DatasetFibers::createProps()
     m_properties["maingl"].createFloat( Fn::Property::D_MATERIAL_SHININESS, 2.0f, 0.0f, 200.0f, "light" );
 
     m_properties["maingl"].createBool( Fn::Property::D_UNFOLDING_ACTIVE, false, "art" );
-    m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_THETA,   0.0f, 0.0f, 3.14f, "art" );
+    m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_THETA,   1.57f, 0.0f, 3.14f, "art" );
     m_properties["maingl"].createVector( Fn::Property::D_UNFOLDING_BARYCENTER, QVector3D( 0, 0, 0 ), "art" );
     m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_MAX_HEIGHT, 0.0f, -1000.f, 1000.f, "art" );
     m_properties["maingl"].createFloat( Fn::Property::D_UNFOLDING_MAX_RADIUS, 0.0f, -1000.f, 1000.f, "art" );
