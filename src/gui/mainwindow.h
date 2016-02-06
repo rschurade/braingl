@@ -15,6 +15,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QTcpServer>
+#include <QThread>
 
 class ColormapEditWidget;
 class Dataset;
@@ -79,6 +80,8 @@ private:
     bool m_debug;
 
     QMainWindow* m_centralWidget;
+
+    QMutex m_mutex;
 
     GLWidget* mainGLWidget;
     GLWidget* mainGLWidget2;
@@ -161,6 +164,11 @@ private:
     QFileDialog* fd;
 
     static int countMainGL;
+
+    QStringList netinput1;
+    QStringList netinput2;
+
+    int m_countNoMT1U;
 
 public slots:
     void screenshot( bool exitAfter = false );

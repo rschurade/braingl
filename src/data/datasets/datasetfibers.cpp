@@ -25,6 +25,8 @@
 
 #include "../../io/loadervtk.h"
 
+#include "math.h"
+
 DatasetFibers::DatasetFibers( QDir filename, Fn::DatasetType type ) :
     Dataset( filename, type ),
     m_kdVerts( 0 ),

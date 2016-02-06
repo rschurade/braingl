@@ -69,7 +69,8 @@ int MainWindow::countMainGL = 2;
 
 MainWindow::MainWindow( bool debug, bool resetSettings ) :
 	QMainWindow(),
-    m_debug( debug )
+    m_debug( debug ),
+    m_countNoMT1U( 0 )
 {
     setDockOptions( QMainWindow::AnimatedDocks |  QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks | QMainWindow::VerticalTabs );
 
@@ -1709,12 +1710,126 @@ void MainWindow::receiveTCP()
 
 void MainWindow::readTCP()
 {
+    QMutexLocker lock( &m_mutex );
     QString stuff = m_clientConnection->readAll();
-    qDebug() << stuff;
-    QStringList sl = stuff.split( " " );
-    float x = sl.at(0).toFloat();
+    QStringList inp = stuff.split( '#' );
+    int id;
+    for ( auto i = 0; i < inp.size(); ++i )    
+    {
+        qDebug() << inp[i];
+        QStringList tmp = inp[i].split( ' ' );
+        id = tmp.at( 0 ).toInt();
+        if ( id == 1 ) netinput1 = tmp;
+        else if ( id == 2 ) netinput2 = tmp;
+    }
+    if ( netinput1.size() >= 5 )
+    {
+        QString mt1u = netinput1.at( 4 );
+        if ( mt1u == "true" )
+        {
+            m_countNoMT1U = 0;
+            Models::getDataset( 0 )->properties().set( Fn::Property::D_ACTIVE, false );
+            Models::getDataset( 1 )->properties().set( Fn::Property::D_ACTIVE, true );
+            Models::setROIProp( 0, 0, Fn::Property::D_ACTIVE, true );
+            Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, true );
+            int length = Models::getDataset( 1 )->properties().get( Fn::Property::D_FIBER_GROW_LENGTH ).toInt();
+            length += 5;
+            if ( length > 370 ) length = 0;
+            Models::getDataset( 1 )->properties().set( Fn::Property::D_FIBER_GROW_LENGTH, length );
 
-    Models::setGlobal( Fn::Property::G_SAGITTAL, x );
+        }
+        else
+        {
+            ++m_countNoMT1U;
+        }
 
-    Models::g()->submit();
+        if ( m_countNoMT1U > 50 )
+        {
+            Models::getDataset( 0 )->properties().set( Fn::Property::D_ACTIVE, true );
+            Models::getDataset( 1 )->properties().set( Fn::Property::D_ACTIVE, false );
+            Models::setROIProp( 0, 0, Fn::Property::D_ACTIVE, false );
+            Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, false );
+        }
+    }
+    
+    float x, y, z;
+    
+    if ( netinput1.size() >= 4 )
+    {    
+        id = netinput1.at(0).toInt();
+        if ( id < 1 && id > 2 ) return;
+        x = netinput1.at(1).toFloat();
+        y = netinput1.at(2).toFloat();
+        z = netinput1.at(3).toFloat();
+
+        ROI* roi = Models::getRoi( 0, id - 1 );
+        
+
+        float oldX = roi->properties()->get( Fn::Property::D_X ).toFloat(); //Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+        float oldY = roi->properties()->get( Fn::Property::D_Y ).toFloat(); //Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+        float oldZ = roi->properties()->get( Fn::Property::D_Z ).toFloat(); //Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+        float newX = oldX;
+        float newY = oldY;
+        float newZ = oldZ;
+
+        // accounting for big steps as well
+        if ( x > oldX + 2 ) newX = oldX + sqrt( x - oldX );
+        else if ( x < oldX - 2 ) newX  = oldX - sqrt( oldX - x );
+        if ( y > oldY + 2 ) newY = oldY + sqrt( y - oldY );
+        else if ( y < oldY - 2 ) newY = oldY - sqrt( oldY - y );
+        if ( z > oldZ + 2 ) newZ = oldZ + sqrt( z - oldZ );
+        else if ( z < oldZ - 2 ) newZ = oldZ - sqrt( oldZ - z );
+
+        qDebug() << id << "###" << newX << " " << newY << " " << newZ;
+
+        
+        Models::setROIProp( 0, id - 1, Fn::Property::D_X, newX );
+        Models::setROIProp( 0, id - 1, Fn::Property::D_Y, newY );
+        Models::setROIProp( 0, id - 1, Fn::Property::D_Z, newZ );
+
+        Models::setGlobal( Fn::Property::G_SAGITTAL, newX );
+        Models::setGlobal( Fn::Property::G_CORONAL,  newY );
+        Models::setGlobal( Fn::Property::G_AXIAL,    newZ );
+    }
+
+    if ( netinput2.size() >= 4 )
+    {    
+        id = netinput2.at( 0 ).toInt();
+        if ( id < 1 && id > 2 ) return;
+        x = netinput2.at(1).toFloat();
+        y = netinput2.at(2).toFloat();
+        z = netinput2.at(3).toFloat();
+
+        ROI* roi = Models::getRoi( 0, id - 1 );
+        
+
+        float oldX = roi->properties()->get( Fn::Property::D_X ).toFloat(); //Models::getGlobal( Fn::Property::G_SAGITTAL ).toFloat();
+        float oldY = roi->properties()->get( Fn::Property::D_Y ).toFloat(); //Models::getGlobal( Fn::Property::G_CORONAL ).toFloat();
+        float oldZ = roi->properties()->get( Fn::Property::D_Z ).toFloat(); //Models::getGlobal( Fn::Property::G_AXIAL ).toFloat();
+
+        float newX = oldX;
+        float newY = oldY;
+        float newZ = oldZ;
+
+        // accounting for big steps as well
+        if ( x > oldX + 2 ) newX = oldX + sqrt( x - oldX );
+        else if ( x < oldX - 2 ) newX  = oldX - sqrt( oldX - x );
+        if ( y > oldY + 2 ) newY = oldY + sqrt( y - oldY );
+        else if ( y < oldY - 2 ) newY = oldY - sqrt( oldY - y );
+        if ( z > oldZ + 2 ) newZ = oldZ + sqrt( z - oldZ );
+        else if ( z < oldZ - 2 ) newZ = oldZ - sqrt( oldZ - z );
+
+        qDebug() << id << "###" << newX << " " << newY << " " << newZ;
+
+        
+        Models::setROIProp( 0, id - 1, Fn::Property::D_X, newX );
+        Models::setROIProp( 0, id - 1, Fn::Property::D_Y, newY );
+        Models::setROIProp( 0, id - 1, Fn::Property::D_Z, newZ );
+
+       
+    }
+
+
+     Models::g()->submit();
 }
