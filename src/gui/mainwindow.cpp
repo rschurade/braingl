@@ -1086,6 +1086,11 @@ void MainWindow::createActions()
     loadRoiAct->setStatusTip( tr( "Load a ROI from a Nifti file " ) );
     connect( loadRoiAct, SIGNAL( triggered() ), this, SLOT( loadRoi() ) );
 
+    fullScreenAct = new QAction( tr( "fullscreen mode" ), this );
+    fullScreenAct->setStatusTip( tr( "full screen mode" ) );
+    fullScreenAct->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+    connect( fullScreenAct, SIGNAL( triggered() ), this, SLOT( toggleFullScreen() ) );
+
     saveSceneAct = new QAction( tr( "Save Scene" ), this );
     saveSceneAct->setStatusTip( tr( "Save the current scene" ) );
     connect( saveSceneAct, SIGNAL( triggered() ), this, SLOT( saveScene() ) );
@@ -1224,6 +1229,9 @@ void MainWindow::createMenus()
     fileMenu->addAction( packAndGoAct );
     separatorAct = fileMenu->addSeparator();
 
+    fileMenu->addAction( fullScreenAct );
+    separatorAct = fileMenu->addSeparator();
+
     fileMenu->addAction( exportColormapsAct );
     fileMenu->addAction( importColormapsAct );
     separatorAct = fileMenu->addSeparator();
@@ -1291,7 +1299,7 @@ void MainWindow::createToolBars()
 
     m_toolsToolBar = new ToolBar( tr( "Tools" ), this );
     addToolBar( m_toolsToolBar );
-    
+
 }
 
 void MainWindow::createStatusBar()
@@ -1375,6 +1383,7 @@ void MainWindow::createDockWindows()
 
     // GL Widgets
     mainGLWidget = new GLWidget( "maingl", m_roiWidget->selectionModel() );
+    connect( mainGLWidget, SIGNAL( signalKeyPressed( int, Qt::KeyboardModifiers ) ), this, SLOT( onKeyPressed( int, Qt::KeyboardModifiers ) ) );
     FNDockWidget* dockMainGL = new FNDockWidget( QString( "main gl" ), mainGLWidget, this );
     m_centralWidget->addDockWidget( Qt::LeftDockWidgetArea, dockMainGL );
     connect( lockDockTitlesAct, SIGNAL( triggered() ), dockMainGL, SLOT( toggleTitleWidget() ) );
@@ -1696,6 +1705,52 @@ void MainWindow::newLabel()
 {
     DatasetLabel* g = new DatasetLabel();
     Models::addDataset( g );
+}
+
+void MainWindow::onKeyPressed( int key, Qt::KeyboardModifiers mods )
+{
+    if ( mods & Qt::ControlModifier )
+    {
+        switch( key )
+        {
+            case Qt::Key_F:
+            {
+                toggleFullScreen();
+            }
+        }
+    }
+}
+
+void MainWindow::toggleFullScreen()
+{
+    qDebug() << "toggle full screen";
+    if ( !mainGLWidget->isFullScreen() )
+    {
+        m_dockFlags = mainGLWidget->windowFlags();
+        m_styleSheet = mainGLWidget->styleSheet();
+        m_geometry = mainGLWidget->geometry();
+
+
+        mainGLWidget->setWindowFlags( Qt::Window );
+
+        mainGLWidget->setStyleSheet(
+          QString("QDockWidget{ border: 0px; color: #000099; background-color: black; margin: 0px; padding: 0px }") +
+          QString("QDockWidget::title{ text-align: center; background-color: black; padding: 0px; margin: 0px; }") +
+          QString("QDockWidget::close-button, QDockWidget::float-button { border: 0px solid black; background: black; padding: 0px; }") +
+          QString("QDockWidget::close-button:hover, QDockWidget::float-button:hover { background: gray; }") +
+          QString("QDockWidget::close-button:pressed, QDockWidget::float-button:pressed { padding: 1px -1px -1px 1px; }") );
+
+        mainGLWidget->showFullScreen();
+    }
+    else
+    {
+        // Reset from fullscreen:
+        mainGLWidget->setWindowFlags( m_dockFlags );
+        mainGLWidget->setStyleSheet( m_styleSheet );
+        mainGLWidget->setGeometry( m_geometry );
+
+        mainGLWidget->show();
+    }
 }
 
 void MainWindow::receiveTCP()

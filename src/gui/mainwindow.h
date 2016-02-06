@@ -158,9 +158,15 @@ private:
 
     QAction* dilbertAct;
 
+    QAction* fullScreenAct;
+
     QFileDialog* fd;
 
     static int countMainGL;
+
+    Qt::WindowFlags m_dockFlags;
+    QString m_styleSheet;
+    QRect m_geometry;
 
 public slots:
     void screenshot( bool exitAfter = false );
@@ -202,6 +208,10 @@ private slots:
     void newPlane();
     void newGuide();
     void newLabel();
+
+
+    void onKeyPressed( int key, Qt::KeyboardModifiers mods );
+    void toggleFullScreen();
 
     void receiveTCP();
     void readTCP();
