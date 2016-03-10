@@ -131,6 +131,7 @@ void FiberSelector::init( std::vector<Fib>& fibs )
 
 void FiberSelector::updatePresentRois()
 {
+    //qDebug() << "update present rois";
     int numBranches = Models::r()->rowCount( QModelIndex() );
 
     for ( int i = 0; i < numBranches; ++i )
@@ -156,6 +157,7 @@ void FiberSelector::updatePresentRois()
 
 void FiberSelector::roiChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight )
 {
+    //qDebug() << "roi changed";
     if ( topLeft.row() == -1 ) return;
 
     int branch = 0;

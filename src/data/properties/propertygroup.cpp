@@ -23,7 +23,8 @@
 
 #include <QDebug>
 
-PropertyGroup::PropertyGroup()
+PropertyGroup::PropertyGroup() :
+    m_silent( false )
 {
 }
 
@@ -549,8 +550,11 @@ QWidget* PropertyGroup::getWidget( Fn::Property name )
 
 void PropertyGroup::slotPropChanged()
 {
-    Models::d()->submit();
-    emit( signalPropChanged() );
+    if ( !m_silent )
+    {
+        //Models::d()->submit();
+        emit( signalPropChanged() );
+    }
 }
 
 int PropertyGroup::size() const

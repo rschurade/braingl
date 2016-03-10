@@ -37,7 +37,8 @@ GLWidget::GLWidget( QString name, QItemSelectionModel* roiSelectionModel, QWidge
     m_height( 0 ),
     m_doScreenshot( false ),
     m_exitAfterScreenshot( false ),
-    m_copyCameraMode( 0 )
+    m_copyCameraMode( 0 ),
+    m_dontrender( false )
 {
     m_arcBall = new ArcBall( 400, 400 );
     m_camera = new Camera( 400, 400 );
@@ -140,6 +141,10 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    if ( m_dontrender )
+    {
+        return;
+    }
     if ( m_doScreenshot )
     {
 //        if( Models::getGlobal( Fn::Property::G_SCREENSHOT_STEREOSCOPIC ).toBool() )
@@ -171,6 +176,7 @@ void GLWidget::paintGL()
     {
         if ( m_visible )
         {
+            //qDebug() << m_name << " redraw";
             m_sceneRenderer->draw( m_mvMatrix, m_pMatrix );
         }
     }

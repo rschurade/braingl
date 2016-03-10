@@ -75,10 +75,10 @@ public:
     void setState( QList<QVariant> state );
 
     void unsetTab( QString tab );
-
+    void setSilent( bool val ) { m_silent = val; }
 private:
     std::vector<QPair<Fn::Property, Property*> >m_properties;
-
+    bool m_silent;
 public slots:
     void slotPropChanged();
 

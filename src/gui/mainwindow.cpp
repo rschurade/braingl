@@ -124,7 +124,7 @@ MainWindow::MainWindow( bool debug, bool resetSettings ) :
     {
         connect( m_tcpServer, &QTcpServer::newConnection , this, &MainWindow::receiveTCP );
     }
-
+    m_timer.start();
 }
 
 void MainWindow::closeEvent( QCloseEvent *event )
@@ -1765,7 +1765,12 @@ void MainWindow::receiveTCP()
 
 void MainWindow::readTCP()
 {
-    QMutexLocker lock( &m_mutex );
+    //qDebug() << "timer: " << m_timer.elapsed();
+    m_timer.restart();
+
+    if ( !m_mutex.tryLock() ) return;
+    mainGLWidget->setDontRender( true );
+    //QMutexLocker lock( &m_mutex );
     QString stuff = m_clientConnection->readAll();
     QStringList inp = stuff.split( '#' );
     int id;
@@ -1806,7 +1811,8 @@ void MainWindow::readTCP()
             Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, false );
         }
     }
-    
+    //qDebug() << "timer1: " << m_timer.elapsed();
+    m_timer.restart();
     float x, y, z;
     
     if ( netinput1.size() >= 4 )
@@ -1838,16 +1844,20 @@ void MainWindow::readTCP()
 
         qDebug() << id << "###" << newX << " " << newY << " " << newZ;
 
-        
-        Models::setROIProp( 0, id - 1, Fn::Property::D_X, newX );
-        Models::setROIProp( 0, id - 1, Fn::Property::D_Y, newY );
-        Models::setROIProp( 0, id - 1, Fn::Property::D_Z, newZ );
+        //qDebug() << "timer1.5: " << m_timer.elapsed();
+    m_timer.restart();
+        roi->properties()->setSilent( true );
+        roi->properties()->set( Fn::Property::D_X, newX );
+        roi->properties()->set( Fn::Property::D_Y, newY );
+        roi->properties()->setSilent( false );
+        roi->properties()->set( Fn::Property::D_Z, newZ );
 
         Models::setGlobal( Fn::Property::G_SAGITTAL, newX );
         Models::setGlobal( Fn::Property::G_CORONAL,  newY );
         Models::setGlobal( Fn::Property::G_AXIAL,    newZ );
     }
-
+//qDebug() << "timer2: " << m_timer.elapsed();
+    m_timer.restart();
     if ( netinput2.size() >= 4 )
     {    
         id = netinput2.at( 0 ).toInt();
@@ -1878,13 +1888,20 @@ void MainWindow::readTCP()
         qDebug() << id << "###" << newX << " " << newY << " " << newZ;
 
         
-        Models::setROIProp( 0, id - 1, Fn::Property::D_X, newX );
-        Models::setROIProp( 0, id - 1, Fn::Property::D_Y, newY );
-        Models::setROIProp( 0, id - 1, Fn::Property::D_Z, newZ );
+        roi->properties()->setSilent( true );
+        roi->properties()->set( Fn::Property::D_X, newX );
+        roi->properties()->set( Fn::Property::D_Y, newY );
+        roi->properties()->setSilent( false );
+        roi->properties()->set( Fn::Property::D_Z, newZ );
 
        
     }
-
-
-     Models::g()->submit();
+//qDebug() << "timer3: " << m_timer.elapsed();
+    m_timer.restart();
+    mainGLWidget->setDontRender( false );
+    mainGLWidget->update();
+     Models::r()->submit();
+ //    qDebug() << "timer4: " << m_timer.elapsed();
+    m_timer.restart();
+     m_mutex.unlock();
 }

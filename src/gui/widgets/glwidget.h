@@ -41,6 +41,8 @@ public:
 
     void getCameraParametersFromModelviewMatrix( QVector3D &eyepos,  QVector3D &viewdir, QVector3D &updir );
 
+    void setDontRender( bool value ) { m_dontrender = value; }
+
 private:
     QString m_name;
 
@@ -73,6 +75,8 @@ private:
     QString m_screenshotFileName;
 
     int m_copyCameraMode;
+
+    bool m_dontrender;
 
     void calcMVPMatrix();
 

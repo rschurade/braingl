@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QTcpServer>
 #include <QThread>
+#include <QElapsedTimer>
 
 class ColormapEditWidget;
 class Dataset;
@@ -171,6 +172,8 @@ private:
     QStringList netinput2;
 
     int m_countNoMT1U;
+
+    QElapsedTimer m_timer;
 
     Qt::WindowFlags m_dockFlags;
     QString m_styleSheet;
