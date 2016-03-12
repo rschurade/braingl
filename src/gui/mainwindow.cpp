@@ -1792,6 +1792,8 @@ void MainWindow::readTCP()
             Models::getDataset( 1 )->properties().set( Fn::Property::D_ACTIVE, true );
             Models::setROIProp( 0, 0, Fn::Property::D_ACTIVE, true );
             Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, true );
+            //if you run the code with anatomy + ROI + fibers (and not just anatomy)
+            Models::setROIProp( 0, 0, Fn::Property::D_STICK_TO_CROSSHAIR, false );
             int length = Models::getDataset( 1 )->properties().get( Fn::Property::D_FIBER_GROW_LENGTH ).toInt();
             length += 5;
             if ( length > 370 ) length = 0;
@@ -1803,11 +1805,25 @@ void MainWindow::readTCP()
             ++m_countNoMT1U;
         }
 
+        
+        //if you just want to walk the anatomy uncomment these lines of code
+        /*
         if ( m_countNoMT1U > 50 )
         {
             Models::getDataset( 0 )->properties().set( Fn::Property::D_ACTIVE, true );
             Models::getDataset( 1 )->properties().set( Fn::Property::D_ACTIVE, false );
             Models::setROIProp( 0, 0, Fn::Property::D_ACTIVE, false );
+            Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, false );
+        }
+        */
+
+        //if you want to walk anatomy + ROI with fibers
+        if ( m_countNoMT1U > 50 )
+        {
+            Models::getDataset( 0 )->properties().set( Fn::Property::D_ACTIVE, true );
+            Models::getDataset( 1 )->properties().set( Fn::Property::D_ACTIVE, true );
+            Models::setROIProp( 0, 0, Fn::Property::D_ACTIVE, true );
+            Models::setROIProp( 0, 0, Fn::Property::D_STICK_TO_CROSSHAIR, true );
             Models::setROIProp( 0, 1, Fn::Property::D_ACTIVE, false );
         }
     }
